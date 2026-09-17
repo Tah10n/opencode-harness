@@ -1,0 +1,35 @@
+diff --git a/packages/material-ui/src/Select/Select.test.js b/packages/material-ui/src/Select/Select.test.js
+index fc559858e90997e565f1ce3168f7b767f93f16c0..0eae8dc1e2e041ba378799867cdea989542079d6 100644
+--- a/packages/material-ui/src/Select/Select.test.js
++++ b/packages/material-ui/src/Select/Select.test.js
+@@ -408,8 +408,7 @@ describe('<Select />', () => {
+     it('it will fallback to its content for the accessible name when it has no name', () => {
+       const { getByRole } = render(<Select value="" />);
+ 
+-      // TODO what is the accessible name actually?
+-      expect(getByRole('button')).to.have.attribute('aria-labelledby', ' ');
++      expect(getByRole('button')).not.to.have.attribute('aria-labelledby');
+     });
+ 
+     it('is labelled by itself when it has a name', () => {
+diff --git a/packages/material-ui/src/Select/SelectInput.js b/packages/material-ui/src/Select/SelectInput.js
+index 4bc58297fae498c38256db604b88e8bd3c831074..1d15427a6e46ac9843f8fe7b56209d05d621323f 100644
+--- a/packages/material-ui/src/Select/SelectInput.js
++++ b/packages/material-ui/src/Select/SelectInput.js
+@@ -305,6 +305,7 @@ const SelectInput = React.forwardRef(function SelectInput(props, ref) {
+   }
+ 
+   const buttonId = SelectDisplayProps.id || (name ? `mui-component-select-${name}` : undefined);
++  const ariaLabelledby = labelId || buttonId ? `${labelId || ''} ${buttonId || ''}` : undefined;
+ 
+   return (
+     <React.Fragment>
+@@ -324,7 +325,7 @@ const SelectInput = React.forwardRef(function SelectInput(props, ref) {
+         tabIndex={tabIndex}
+         role="button"
+         aria-expanded={open ? 'true' : undefined}
+-        aria-labelledby={`${labelId || ''} ${buttonId || ''}`}
++        aria-labelledby={ariaLabelledby}
+         aria-haspopup="listbox"
+         onKeyDown={handleKeyDown}
+         onMouseDown={disabled || readOnly ? null : handleMouseDown}

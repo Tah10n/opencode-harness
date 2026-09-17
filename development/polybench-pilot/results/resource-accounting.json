@@ -1,0 +1,495 @@
+{
+  "coder__code-server-4923-baseline-accounting.json": {
+    "elapsed_seconds": 44.84392309188843,
+    "exit_code": 0
+  },
+  "coder__code-server-4923-gold-accounting.json": {
+    "elapsed_seconds": 46.527647972106934,
+    "exit_code": 0
+  },
+  "coder__code-server-4923-pull-accounting.json": {
+    "elapsed_seconds": 560.4931440353394,
+    "exit_code": 0,
+    "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.coder__code-server-4923:v1.1"
+  },
+  "microsoft__vscode-136347-gold-accounting.json": {
+    "elapsed_seconds": 429.182000875473,
+    "exit_code": 0
+  },
+  "microsoft__vscode-136347-pull-accounting.json": {
+    "elapsed_seconds": 677.395665884018,
+    "exit_code": 0,
+    "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-136347:v1.1"
+  },
+  "mui__material-ui-17301-baseline-accounting.json": {
+    "elapsed_seconds": 22.375597715377808,
+    "exit_code": 0
+  },
+  "mui__material-ui-17301-gold-accounting.json": {
+    "elapsed_seconds": 25.681301832199097,
+    "exit_code": 0
+  },
+  "mui__material-ui-17301-pull-accounting.json": {
+    "elapsed_seconds": 324.7166929244995,
+    "exit_code": 0,
+    "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-17301:v1.1"
+  },
+  "mui__material-ui-18141-baseline-accounting.json": {
+    "elapsed_seconds": 21.252387046813965,
+    "exit_code": 0
+  },
+  "mui__material-ui-18141-gold-accounting.json": {
+    "elapsed_seconds": 23.818171977996826,
+    "exit_code": 0
+  },
+  "mui__material-ui-18141-pull-accounting.json": {
+    "elapsed_seconds": 335.87341809272766,
+    "exit_code": 0,
+    "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-18141:v1.1"
+  },
+  "scripted-preparation-accounting.json": {
+    "scripted_runs_with_request_records": 53,
+    "scripted_requests": 314,
+    "records": [
+      {
+        "preflight": "preflight-final-mui__material-ui-18141",
+        "run": "mui__material-ui-18141-P",
+        "scripted_requests": 5,
+        "elapsed_ms": 11499,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-mui__material-ui-18141",
+        "run": "mui__material-ui-18141-H0",
+        "scripted_requests": 7,
+        "elapsed_ms": 79008,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-mui__material-ui-18141",
+        "run": "mui__material-ui-18141-H1",
+        "scripted_requests": 7,
+        "elapsed_ms": 73880,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-coder__code-server-4923-lfs-failure",
+        "run": "coder__code-server-4923-P",
+        "scripted_requests": 5,
+        "elapsed_ms": 5424,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-coder__code-server-4923-lfs-failure",
+        "run": "coder__code-server-4923-H0",
+        "scripted_requests": 3,
+        "elapsed_ms": null,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-serverless__serverless-6534",
+        "run": "serverless__serverless-6534-P",
+        "scripted_requests": 5,
+        "elapsed_ms": 7662,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-serverless__serverless-6534",
+        "run": "serverless__serverless-6534-H1",
+        "scripted_requests": 7,
+        "elapsed_ms": 40264,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-serverless__serverless-6534",
+        "run": "serverless__serverless-6534-H0",
+        "scripted_requests": 7,
+        "elapsed_ms": 38608,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-coder__code-server-4923-copy-timeout",
+        "run": "coder__code-server-4923-P",
+        "scripted_requests": 0,
+        "elapsed_ms": null,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "scripted-preflight-6",
+        "run": "serverless__serverless-2434-H1",
+        "scripted_requests": 7,
+        "elapsed_ms": 37218,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "scripted-preflight-6",
+        "run": "serverless__serverless-2434-H0",
+        "scripted_requests": 7,
+        "elapsed_ms": 36392,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "scripted-preflight-6",
+        "run": "serverless__serverless-2434-P",
+        "scripted_requests": 5,
+        "elapsed_ms": 8453,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-serverless__serverless-6842",
+        "run": "serverless__serverless-6842-P",
+        "scripted_requests": 5,
+        "elapsed_ms": 7562,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-serverless__serverless-6842",
+        "run": "serverless__serverless-6842-H1",
+        "scripted_requests": 7,
+        "elapsed_ms": 49319,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-serverless__serverless-6842",
+        "run": "serverless__serverless-6842-H0",
+        "scripted_requests": 7,
+        "elapsed_ms": 38041,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "scripted-preflight-8",
+        "run": "serverless__serverless-2434-H1",
+        "scripted_requests": 7,
+        "elapsed_ms": 35643,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "scripted-preflight-8",
+        "run": "serverless__serverless-2434-H0",
+        "scripted_requests": 7,
+        "elapsed_ms": 33630,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "scripted-preflight-8",
+        "run": "serverless__serverless-2434-P",
+        "scripted_requests": 5,
+        "elapsed_ms": 8241,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-sveltejs__svelte-5452",
+        "run": "sveltejs__svelte-5452-H1",
+        "scripted_requests": 7,
+        "elapsed_ms": 46626,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-sveltejs__svelte-5452",
+        "run": "sveltejs__svelte-5452-H0",
+        "scripted_requests": 7,
+        "elapsed_ms": 43028,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-sveltejs__svelte-5452",
+        "run": "sveltejs__svelte-5452-P",
+        "scripted_requests": 5,
+        "elapsed_ms": 11692,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "scripted-preflight-7",
+        "run": "serverless__serverless-2434-H1",
+        "scripted_requests": 7,
+        "elapsed_ms": 36147,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "scripted-preflight-7",
+        "run": "serverless__serverless-2434-H0",
+        "scripted_requests": 7,
+        "elapsed_ms": 34466,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "scripted-preflight-7",
+        "run": "serverless__serverless-2434-P",
+        "scripted_requests": 5,
+        "elapsed_ms": 9316,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-mui__material-ui-17301",
+        "run": "mui__material-ui-17301-P",
+        "scripted_requests": 5,
+        "elapsed_ms": 10248,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-mui__material-ui-17301",
+        "run": "mui__material-ui-17301-H0",
+        "scripted_requests": 7,
+        "elapsed_ms": 63626,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-mui__material-ui-17301",
+        "run": "mui__material-ui-17301-H1",
+        "scripted_requests": 7,
+        "elapsed_ms": 61031,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-serverless__serverless-2434",
+        "run": "serverless__serverless-2434-H1",
+        "scripted_requests": 7,
+        "elapsed_ms": 39906,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-serverless__serverless-2434",
+        "run": "serverless__serverless-2434-H0",
+        "scripted_requests": 7,
+        "elapsed_ms": 42136,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-serverless__serverless-2434",
+        "run": "serverless__serverless-2434-P",
+        "scripted_requests": 5,
+        "elapsed_ms": 10042,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-coder__code-server-4923-before-vendor",
+        "run": "coder__code-server-4923-P",
+        "scripted_requests": 5,
+        "elapsed_ms": 5380,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-coder__code-server-4923-before-vendor",
+        "run": "coder__code-server-4923-H1",
+        "scripted_requests": 7,
+        "elapsed_ms": 72585,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-coder__code-server-4923-before-vendor",
+        "run": "coder__code-server-4923-H0",
+        "scripted_requests": 7,
+        "elapsed_ms": 66775,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-sveltejs__svelte-1190",
+        "run": "sveltejs__svelte-1190-P",
+        "scripted_requests": 5,
+        "elapsed_ms": 10750,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-sveltejs__svelte-1190",
+        "run": "sveltejs__svelte-1190-H0",
+        "scripted_requests": 7,
+        "elapsed_ms": 44241,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-sveltejs__svelte-1190",
+        "run": "sveltejs__svelte-1190-H1",
+        "scripted_requests": 7,
+        "elapsed_ms": 44456,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-microsoft__vscode-136347",
+        "run": "microsoft__vscode-136347-H0",
+        "scripted_requests": 7,
+        "elapsed_ms": 36360,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-microsoft__vscode-136347",
+        "run": "microsoft__vscode-136347-H1",
+        "scripted_requests": 7,
+        "elapsed_ms": 42946,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-microsoft__vscode-136347",
+        "run": "microsoft__vscode-136347-P",
+        "scripted_requests": 5,
+        "elapsed_ms": 6985,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "scripted-preflight-5",
+        "run": "serverless__serverless-2434-H1",
+        "scripted_requests": 7,
+        "elapsed_ms": 36635,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "scripted-preflight-5",
+        "run": "serverless__serverless-2434-H0",
+        "scripted_requests": 7,
+        "elapsed_ms": 34620,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "scripted-preflight-5",
+        "run": "serverless__serverless-2434-P",
+        "scripted_requests": 5,
+        "elapsed_ms": 8021,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "scripted-preflight-2",
+        "run": "serverless__serverless-2434-P",
+        "scripted_requests": 2,
+        "elapsed_ms": 2496,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-mui__material-ui-20356",
+        "run": "mui__material-ui-20356-P",
+        "scripted_requests": 5,
+        "elapsed_ms": 11081,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-mui__material-ui-20356",
+        "run": "mui__material-ui-20356-H1",
+        "scripted_requests": 7,
+        "elapsed_ms": 85549,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-mui__material-ui-20356",
+        "run": "mui__material-ui-20356-H0",
+        "scripted_requests": 7,
+        "elapsed_ms": 84344,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-coder__code-server-4923",
+        "run": "coder__code-server-4923-P",
+        "scripted_requests": 5,
+        "elapsed_ms": 6538,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-coder__code-server-4923",
+        "run": "coder__code-server-4923-H1",
+        "scripted_requests": 7,
+        "elapsed_ms": 70504,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "preflight-final-coder__code-server-4923",
+        "run": "coder__code-server-4923-H0",
+        "scripted_requests": 7,
+        "elapsed_ms": 70782,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "scripted-preflight-3",
+        "run": "serverless__serverless-2434-H1",
+        "scripted_requests": 7,
+        "elapsed_ms": 34905,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "scripted-preflight-3",
+        "run": "serverless__serverless-2434-H0",
+        "scripted_requests": 7,
+        "elapsed_ms": 32143,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "scripted-preflight-3",
+        "run": "serverless__serverless-2434-P",
+        "scripted_requests": 5,
+        "elapsed_ms": 8175,
+        "real_provider_requests": 0
+      },
+      {
+        "preflight": "scripted-preflight-4",
+        "run": "serverless__serverless-2434-P",
+        "scripted_requests": 0,
+        "elapsed_ms": null,
+        "real_provider_requests": 0
+      }
+    ],
+    "real_provider_requests": 0,
+    "duration_note": "Only saved run elapsed values are known; absent durations remain unknown. Fake usage values are not model consumption."
+  },
+  "serverless__serverless-6534-baseline-accounting.json": {
+    "elapsed_seconds": 14.37551999092102,
+    "exit_code": 0
+  },
+  "serverless__serverless-6534-gold-accounting.json": {
+    "elapsed_seconds": 15.915515184402466,
+    "exit_code": 0
+  },
+  "serverless__serverless-6534-pull-accounting.json": {
+    "elapsed_seconds": 48.034594774246216,
+    "exit_code": 0,
+    "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6534:v1.1"
+  },
+  "serverless__serverless-6842-baseline-accounting.json": {
+    "elapsed_seconds": 14.459559917449951,
+    "exit_code": 0
+  },
+  "serverless__serverless-6842-gold-accounting.json": {
+    "elapsed_seconds": 16.10464096069336,
+    "exit_code": 0
+  },
+  "serverless__serverless-6842-pull-accounting.json": {
+    "elapsed_seconds": 48.19712424278259,
+    "exit_code": 0,
+    "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6842:v1.1"
+  },
+  "sveltejs__svelte-1190-baseline-accounting.json": {
+    "elapsed_seconds": 122.23684620857239,
+    "exit_code": 0
+  },
+  "sveltejs__svelte-1190-gold-accounting.json": {
+    "elapsed_seconds": 122.99003005027771,
+    "exit_code": 0
+  },
+  "sveltejs__svelte-1190-pull-accounting.json": {
+    "elapsed_seconds": 59.21214699745178,
+    "exit_code": 0,
+    "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1190:v1.1"
+  },
+  "sveltejs__svelte-5452-baseline-accounting.json": {
+    "elapsed_seconds": 82.70857620239258,
+    "exit_code": 0
+  },
+  "sveltejs__svelte-5452-gold-accounting.json": {
+    "elapsed_seconds": 88.30774188041687,
+    "exit_code": 0
+  },
+  "sveltejs__svelte-5452-pull-accounting.json": {
+    "elapsed_seconds": 89.81392884254456,
+    "exit_code": 0,
+    "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-5452:v1.1"
+  },
+  "H0-evaluation-process.json": {
+    "exit_code": 0,
+    "elapsed_seconds": 72.82790207862854
+  },
+  "H1-evaluation-process.json": {
+    "exit_code": 0,
+    "elapsed_seconds": 151.79328680038452
+  },
+  "P-evaluation-process.json": {
+    "exit_code": 0,
+    "elapsed_seconds": 149.93758702278137
+  },
+  "money": null,
+  "unrecorded_duration": "Unknown; absent preparation/scripted durations are not zero."
+}

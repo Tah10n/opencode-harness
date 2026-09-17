@@ -1,0 +1,145 @@
+diff --git a/docs/providers/aws/guide/iam.md b/docs/providers/aws/guide/iam.md
+index f08eef33c1259dc765eed8c8ccbe2a123a6b7cf9..e255b5a6bdd14e4f057eddc23def8996ff31d7ca 100644
+--- a/docs/providers/aws/guide/iam.md
++++ b/docs/providers/aws/guide/iam.md
+@@ -22,6 +22,8 @@ By default, one IAM Role is shared by all of the Lambda functions in your servic
+ 
+ To add specific rights to this service-wide Role, define statements in `provider.iamRoleStatements` which will be merged into the generated policy. As those statements will be merged into the CloudFormation template, you can use `Join`, `Ref` or any other CloudFormation method or feature.
+ 
++Each statement must define `Effect`, and either `Action` or `NotAction`, and either `Resource` or `NotResource`.
++
+ ```yml
+ service: new-service
+ 
+@@ -47,6 +49,18 @@ provider:
+             - '/*'
+ ```
+ 
++For example, `NotResource` can be used to allow an action for all resources except those matching a pattern:
++
++```yml
++provider:
++  name: aws
++  iamRoleStatements:
++    - Effect: 'Allow'
++      Action:
++        - 'sns:Publish'
++      NotResource: 'arn:aws:sns:*:*:*'
++```
++
+ Alongside `provider.iamRoleStatements` managed policies can also be added to this service-wide Role, define managed policies in `provider.iamManagedPolicies`. These will also be merged into the generated IAM Role so you can use `Join`, `Ref` or any other CloudFormation method or feature here too.
+ 
+ ```yml
+diff --git a/lib/plugins/aws/package/lib/mergeIamTemplates.js b/lib/plugins/aws/package/lib/mergeIamTemplates.js
+index 2d97671ad03cae1456642b4c6eb20bd683c04355..1d912b8228e2534995bb048b4e40c6eae3a53f0c 100644
+--- a/lib/plugins/aws/package/lib/mergeIamTemplates.js
++++ b/lib/plugins/aws/package/lib/mergeIamTemplates.js
+@@ -182,8 +182,8 @@ module.exports = {
+   },
+ 
+   validateStatements(statements) {
+-    // Verify that iamRoleStatements (if present) is an array of { Effect: ...,
+-    // Action: ..., Resource: ... } objects.
++    // Verify that iamRoleStatements (if present) is an array of objects with
++    // Effect and either Action or NotAction, and either Resource or NotResource.
+     if (!statements) {
+       return;
+     }
+@@ -192,9 +192,13 @@ module.exports = {
+       violationsFound = 'it is not an array';
+     } else {
+       const descriptions = statements.map((statement, i) => {
+-        const missing = ['Effect', 'Action', 'Resource'].filter(
+-          prop => statement[prop] === undefined
+-        );
++        const missing = ['Effect'].filter(prop => statement[prop] === undefined);
++        if (statement.Action === undefined && statement.NotAction === undefined) {
++          missing.push('Action or NotAction');
++        }
++        if (statement.Resource === undefined && statement.NotResource === undefined) {
++          missing.push('Resource or NotResource');
++        }
+         return missing.length === 0
+           ? null
+           : `statement ${i} is missing the following properties: ${missing.join(', ')}`;
+@@ -208,7 +212,7 @@ module.exports = {
+     if (violationsFound) {
+       const errorMessage = [
+         'iamRoleStatements should be an array of objects,',
+-        ' where each object has Effect, Action, Resource fields.',
++        ' where each object has Effect, Action or NotAction, and Resource or NotResource fields.',
+         ` Specifically, ${violationsFound}`,
+       ].join('');
+       throw new this.serverless.classes.Error(errorMessage);
+diff --git a/lib/plugins/aws/package/lib/mergeIamTemplates.test.js b/lib/plugins/aws/package/lib/mergeIamTemplates.test.js
+index b7da9693183a35e8ab169c1a2ba5193641e84efe..55ff9a5c0e6cca349fbfda5dc016226c488d2b67 100644
+--- a/lib/plugins/aws/package/lib/mergeIamTemplates.test.js
++++ b/lib/plugins/aws/package/lib/mergeIamTemplates.test.js
+@@ -513,7 +513,7 @@ describe('#mergeIamTemplates()', () => {
+     ];
+ 
+     expect(() => awsPackage.mergeIamTemplates()).to.throw(
+-      'missing the following properties: Action'
++      'missing the following properties: Action or NotAction'
+     );
+   });
+ 
+@@ -526,7 +526,7 @@ describe('#mergeIamTemplates()', () => {
+     ];
+ 
+     expect(() => awsPackage.mergeIamTemplates()).to.throw(
+-      'missing the following properties: Resource'
++      'missing the following properties: Resource or NotResource'
+     );
+   });
+ 
+@@ -547,7 +547,7 @@ describe('#mergeIamTemplates()', () => {
+     ];
+ 
+     expect(() => awsPackage.mergeIamTemplates()).to.throw(
+-      /statement 0 is missing.*Resource; statement 2 is missing.*Effect, Action/
++      /statement 0 is missing.*Resource or NotResource; statement 2 is missing.*Effect, Action or NotAction/
+     );
+   });
+ 
+@@ -836,4 +836,40 @@ describe('#mergeIamTemplates()', () => {
+         );
+     });
+   });
++
++  it('should add custom IAM policy statements with NotAction and NotResource', () => {
++    awsPackage.serverless.service.provider.iamRoleStatements = [
++      {
++        Effect: 'Allow',
++        NotAction: ['iam:DeleteUser'],
++        Resource: '*',
++      },
++      {
++        Effect: 'Allow',
++        Action: ['sns:Publish'],
++        NotResource: 'arn:aws:sns:*:*:*',
++      },
++    ];
++
++    expect(awsPackage.serverless.service.provider.iamRoleStatements).to.deep.equal([
++      {
++        Effect: 'Allow',
++        NotAction: ['iam:DeleteUser'],
++        Resource: '*',
++      },
++      {
++        Effect: 'Allow',
++        Action: ['sns:Publish'],
++        NotResource: 'arn:aws:sns:*:*:*',
++      },
++    ]);
++
++    return awsPackage.mergeIamTemplates().then(() => {
++      expect(
++        awsPackage.serverless.service.provider.compiledCloudFormationTemplate.Resources[
++          awsPackage.provider.naming.getRoleLogicalId()
++        ].Properties.Policies[0].PolicyDocument.Statement.slice(2)
++      ).to.deep.equal(awsPackage.serverless.service.provider.iamRoleStatements);
++    });
++  });
+ });

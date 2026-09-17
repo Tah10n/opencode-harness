@@ -1,0 +1,79 @@
+diff --git a/lib/plugins/aws/package/lib/mergeIamTemplates.js b/lib/plugins/aws/package/lib/mergeIamTemplates.js
+index 2d97671ad03cae1456642b4c6eb20bd683c04355..3fe6ff46ba60ebc54342c36393f6f0374234a33d 100644
+--- a/lib/plugins/aws/package/lib/mergeIamTemplates.js
++++ b/lib/plugins/aws/package/lib/mergeIamTemplates.js
+@@ -183,7 +183,7 @@ module.exports = {
+ 
+   validateStatements(statements) {
+     // Verify that iamRoleStatements (if present) is an array of { Effect: ...,
+-    // Action: ..., Resource: ... } objects.
++    // Action or NotAction: ..., Resource or NotResource: ... } objects.
+     if (!statements) {
+       return;
+     }
+@@ -192,9 +192,13 @@ module.exports = {
+       violationsFound = 'it is not an array';
+     } else {
+       const descriptions = statements.map((statement, i) => {
+-        const missing = ['Effect', 'Action', 'Resource'].filter(
+-          prop => statement[prop] === undefined
+-        );
++        const missing = ['Effect'].filter(prop => statement[prop] === undefined);
++        if (statement.Action === undefined && statement.NotAction === undefined) {
++          missing.push('Action or NotAction');
++        }
++        if (statement.Resource === undefined && statement.NotResource === undefined) {
++          missing.push('Resource or NotResource');
++        }
+         return missing.length === 0
+           ? null
+           : `statement ${i} is missing the following properties: ${missing.join(', ')}`;
+@@ -208,7 +212,7 @@ module.exports = {
+     if (violationsFound) {
+       const errorMessage = [
+         'iamRoleStatements should be an array of objects,',
+-        ' where each object has Effect, Action, Resource fields.',
++        ' where each object has Effect, Action or NotAction, Resource or NotResource fields.',
+         ` Specifically, ${violationsFound}`,
+       ].join('');
+       throw new this.serverless.classes.Error(errorMessage);
+diff --git a/lib/plugins/aws/package/lib/mergeIamTemplates.test.js b/lib/plugins/aws/package/lib/mergeIamTemplates.test.js
+index b7da9693183a35e8ab169c1a2ba5193641e84efe..2f6b27876a67ce88abd4b351cf51a243347c8dbc 100644
+--- a/lib/plugins/aws/package/lib/mergeIamTemplates.test.js
++++ b/lib/plugins/aws/package/lib/mergeIamTemplates.test.js
+@@ -426,6 +426,35 @@ describe('#mergeIamTemplates()', () => {
+     });
+   });
+ 
++  it('should add custom IAM policy statements with NotAction and NotResource', () => {
++    awsPackage.serverless.service.provider.iamRoleStatements = [
++      {
++        Effect: 'Allow',
++        NotAction: ['iam:DeleteUser'],
++        Resource: '*',
++      },
++      {
++        Effect: 'Allow',
++        Action: 'sns:Publish',
++        NotResource: 'arn:aws:sns:*:*:*',
++      },
++    ];
++
++    return awsPackage.mergeIamTemplates().then(() => {
++      const statements =
++        awsPackage.serverless.service.provider.compiledCloudFormationTemplate.Resources[
++          awsPackage.provider.naming.getRoleLogicalId()
++        ].Properties.Policies[0].PolicyDocument.Statement;
++
++      expect(statements[2]).to.deep.equal(
++        awsPackage.serverless.service.provider.iamRoleStatements[0]
++      );
++      expect(statements[3]).to.deep.equal(
++        awsPackage.serverless.service.provider.iamRoleStatements[1]
++      );
++    });
++  });
++
+   it('should add managed policy arns', () => {
+     awsPackage.serverless.service.provider.iamManagedPolicies = [
+       'some:aws:arn:xxx:*:*',

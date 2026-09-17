@@ -3,7 +3,9 @@
 This adapter compares ordinary OpenCode (P) with the unchanged installed direct
 harness without (H0) and with (H1) TYPE_COMPAT. Official SWE-PolyBench `resolved`
 is the primary outcome. Ten tasks, three arms, one model attempt per slot.
-See [PLAN.md](PLAN.md) for the selection rule and acceptance boundaries.
+See [PLAN.md](PLAN.md) for the selection rule and acceptance boundaries, and
+[REPORT.md](REPORT.md) for the stopped 18-run result: 12 assigned slots remain
+unknown after admission closed. This batch must not be resumed.
 
 Run from the `feat/native-task-workflow` worktree. Prerequisites are the existing
 Docker Desktop, Python 3.12, Node 24, prepared OpenCode 1.18.26 ARM64 binary and
