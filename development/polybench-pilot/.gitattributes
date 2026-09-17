@@ -1,0 +1,4 @@
+# Preserve original benchmark prompts and model patch bytes, including CRLF
+# and upstream trailing whitespace. These are evidence, not reformatted prose.
+prompts/*.md -text -whitespace
+results/patches/** -text -whitespace

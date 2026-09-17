@@ -80,12 +80,18 @@ if(amendment){
 }
 
 function verify(){
+ const polybench=f.experimentKind==='polybench-pilot', polybenchPreflight=f.experimentKind==='polybench-pilot-preflight';
  const subscribeRepeatability=f.experimentKind==='subscribe-offline'&&f.repeatability===true, subscribeOffline=f.experimentKind==='subscribe-offline', typeCompat=f.experimentKind==='type-compat', commandHints=f.experimentKind==='command-hints', transfer=f.experimentKind==='transfer', h00=f.experimentKind==='h00-transfer', sensitivity=f.experimentKind==='sensitivity', usage=f.experimentKind==='sensitivity-usage', replay=f.experimentKind==='sensitivity-replay', targeted=f.experimentKind==='sensitivity-targeted', integration=f.experimentKind==='targeted-integration';
- if(f.attempts.length!==(subscribeOffline?(subscribeRepeatability?4:2):(commandHints||typeCompat)?4:repeatedContinuation?12:integration?9:targeted?3:replay?4:usage?2:h00?48:transfer||sensitivity?8:30)||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==((subscribeOffline||commandHints||typeCompat||repeatedContinuation)?1800000:900000)||!f.preflightPassed)throw Error('Invalid development configuration');
+ if(f.attempts.length!==(polybenchPreflight?3:subscribeOffline?(subscribeRepeatability?4:2):(commandHints||typeCompat)?4:repeatedContinuation?12:integration?9:targeted?3:replay?4:usage?2:h00?48:transfer||sensitivity?8:30)||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==((polybench||polybenchPreflight||subscribeOffline||commandHints||typeCompat||repeatedContinuation)?1800000:900000)||!f.preflightPassed)throw Error('Invalid development configuration');
  for(const [file,digest] of Object.entries(f.files))if(sha(fs.readFileSync(file))!==(amendment?.launcherFiles[file]?.after??digest))throw Error('Frozen file changed: '+file);
  for(const [directory,expected]of Object.entries(f.runtimeManifests??{})){const seen=new Set();const visit=(dir,prefix='')=>{for(const entry of fs.readdirSync(dir,{withFileTypes:true})){if(repeatedContinuation&&entry.name==='.git')continue;const file=path.join(dir,entry.name),name=prefix+entry.name,stat=fs.lstatSync(file);if(stat.isDirectory()){visit(file,name+'/');continue;}const got=stat.isSymbolicLink()?{symlink:fs.readlinkSync(file)}:{sha256:sha(fs.readFileSync(file)),executable:!!(stat.mode&0o111)};if(JSON.stringify(got)!==JSON.stringify(expected[name]))throw Error('Installed runtime changed: '+name);seen.add(name);}};visit(directory);if(seen.size!==Object.keys(expected).length)throw Error('Installed runtime missing files');}
  const groups=new Map();for(const a of f.attempts){const group=groups.get(a.task)??[];group.push(a.arm);groups.set(a.task,group);}
- if(subscribeOffline){
+ if(polybench||polybenchPreflight){
+  const count=polybench?10:1;
+  if(amendment||f.runtimeSha!=='e18db1fe10223db52dcc05b3e769bca140367c2b'||f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||groups.size!==count||f.attempts.length!==count*3)throw Error('Invalid PolyBench frozen schedule');
+  let index=0;for(const arms of groups.values()){if(arms.join(',')!==['P,H0,H1','H0,H1,P','H1,P,H0'][index++%3])throw Error('Invalid PolyBench cyclic order');}
+  if(polybench&&(new Set(f.attempts.map(a=>a.project)).size<4||f.budgetMs!==1800000))throw Error('Invalid PolyBench allocation');
+ }else if(subscribeOffline){
   if(amendment||f.runtimeSha!=='e18db1fe10223db52dcc05b3e769bca140367c2b'||f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||(subscribeRepeatability?f.attempts.map(a=>[a.task,a.repetition,a.arm].join(':')).join(',')!=='A:1:ON,A:1:OFF,A:2:OFF,A:2:ON':f.attempts.map(a=>a.task+':'+a.arm).join(',')!=='A:OFF,A:ON')||groups.size!==1)throw Error('Invalid frozen offline subscribe pair');
  }else if(typeCompat){
   if(amendment||f.runtimeSha!=='8264ce42ef198580af834dcb09df996ac1274f1d'||f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.map(a=>a.task+':'+a.arm).join(',')!=='A:OFF,A:ON,B:ON,B:OFF'||groups.size!==2)throw Error('Invalid frozen type-compat comparison');
@@ -171,7 +177,7 @@ for(const attempt of f.attempts.filter(a=>!amendment||(a.slot>=firstSlot&&a.slot
     const requestKind=frame.body?.tools?.length?'work':'title';
     let requestSignal;
     const record={requestIndex:requests.length+1,relayRequestId:frame.id??null,requestKind,at:new Date().toISOString(),path:frame.path,model:frame.body?.model,effort:frame.body?.reasoning?.effort??null,forwarded:false,usage:null};requests.push(record);save();
-    if(['subscribe-offline','type-compat','h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration','integrated-repeats'].includes(f.experimentKind))fs.writeFileSync(path.join(out,'request-'+requests.length+'.json'),JSON.stringify(frame.body),{mode:0o600,flag:'wx'});
+    if(['polybench-pilot','polybench-pilot-preflight','subscribe-offline','type-compat','h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration','integrated-repeats'].includes(f.experimentKind))fs.writeFileSync(path.join(out,'request-'+requests.length+'.json'),JSON.stringify(frame.body),{mode:0o600,flag:'wx'});
     const blocked=()=>{
      if(!pause&&!abort.signal.aborted&&!signal.aborted&&forwardingOpen&&deadline&&Date.now()<deadline)return false;
      record.notForwardedReason=pause?'series-paused':signal.aborted?'client-cancelled':'closed-or-deadline';record.blockedBy=pause;record.finishedAt=new Date().toISOString();save();
@@ -227,7 +233,7 @@ for(const attempt of f.attempts.filter(a=>!amendment||(a.slot>=firstSlot&&a.slot
      send({type:'headers',status:response.status,contentType:response.headers.get('content-type')??'text/event-stream'});
      const observer=responseObserver(record,save,details=>pauseScheduling(details.kind,attempt.slot,{requestIndex:record.requestIndex,...details}));
      for await(const chunk of response.body){
-      if(['subscribe-offline','type-compat','h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration','integrated-repeats'].includes(f.experimentKind))fs.appendFileSync(path.join(out,'response-'+record.requestIndex+'.sse'),chunk,{mode:0o600});
+      if(['polybench-pilot','polybench-pilot-preflight','subscribe-offline','type-compat','h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration','integrated-repeats'].includes(f.experimentKind))fs.appendFileSync(path.join(out,'response-'+record.requestIndex+'.sse'),chunk,{mode:0o600});
       // Observe/persist upstream facts before delivery can fail or be cancelled.
       observer.push(chunk);
       // The observer persists response facts AND the pause synchronously, before

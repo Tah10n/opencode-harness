@@ -7,15 +7,19 @@ import { fileURLToPath } from 'node:url';
 import readline from 'node:readline';
 
 export const image='sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6';
-export async function startContainer({source,toolchain,template,output,onRequest,workMemoryMb=512,memoryMb=2048}) {
+export async function startContainer({source,toolchain,template,output,onRequest,workMemoryMb=512,memoryMb=2048,preparedEnvironment=null}) {
   for(const p of [source,toolchain,output,...(template?[template]:[])])if(!path.isAbsolute(p))throw Error('absolute paths required');
   fs.mkdirSync(output,{mode:0o700});
-  if (!Number.isSafeInteger(workMemoryMb) || workMemoryMb < 512 || workMemoryMb > 1536 || !Number.isSafeInteger(memoryMb) || memoryMb < 2048 || memoryMb > 3072) throw Error('Unsupported development container memory bound');
+  if (preparedEnvironment && (!/^sha256:[a-f0-9]{64}$/.test(preparedEnvironment.image) || preparedEnvironment.node !== '/diagnostic/node' || typeof preparedEnvironment.projectPath !== 'string' || preparedEnvironment.projectPath.includes('\n'))) throw Error('Invalid prepared benchmark environment');
+  const selectedImage=preparedEnvironment?.image??image;
+  const selectedNode=preparedEnvironment?.node??'node';
+  const maxWork=preparedEnvironment?8192:1536,maxMemory=preparedEnvironment?12288:3072;
+  if (!Number.isSafeInteger(workMemoryMb) || workMemoryMb < 512 || workMemoryMb > maxWork || !Number.isSafeInteger(memoryMb) || memoryMb < 2048 || memoryMb > maxMemory) throw Error('Unsupported development container memory bound');
   const name=`template-dev-${randomUUID()}`;
   const relay=fileURLToPath(new URL('./container-relay.mjs',import.meta.url));
   // Reap orphaned test/CLI descendants; the relay itself is not an init process.
-  const argv=['run','--init','-i','--name',name,'--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges',
-    '--pids-limit','512','--memory',`${memoryMb}m`,'--cpus','2','--user','node',
+  const argv=['run',...(preparedEnvironment?['--platform','linux/amd64','--workdir','/']:[]),'--init','-i','--name',name,'--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges',
+    '--pids-limit','512','--memory',`${memoryMb}m`,'--cpus','2','--user',preparedEnvironment?'1000:1000':'node',
     '--tmpfs','/tmp:rw,noexec,nosuid,size=64m','--tmpfs',`/work:rw,exec,nosuid,uid=1000,gid=1000,mode=0700,size=${workMemoryMb}m`,
     '--mount',`type=bind,source=${source},target=/input,readonly`,
     '--mount',`type=bind,source=${path.join(toolchain,'package/bin/opencode')},target=/opt/opencode,readonly`,
@@ -23,8 +27,8 @@ export async function startContainer({source,toolchain,template,output,onRequest
     ...(template?['--mount',`type=bind,source=${template},target=/template,readonly`]:[]),
     ...Object.entries({HOME:'/work/home',TMPDIR:'/work/tmp',XDG_CONFIG_HOME:'/work/config',XDG_DATA_HOME:'/work/data',
       XDG_CACHE_HOME:'/work/cache',XDG_STATE_HOME:'/work/state',OPENCODE_DISABLE_MODELS_FETCH:'true',OPENCODE_DISABLE_AUTOUPDATE:'true'}).flatMap(([k,v])=>['--env',`${k}=${v}`]),
-    image,'node','/relay.mjs'];
-  fs.writeFileSync(path.join(output,'container.json'),JSON.stringify({name,image,argv},null,2));
+    selectedImage,selectedNode,'/relay.mjs'];
+  fs.writeFileSync(path.join(output,'container.json'),JSON.stringify({name,image:selectedImage,argv},null,2));
   const child=spawn('docker',argv,{stdio:['pipe','pipe','pipe']});
   let stderr='';child.stderr.on('data',x=>stderr+=x);
   const requests=new Map();let readyResolve,readyReject,relayPid;
@@ -42,7 +46,9 @@ export async function startContainer({source,toolchain,template,output,onRequest
   });
   child.once('error',readyReject);
   child.once('close',()=>{readyReject(Error(`container exited: ${stderr}`));for(const c of requests.values())c.abort();});
-  const timer=setTimeout(()=>readyReject(Error('container readiness timed out')),30000);
+  // Prepared public projects can exceed a gigabyte; allow bounded input-copy
+  // preparation before the unchanged provider/task deadline starts.
+  const timer=setTimeout(()=>readyReject(Error('container readiness timed out')),preparedEnvironment?120000:30000);
   const close=()=>{
     for(const c of requests.values())c.abort();
     const result=spawnSync('docker',['rm','--force',name],{encoding:'utf8',timeout:15000});
@@ -50,6 +56,6 @@ export async function startContainer({source,toolchain,template,output,onRequest
     return result.status;
   };
   try{await ready;}catch(error){close();throw error;}finally{clearTimeout(timer);}
-  const exec=argv=>spawnSync('docker',['exec','--workdir','/work/repo',name,...argv],{encoding:'utf8',timeout:30000,maxBuffer:32*1024*1024});
-  return {name,relayPid,exec,close,output,setTaskBudget(milliseconds){if(!Number.isFinite(milliseconds)||milliseconds<=0||milliseconds>1800000)throw Error('Invalid relay task budget');send({type:'task-budget',milliseconds});}};
+  const exec=argv=>spawnSync('docker',['exec','--workdir','/work/repo',name,...(argv[0]==='node'?[selectedNode,...argv.slice(1)]:argv)],{encoding:'utf8',timeout:30000,maxBuffer:32*1024*1024});
+  return {name,relayPid,exec,close,output,preparedEnvironment,setTaskBudget(milliseconds){if(!Number.isFinite(milliseconds)||milliseconds<=0||milliseconds>1800000)throw Error('Invalid relay task budget');send({type:'task-budget',milliseconds});}};
 }
