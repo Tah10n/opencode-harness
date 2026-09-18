@@ -1,0 +1,77 @@
+{
+  "decision": "A",
+  "review": "One bounded final review, plus computational checks; not an independent agent/security audit.",
+  "checks": [
+    {
+      "instance_id": "serverless__serverless-6534",
+      "arm": "P",
+      "production_equal": true,
+      "source_paths_compared": 1041,
+      "independent_test_names_equal_gold": true,
+      "F_E_build_inputs_equal": true,
+      "F_E_build_outputs_equal": true,
+      "expected_files_unchanged": true,
+      "no_missing_decisive_tests": true
+    },
+    {
+      "instance_id": "serverless__serverless-6534",
+      "arm": "H0",
+      "production_equal": true,
+      "source_paths_compared": 1041,
+      "independent_test_names_equal_gold": true,
+      "F_E_build_inputs_equal": true,
+      "F_E_build_outputs_equal": true,
+      "expected_files_unchanged": true,
+      "no_missing_decisive_tests": true
+    },
+    {
+      "instance_id": "serverless__serverless-6534",
+      "arm": "H1",
+      "production_equal": true,
+      "source_paths_compared": 1041,
+      "independent_test_names_equal_gold": true,
+      "F_E_build_inputs_equal": true,
+      "F_E_build_outputs_equal": true,
+      "expected_files_unchanged": true,
+      "no_missing_decisive_tests": true
+    },
+    {
+      "instance_id": "sveltejs__svelte-1190",
+      "arm": "P",
+      "production_equal": true,
+      "source_paths_compared": 1916,
+      "independent_test_names_equal_gold": true,
+      "F_E_build_inputs_equal": true,
+      "F_E_build_outputs_equal": true,
+      "expected_files_unchanged": true,
+      "no_missing_decisive_tests": true
+    },
+    {
+      "instance_id": "sveltejs__svelte-1190",
+      "arm": "H0",
+      "production_equal": true,
+      "source_paths_compared": 1918,
+      "independent_test_names_equal_gold": true,
+      "F_E_build_inputs_equal": true,
+      "F_E_build_outputs_equal": true,
+      "expected_files_unchanged": true,
+      "no_missing_decisive_tests": true
+    },
+    {
+      "instance_id": "sveltejs__svelte-1190",
+      "arm": "H1",
+      "production_equal": true,
+      "source_paths_compared": 1918,
+      "independent_test_names_equal_gold": true,
+      "F_E_build_inputs_equal": true,
+      "F_E_build_outputs_equal": true,
+      "expected_files_unchanged": true,
+      "no_missing_decisive_tests": true
+    }
+  ],
+  "historical_inputs_unchanged": true,
+  "runtime_changed": false,
+  "new_author_or_provider_calls": 0,
+  "initial_completed_test_outcomes_reproduced": true,
+  "scope": "Exactly two instances/six M; same manifests for all arms. No score repair or model lift claim."
+}
