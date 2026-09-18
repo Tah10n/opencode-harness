@@ -1,0 +1,747 @@
+{
+  "instance_id": "mui__material-ui-20356",
+  "arm": "H1",
+  "base_commit": "67468679f7c5dfa881ea12a32cfe4a5b44cf6680",
+  "image": {
+    "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-20356:v1.1",
+    "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-20356@sha256:7acde0dad3050de6a079120cf982095a8c11e3c41c5e8932155ce1f33081e3f7",
+    "id": "sha256:7acde0dad3050de6a079120cf982095a8c11e3c41c5e8932155ce1f33081e3f7",
+    "architecture": "amd64",
+    "os": "linux",
+    "size": 8821349006,
+    "workdir": "/testbed"
+  },
+  "source_patch": "development/polybench-pilot/results/patches/H1/mui__material-ui-20356.patch",
+  "model_sha256": "e5f9f0d33c1b4fde87cbcc2d589edc65817d13067f2323ef358e4108dc123a74",
+  "test_sha256": "b04b9562fbaf596dc07e5079a8748c339d1035e2569ed94d943a211b0c6a173f",
+  "prediction_bytes_equal": true,
+  "final_newline": true,
+  "cr_bytes": 0,
+  "model_hunks": {
+    "packages/material-ui/src/Select/Select.test.js": [
+      {
+        "patch_line": 5,
+        "header": "@@ -405,11 +405,10 @@ describe('<Select />', () => {",
+        "base_start": 405,
+        "base_count": 11
+      },
+      {
+        "patch_line": 19,
+        "header": "@@ -417,7 +416,7 @@ describe('<Select />', () => {",
+        "base_start": 417,
+        "base_count": 7
+      }
+    ],
+    "packages/material-ui/src/Select/SelectInput.js": [
+      {
+        "patch_line": 32,
+        "header": "@@ -324,7 +324,7 @@ const SelectInput = React.forwardRef(function SelectInput(props, ref) {",
+        "base_start": 324,
+        "base_count": 7
+      }
+    ],
+    "packages/material-ui/src/TablePagination/TablePagination.test.js": [
+      {
+        "patch_line": 45,
+        "header": "@@ -245,6 +245,28 @@ describe('<TablePagination />', () => {",
+        "base_start": 245,
+        "base_count": 6
+      }
+    ]
+  },
+  "test_hunks": {
+    "packages/material-ui/src/Select/Select.test.js": [
+      {
+        "patch_line": 4,
+        "header": "@@ -409,7 +409,7 @@ describe('<Select />', () => {",
+        "base_start": 409,
+        "base_count": 7
+      },
+      {
+        "patch_line": 13,
+        "header": "@@ -417,7 +417,7 @@ describe('<Select />', () => {",
+        "base_start": 417,
+        "base_count": 7
+      }
+    ]
+  },
+  "scenarios": {
+    "B+M": {
+      "commands": [
+        {
+          "cmd": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0492,
+          "output_sha256": "37f0eba8f4ff50a23f5da38a72e6a5f1a4d6b6f5e61375c4c904076e670f7867",
+          "output": "67468679f7c5dfa881ea12a32cfe4a5b44cf6680\n"
+        },
+        {
+          "cmd": [
+            "git",
+            "diff",
+            "--exit-code",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 1,
+          "seconds": 1.1354,
+          "output_sha256": "92016ea8c6dcfe84d85972778cbb1f81679fa5eb3683a3829c3727c39ffb651f"
+        },
+        {
+          "cmd": [
+            "git",
+            "diff",
+            "--name-only",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.1041,
+          "output_sha256": "85ee32c3706060ab6172a0ecfdc4265e529a23ac78c03fa66373c05b958a7ecf"
+        },
+        {
+          "cmd": [
+            "git",
+            "restore",
+            "--source=HEAD",
+            "--staged",
+            "--worktree",
+            "--",
+            "package.json",
+            "yarn.lock"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0901,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "cmd": [
+            "git",
+            "--version"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.036,
+          "output_sha256": "30279da57eb04a496cb207bc2f7c7e04d9c94788be5bc68824e6727e283b264b",
+          "output": "git version 2.34.1\n"
+        },
+        {
+          "cmd": [
+            "patch",
+            "--version"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0319,
+          "output_sha256": "0f262d227713e53ac79165163c1ec3d84fe55fdea2d7b80fce954e2c924ca12a",
+          "output": "GNU patch 2.7.6\nCopyright (C) 2003, 2009-2012 Free Software Foundation, Inc.\nCopyright (C) 1988 Larry Wall\n\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n\nWritten by Larry Wall and Paul Eggert\n"
+        },
+        {
+          "cmd": [
+            "git",
+            "apply",
+            "--binary",
+            "--check",
+            "/testbed/patch_code.diff"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0474,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "cmd": [
+            "git",
+            "apply",
+            "--binary",
+            "/testbed/patch_code.diff"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0493,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "image_baseline_diff_sha256": "92016ea8c6dcfe84d85972778cbb1f81679fa5eb3683a3829c3727c39ffb651f",
+      "image_baseline_changed_files": [
+        "package.json",
+        "yarn.lock"
+      ],
+      "baseline_policy": "exact tracked B; baked unrelated build edits restored before any patch",
+      "snapshots": [
+        {
+          "label": "B",
+          "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "changed_files": [],
+          "untracked": [
+            "Dockerfile",
+            "custom-reporter.js"
+          ],
+          "artifacts": {}
+        },
+        {
+          "label": "after strict M",
+          "diff_sha256": "31ab780066ae3fe4a0afb000b0e860e4bbad0b1023842a8ad8ed99230ab877f3",
+          "changed_files": [
+            "packages/material-ui/src/Select/Select.test.js",
+            "packages/material-ui/src/Select/SelectInput.js",
+            "packages/material-ui/src/TablePagination/TablePagination.test.js"
+          ],
+          "untracked": [
+            "Dockerfile",
+            "custom-reporter.js",
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        },
+        {
+          "label": "immediately before upstream cleanup",
+          "diff_sha256": "31ab780066ae3fe4a0afb000b0e860e4bbad0b1023842a8ad8ed99230ab877f3",
+          "changed_files": [
+            "packages/material-ui/src/Select/Select.test.js",
+            "packages/material-ui/src/Select/SelectInput.js",
+            "packages/material-ui/src/TablePagination/TablePagination.test.js"
+          ],
+          "untracked": [
+            "Dockerfile",
+            "custom-reporter.js",
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        }
+      ],
+      "strict_M": 0
+    },
+    "B+T+strict-M": {
+      "commands": [
+        {
+          "cmd": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0505,
+          "output_sha256": "37f0eba8f4ff50a23f5da38a72e6a5f1a4d6b6f5e61375c4c904076e670f7867",
+          "output": "67468679f7c5dfa881ea12a32cfe4a5b44cf6680\n"
+        },
+        {
+          "cmd": [
+            "git",
+            "diff",
+            "--exit-code",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 1,
+          "seconds": 1.2913,
+          "output_sha256": "92016ea8c6dcfe84d85972778cbb1f81679fa5eb3683a3829c3727c39ffb651f"
+        },
+        {
+          "cmd": [
+            "git",
+            "diff",
+            "--name-only",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.1047,
+          "output_sha256": "85ee32c3706060ab6172a0ecfdc4265e529a23ac78c03fa66373c05b958a7ecf"
+        },
+        {
+          "cmd": [
+            "git",
+            "restore",
+            "--source=HEAD",
+            "--staged",
+            "--worktree",
+            "--",
+            "package.json",
+            "yarn.lock"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0891,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "cmd": [
+            "git",
+            "--version"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0349,
+          "output_sha256": "30279da57eb04a496cb207bc2f7c7e04d9c94788be5bc68824e6727e283b264b",
+          "output": "git version 2.34.1\n"
+        },
+        {
+          "cmd": [
+            "patch",
+            "--version"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0302,
+          "output_sha256": "0f262d227713e53ac79165163c1ec3d84fe55fdea2d7b80fce954e2c924ca12a",
+          "output": "GNU patch 2.7.6\nCopyright (C) 2003, 2009-2012 Free Software Foundation, Inc.\nCopyright (C) 1988 Larry Wall\n\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n\nWritten by Larry Wall and Paul Eggert\n"
+        },
+        {
+          "cmd": [
+            "git",
+            "apply",
+            "--binary",
+            "--check",
+            "/testbed/patch_test.diff"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0465,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "cmd": [
+            "git",
+            "apply",
+            "--binary",
+            "/testbed/patch_test.diff"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0491,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "cmd": [
+            "git",
+            "apply",
+            "--binary",
+            "--check",
+            "/testbed/patch_code.diff"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 1,
+          "seconds": 0.0476,
+          "output_sha256": "eb679caad5e9eb9296b67c7cf4ecc48f6926bc4d65c9b3bc57c409702d2b7d9a"
+        }
+      ],
+      "image_baseline_diff_sha256": "92016ea8c6dcfe84d85972778cbb1f81679fa5eb3683a3829c3727c39ffb651f",
+      "image_baseline_changed_files": [
+        "package.json",
+        "yarn.lock"
+      ],
+      "baseline_policy": "exact tracked B; baked unrelated build edits restored before any patch",
+      "snapshots": [
+        {
+          "label": "B",
+          "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "changed_files": [],
+          "untracked": [
+            "Dockerfile",
+            "custom-reporter.js"
+          ],
+          "artifacts": {}
+        },
+        {
+          "label": "after strict T",
+          "diff_sha256": "b9fedada55aedb6b85f66cf18720b611a539528a136612c9b5ccaab025c16a8d",
+          "changed_files": [
+            "packages/material-ui/src/Select/Select.test.js"
+          ],
+          "untracked": [
+            "Dockerfile",
+            "custom-reporter.js",
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        },
+        {
+          "label": "immediately before upstream cleanup",
+          "diff_sha256": "b9fedada55aedb6b85f66cf18720b611a539528a136612c9b5ccaab025c16a8d",
+          "changed_files": [
+            "packages/material-ui/src/Select/Select.test.js"
+          ],
+          "untracked": [
+            "Dockerfile",
+            "custom-reporter.js",
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        }
+      ],
+      "strict_T": 0,
+      "strict_M_after_T": 1
+    },
+    "official-B+T+M": {
+      "commands": [
+        {
+          "cmd": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0525,
+          "output_sha256": "37f0eba8f4ff50a23f5da38a72e6a5f1a4d6b6f5e61375c4c904076e670f7867",
+          "output": "67468679f7c5dfa881ea12a32cfe4a5b44cf6680\n"
+        },
+        {
+          "cmd": [
+            "git",
+            "diff",
+            "--exit-code",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 1,
+          "seconds": 1.247,
+          "output_sha256": "92016ea8c6dcfe84d85972778cbb1f81679fa5eb3683a3829c3727c39ffb651f"
+        },
+        {
+          "cmd": [
+            "git",
+            "diff",
+            "--name-only",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.119,
+          "output_sha256": "85ee32c3706060ab6172a0ecfdc4265e529a23ac78c03fa66373c05b958a7ecf"
+        },
+        {
+          "cmd": [
+            "git",
+            "--version"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.041,
+          "output_sha256": "30279da57eb04a496cb207bc2f7c7e04d9c94788be5bc68824e6727e283b264b",
+          "output": "git version 2.34.1\n"
+        },
+        {
+          "cmd": [
+            "patch",
+            "--version"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0349,
+          "output_sha256": "0f262d227713e53ac79165163c1ec3d84fe55fdea2d7b80fce954e2c924ca12a",
+          "output": "GNU patch 2.7.6\nCopyright (C) 2003, 2009-2012 Free Software Foundation, Inc.\nCopyright (C) 1988 Larry Wall\n\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n\nWritten by Larry Wall and Paul Eggert\n"
+        },
+        {
+          "cmd": "git apply -v --ignore-whitespace --reject /testbed/patch_test.diff",
+          "cwd": "/testbed",
+          "user": "root",
+          "exit_code": 0,
+          "seconds": 0.0523,
+          "output_sha256": "691db58d8269294e97c3287d9ad6837891cc81bcdfe2f7c389cf073a8849aa19",
+          "observations": [
+            "Checking patch packages/material-ui/src/Select/Select.test.js...",
+            "Applied patch packages/material-ui/src/Select/Select.test.js cleanly."
+          ]
+        },
+        {
+          "cmd": "git apply -v --ignore-whitespace --reject /testbed/patch_code.diff",
+          "cwd": "/testbed",
+          "user": "root",
+          "exit_code": 1,
+          "seconds": 0.0561,
+          "output_sha256": "10bfb67ca5b542e70dabb4b67d364753d21222236b302a9a4246d28717683212",
+          "observations": [
+            "Checking patch packages/material-ui/src/Select/Select.test.js...",
+            "error: patch failed: packages/material-ui/src/Select/Select.test.js:405",
+            "error: patch failed: packages/material-ui/src/Select/Select.test.js:417",
+            "Checking patch packages/material-ui/src/Select/SelectInput.js...",
+            "Checking patch packages/material-ui/src/TablePagination/TablePagination.test.js...",
+            "Applying patch packages/material-ui/src/Select/Select.test.js with 2 rejects...",
+            "Rejected hunk #1.",
+            "Rejected hunk #2.",
+            "Applied patch packages/material-ui/src/Select/SelectInput.js cleanly.",
+            "Applied patch packages/material-ui/src/TablePagination/TablePagination.test.js cleanly."
+          ]
+        },
+        {
+          "cmd": "patch --batch --fuzz=5 -p1 -f -i /testbed/patch_code.diff",
+          "cwd": "/testbed",
+          "user": "root",
+          "exit_code": 1,
+          "seconds": 0.0486,
+          "output_sha256": "7207c3e18076e96d9f53e928ecbfe06de4a4d8f8efd5bdec6b25054fe0a22e0c",
+          "observations": [
+            "patching file packages/material-ui/src/Select/Select.test.js",
+            "Hunk #1 FAILED at 405.",
+            "Hunk #2 FAILED at 417.",
+            "2 out of 2 hunks FAILED -- saving rejects to file packages/material-ui/src/Select/Select.test.js.rej",
+            "patching file packages/material-ui/src/Select/SelectInput.js",
+            "Hunk #1 FAILED at 324.",
+            "1 out of 1 hunk FAILED -- saving rejects to file packages/material-ui/src/Select/SelectInput.js.rej",
+            "patching file packages/material-ui/src/TablePagination/TablePagination.test.js",
+            "Hunk #1 succeeded at 267 with fuzz 2 (offset 22 lines)."
+          ]
+        }
+      ],
+      "image_baseline_diff_sha256": "92016ea8c6dcfe84d85972778cbb1f81679fa5eb3683a3829c3727c39ffb651f",
+      "image_baseline_changed_files": [
+        "package.json",
+        "yarn.lock"
+      ],
+      "baseline_policy": "original image without reset",
+      "snapshots": [
+        {
+          "label": "B",
+          "diff_sha256": "92016ea8c6dcfe84d85972778cbb1f81679fa5eb3683a3829c3727c39ffb651f",
+          "changed_files": [
+            "package.json",
+            "yarn.lock"
+          ],
+          "untracked": [
+            "Dockerfile",
+            "custom-reporter.js"
+          ],
+          "artifacts": {}
+        },
+        {
+          "label": "after git",
+          "diff_sha256": "80b6aaf527e9f908d4b60736c1436607dc1bba2dacc74dbcbdaa6da27849744e",
+          "changed_files": [
+            "package.json",
+            "packages/material-ui/src/Select/Select.test.js",
+            "yarn.lock"
+          ],
+          "untracked": [
+            "Dockerfile",
+            "custom-reporter.js",
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        },
+        {
+          "label": "before official M",
+          "diff_sha256": "80b6aaf527e9f908d4b60736c1436607dc1bba2dacc74dbcbdaa6da27849744e",
+          "changed_files": [
+            "package.json",
+            "packages/material-ui/src/Select/Select.test.js",
+            "yarn.lock"
+          ],
+          "untracked": [
+            "Dockerfile",
+            "custom-reporter.js",
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        },
+        {
+          "label": "after git",
+          "diff_sha256": "c3aaf232f2c3b2e3dc9b2e0d3bf553fca6cf2724f02bc6a0b3d11ca3b7645885",
+          "changed_files": [
+            "package.json",
+            "packages/material-ui/src/Select/Select.test.js",
+            "packages/material-ui/src/Select/SelectInput.js",
+            "packages/material-ui/src/TablePagination/TablePagination.test.js",
+            "yarn.lock"
+          ],
+          "untracked": [
+            "Dockerfile",
+            "custom-reporter.js",
+            "packages/material-ui/src/Select/Select.test.js.rej",
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {
+            "packages/material-ui/src/Select/Select.test.js.rej": {
+              "sha256": "98802cc554371605262ac025f707ef5fad8fbaec0d580016104ed9e61ab0e7f0",
+              "bytes": 1053,
+              "hunk_headers": [
+                "@@ -405,11 +405,10 @@",
+                "@@ -417,7 +416,7 @@"
+              ]
+            }
+          }
+        },
+        {
+          "label": "after patch",
+          "diff_sha256": "9a364aa6c67a045648d4829cdf8851f9810c8ce6ae65123a2e50f07c78557edd",
+          "changed_files": [
+            "package.json",
+            "packages/material-ui/src/Select/Select.test.js",
+            "packages/material-ui/src/Select/SelectInput.js",
+            "packages/material-ui/src/TablePagination/TablePagination.test.js",
+            "yarn.lock"
+          ],
+          "untracked": [
+            "Dockerfile",
+            "custom-reporter.js",
+            "packages/material-ui/src/Select/Select.test.js.rej",
+            "packages/material-ui/src/Select/SelectInput.js.orig",
+            "packages/material-ui/src/Select/SelectInput.js.rej",
+            "packages/material-ui/src/TablePagination/TablePagination.test.js.orig",
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {
+            "packages/material-ui/src/Select/Select.test.js.rej": {
+              "sha256": "7231acee2ef15295c62faed6db7220e5860bd842f3d040bc004b746914ef9a5c",
+              "bytes": 1035,
+              "hunk_headers": [
+                "@@ -405,11 +405,10 @@",
+                "@@ -417,7 +416,7 @@"
+              ]
+            },
+            "packages/material-ui/src/Select/SelectInput.js.orig": {
+              "sha256": "8cdc159ebf3b8a31d366010abd632aeb0a91663fda24bfcccfef4493710bea1d",
+              "bytes": 13599
+            },
+            "packages/material-ui/src/Select/SelectInput.js.rej": {
+              "sha256": "510f56788826a1fc8eb90f7d7b6404ac8c87ae216f3e72c3c2880df553a4232c",
+              "bytes": 584,
+              "hunk_headers": [
+                "@@ -324,7 +324,7 @@"
+              ]
+            },
+            "packages/material-ui/src/TablePagination/TablePagination.test.js.orig": {
+              "sha256": "f348f50ef534f96c95cefea6d3511af7f7f3640dcc410b7de211088cf17a4632",
+              "bytes": 9656
+            }
+          }
+        },
+        {
+          "label": "immediately before upstream cleanup",
+          "diff_sha256": "9a364aa6c67a045648d4829cdf8851f9810c8ce6ae65123a2e50f07c78557edd",
+          "changed_files": [
+            "package.json",
+            "packages/material-ui/src/Select/Select.test.js",
+            "packages/material-ui/src/Select/SelectInput.js",
+            "packages/material-ui/src/TablePagination/TablePagination.test.js",
+            "yarn.lock"
+          ],
+          "untracked": [
+            "Dockerfile",
+            "custom-reporter.js",
+            "packages/material-ui/src/Select/Select.test.js.rej",
+            "packages/material-ui/src/Select/SelectInput.js.orig",
+            "packages/material-ui/src/Select/SelectInput.js.rej",
+            "packages/material-ui/src/TablePagination/TablePagination.test.js.orig",
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {
+            "packages/material-ui/src/Select/Select.test.js.rej": {
+              "sha256": "7231acee2ef15295c62faed6db7220e5860bd842f3d040bc004b746914ef9a5c",
+              "bytes": 1035,
+              "hunk_headers": [
+                "@@ -405,11 +405,10 @@",
+                "@@ -417,7 +416,7 @@"
+              ]
+            },
+            "packages/material-ui/src/Select/SelectInput.js.orig": {
+              "sha256": "8cdc159ebf3b8a31d366010abd632aeb0a91663fda24bfcccfef4493710bea1d",
+              "bytes": 13599
+            },
+            "packages/material-ui/src/Select/SelectInput.js.rej": {
+              "sha256": "510f56788826a1fc8eb90f7d7b6404ac8c87ae216f3e72c3c2880df553a4232c",
+              "bytes": 584,
+              "hunk_headers": [
+                "@@ -324,7 +324,7 @@"
+              ]
+            },
+            "packages/material-ui/src/TablePagination/TablePagination.test.js.orig": {
+              "sha256": "f348f50ef534f96c95cefea6d3511af7f7f3640dcc410b7de211088cf17a4632",
+              "bytes": 9656
+            }
+          }
+        }
+      ],
+      "official_T": 0,
+      "official_M": "exception: Failed to apply patch."
+    }
+  },
+  "elapsed_seconds": 40.0,
+  "common_baseline_comparison": [
+    {
+      "path": "packages/material-ui/src/Select/Select.test.js",
+      "sha256": {
+        "B": "e798b34dc3872cd7e8de0c857699bd6ed228a9f565b6a553eb88da7cd022bcab",
+        "T": "f36d9b3313d981026cc4c8f07f36ed9484e14688c6b90135ae438442e84411fe",
+        "M": "1dd8ea9004bae168e73eb952c415fae5a9dd3e3b3bac6fbf688dd7d361850779"
+      },
+      "T_equals_M": false,
+      "only_terminal_LF_differs": false,
+      "base_relative_changed_ranges": {
+        "T": [
+          "@@ -412 +412 @@",
+          "@@ -420 +420 @@"
+        ],
+        "M": [
+          "@@ -408 +408 @@",
+          "@@ -411,2 +411 @@",
+          "@@ -420 +419 @@"
+        ]
+      }
+    }
+  ],
+  "first_git_rejected_hunks": [
+    {
+      "path": "packages/material-ui/src/Select/Select.test.js",
+      "base_start": 405,
+      "classification": [
+        "different-text-for-same-assertion-intent",
+        "overlapping-comment-or-title-edit"
+      ]
+    },
+    {
+      "path": "packages/material-ui/src/Select/Select.test.js",
+      "base_start": 417,
+      "classification": [
+        "identical-change-repeated"
+      ]
+    }
+  ],
+  "semantic_limit": "Application diagnosis only; implementation correctness and test strength unproven.",
+  "classification": [
+    "different-text-for-same-assertion-intent",
+    "identical-change-repeated",
+    "overlapping-comment-or-title-edit"
+  ],
+  "first_rejection_scope": "tests/fixtures only; production hunks applied by git before fallback",
+  "fallback_scope": "production and tests may be rejected or duplicated on the already modified tree; no reverse-switch or reset"
+}

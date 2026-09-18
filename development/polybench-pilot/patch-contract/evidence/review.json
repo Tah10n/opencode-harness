@@ -1,0 +1,20 @@
+{
+  "review": "one bounded self-review; no reviewer model sessions",
+  "cases": 9,
+  "status": "passed",
+  "checks": [
+    "evidence rebuilt from saved raw run and compared structurally",
+    "four frozen CSV hashes and base/image identities; historical M/T byte bindings",
+    "all nine strict and original fallback outcomes; intermediate snapshots and first-failure hunk classifications",
+    "baked edits and diagnostic input filenames disjoint from patch paths",
+    "pinned upstream files match Git objects",
+    "no reset between Git and fallback; no manual repair, filtering, suites or scoring",
+    "full M distinct from future protocol proposal; no production correctness claim",
+    "historical inputs unchanged and 12 slots remain not_started"
+  ],
+  "limitations": [
+    "existing Docker/CSV/venv prerequisites needed for real reproduction",
+    "no full CI/platform pass claimed",
+    "classification is case-specific, not a general merge algorithm"
+  ]
+}

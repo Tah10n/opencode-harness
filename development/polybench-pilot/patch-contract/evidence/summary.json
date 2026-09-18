@@ -1,0 +1,122 @@
+{
+  "historical_commit": "9317ccc9e2e3af6cfe7e876acd4541f3e7445f3b",
+  "evaluator": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+  "dataset_revision": "b3fca77b637379f0c01ad86d18753a7ac1998b53",
+  "provider_calls": 0,
+  "test_runs": 0,
+  "scoring_runs": 0,
+  "containers_created": 27,
+  "containers_remaining": [],
+  "elapsed_seconds": 331.624,
+  "inputs_unchanged": true,
+  "cases": [
+    {
+      "instance_id": "serverless__serverless-6534",
+      "arm": "P",
+      "B+M": 0,
+      "B+T": 0,
+      "strict_M_after_T": 1,
+      "official_M_after_T": "exception: Failed to apply patch.",
+      "first_rejected_files": 1,
+      "first_rejected_hunks": 2,
+      "same_T_M_overlap_files": 0,
+      "different_T_M_overlap_files": 1
+    },
+    {
+      "instance_id": "serverless__serverless-6534",
+      "arm": "H0",
+      "B+M": 0,
+      "B+T": 0,
+      "strict_M_after_T": 1,
+      "official_M_after_T": "exception: Failed to apply patch.",
+      "first_rejected_files": 1,
+      "first_rejected_hunks": 2,
+      "same_T_M_overlap_files": 0,
+      "different_T_M_overlap_files": 1
+    },
+    {
+      "instance_id": "serverless__serverless-6534",
+      "arm": "H1",
+      "B+M": 0,
+      "B+T": 0,
+      "strict_M_after_T": 1,
+      "official_M_after_T": "exception: Failed to apply patch.",
+      "first_rejected_files": 1,
+      "first_rejected_hunks": 2,
+      "same_T_M_overlap_files": 0,
+      "different_T_M_overlap_files": 1
+    },
+    {
+      "instance_id": "serverless__serverless-6842",
+      "arm": "H0",
+      "B+M": 0,
+      "B+T": 0,
+      "strict_M_after_T": 1,
+      "official_M_after_T": "exception: Failed to apply patch.",
+      "first_rejected_files": 1,
+      "first_rejected_hunks": 3,
+      "same_T_M_overlap_files": 0,
+      "different_T_M_overlap_files": 1
+    },
+    {
+      "instance_id": "mui__material-ui-20356",
+      "arm": "P",
+      "B+M": 0,
+      "B+T": 0,
+      "strict_M_after_T": 1,
+      "official_M_after_T": "exception: Failed to apply patch.",
+      "first_rejected_files": 1,
+      "first_rejected_hunks": 1,
+      "same_T_M_overlap_files": 0,
+      "different_T_M_overlap_files": 1
+    },
+    {
+      "instance_id": "mui__material-ui-20356",
+      "arm": "H1",
+      "B+M": 0,
+      "B+T": 0,
+      "strict_M_after_T": 1,
+      "official_M_after_T": "exception: Failed to apply patch.",
+      "first_rejected_files": 1,
+      "first_rejected_hunks": 2,
+      "same_T_M_overlap_files": 0,
+      "different_T_M_overlap_files": 1
+    },
+    {
+      "instance_id": "sveltejs__svelte-1190",
+      "arm": "P",
+      "B+M": 0,
+      "B+T": 0,
+      "strict_M_after_T": 1,
+      "official_M_after_T": "exception: Failed to apply patch.",
+      "first_rejected_files": 84,
+      "first_rejected_hunks": 84,
+      "same_T_M_overlap_files": 62,
+      "different_T_M_overlap_files": 22
+    },
+    {
+      "instance_id": "sveltejs__svelte-1190",
+      "arm": "H0",
+      "B+M": 0,
+      "B+T": 0,
+      "strict_M_after_T": 1,
+      "official_M_after_T": "exception: Failed to apply patch.",
+      "first_rejected_files": 81,
+      "first_rejected_hunks": 87,
+      "same_T_M_overlap_files": 0,
+      "different_T_M_overlap_files": 81
+    },
+    {
+      "instance_id": "sveltejs__svelte-1190",
+      "arm": "H1",
+      "B+M": 0,
+      "B+T": 0,
+      "strict_M_after_T": 1,
+      "official_M_after_T": "exception: Failed to apply patch.",
+      "first_rejected_files": 84,
+      "first_rejected_hunks": 86,
+      "same_T_M_overlap_files": 64,
+      "different_T_M_overlap_files": 20
+    }
+  ]
+}
