@@ -1,0 +1,282 @@
+{
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "deadlineMs": 900000,
+  "freezeHead": "439f85aee656228ca1d3e3e307eee38f5f1a1208",
+  "scheduled": 8,
+  "finished": 6,
+  "monetaryCharges": "unavailable",
+  "rows": [
+    {
+      "slot": 1,
+      "task": "promise-clear-queue",
+      "project": "p-debounce",
+      "repetition": 1,
+      "arm": "P",
+      "nativeCompleted": true,
+      "slotWallMs": 540558,
+      "elapsedMs": 536817,
+      "timeout": false,
+      "sessions": 1,
+      "tools": 46,
+      "workflowStatus": null,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "providerRequests": 25,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 968816,
+        "output_tokens": 23780,
+        "total_tokens": 992596,
+        "cached_tokens": 234496,
+        "reasoning_tokens": 11875
+      },
+      "components": {
+        "A": {
+          "delivered": 0,
+          "elapsedMs": 0
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "elapsedMs": 0,
+          "statuses": {}
+        }
+      }
+    },
+    {
+      "slot": 2,
+      "task": "promise-clear-queue",
+      "project": "p-debounce",
+      "repetition": 1,
+      "arm": "H11",
+      "nativeCompleted": true,
+      "slotWallMs": 537924,
+      "elapsedMs": 534446,
+      "timeout": false,
+      "sessions": 2,
+      "tools": 67,
+      "workflowStatus": "incomplete",
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "providerRequests": 43,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 1987215,
+        "output_tokens": 18512,
+        "total_tokens": 2005727,
+        "cached_tokens": 901120,
+        "reasoning_tokens": 7777
+      },
+      "components": {
+        "A": {
+          "delivered": 9,
+          "elapsedMs": 668.8319590000174
+        },
+        "B": {
+          "events": 1,
+          "executed": 1,
+          "elapsedMs": 10163.230878999999,
+          "statuses": {
+            "passed": 1
+          }
+        }
+      }
+    },
+    {
+      "slot": 3,
+      "task": "promise-clear-queue",
+      "project": "p-debounce",
+      "repetition": 2,
+      "arm": "H11",
+      "nativeCompleted": true,
+      "slotWallMs": 491747,
+      "elapsedMs": 487730,
+      "timeout": false,
+      "sessions": 2,
+      "tools": 40,
+      "workflowStatus": "incomplete",
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "providerRequests": 24,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 991383,
+        "output_tokens": 20760,
+        "total_tokens": 1012143,
+        "cached_tokens": 255488,
+        "reasoning_tokens": 10573
+      },
+      "components": {
+        "A": {
+          "delivered": 8,
+          "elapsedMs": 620.2431270000343
+        },
+        "B": {
+          "events": 1,
+          "executed": 1,
+          "elapsedMs": 10261.197255,
+          "statuses": {
+            "passed": 1
+          }
+        }
+      }
+    },
+    {
+      "slot": 4,
+      "task": "promise-clear-queue",
+      "project": "p-debounce",
+      "repetition": 2,
+      "arm": "P",
+      "nativeCompleted": true,
+      "slotWallMs": 260922,
+      "elapsedMs": 256788,
+      "timeout": false,
+      "sessions": 1,
+      "tools": 34,
+      "workflowStatus": null,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "providerRequests": 18,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 424722,
+        "output_tokens": 10763,
+        "total_tokens": 435485,
+        "cached_tokens": 103424,
+        "reasoning_tokens": 5615
+      },
+      "components": {
+        "A": {
+          "delivered": 0,
+          "elapsedMs": 0
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "elapsedMs": 0,
+          "statuses": {}
+        }
+      }
+    },
+    {
+      "slot": 5,
+      "task": "throttle-callback-receivers",
+      "project": "p-throttle",
+      "repetition": 1,
+      "arm": "H11",
+      "nativeCompleted": true,
+      "slotWallMs": 635850,
+      "elapsedMs": 631479,
+      "timeout": false,
+      "sessions": 2,
+      "tools": 61,
+      "workflowStatus": "incomplete",
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "providerRequests": 41,
+      "requestsWithoutUsage": 0,
+      "knownUsage": {
+        "input_tokens": 3446453,
+        "output_tokens": 22337,
+        "total_tokens": 3468790,
+        "cached_tokens": 1660928,
+        "reasoning_tokens": 8956
+      },
+      "components": {
+        "A": {
+          "delivered": 12,
+          "elapsedMs": 1004.0690839999043
+        },
+        "B": {
+          "events": 5,
+          "executed": 1,
+          "elapsedMs": 22702.322217999998,
+          "statuses": {
+            "passed": 1,
+            "not-rerun": 4
+          }
+        }
+      }
+    },
+    {
+      "slot": 6,
+      "task": "throttle-callback-receivers",
+      "project": "p-throttle",
+      "repetition": 1,
+      "arm": "P",
+      "nativeCompleted": false,
+      "slotWallMs": 200929,
+      "elapsedMs": 196584,
+      "timeout": false,
+      "sessions": 1,
+      "tools": 13,
+      "workflowStatus": null,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": true
+      },
+      "providerRequests": 5,
+      "requestsWithoutUsage": 1,
+      "knownUsage": {
+        "input_tokens": 22581,
+        "output_tokens": 595,
+        "total_tokens": 23176,
+        "cached_tokens": 5632,
+        "reasoning_tokens": 116
+      },
+      "components": {
+        "A": {
+          "delivered": 0,
+          "elapsedMs": 0
+        },
+        "B": {
+          "events": 0,
+          "executed": 0,
+          "elapsedMs": 0,
+          "statuses": {}
+        }
+      }
+    }
+  ]
+}

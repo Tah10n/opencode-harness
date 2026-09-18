@@ -1,0 +1,149 @@
+diff --git a/lib/plugins/aws/package/lib/mergeIamTemplates.js b/lib/plugins/aws/package/lib/mergeIamTemplates.js
+index 945312b6987c4aa94e03ffa097dfec9ed3a2af06..c9e3c7c33f6dcfc6535bee37a891f2104e860de8 100644
+--- a/lib/plugins/aws/package/lib/mergeIamTemplates.js
++++ b/lib/plugins/aws/package/lib/mergeIamTemplates.js
+@@ -85,23 +85,29 @@ module.exports = {
+       this.provider.serverless.service.service
+     }-${this.provider.getStage()}`;
+     const logGroupsPrefix = this.provider.naming.getLogGroupName(canonicalFunctionNamePrefix);
++    const hasDefaultFunctionName = this.serverless.service.getAllFunctions().some(functionName => {
++      const { name: resolvedFunctionName } = this.serverless.service.getFunction(functionName);
++      return resolvedFunctionName && resolvedFunctionName.startsWith(canonicalFunctionNamePrefix);
++    });
+ 
+     const policyDocumentStatements = this.serverless.service.provider.compiledCloudFormationTemplate
+       .Resources[this.provider.naming.getRoleLogicalId()].Properties.Policies[0].PolicyDocument
+       .Statement;
+ 
+     // Ensure general polices for functions with default name resolution
+-    policyDocumentStatements[0].Resource.push({
+-      'Fn::Sub':
+-        'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}' +
+-        `:log-group:${logGroupsPrefix}*:*`,
+-    });
++    if (hasDefaultFunctionName) {
++      policyDocumentStatements[0].Resource.push({
++        'Fn::Sub':
++          'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}' +
++          `:log-group:${logGroupsPrefix}*:*`,
++      });
+ 
+-    policyDocumentStatements[1].Resource.push({
+-      'Fn::Sub':
+-        'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}' +
+-        `:log-group:${logGroupsPrefix}*:*:*`,
+-    });
++      policyDocumentStatements[1].Resource.push({
++        'Fn::Sub':
++          'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}' +
++          `:log-group:${logGroupsPrefix}*:*:*`,
++      });
++    }
+ 
+     // Ensure policies for functions with custom name resolution
+     this.serverless.service.getAllFunctions().forEach(functionName => {
+diff --git a/lib/plugins/aws/package/lib/mergeIamTemplates.test.js b/lib/plugins/aws/package/lib/mergeIamTemplates.test.js
+index 09447f64157f160d043ed34c05042b1f17517e1d..6f6636c9e865c011e8c45ad19d890fb00f2b3e6e 100644
+--- a/lib/plugins/aws/package/lib/mergeIamTemplates.test.js
++++ b/lib/plugins/aws/package/lib/mergeIamTemplates.test.js
+@@ -138,11 +138,11 @@ describe('#mergeIamTemplates()', () => {
+     };
+     serverless.service.setFunctionNames(); // Ensure to resolve function names
+ 
+-    return awsPackage.mergeIamTemplates().then(() => {
+-      const canonicalFunctionsPrefix = `${
+-        awsPackage.serverless.service.service
+-      }-${awsPackage.provider.getStage()}`;
++    expect(awsPackage.serverless.service.getAllFunctionsNames()).to.deep.equal([
++      customFunctionName,
++    ]);
+ 
++    return awsPackage.mergeIamTemplates().then(() => {
+       expect(
+         awsPackage.serverless.service.provider.compiledCloudFormationTemplate.Resources[
+           awsPackage.provider.naming.getRoleLogicalId()
+@@ -178,11 +178,6 @@ describe('#mergeIamTemplates()', () => {
+                     Effect: 'Allow',
+                     Action: ['logs:CreateLogStream'],
+                     Resource: [
+-                      {
+-                        'Fn::Sub':
+-                          'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:' +
+-                          `log-group:/aws/lambda/${canonicalFunctionsPrefix}*:*`,
+-                      },
+                       {
+                         'Fn::Sub':
+                           'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:' +
+@@ -194,11 +189,6 @@ describe('#mergeIamTemplates()', () => {
+                     Effect: 'Allow',
+                     Action: ['logs:PutLogEvents'],
+                     Resource: [
+-                      {
+-                        'Fn::Sub':
+-                          'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:' +
+-                          `log-group:/aws/lambda/${canonicalFunctionsPrefix}*:*:*`,
+-                      },
+                       {
+                         'Fn::Sub':
+                           'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:' +
+@@ -228,6 +218,60 @@ describe('#mergeIamTemplates()', () => {
+     });
+   });
+ 
++  it('should ensure IAM policies for functions with default and custom names', () => {
++    const customFunctionName = 'foo-bar';
++    awsPackage.serverless.service.functions = {
++      defaultFunction: {
++        artifact: 'test.zip',
++        handler: 'handler.hello',
++      },
++      customFunction: {
++        name: customFunctionName,
++        artifact: 'test.zip',
++        handler: 'handler.hello',
++      },
++    };
++    serverless.service.setFunctionNames();
++
++    expect(awsPackage.serverless.service.getAllFunctionsNames()).to.deep.equal([
++      `${serviceName}-${stage}-defaultFunction`,
++      customFunctionName,
++    ]);
++
++    return awsPackage.mergeIamTemplates().then(() => {
++      const statements =
++        awsPackage.serverless.service.provider.compiledCloudFormationTemplate.Resources[
++          awsPackage.provider.naming.getRoleLogicalId()
++        ].Properties.Policies[0].PolicyDocument.Statement;
++      const canonicalFunctionsPrefix = `${serviceName}-${stage}`;
++
++      expect(statements[0].Resource).to.deep.equal([
++        {
++          'Fn::Sub':
++            'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:' +
++            `log-group:/aws/lambda/${canonicalFunctionsPrefix}*:*`,
++        },
++        {
++          'Fn::Sub':
++            'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:' +
++            `log-group:/aws/lambda/${customFunctionName}:*`,
++        },
++      ]);
++      expect(statements[1].Resource).to.deep.equal([
++        {
++          'Fn::Sub':
++            'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:' +
++            `log-group:/aws/lambda/${canonicalFunctionsPrefix}*:*:*`,
++        },
++        {
++          'Fn::Sub':
++            'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:' +
++            `log-group:/aws/lambda/${customFunctionName}:*:*`,
++        },
++      ]);
++    });
++  });
++
+   it('should add custom IAM policy statements', () => {
+     awsPackage.serverless.service.provider.iamRoleStatements = [
+       {

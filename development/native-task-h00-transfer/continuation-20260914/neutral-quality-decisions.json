@@ -1,0 +1,1735 @@
+{
+  "savedAt": "2026-09-14T10:55:58.941484+00:00",
+  "scope": "24 new neutral patches only; historical first18 unchanged",
+  "armMappingReadBeforeDecision": false,
+  "authorFinalNarrativesReadBeforeDecision": false,
+  "assessorLimit": "Same assessor monitored original schedule. Neutral-label review is best-effort, not independent double blinding. Operational order and patch clues may reveal arms.",
+  "rows": [
+    {
+      "id": "0e1eaa2beb52",
+      "task": "denque-rotate",
+      "project": "denque",
+      "Q": 0,
+      "findings": [
+        {
+          "category": "documentation-error",
+          "reason": "README sequential rotate()/rotate(-2) example claims [1,2,3,4] instead of [2,3,4,1]."
+        }
+      ],
+      "contentReview": {
+        "id": "0e1eaa2beb52",
+        "task": "denque-rotate",
+        "project": "denque",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Validates before mutation; nonfinite infinity produces NaN remainder and is rejected. Modulo normalization rebuilds same-sized storage with original references; capacity remains untouched.",
+        "retainedTestsReview": "All pre-existing cases retained, new describe inserted between existing suites.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Default, positive/negative, zero, beyond-length counts and MAX_SAFE_INTEGER assert exact order and this."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Wrapped state explicitly asserted before rotating; subsequent peek/shift/pop/unshift/push/remove assert correct order. Capacity queue rotates and overflows both ends while asserting configured capacity and expected order."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Three objects are actually rotated, strict peekFront/peekBack equality checked against original references; invalid rotations preserve backing list/head/tail and values. Empty/singleton reuse covered."
+          }
+        ],
+        "typesReview": "rotate optional number returns this; default/negative/typed consumer cases supplied.",
+        "docsReview": "README explains directions, modulo, no-op and invalid-input errors. Its sequential example incorrectly claims [1,2,3,4] after rotate() then rotate(-2); task semantics and delivered test give [2,3,4,1].",
+        "contentFindings": [
+          {
+            "category": "documentation-error",
+            "reason": "README sequential rotate()/rotate(-2) example claims [1,2,3,4] instead of [2,3,4,1]."
+          }
+        ],
+        "pending": [
+          "ordinary project checks",
+          "independent checks",
+          "ordinary patch applicability",
+          "object-identity sensitivity diagnostic",
+          "confirm README example mismatch using public API in an independent copy"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "0e1eaa2beb52",
+        "task": "denque-rotate",
+        "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "84a444e3fa7c798d90bacaa71e9db31cac5263c935f4193d9008474148a83498",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "84a444e3fa7c798d90bacaa71e9db31cac5263c935f4193d9008474148a83498",
+      "sourcePatchBytes": 6678,
+      "assessmentNotes": []
+    },
+    {
+      "id": "2074dfbdf22d",
+      "task": "eventemitter-prepend",
+      "project": "eventemitter3",
+      "Q": 1,
+      "findings": [],
+      "contentReview": {
+        "id": "2074dfbdf22d",
+        "task": "eventemitter-prepend",
+        "project": "eventemitter3",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Extends original addListener helper with optional prepend boolean; retains validation, normalized context and once removal path. New prepends use unshift when listeners already form array; previous append registration path and emit/off functions unchanged.",
+        "retainedTestsReview": "All original independent regression cases retained, new CJS/ESM cases and type fixture added.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Mixed append/once/prepend/latest-prepend order with explicit receivers and two arguments, return this and second-emission persistent ordering."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Recursive prependOnce invokes once exactly once; regular prepended persists and removeListener removes it."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Symbol event emits twice with expected once/persistent order; both APIs exercised by ESM import; invalid handler on string event retains original registration."
+          }
+        ],
+        "typesReview": "Event-specific generic declarations plus test/types.ts checks inferred string/number params for both methods, empty-argument event, typed context and expected compile rejection of swapped number/string callback.",
+        "docsReview": "README removes stale unavailable-method claim and explains reverse registration ordering and optional-context examples.",
+        "contentFindings": [],
+        "pending": [
+          "ordinary project checks and ESM",
+          "independent public API checks",
+          "ordinary patch applicability",
+          "delivered TypeScript consumer compilation"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "2074dfbdf22d",
+        "task": "eventemitter-prepend",
+        "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "60898eb7b10ae52fbff4bdf695e89bc1e3840150a4c4df9dfd90e5b1abb34eaa",
+        "excludedPreparationArtifacts": [],
+        "types": {
+          "compiler": "6.0.3",
+          "exit": 0,
+          "output": "",
+          "fixtures": [
+            "test/types.ts"
+          ],
+          "scope": "Delivered standalone consumer checked with the same host compiler as calibration; ordinary runtime checks run separately on Linux arm64."
+        }
+      },
+      "sourcePatchSha256": "60898eb7b10ae52fbff4bdf695e89bc1e3840150a4c4df9dfd90e5b1abb34eaa",
+      "sourcePatchBytes": 10117,
+      "assessmentNotes": []
+    },
+    {
+      "id": "24400478fb85",
+      "task": "fastq-on-idle",
+      "project": "fastq",
+      "Q": 0,
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "No delivered regression for kill clearing queued-only work while no worker is active, an explicit required idle-transition path."
+        }
+      ],
+      "contentReview": {
+        "id": "24400478fb85",
+        "task": "fastq-on-idle",
+        "project": "fastq",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Resolver list is notified when release drains and after kill/abort. callDrain wraps invocation internally without replacing user drain property; depth delays notification until nested synchronous drain calls finish. onIdle during drain waits for final actual idle.",
+        "retainedTestsReview": "All original ordinary callback/promise tests and type example preserved; independent new suites added.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Two concurrent active workers plus paused queued task; multiple subscribers remain pending after workers finish while queue paused, then all resolve after resume and final completion."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Drain identity checked before/while/after wait; first drain subscribes and enqueues second async worker; subscription asserts idle after reentrant work and two drain calls."
+          },
+          {
+            "scenario": 3,
+            "covered": false,
+            "evidence": "For all three methods, active-worker tests wait an immediate turn and assert subscriber still pending before finishing worker. Queued-only killAndDrain and abort exercised; rejected worker promise covered. No queued-only kill case exists: its sole new kill call has an active worker, so a missing immediate-idle notification in kill could escape."
+          }
+        ],
+        "typesReview": "onIdle(): Promise<void> added to shared queue declaration inherited by promise queue; ordinary typed callback queue example invokes API.",
+        "docsReview": "README describes independent promises, actual idle condition, already-idle and paused queues, preserved drain property and both queue variants.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "reason": "No delivered regression for kill clearing queued-only work while no worker is active, an explicit required idle-transition path."
+          }
+        ],
+        "pending": [
+          "ordinary project checks and TypeScript",
+          "independent public API checks",
+          "ordinary patch applicability",
+          "existing idle-transition and early-kill sensitivity diagnostics"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "24400478fb85",
+        "task": "fastq-on-idle",
+        "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "8ebaae8e4fadbafea7f8a81d33ba2bf308181c08f5e0926cdeb358100f6b7804",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "8ebaae8e4fadbafea7f8a81d33ba2bf308181c08f5e0926cdeb358100f6b7804",
+      "sourcePatchBytes": 10577,
+      "assessmentNotes": []
+    },
+    {
+      "id": "25176f07bc87",
+      "task": "ufo-query-sort",
+      "project": "ufo",
+      "Q": 0,
+      "findings": [
+        {
+          "category": "empty-delivery",
+          "reason": "No source changes delivered for the requested feature."
+        }
+      ],
+      "contentReview": {
+        "id": "25176f07bc87",
+        "task": "ufo-query-sort",
+        "project": "ufo",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Empty source patch; requested query sort API is not delivered.",
+        "retainedTestsReview": "Pinned baseline unchanged; no new regression cases.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": false,
+            "evidence": "No delivered changes."
+          },
+          {
+            "scenario": 2,
+            "covered": false,
+            "evidence": "No delivered changes."
+          },
+          {
+            "scenario": 3,
+            "covered": false,
+            "evidence": "No delivered changes."
+          }
+        ],
+        "typesReview": "No requested declaration/type consumer changes.",
+        "docsReview": "No requested documentation changes.",
+        "contentFindings": [
+          {
+            "category": "empty-delivery",
+            "reason": "No source changes delivered for the requested feature."
+          }
+        ],
+        "pending": [
+          "ordinary baseline check",
+          "independent missing-feature check",
+          "ordinary patch applicability"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 1,
+      "interpretedIndependentExit": 1,
+      "applicability": {
+        "id": "25176f07bc87",
+        "task": "ufo-query-sort",
+        "sourceCommit": "f06c800d0c59f2a4a1b9ba65eb6cb61a84419be6",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourcePatchBytes": 0,
+      "assessmentNotes": []
+    },
+    {
+      "id": "4d51f8b6284c",
+      "task": "ufo-query-sort",
+      "project": "ufo",
+      "Q": 0,
+      "findings": [
+        {
+          "category": "empty-delivery",
+          "reason": "No source changes delivered for the requested feature."
+        }
+      ],
+      "contentReview": {
+        "id": "4d51f8b6284c",
+        "task": "ufo-query-sort",
+        "project": "ufo",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Empty source patch; requested query sort API is not delivered.",
+        "retainedTestsReview": "Pinned baseline unchanged; no new regression cases.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": false,
+            "evidence": "No delivered changes."
+          },
+          {
+            "scenario": 2,
+            "covered": false,
+            "evidence": "No delivered changes."
+          },
+          {
+            "scenario": 3,
+            "covered": false,
+            "evidence": "No delivered changes."
+          }
+        ],
+        "typesReview": "No requested declaration/type consumer changes.",
+        "docsReview": "No requested documentation changes.",
+        "contentFindings": [
+          {
+            "category": "empty-delivery",
+            "reason": "No source changes delivered for the requested feature."
+          }
+        ],
+        "pending": [
+          "ordinary baseline check",
+          "independent missing-feature check",
+          "ordinary patch applicability"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 1,
+      "interpretedIndependentExit": 1,
+      "applicability": {
+        "id": "4d51f8b6284c",
+        "task": "ufo-query-sort",
+        "sourceCommit": "f06c800d0c59f2a4a1b9ba65eb6cb61a84419be6",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourcePatchBytes": 0,
+      "assessmentNotes": []
+    },
+    {
+      "id": "5577cf98c7bb",
+      "task": "denque-rotate",
+      "project": "denque",
+      "Q": 0,
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "Missing object identity discrimination during a valid nontrivial rotation"
+        },
+        {
+          "category": "documentation-error",
+          "reason": "README sequential example says rotate moves 4 after pop removed 4; it actually moves 3."
+        }
+      ],
+      "contentReview": {
+        "id": "5577cf98c7bb",
+        "task": "denque-rotate",
+        "project": "denque",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Finite integer validation precedes mutation; modulo normalization rebuilds existing-sized backing storage and retains original references, capacity mask and configured capacity. Subsequent operations and independent behavior checks pending.",
+        "retainedTestsReview": "Existing splice and shrink tests retained; new rotate describe nested inside splice describe, which does not remove assertions.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Default, positive/negative, zero, MAX_SAFE_INTEGER and negative large counts assert order and same instance."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Wrapped queue shifts then pushes through end; asserts rotation order, length, mask/backing length and peek/shift/pop/remove. Capacity queue asserts configured capacity plus subsequent unshift/push order."
+          },
+          {
+            "scenario": 3,
+            "covered": false,
+            "evidence": "Objects occur only in invalid rotations and singleton no-op. All actual nontrivial rotation assertions use numbers; no object identity check after rotation. Original object-cloning sensitivity diagnostic pending. Empty/singleton reuse and invalid atomicity are covered."
+          }
+        ],
+        "typesReview": "rotate optional number returns this; consumer fixture exercises default and typed chained return.",
+        "docsReview": "API docs describe directions, normalization, errors and no-ops. Added README inline comment says rotate moves 4 after the preceding pop already removed 4; actual remaining back value is 3.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "reason": "Missing object identity discrimination during a valid nontrivial rotation; pending saved diagnostic."
+          },
+          {
+            "category": "documentation-error",
+            "reason": "README sequential example says rotate moves 4 after pop removed 4; it actually moves 3."
+          }
+        ],
+        "pending": [
+          "ordinary project checks",
+          "independent checks",
+          "ordinary patch applicability",
+          "object-identity sensitivity diagnostic"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "5577cf98c7bb",
+        "task": "denque-rotate",
+        "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "0e086ac3bd6f9cbde2774a48b5ec154e74dbf6fc7f0d5d7716868717eea488c5",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "0e086ac3bd6f9cbde2774a48b5ec154e74dbf6fc7f0d5d7716868717eea488c5",
+      "sourcePatchBytes": 7430,
+      "assessmentNotes": []
+    },
+    {
+      "id": "5bd7601b2ab2",
+      "task": "fastq-running-tasks",
+      "project": "fastq",
+      "Q": 1,
+      "findings": [],
+      "contentReview": {
+        "id": "5bd7601b2ab2",
+        "task": "fastq-running-tasks",
+        "project": "fastq",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Maintains separate doubly linked running list; every direct/promoted start adds before worker, Task.worked removes before error handler and completion callback. Snapshot copies values into a fresh array; pooled running links are cleared. Original _running/release scheduling and callback context flow remain unchanged.",
+        "retainedTestsReview": "All original callback/promise and type examples retained; new cases added.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Deferred workers distinguish active from queued values; fresh-array identity and mutation isolation asserted."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Two undefined values become concurrently active after distinct completion, callbacks assert their own absence, queued promotion and pooled-task reuse checked; retained snapshot still contains original values after reuse."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Paused queue with push/unshift, resume, concurrency increase and promotion asserts active snapshots; deferred promise fulfillment and rejection assert successive active lists and final emptiness."
+          }
+        ],
+        "typesReview": "runningTasks(): T[] added to shared queue declaration inherited by promise queues; both callback and promise public consumers added to ordinary example fixture.",
+        "docsReview": "README API link and method docs define fresh snapshot, active-only inclusion, start order, duplicates and undefined.",
+        "contentFindings": [],
+        "pending": [
+          "ordinary project checks and TypeScript",
+          "independent public API checks",
+          "ordinary patch applicability"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "5bd7601b2ab2",
+        "task": "fastq-running-tasks",
+        "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "97734961552bde179602bae742a34b5fdf043c966970666f159723be2be84bf1",
+        "excludedPreparationArtifacts": [
+          "package-lock.json"
+        ],
+        "types": null
+      },
+      "sourcePatchSha256": "97734961552bde179602bae742a34b5fdf043c966970666f159723be2be84bf1",
+      "sourcePatchBytes": 10874,
+      "assessmentNotes": []
+    },
+    {
+      "id": "634888ad4881",
+      "task": "denque-remove-where",
+      "project": "denque",
+      "Q": 0,
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "Configured capacity after successful filtering is not discriminated by the delivered suite"
+        }
+      ],
+      "contentReview": {
+        "id": "634888ad4881",
+        "task": "denque-remove-where",
+        "project": "denque",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Snapshots original logical values then evaluates predicate completely before writing survivors in original head positions, clears removed tail slots and adjusts tail. Retains configured capacity and references; exception identity propagated naturally.",
+        "retainedTestsReview": "Existing independent regression cases preserved; one new suite inserted.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Records every original value/index exactly; mixed, none and all assert counts and order."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Predicate returns match at index 0 then throws original Error at index 1; all original reference identities and length retained. Null predicate on empty throws."
+          },
+          {
+            "scenario": 3,
+            "covered": false,
+            "evidence": "Actual wrapped bounded queue contains duplicate 0, false and object; filtering asserts survivors and object identity. Checks backing length/mask only, then pushes one value below configured capacity. Never asserts _capacity or overflows after filtering, so loss of configured capacity can escape; original capacity-loss mutation pending."
+          }
+        ],
+        "typesReview": "Predicate takes generic value and numeric index, unknown result supports truthy matching; ordinary consumer uses value.length and index.",
+        "docsReview": "README and API document original indexes, order, removed count and atomic throw behavior with valid example.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "reason": "Configured capacity after successful filtering is not discriminated by the delivered suite; pending same capacity-loss diagnostic used for first repetition."
+          }
+        ],
+        "pending": [
+          "ordinary project checks",
+          "independent behavior",
+          "ordinary patch applicability",
+          "configured-capacity test sensitivity"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "634888ad4881",
+        "task": "denque-remove-where",
+        "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "52f7a5afc7476758e50dafdbe59bff4710a6fea03f604ddc15d0704629619b9a",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "52f7a5afc7476758e50dafdbe59bff4710a6fea03f604ddc15d0704629619b9a",
+      "sourcePatchBytes": 6260,
+      "assessmentNotes": []
+    },
+    {
+      "id": "71b56c9173d2",
+      "task": "ms-parse-compound",
+      "project": "ms",
+      "Q": 1,
+      "findings": [],
+      "contentReview": {
+        "id": "71b56c9173d2",
+        "task": "ms-parse-compound",
+        "project": "ms",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "retainedTestsReview": "Existing parse/format/ms/type cases retained; new test file added. Existing parser entry points unchanged.",
+        "behaviorReview": "Full regex validates before summing explicit units via original parse conversions, leading minus applied to whole sum. Suspected terminal-newline acceptance from dollar anchor needs direct compiled API verification.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "One mixed expression covers spelled/mixed-case units, decimals, repeated and reordered hour/day units, months/years and negative sum."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Delivered assertions reject missing units, later signs, suffix garbage, leading/trailing ASCII spaces and non-space separators. Terminal-newline implementation hypothesis checked separately."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Non-string, empty, oversized inputs throw; all three original parsers reject compound syntax."
+          }
+        ],
+        "typesReview": "Exported TS function has string argument and number return; ts-expect-error runtime/type cases reject undefined and compound inputs to strict parsers. Normal project typecheck/build pending.",
+        "docsReview": "README API import/example, grammar, negative-sum and error-boundary documentation present.",
+        "contentFindings": [],
+        "pending": [
+          "ordinary project checks/build/types",
+          "independent runtime checks",
+          "ordinary patch applicability",
+          "direct contract probe for forbidden trailing newline on author patches and reference/alternative"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "71b56c9173d2",
+        "task": "ms-parse-compound",
+        "sourceCommit": "4ff48cec099f0514c3e9bbca18706c9c21122bfb",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "3a5d6cf8cb91a8026ffaa61bcb8dbf87393e254bffca31105549cd9e8853b8bb",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "3a5d6cf8cb91a8026ffaa61bcb8dbf87393e254bffca31105549cd9e8853b8bb",
+      "sourcePatchBytes": 4590,
+      "assessmentNotes": [
+        "Suspected trailing-line-terminator defect refuted: compiled public API returns NaN for LF, CR, U+2028 and U+2029; both controls pass same probe."
+      ]
+    },
+    {
+      "id": "786a7040da24",
+      "task": "quick-lru-prune",
+      "project": "quick-lru",
+      "Q": 0,
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "Delivered shadow regression never uses a still-live old entry when current expires, leaving the required no-resurrection distinction untested."
+        }
+      ],
+      "contentReview": {
+        "id": "786a7040da24",
+        "task": "quick-lru-prune",
+        "project": "quick-lru",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Prunes current generation with original expiry helper, then old keys lacking current entries. Helper deletes both copies, so current expiration does not resurrect old value. Live entries are not promoted/reordered. Current-first callback order is allowed by task.",
+        "retainedTestsReview": "All original runtime and tsd cases retained; serial clock-controlled regressions added with teardown restoration.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Current and old expired entries counted and notified once, full live iteration order compared to pre-expiration snapshot."
+          },
+          {
+            "scenario": 2,
+            "covered": false,
+            "evidence": "Live current shadows expired old with no callback. When current then expires, old is already expired as well; later get() would lazily erase a mistakenly retained old entry, so this does not discriminate resurrection of a still-live old value. Same gap as the disclosed first-repetition prune assessment."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Exact fake-clock boundary, Infinity, stored undefined and repeat prune checked; live entry deleted to make size zero, then cache reused and pruned."
+          }
+        ],
+        "typesReview": "pruneExpired(): number declaration and tsd number assertion supplied.",
+        "docsReview": "README/declaration explain logical-key count, normal callbacks, current visibility, no reordering and no resurrection.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "reason": "Delivered shadow regression never uses a still-live old entry when current expires, leaving the required no-resurrection distinction untested."
+          }
+        ],
+        "pending": [
+          "ordinary project checks including tsd",
+          "original independent checks",
+          "uniform callback-order interpretation",
+          "ordinary patch applicability"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 1,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "786a7040da24",
+        "task": "quick-lru-prune",
+        "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "885ddc77172e118c654296a5e88abc01c52febf0f7025c61f2a4caf515f1c55d",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "885ddc77172e118c654296a5e88abc01c52febf0f7025c61f2a4caf515f1c55d",
+      "sourcePatchBytes": 5912,
+      "assessmentNotes": [
+        "Original independent exit preserved; only unsupported cross-generation callback order interpreted uniformly as before amendment."
+      ]
+    },
+    {
+      "id": "7c3df8a293a7",
+      "task": "denque-remove-where",
+      "project": "denque",
+      "Q": 1,
+      "findings": [],
+      "contentReview": {
+        "id": "7c3df8a293a7",
+        "task": "denque-remove-where",
+        "project": "denque",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Snapshot and match evaluation finish before clearing/writing slots; original references retained, _capacity unchanged, tail normalized. Non-function validated before empty early return.",
+        "retainedTestsReview": "All original regression cases retained; separate suite inserted.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Exact original order/index trace, mixed survivors and none/all counts."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Returns a match before throwing original Error; strict identity assertions retain every original entry. Null on empty throws."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Wrapped capacity-4 queue with duplicate marker object and falsy values filters, checks both marker identities and configured _capacity, then push/unshift plus overflow proves cap and order preserved."
+          }
+        ],
+        "typesReview": "Generic predicate value/index and unknown return; consumer value.length truthy result and numeric removed assignment supplied.",
+        "docsReview": "README and API cover order, original indexes, truthy filtering, removed count, invalid predicate and atomic thrown error with valid examples.",
+        "contentFindings": [],
+        "pending": [
+          "ordinary project checks",
+          "independent behavior",
+          "ordinary patch applicability",
+          "configured-capacity test sensitivity"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "7c3df8a293a7",
+        "task": "denque-remove-where",
+        "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "d4179fbe5556e631a5c4b068e8adaa049d906c3603c209db25929b44bf82c3e0",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "d4179fbe5556e631a5c4b068e8adaa049d906c3603c209db25929b44bf82c3e0",
+      "sourcePatchBytes": 7184,
+      "assessmentNotes": []
+    },
+    {
+      "id": "9362cee5515b",
+      "task": "ms-format-unit",
+      "project": "ms",
+      "Q": 1,
+      "findings": [],
+      "contentReview": {
+        "id": "9362cee5515b",
+        "task": "ms-format-unit",
+        "project": "ms",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "retainedTestsReview": "Original format cases retained; only import extended and new scenario groups added. Original ms/parse/parseStrict source paths unchanged.",
+        "behaviorReview": "Forced-unit switch reuses original constants, Math.round and plural helper; ms unit retains fractional numeric value. Unknown runtime values hit Error default. Numeric ms still forwards options to format; string parsing ignores options as before.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "All units exercised; forced smaller milliseconds and larger year differ from automatic format, explicit month/year constants and fractional ms."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Negative rounding at -2500 and -1500, zero long hour, 1499/1500 singular/plural boundary, fractional long ms."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Unknown runtime unit rejected by format and numeric ms; string ms parses normally with invalid formatting option. Existing default/parse/parseStrict tests retained. Type fixture rejects invalid unit via ts-expect-error."
+          }
+        ],
+        "typesReview": "Options exported with supported unit union; source type fixture checks format/ms string returns, parse numeric overload and invalid unit rejection; normal typecheck/build pending.",
+        "docsReview": "README forced-unit examples include short seconds, long minutes and month conversion; Options JSDoc documents forcing vs automatic.",
+        "contentFindings": [],
+        "pending": [
+          "ordinary project checks/build/types",
+          "independent runtime checks",
+          "ordinary patch applicability",
+          "classify 17 generated Husky files against pinned dependency output; preserve raw capture"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "9362cee5515b",
+        "task": "ms-format-unit",
+        "sourceCommit": "4ff48cec099f0514c3e9bbca18706c9c21122bfb",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "02c361d7236e65072db769475b9728fa42c2da36cce467114ec75383ba264b75",
+        "excludedPreparationArtifacts": [
+          ".husky/_/.gitignore",
+          ".husky/_/applypatch-msg",
+          ".husky/_/commit-msg",
+          ".husky/_/h",
+          ".husky/_/husky.sh",
+          ".husky/_/post-applypatch",
+          ".husky/_/post-checkout",
+          ".husky/_/post-commit",
+          ".husky/_/post-merge",
+          ".husky/_/post-rewrite",
+          ".husky/_/pre-applypatch",
+          ".husky/_/pre-auto-gc",
+          ".husky/_/pre-commit",
+          ".husky/_/pre-merge-commit",
+          ".husky/_/pre-push",
+          ".husky/_/pre-rebase",
+          ".husky/_/prepare-commit-msg"
+        ],
+        "types": null
+      },
+      "sourcePatchSha256": "02c361d7236e65072db769475b9728fa42c2da36cce467114ec75383ba264b75",
+      "sourcePatchBytes": 6060,
+      "assessmentNotes": [
+        "17 ignored Husky files exactly match pinned generator bytes/modes and are absent upstream; omitted only from public-source projection, raw capture unchanged."
+      ]
+    },
+    {
+      "id": "9381115d1f3d",
+      "task": "fastq-on-idle",
+      "project": "fastq",
+      "Q": 0,
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "Delivered regressions omit onIdle remaining pending when killAndDrain or abort removes queued work while a worker remains active."
+        },
+        {
+          "category": "behavior-defect",
+          "reason": "Public onIdle subscription created inside drain resolves before work synchronously enqueued by that same drain callback finishes; direct probe fails. Same check on both historical patches and both controls also fails; their saved grades remain unchanged."
+        }
+      ],
+      "contentReview": {
+        "id": "9381115d1f3d",
+        "task": "fastq-on-idle",
+        "project": "fastq",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Resolver array and notification-suppression depth defer existing subscribers until drain and abort callbacks end. onIdle itself resolves immediately on idle() without checking suppression depth, so a newly created subscription inside drain may resolve before later synchronous enqueue completes; direct probe pending.",
+        "retainedTestsReview": "Original callback/promise/type cases preserved; ordinary abort callback flow wrapped in try/finally suppression without changing callback order or receivers.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Multiple subscribers and deferred promise workers check pending state across promotions; paused queued/rejected work waits for remaining running worker, final empty resolves."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Drain identity and call counts preserved; normal and nested synchronous drain enqueue exercises waiting until final async worker completion. Subscription created inside drain is not tested and is a separate implementation hypothesis."
+          },
+          {
+            "scenario": 3,
+            "covered": false,
+            "evidence": "Queued-only kill/killAndDrain/abort and rejected promise work exercised. Callback kill test waits an immediate turn and checks subscription pending with worker alive. No active-worker killAndDrain or active-worker abort subscription case appears."
+          }
+        ],
+        "typesReview": "onIdle(): Promise<void> shared declaration, callback .then consumer and awaited promise-queue consumer present.",
+        "docsReview": "README documents independent promise, actual idle, paused queues and preserved drain callback.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "reason": "Delivered regressions omit onIdle remaining pending when killAndDrain or abort removes queued work while a worker remains active."
+          }
+        ],
+        "pending": [
+          "ordinary project checks and TypeScript",
+          "independent public API checks",
+          "ordinary patch applicability",
+          "existing idle-transition and early-kill sensitivity diagnostics",
+          "new subscription-inside-drain existing-contract probe"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "9381115d1f3d",
+        "task": "fastq-on-idle",
+        "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "1efd5b771695298f012f25bc04578530aee20de9e66e2dd7fe1ac976e3661168",
+        "excludedPreparationArtifacts": [
+          "package-lock.json"
+        ],
+        "types": null
+      },
+      "sourcePatchSha256": "1efd5b771695298f012f25bc04578530aee20de9e66e2dd7fe1ac976e3661168",
+      "sourcePatchBytes": 15616,
+      "assessmentNotes": []
+    },
+    {
+      "id": "99f4f21261a8",
+      "task": "quick-lru-computed",
+      "project": "quick-lru",
+      "Q": 0,
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "Recency assertion only observes absence from old generation and does not establish retention after promotion."
+        },
+        {
+          "category": "required-coverage-loss",
+          "reason": "Default TTL assertion admits Infinity"
+        }
+      ],
+      "contentReview": {
+        "id": "99f4f21261a8",
+        "task": "quick-lru-computed",
+        "project": "quick-lru",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Checks current then old generation, uses normal expiry deletion/notification and old-entry moveToRecent; default set computes finite cache maxAge. Synchronous factory errors propagate before insertion.",
+        "retainedTestsReview": "Original runtime and tsd cases retained; three runtime cases and consumer regressions added.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": false,
+            "evidence": "Stored undefined hit checks no factory and deletion from old cache only. No assertion that key survives in current cache or subsequent eviction proves refresh; a dropped old entry could pass. Historical corresponding test also asserted has(old), which this delivered test omits."
+          },
+          {
+            "scenario": 2,
+            "covered": false,
+            "evidence": "Expired entry, one factory call and one eviction are checked. Remaining TTL is only compared >10, accepting Infinity; no finite/default upper bound or later expiry. Same loss-of-default-TTL diagnostic prepared."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Original thrown Error and empty cache retained; object key strictly passed to factory, repeat hit avoids factory, separate cache and distinct object key use separate values."
+          }
+        ],
+        "typesReview": "tsd asserts key string inference and number result, rejects wrong factory return type.",
+        "docsReview": "README and public declaration explain synchronous miss computation, no computation on hit, recency and default maxAge.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "reason": "Recency assertion only observes absence from old generation and does not establish retention after promotion."
+          },
+          {
+            "category": "required-coverage-loss",
+            "reason": "Default TTL assertion admits Infinity; pending same concrete TTL-loss diagnostic used for both new and historical attempts and controls."
+          }
+        ],
+        "pending": [
+          "ordinary project checks including tsd",
+          "independent public API checks",
+          "ordinary patch applicability",
+          "missing-default-TTL test sensitivity"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "99f4f21261a8",
+        "task": "quick-lru-computed",
+        "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "64536230e290be1931d4ab52a3d86c5b4ac1de8ee2ff5c9446b24c64643e1131",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "64536230e290be1931d4ab52a3d86c5b4ac1de8ee2ff5c9446b24c64643e1131",
+      "sourcePatchBytes": 4984,
+      "assessmentNotes": [
+        "Delivered AVA suite accepts isolated removal of computed entry expiry. Initial set-based diagnostic retained separately because repeat set could also alter eviction; refined probe changes only stored expiry. Both historical suites and controls detect refined mutant."
+      ]
+    },
+    {
+      "id": "a34f6f2c0e6b",
+      "task": "quick-lru-prune",
+      "project": "quick-lru",
+      "Q": 1,
+      "findings": [],
+      "contentReview": {
+        "id": "a34f6f2c0e6b",
+        "task": "quick-lru-prune",
+        "project": "quick-lru",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Current entries pruned first through original expiry helper that deletes both generations, then unshadowed old entries. Live entries retain insertion/generation order. Current-first callback ordering is valid under original interpretation.",
+        "retainedTestsReview": "All prior runtime and tsd regressions retained.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Expired current/old entries distinguished with generation checks, removed count and callback count/value assertions; live entriesAscending order exact."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Live current shadows expired old without false notification. Separate still-live old resurrected key is shadowed by expired current; old presence before prune verified, get undefined and final iteration prove no resurrection."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Zero maxAge, Infinity, undefined, repeated prune and explicit size-zero prune followed by successful undefined-valued reuse and iteration checked. Independent frozen clock probe remains separate exact-boundary evidence."
+          }
+        ],
+        "typesReview": "pruneExpired(): number declaration and tsd result type assertion supplied.",
+        "docsReview": "README/declaration document logical-visible expired removal, no recency change, count and normal onEviction notification.",
+        "contentFindings": [],
+        "pending": [
+          "ordinary project checks including tsd",
+          "original independent checks",
+          "uniform callback-order interpretation",
+          "ordinary patch applicability"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 1,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "a34f6f2c0e6b",
+        "task": "quick-lru-prune",
+        "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "63abad4d5c1cbb2b8c6c7c67b1930b0d1659d4067673243877e19d8631006ecf",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "63abad4d5c1cbb2b8c6c7c67b1930b0d1659d4067673243877e19d8631006ecf",
+      "sourcePatchBytes": 5349,
+      "assessmentNotes": [
+        "Original independent exit preserved; only unsupported cross-generation callback order interpreted uniformly as before amendment."
+      ]
+    },
+    {
+      "id": "a4b23cec6afd",
+      "task": "ufo-append-query",
+      "project": "ufo",
+      "Q": 0,
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "The only empty array is emptyArray on an input containing only existing=one; it tests omission for an absent key, not retention for an existing key."
+        }
+      ],
+      "contentReview": {
+        "id": "a4b23cec6afd",
+        "task": "ufo-append-query",
+        "project": "ufo",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "retainedTestsReview": "Original tests remain unchanged; additions only.",
+        "behaviorReview": "Builds URL from parsed old query, emits old then new encoded items per key, omits pollution keys, never writes query/arrays. Null for an existing key serializes as bare repeated key rather than key=; both encode an empty value. Original evaluator exact-byte expectation needs interpretation review, not an automatic behavior failure.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Old repeated tag values plus new array exact append order; same input with withQuery proves replacement retained."
+          },
+          {
+            "scenario": 2,
+            "covered": "partial",
+            "evidence": "Existing key with undefined retains value; new absent emptyArray key is omitted. No test passes [] for an existing key, so loss of existing data specifically for empty arrays is not distinguished. Empty/null/zero/false serialization asserted for new keys."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Absolute and relative URLs, repeated differently encoded keys, fragment, null-prototype pollution keys from old/new data; array content, property identity and object keys checked unchanged."
+          }
+        ],
+        "typesReview": "Public function typed string/QueryObject->string and exposed by existing utils export-star. Delivered expectTypeOf exact public signature fixture. Normal declaration build remains to run.",
+        "docsReview": "API JSDoc/README describe append behavior, ignored values, empty/null and pollution policy with order example.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "requirement": "Empty new arrays must not erase existing data.",
+            "evidence": "The only empty array is emptyArray on an input containing only existing=one; it tests omission for an absent key, not retention for an existing key.",
+            "confirmationPending": "Narrow test sensitivity for losing existing values only when the new value is [], uniformly across applicable appendQuery patches and controls."
+          }
+        ],
+        "pending": [
+          "ordinary project checks/build/types",
+          "raw independent checks",
+          "empty-append syntax interpretation check",
+          "required empty-array preservation sensitivity",
+          "ordinary source applicability"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 1,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "a4b23cec6afd",
+        "task": "ufo-append-query",
+        "sourceCommit": "f06c800d0c59f2a4a1b9ba65eb6cb61a84419be6",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "acf6074a701b3ad5a813351914dcb72cf98a3663061a49ebd1372303b6ed8bc6",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "acf6074a701b3ad5a813351914dcb72cf98a3663061a49ebd1372303b6ed8bc6",
+      "sourcePatchBytes": 6244,
+      "assessmentNotes": [
+        "Original empty-value serialization assertion accepts either key or key= for appended empty value. Both controls pass; nonempty author patch passes, empty patch still fails. Q=0 remains due separate required test gap or empty delivery.",
+        "Delivered runtime/type suite accepts deletion of existing values only when appending an empty array; both controls detect the same mutant."
+      ]
+    },
+    {
+      "id": "a53a7c1ad827",
+      "task": "quick-lru-computed",
+      "project": "quick-lru",
+      "Q": 0,
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "Default TTL regression accepts an infinite expiry because its only post-insertion TTL assertion is >0"
+        }
+      ],
+      "contentReview": {
+        "id": "a53a7c1ad827",
+        "task": "quick-lru-computed",
+        "project": "quick-lru",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Uses current/old cache membership to preserve stored undefined, original expiry deletion/notification, moveToRecent on old hits, and normal set for default maxAge on computed misses. Thrown factory leaves absent key uninserted.",
+        "retainedTestsReview": "All original runtime and tsd regression cases retained.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Old-generation stored undefined hit never calls factory; several inserts force next generation, making missing recency promotion observable."
+          },
+          {
+            "scenario": 2,
+            "covered": false,
+            "evidence": "Expired entry is observed without deletion via expiresIn, factory count/key/returned value and one eviction checked. Reinserted TTL only checked as >0, which also accepts Infinity; no upper bound, finite check or later expiry proves default TTL. Same diagnostic of missing finite TTL prepared."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Same thrown Error returned and no insertion; object key is strictly passed to factory and two caches retain distinct object values."
+          }
+        ],
+        "typesReview": "Typed key inference and ValueType return via tsd, with invalid factory string return rejected for numeric cache.",
+        "docsReview": "README and declarations explain synchronous compute, hit recency, no factory on hits and default maxAge.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "reason": "Default TTL regression accepts an infinite expiry because its only post-insertion TTL assertion is >0; pending same loss-of-TTL sensitivity check for all affected patches and controls."
+          }
+        ],
+        "pending": [
+          "ordinary project checks including tsd",
+          "independent public API checks",
+          "ordinary patch applicability",
+          "missing-default-TTL test sensitivity"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "a53a7c1ad827",
+        "task": "quick-lru-computed",
+        "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "ef444325ed5d796e0761414388db7734a2dd5e8063a50c36b285e7b277cf4461",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "ef444325ed5d796e0761414388db7734a2dd5e8063a50c36b285e7b277cf4461",
+      "sourcePatchBytes": 5151,
+      "assessmentNotes": [
+        "Delivered AVA suite accepts isolated removal of computed entry expiry. Initial set-based diagnostic retained separately because repeat set could also alter eviction; refined probe changes only stored expiry. Both historical suites and controls detect refined mutant."
+      ]
+    },
+    {
+      "id": "b0e2b73ec839",
+      "task": "ms-parse-compound",
+      "project": "ms",
+      "Q": 1,
+      "findings": [],
+      "contentReview": {
+        "id": "b0e2b73ec839",
+        "task": "ms-parse-compound",
+        "project": "ms",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "retainedTestsReview": "Existing parse/format/ms/type cases retained; new test file added. Existing parser entry points unchanged.",
+        "behaviorReview": "Full regex validates before summing explicit units via original parse conversions, leading minus applied to whole sum. Suspected terminal-newline acceptance from dollar anchor needs direct compiled API verification.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "One mixed expression covers spelled/mixed-case units, decimals, repeated and reordered hour/day units, months/years and negative sum."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Delivered assertions reject missing units, later signs, suffix garbage, leading/trailing ASCII spaces and non-space separators. Terminal-newline implementation hypothesis checked separately."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Non-string, empty, oversized inputs throw; all three original parsers reject compound syntax."
+          }
+        ],
+        "typesReview": "Exported TS function has string argument and number return; ts-expect-error runtime/type cases reject undefined and compound inputs to strict parsers. Normal project typecheck/build pending.",
+        "docsReview": "README API import/example, grammar, negative-sum and error-boundary documentation present.",
+        "contentFindings": [],
+        "pending": [
+          "ordinary project checks/build/types",
+          "independent runtime checks",
+          "ordinary patch applicability",
+          "direct contract probe for forbidden trailing newline on author patches and reference/alternative"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "b0e2b73ec839",
+        "task": "ms-parse-compound",
+        "sourceCommit": "4ff48cec099f0514c3e9bbca18706c9c21122bfb",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "071c9f184bcccf0bdaa32ce8c961297fb6a7dcd1d4ce62405a70637e9b3d3633",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "071c9f184bcccf0bdaa32ce8c961297fb6a7dcd1d4ce62405a70637e9b3d3633",
+      "sourcePatchBytes": 4604,
+      "assessmentNotes": [
+        "Suspected trailing-line-terminator defect refuted: compiled public API returns NaN for LF, CR, U+2028 and U+2029; both controls pass same probe."
+      ]
+    },
+    {
+      "id": "c80764cf5b7c",
+      "task": "eventemitter-remove-context",
+      "project": "eventemitter3",
+      "Q": 0,
+      "findings": [
+        {
+          "category": "required-type-test-missing",
+          "reason": "No delivered TypeScript consumer fixture for the added public declaration."
+        }
+      ],
+      "contentReview": {
+        "id": "c80764cf5b7c",
+        "task": "eventemitter-remove-context",
+        "project": "eventemitter3",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Shared helper filters individual event registrations by strict stored context; outer method visits own strings and symbols. clearEvent tracks empty events; remaining arrays preserve order and existing emit snapshot semantics.",
+        "retainedTestsReview": "Original independent regressions retained; CJS and ESM tests added.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Same callback with two contexts across strings and symbols, duplicate and once registrations counted separately."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Two unrelated survivors in alpha retain order, empty names removed, repeat removal zero; separate emitter removes all registrations, then new listener emits successfully after empty state."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Omitted/zero/null/false registration contexts equal emitter; passing zero matches nothing and passing emitter removes all four."
+          }
+        ],
+        "typesReview": "Public method correctly accepts Context | this, representing normalized emitter context. No delivered .ts consumer fixture exists; declarations alone do not satisfy required type tests. Supplemental uniform consumer compile pending.",
+        "docsReview": "README adds count/strict context behavior, duplicate/once and emitter normalization explanation plus removal example.",
+        "contentFindings": [
+          {
+            "category": "required-type-test-missing",
+            "reason": "No delivered TypeScript consumer fixture for the added public declaration."
+          }
+        ],
+        "pending": [
+          "ordinary project checks and ESM",
+          "independent public API checks",
+          "ordinary patch applicability",
+          "supplemental typed normalized-emitter-context contract probe"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "c80764cf5b7c",
+        "task": "eventemitter-remove-context",
+        "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "7295bff912376831d5d057a9c5cfdce9cdcb009549d352713ade6de9017200c0",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "7295bff912376831d5d057a9c5cfdce9cdcb009549d352713ade6de9017200c0",
+      "sourcePatchBytes": 9268,
+      "assessmentNotes": []
+    },
+    {
+      "id": "cb90bdf3b5ea",
+      "task": "eventemitter-prepend",
+      "project": "eventemitter3",
+      "Q": 0,
+      "findings": [
+        {
+          "category": "required-type-test-missing",
+          "reason": "No applicable delivered TypeScript consumer test for the newly declared generic API."
+        }
+      ],
+      "contentReview": {
+        "id": "cb90bdf3b5ea",
+        "task": "eventemitter-prepend",
+        "project": "eventemitter3",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Uses original addListener validation/context normalization and EE once flag; prepended arrays copied with concat to place new listener before all existing entries. Existing append path and emit/off code unchanged.",
+        "retainedTestsReview": "Original tests retained; new commonjs and esm cases appended.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Mixed append/once/prepend/prependOnce/latest-prepend order checks receiver labels and two arguments, then second emission checks once removal."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Recursive emit from prependOnce checks no recursive repeat; regular prepended listener persists and can be removed, listener enumeration asserted."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "ESM default import uses symbol event and both APIs with correct execution order; CJS invalid handlers on existing symbol event retain registrations and eventNames."
+          }
+        ],
+        "typesReview": "Public declarations preserve event-specific generic listener argument type and context/this. No delivered .ts consumer fixture exists; adding declarations alone does not satisfy required type tests.",
+        "docsReview": "README removes stale unavailable-method claim and explains prepend order, context and examples.",
+        "contentFindings": [
+          {
+            "category": "required-type-test-missing",
+            "reason": "No applicable delivered TypeScript consumer test for the newly declared generic API."
+          }
+        ],
+        "pending": [
+          "ordinary project checks and ESM",
+          "independent public API checks",
+          "ordinary patch applicability"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "cb90bdf3b5ea",
+        "task": "eventemitter-prepend",
+        "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "27b2133e16ce63b549817749a3d21dae8685ab6d210afe85b6c7c764dfc07249",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "27b2133e16ce63b549817749a3d21dae8685ab6d210afe85b6c7c764dfc07249",
+      "sourcePatchBytes": 10670,
+      "assessmentNotes": []
+    },
+    {
+      "id": "d6ba620c886f",
+      "task": "ms-format-unit",
+      "project": "ms",
+      "Q": 0,
+      "findings": [
+        {
+          "category": "missing-delivery",
+          "reason": "Zero changed/deleted files."
+        }
+      ],
+      "contentReview": {
+        "id": "d6ba620c886f",
+        "task": "ms-format-unit",
+        "project": "ms",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Empty source patch; requested API option, type and tests/docs not delivered.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": false,
+            "evidence": "No delivered edits."
+          },
+          {
+            "scenario": 2,
+            "covered": false,
+            "evidence": "No delivered edits."
+          },
+          {
+            "scenario": 3,
+            "covered": false,
+            "evidence": "No delivered edits."
+          }
+        ],
+        "typesReview": "No new Options export/unit type.",
+        "docsReview": "No new docs.",
+        "contentFindings": [
+          {
+            "category": "missing-delivery",
+            "evidence": "Zero changed/deleted files."
+          }
+        ],
+        "pending": [
+          "ordinary baseline checks",
+          "independent expected failure",
+          "empty applicability record"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 1,
+      "interpretedIndependentExit": 1,
+      "applicability": {
+        "id": "d6ba620c886f",
+        "task": "ms-format-unit",
+        "sourceCommit": "4ff48cec099f0514c3e9bbca18706c9c21122bfb",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourcePatchBytes": 0,
+      "assessmentNotes": []
+    },
+    {
+      "id": "e37d900f2b06",
+      "task": "ufo-append-query",
+      "project": "ufo",
+      "Q": 0,
+      "findings": [
+        {
+          "category": "missing-delivery",
+          "reason": "Zero changed or deleted source files."
+        }
+      ],
+      "contentReview": {
+        "id": "e37d900f2b06",
+        "task": "ufo-append-query",
+        "project": "ufo",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Empty captured source patch; new public API is absent.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": false,
+            "evidence": "No delivered source or test edits."
+          },
+          {
+            "scenario": 2,
+            "covered": false,
+            "evidence": "No delivered source or test edits."
+          },
+          {
+            "scenario": 3,
+            "covered": false,
+            "evidence": "No delivered source or test edits."
+          }
+        ],
+        "typesReview": "No new public API/types.",
+        "docsReview": "No new docs.",
+        "contentFindings": [
+          {
+            "category": "missing-delivery",
+            "evidence": "Zero changed or deleted source files."
+          }
+        ],
+        "pending": [
+          "ordinary baseline checks",
+          "independent expected failure",
+          "empty patch applicability record"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 1,
+      "interpretedIndependentExit": 1,
+      "applicability": {
+        "id": "e37d900f2b06",
+        "task": "ufo-append-query",
+        "sourceCommit": "f06c800d0c59f2a4a1b9ba65eb6cb61a84419be6",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourcePatchBytes": 0,
+      "assessmentNotes": [
+        "Original empty-value serialization assertion accepts either key or key= for appended empty value. Both controls pass; nonempty author patch passes, empty patch still fails. Q=0 remains due separate required test gap or empty delivery."
+      ]
+    },
+    {
+      "id": "e89095b9bad6",
+      "task": "fastq-running-tasks",
+      "project": "fastq",
+      "Q": 1,
+      "findings": [],
+      "contentReview": {
+        "id": "e89095b9bad6",
+        "task": "fastq-running-tasks",
+        "project": "fastq",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Uses circular sentinel list of active Task objects. Every direct/promoted start inserts at tail; worked unlinks before reading callback and clearing value. New snapshots copy values in start order and task links clear on completion. Existing scheduler, receivers and release flow unchanged.",
+        "retainedTestsReview": "Original callback/promise and type examples retained; new suites added.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Deferred workers distinguish running from queued; modifying returned snapshot does not change active list."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Duplicate and undefined completions assert current value absent at callback entry, queued promotion is visible, reused pooled task tracked and prior modified snapshot remains stable after reuse."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Paused/concurrency-changed queue stays unstarted; resume and later concurrency increase promote expected order. Promise fulfillment/rejection retains results and removes settled values."
+          }
+        ],
+        "typesReview": "Shared queue declaration adds runningTasks(): T[]; existing typed callback and promise consumer examples use the added API.",
+        "docsReview": "README API link and docs specify fresh shallow snapshot, start order, duplicate/undefined preservation and exclusion of queued/paused work.",
+        "contentFindings": [],
+        "pending": [
+          "ordinary project checks and TypeScript",
+          "independent public API checks",
+          "ordinary patch applicability"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "e89095b9bad6",
+        "task": "fastq-running-tasks",
+        "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "4287df7b8c6b73ac23b7fc49ac62bab28dae1f03a8ae4cc0295ba8ff8f86213b",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "sourcePatchSha256": "4287df7b8c6b73ac23b7fc49ac62bab28dae1f03a8ae4cc0295ba8ff8f86213b",
+      "sourcePatchBytes": 10057,
+      "assessmentNotes": []
+    },
+    {
+      "id": "ed67791a7735",
+      "task": "eventemitter-remove-context",
+      "project": "eventemitter3",
+      "Q": 0,
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "No delivered regression reuses the emitter after it becomes empty; reuse occurs while unrelated events remain."
+        },
+        {
+          "category": "public-type-defect",
+          "reason": "With a typed Context, omitted registration context is allowed, but removeListenersByContext(emitter) fails TS2345. Both historical patches and both controls also fail this supplemental consumer; historical grades remain unchanged."
+        }
+      ],
+      "contentReview": {
+        "id": "ed67791a7735",
+        "task": "eventemitter-remove-context",
+        "project": "eventemitter3",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete-pending-mechanical-checks",
+        "Q": null,
+        "behaviorReview": "Iterates own string and symbol keys, matches stored context by strict equality, replaces filtered listener arrays and uses original clearEvent bookkeeping. Original registration normalization and emit snapshot/removal behavior retained.",
+        "retainedTestsReview": "Existing tests preserved, new CJS/ESM and consumer type cases added.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Duplicate string registrations and once symbol registration share target context; same callback with other context on symbol survives and counts/eventNames asserted."
+          },
+          {
+            "scenario": 2,
+            "covered": false,
+            "evidence": "Some tests remove to empty and others exercise reuse, but reuse test retains keep-first/keep-second throughout. No reuse after becoming empty as explicitly required. Repeated removal and nonempty event-name ordering are checked."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Omitted/undefined/null/false/zero/empty contexts normalize to emitter; passing null removes zero, emitter removes six and leaves unrelated context."
+          }
+        ],
+        "typesReview": "Delivered test/types.test-d.ts is a .ts consumer fixture (not a declaration file); verifies object Context and numeric result. Public declaration accepts only Context, which may reject required removal by emitter after omitted-context registration when Context is explicit. Uniform supplemental compile-probe pending for all affected patches and both controls.",
+        "docsReview": "README covers strict stored context, duplicate/once/symbol registrations and emitter normalization, with matching removal example.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "reason": "No delivered regression reuses the emitter after it becomes empty; reuse occurs while unrelated events remain."
+          }
+        ],
+        "pending": [
+          "ordinary project checks and ESM",
+          "independent public API checks",
+          "ordinary patch applicability",
+          "delivered TypeScript consumer compilation",
+          "supplemental typed normalized-emitter-context contract probe"
+        ]
+      },
+      "ordinaryExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "applicability": {
+        "id": "ed67791a7735",
+        "task": "eventemitter-remove-context",
+        "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "7a730a1358a03f74598240fff0301c6ebb396d159941295400ad381523f54a14",
+        "excludedPreparationArtifacts": [],
+        "types": {
+          "compiler": "6.0.3",
+          "exit": 0,
+          "output": "",
+          "fixtures": [
+            "test/types.test-d.ts"
+          ],
+          "scope": "Delivered standalone consumer checked with the same host compiler as calibration; ordinary runtime checks run separately on Linux arm64."
+        }
+      },
+      "sourcePatchSha256": "7a730a1358a03f74598240fff0301c6ebb396d159941295400ad381523f54a14",
+      "sourcePatchBytes": 8067,
+      "assessmentNotes": []
+    }
+  ]
+}

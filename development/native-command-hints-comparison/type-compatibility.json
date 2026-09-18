@@ -1,0 +1,27 @@
+{
+  "kind": "post-hoc existing public type compatibility",
+  "compiler": "prepared TypeScript 6.0.3, Node host; declaration-only, not an additional Linux runtime claim",
+  "fixture": "import E from './index';\nconst e = new E<{ value: [string] }, { prefix: string }>();\nconst callback = (value: string) => { void value.length; };\ne.on('value', callback, { prefix: 'value:' });\n// The registered arrow callback ignores its receiver and is safe to call directly.\nconst sameCallback = e.listeners('value')[0];\nsameCallback('hello');\n",
+  "rows": [
+    {
+      "id": "baseline",
+      "status": 0,
+      "output": ""
+    },
+    {
+      "id": "reference",
+      "status": 0,
+      "output": ""
+    },
+    {
+      "id": "n03",
+      "status": 2,
+      "output": "consumer.ts(7,1): error TS2684: The 'this' context of type 'void' is not assignable to method's 'this' of type '{ prefix: string; }'.\n"
+    },
+    {
+      "id": "n04",
+      "status": 2,
+      "output": "consumer.ts(7,1): error TS2684: The 'this' context of type 'void' is not assignable to method's 'this' of type '{ prefix: string; }'.\n"
+    }
+  ]
+}

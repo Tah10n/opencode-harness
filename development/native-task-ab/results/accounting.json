@@ -1,0 +1,113 @@
+{
+  "arms": [
+    {
+      "arm": "P",
+      "full": 3,
+      "nativeCompleted": 6,
+      "falseFullDeliveryClaims": 3,
+      "medianTaskWallMs": 270363,
+      "requests": 145,
+      "missingUsage": 0,
+      "knownUsage": {
+        "input_tokens": 4792707,
+        "output_tokens": 67604,
+        "total_tokens": 4860311,
+        "cached_tokens": 1641984,
+        "reasoning_tokens": 34201
+      },
+      "A": 0,
+      "Ams": 0,
+      "B": 0,
+      "Bexecuted": 0,
+      "Bms": 0
+    },
+    {
+      "arm": "H00",
+      "full": 6,
+      "nativeCompleted": 5,
+      "falseFullDeliveryClaims": 0,
+      "medianTaskWallMs": 455068.5,
+      "requests": 205,
+      "missingUsage": 1,
+      "knownUsage": {
+        "input_tokens": 7658940,
+        "output_tokens": 85572,
+        "total_tokens": 7744512,
+        "cached_tokens": 2964992,
+        "reasoning_tokens": 45890
+      },
+      "A": 0,
+      "Ams": 0,
+      "B": 0,
+      "Bexecuted": 0,
+      "Bms": 0
+    },
+    {
+      "arm": "H10",
+      "full": 5,
+      "nativeCompleted": 5,
+      "falseFullDeliveryClaims": 0,
+      "medianTaskWallMs": 460914.5,
+      "requests": 159,
+      "missingUsage": 1,
+      "knownUsage": {
+        "input_tokens": 6835199,
+        "output_tokens": 77874,
+        "total_tokens": 6913073,
+        "cached_tokens": 2340352,
+        "reasoning_tokens": 41217
+      },
+      "A": 55,
+      "Ams": 6890.842628999986,
+      "B": 0,
+      "Bexecuted": 0,
+      "Bms": 0
+    },
+    {
+      "arm": "H01",
+      "full": 6,
+      "nativeCompleted": 6,
+      "falseFullDeliveryClaims": 0,
+      "medianTaskWallMs": 346019,
+      "requests": 199,
+      "missingUsage": 0,
+      "knownUsage": {
+        "input_tokens": 10693298,
+        "output_tokens": 68650,
+        "total_tokens": 10761948,
+        "cached_tokens": 3688960,
+        "reasoning_tokens": 37226
+      },
+      "A": 0,
+      "Ams": 0,
+      "B": 48,
+      "Bexecuted": 13,
+      "Bms": 408943.54947900004
+    },
+    {
+      "arm": "H11",
+      "full": 6,
+      "nativeCompleted": 6,
+      "falseFullDeliveryClaims": 0,
+      "medianTaskWallMs": 317850.5,
+      "requests": 166,
+      "missingUsage": 0,
+      "knownUsage": {
+        "input_tokens": 7301354,
+        "output_tokens": 69317,
+        "total_tokens": 7370671,
+        "cached_tokens": 2469376,
+        "reasoning_tokens": 38448
+      },
+      "A": 47,
+      "Ams": 6237.154838999939,
+      "B": 19,
+      "Bexecuted": 9,
+      "Bms": 220679.54401800004
+    }
+  ],
+  "monetaryCharges": "unavailable; existing OAuth account, no billing statement",
+  "unknownUsageIsNotZero": true,
+  "cachedTokensAreSubsetOfInput": true,
+  "reasoningTokensAreSubsetOfOutput": true
+}

@@ -1,0 +1,95 @@
+{
+  "frozenFiles": [
+    {
+      "file": "development/native-task-integrated/PLAN.md",
+      "matched": true
+    },
+    {
+      "file": "development/native-task-integrated/container-relay.mjs",
+      "matched": true
+    },
+    {
+      "file": "development/native-task-integrated/container-session.mjs",
+      "matched": true
+    },
+    {
+      "file": "development/native-task-integrated/freeze.mjs",
+      "matched": true
+    },
+    {
+      "file": "development/native-task-integrated/native-run.mjs",
+      "matched": true
+    },
+    {
+      "file": "development/native-task-integrated/preflight.mjs",
+      "matched": true
+    },
+    {
+      "file": "development/native-task-integrated/run.mjs",
+      "matched": true
+    },
+    {
+      "file": "development/native-task-integrated/tasks/visual-preferences.md",
+      "matched": true
+    },
+    {
+      "file": "development/native-task-integrated/tasks/url-search-params.md",
+      "matched": true
+    },
+    {
+      "file": "development/native-task-ab/run-comparison.mjs",
+      "matched": true
+    },
+    {
+      "file": "development/native-task-abc/native-run.mjs",
+      "matched": true
+    },
+    {
+      "file": "development/native-task-ab/capture-candidate.mjs",
+      "matched": true
+    },
+    {
+      "file": "development/native-task-ab/extract-candidate.py",
+      "matched": true
+    },
+    {
+      "file": "development/native-task-utility/container/stop-workload.mjs",
+      "matched": true
+    },
+    {
+      "file": "visual-browser.mjs",
+      "matched": true
+    },
+    {
+      "file": "url-contract.test.ts",
+      "matched": true
+    },
+    {
+      "file": "serve-check.mjs",
+      "matched": true
+    }
+  ],
+  "frozenTrees": [
+    {
+      "directory": "bundle",
+      "entries": 6250,
+      "matched": true
+    },
+    {
+      "directory": "plain-dependencies",
+      "entries": 3797,
+      "matched": true
+    },
+    {
+      "directory": "visual-preferences",
+      "entries": 9431,
+      "matched": true
+    },
+    {
+      "directory": "url-search-params",
+      "entries": 10551,
+      "matched": true
+    }
+  ],
+  "checkedAfterEvaluation": true
+}

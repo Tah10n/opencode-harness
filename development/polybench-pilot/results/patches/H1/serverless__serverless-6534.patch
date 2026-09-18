@@ -1,0 +1,80 @@
+diff --git a/lib/plugins/aws/package/lib/mergeIamTemplates.js b/lib/plugins/aws/package/lib/mergeIamTemplates.js
+index 945312b6987c4aa94e03ffa097dfec9ed3a2af06..02293015fc72a05a5239eb7bc3454d2dd1a694eb 100644
+--- a/lib/plugins/aws/package/lib/mergeIamTemplates.js
++++ b/lib/plugins/aws/package/lib/mergeIamTemplates.js
+@@ -90,18 +90,24 @@ module.exports = {
+       .Resources[this.provider.naming.getRoleLogicalId()].Properties.Policies[0].PolicyDocument
+       .Statement;
+ 
+-    // Ensure general polices for functions with default name resolution
+-    policyDocumentStatements[0].Resource.push({
+-      'Fn::Sub':
+-        'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}' +
+-        `:log-group:${logGroupsPrefix}*:*`,
++    // Ensure general policies for functions with default name resolution
++    const hasDefaultFunctionName = this.serverless.service.getAllFunctions().some(functionName => {
++      const { name: resolvedFunctionName } = this.serverless.service.getFunction(functionName);
++      return !resolvedFunctionName || resolvedFunctionName.startsWith(canonicalFunctionNamePrefix);
+     });
++    if (hasDefaultFunctionName) {
++      policyDocumentStatements[0].Resource.push({
++        'Fn::Sub':
++          'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}' +
++          `:log-group:${logGroupsPrefix}*:*`,
++      });
+ 
+-    policyDocumentStatements[1].Resource.push({
+-      'Fn::Sub':
+-        'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}' +
+-        `:log-group:${logGroupsPrefix}*:*:*`,
+-    });
++      policyDocumentStatements[1].Resource.push({
++        'Fn::Sub':
++          'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}' +
++          `:log-group:${logGroupsPrefix}*:*:*`,
++      });
++    }
+ 
+     // Ensure policies for functions with custom name resolution
+     this.serverless.service.getAllFunctions().forEach(functionName => {
+diff --git a/lib/plugins/aws/package/lib/mergeIamTemplates.test.js b/lib/plugins/aws/package/lib/mergeIamTemplates.test.js
+index 09447f64157f160d043ed34c05042b1f17517e1d..d9a8a2477b7a08ba395811bebf8adbfb070c7e70 100644
+--- a/lib/plugins/aws/package/lib/mergeIamTemplates.test.js
++++ b/lib/plugins/aws/package/lib/mergeIamTemplates.test.js
+@@ -138,11 +138,8 @@ describe('#mergeIamTemplates()', () => {
+     };
+     serverless.service.setFunctionNames(); // Ensure to resolve function names
+ 
++    expect(serverless.service.getFunction(functionName).name).to.equal(customFunctionName);
+     return awsPackage.mergeIamTemplates().then(() => {
+-      const canonicalFunctionsPrefix = `${
+-        awsPackage.serverless.service.service
+-      }-${awsPackage.provider.getStage()}`;
+-
+       expect(
+         awsPackage.serverless.service.provider.compiledCloudFormationTemplate.Resources[
+           awsPackage.provider.naming.getRoleLogicalId()
+@@ -178,11 +175,6 @@ describe('#mergeIamTemplates()', () => {
+                     Effect: 'Allow',
+                     Action: ['logs:CreateLogStream'],
+                     Resource: [
+-                      {
+-                        'Fn::Sub':
+-                          'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:' +
+-                          `log-group:/aws/lambda/${canonicalFunctionsPrefix}*:*`,
+-                      },
+                       {
+                         'Fn::Sub':
+                           'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:' +
+@@ -194,11 +186,6 @@ describe('#mergeIamTemplates()', () => {
+                     Effect: 'Allow',
+                     Action: ['logs:PutLogEvents'],
+                     Resource: [
+-                      {
+-                        'Fn::Sub':
+-                          'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:' +
+-                          `log-group:/aws/lambda/${canonicalFunctionsPrefix}*:*:*`,
+-                      },
+                       {
+                         'Fn::Sub':
+                           'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:' +

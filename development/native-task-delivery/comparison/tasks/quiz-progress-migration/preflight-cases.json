@@ -1,0 +1,12 @@
+{
+  "alternative": {
+    "src/progress.mjs": "export function migrate(value){if(value.version===2)return JSON.parse(JSON.stringify(value));if(value.version!==1)throw new RangeError('version');const out=JSON.parse(JSON.stringify(value));delete out.answered;out.version=2;out.answers=value.answered.map((id,i)=>({id,order:i}));return out;}export function encode(value){return JSON.stringify(migrate(value));}export function decode(text){return migrate(JSON.parse(text));}"
+  },
+  "mutants": [
+    {
+      "name": "v2-drops-extras",
+      "file": "src/progress.mjs",
+      "replacement": "export function migrate(value){if(value.version===2)return {version:2,answers:structuredClone(value.answers)};if(value.version!==1)throw new RangeError('version');const out=structuredClone(value);delete out.answered;out.version=2;out.answers=value.answered.map((id,i)=>({id,order:i}));return out;}export function encode(value){return JSON.stringify(migrate(value));}export function decode(text){return migrate(JSON.parse(text));}"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+[
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "P",
+    "phase": "final",
+    "base": "original public task baseline",
+    "file": "patches/legacy-runtime-reload/P-final.patch",
+    "sha256": "7a2b57f983e3ae626fe2795948fa0029fbbda4b278218dcd0133c80e5ae57efb"
+  }
+]

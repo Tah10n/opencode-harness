@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert incremental/empty outputs and detached snapshots with a single-pass source.",
+    "Assert value/count rejection leaves state unchanged and exact sum/signed-zero behavior."
+  ],
+  "docDelivery": [
+    "Explain accumulator API, delegation and O(1) retained state.",
+    "Document numeric/count bounds, empty output, atomic invalid add and source errors."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Single-pass bounded integer iterables, count<=100000, exact bounded sum, signed-zero extrema and atomic add validation.",
+  "manualBehavior": [
+    "Inspect createSummary retained state: aggregate scalars only, no retained input-value collection. summarize delegates to accumulator and does not materialize the iterable or duplicate aggregation logic."
+  ],
+  "independence": "Replace array accumulation with incremental fold preserving empty input, numeric bounds and stable aggregate results."
+}

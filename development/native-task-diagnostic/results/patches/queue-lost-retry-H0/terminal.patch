@@ -1,0 +1,69 @@
+diff --git a/README.md b/README.md
+index 96cd0da29f9980cb5dcc1903bf0aa04af52e6b0a..523fb725bb2990ac6e8bdc2d6f55319be9d25661 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,15 @@
+ # queue-lost-retry
+ 
+ A compact stateful single-job queue project. Run `npm test` with Node 24 or newer.
++
++`queue(jobs)` stores ready jobs and tracks the one job currently being worked.
++`work(q, send)` takes one job and calls `send(job)` once. A truthy result marks
++the job delivered and removes it. A falsy result returns the job, including its
++ID and payload, to ready work without leaving a lease; other ready jobs remain
++available. A later call can successfully consume that retried job.
++
++When there is no ready job, `work` returns `{sent: [], retried: []}` and does
++not call `send`.
++
++The regression suite covers successful delivery, failed delivery followed by a
++retry while preserving unrelated work, and idle processing of an empty queue.
+diff --git a/test/worker.test.mjs b/test/worker.test.mjs
+index ff033496e5a2f6351e2ad1739681b6bd324defb7..7c657612b0298f8552bbd204b75cda8ab442f918 100644
+--- a/test/worker.test.mjs
++++ b/test/worker.test.mjs
+@@ -1,11 +1,36 @@
+ import {test} from 'node:test';import assert from 'node:assert/strict';
+ import {queue} from '../src/queue.mjs';import {work} from '../src/worker.mjs';
+-test('success, retry and idle',()=>{
+- const q=queue([{id:'a',payload:1}]);
+- assert.deepEqual(work(q,()=>true),{sent:['a'],retried:[]});
+- assert.deepEqual(q.snapshot(),{ready:[],leased:[]});
+- const expected=q.snapshot().ready.map(x=>x.id);
+- assert.deepEqual(work(q,job=>!expected.includes(job.id)).retried,expected);
+- assert.deepEqual(q.snapshot().ready.map(x=>x.id),expected);
+- assert.deepEqual(work(q,()=>true),{sent:[],retried:[]});
++
++test('successful delivery sends once and removes the job',()=>{
++  const job={id:'a',payload:{value:1}};
++  const q=queue([job]);
++  const delivered=[];
++
++  assert.deepEqual(work(q,sentJob=>{delivered.push(sentJob);return true;}),{sent:['a'],retried:[]});
++  assert.deepEqual(delivered,[job]);
++  assert.deepEqual(q.snapshot(),{ready:[],leased:[]});
++});
++
++test('failed delivery retries with its payload and preserves unrelated ready work',()=>{
++  const failed={id:'failed',payload:{value:1}};
++  const other={id:'other',payload:{value:2}};
++  const q=queue([failed,other]);
++
++  assert.deepEqual(work(q,()=>false),{sent:[],retried:['failed']});
++  assert.deepEqual(q.snapshot(),{ready:[other,failed],leased:[]});
++
++  const delivered=[];
++  assert.deepEqual(work(q,sentJob=>{delivered.push(sentJob);return true;}),{sent:['other'],retried:[]});
++  assert.deepEqual(work(q,sentJob=>{delivered.push(sentJob);return true;}),{sent:['failed'],retried:[]});
++  assert.deepEqual(delivered,[other,failed]);
++  assert.deepEqual(q.snapshot(),{ready:[],leased:[]});
++});
++
++test('empty queue returns empty results without sending',()=>{
++  const q=queue([]);
++  let sendCalls=0;
++
++  assert.deepEqual(work(q,()=>{sendCalls++;return true;}),{sent:[],retried:[]});
++  assert.equal(sendCalls,0);
++  assert.deepEqual(q.snapshot(),{ready:[],leased:[]});
+ });

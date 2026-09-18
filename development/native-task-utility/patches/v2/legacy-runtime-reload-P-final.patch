@@ -1,0 +1,397 @@
+diff --git a/packages/connector/README.md b/packages/connector/README.md
+index 5a1e8c6..3487206 100644
+--- a/packages/connector/README.md
++++ b/packages/connector/README.md
+@@ -105,6 +105,11 @@ availability, partial warnings, and the last hook error; `doctor --repair` refre
+ runtime and owned hooks; its server reconciliation shares the sync lock, and it does not collect
+ usage unless the user separately runs `viberacing sync`. A successful compatible reconnect,
+ authenticated sync, or doctor server check clears a prior version-upgrade automatic-sync disable.
++An older installation may also contain the exact historical flat `bin/viberacing.mjs` and `lib/`
++runtime files. State validation recognizes that allowlisted layout only, leaves those files and
++existing identity/config/source metadata unchanged, and prepares the current versioned runtime
++under `runtime/<version>/`; unknown files, nesting, links, or ambiguous ownership are rejected. The
++historical `lib/adapters/cursor.mjs` is recognized for ownership only and is not a collector.
+ 
+ Codex, Claude Code, Kimi Code, Qwen Code, and Gemini CLI install supported lifecycle triggers.
+ Qwen's trigger currently covers interactive TUI and ACP lifecycle events, not headless `qwen -p`
+diff --git a/packages/connector/lib/config.mjs b/packages/connector/lib/config.mjs
+index bf11763..8b01842 100644
+--- a/packages/connector/lib/config.mjs
++++ b/packages/connector/lib/config.mjs
+@@ -54,7 +54,7 @@ const stateFiles = new Set([
+   "state.json",
+   "dirty.json",
+ ]);
+-const stateDirectories = new Set(["pending", "captures", "runtime", "logs", "bin"]);
++const stateDirectories = new Set(["pending", "captures", "runtime", "logs", "bin", "lib"]);
+ const ownedLockPattern =
+   /^(?:\.viberacing-state|connection-state|sync|dirty|scheduler|scheduler-launch|lifecycle|lifecycle-revoking)\.lock(?:\.recovery(?:\.stale\.[0-9a-f-]{36})?|\.stale\.[0-9a-f-]{36})?$/i;
+ const stateTemporaryPattern =
+@@ -73,6 +73,50 @@ const legacyCollectionMethods = new Set([
+   "opencode\0opencode_sqlite",
+   "qwen_code\0qwen_stats_jsonl",
+ ]);
++const legacyRuntimeFiles = new Set([
++  "browser.mjs",
++  "config.mjs",
++  "executables.mjs",
++  "readers.mjs",
++  "registry.mjs",
++  "runtime.mjs",
++]);
++const legacyRuntimeAdapterFiles = new Set([
++  "antigravity.mjs",
++  "claude.mjs",
++  "codex.mjs",
++  "cursor.mjs",
++  "gemini.mjs",
++  "kimi.mjs",
++  "opencode.mjs",
++  "qwen-settings.mjs",
++  "qwen.mjs",
++  "shared.mjs",
++]);
++const legacyFlatRuntimePaths = new Set([
++  "bin/viberacing.mjs",
++  ...[...legacyRuntimeFiles].map((name) => `lib/${name}`),
++  ...[...legacyRuntimeAdapterFiles].map((name) => `lib/adapters/${name}`),
++]);
++
++function normalizedRelativePath(path) {
++  return path.split(/[\\/]/).join("/");
++}
++
++function assertCompleteLegacyFlatRuntime(paths) {
++  const relativePaths = new Set(
++    paths.slice(1).map((path) => normalizedRelativePath(relative(stateDirectory, path))),
++  );
++  if (!relativePaths.has("lib")) return;
++  const runtimePaths = new Set(
++    [...relativePaths].filter((path) => legacyFlatRuntimePaths.has(path)),
++  );
++  if (
++    runtimePaths.size !== legacyFlatRuntimePaths.size ||
++    [...legacyFlatRuntimePaths].some((path) => !runtimePaths.has(path))
++  )
++    throw new Error("Vibe Racing legacy flat runtime is incomplete");
++}
+ 
+ function isStateMigrationArtifact(relativePath) {
+   return (
+@@ -146,6 +190,13 @@ function ownedStatePath(path, info) {
+     return false;
+   }
+   if (top === "bin") return parts.length === 2 && parts[1] === "viberacing.mjs" && info.isFile();
++  if (top === "lib") {
++    if (parts.length === 2 && parts[1] === "adapters") return info.isDirectory();
++    if (parts.length === 2) return legacyRuntimeFiles.has(parts[1]) && info.isFile();
++    if (parts.length === 3 && parts[1] === "adapters")
++      return legacyRuntimeAdapterFiles.has(parts[2]) && info.isFile();
++    return false;
++  }
+   return top === "logs" && parts.length === 2 && parts[1] === "last-error.log" && info.isFile();
+ }
+ 
+@@ -313,20 +364,8 @@ async function markedStatePaths() {
+   }
+   if (marker?.format !== 1 || Object.keys(marker).length !== 1)
+     throw new Error("Vibe Racing state marker is invalid");
+-  const paths = [stateDirectory, stateMarkerPath];
+-  for (const entry of await readdir(stateDirectory, { withFileTypes: true })) {
+-    if (entry.name === ".viberacing-state") continue;
+-    const child = join(stateDirectory, entry.name);
+-    const info = await lstat(child);
+-    if (!ownedTopLevelName(entry.name)) continue;
+-    if (
+-      info.isSymbolicLink() ||
+-      (info.isFile() && info.nlink !== 1) ||
+-      !ownedStatePath(child, info)
+-    )
+-      throw new Error(`Vibe Racing state contains an unsafe owned entry: ${entry.name}`);
+-    paths.push(child);
+-  }
++  const paths = await inspectOwnedStateTree(stateDirectory);
++  assertCompleteLegacyFlatRuntime(paths);
+   return paths;
+ }
+ 
+@@ -397,6 +436,7 @@ async function secureStateDirectory() {
+   if (marked) return secureStatePaths(marked);
+ 
+   const preflightPaths = await inspectOwnedStateTree(stateDirectory);
++  assertCompleteLegacyFlatRuntime(preflightPaths);
+   const substantivePreflightPaths = substantiveStatePaths(preflightPaths);
+   const nonempty = substantivePreflightPaths.length > 1;
+   if (nonempty && stateDirectory !== defaultStateDirectory)
+@@ -416,6 +456,7 @@ async function secureStateDirectory() {
+     const alreadyMarked = await markedStatePaths();
+     if (alreadyMarked) return secureStatePaths(alreadyMarked);
+     const legacyPaths = substantiveStatePaths(await inspectOwnedStateTree(stateDirectory));
++    assertCompleteLegacyFlatRuntime(legacyPaths);
+     if (JSON.stringify(migrationSnapshot(legacyPaths)) !== JSON.stringify(preflightSnapshot))
+       throw new Error("Vibe Racing state changed during migration");
+     if (nonempty && !(await validLegacyStateEvidence()))
+@@ -1270,10 +1311,24 @@ async function verifyInstalledRuntime(directory) {
+   await access(join(directory, "lib", "adapters", "codex.mjs"));
+ }
+ 
++async function hasLegacyFlatRuntime(directory) {
++  try {
++    await Promise.all(
++      [...legacyFlatRuntimePaths].map((path) => access(join(directory, ...path.split("/")))),
++    );
++    return true;
++  } catch {
++    return false;
++  }
++}
++
+ async function installRuntime(sourceUrl) {
+   await ensurePrivateStateDirectory();
+   const sourceScript = fileURLToPath(sourceUrl);
+-  const sourceRoot = resolve(dirname(sourceScript), "..");
++  const candidateRoot = resolve(dirname(sourceScript), "..");
++  const sourceRoot = (await hasLegacyFlatRuntime(candidateRoot))
++    ? resolve(dirname(fileURLToPath(import.meta.url)), "..")
++    : candidateRoot;
+   const installedScript = installedRuntimeScript();
+   const installedDirectory = resolve(dirname(installedScript), "..");
+   if (resolve(sourceScript) === resolve(installedScript)) return installedScript;
+diff --git a/packages/connector/test/state-security.test.mjs b/packages/connector/test/state-security.test.mjs
+index 3b2b4c6..67d99c8 100644
+--- a/packages/connector/test/state-security.test.mjs
++++ b/packages/connector/test/state-security.test.mjs
+@@ -13,18 +13,69 @@ import {
+   readdir,
+   rm,
+   symlink,
++  unlink,
+   writeFile,
+ } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+-import { join } from "node:path";
++import { dirname, join } from "node:path";
+ import { setTimeout as delay } from "node:timers/promises";
+-import { fileURLToPath } from "node:url";
++import { fileURLToPath, pathToFileURL } from "node:url";
+ import { promisify } from "node:util";
++import { connectorVersion } from "../lib/version.mjs";
+ 
+ const execFileAsync = promisify(execFile);
+ const connectorPath = fileURLToPath(new URL("../bin/viberacing.mjs", import.meta.url));
+ const configUrl = new URL("../lib/config.mjs", import.meta.url).href;
+ const ensureStateScript = `import { ensurePrivateStateDirectory } from ${JSON.stringify(configUrl)}; await ensurePrivateStateDirectory();`;
++const legacyRuntimeFiles = [
++  "bin/viberacing.mjs",
++  "lib/browser.mjs",
++  "lib/config.mjs",
++  "lib/executables.mjs",
++  "lib/readers.mjs",
++  "lib/registry.mjs",
++  "lib/runtime.mjs",
++  "lib/adapters/antigravity.mjs",
++  "lib/adapters/claude.mjs",
++  "lib/adapters/codex.mjs",
++  "lib/adapters/cursor.mjs",
++  "lib/adapters/gemini.mjs",
++  "lib/adapters/kimi.mjs",
++  "lib/adapters/opencode.mjs",
++  "lib/adapters/qwen-settings.mjs",
++  "lib/adapters/qwen.mjs",
++  "lib/adapters/shared.mjs",
++];
++
++async function writeLegacyRuntime(state, { identity = true, unknownPath } = {}) {
++  const contents = new Map();
++  for (const relativePath of legacyRuntimeFiles) {
++    const path = join(state, ...relativePath.split("/"));
++    const value =
++      relativePath === "bin/viberacing.mjs"
++        ? await readFile(connectorPath, "utf8")
++        : `legacy fixture: ${relativePath}\n`;
++    await mkdir(dirname(path), { recursive: true });
++    await writeFile(path, value);
++    contents.set(relativePath, value);
++  }
++  if (unknownPath) {
++    const path = join(state, ...unknownPath.split("/"));
++    await mkdir(dirname(path), { recursive: true });
++    await writeFile(path, "foreign fixture\n");
++    contents.set(unknownPath, "foreign fixture\n");
++  }
++  if (identity)
++    await writeFile(
++      join(state, "installation.json"),
++      `${JSON.stringify({
++        version: 1,
++        id: "12345678-1234-4123-8123-123456789abc",
++        secret: "legacy_installation_secret_that_is_long_enough",
++      })}\n`,
++    );
++  return contents;
++}
+ 
+ test(
+   "POSIX state security migrates only recognized legacy state and writes its marker",
+@@ -106,6 +157,161 @@ test(
+   },
+ );
+ 
++test(
++  "migrates the exact legacy flat runtime without replacing identity or launcher files",
++  { skip: process.platform === "win32" },
++  async (context) => {
++    const root = await mkdtemp(join(tmpdir(), "viberacing-flat-runtime-"));
++    context.after(() => rm(root, { recursive: true, force: true }));
++    const state = join(root, ".viberacing");
++    const legacyContents = await writeLegacyRuntime(state);
++    const clientSourceId = "abababab-abab-4bab-8bab-abababababab";
++    const sourceId = "cdcdcdcd-cdcd-4dcd-8dcd-cdcdcdcdcdcd";
++    const sources = {
++      version: 1,
++      sources: [
++        {
++          clientSourceId,
++          agentId: "opencode",
++          collectionMethod: "opencode_sqlite",
++          dataPath: join(root, "opencode.db"),
++          suggestedLabel: "OpenCode",
++          supportedSurface: "cli",
++        },
++      ],
++    };
++    const config = {
++      version: 2,
++      origin: "https://viberacing.example",
++      installationId: "12345678-1234-4123-8123-123456789abc",
++      deviceToken: "legacy_device_token_that_is_long_enough",
++      sources: [
++        {
++          clientSourceId,
++          sourceId,
++          agentId: "opencode",
++          accountLabel: "OpenCode",
++          collectionMethod: "opencode_sqlite",
++          lastAcceptedSyncSequence: "4",
++        },
++      ],
++    };
++    const sourcesText = `${JSON.stringify(sources)}\n`;
++    const configText = `${JSON.stringify(config)}\n`;
++    await writeFile(join(state, "sources.json"), sourcesText);
++    await writeFile(join(state, "config.json"), configText);
++    const environment = { ...process.env, HOME: root, USERPROFILE: root };
++    delete environment.VIBERACING_STATE_DIR;
++    const prepareScript = `
++      const config = await import(${JSON.stringify(configUrl)} + "?legacy-runtime=" + process.pid);
++      const before = await config.readConfig();
++      if (before.installationId !== ${JSON.stringify(config.installationId)} || before.sources[0].sourceId !== ${JSON.stringify(sourceId)})
++        throw new Error("legacy identity changed");
++      const first = await config.prepareRuntime(
++        new URL(${JSON.stringify(pathToFileURL(join(state, "bin", "viberacing.mjs")).href)}),
++      );
++      const second = await config.prepareRuntime(
++        new URL(${JSON.stringify(pathToFileURL(join(state, "bin", "viberacing.mjs")).href)}),
++      );
++      if (first !== second) throw new Error("runtime preparation was not repeatable");
++    `;
++    await execFileAsync(process.execPath, ["--input-type=module", "--eval", prepareScript], {
++      env: environment,
++    });
++    const listing = await execFileAsync(process.execPath, [connectorPath, "source", "list"], {
++      env: environment,
++    });
++    assert.match(listing.stdout, new RegExp(clientSourceId));
++    await execFileAsync(process.execPath, ["--input-type=module", "--eval", prepareScript], {
++      env: environment,
++    });
++    const installedScript = join(state, "runtime", connectorVersion, "bin", "viberacing.mjs");
++    await access(installedScript);
++    const version = await execFileAsync(process.execPath, [installedScript, "--version"], {
++      env: environment,
++    });
++    assert.equal(version.stdout, `${connectorVersion}\n`);
++    assert.equal(version.stderr, "");
++    assert.deepEqual(JSON.parse(await readFile(join(state, ".viberacing-state"), "utf8")), {
++      format: 1,
++    });
++    assert.equal(await readFile(join(state, "sources.json"), "utf8"), sourcesText);
++    assert.equal(await readFile(join(state, "config.json"), "utf8"), configText);
++    for (const [relativePath, contents] of legacyContents)
++      assert.equal(await readFile(join(state, ...relativePath.split("/")), "utf8"), contents);
++  },
++);
++
++test(
++  "rejects near-miss legacy flat runtimes before changing their bytes",
++  { skip: process.platform === "win32" },
++  async (context) => {
++    const root = await mkdtemp(join(tmpdir(), "viberacing-flat-runtime-reject-"));
++    context.after(() => rm(root, { recursive: true, force: true }));
++    const cases = [
++      { name: "unknown-library", unknownPath: "lib/foreign.mjs" },
++      { name: "extra-nesting", unknownPath: "lib/adapters/nested/shared.mjs" },
++      { name: "foreign-executable", unknownPath: "bin/foreign-tool" },
++    ];
++    for (const item of cases) {
++      const home = join(root, item.name);
++      const state = join(home, ".viberacing");
++      const contents = await writeLegacyRuntime(state, { unknownPath: item.unknownPath });
++      await chmod(state, 0o777);
++      const environment = { ...process.env, HOME: home, USERPROFILE: home };
++      delete environment.VIBERACING_STATE_DIR;
++      await assert.rejects(
++        execFileAsync(process.execPath, ["--input-type=module", "--eval", ensureStateScript], {
++          env: environment,
++        }),
++        /unrelated entry|legacy flat runtime/i,
++      );
++      await assert.rejects(access(join(state, ".viberacing-state")), { code: "ENOENT" });
++      assert.equal((await lstat(state)).mode & 0o777, 0o777);
++      for (const [relativePath, value] of contents)
++        assert.equal(await readFile(join(state, ...relativePath.split("/")), "utf8"), value);
++    }
++    const linkedHome = join(root, "linked");
++    const linkedState = join(linkedHome, ".viberacing");
++    await writeLegacyRuntime(linkedState);
++    const linkTarget = join(root, "legacy-config-target.mjs");
++    await writeFile(linkTarget, "outside state\n");
++    await unlink(join(linkedState, "lib", "config.mjs"));
++    await symlink(linkTarget, join(linkedState, "lib", "config.mjs"));
++    const linkedEnvironment = { ...process.env, HOME: linkedHome, USERPROFILE: linkedHome };
++    delete linkedEnvironment.VIBERACING_STATE_DIR;
++    await assert.rejects(
++      execFileAsync(process.execPath, ["--input-type=module", "--eval", ensureStateScript], {
++        env: linkedEnvironment,
++      }),
++      /unsupported entry/,
++    );
++    assert.equal((await lstat(join(linkedState, "lib", "config.mjs"))).isSymbolicLink(), true);
++    await assert.rejects(access(join(linkedState, ".viberacing-state")), { code: "ENOENT" });
++    const ambiguousHome = join(root, "ambiguous");
++    const ambiguousState = join(ambiguousHome, ".viberacing");
++    const ambiguousContents = await writeLegacyRuntime(ambiguousState, { identity: false });
++    const ambiguousEnvironment = {
++      ...process.env,
++      HOME: ambiguousHome,
++      USERPROFILE: ambiguousHome,
++    };
++    delete ambiguousEnvironment.VIBERACING_STATE_DIR;
++    await assert.rejects(
++      execFileAsync(process.execPath, ["--input-type=module", "--eval", ensureStateScript], {
++        env: ambiguousEnvironment,
++      }),
++      /valid identity or source registry/,
++    );
++    await assert.rejects(access(join(ambiguousState, ".viberacing-state")), { code: "ENOENT" });
++    for (const [relativePath, value] of ambiguousContents)
++      assert.equal(
++        await readFile(join(ambiguousState, ...relativePath.split("/")), "utf8"),
++        value,
++      );
++  },
++);
++
+ test(
+   "POSIX state security rejects unrelated content before changing modes",
+   { skip: process.platform === "win32" },

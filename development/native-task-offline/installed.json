@@ -1,0 +1,1638 @@
+{
+  "installed": "1.18.26",
+  "binarySha256": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe",
+  "network": "none; loopback only",
+  "realProviderCalls": 0,
+  "fixtureSha256": "28be9b03b8b21bc9840877bcae5ac554134454cafd40a204e8f9eda98f4b6728",
+  "override": {
+    "permission": {
+      "webfetch": "deny"
+    },
+    "agent": {
+      "build": {
+        "permission": {
+          "webfetch": "deny"
+        }
+      }
+    }
+  },
+  "results": [
+    {
+      "mode": "sequential-offline",
+      "offline": true,
+      "installedPluginSha256": "9a1f4fcd8b99a87402e6116fb287e2e9d32e03b8b4d396f59bb5449370bbb8e8",
+      "bundleHashes": {
+        "native-command-hints.mjs": "4ba8f87a18157dfcf794c030d836ce4ca22260eb7a9c1472255b628b19f490bc",
+        "native-project-checks.mjs": "ae20921040df6aa27718853028cb11e81875e0fad7adc34004bcb744585606ac",
+        "native-project-config.mjs": "c3d758632ab72f7a63c5fec8a13520987a7d1ddc75020a908bd448166fa0167e",
+        "native-project-context.mjs": "5f35a51aebc7cdc3e12edf3506c6b590ced57f819a02b09ed6254702f500f394",
+        "native-project-feedback.mjs": "c3ed707cc0e6dd4fc40e882dd2895ec631f95de8c30663c262f20b72efdf3cb7",
+        "native-project-scope.mjs": "f5dcd760610c97a3fbf49229ea5c4723dce6d3aa0fe160228f908c62d29e8be4",
+        "native-review-context.mjs": "8775ae59ef3d3b5b432798f909f94869d43b7561b4b5f144f972e5bcce20e312",
+        "native-sensitivity-runner.mjs": "59056d6661c099b4e48b89874bbd7991a3af6b09199cc5bee74b719491f7b1de",
+        "native-sensitivity.mjs": "91a918585e5889bba4d0c7299a469da4c0e637ee3b82bf1b6044934ff8827c73",
+        "native-task-investigation.mjs": "37185994a4758628eb52f965d9a6327974d925523c73620bfe9b7c83821167cd",
+        "native-task-observations.mjs": "126a3e695c2dd2ec930a44fca4aa033f0f21e8ae364aae15db39e7f343189de8",
+        "native-task-plugin.mjs": "9a1f4fcd8b99a87402e6116fb287e2e9d32e03b8b4d396f59bb5449370bbb8e8",
+        "native-task-workflow.mjs": "10688211fce75592ce22a669b10d49aa067b89aa0dee05da6a2d35b9ceca7ed8",
+        "native-type-compat-generator.mjs": "321eff1892c9a5327e7f6e38f23a986c1be3fbaf26da5662b99cd27cac50cc68",
+        "native-type-compat-worker.mjs": "c9cc1ff4922488ba1058d11af9f609a3fc5cef4a98aed7941ef5e8fe2f3eafc2",
+        "native-type-compat.mjs": "96f85cbc7ee01f3aeedc31cea51c0dd5c452afe220b4683df1b2d5fd987d9007"
+      },
+      "requests": 10,
+      "inventories": [
+        {
+          "request": 2,
+          "role": "parent",
+          "sha256": "c09f9278a590fc36954071236f55738b7be90ff12f8613b5fb86c116c94cd45b",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "harness_task",
+            "question",
+            "read",
+            "skill",
+            "task",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 0,
+          "sessionID": "ses_f54c98d7cffe0mX6ksCBMvt5uT"
+        },
+        {
+          "request": 3,
+          "role": "author",
+          "sha256": "8e6dc5ad0c5c911d40184970f8bd6dadbcaca5779cc18b0f3c3a6ada79d40c85",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 0,
+          "sessionID": "ses_f54c98a53ffep3MqjC0sC9IK8M"
+        },
+        {
+          "request": 4,
+          "role": "author",
+          "sha256": "ad0788dbd53579d8e6e0c23bb95ff4d9af3ae57d3b4e270220cfd27c51a84287",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 1,
+          "sessionID": "ses_f54c98a53ffep3MqjC0sC9IK8M"
+        },
+        {
+          "request": 5,
+          "role": "author",
+          "sha256": "fd0bef9c2ba9cc550a4925b17a50c89b9784d8dbfd32afd29a7fa0c63991da35",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 2,
+          "sessionID": "ses_f54c98a53ffep3MqjC0sC9IK8M"
+        },
+        {
+          "request": 6,
+          "role": "author",
+          "sha256": "1767f1c7663ad35a765df34078bcece785793d0f09c63a2842cfb6c1d28d79d2",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 3,
+          "sessionID": "ses_f54c98a53ffep3MqjC0sC9IK8M"
+        },
+        {
+          "request": 7,
+          "role": "author",
+          "sha256": "0fd5c9806de79306a27d1111b4368ac2adbcd7d6729d1f62a416714042ff28fe",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 4,
+          "sessionID": "ses_f54c98a53ffep3MqjC0sC9IK8M"
+        },
+        {
+          "request": 8,
+          "role": "author",
+          "sha256": "7ae4b9325f281d1b6f47005531e146ff61565e8a620f1d6b94885aaa198dfadb",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 5,
+          "sessionID": "ses_f54c98a53ffep3MqjC0sC9IK8M"
+        },
+        {
+          "request": 9,
+          "role": "author",
+          "sha256": "b6f84d486d9146b9bd6852eb1b01b9be3cfc8204b15fd395a61b4dae00249110",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 6,
+          "sessionID": "ses_f54c98a53ffep3MqjC0sC9IK8M"
+        },
+        {
+          "request": 10,
+          "role": "parent",
+          "sha256": "eac6be0d0bf355d9e06de953c603f51905352aeacf1060d6a64b784111051ec7",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "harness_task",
+            "question",
+            "read",
+            "skill",
+            "task",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 1,
+          "sessionID": "ses_f54c98d7cffe0mX6ksCBMvt5uT"
+        }
+      ],
+      "commands": [
+        {
+          "command": "npm test",
+          "exit": 0,
+          "time": {
+            "start": 1789578869089,
+            "end": 1789578869352
+          },
+          "outputSha256": "2dc26edde0892747e85b9cab7c6a00c4971a4c606faf2e3a1e507413ca65d6f0"
+        },
+        {
+          "command": "git diff --check",
+          "exit": 0,
+          "time": {
+            "start": 1789578869423,
+            "end": 1789578869469
+          },
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+        }
+      ],
+      "httpCount": 0,
+      "status": "checks_passed",
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "parent": {
+        "id": "ses_f54c98d7cffe0mX6ksCBMvt5uT",
+        "permission": []
+      },
+      "child": {
+        "id": "ses_f54c98a53ffep3MqjC0sC9IK8M",
+        "permission": [
+          {
+            "permission": "harness_task",
+            "pattern": "*",
+            "action": "deny"
+          },
+          {
+            "permission": "task",
+            "pattern": "*",
+            "action": "deny"
+          }
+        ]
+      },
+      "effectivePermissions": [
+        {
+          "permission": "*",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "doom_loop",
+          "pattern": "*",
+          "action": "ask"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "*",
+          "action": "ask"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "/work/sequential-offline/data/opencode/tool-output/*",
+          "action": "allow"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "/work/sequential-offline/tmp/opencode/*",
+          "action": "allow"
+        },
+        {
+          "permission": "question",
+          "pattern": "*",
+          "action": "deny"
+        },
+        {
+          "permission": "plan_enter",
+          "pattern": "*",
+          "action": "deny"
+        },
+        {
+          "permission": "plan_exit",
+          "pattern": "*",
+          "action": "deny"
+        },
+        {
+          "permission": "read",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "read",
+          "pattern": "*.env",
+          "action": "ask"
+        },
+        {
+          "permission": "read",
+          "pattern": "*.env.*",
+          "action": "ask"
+        },
+        {
+          "permission": "read",
+          "pattern": "*.env.example",
+          "action": "allow"
+        },
+        {
+          "permission": "question",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "plan_enter",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "task",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "bash",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "webfetch",
+          "pattern": "*",
+          "action": "deny"
+        },
+        {
+          "permission": "read",
+          "pattern": "private/**",
+          "action": "deny"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "*",
+          "action": "ask"
+        },
+        {
+          "permission": "webfetch",
+          "pattern": "*",
+          "action": "deny"
+        },
+        {
+          "permission": "read",
+          "pattern": "ask/**",
+          "action": "ask"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "/work/sequential-offline/data/opencode/tool-output/*",
+          "action": "allow"
+        }
+      ],
+      "configPermission": {
+        "read": {
+          "private/**": "deny"
+        },
+        "bash": "allow",
+        "task": "allow",
+        "external_directory": "ask",
+        "webfetch": "deny"
+      },
+      "selectedAgentPermission": {
+        "read": {
+          "ask/**": "ask"
+        },
+        "webfetch": "deny"
+      },
+      "conflictingSessionRejectedBeforeProvider": true,
+      "originalUnchanged": true,
+      "allToolsCompleted": true,
+      "portableChecks": "passed",
+      "patchSha256": "0506ab086985c9f1cb375c18441f6c7d98c12d35619de47c153e297c93ace318",
+      "files": {
+        "value.mjs": {
+          "sha256": "af803b07659757fcc6dd66201c0bfccee5e5cf9345e85e29822e43d971653772",
+          "mode": 493
+        },
+        "value.test.mjs": {
+          "sha256": "6ecdf7fa69dcbbbdbb5a6c66b979de382cebb48684fc18d25acd884aa70e9d72",
+          "mode": 420
+        }
+      }
+    },
+    {
+      "mode": "sequential-ordinary",
+      "offline": false,
+      "installedPluginSha256": "9a1f4fcd8b99a87402e6116fb287e2e9d32e03b8b4d396f59bb5449370bbb8e8",
+      "bundleHashes": {
+        "native-command-hints.mjs": "4ba8f87a18157dfcf794c030d836ce4ca22260eb7a9c1472255b628b19f490bc",
+        "native-project-checks.mjs": "ae20921040df6aa27718853028cb11e81875e0fad7adc34004bcb744585606ac",
+        "native-project-config.mjs": "c3d758632ab72f7a63c5fec8a13520987a7d1ddc75020a908bd448166fa0167e",
+        "native-project-context.mjs": "5f35a51aebc7cdc3e12edf3506c6b590ced57f819a02b09ed6254702f500f394",
+        "native-project-feedback.mjs": "c3ed707cc0e6dd4fc40e882dd2895ec631f95de8c30663c262f20b72efdf3cb7",
+        "native-project-scope.mjs": "f5dcd760610c97a3fbf49229ea5c4723dce6d3aa0fe160228f908c62d29e8be4",
+        "native-review-context.mjs": "8775ae59ef3d3b5b432798f909f94869d43b7561b4b5f144f972e5bcce20e312",
+        "native-sensitivity-runner.mjs": "59056d6661c099b4e48b89874bbd7991a3af6b09199cc5bee74b719491f7b1de",
+        "native-sensitivity.mjs": "91a918585e5889bba4d0c7299a469da4c0e637ee3b82bf1b6044934ff8827c73",
+        "native-task-investigation.mjs": "37185994a4758628eb52f965d9a6327974d925523c73620bfe9b7c83821167cd",
+        "native-task-observations.mjs": "126a3e695c2dd2ec930a44fca4aa033f0f21e8ae364aae15db39e7f343189de8",
+        "native-task-plugin.mjs": "9a1f4fcd8b99a87402e6116fb287e2e9d32e03b8b4d396f59bb5449370bbb8e8",
+        "native-task-workflow.mjs": "10688211fce75592ce22a669b10d49aa067b89aa0dee05da6a2d35b9ceca7ed8",
+        "native-type-compat-generator.mjs": "321eff1892c9a5327e7f6e38f23a986c1be3fbaf26da5662b99cd27cac50cc68",
+        "native-type-compat-worker.mjs": "c9cc1ff4922488ba1058d11af9f609a3fc5cef4a98aed7941ef5e8fe2f3eafc2",
+        "native-type-compat.mjs": "96f85cbc7ee01f3aeedc31cea51c0dd5c452afe220b4683df1b2d5fd987d9007"
+      },
+      "requests": 11,
+      "inventories": [
+        {
+          "request": 2,
+          "role": "parent",
+          "sha256": "2fe2cc5ee6730d03c2e9766105733aa16c57a33230212375e7108ae9a876e33c",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "harness_task",
+            "question",
+            "read",
+            "skill",
+            "task",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 0,
+          "sessionID": "ses_f54c81bacffe2KuQpaIqCzOTHr"
+        },
+        {
+          "request": 3,
+          "role": "author",
+          "sha256": "adcfa23213000b2a38a1f56b1f782aeff5b2b9602a7e0a710a68b396d609c02e",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 0,
+          "sessionID": "ses_f54c81885ffe7HhsBGDtOWJ3De"
+        },
+        {
+          "request": 4,
+          "role": "author",
+          "sha256": "6aa780e3898faa6eb4cba9c9a27655f06d8ca81a15b0052376f257bd1141853a",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 1,
+          "sessionID": "ses_f54c81885ffe7HhsBGDtOWJ3De"
+        },
+        {
+          "request": 5,
+          "role": "author",
+          "sha256": "671e2c4f01c66a18d5abffbe2c7096f1d2133c9647016b60962a68b21dabdebd",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 2,
+          "sessionID": "ses_f54c81885ffe7HhsBGDtOWJ3De"
+        },
+        {
+          "request": 6,
+          "role": "author",
+          "sha256": "459451ada84979d74bd1edd7be0fed889f5a51d14982e450a3c3c6dad254e9e5",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 3,
+          "sessionID": "ses_f54c81885ffe7HhsBGDtOWJ3De"
+        },
+        {
+          "request": 7,
+          "role": "author",
+          "sha256": "39cb45859da42b87e19ea922ca5d36dc29116bd7b3bf4b6c2eb4349df6145459",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 4,
+          "sessionID": "ses_f54c81885ffe7HhsBGDtOWJ3De"
+        },
+        {
+          "request": 8,
+          "role": "author",
+          "sha256": "6a16dfc3bac36c7472aef42e60a28bbe73d8ce1c5bf47616a054b2f858a4fc39",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 5,
+          "sessionID": "ses_f54c81885ffe7HhsBGDtOWJ3De"
+        },
+        {
+          "request": 9,
+          "role": "author",
+          "sha256": "d297573675dd2ad4ab7e9ac64619ed1bb94fb81db7e812285d2a595842306caa",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 6,
+          "sessionID": "ses_f54c81885ffe7HhsBGDtOWJ3De"
+        },
+        {
+          "request": 10,
+          "role": "author",
+          "sha256": "cfb148b25a50d6374c78d097d2cd9e215f67826d56f3d913a4037fbc52b58625",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 7,
+          "sessionID": "ses_f54c81885ffe7HhsBGDtOWJ3De"
+        },
+        {
+          "request": 11,
+          "role": "parent",
+          "sha256": "63ae18105c15696df6ace9894bd706a3b9a535cc9480527efc8bb0a54f65a6a3",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "harness_task",
+            "question",
+            "read",
+            "skill",
+            "task",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 1,
+          "sessionID": "ses_f54c81bacffe2KuQpaIqCzOTHr"
+        }
+      ],
+      "commands": [
+        {
+          "command": "npm test",
+          "exit": 0,
+          "time": {
+            "start": 1789578963914,
+            "end": 1789578964180
+          },
+          "outputSha256": "9ac504d25e48625f91f14196f4a3f492c04bc1a43163249dfe402eb95f55ab32"
+        },
+        {
+          "command": "git diff --check",
+          "exit": 0,
+          "time": {
+            "start": 1789578964277,
+            "end": 1789578964325
+          },
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+        }
+      ],
+      "httpCount": 1,
+      "status": "checks_passed",
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "parent": {
+        "id": "ses_f54c81bacffe2KuQpaIqCzOTHr",
+        "permission": []
+      },
+      "child": {
+        "id": "ses_f54c81885ffe7HhsBGDtOWJ3De",
+        "permission": [
+          {
+            "permission": "harness_task",
+            "pattern": "*",
+            "action": "deny"
+          },
+          {
+            "permission": "task",
+            "pattern": "*",
+            "action": "deny"
+          }
+        ]
+      },
+      "effectivePermissions": [
+        {
+          "permission": "*",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "doom_loop",
+          "pattern": "*",
+          "action": "ask"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "*",
+          "action": "ask"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "/work/sequential-ordinary/data/opencode/tool-output/*",
+          "action": "allow"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "/work/sequential-ordinary/tmp/opencode/*",
+          "action": "allow"
+        },
+        {
+          "permission": "question",
+          "pattern": "*",
+          "action": "deny"
+        },
+        {
+          "permission": "plan_enter",
+          "pattern": "*",
+          "action": "deny"
+        },
+        {
+          "permission": "plan_exit",
+          "pattern": "*",
+          "action": "deny"
+        },
+        {
+          "permission": "read",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "read",
+          "pattern": "*.env",
+          "action": "ask"
+        },
+        {
+          "permission": "read",
+          "pattern": "*.env.*",
+          "action": "ask"
+        },
+        {
+          "permission": "read",
+          "pattern": "*.env.example",
+          "action": "allow"
+        },
+        {
+          "permission": "question",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "plan_enter",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "task",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "bash",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "webfetch",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "read",
+          "pattern": "private/**",
+          "action": "deny"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "*",
+          "action": "ask"
+        },
+        {
+          "permission": "webfetch",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "read",
+          "pattern": "ask/**",
+          "action": "ask"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "/work/sequential-ordinary/data/opencode/tool-output/*",
+          "action": "allow"
+        }
+      ],
+      "configPermission": {
+        "read": {
+          "private/**": "deny"
+        },
+        "bash": "allow",
+        "task": "allow",
+        "external_directory": "ask",
+        "webfetch": "allow"
+      },
+      "selectedAgentPermission": {
+        "read": {
+          "ask/**": "ask"
+        },
+        "webfetch": "allow"
+      },
+      "conflictingSessionRejectedBeforeProvider": true,
+      "originalUnchanged": true,
+      "allToolsCompleted": true,
+      "portableChecks": "passed",
+      "patchSha256": "0506ab086985c9f1cb375c18441f6c7d98c12d35619de47c153e297c93ace318",
+      "files": {
+        "value.mjs": {
+          "sha256": "af803b07659757fcc6dd66201c0bfccee5e5cf9345e85e29822e43d971653772",
+          "mode": 493
+        },
+        "value.test.mjs": {
+          "sha256": "6ecdf7fa69dcbbbdbb5a6c66b979de382cebb48684fc18d25acd884aa70e9d72",
+          "mode": 420
+        }
+      }
+    },
+    {
+      "mode": "concurrent-offline",
+      "offline": true,
+      "installedPluginSha256": "9a1f4fcd8b99a87402e6116fb287e2e9d32e03b8b4d396f59bb5449370bbb8e8",
+      "bundleHashes": {
+        "native-command-hints.mjs": "4ba8f87a18157dfcf794c030d836ce4ca22260eb7a9c1472255b628b19f490bc",
+        "native-project-checks.mjs": "ae20921040df6aa27718853028cb11e81875e0fad7adc34004bcb744585606ac",
+        "native-project-config.mjs": "c3d758632ab72f7a63c5fec8a13520987a7d1ddc75020a908bd448166fa0167e",
+        "native-project-context.mjs": "5f35a51aebc7cdc3e12edf3506c6b590ced57f819a02b09ed6254702f500f394",
+        "native-project-feedback.mjs": "c3ed707cc0e6dd4fc40e882dd2895ec631f95de8c30663c262f20b72efdf3cb7",
+        "native-project-scope.mjs": "f5dcd760610c97a3fbf49229ea5c4723dce6d3aa0fe160228f908c62d29e8be4",
+        "native-review-context.mjs": "8775ae59ef3d3b5b432798f909f94869d43b7561b4b5f144f972e5bcce20e312",
+        "native-sensitivity-runner.mjs": "59056d6661c099b4e48b89874bbd7991a3af6b09199cc5bee74b719491f7b1de",
+        "native-sensitivity.mjs": "91a918585e5889bba4d0c7299a469da4c0e637ee3b82bf1b6044934ff8827c73",
+        "native-task-investigation.mjs": "37185994a4758628eb52f965d9a6327974d925523c73620bfe9b7c83821167cd",
+        "native-task-observations.mjs": "126a3e695c2dd2ec930a44fca4aa033f0f21e8ae364aae15db39e7f343189de8",
+        "native-task-plugin.mjs": "9a1f4fcd8b99a87402e6116fb287e2e9d32e03b8b4d396f59bb5449370bbb8e8",
+        "native-task-workflow.mjs": "10688211fce75592ce22a669b10d49aa067b89aa0dee05da6a2d35b9ceca7ed8",
+        "native-type-compat-generator.mjs": "321eff1892c9a5327e7f6e38f23a986c1be3fbaf26da5662b99cd27cac50cc68",
+        "native-type-compat-worker.mjs": "c9cc1ff4922488ba1058d11af9f609a3fc5cef4a98aed7941ef5e8fe2f3eafc2",
+        "native-type-compat.mjs": "96f85cbc7ee01f3aeedc31cea51c0dd5c452afe220b4683df1b2d5fd987d9007"
+      },
+      "requests": 10,
+      "inventories": [
+        {
+          "request": 2,
+          "role": "parent",
+          "sha256": "9da332079756bb907c8096f4e3f166c5d2a18dab90ecf4e1641cea29427d102a",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "harness_task",
+            "question",
+            "read",
+            "skill",
+            "task",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 0,
+          "sessionID": "ses_f54c6a2e9ffel7FYlg7yTPXdJ8"
+        },
+        {
+          "request": 3,
+          "role": "author",
+          "sha256": "6e228af6514e905a811174234b7ceb8a58a39186e04a42b97de7af049adb84bb",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 0,
+          "sessionID": "ses_f54c69d55ffe1tdcdzPRqh38Ku"
+        },
+        {
+          "request": 4,
+          "role": "author",
+          "sha256": "a9738fe9d53960b19b0dcc5fc53c0557cee912d2ed48ebb5e6589890c0d50471",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 1,
+          "sessionID": "ses_f54c69d55ffe1tdcdzPRqh38Ku"
+        },
+        {
+          "request": 5,
+          "role": "author",
+          "sha256": "50ebb0707ae972f88ab829819c0f61fd6b27b90434263991dc0d2c9d92d4164c",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 2,
+          "sessionID": "ses_f54c69d55ffe1tdcdzPRqh38Ku"
+        },
+        {
+          "request": 6,
+          "role": "author",
+          "sha256": "b16a521c6daacaba072535dc93d8afc762f7792dc6de953a0b9cd7af140e8c7f",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 3,
+          "sessionID": "ses_f54c69d55ffe1tdcdzPRqh38Ku"
+        },
+        {
+          "request": 7,
+          "role": "author",
+          "sha256": "2a3d892e1b7d9524ed9016996a195c4b224ecc95a2e0f86c4b868d6fb5c58a33",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 4,
+          "sessionID": "ses_f54c69d55ffe1tdcdzPRqh38Ku"
+        },
+        {
+          "request": 8,
+          "role": "author",
+          "sha256": "05c100ef75ee3aabb8efeb2134917e0e7147e842f0903bff9545e0f7b39a87c0",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 5,
+          "sessionID": "ses_f54c69d55ffe1tdcdzPRqh38Ku"
+        },
+        {
+          "request": 9,
+          "role": "author",
+          "sha256": "3a3f7f3e426b8a43adb50a9e058b298c2112c0e6675e4ae6233c288783a40e56",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 6,
+          "sessionID": "ses_f54c69d55ffe1tdcdzPRqh38Ku"
+        },
+        {
+          "request": 10,
+          "role": "parent",
+          "sha256": "2a7575e1c699a84cbcdea7d7367a20cea31c058ac656a1fe916efd1c3beed904",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "harness_task",
+            "question",
+            "read",
+            "skill",
+            "task",
+            "todowrite",
+            "write"
+          ],
+          "toolResults": 1,
+          "sessionID": "ses_f54c6a2e9ffel7FYlg7yTPXdJ8"
+        }
+      ],
+      "commands": [
+        {
+          "command": "npm test",
+          "exit": 0,
+          "time": {
+            "start": 1789579061319,
+            "end": 1789579061775
+          },
+          "outputSha256": "6997b9d56401e15797fec3c7f14a2b02bce5ff285b38ae54b2c0f5cef389d6f7"
+        },
+        {
+          "command": "git diff --check",
+          "exit": 0,
+          "time": {
+            "start": 1789579061970,
+            "end": 1789579062024
+          },
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+        }
+      ],
+      "httpCount": 0,
+      "status": "checks_passed",
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "parent": {
+        "id": "ses_f54c6a2e9ffel7FYlg7yTPXdJ8",
+        "permission": []
+      },
+      "child": {
+        "id": "ses_f54c69d55ffe1tdcdzPRqh38Ku",
+        "permission": [
+          {
+            "permission": "harness_task",
+            "pattern": "*",
+            "action": "deny"
+          },
+          {
+            "permission": "task",
+            "pattern": "*",
+            "action": "deny"
+          }
+        ]
+      },
+      "effectivePermissions": [
+        {
+          "permission": "*",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "doom_loop",
+          "pattern": "*",
+          "action": "ask"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "*",
+          "action": "ask"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "/work/concurrent-offline/data/opencode/tool-output/*",
+          "action": "allow"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "/work/concurrent-offline/tmp/opencode/*",
+          "action": "allow"
+        },
+        {
+          "permission": "question",
+          "pattern": "*",
+          "action": "deny"
+        },
+        {
+          "permission": "plan_enter",
+          "pattern": "*",
+          "action": "deny"
+        },
+        {
+          "permission": "plan_exit",
+          "pattern": "*",
+          "action": "deny"
+        },
+        {
+          "permission": "read",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "read",
+          "pattern": "*.env",
+          "action": "ask"
+        },
+        {
+          "permission": "read",
+          "pattern": "*.env.*",
+          "action": "ask"
+        },
+        {
+          "permission": "read",
+          "pattern": "*.env.example",
+          "action": "allow"
+        },
+        {
+          "permission": "question",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "plan_enter",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "task",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "bash",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "webfetch",
+          "pattern": "*",
+          "action": "deny"
+        },
+        {
+          "permission": "read",
+          "pattern": "private/**",
+          "action": "deny"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "*",
+          "action": "ask"
+        },
+        {
+          "permission": "webfetch",
+          "pattern": "*",
+          "action": "deny"
+        },
+        {
+          "permission": "read",
+          "pattern": "ask/**",
+          "action": "ask"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "/work/concurrent-offline/data/opencode/tool-output/*",
+          "action": "allow"
+        }
+      ],
+      "configPermission": {
+        "read": {
+          "private/**": "deny"
+        },
+        "bash": "allow",
+        "task": "allow",
+        "external_directory": "ask",
+        "webfetch": "deny"
+      },
+      "selectedAgentPermission": {
+        "read": {
+          "ask/**": "ask"
+        },
+        "webfetch": "deny"
+      },
+      "conflictingSessionRejectedBeforeProvider": true,
+      "originalUnchanged": true,
+      "allToolsCompleted": true,
+      "portableChecks": "passed",
+      "patchSha256": "0506ab086985c9f1cb375c18441f6c7d98c12d35619de47c153e297c93ace318",
+      "files": {
+        "value.mjs": {
+          "sha256": "af803b07659757fcc6dd66201c0bfccee5e5cf9345e85e29822e43d971653772",
+          "mode": 493
+        },
+        "value.test.mjs": {
+          "sha256": "6ecdf7fa69dcbbbdbb5a6c66b979de382cebb48684fc18d25acd884aa70e9d72",
+          "mode": 420
+        }
+      }
+    },
+    {
+      "mode": "concurrent-ordinary",
+      "offline": false,
+      "installedPluginSha256": "9a1f4fcd8b99a87402e6116fb287e2e9d32e03b8b4d396f59bb5449370bbb8e8",
+      "bundleHashes": {
+        "native-command-hints.mjs": "4ba8f87a18157dfcf794c030d836ce4ca22260eb7a9c1472255b628b19f490bc",
+        "native-project-checks.mjs": "ae20921040df6aa27718853028cb11e81875e0fad7adc34004bcb744585606ac",
+        "native-project-config.mjs": "c3d758632ab72f7a63c5fec8a13520987a7d1ddc75020a908bd448166fa0167e",
+        "native-project-context.mjs": "5f35a51aebc7cdc3e12edf3506c6b590ced57f819a02b09ed6254702f500f394",
+        "native-project-feedback.mjs": "c3ed707cc0e6dd4fc40e882dd2895ec631f95de8c30663c262f20b72efdf3cb7",
+        "native-project-scope.mjs": "f5dcd760610c97a3fbf49229ea5c4723dce6d3aa0fe160228f908c62d29e8be4",
+        "native-review-context.mjs": "8775ae59ef3d3b5b432798f909f94869d43b7561b4b5f144f972e5bcce20e312",
+        "native-sensitivity-runner.mjs": "59056d6661c099b4e48b89874bbd7991a3af6b09199cc5bee74b719491f7b1de",
+        "native-sensitivity.mjs": "91a918585e5889bba4d0c7299a469da4c0e637ee3b82bf1b6044934ff8827c73",
+        "native-task-investigation.mjs": "37185994a4758628eb52f965d9a6327974d925523c73620bfe9b7c83821167cd",
+        "native-task-observations.mjs": "126a3e695c2dd2ec930a44fca4aa033f0f21e8ae364aae15db39e7f343189de8",
+        "native-task-plugin.mjs": "9a1f4fcd8b99a87402e6116fb287e2e9d32e03b8b4d396f59bb5449370bbb8e8",
+        "native-task-workflow.mjs": "10688211fce75592ce22a669b10d49aa067b89aa0dee05da6a2d35b9ceca7ed8",
+        "native-type-compat-generator.mjs": "321eff1892c9a5327e7f6e38f23a986c1be3fbaf26da5662b99cd27cac50cc68",
+        "native-type-compat-worker.mjs": "c9cc1ff4922488ba1058d11af9f609a3fc5cef4a98aed7941ef5e8fe2f3eafc2",
+        "native-type-compat.mjs": "96f85cbc7ee01f3aeedc31cea51c0dd5c452afe220b4683df1b2d5fd987d9007"
+      },
+      "requests": 11,
+      "inventories": [
+        {
+          "request": 2,
+          "role": "parent",
+          "sha256": "c57626fdf1d9645eb11eaa41fee456c0a1b2e3cc66f8314e6d0f2d2abfb4e6d8",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "harness_task",
+            "question",
+            "read",
+            "skill",
+            "task",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 0,
+          "sessionID": "ses_f54c6a2ddffeHI4WIvvDCH5qHZ"
+        },
+        {
+          "request": 3,
+          "role": "author",
+          "sha256": "a5ea04f6014793c58b86ae05b6542d2953fbd700fdd49748a3553df123e867b4",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 0,
+          "sessionID": "ses_f54c69da6ffeW7cV8osB8lkB7l"
+        },
+        {
+          "request": 4,
+          "role": "author",
+          "sha256": "57738047344c7bc2b4fe835552d29c22fe54beff813d1af8f4e9201a7d061407",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 1,
+          "sessionID": "ses_f54c69da6ffeW7cV8osB8lkB7l"
+        },
+        {
+          "request": 5,
+          "role": "author",
+          "sha256": "47eb76678b38bec84a0c5c0827f9d193fcaed97674e4ed7fba7c2114862e1d2e",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 2,
+          "sessionID": "ses_f54c69da6ffeW7cV8osB8lkB7l"
+        },
+        {
+          "request": 6,
+          "role": "author",
+          "sha256": "98fcb653e6108a76a11147fcdaec1b73ee2122cf054c52a9d0542ee5c4647f78",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 3,
+          "sessionID": "ses_f54c69da6ffeW7cV8osB8lkB7l"
+        },
+        {
+          "request": 7,
+          "role": "author",
+          "sha256": "2ead8419edf8151fd4c7fc9e6040eb5076d782339f3c5eb382c005f89900cdf0",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 4,
+          "sessionID": "ses_f54c69da6ffeW7cV8osB8lkB7l"
+        },
+        {
+          "request": 8,
+          "role": "author",
+          "sha256": "2f12c0a2de76a23ea774da86811b3aa57c1c5ddebe37bd96672d184ca3990b8f",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 5,
+          "sessionID": "ses_f54c69da6ffeW7cV8osB8lkB7l"
+        },
+        {
+          "request": 9,
+          "role": "author",
+          "sha256": "dc8fc290b30be637b4158ef1fe7a5395e18e8dca2f070e9148f4137fa11cf06b",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 6,
+          "sessionID": "ses_f54c69da6ffeW7cV8osB8lkB7l"
+        },
+        {
+          "request": 10,
+          "role": "author",
+          "sha256": "717fd754c4e81420a810096954cdf118a48bcbcec14b00a9d4d3d525c01e2861",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "skill",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 7,
+          "sessionID": "ses_f54c69da6ffeW7cV8osB8lkB7l"
+        },
+        {
+          "request": 11,
+          "role": "parent",
+          "sha256": "de67c5d62da4d2e98ca81b1651b5ace88e8faeb52703ced02e815865633aade8",
+          "tools": [
+            "bash",
+            "edit",
+            "glob",
+            "grep",
+            "harness_task",
+            "question",
+            "read",
+            "skill",
+            "task",
+            "todowrite",
+            "webfetch",
+            "write"
+          ],
+          "toolResults": 1,
+          "sessionID": "ses_f54c6a2ddffeHI4WIvvDCH5qHZ"
+        }
+      ],
+      "commands": [
+        {
+          "command": "npm test",
+          "exit": 0,
+          "time": {
+            "start": 1789579061569,
+            "end": 1789579062004
+          },
+          "outputSha256": "b28a8dc62b2add60b0c03f35caef6a34b5ec2f4b75c6d44675988e91015bd02e"
+        },
+        {
+          "command": "git diff --check",
+          "exit": 0,
+          "time": {
+            "start": 1789579062160,
+            "end": 1789579062218
+          },
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+        }
+      ],
+      "httpCount": 1,
+      "status": "checks_passed",
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "parent": {
+        "id": "ses_f54c6a2ddffeHI4WIvvDCH5qHZ",
+        "permission": []
+      },
+      "child": {
+        "id": "ses_f54c69da6ffeW7cV8osB8lkB7l",
+        "permission": [
+          {
+            "permission": "harness_task",
+            "pattern": "*",
+            "action": "deny"
+          },
+          {
+            "permission": "task",
+            "pattern": "*",
+            "action": "deny"
+          }
+        ]
+      },
+      "effectivePermissions": [
+        {
+          "permission": "*",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "doom_loop",
+          "pattern": "*",
+          "action": "ask"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "*",
+          "action": "ask"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "/work/concurrent-ordinary/data/opencode/tool-output/*",
+          "action": "allow"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "/work/concurrent-ordinary/tmp/opencode/*",
+          "action": "allow"
+        },
+        {
+          "permission": "question",
+          "pattern": "*",
+          "action": "deny"
+        },
+        {
+          "permission": "plan_enter",
+          "pattern": "*",
+          "action": "deny"
+        },
+        {
+          "permission": "plan_exit",
+          "pattern": "*",
+          "action": "deny"
+        },
+        {
+          "permission": "read",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "read",
+          "pattern": "*.env",
+          "action": "ask"
+        },
+        {
+          "permission": "read",
+          "pattern": "*.env.*",
+          "action": "ask"
+        },
+        {
+          "permission": "read",
+          "pattern": "*.env.example",
+          "action": "allow"
+        },
+        {
+          "permission": "question",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "plan_enter",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "task",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "bash",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "webfetch",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "read",
+          "pattern": "private/**",
+          "action": "deny"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "*",
+          "action": "ask"
+        },
+        {
+          "permission": "webfetch",
+          "pattern": "*",
+          "action": "allow"
+        },
+        {
+          "permission": "read",
+          "pattern": "ask/**",
+          "action": "ask"
+        },
+        {
+          "permission": "external_directory",
+          "pattern": "/work/concurrent-ordinary/data/opencode/tool-output/*",
+          "action": "allow"
+        }
+      ],
+      "configPermission": {
+        "read": {
+          "private/**": "deny"
+        },
+        "bash": "allow",
+        "task": "allow",
+        "external_directory": "ask",
+        "webfetch": "allow"
+      },
+      "selectedAgentPermission": {
+        "read": {
+          "ask/**": "ask"
+        },
+        "webfetch": "allow"
+      },
+      "conflictingSessionRejectedBeforeProvider": true,
+      "originalUnchanged": true,
+      "allToolsCompleted": true,
+      "portableChecks": "passed",
+      "patchSha256": "0506ab086985c9f1cb375c18441f6c7d98c12d35619de47c153e297c93ace318",
+      "files": {
+        "value.mjs": {
+          "sha256": "af803b07659757fcc6dd66201c0bfccee5e5cf9345e85e29822e43d971653772",
+          "mode": 493
+        },
+        "value.test.mjs": {
+          "sha256": "6ecdf7fa69dcbbbdbb5a6c66b979de382cebb48684fc18d25acd884aa70e9d72",
+          "mode": 420
+        }
+      }
+    }
+  ],
+  "configurationChecks": [
+    {
+      "passed": true,
+      "checks": [
+        "resolved instruction path and exact bytes",
+        "native build tools",
+        "project denial retained",
+        "no plugins",
+        "global-only denial overridden by agent",
+        "agent-scoped denial",
+        "other deny/ask rules retained",
+        "repeat application stable",
+        "ordinary resolution restored"
+      ],
+      "providerRequests": 0,
+      "limit": "Does not exercise model prompt delivery or instruction compliance."
+    },
+    {
+      "passed": true,
+      "checks": [
+        "resolved instruction path and exact bytes",
+        "native build tools",
+        "project denial retained",
+        "no plugins"
+      ],
+      "providerRequests": 0,
+      "limit": "Does not exercise model prompt delivery or instruction compliance."
+    }
+  ]
+}

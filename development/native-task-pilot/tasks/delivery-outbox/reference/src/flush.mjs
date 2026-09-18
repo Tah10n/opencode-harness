@@ -1,0 +1,2 @@
+import {loadQueue,saveQueue} from './queue.mjs';
+export async function flush(file,send){const state=loadQueue(file);let delivered=0;for(const id of state.pending.map(x=>x.id)){const item=state.pending.find(x=>x.id===id);let response;try{response=await send(item.payload,id);}catch{}if(response?.ack===id){state.pending=state.pending.filter(x=>x.id!==id);state.delivered.push(id);delivered++;}else item.attempts++;saveQueue(file,state);}return {delivered,pending:state.pending.length};}

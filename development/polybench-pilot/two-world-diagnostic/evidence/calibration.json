@@ -1,0 +1,2724 @@
+{
+  "mode": "calibrate",
+  "provider_calls": 0,
+  "cases": [
+    {
+      "delivery_apply": true,
+      "model_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "full_git_tree": "cffd9241ec0befa5d81eae533f6c37b57df41219",
+      "test_sha256": "33a2d899db2bfc5dc663d853eb18f97bdbccb2df9ec5a304807935de4b51369d",
+      "base_commit": "d4c8bc1450d31275596b26bb7464a6f1b28392af",
+      "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6534@sha256:8600be77e4c2e4456f8587222423922fd33b4a70162c127bb1c16c8a55a3792f",
+      "instance_id": "serverless__serverless-6534",
+      "arm": "baseline",
+      "E": {
+        "instance_id": "serverless__serverless-6534",
+        "label": "serverless__serverless-6534-baseline-E",
+        "world": "E",
+        "command": ". /usr/local/nvm/nvm.sh && npx mocha lib/plugins/aws/package/lib/mergeIamTemplates.test.js --reporter json",
+        "timeout_seconds": 1200,
+        "acceptance_diag": {
+          "instance_id": "serverless__serverless-6534",
+          "patch_applied": true,
+          "generation": true,
+          "with_logs": true,
+          "all_f2p_passed": false,
+          "no_p2p_failed": true,
+          "resolved": false
+        },
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1041,
+          "differences": [
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+          ]
+        },
+        "source_inventory_sha256": "04cea446dcc0e1be2936a673dc56af880b59cad9a4ff4b170fb78cfec36bcbf3",
+        "full_inventory_sha256": "e28b3a764a9340a401e0004648140903cbb34ea687120c08ffe7feab6622f658",
+        "import_targets": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "build_inputs_sha256": "1dc0bb6dfd873d038c57a2742126e0c3f44fcf1527b25fd75373741dbd3fa1cf",
+        "execution_overlay": {
+          "Dockerfile": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+          }
+        },
+        "exit_code": 2,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 2.663,
+        "output_sha256": "ec780dac751867b30d7e2a195f794c2bb0ce77a844bff2ee86d12eaeb6adb039",
+        "source_mutations": {
+          "Dockerfile": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "33e49261fb35b175605506dc6d1f387824f6c077f39eeefb968b3ce158b6ca56"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {},
+        "resolved_modules": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "runner_stats": {
+          "suites": 2,
+          "tests": 25,
+          "passes": 23,
+          "pending": 0,
+          "failures": 2,
+          "start": "2026-09-18T05:03:26.096Z",
+          "end": "2026-09-18T05:03:26.196Z",
+          "duration": 100
+        },
+        "passed": 23,
+        "failed": 2,
+        "delivered_checks": "failed",
+        "missing_required_tests": [],
+        "seconds": 6.519,
+        "test_set": "test-sets/72dd721dafce220a8e9d054fc1dcbd52f8e93a4b305ca1e28ef265a12b694d9c.json",
+        "failures": [
+          {
+            "test": "#mergeIamTemplates() should ensure IAM policies when service contains only custom named functions",
+            "name": null,
+            "kind": "assertion",
+            "message": "expected { Type: 'AWS::IAM::Role', \u2026(1) } to deeply equal { Type: 'AWS::IAM::Role', \u2026(1) }",
+            "detail_sha256": "da9057cfe4a593026cb588221acb3bfc4faf2cf751dbe590d605776c8dca92dd"
+          },
+          {
+            "test": "#mergeIamTemplates() should ensure IAM policies for custom and canonically named functions",
+            "name": null,
+            "kind": "assertion",
+            "message": "expected { Type: 'AWS::IAM::Role', \u2026(1) } to deeply equal { Type: 'AWS::IAM::Role', \u2026(1) }",
+            "detail_sha256": "3763508498238cea140c8b8ec65f1f5f6690b880c5de56e9141686dd27e0577a"
+          }
+        ],
+        "failure_kinds": {
+          "assertion": 2,
+          "test_timeout": 0,
+          "other": 0
+        }
+      }
+    },
+    {
+      "delivery_apply": true,
+      "model_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_sha256": "33a2d899db2bfc5dc663d853eb18f97bdbccb2df9ec5a304807935de4b51369d",
+      "base_commit": "d4c8bc1450d31275596b26bb7464a6f1b28392af",
+      "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6534@sha256:8600be77e4c2e4456f8587222423922fd33b4a70162c127bb1c16c8a55a3792f",
+      "instance_id": "serverless__serverless-6534",
+      "arm": "baseline-overlap",
+      "E": {
+        "instance_id": "serverless__serverless-6534",
+        "label": "serverless__serverless-6534-baseline-overlap-E",
+        "world": "E",
+        "command": ". /usr/local/nvm/nvm.sh && npx mocha lib/plugins/aws/package/lib/mergeIamTemplates.test.js --reporter json",
+        "timeout_seconds": 1200,
+        "acceptance_diag": {
+          "instance_id": "serverless__serverless-6534",
+          "patch_applied": true,
+          "generation": true,
+          "with_logs": true,
+          "all_f2p_passed": false,
+          "no_p2p_failed": true,
+          "resolved": false
+        },
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1041,
+          "differences": [
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+          ]
+        },
+        "source_inventory_sha256": "04cea446dcc0e1be2936a673dc56af880b59cad9a4ff4b170fb78cfec36bcbf3",
+        "full_inventory_sha256": "21c748c31190f0fad5fc29d5d4403fbd8da160bc3037ecd8dafc6a1c24b839cc",
+        "import_targets": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "build_inputs_sha256": "1dc0bb6dfd873d038c57a2742126e0c3f44fcf1527b25fd75373741dbd3fa1cf",
+        "execution_overlay": {
+          "Dockerfile": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+          }
+        },
+        "exit_code": 2,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 2.66,
+        "output_sha256": "69bac7dc89a429c28bed84419280357e1844004cc708405eab54f8ca6c590bf2",
+        "source_mutations": {
+          "Dockerfile": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "33e49261fb35b175605506dc6d1f387824f6c077f39eeefb968b3ce158b6ca56"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {},
+        "resolved_modules": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "runner_stats": {
+          "suites": 2,
+          "tests": 25,
+          "passes": 23,
+          "pending": 0,
+          "failures": 2,
+          "start": "2026-09-18T05:03:32.874Z",
+          "end": "2026-09-18T05:03:32.974Z",
+          "duration": 100
+        },
+        "passed": 23,
+        "failed": 2,
+        "delivered_checks": "failed",
+        "missing_required_tests": [],
+        "seconds": 5.782,
+        "test_set": "test-sets/72dd721dafce220a8e9d054fc1dcbd52f8e93a4b305ca1e28ef265a12b694d9c.json",
+        "failures": [
+          {
+            "test": "#mergeIamTemplates() should ensure IAM policies when service contains only custom named functions",
+            "name": null,
+            "kind": "assertion",
+            "message": "expected { Type: 'AWS::IAM::Role', \u2026(1) } to deeply equal { Type: 'AWS::IAM::Role', \u2026(1) }",
+            "detail_sha256": "da9057cfe4a593026cb588221acb3bfc4faf2cf751dbe590d605776c8dca92dd"
+          },
+          {
+            "test": "#mergeIamTemplates() should ensure IAM policies for custom and canonically named functions",
+            "name": null,
+            "kind": "assertion",
+            "message": "expected { Type: 'AWS::IAM::Role', \u2026(1) } to deeply equal { Type: 'AWS::IAM::Role', \u2026(1) }",
+            "detail_sha256": "3763508498238cea140c8b8ec65f1f5f6690b880c5de56e9141686dd27e0577a"
+          }
+        ],
+        "failure_kinds": {
+          "assertion": 2,
+          "test_timeout": 0,
+          "other": 0
+        }
+      },
+      "seed_git_tree": "cffd9241ec0befa5d81eae533f6c37b57df41219",
+      "control": {
+        "change": "replace control_test with comment removing author assertions",
+        "content_sha256": "dfff720fe5cd32bbdec1bc3e3da961cd2980375701510d7034b7d957e4474fd7",
+        "full_snapshot_binding": "21c748c31190f0fad5fc29d5d4403fbd8da160bc3037ecd8dafc6a1c24b839cc"
+      }
+    },
+    {
+      "delivery_apply": true,
+      "model_sha256": "86ce56afe611b83c277195196c490f15d61a72a5d32a548822025cb1c1863d15",
+      "full_git_tree": "5c26351d30707e8f57d2cc7a9508d137cf588451",
+      "test_sha256": "33a2d899db2bfc5dc663d853eb18f97bdbccb2df9ec5a304807935de4b51369d",
+      "base_commit": "d4c8bc1450d31275596b26bb7464a6f1b28392af",
+      "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6534@sha256:8600be77e4c2e4456f8587222423922fd33b4a70162c127bb1c16c8a55a3792f",
+      "instance_id": "serverless__serverless-6534",
+      "arm": "gold",
+      "E": {
+        "instance_id": "serverless__serverless-6534",
+        "label": "serverless__serverless-6534-gold-E",
+        "world": "E",
+        "command": ". /usr/local/nvm/nvm.sh && npx mocha lib/plugins/aws/package/lib/mergeIamTemplates.test.js --reporter json",
+        "timeout_seconds": 1200,
+        "acceptance_diag": {
+          "instance_id": "serverless__serverless-6534",
+          "patch_applied": true,
+          "generation": true,
+          "with_logs": true,
+          "all_f2p_passed": true,
+          "no_p2p_failed": true,
+          "resolved": true
+        },
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1041,
+          "differences": [
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+          ]
+        },
+        "source_inventory_sha256": "fee95621ad6fd2c3a0d6ad23df0b5a7f72ebb0184234308c4fab1efbfce4e31a",
+        "full_inventory_sha256": "4ef5f64244a9d6ec56ad41a47943bb43e8cb03d0abe1f2618419da4747a992f6",
+        "import_targets": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "build_inputs_sha256": "e5d757d9cab8b2f45a2d76dfd68f7cc06afcb1baa6f2073f32a9fcb8e59627f2",
+        "execution_overlay": {
+          "Dockerfile": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+          }
+        },
+        "exit_code": 0,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 2.701,
+        "output_sha256": "7bb0a2ff21160dc4ad204ab91fc2220fc7e687c50c4ecaba68a7fa82a7262c67",
+        "source_mutations": {
+          "Dockerfile": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "33e49261fb35b175605506dc6d1f387824f6c077f39eeefb968b3ce158b6ca56"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {},
+        "resolved_modules": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "runner_stats": {
+          "suites": 2,
+          "tests": 25,
+          "passes": 25,
+          "pending": 0,
+          "failures": 0,
+          "start": "2026-09-18T05:03:39.069Z",
+          "end": "2026-09-18T05:03:39.167Z",
+          "duration": 98
+        },
+        "passed": 25,
+        "failed": 0,
+        "delivered_checks": "passed",
+        "missing_required_tests": [],
+        "seconds": 5.815,
+        "test_set": "test-sets/a06bf8815e45ce0d7bc8fa15c9f9d304fadda63ab4a8bbcc4f1234d6e9b3f36e.json",
+        "failures": [],
+        "failure_kinds": {
+          "assertion": 0,
+          "test_timeout": 0,
+          "other": 0
+        }
+      }
+    },
+    {
+      "delivery_apply": true,
+      "model_sha256": "86ce56afe611b83c277195196c490f15d61a72a5d32a548822025cb1c1863d15",
+      "test_sha256": "33a2d899db2bfc5dc663d853eb18f97bdbccb2df9ec5a304807935de4b51369d",
+      "base_commit": "d4c8bc1450d31275596b26bb7464a6f1b28392af",
+      "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6534@sha256:8600be77e4c2e4456f8587222423922fd33b4a70162c127bb1c16c8a55a3792f",
+      "instance_id": "serverless__serverless-6534",
+      "arm": "gold-overlap",
+      "E": {
+        "instance_id": "serverless__serverless-6534",
+        "label": "serverless__serverless-6534-gold-overlap-E",
+        "world": "E",
+        "command": ". /usr/local/nvm/nvm.sh && npx mocha lib/plugins/aws/package/lib/mergeIamTemplates.test.js --reporter json",
+        "timeout_seconds": 1200,
+        "acceptance_diag": {
+          "instance_id": "serverless__serverless-6534",
+          "patch_applied": true,
+          "generation": true,
+          "with_logs": true,
+          "all_f2p_passed": true,
+          "no_p2p_failed": true,
+          "resolved": true
+        },
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1041,
+          "differences": [
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+          ]
+        },
+        "source_inventory_sha256": "fee95621ad6fd2c3a0d6ad23df0b5a7f72ebb0184234308c4fab1efbfce4e31a",
+        "full_inventory_sha256": "f694756ca180267cfde8ff1a57045f9b1d9efbfd2716cf78a36844491d13c67c",
+        "import_targets": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "build_inputs_sha256": "e5d757d9cab8b2f45a2d76dfd68f7cc06afcb1baa6f2073f32a9fcb8e59627f2",
+        "execution_overlay": {
+          "Dockerfile": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+          }
+        },
+        "exit_code": 0,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 2.648,
+        "output_sha256": "bda3007045aa18905b79872eda7a5596d6b44e07a026d0da6689872be812ebe6",
+        "source_mutations": {
+          "Dockerfile": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "33e49261fb35b175605506dc6d1f387824f6c077f39eeefb968b3ce158b6ca56"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {},
+        "resolved_modules": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "runner_stats": {
+          "suites": 2,
+          "tests": 25,
+          "passes": 25,
+          "pending": 0,
+          "failures": 0,
+          "start": "2026-09-18T05:03:45.081Z",
+          "end": "2026-09-18T05:03:45.180Z",
+          "duration": 99
+        },
+        "passed": 25,
+        "failed": 0,
+        "delivered_checks": "passed",
+        "missing_required_tests": [],
+        "seconds": 5.756,
+        "test_set": "test-sets/a06bf8815e45ce0d7bc8fa15c9f9d304fadda63ab4a8bbcc4f1234d6e9b3f36e.json",
+        "failures": [],
+        "failure_kinds": {
+          "assertion": 0,
+          "test_timeout": 0,
+          "other": 0
+        }
+      },
+      "seed_git_tree": "5c26351d30707e8f57d2cc7a9508d137cf588451",
+      "control": {
+        "change": "replace control_test with comment removing author assertions",
+        "content_sha256": "dfff720fe5cd32bbdec1bc3e3da961cd2980375701510d7034b7d957e4474fd7",
+        "full_snapshot_binding": "f694756ca180267cfde8ff1a57045f9b1d9efbfd2716cf78a36844491d13c67c"
+      }
+    },
+    {
+      "delivery_apply": true,
+      "model_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "full_git_tree": "525fc1f2071127beccbd70bb043b22593bc76764",
+      "test_sha256": "865f82b594d861f5ecbae4f058002f89ccaf318d07ce2a1ff8fa8fd41120f4ac",
+      "base_commit": "0c3e44ac05c651c12c94e047bf712cb86278d345",
+      "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1190@sha256:28167366b3d50bb7b6cc3441186980d6022986d9fc60d6e6a193c7aa7cb7b858",
+      "instance_id": "sveltejs__svelte-1190",
+      "arm": "baseline",
+      "E": {
+        "instance_id": "sveltejs__svelte-1190",
+        "label": "sveltejs__svelte-1190-baseline-E",
+        "world": "E",
+        "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm pkg set scripts.lint=\"echo noop\" && npm run test -- --reporter json --exit",
+        "timeout_seconds": 1200,
+        "acceptance_diag": {
+          "instance_id": "sveltejs__svelte-1190",
+          "patch_applied": true,
+          "generation": true,
+          "with_logs": true,
+          "all_f2p_passed": false,
+          "no_p2p_failed": true,
+          "resolved": false
+        },
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1916,
+          "differences": [
+            "test/css/index.js",
+            "test/css/samples/attribute-selector-only-name/expected.css",
+            "test/css/samples/attribute-selector-unquoted/expected.css",
+            "test/css/samples/basic/expected.css",
+            "test/css/samples/cascade-false-empty-rule-dev/expected.css",
+            "test/css/samples/cascade-false-global-keyframes/expected.css",
+            "test/css/samples/cascade-false-keyframes-from-to/expected.css",
+            "test/css/samples/cascade-false-keyframes/expected.css",
+            "test/css/samples/cascade-false-pseudo-element/expected.css",
+            "test/css/samples/cascade-false-universal-selector/expected.css",
+            "test/css/samples/cascade-false-universal-selector/expected.html",
+            "test/css/samples/cascade-false/expected.css",
+            "test/css/samples/combinator-child/expected.css",
+            "test/css/samples/combinator-child/expected.html",
+            "test/css/samples/css-vars/expected.css",
+            "test/css/samples/descendant-selector-non-top-level-outer/expected.css",
+            "test/css/samples/descendant-selector-non-top-level-outer/expected.html",
+            "test/css/samples/keyframes/expected.css",
+            "test/css/samples/media-query-word/expected.css",
+            "test/css/samples/media-query/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/expected.css",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-static/expected.css",
+            "test/css/samples/omit-scoping-attribute-class-static/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.html",
+            "test/css/samples/omit-scoping-attribute-id/expected.css",
+            "test/css/samples/omit-scoping-attribute-id/expected.html",
+            "test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-whitespace/expected.css",
+            "test/css/samples/omit-scoping-attribute-whitespace/expected.html",
+            "test/css/samples/omit-scoping-attribute/expected.css",
+            "test/css/samples/omit-scoping-attribute/expected.html",
+            "test/css/samples/refs-qualified/expected.css",
+            "test/css/samples/refs-qualified/expected.html",
+            "test/css/samples/refs/expected.css",
+            "test/css/samples/refs/expected.html",
+            "test/css/samples/supports-query/expected.css",
+            "test/css/samples/universal-selector/expected.css",
+            "test/css/samples/unknown-at-rule/expected.css",
+            "test/css/samples/unused-selector-leading/expected.css",
+            "test/css/samples/unused-selector-leading/expected.html",
+            "test/css/samples/unused-selector-ternary/expected.css",
+            "test/css/samples/unused-selector-ternary/expected.html",
+            "test/css/samples/unused-selector/expected.css",
+            "test/css/samples/unused-selector/expected.html",
+            "test/js/samples/collapses-text-around-comments/expected-bundle.js",
+            "test/js/samples/collapses-text-around-comments/expected.js",
+            "test/js/samples/css-media-query/expected-bundle.js",
+            "test/js/samples/css-media-query/expected.js",
+            "test/server-side-rendering/samples/styles-nested/_actual.css",
+            "test/server-side-rendering/samples/styles-nested/_actual.html",
+            "test/server-side-rendering/samples/styles-nested/_expected.css",
+            "test/server-side-rendering/samples/styles-nested/_expected.html",
+            "test/server-side-rendering/samples/styles/_actual.css",
+            "test/server-side-rendering/samples/styles/_actual.html",
+            "test/server-side-rendering/samples/styles/_expected.css",
+            "test/server-side-rendering/samples/styles/_expected.html",
+            "test/sourcemaps/samples/css-cascade-false/output.css",
+            "test/sourcemaps/samples/css-cascade-false/output.css.map",
+            "test/sourcemaps/samples/css/output.css",
+            "test/sourcemaps/samples/css/output.css.map"
+          ]
+        },
+        "source_inventory_sha256": "451e2f15c4676dc57312d438171cda08916ce07cf4e93319298298e8c9d29747",
+        "full_inventory_sha256": "0585a9734a79d401330853625dec3344fdda96edd58f38d024be992ccd9e197d",
+        "import_targets": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js"
+        ],
+        "build_inputs_sha256": "6392c93d7ee316b89c5c3b963479d9248df9898e55058f0eeed68597c173b079",
+        "execution_overlay": {
+          "package.json": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+          },
+          "yarn.lock": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+          }
+        },
+        "exit_code": 59,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 108.581,
+        "output_sha256": "61e6e583271a37e3aa4e806ac4639d98ad1d0c22919997f452c9163b275ee99f",
+        "source_mutations": {
+          "package.json": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "68c157e3d08190b151027775fb8b57a00b6ec81d2be3c2056335d00b498b0f90"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+            }
+          },
+          "test/server-side-rendering/samples/styles-nested/_actual.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "b00572102ab4ce2864f0693652e60afb32c715ec8f18f4fa5a785f7efd3f9cf7"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "745e2e863990264ddc64c680d5d312087d68cad6c3d25b4528aac742ec6346e1"
+            }
+          },
+          "test/server-side-rendering/samples/styles-nested/_actual.html": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "c4b09f0b7710aa940387c40dea1a6dea2241cb68c4d98ce9be4acc1f4297d73f"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "797698a0808be7543ca8c8c0f24f256a975154468ac012ed8a6e97f1bc68da12"
+            }
+          },
+          "test/server-side-rendering/samples/styles/_actual.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "38fa0b7ce65683e4f08419df6059714c244554d26f2a361ccd31a1f84808719a"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "87cda4fd5173a67073ffc040333d4f99db66234f8f91b5a0e328ebbb53b5df71"
+            }
+          },
+          "test/server-side-rendering/samples/styles/_actual.html": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7f2cfd01d5699de1dcd47113cec03ef7bb1327df6c4a253a96a75bf3d937c06a"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "fd8f3462820eadce4bb59e8d73bf2d29bdb8c864a0d0c55188443b9a08f9ff54"
+            }
+          },
+          "test/sourcemaps/samples/css-cascade-false/output.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "37869336fe989e75e08192b1964efff1990fa62bae2ea4c19dc4758a1ced82d6"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "dcb2c272e64485bb3543eb6f56f904397f3a1d26b8cb7c9df69bbf9152f5752d"
+            }
+          },
+          "test/sourcemaps/samples/css-cascade-false/output.css.map": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "0c585caf3c9063a25617ca47885929986baa141d42bdeac19765da68609cb12d"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7ad0021c3d6a3c096c5e7fc60ea2345d090e0ca58774f74709be14eb234622b2"
+            }
+          },
+          "test/sourcemaps/samples/css/output.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7cdfb4ba21a658af6c3c72f09ea1802bb317795c66478bd088c67f61d0bb75e3"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "f50fc8b63026f77c69b07e57f3834a1d96576332269e0c4988c0adb5c5306d22"
+            }
+          },
+          "test/sourcemaps/samples/css/output.css.map": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7a9be97c6327b1389c469ce68e7d01e7500e20f31d150b55c77a2b3afd63eb71"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "1cfcbbdd414396d0499a524a00025fd2cf26d1fe78649dd8cd240020476e6774"
+            }
+          },
+          "yarn.lock": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "ff0602af5e3e7ab7038a2cdb0f49fcaea48d816b707a705610fe6a867fab8c0d"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {
+          "compiler/svelte.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "2fe436f6863e243d892f1bf52d4094067d98ab90b2c934cb8b56d3431c2fd196"
+          },
+          "compiler/svelte.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "0c4f00e72f418d756239c8a817aad05494469d1239ac69f74f5a93096f853aa0"
+          },
+          "shared.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "435f4c03fae641ab095970036f4917db06fd93b7e921b11cd287f0c97bf37ead"
+          },
+          "src/generators/dom/shared.ts": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "437634bf11a74f2e74590c3906ba7408d6848505345a370faaeb1f6c50d74d4a"
+          },
+          "ssr/register.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "9c3231e5e9b8efd1b0cfbfa12de8196e8d1782151204ab83fa8736a0f569d877"
+          },
+          "ssr/register.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "8258f583e14ec69f334276650be5e370aa72f3c234f6a6ac773523416cdd43ce"
+          },
+          "store.umd.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "e6192955ee99d919d9bac8a34d97038b5d77fabaf8697ba3019879283a7f25c5"
+          }
+        },
+        "resolved_modules": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js",
+          "/testbed/compiler/svelte.js",
+          "/testbed/ssr/register.js",
+          "/testbed/shared.js",
+          "/testbed/store.umd.js"
+        ],
+        "runner_stats": {
+          "suites": 25,
+          "tests": 1730,
+          "passes": 1618,
+          "pending": 53,
+          "failures": 59,
+          "start": "2026-09-18T05:04:03.485Z",
+          "end": "2026-09-18T05:05:38.579Z",
+          "duration": 95094
+        },
+        "passed": 1618,
+        "failed": 59,
+        "delivered_checks": "failed",
+        "missing_required_tests": [],
+        "seconds": 112.382,
+        "test_set": "test-sets/d745bd2be36b669626f892ff1a2c4934ee7d08057c35fb7b3404450ee78990de.json",
+        "failures": [
+          {
+            "test": "css attribute-selector-only-name",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'[foo][svelte-xyz]{color:red}[baz][svelte-xyz]{color:blue}' == '[foo].svelte-xyz{color:red}[baz].svelte-xyz{color:blue}'",
+            "detail_sha256": "b7456090c5dada1a732d360919f61b536fac84703a6b0ff6bfda3b7ffad7a6cc"
+          },
+          {
+            "test": "css attribute-selector-unquoted",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'[foo=bar][svelte-xyz]{color:red}' == '[foo=bar].svelte-xyz{color:red}'",
+            "detail_sha256": "e327a0442ed353ce7c0e39b34dfe74dc41020e7110e7e1ada560f3eb23e0d92b"
+          },
+          {
+            "test": "css basic",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div[svelte-xyz],[svelte-xyz] div{color:red}' == 'div.svelte-xyz,.svelte-xyz div{color:red}'",
+            "detail_sha256": "d5b0e38635b158254f593c680653b9c8b9465e92ef3ad9bee97dfd4089eeadde"
+          },
+          {
+            "test": "css cascade-false",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div[svelte-xyz]{color:red}div.foo[svelte-xyz]{color:blue}.foo[svelte-xyz]{font-weight:bold}' == 'div.svelte-xyz{color:red}div.foo.svelte-xyz{color:blue}.foo.svelte-xyz{font-weight:bold}'",
+            "detail_sha256": "ad84d73868e603d5e8c13525a4743e7a1269502d8a67b8ed0c5d952e82e0a03b"
+          },
+          {
+            "test": "css cascade-false-empty-rule-dev",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'.foo[svelte-xyz]{}' == '.foo.svelte-xyz{}'",
+            "detail_sha256": "555b16fe7c4d95b05574e84d57988e1ec4b572627fd60e752b3c283ef99d4596"
+          },
+          {
+            "test": "css cascade-false-global-keyframes",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'@keyframes why{0%{color:red}100%{color:blue}}.animated[svelte-xyz]{animation:why 2s}.also-animated[svelte-xyz]{animation:not-defined-here 2s}' == '@keyframes why{0%{color:red}100%{color:blue}}.animated.svelte-xyz{animation:why 2s}.also-animated.svelte-xyz{animation:not-defined-here 2s}'",
+            "detail_sha256": "f2353dba8cb218dc59eae3422de43589de7a8bc024e8584bcf4dbe602d3b78af"
+          },
+          {
+            "test": "css cascade-false-keyframes",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'@keyframes svelte-xyz-why{0%{color:red}100%{color:blue}}.animated[svelte-xyz]{animation:svelte-xyz-why 2s}.also-animated[svelte-xyz]{animation:not-defined-here 2s}' == '@keyframes svelte-xyz-why{0%{color:red}100%{color:blue}}.animated.svelte-xyz{animation:svelte-xyz-why 2s}.also-animated.svelte-xyz{animation:not-defined-here 2s}'",
+            "detail_sha256": "637af6eb2b3e15d6a255312186ccb1099edf95ba2c9d887c89eaf2fd6328b427"
+          },
+          {
+            "test": "css cascade-false-keyframes-from-to",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'@keyframes svelte-xyz-why{from{color:red}to{color:blue}}.animated[svelte-xyz]{animation:svelte-xyz-why 2s}' == '@keyframes svelte-xyz-why{from{color:red}to{color:blue}}.animated.svelte-xyz{animation:svelte-xyz-why 2s}'",
+            "detail_sha256": "0b272a43fe9a6f55a2169516d1003384bb9f98e5400a9bcc4a6d8c20f837e659"
+          },
+          {
+            "test": "css cascade-false-pseudo-element",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"span[svelte-xyz]::after{content:'i am a pseudo-element'}span[svelte-xyz]:first-child{color:red}span[svelte-xyz]:last-child::after{color:blue}\" == \"span.svelte-xyz::after{content:'i am a pseudo-element'}span.svelte-xyz:first-child{color:red}span.svelte-xyz:last-child::after{color:blue}\"",
+            "detail_sha256": "9a0fcb88d5ca0b1b82db2927f26147c75a44faa785bcd7e3ea4f766c4bbb186d"
+          },
+          {
+            "test": "css cascade-false-universal-selector",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'[svelte-xyz]{color:red}' == '.svelte-xyz{color:red}'",
+            "detail_sha256": "a11030d3c7eef1092aa0e38b7fb036627da60b5e1af3ec76d4d649530ef14a59"
+          },
+          {
+            "test": "css combinator-child",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'.test[svelte-xyz]>div[svelte-xyz]{color:#0af}' == '.test.svelte-xyz>div.svelte-xyz{color:#0af}'",
+            "detail_sha256": "c0511899e72124e626d6813a60a15250217e96fa413cb2c60cda68b2711a154e"
+          },
+          {
+            "test": "css css-vars",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div[svelte-xyz],[svelte-xyz] div{--test:10}' == 'div.svelte-xyz,.svelte-xyz div{--test:10}'",
+            "detail_sha256": "39145af66c3eb504cfd49d4c84d235b7770745b4791acaace50702dab456aaee"
+          },
+          {
+            "test": "css descendant-selector-non-top-level-outer",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'p[svelte-xyz] span[svelte-xyz]{color:red}' == 'p.svelte-xyz span.svelte-xyz{color:red}'",
+            "detail_sha256": "0daabab7afc89532df4c79e4ef8e49bd04b2c219e8bec73352c8a09eb7d1aa87"
+          },
+          {
+            "test": "css keyframes",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'@keyframes svelte-xyz-why{0%{color:red}100%{color:blue}}[svelte-xyz].animated,[svelte-xyz] .animated{animation:svelte-xyz-why 2s}' == '@keyframes svelte-xyz-why{0%{color:red}100%{color:blue}}.svelte-xyz.animated,.svelte-xyz .animated{animation:svelte-xyz-why 2s}'",
+            "detail_sha256": "7be1d5cdfbb29e42eb1ecc93e565bfeadb5deeec1c4b336184ae9ddfaace955a"
+          },
+          {
+            "test": "css media-query",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'@media(min-width: 400px){[svelte-xyz].large-screen,[svelte-xyz] .large-screen{display:block}}' == '@media(min-width: 400px){.svelte-xyz.large-screen,.svelte-xyz .large-screen{display:block}}'",
+            "detail_sha256": "f36a793d4f7d0e8f4b25054de747e63463680e950cd64a0b396eec3c87b5ead9"
+          },
+          {
+            "test": "css media-query-word",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'@media only screen and (min-width: 400px){div[svelte-xyz],[svelte-xyz] div{color:red}}' == '@media only screen and (min-width: 400px){div.svelte-xyz,.svelte-xyz div{color:red}}'",
+            "detail_sha256": "d42cf7a14d7c58e32be8ff4277def4873fdba91712412e6e6da3fc04517927c6"
+          },
+          {
+            "test": "css omit-scoping-attribute",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'p[svelte-xyz]{color:red}' == 'p.svelte-xyz{color:red}'",
+            "detail_sha256": "7efb61aca03a138009e17cbe748b6433d7cb518bf270aeba474703a8e06d22e0"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'[autoplay][svelte-xyz]{color:red}' == '[autoplay].svelte-xyz{color:red}'",
+            "detail_sha256": "05af5ce7aaecf40875b765e9d1c1ca41119953fc12843020a624d127a0302c1a"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector-contains",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"[data-foo*='bar'][svelte-xyz]{color:red}\" == \"[data-foo*='bar'].svelte-xyz{color:red}\"",
+            "detail_sha256": "a4d8bec8ea330872e8dda7fd25348cdf88ae7b13f30e8aa4acb8c2181f346230"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector-equals",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"[data-foo='bar'][svelte-xyz]{color:red}\" == \"[data-foo='bar'].svelte-xyz{color:red}\"",
+            "detail_sha256": "62821e09ac9c083f50aae693e8ccaf56e06379d1e3696b4d16273a0f1a6d8424"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector-equals-case-insensitive",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"[data-foo='bar' i][svelte-xyz]{color:red}\" == \"[data-foo='bar' i].svelte-xyz{color:red}\"",
+            "detail_sha256": "d318ea8e33af912d344d8ae927e19c217bcbce978dfefbfdeaf7b395ef14f97b"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector-equals-dynamic",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"[data-foo='bar'][svelte-xyz]{color:red}\" == \"[data-foo='bar'].svelte-xyz{color:red}\"",
+            "detail_sha256": "7834791012f78a374c3e67f7455006338e7e380c4a0d30cfc3e8133bec9bd648"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector-pipe-equals",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"[data-foo|='bar'][svelte-xyz]{color:red}\" == \"[data-foo|='bar'].svelte-xyz{color:red}\"",
+            "detail_sha256": "9e140a30626b8150bfe4a0a4bf61a12a1ac2ff5fe7ea062dd8ea381c976a5229"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector-prefix",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"[data-foo^='bar'][svelte-xyz]{color:red}\" == \"[data-foo^='bar'].svelte-xyz{color:red}\"",
+            "detail_sha256": "ff8e47e4200d45602e38b8822f14c738ff23b5da5545fe5003b5257bff11ad61"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector-suffix",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"[data-foo$='bar'][svelte-xyz]{color:red}\" == \"[data-foo$='bar'].svelte-xyz{color:red}\"",
+            "detail_sha256": "b7d51b07d1fb4d78a2ff3749a67f2d1866407e4095bc241533595fc7d83e1f97"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector-word-equals",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"[data-foo~='bar'][svelte-xyz]{color:red}\" == \"[data-foo~='bar'].svelte-xyz{color:red}\"",
+            "detail_sha256": "702d2601bce3dc9d07e4ea6e0bc47f0fabf55a28f675d6d876a67e5734957ca6"
+          },
+          {
+            "test": "css omit-scoping-attribute-class-dynamic",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'.foo[svelte-xyz]{color:red}' == '.foo.svelte-xyz{color:red}'",
+            "detail_sha256": "d2613dbd1b97f7a43e72209ed6bcce2ecd359b8ac2b5422f5fe5efcd3f8a8131"
+          },
+          {
+            "test": "css omit-scoping-attribute-class-static",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'.foo[svelte-xyz]{color:red}' == '.foo.svelte-xyz{color:red}'",
+            "detail_sha256": "02d4c91f21df000adbdfd3365665e255f12e8128239b9eadee70a7d228bb7fb9"
+          },
+          {
+            "test": "css omit-scoping-attribute-descendant-global-inner",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div[svelte-xyz]>p{color:red}' == 'div.svelte-xyz>p{color:red}'",
+            "detail_sha256": "5bb2d92f8e871bea5ef2ea8a89c32345abddfcbfcdfcf38edd32fc78abf17f93"
+          },
+          {
+            "test": "css omit-scoping-attribute-descendant-global-inner-class",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'.foo[svelte-xyz] .bar{color:red}' == '.foo.svelte-xyz .bar{color:red}'",
+            "detail_sha256": "f74b26e1406b80337b883a97f2f0db3b6d196a8abe16cfcff5904887fc7fe046"
+          },
+          {
+            "test": "css omit-scoping-attribute-descendant-global-inner-multiple",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div[svelte-xyz]>p>em{color:red}' == 'div.svelte-xyz>p>em{color:red}'",
+            "detail_sha256": "ee893ca8da116563a6fd64540474ee468c41d5d06a6f1ac7f053c3f0edde8e52"
+          },
+          {
+            "test": "css omit-scoping-attribute-descendant-global-outer",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div>p[svelte-xyz]{color:red}' == 'div>p.svelte-xyz{color:red}'",
+            "detail_sha256": "cd86475085f30c5111f7c2a3ae183541e651a5657456fe4eac390f51f21d00bc"
+          },
+          {
+            "test": "css omit-scoping-attribute-descendant-global-outer-multiple",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div>section>p[svelte-xyz]{color:red}' == 'div>section>p.svelte-xyz{color:red}'",
+            "detail_sha256": "39f85f8360553ecceed55d960d992ae7b1e300c1622c42c8174b7ddb818527f5"
+          },
+          {
+            "test": "css omit-scoping-attribute-id",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'#foo[svelte-xyz]{color:red}' == '#foo.svelte-xyz{color:red}'",
+            "detail_sha256": "e823bf4259e9b20f4c424102846e90c0a4fa3c100213d9a07ebe83d3501617ae"
+          },
+          {
+            "test": "css omit-scoping-attribute-whitespace",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div[svelte-xyz] p[svelte-xyz]{color:red}' == 'div.svelte-xyz p.svelte-xyz{color:red}'",
+            "detail_sha256": "cde3879bfeae2c79c91c616a15931d93f40ebc39d37aec29f5782bba9d33e510"
+          },
+          {
+            "test": "css omit-scoping-attribute-whitespace-multiple",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div[svelte-xyz] section p[svelte-xyz]{color:red}' == 'div.svelte-xyz section p.svelte-xyz{color:red}'",
+            "detail_sha256": "6ca86bccde72e423ca46df9f52780e2015d501367f02ad9c148520c885158e30"
+          },
+          {
+            "test": "css refs",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'[svelte-ref-a][svelte-xyz]{color:red}[svelte-ref-b][svelte-xyz]{color:green}' == '[svelte-ref-a].svelte-xyz{color:red}[svelte-ref-b].svelte-xyz{color:green}'",
+            "detail_sha256": "777b53bb4153c905eb57dbfb2de35eba19aea6b92208ee6a3e1313c8d3be2dd2"
+          },
+          {
+            "test": "css refs-qualified",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'[svelte-ref-button].active[svelte-xyz]{color:red}' == '[svelte-ref-button].active.svelte-xyz{color:red}'",
+            "detail_sha256": "7537027a55c119f81621e2e6e105e29675ff112454bbc560b6d4b5bf69d0128d"
+          },
+          {
+            "test": "css supports-query",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'@supports (display: grid){.maybe-grid[svelte-xyz]{display:grid}}' == '@supports (display: grid){.maybe-grid.svelte-xyz{display:grid}}'",
+            "detail_sha256": "27b90c8c78dbfcba300f74c41b8d849e48c1700afbe8f6dff6f860e1a5a281c8"
+          },
+          {
+            "test": "css universal-selector",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'[svelte-xyz],[svelte-xyz] *{color:red}' == '.svelte-xyz,.svelte-xyz *{color:red}'",
+            "detail_sha256": "7aa28b8829ac4c3a4260dab91f061d3a4237a4eb5a216550da24a7f833236093"
+          },
+          {
+            "test": "css unknown-at-rule",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div[svelte-xyz],[svelte-xyz] div{@apply --funky-div;}' == 'div.svelte-xyz,.svelte-xyz div{@apply --funky-div;}'",
+            "detail_sha256": "c9b2c00e453e120edf01c06f97e71d4bac4308a433a71386cb476e8dde150b46"
+          },
+          {
+            "test": "css unused-selector",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'.foo[svelte-xyz]{color:red}' == '.foo.svelte-xyz{color:red}'",
+            "detail_sha256": "345724c0825946268cb608f01d164e8ac4bac2f5ccac701d16491a933d2530ab"
+          },
+          {
+            "test": "css unused-selector-leading",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'.bar[svelte-xyz]{color:red}' == '.bar.svelte-xyz{color:red}'",
+            "detail_sha256": "23bb55268940579c9f9e3302b22adaaf5279c105a002e91d076cdf5a09897323"
+          },
+          {
+            "test": "css unused-selector-ternary",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'.active[svelte-xyz]{color:red}.inactive[svelte-xyz]{color:blue}' == '.active.svelte-xyz{color:red}.inactive.svelte-xyz{color:blue}'",
+            "detail_sha256": "71824353897905c2895ca0c5bc047efec81e65a0df094573b29286f53e8a8124"
+          },
+          {
+            "test": "custom-elements escaped-css",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "9f7e6c1ca0fa9b2788a18e60fb3bd6f007d53b3d0182f4df598bb0c8040278f8"
+          },
+          {
+            "test": "custom-elements html",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "6614d123bc91938810bb793d0d7a0122ee21917bc7c436d45fa45ff4459a6221"
+          },
+          {
+            "test": "custom-elements html-slots",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "dc45f39f2fb9b320dee5782b31f4bd5730daec25037a7b3e5c3a785adaff8df4"
+          },
+          {
+            "test": "custom-elements nested",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "36a0e6d0795dbb967784c58be924256c9b87423566c96ce53f6d30143885eb0b"
+          },
+          {
+            "test": "custom-elements new",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "05bcb8835b286e3d85a1bf950dff4468965f5899b5fe8ee470e35fc44762741f"
+          },
+          {
+            "test": "custom-elements new-styled",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "b10ed7a6f0123331913529a3db32f528aa47557c263419c9f701a566b5f317c1"
+          },
+          {
+            "test": "custom-elements no-missing-prop-warnings",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "b7875fdcd18c2eda80cdfe36715ab987a1de4fe8f8f4264b32ea338f4506449f"
+          },
+          {
+            "test": "custom-elements oncreate",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "165135eed5d8a1a3713d6e29ea3bac77a367466289e4d29048396dc4896669c7"
+          },
+          {
+            "test": "js collapses-text-around-comments",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'/* generated by Svelte vX.Y.Z */\\n' +\n  'import { appendNode, assign, createElement, createText, detachNode, init, insertNode, noop, proto, setAttribute } from \"svelte/shared.js\";\\n' +\n  '\\n' +\n  'function data() {\\n' +\n  '\\treturn { foo: 42 }\\n' +\n  '};\\n' +\n  '\\n' +\n  'function encapsulateStyles(node) {\\n' +\n  '\\tsetAttribute(node, \"svelte-2794052100\", \"\");\\n' +\n  '}\\n' +\n  '\\n' +\n  'function add_css() {\\n' +\n  '\\tvar style = createElement(\"style\");\\n' +\n  \"\\tstyle.id = 'svelte-2794052100-sty",
+            "detail_sha256": "73a5268c76ea96ceaf3cf0e49571f1dea316bcfbdb03536ab30ac6cdddfff095"
+          },
+          {
+            "test": "js css-media-query",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'/* generated by Svelte vX.Y.Z */\\n' +\n  'import { appendNode, assign, createElement, detachNode, init, insertNode, noop, proto, setAttribute } from \"svelte/shared.js\";\\n' +\n  '\\n' +\n  'function encapsulateStyles(node) {\\n' +\n  '\\tsetAttribute(node, \"svelte-3905933315\", \"\");\\n' +\n  '}\\n' +\n  '\\n' +\n  'function add_css() {\\n' +\n  '\\tvar style = createElement(\"style\");\\n' +\n  \"\\tstyle.id = 'svelte-3905933315-style';\\n\" +\n  '\\tstyle.textContent = \"@media(min-width: 1px){div[svelte-3905933315],[svel",
+            "detail_sha256": "bb8b2272b7f54cad97ed4c30877a9e30e2bff932a732bb159f84394532436658"
+          },
+          {
+            "test": "runtime binding-select (shared helpers)",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n[\n  HTMLOptionElement {\n    __value: 'one'\n  },\n  HTMLOptionElement {\n    __value: 'two'\n  },\n  HTMLOptionElement {\n    __value: 'three'\n  }\n]\n\nshould loosely deep-equal\n\nHTMLOptionsCollection {}",
+            "detail_sha256": "7c131e22120d9cbf76b7d8dc1bc498c9a7e279e4988a37e753f78a7713955d76"
+          },
+          {
+            "test": "runtime binding-select (shared helpers , hydration)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "13ea6706b966ce56e1316fedf2549f9ed41699cb9cacfff2aef2c5f73033d266"
+          },
+          {
+            "test": "runtime binding-select (inline helpers)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "9c0a580aa3760a7036be87705f352a5ebd5a92bfcc07e2903ea823ac7f44b9b0"
+          },
+          {
+            "test": "ssr styles",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n'<div svelte-724714405=\"\">red</div>'\n\nshould loosely deep-equal\n\n'<div class=\"svelte-bzh57p\">red</div>'",
+            "detail_sha256": "a6f13a6f9cbfa5160e52458b398b5a33190e5460441b3ff3129bec3c9f202f61"
+          },
+          {
+            "test": "ssr styles-nested",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n'<div svelte-724714405=\"\">red</div><div svelte-300476157=\"\">green: foo</div><div svelte-300476157=\"\">green: bar</div>'\n\nshould loosely deep-equal\n\n'<div class=\"svelte-bzh57p\">red</div><div class=\"svelte-4yw8vx\">green: foo</div><div class=\"svelte-4yw8vx\">green: bar</div>'",
+            "detail_sha256": "5b3b6904b2f8d752ccd6631f43cef0d589e9ffcab641502c84e1b7a8ac686a8f"
+          }
+        ],
+        "failure_kinds": {
+          "assertion": 49,
+          "test_timeout": 8,
+          "other": 2
+        }
+      }
+    },
+    {
+      "delivery_apply": true,
+      "model_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_sha256": "865f82b594d861f5ecbae4f058002f89ccaf318d07ce2a1ff8fa8fd41120f4ac",
+      "base_commit": "0c3e44ac05c651c12c94e047bf712cb86278d345",
+      "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1190@sha256:28167366b3d50bb7b6cc3441186980d6022986d9fc60d6e6a193c7aa7cb7b858",
+      "instance_id": "sveltejs__svelte-1190",
+      "arm": "baseline-overlap",
+      "E": {
+        "instance_id": "sveltejs__svelte-1190",
+        "label": "sveltejs__svelte-1190-baseline-overlap-E",
+        "world": "E",
+        "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm pkg set scripts.lint=\"echo noop\" && npm run test -- --reporter json --exit",
+        "timeout_seconds": 1200,
+        "acceptance_diag": {
+          "instance_id": "sveltejs__svelte-1190",
+          "patch_applied": true,
+          "generation": true,
+          "with_logs": true,
+          "all_f2p_passed": false,
+          "no_p2p_failed": true,
+          "resolved": false
+        },
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1916,
+          "differences": [
+            "test/css/index.js",
+            "test/css/samples/attribute-selector-only-name/expected.css",
+            "test/css/samples/attribute-selector-unquoted/expected.css",
+            "test/css/samples/basic/expected.css",
+            "test/css/samples/cascade-false-empty-rule-dev/expected.css",
+            "test/css/samples/cascade-false-global-keyframes/expected.css",
+            "test/css/samples/cascade-false-keyframes-from-to/expected.css",
+            "test/css/samples/cascade-false-keyframes/expected.css",
+            "test/css/samples/cascade-false-pseudo-element/expected.css",
+            "test/css/samples/cascade-false-universal-selector/expected.css",
+            "test/css/samples/cascade-false-universal-selector/expected.html",
+            "test/css/samples/cascade-false/expected.css",
+            "test/css/samples/combinator-child/expected.css",
+            "test/css/samples/combinator-child/expected.html",
+            "test/css/samples/css-vars/expected.css",
+            "test/css/samples/descendant-selector-non-top-level-outer/expected.css",
+            "test/css/samples/descendant-selector-non-top-level-outer/expected.html",
+            "test/css/samples/keyframes/expected.css",
+            "test/css/samples/media-query-word/expected.css",
+            "test/css/samples/media-query/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/expected.css",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-static/expected.css",
+            "test/css/samples/omit-scoping-attribute-class-static/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.html",
+            "test/css/samples/omit-scoping-attribute-id/expected.css",
+            "test/css/samples/omit-scoping-attribute-id/expected.html",
+            "test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-whitespace/expected.css",
+            "test/css/samples/omit-scoping-attribute-whitespace/expected.html",
+            "test/css/samples/omit-scoping-attribute/expected.css",
+            "test/css/samples/omit-scoping-attribute/expected.html",
+            "test/css/samples/refs-qualified/expected.css",
+            "test/css/samples/refs-qualified/expected.html",
+            "test/css/samples/refs/expected.css",
+            "test/css/samples/refs/expected.html",
+            "test/css/samples/supports-query/expected.css",
+            "test/css/samples/universal-selector/expected.css",
+            "test/css/samples/unknown-at-rule/expected.css",
+            "test/css/samples/unused-selector-leading/expected.css",
+            "test/css/samples/unused-selector-leading/expected.html",
+            "test/css/samples/unused-selector-ternary/expected.css",
+            "test/css/samples/unused-selector-ternary/expected.html",
+            "test/css/samples/unused-selector/expected.css",
+            "test/css/samples/unused-selector/expected.html",
+            "test/js/samples/collapses-text-around-comments/expected-bundle.js",
+            "test/js/samples/collapses-text-around-comments/expected.js",
+            "test/js/samples/css-media-query/expected-bundle.js",
+            "test/js/samples/css-media-query/expected.js",
+            "test/server-side-rendering/samples/styles-nested/_actual.css",
+            "test/server-side-rendering/samples/styles-nested/_actual.html",
+            "test/server-side-rendering/samples/styles-nested/_expected.css",
+            "test/server-side-rendering/samples/styles-nested/_expected.html",
+            "test/server-side-rendering/samples/styles/_actual.css",
+            "test/server-side-rendering/samples/styles/_actual.html",
+            "test/server-side-rendering/samples/styles/_expected.css",
+            "test/server-side-rendering/samples/styles/_expected.html",
+            "test/sourcemaps/samples/css-cascade-false/output.css",
+            "test/sourcemaps/samples/css-cascade-false/output.css.map",
+            "test/sourcemaps/samples/css/output.css",
+            "test/sourcemaps/samples/css/output.css.map"
+          ]
+        },
+        "source_inventory_sha256": "451e2f15c4676dc57312d438171cda08916ce07cf4e93319298298e8c9d29747",
+        "full_inventory_sha256": "4400d12c5a3db5234f3b72f0e7e3a0c3bb4f4a6d881a992b95080e7982249fc7",
+        "import_targets": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js"
+        ],
+        "build_inputs_sha256": "6392c93d7ee316b89c5c3b963479d9248df9898e55058f0eeed68597c173b079",
+        "execution_overlay": {
+          "package.json": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+          },
+          "yarn.lock": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+          }
+        },
+        "exit_code": 59,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 108.724,
+        "output_sha256": "55f61576893509b413df522d175e432160733c14cc147cd8e42ae78422ba0093",
+        "source_mutations": {
+          "package.json": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "68c157e3d08190b151027775fb8b57a00b6ec81d2be3c2056335d00b498b0f90"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+            }
+          },
+          "test/server-side-rendering/samples/styles-nested/_actual.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "b00572102ab4ce2864f0693652e60afb32c715ec8f18f4fa5a785f7efd3f9cf7"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "745e2e863990264ddc64c680d5d312087d68cad6c3d25b4528aac742ec6346e1"
+            }
+          },
+          "test/server-side-rendering/samples/styles-nested/_actual.html": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "c4b09f0b7710aa940387c40dea1a6dea2241cb68c4d98ce9be4acc1f4297d73f"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "797698a0808be7543ca8c8c0f24f256a975154468ac012ed8a6e97f1bc68da12"
+            }
+          },
+          "test/server-side-rendering/samples/styles/_actual.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "38fa0b7ce65683e4f08419df6059714c244554d26f2a361ccd31a1f84808719a"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "87cda4fd5173a67073ffc040333d4f99db66234f8f91b5a0e328ebbb53b5df71"
+            }
+          },
+          "test/server-side-rendering/samples/styles/_actual.html": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7f2cfd01d5699de1dcd47113cec03ef7bb1327df6c4a253a96a75bf3d937c06a"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "fd8f3462820eadce4bb59e8d73bf2d29bdb8c864a0d0c55188443b9a08f9ff54"
+            }
+          },
+          "test/sourcemaps/samples/css-cascade-false/output.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "37869336fe989e75e08192b1964efff1990fa62bae2ea4c19dc4758a1ced82d6"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "dcb2c272e64485bb3543eb6f56f904397f3a1d26b8cb7c9df69bbf9152f5752d"
+            }
+          },
+          "test/sourcemaps/samples/css-cascade-false/output.css.map": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "0c585caf3c9063a25617ca47885929986baa141d42bdeac19765da68609cb12d"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7ad0021c3d6a3c096c5e7fc60ea2345d090e0ca58774f74709be14eb234622b2"
+            }
+          },
+          "test/sourcemaps/samples/css/output.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7cdfb4ba21a658af6c3c72f09ea1802bb317795c66478bd088c67f61d0bb75e3"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "f50fc8b63026f77c69b07e57f3834a1d96576332269e0c4988c0adb5c5306d22"
+            }
+          },
+          "test/sourcemaps/samples/css/output.css.map": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7a9be97c6327b1389c469ce68e7d01e7500e20f31d150b55c77a2b3afd63eb71"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "1cfcbbdd414396d0499a524a00025fd2cf26d1fe78649dd8cd240020476e6774"
+            }
+          },
+          "yarn.lock": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "ff0602af5e3e7ab7038a2cdb0f49fcaea48d816b707a705610fe6a867fab8c0d"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {
+          "compiler/svelte.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "2fe436f6863e243d892f1bf52d4094067d98ab90b2c934cb8b56d3431c2fd196"
+          },
+          "compiler/svelte.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "0c4f00e72f418d756239c8a817aad05494469d1239ac69f74f5a93096f853aa0"
+          },
+          "shared.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "435f4c03fae641ab095970036f4917db06fd93b7e921b11cd287f0c97bf37ead"
+          },
+          "src/generators/dom/shared.ts": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "437634bf11a74f2e74590c3906ba7408d6848505345a370faaeb1f6c50d74d4a"
+          },
+          "ssr/register.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "9c3231e5e9b8efd1b0cfbfa12de8196e8d1782151204ab83fa8736a0f569d877"
+          },
+          "ssr/register.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "8258f583e14ec69f334276650be5e370aa72f3c234f6a6ac773523416cdd43ce"
+          },
+          "store.umd.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "e6192955ee99d919d9bac8a34d97038b5d77fabaf8697ba3019879283a7f25c5"
+          }
+        },
+        "resolved_modules": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js",
+          "/testbed/compiler/svelte.js",
+          "/testbed/ssr/register.js",
+          "/testbed/shared.js",
+          "/testbed/store.umd.js"
+        ],
+        "runner_stats": {
+          "suites": 25,
+          "tests": 1730,
+          "passes": 1618,
+          "pending": 53,
+          "failures": 59,
+          "start": "2026-09-18T05:05:56.116Z",
+          "end": "2026-09-18T05:07:31.303Z",
+          "duration": 95187
+        },
+        "passed": 1618,
+        "failed": 59,
+        "delivered_checks": "failed",
+        "missing_required_tests": [],
+        "seconds": 112.486,
+        "test_set": "test-sets/d745bd2be36b669626f892ff1a2c4934ee7d08057c35fb7b3404450ee78990de.json",
+        "failures": [
+          {
+            "test": "css attribute-selector-only-name",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'[foo][svelte-xyz]{color:red}[baz][svelte-xyz]{color:blue}' == '[foo].svelte-xyz{color:red}[baz].svelte-xyz{color:blue}'",
+            "detail_sha256": "b7456090c5dada1a732d360919f61b536fac84703a6b0ff6bfda3b7ffad7a6cc"
+          },
+          {
+            "test": "css attribute-selector-unquoted",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'[foo=bar][svelte-xyz]{color:red}' == '[foo=bar].svelte-xyz{color:red}'",
+            "detail_sha256": "717ec3b7c3f7cdc6c555b5aa1a0d3d74a5e2face913de99f9e302c439e18c604"
+          },
+          {
+            "test": "css basic",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div[svelte-xyz],[svelte-xyz] div{color:red}' == 'div.svelte-xyz,.svelte-xyz div{color:red}'",
+            "detail_sha256": "91209425c95ac1adafc6b76d269b32b3e4459af10fac1706c7ea99a3317293d2"
+          },
+          {
+            "test": "css cascade-false",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div[svelte-xyz]{color:red}div.foo[svelte-xyz]{color:blue}.foo[svelte-xyz]{font-weight:bold}' == 'div.svelte-xyz{color:red}div.foo.svelte-xyz{color:blue}.foo.svelte-xyz{font-weight:bold}'",
+            "detail_sha256": "ad84d73868e603d5e8c13525a4743e7a1269502d8a67b8ed0c5d952e82e0a03b"
+          },
+          {
+            "test": "css cascade-false-empty-rule-dev",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'.foo[svelte-xyz]{}' == '.foo.svelte-xyz{}'",
+            "detail_sha256": "20b5863241b0d202a37bf1306e018e108286726e17eaaf2ae0a55d1c6a2f56d7"
+          },
+          {
+            "test": "css cascade-false-global-keyframes",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'@keyframes why{0%{color:red}100%{color:blue}}.animated[svelte-xyz]{animation:why 2s}.also-animated[svelte-xyz]{animation:not-defined-here 2s}' == '@keyframes why{0%{color:red}100%{color:blue}}.animated.svelte-xyz{animation:why 2s}.also-animated.svelte-xyz{animation:not-defined-here 2s}'",
+            "detail_sha256": "f2353dba8cb218dc59eae3422de43589de7a8bc024e8584bcf4dbe602d3b78af"
+          },
+          {
+            "test": "css cascade-false-keyframes",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'@keyframes svelte-xyz-why{0%{color:red}100%{color:blue}}.animated[svelte-xyz]{animation:svelte-xyz-why 2s}.also-animated[svelte-xyz]{animation:not-defined-here 2s}' == '@keyframes svelte-xyz-why{0%{color:red}100%{color:blue}}.animated.svelte-xyz{animation:svelte-xyz-why 2s}.also-animated.svelte-xyz{animation:not-defined-here 2s}'",
+            "detail_sha256": "d5a4fa8bf11cc2fa09c6af57a9915d1fdbc3741d465fffa3b146afb5ee3724e0"
+          },
+          {
+            "test": "css cascade-false-keyframes-from-to",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'@keyframes svelte-xyz-why{from{color:red}to{color:blue}}.animated[svelte-xyz]{animation:svelte-xyz-why 2s}' == '@keyframes svelte-xyz-why{from{color:red}to{color:blue}}.animated.svelte-xyz{animation:svelte-xyz-why 2s}'",
+            "detail_sha256": "0b272a43fe9a6f55a2169516d1003384bb9f98e5400a9bcc4a6d8c20f837e659"
+          },
+          {
+            "test": "css cascade-false-pseudo-element",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"span[svelte-xyz]::after{content:'i am a pseudo-element'}span[svelte-xyz]:first-child{color:red}span[svelte-xyz]:last-child::after{color:blue}\" == \"span.svelte-xyz::after{content:'i am a pseudo-element'}span.svelte-xyz:first-child{color:red}span.svelte-xyz:last-child::after{color:blue}\"",
+            "detail_sha256": "9a0fcb88d5ca0b1b82db2927f26147c75a44faa785bcd7e3ea4f766c4bbb186d"
+          },
+          {
+            "test": "css cascade-false-universal-selector",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'[svelte-xyz]{color:red}' == '.svelte-xyz{color:red}'",
+            "detail_sha256": "f4ff3e3fc4f2943157cfaaec427b3e3573e2dd6b64cb7bbdf86793c1cb329f22"
+          },
+          {
+            "test": "css combinator-child",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'.test[svelte-xyz]>div[svelte-xyz]{color:#0af}' == '.test.svelte-xyz>div.svelte-xyz{color:#0af}'",
+            "detail_sha256": "b59b3ee57c75d6fc559f8d777c96cf1685b72e309e514d302b3f91ed3a52115a"
+          },
+          {
+            "test": "css css-vars",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div[svelte-xyz],[svelte-xyz] div{--test:10}' == 'div.svelte-xyz,.svelte-xyz div{--test:10}'",
+            "detail_sha256": "bcc6a40835a8ee04ac93c7af28fa337d4a2630c2f250b5d3021401dadc5d3048"
+          },
+          {
+            "test": "css descendant-selector-non-top-level-outer",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'p[svelte-xyz] span[svelte-xyz]{color:red}' == 'p.svelte-xyz span.svelte-xyz{color:red}'",
+            "detail_sha256": "0daabab7afc89532df4c79e4ef8e49bd04b2c219e8bec73352c8a09eb7d1aa87"
+          },
+          {
+            "test": "css keyframes",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'@keyframes svelte-xyz-why{0%{color:red}100%{color:blue}}[svelte-xyz].animated,[svelte-xyz] .animated{animation:svelte-xyz-why 2s}' == '@keyframes svelte-xyz-why{0%{color:red}100%{color:blue}}.svelte-xyz.animated,.svelte-xyz .animated{animation:svelte-xyz-why 2s}'",
+            "detail_sha256": "7be1d5cdfbb29e42eb1ecc93e565bfeadb5deeec1c4b336184ae9ddfaace955a"
+          },
+          {
+            "test": "css media-query",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'@media(min-width: 400px){[svelte-xyz].large-screen,[svelte-xyz] .large-screen{display:block}}' == '@media(min-width: 400px){.svelte-xyz.large-screen,.svelte-xyz .large-screen{display:block}}'",
+            "detail_sha256": "3b8c8bffa33c261558a9a792f4a158df845c73be849834427cc47bb3920c0904"
+          },
+          {
+            "test": "css media-query-word",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'@media only screen and (min-width: 400px){div[svelte-xyz],[svelte-xyz] div{color:red}}' == '@media only screen and (min-width: 400px){div.svelte-xyz,.svelte-xyz div{color:red}}'",
+            "detail_sha256": "088eef78d95837002762180860227f0f9ec2e3b15d76fc37426cd53a8f6135ec"
+          },
+          {
+            "test": "css omit-scoping-attribute",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'p[svelte-xyz]{color:red}' == 'p.svelte-xyz{color:red}'",
+            "detail_sha256": "7efb61aca03a138009e17cbe748b6433d7cb518bf270aeba474703a8e06d22e0"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'[autoplay][svelte-xyz]{color:red}' == '[autoplay].svelte-xyz{color:red}'",
+            "detail_sha256": "4420c4c0b62e4ec5f25b84b2b500b87e38dd00e574e9045523f6b96c412fc438"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector-contains",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"[data-foo*='bar'][svelte-xyz]{color:red}\" == \"[data-foo*='bar'].svelte-xyz{color:red}\"",
+            "detail_sha256": "4e70b432e3a2cdb8e297e8a7e91210f583e99348af5778585ee3d6763c7b70c6"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector-equals",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"[data-foo='bar'][svelte-xyz]{color:red}\" == \"[data-foo='bar'].svelte-xyz{color:red}\"",
+            "detail_sha256": "742011ec42a85a46eab44e550b181933a809209cbae860d3d436bd9fc5099517"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector-equals-case-insensitive",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"[data-foo='bar' i][svelte-xyz]{color:red}\" == \"[data-foo='bar' i].svelte-xyz{color:red}\"",
+            "detail_sha256": "d318ea8e33af912d344d8ae927e19c217bcbce978dfefbfdeaf7b395ef14f97b"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector-equals-dynamic",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"[data-foo='bar'][svelte-xyz]{color:red}\" == \"[data-foo='bar'].svelte-xyz{color:red}\"",
+            "detail_sha256": "4cfa2b1cd93dc3b542ca1d788481d02e0188451d0422652bfd8001e4951c0100"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector-pipe-equals",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"[data-foo|='bar'][svelte-xyz]{color:red}\" == \"[data-foo|='bar'].svelte-xyz{color:red}\"",
+            "detail_sha256": "38a276036b8e3b214da295fb1b5f5d1e92bdf30107a3eea04bbf2c5db772dd84"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector-prefix",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"[data-foo^='bar'][svelte-xyz]{color:red}\" == \"[data-foo^='bar'].svelte-xyz{color:red}\"",
+            "detail_sha256": "5976a348b918fbfa529261f8aca903227fa53c473d0c415aa016464bfe4e0929"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector-suffix",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"[data-foo$='bar'][svelte-xyz]{color:red}\" == \"[data-foo$='bar'].svelte-xyz{color:red}\"",
+            "detail_sha256": "2a28418f1e4c0228815f2d1cdb4d2cb56bf2753cd1893fc0fa11cc4448544deb"
+          },
+          {
+            "test": "css omit-scoping-attribute-attribute-selector-word-equals",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "\"[data-foo~='bar'][svelte-xyz]{color:red}\" == \"[data-foo~='bar'].svelte-xyz{color:red}\"",
+            "detail_sha256": "a3bb6468e537cd33f0c4dfc03744d011fd430df1caa5fbde376c9aec37f03c96"
+          },
+          {
+            "test": "css omit-scoping-attribute-class-dynamic",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'.foo[svelte-xyz]{color:red}' == '.foo.svelte-xyz{color:red}'",
+            "detail_sha256": "ccd0b63b04e5da559f64fab22f15cfbbfc4f1fce5633bde30f03102cce01a04a"
+          },
+          {
+            "test": "css omit-scoping-attribute-class-static",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'.foo[svelte-xyz]{color:red}' == '.foo.svelte-xyz{color:red}'",
+            "detail_sha256": "7decc66ad277f044f3b21ae1729194f2fb9081912166ecfb649618013cb6408d"
+          },
+          {
+            "test": "css omit-scoping-attribute-descendant-global-inner",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div[svelte-xyz]>p{color:red}' == 'div.svelte-xyz>p{color:red}'",
+            "detail_sha256": "444b232cc1fe5ae95832fa02bd970cf440364348f02c1547ec84fa5afa4926b7"
+          },
+          {
+            "test": "css omit-scoping-attribute-descendant-global-inner-class",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'.foo[svelte-xyz] .bar{color:red}' == '.foo.svelte-xyz .bar{color:red}'",
+            "detail_sha256": "e673c4753d33e3410c7f6e36310c7bc3af29f72e5ac90b9546e425a930f9b581"
+          },
+          {
+            "test": "css omit-scoping-attribute-descendant-global-inner-multiple",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div[svelte-xyz]>p>em{color:red}' == 'div.svelte-xyz>p>em{color:red}'",
+            "detail_sha256": "e14308f92152ca38bc736fffdfcf76aad2ce72f0d25a9aa739d97b37ef07dba8"
+          },
+          {
+            "test": "css omit-scoping-attribute-descendant-global-outer",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div>p[svelte-xyz]{color:red}' == 'div>p.svelte-xyz{color:red}'",
+            "detail_sha256": "30792ec65f008f9ac9faf61be38a431ec72c1d4774cf995a52d706f46939f087"
+          },
+          {
+            "test": "css omit-scoping-attribute-descendant-global-outer-multiple",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div>section>p[svelte-xyz]{color:red}' == 'div>section>p.svelte-xyz{color:red}'",
+            "detail_sha256": "b215552675a53fbf3f900c5e83da51e2e050420131b4aa6c6092aec7e964a2b3"
+          },
+          {
+            "test": "css omit-scoping-attribute-id",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'#foo[svelte-xyz]{color:red}' == '#foo.svelte-xyz{color:red}'",
+            "detail_sha256": "7c8e218ce167943a94b96a719307be0fae03ed720f7acac25ac776d2ae7bca93"
+          },
+          {
+            "test": "css omit-scoping-attribute-whitespace",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div[svelte-xyz] p[svelte-xyz]{color:red}' == 'div.svelte-xyz p.svelte-xyz{color:red}'",
+            "detail_sha256": "cde3879bfeae2c79c91c616a15931d93f40ebc39d37aec29f5782bba9d33e510"
+          },
+          {
+            "test": "css omit-scoping-attribute-whitespace-multiple",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div[svelte-xyz] section p[svelte-xyz]{color:red}' == 'div.svelte-xyz section p.svelte-xyz{color:red}'",
+            "detail_sha256": "6ca86bccde72e423ca46df9f52780e2015d501367f02ad9c148520c885158e30"
+          },
+          {
+            "test": "css refs",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'[svelte-ref-a][svelte-xyz]{color:red}[svelte-ref-b][svelte-xyz]{color:green}' == '[svelte-ref-a].svelte-xyz{color:red}[svelte-ref-b].svelte-xyz{color:green}'",
+            "detail_sha256": "777b53bb4153c905eb57dbfb2de35eba19aea6b92208ee6a3e1313c8d3be2dd2"
+          },
+          {
+            "test": "css refs-qualified",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'[svelte-ref-button].active[svelte-xyz]{color:red}' == '[svelte-ref-button].active.svelte-xyz{color:red}'",
+            "detail_sha256": "dec31540cb7788b8098d68a1288317d4859fbc66d00dcc9ee40f239429433d45"
+          },
+          {
+            "test": "css supports-query",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'@supports (display: grid){.maybe-grid[svelte-xyz]{display:grid}}' == '@supports (display: grid){.maybe-grid.svelte-xyz{display:grid}}'",
+            "detail_sha256": "9e4f4255581dae5e0c488a8555d9ecb4c322564a50dd70a6e306d1582f45aae6"
+          },
+          {
+            "test": "css universal-selector",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'[svelte-xyz],[svelte-xyz] *{color:red}' == '.svelte-xyz,.svelte-xyz *{color:red}'",
+            "detail_sha256": "7aa28b8829ac4c3a4260dab91f061d3a4237a4eb5a216550da24a7f833236093"
+          },
+          {
+            "test": "css unknown-at-rule",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'div[svelte-xyz],[svelte-xyz] div{@apply --funky-div;}' == 'div.svelte-xyz,.svelte-xyz div{@apply --funky-div;}'",
+            "detail_sha256": "c9b2c00e453e120edf01c06f97e71d4bac4308a433a71386cb476e8dde150b46"
+          },
+          {
+            "test": "css unused-selector",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'.foo[svelte-xyz]{color:red}' == '.foo.svelte-xyz{color:red}'",
+            "detail_sha256": "928a50e2ba8aa45396dc30b6de0dcab95323ba39875ca0f95151f131b992ac24"
+          },
+          {
+            "test": "css unused-selector-leading",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'.bar[svelte-xyz]{color:red}' == '.bar.svelte-xyz{color:red}'",
+            "detail_sha256": "23bb55268940579c9f9e3302b22adaaf5279c105a002e91d076cdf5a09897323"
+          },
+          {
+            "test": "css unused-selector-ternary",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'.active[svelte-xyz]{color:red}.inactive[svelte-xyz]{color:blue}' == '.active.svelte-xyz{color:red}.inactive.svelte-xyz{color:blue}'",
+            "detail_sha256": "693422831e57f637a849071a7bd7031877ab7bc7da70859c8512d85774762ec1"
+          },
+          {
+            "test": "custom-elements escaped-css",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "346b7b71248c42b25d96f7439c2af9f465eb5ecf2e53b270d3de4b1b2fc418fe"
+          },
+          {
+            "test": "custom-elements html",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "967d347da0e553ba344715846050d38b0250e93e38aec633956ccfa0d7f9e389"
+          },
+          {
+            "test": "custom-elements html-slots",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "01882394b7171d41cde2781dcb6f351d6ae5a1193e706884a2420e978e38c812"
+          },
+          {
+            "test": "custom-elements nested",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "ffad549bb99e39854105a7b74f00d6ff9055dcbc1540ca9bcb08a010ac726b21"
+          },
+          {
+            "test": "custom-elements new",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "00fcfee8e0516ed0cb5ff7b56d41039499ad56588268532027b838fb71dec427"
+          },
+          {
+            "test": "custom-elements new-styled",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "afc804a81861458d6194da0af3403b4fb7b8944f36f222242a3094b33d43f1d5"
+          },
+          {
+            "test": "custom-elements no-missing-prop-warnings",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "57ad3011a8c9f66b3fbb33c5a45c50d5fd8658b49cec3bc3b7073ae96d234d5c"
+          },
+          {
+            "test": "custom-elements oncreate",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "284395898a23573bb17be54d472adbe0388193cd65e3b353e88bc060a38abcb8"
+          },
+          {
+            "test": "js collapses-text-around-comments",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'/* generated by Svelte vX.Y.Z */\\n' +\n  'import { appendNode, assign, createElement, createText, detachNode, init, insertNode, noop, proto, setAttribute } from \"svelte/shared.js\";\\n' +\n  '\\n' +\n  'function data() {\\n' +\n  '\\treturn { foo: 42 }\\n' +\n  '};\\n' +\n  '\\n' +\n  'function encapsulateStyles(node) {\\n' +\n  '\\tsetAttribute(node, \"svelte-2794052100\", \"\");\\n' +\n  '}\\n' +\n  '\\n' +\n  'function add_css() {\\n' +\n  '\\tvar style = createElement(\"style\");\\n' +\n  \"\\tstyle.id = 'svelte-2794052100-sty",
+            "detail_sha256": "ca5c86798e926620433ea11dce519304f3e30441acef89c5a9b563ec96479bd1"
+          },
+          {
+            "test": "js css-media-query",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'/* generated by Svelte vX.Y.Z */\\n' +\n  'import { appendNode, assign, createElement, detachNode, init, insertNode, noop, proto, setAttribute } from \"svelte/shared.js\";\\n' +\n  '\\n' +\n  'function encapsulateStyles(node) {\\n' +\n  '\\tsetAttribute(node, \"svelte-3905933315\", \"\");\\n' +\n  '}\\n' +\n  '\\n' +\n  'function add_css() {\\n' +\n  '\\tvar style = createElement(\"style\");\\n' +\n  \"\\tstyle.id = 'svelte-3905933315-style';\\n\" +\n  '\\tstyle.textContent = \"@media(min-width: 1px){div[svelte-3905933315],[svel",
+            "detail_sha256": "64b0c9eedabb41b30db521240219d1f2c65bf0b17c88ff801580bf2844893303"
+          },
+          {
+            "test": "runtime binding-select (shared helpers)",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n[\n  HTMLOptionElement {\n    __value: 'one'\n  },\n  HTMLOptionElement {\n    __value: 'two'\n  },\n  HTMLOptionElement {\n    __value: 'three'\n  }\n]\n\nshould loosely deep-equal\n\nHTMLOptionsCollection {}",
+            "detail_sha256": "ea53d6469a85c9a52a2d5c302098a368a03e778be894b1524cdfcc25523bb1a6"
+          },
+          {
+            "test": "runtime binding-select (shared helpers , hydration)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "13ea6706b966ce56e1316fedf2549f9ed41699cb9cacfff2aef2c5f73033d266"
+          },
+          {
+            "test": "runtime binding-select (inline helpers)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "9c0a580aa3760a7036be87705f352a5ebd5a92bfcc07e2903ea823ac7f44b9b0"
+          },
+          {
+            "test": "ssr styles",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n'<div svelte-724714405=\"\">red</div>'\n\nshould loosely deep-equal\n\n'<div class=\"svelte-bzh57p\">red</div>'",
+            "detail_sha256": "ab6533b96bce3686909e4e38d3ac5a43117eeb276435df31d03c9e4ac6c0eb99"
+          },
+          {
+            "test": "ssr styles-nested",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n'<div svelte-724714405=\"\">red</div><div svelte-300476157=\"\">green: foo</div><div svelte-300476157=\"\">green: bar</div>'\n\nshould loosely deep-equal\n\n'<div class=\"svelte-bzh57p\">red</div><div class=\"svelte-4yw8vx\">green: foo</div><div class=\"svelte-4yw8vx\">green: bar</div>'",
+            "detail_sha256": "9fd1eefd9cf4e1d1fc1ac2a51a9afbcbb23897ba41b7537c8655eefe8fc6d403"
+          }
+        ],
+        "failure_kinds": {
+          "assertion": 49,
+          "test_timeout": 8,
+          "other": 2
+        }
+      },
+      "seed_git_tree": "525fc1f2071127beccbd70bb043b22593bc76764",
+      "control": {
+        "change": "replace control_test with comment removing author assertions",
+        "content_sha256": "dfff720fe5cd32bbdec1bc3e3da961cd2980375701510d7034b7d957e4474fd7",
+        "full_snapshot_binding": "4400d12c5a3db5234f3b72f0e7e3a0c3bb4f4a6d881a992b95080e7982249fc7"
+      }
+    },
+    {
+      "delivery_apply": true,
+      "model_sha256": "d7b3744399c31f9f2e6ff722c029091728a46afc28bc9ca8c434944c14eeaf1f",
+      "full_git_tree": "83164ca3d3a5eb9afe288f6e20761c0ae40c20e5",
+      "test_sha256": "865f82b594d861f5ecbae4f058002f89ccaf318d07ce2a1ff8fa8fd41120f4ac",
+      "base_commit": "0c3e44ac05c651c12c94e047bf712cb86278d345",
+      "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1190@sha256:28167366b3d50bb7b6cc3441186980d6022986d9fc60d6e6a193c7aa7cb7b858",
+      "instance_id": "sveltejs__svelte-1190",
+      "arm": "gold",
+      "E": {
+        "instance_id": "sveltejs__svelte-1190",
+        "label": "sveltejs__svelte-1190-gold-E",
+        "world": "E",
+        "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm pkg set scripts.lint=\"echo noop\" && npm run test -- --reporter json --exit",
+        "timeout_seconds": 1200,
+        "acceptance_diag": {
+          "instance_id": "sveltejs__svelte-1190",
+          "patch_applied": true,
+          "generation": true,
+          "with_logs": true,
+          "all_f2p_passed": true,
+          "no_p2p_failed": true,
+          "resolved": true
+        },
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1916,
+          "differences": [
+            "test/css/index.js",
+            "test/css/samples/attribute-selector-only-name/expected.css",
+            "test/css/samples/attribute-selector-unquoted/expected.css",
+            "test/css/samples/basic/expected.css",
+            "test/css/samples/cascade-false-empty-rule-dev/expected.css",
+            "test/css/samples/cascade-false-global-keyframes/expected.css",
+            "test/css/samples/cascade-false-keyframes-from-to/expected.css",
+            "test/css/samples/cascade-false-keyframes/expected.css",
+            "test/css/samples/cascade-false-pseudo-element/expected.css",
+            "test/css/samples/cascade-false-universal-selector/expected.css",
+            "test/css/samples/cascade-false-universal-selector/expected.html",
+            "test/css/samples/cascade-false/expected.css",
+            "test/css/samples/combinator-child/expected.css",
+            "test/css/samples/combinator-child/expected.html",
+            "test/css/samples/css-vars/expected.css",
+            "test/css/samples/descendant-selector-non-top-level-outer/expected.css",
+            "test/css/samples/descendant-selector-non-top-level-outer/expected.html",
+            "test/css/samples/keyframes/expected.css",
+            "test/css/samples/media-query-word/expected.css",
+            "test/css/samples/media-query/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/expected.css",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-static/expected.css",
+            "test/css/samples/omit-scoping-attribute-class-static/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.html",
+            "test/css/samples/omit-scoping-attribute-id/expected.css",
+            "test/css/samples/omit-scoping-attribute-id/expected.html",
+            "test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-whitespace/expected.css",
+            "test/css/samples/omit-scoping-attribute-whitespace/expected.html",
+            "test/css/samples/omit-scoping-attribute/expected.css",
+            "test/css/samples/omit-scoping-attribute/expected.html",
+            "test/css/samples/refs-qualified/expected.css",
+            "test/css/samples/refs-qualified/expected.html",
+            "test/css/samples/refs/expected.css",
+            "test/css/samples/refs/expected.html",
+            "test/css/samples/supports-query/expected.css",
+            "test/css/samples/universal-selector/expected.css",
+            "test/css/samples/unknown-at-rule/expected.css",
+            "test/css/samples/unused-selector-leading/expected.css",
+            "test/css/samples/unused-selector-leading/expected.html",
+            "test/css/samples/unused-selector-ternary/expected.css",
+            "test/css/samples/unused-selector-ternary/expected.html",
+            "test/css/samples/unused-selector/expected.css",
+            "test/css/samples/unused-selector/expected.html",
+            "test/js/samples/collapses-text-around-comments/expected-bundle.js",
+            "test/js/samples/collapses-text-around-comments/expected.js",
+            "test/js/samples/css-media-query/expected-bundle.js",
+            "test/js/samples/css-media-query/expected.js",
+            "test/server-side-rendering/samples/styles-nested/_actual.css",
+            "test/server-side-rendering/samples/styles-nested/_actual.html",
+            "test/server-side-rendering/samples/styles-nested/_expected.css",
+            "test/server-side-rendering/samples/styles-nested/_expected.html",
+            "test/server-side-rendering/samples/styles/_actual.css",
+            "test/server-side-rendering/samples/styles/_actual.html",
+            "test/server-side-rendering/samples/styles/_expected.css",
+            "test/server-side-rendering/samples/styles/_expected.html",
+            "test/sourcemaps/samples/css-cascade-false/output.css",
+            "test/sourcemaps/samples/css-cascade-false/output.css.map",
+            "test/sourcemaps/samples/css/output.css",
+            "test/sourcemaps/samples/css/output.css.map"
+          ]
+        },
+        "source_inventory_sha256": "c299ea70f773ccc165085a3d5bd378b4537042e4dee11807ba1286034679173c",
+        "full_inventory_sha256": "f74cbf0ce6982104fe863d2d9a603d7ecb03c4295239ff3fc5731ddf5928798c",
+        "import_targets": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js"
+        ],
+        "build_inputs_sha256": "d8fe3e21aafec06cd6a277b94bcd0deca35cb412af64b8c00732641b58d85a02",
+        "execution_overlay": {
+          "package.json": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+          },
+          "yarn.lock": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+          }
+        },
+        "exit_code": 11,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 108.663,
+        "output_sha256": "9147731d0f804e2c9b1c69639339ad638bea1c269a5a53bf408bb3d344d10343",
+        "source_mutations": {
+          "package.json": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "68c157e3d08190b151027775fb8b57a00b6ec81d2be3c2056335d00b498b0f90"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+            }
+          },
+          "yarn.lock": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "ff0602af5e3e7ab7038a2cdb0f49fcaea48d816b707a705610fe6a867fab8c0d"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {
+          "compiler/svelte.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "618c9e84be9bfa714ebbe93ddf4cef6e1c53d72ef5e024647a0615f042e56b32"
+          },
+          "compiler/svelte.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "98d849910b798ff483692fc88407e86150471e1eccdae2b399ea299f231552b7"
+          },
+          "shared.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "435f4c03fae641ab095970036f4917db06fd93b7e921b11cd287f0c97bf37ead"
+          },
+          "src/generators/dom/shared.ts": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "437634bf11a74f2e74590c3906ba7408d6848505345a370faaeb1f6c50d74d4a"
+          },
+          "ssr/register.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "9c3231e5e9b8efd1b0cfbfa12de8196e8d1782151204ab83fa8736a0f569d877"
+          },
+          "ssr/register.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "8258f583e14ec69f334276650be5e370aa72f3c234f6a6ac773523416cdd43ce"
+          },
+          "store.umd.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "e6192955ee99d919d9bac8a34d97038b5d77fabaf8697ba3019879283a7f25c5"
+          }
+        },
+        "resolved_modules": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js",
+          "/testbed/compiler/svelte.js",
+          "/testbed/ssr/register.js",
+          "/testbed/shared.js",
+          "/testbed/store.umd.js"
+        ],
+        "runner_stats": {
+          "suites": 25,
+          "tests": 1730,
+          "passes": 1666,
+          "pending": 53,
+          "failures": 11,
+          "start": "2026-09-18T05:07:48.900Z",
+          "end": "2026-09-18T05:09:24.060Z",
+          "duration": 95160
+        },
+        "passed": 1666,
+        "failed": 11,
+        "delivered_checks": "failed",
+        "missing_required_tests": [],
+        "seconds": 112.386,
+        "test_set": "test-sets/90182742b2e3c45ed1d093862d573e18c82b3eb189525e2f52cc183526ce8bc8.json",
+        "failures": [
+          {
+            "test": "custom-elements escaped-css",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "c1466d76b429d8a07917b781c980ff35fda9c11538b4bc0ac6173139de348c38"
+          },
+          {
+            "test": "custom-elements html",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "c46819b8b49df57a68cb18202e9321591916193b8ddc797dd20a8119517aebcb"
+          },
+          {
+            "test": "custom-elements html-slots",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "d91c40a7ead80bf9a83e3758a2365528bdb41016bfc6e8e48f4d3dc158a9b9cb"
+          },
+          {
+            "test": "custom-elements nested",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "607a725b1ab3ed3cc0e55a7d7b4504fe45b718a294517b8a32a94501d5ecd21b"
+          },
+          {
+            "test": "custom-elements new",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "7ffc29da3eeba5eb54ba1c65ed774e7325ed45d035349493b72eed24db2bcbd3"
+          },
+          {
+            "test": "custom-elements new-styled",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "dd638b7789c265712cf2c8875107c0795a502def344a72ae813b1b8d1f08f1ab"
+          },
+          {
+            "test": "custom-elements no-missing-prop-warnings",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "7bac4b250334623a050562dad44f402edf67bb00bff0bf3a3347db37c195625e"
+          },
+          {
+            "test": "custom-elements oncreate",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "5ccd7f37b1197e6077709bc8ed346ca1f5fa7f8b99672dc766070821196959b7"
+          },
+          {
+            "test": "runtime binding-select (shared helpers)",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n[\n  HTMLOptionElement {\n    __value: 'one'\n  },\n  HTMLOptionElement {\n    __value: 'two'\n  },\n  HTMLOptionElement {\n    __value: 'three'\n  }\n]\n\nshould loosely deep-equal\n\nHTMLOptionsCollection {}",
+            "detail_sha256": "c9c19142a13900656a4ce4be6d6f77d9f2322af0307e492bcece60bcd04e022c"
+          },
+          {
+            "test": "runtime binding-select (shared helpers , hydration)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "13ea6706b966ce56e1316fedf2549f9ed41699cb9cacfff2aef2c5f73033d266"
+          },
+          {
+            "test": "runtime binding-select (inline helpers)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "9c0a580aa3760a7036be87705f352a5ebd5a92bfcc07e2903ea823ac7f44b9b0"
+          }
+        ],
+        "failure_kinds": {
+          "assertion": 1,
+          "test_timeout": 8,
+          "other": 2
+        }
+      }
+    },
+    {
+      "delivery_apply": true,
+      "model_sha256": "d7b3744399c31f9f2e6ff722c029091728a46afc28bc9ca8c434944c14eeaf1f",
+      "test_sha256": "865f82b594d861f5ecbae4f058002f89ccaf318d07ce2a1ff8fa8fd41120f4ac",
+      "base_commit": "0c3e44ac05c651c12c94e047bf712cb86278d345",
+      "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1190@sha256:28167366b3d50bb7b6cc3441186980d6022986d9fc60d6e6a193c7aa7cb7b858",
+      "instance_id": "sveltejs__svelte-1190",
+      "arm": "gold-overlap",
+      "E": {
+        "instance_id": "sveltejs__svelte-1190",
+        "label": "sveltejs__svelte-1190-gold-overlap-E",
+        "world": "E",
+        "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm pkg set scripts.lint=\"echo noop\" && npm run test -- --reporter json --exit",
+        "timeout_seconds": 1200,
+        "acceptance_diag": {
+          "instance_id": "sveltejs__svelte-1190",
+          "patch_applied": true,
+          "generation": true,
+          "with_logs": true,
+          "all_f2p_passed": true,
+          "no_p2p_failed": true,
+          "resolved": true
+        },
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1916,
+          "differences": [
+            "test/css/index.js",
+            "test/css/samples/attribute-selector-only-name/expected.css",
+            "test/css/samples/attribute-selector-unquoted/expected.css",
+            "test/css/samples/basic/expected.css",
+            "test/css/samples/cascade-false-empty-rule-dev/expected.css",
+            "test/css/samples/cascade-false-global-keyframes/expected.css",
+            "test/css/samples/cascade-false-keyframes-from-to/expected.css",
+            "test/css/samples/cascade-false-keyframes/expected.css",
+            "test/css/samples/cascade-false-pseudo-element/expected.css",
+            "test/css/samples/cascade-false-universal-selector/expected.css",
+            "test/css/samples/cascade-false-universal-selector/expected.html",
+            "test/css/samples/cascade-false/expected.css",
+            "test/css/samples/combinator-child/expected.css",
+            "test/css/samples/combinator-child/expected.html",
+            "test/css/samples/css-vars/expected.css",
+            "test/css/samples/descendant-selector-non-top-level-outer/expected.css",
+            "test/css/samples/descendant-selector-non-top-level-outer/expected.html",
+            "test/css/samples/keyframes/expected.css",
+            "test/css/samples/media-query-word/expected.css",
+            "test/css/samples/media-query/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/expected.css",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-static/expected.css",
+            "test/css/samples/omit-scoping-attribute-class-static/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.html",
+            "test/css/samples/omit-scoping-attribute-id/expected.css",
+            "test/css/samples/omit-scoping-attribute-id/expected.html",
+            "test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-whitespace/expected.css",
+            "test/css/samples/omit-scoping-attribute-whitespace/expected.html",
+            "test/css/samples/omit-scoping-attribute/expected.css",
+            "test/css/samples/omit-scoping-attribute/expected.html",
+            "test/css/samples/refs-qualified/expected.css",
+            "test/css/samples/refs-qualified/expected.html",
+            "test/css/samples/refs/expected.css",
+            "test/css/samples/refs/expected.html",
+            "test/css/samples/supports-query/expected.css",
+            "test/css/samples/universal-selector/expected.css",
+            "test/css/samples/unknown-at-rule/expected.css",
+            "test/css/samples/unused-selector-leading/expected.css",
+            "test/css/samples/unused-selector-leading/expected.html",
+            "test/css/samples/unused-selector-ternary/expected.css",
+            "test/css/samples/unused-selector-ternary/expected.html",
+            "test/css/samples/unused-selector/expected.css",
+            "test/css/samples/unused-selector/expected.html",
+            "test/js/samples/collapses-text-around-comments/expected-bundle.js",
+            "test/js/samples/collapses-text-around-comments/expected.js",
+            "test/js/samples/css-media-query/expected-bundle.js",
+            "test/js/samples/css-media-query/expected.js",
+            "test/server-side-rendering/samples/styles-nested/_actual.css",
+            "test/server-side-rendering/samples/styles-nested/_actual.html",
+            "test/server-side-rendering/samples/styles-nested/_expected.css",
+            "test/server-side-rendering/samples/styles-nested/_expected.html",
+            "test/server-side-rendering/samples/styles/_actual.css",
+            "test/server-side-rendering/samples/styles/_actual.html",
+            "test/server-side-rendering/samples/styles/_expected.css",
+            "test/server-side-rendering/samples/styles/_expected.html",
+            "test/sourcemaps/samples/css-cascade-false/output.css",
+            "test/sourcemaps/samples/css-cascade-false/output.css.map",
+            "test/sourcemaps/samples/css/output.css",
+            "test/sourcemaps/samples/css/output.css.map"
+          ]
+        },
+        "source_inventory_sha256": "c299ea70f773ccc165085a3d5bd378b4537042e4dee11807ba1286034679173c",
+        "full_inventory_sha256": "7bc22b38af6a4580912ca912547e684645a4f1c77b514e6c9aaee2e963b69347",
+        "import_targets": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js"
+        ],
+        "build_inputs_sha256": "d8fe3e21aafec06cd6a277b94bcd0deca35cb412af64b8c00732641b58d85a02",
+        "execution_overlay": {
+          "package.json": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+          },
+          "yarn.lock": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+          }
+        },
+        "exit_code": 11,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 110.103,
+        "output_sha256": "e37b537f2af656b6a820d44fa6932eb1676d73b41440a272ac9f85863aee1b14",
+        "source_mutations": {
+          "package.json": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "68c157e3d08190b151027775fb8b57a00b6ec81d2be3c2056335d00b498b0f90"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+            }
+          },
+          "yarn.lock": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "ff0602af5e3e7ab7038a2cdb0f49fcaea48d816b707a705610fe6a867fab8c0d"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {
+          "compiler/svelte.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "618c9e84be9bfa714ebbe93ddf4cef6e1c53d72ef5e024647a0615f042e56b32"
+          },
+          "compiler/svelte.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "98d849910b798ff483692fc88407e86150471e1eccdae2b399ea299f231552b7"
+          },
+          "shared.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "435f4c03fae641ab095970036f4917db06fd93b7e921b11cd287f0c97bf37ead"
+          },
+          "src/generators/dom/shared.ts": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "437634bf11a74f2e74590c3906ba7408d6848505345a370faaeb1f6c50d74d4a"
+          },
+          "ssr/register.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "9c3231e5e9b8efd1b0cfbfa12de8196e8d1782151204ab83fa8736a0f569d877"
+          },
+          "ssr/register.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "8258f583e14ec69f334276650be5e370aa72f3c234f6a6ac773523416cdd43ce"
+          },
+          "store.umd.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "e6192955ee99d919d9bac8a34d97038b5d77fabaf8697ba3019879283a7f25c5"
+          }
+        },
+        "resolved_modules": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js",
+          "/testbed/compiler/svelte.js",
+          "/testbed/ssr/register.js",
+          "/testbed/shared.js",
+          "/testbed/store.umd.js"
+        ],
+        "runner_stats": {
+          "suites": 25,
+          "tests": 1730,
+          "passes": 1666,
+          "pending": 53,
+          "failures": 11,
+          "start": "2026-09-18T05:09:41.763Z",
+          "end": "2026-09-18T05:11:18.128Z",
+          "duration": 96365
+        },
+        "passed": 1666,
+        "failed": 11,
+        "delivered_checks": "failed",
+        "missing_required_tests": [],
+        "seconds": 113.977,
+        "test_set": "test-sets/90182742b2e3c45ed1d093862d573e18c82b3eb189525e2f52cc183526ce8bc8.json",
+        "failures": [
+          {
+            "test": "custom-elements escaped-css",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "f9b75d2ddee088a0699d73af10ca47793d2bf71c1aa64e96aeb4808ebca1d79c"
+          },
+          {
+            "test": "custom-elements html",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "6614d123bc91938810bb793d0d7a0122ee21917bc7c436d45fa45ff4459a6221"
+          },
+          {
+            "test": "custom-elements html-slots",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "1638e0a9ec916e608a4bde3e75f3764be1b8f0fde61972dda3729f583d534870"
+          },
+          {
+            "test": "custom-elements nested",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "49835ac632ec2c287b2b2fd397fba6154b5835f9020b1e99c5bcac77bb504ad8"
+          },
+          {
+            "test": "custom-elements new",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "85bd8327e7ed84c5804f1a42534a8a5c7b55a3fafd48c856c31345a502c8e8ba"
+          },
+          {
+            "test": "custom-elements new-styled",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "8f05f565877c5e9864a802dd966a5dba2623d3d9af1f34556560c0458039ef81"
+          },
+          {
+            "test": "custom-elements no-missing-prop-warnings",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "ccd2b98829242368e9ee559fa6704bb475c071ff16494274d66113b2208124bb"
+          },
+          {
+            "test": "custom-elements oncreate",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "c0ceac29cc0bc46cee6dce28680a35d2b29440fc73ed255917544568c3a1f4cb"
+          },
+          {
+            "test": "runtime binding-select (shared helpers)",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n[\n  HTMLOptionElement {\n    __value: 'one'\n  },\n  HTMLOptionElement {\n    __value: 'two'\n  },\n  HTMLOptionElement {\n    __value: 'three'\n  }\n]\n\nshould loosely deep-equal\n\nHTMLOptionsCollection {}",
+            "detail_sha256": "35b6a42bd7aada3ae0b85a56be2bf323eb8449f75f9975e02a059dbba041910b"
+          },
+          {
+            "test": "runtime binding-select (shared helpers , hydration)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "13ea6706b966ce56e1316fedf2549f9ed41699cb9cacfff2aef2c5f73033d266"
+          },
+          {
+            "test": "runtime binding-select (inline helpers)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "9c0a580aa3760a7036be87705f352a5ebd5a92bfcc07e2903ea823ac7f44b9b0"
+          }
+        ],
+        "failure_kinds": {
+          "assertion": 1,
+          "test_timeout": 8,
+          "other": 2
+        }
+      },
+      "seed_git_tree": "83164ca3d3a5eb9afe288f6e20761c0ae40c20e5",
+      "control": {
+        "change": "replace control_test with comment removing author assertions",
+        "content_sha256": "dfff720fe5cd32bbdec1bc3e3da961cd2980375701510d7034b7d957e4474fd7",
+        "full_snapshot_binding": "7bc22b38af6a4580912ca912547e684645a4f1c77b514e6c9aaee2e963b69347"
+      }
+    }
+  ],
+  "input_hashes": {
+    "development/polybench-pilot/results/repository-sensitivity.json": "8bdcf38f9df1267b4dea59aa8f4d46e95f313ed14f75cb7c7f118dad102684d6",
+    "development/polybench-pilot/results/developing-agent-accounting.json": "a318bafa7749661cc58715cfe964a22a9e7259ba7cc1a601cfcb49dbadd90430",
+    "development/polybench-pilot/results/accounting.json": "b5223305df650bcc54709e3b7cf0daaed3e5dd1884ba42db8cfd58610a72f112",
+    "development/polybench-pilot/results/validation.json": "2c3935a8d1f8057152e10409bc963fa22ceb623933693f2b4506f9686e37921e",
+    "development/polybench-pilot/results/resource-accounting.json": "0b54c20a3ad64e7c263b1c36540365a08d1aa458a5fb5b02a9d5b90dacc4b00f",
+    "development/polybench-pilot/results/svelte-declaration-preparation-observation.json": "3e84dd824d86570b72d1b0243d5b704d55c1e68bf928386efee4d3ad575ab14a",
+    "development/polybench-pilot/results/provider-accounting.json": "730c5595ae5315d9f40266fcf13cf9c68628863db96e72039ae8db689fad2291",
+    "development/polybench-pilot/results/controls/mui__material-ui-17301-baseline.json": "324dade2af72e9ac0acd980effb8d4aa9f12366cd5667bfd0b670671a4963b08",
+    "development/polybench-pilot/results/controls/serverless__serverless-6534-gold.json": "926d4bfe4d20b94713a4cd0f5698a69eaf1850ca0ed5b9d0d0a134c93f6d2958",
+    "development/polybench-pilot/results/controls/coder__code-server-4923-baseline.json": "0eafbe5f322773e37938881a025fe2bad7318c5e2675bf2baee015d577ea9421",
+    "development/polybench-pilot/results/controls/serverless__serverless-2434-baseline.json": "b6d159a173ecf83f5490e4f3062f5e46a0c8c5de75e187466cdaf80c0130ed48",
+    "development/polybench-pilot/results/controls/mui__material-ui-17301-gold.json": "d309a23fa56346b46d9b3f1157b51fda093c819fcd8a8bce077dd87a5df3ff5e",
+    "development/polybench-pilot/results/controls/microsoft__vscode-136347-gold.json": "2731bba6985585c643b614332e5e3cd5d339c715bd3eb53e45f8e1b7549dab2e",
+    "development/polybench-pilot/results/controls/mui__material-ui-20356-gold.json": "b9d7c3720fd6c3754df98bbabbb6debcaa6ef31a0767394ddc824d3ec2c85d45",
+    "development/polybench-pilot/results/controls/serverless__serverless-2434-gold.json": "14bf2e1849173f6dcaeb295e86aae0013e5d09feabf5e00efee1f9b7a19b813a",
+    "development/polybench-pilot/results/controls/serverless__serverless-6842-baseline.json": "be86bbe9437f56b9003a12d21bd5eb12be2800a377e65367c28d9c3ff612e00b",
+    "development/polybench-pilot/results/controls/sveltejs__svelte-5452-gold.json": "8760ccfe0cfc74546145243b8969d06ee4dd81d2aad498f8a7805e42d511b047",
+    "development/polybench-pilot/results/controls/serverless__serverless-6534-baseline.json": "aa37fbc0d4c1141f48d29514a1ea298339ccaca93b031986f58a934c3f094528",
+    "development/polybench-pilot/results/controls/coder__code-server-4923-gold.json": "2a093cdcf1db7062ae3afe4f13f4feea68640a1211c1be4d77d5afce789a192d",
+    "development/polybench-pilot/results/controls/sveltejs__svelte-1190-baseline.json": "eae645122bb42f13722a3b4c6c4930350d8b792c30ce17374854185f153523a6",
+    "development/polybench-pilot/results/controls/sveltejs__svelte-1190-gold.json": "3c58cbb7e140ee790c1d82318063de697783c77bcdcb8da5729f64a966052071",
+    "development/polybench-pilot/results/controls/mui__material-ui-18141-baseline.json": "2d8e22df3b399c00abc653bcb7a76e12c4d65ab32b9778f31b76215a48cdfe49",
+    "development/polybench-pilot/results/controls/mui__material-ui-20356-baseline.json": "acba7fc6435fa630100aa81ade2c64f70edd87f7f8a87c764c837b3039ff4e5f",
+    "development/polybench-pilot/results/controls/serverless__serverless-6842-gold.json": "4daed23c6d3a651ffbc7bd54316e716cf1888d50d4237fc2f47545a59efe47f4",
+    "development/polybench-pilot/results/controls/microsoft__vscode-136347-baseline.json": "877b1692a18c0621c4672507c6f98196543bbb894cb6dd6ecb0a70b97a74af18",
+    "development/polybench-pilot/results/controls/sveltejs__svelte-5452-baseline.json": "4f6fb896ed4decf0ce7cc5917c6b00f2a8b18bb636fad99dc14861e4f8411641",
+    "development/polybench-pilot/results/controls/mui__material-ui-18141-gold.json": "de9d6542bed0e3077e18b10e62596e0d2614b751eb4159d1104da55d47089a84",
+    "development/polybench-pilot/results/predictions/H0.jsonl": "eda56e5f9d65964917ad6e24d3742e909d02be7b1df373caafbe603a3c37c923",
+    "development/polybench-pilot/results/predictions/P.jsonl": "90c868038afb7910a11d191344812bbf120b27d4b6c344e808480673975411cb",
+    "development/polybench-pilot/results/predictions/H1.jsonl": "ba190f7a845126c429d02dd8358c881c8e4f7da4cd8ffdeb910f12175c3ab319",
+    "development/polybench-pilot/results/patches/H1/mui__material-ui-20356.patch": "e5f9f0d33c1b4fde87cbcc2d589edc65817d13067f2323ef358e4108dc123a74",
+    "development/polybench-pilot/results/patches/H1/serverless__serverless-2434.patch": "73d5a2ccb1a776e43369d1390d57fb7e5af2e1eb69960cdd4ce2b75fc81370aa",
+    "development/polybench-pilot/results/patches/H1/sveltejs__svelte-1190.patch": "0cf9b1a0ef4c3087c2bfa7afea475056916955bd40afc1dc0251ebb42d577453",
+    "development/polybench-pilot/results/patches/H1/serverless__serverless-6534.patch": "6beb8ddd3a5d4700a914a549dd415beea379bd78863270e60563fde0f2f997e9",
+    "development/polybench-pilot/results/patches/H1/serverless__serverless-6842.patch": "01661f1d88139ef95b739debc1e021b18d869bd42e30847ca5b081db0fb91e27",
+    "development/polybench-pilot/results/patches/H1/sveltejs__svelte-5452.patch": "8fc0177ce320387098b77bbee5f76dbb23f0efd8c78a230c4e253be1ee67d455",
+    "development/polybench-pilot/results/patches/H0/mui__material-ui-20356.patch": "dcf9fa9f6ce796a8147cd39c2e6dd44a033c153fbf25b48cb33f9cc7ff94482c",
+    "development/polybench-pilot/results/patches/H0/serverless__serverless-2434.patch": "847bead55c4b7207391adad266006ae85f6a9921e817626d5569e507190f1b73",
+    "development/polybench-pilot/results/patches/H0/sveltejs__svelte-1190.patch": "2e2c7e4ba5b4cd22a25762e1ddf24f52d0cbc11eea21d118cf71d14039a6ffc2",
+    "development/polybench-pilot/results/patches/H0/serverless__serverless-6534.patch": "173cfae9a3fef2611140b9340c1df453601353b1f3560dc3410304cec787d59b",
+    "development/polybench-pilot/results/patches/H0/serverless__serverless-6842.patch": "f9bd08a5fb263082cf3edcd4cd36341efc0fba7d6c05c67d8408917ed91df696",
+    "development/polybench-pilot/results/patches/H0/sveltejs__svelte-5452.patch": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "development/polybench-pilot/results/patches/P/mui__material-ui-20356.patch": "781a4eb90073e2675a1a380f6ae738b147494bd39b2a97ecaf6728bb3d35b0e0",
+    "development/polybench-pilot/results/patches/P/serverless__serverless-2434.patch": "40881166d3b82c68d1fb368263da20e6c244fdf7dc2a1111a5981e6fcd1db4f1",
+    "development/polybench-pilot/results/patches/P/sveltejs__svelte-1190.patch": "16187e0e46946257ab31de6e62ea5653068e3e6001c4d8c2dc0e9c001b99c6e9",
+    "development/polybench-pilot/results/patches/P/serverless__serverless-6534.patch": "856c8a1b7cbbe6aa384f1b1c9e2e0523bacc3d13dbf7b8bd9a19fb476765a0fa",
+    "development/polybench-pilot/results/patches/P/serverless__serverless-6842.patch": "a750cdac098b199db151fbdc37f3c14359e7917caa37c12c2d2320c493c43e2f",
+    "development/polybench-pilot/results/patches/P/sveltejs__svelte-5452.patch": "56f73f83b5831096ade8478347f961faf628e25a616845c78f91717849f6f812",
+    "development/polybench-pilot/results/official/H1/provenance.json": "4558cc1468953df205f6b894d158a96d868a7534466ba74feb9690985f99caf8",
+    "development/polybench-pilot/results/official/H1/serverless__serverless-6534_result.json": "3a8be6926218ab8977600f54e5bd7dde7d7dd3f151090aaaebe71257fbdcc630",
+    "development/polybench-pilot/results/official/H1/serverless__serverless-6842_result.json": "4de06a32843f76b8918967dffc5cb76424214b52f6cc42dad006df5d493b36c3",
+    "development/polybench-pilot/results/official/H1/strict-application.jsonl": "f1f9ee467a6076420c326f7e977d26ccf38bd5d4ae2afd45c53bd0956da36e94",
+    "development/polybench-pilot/results/official/H1/mui__material-ui-20356_result.json": "653c651a9fd9f56bfcc73878136df925b9f928c6c79ac76fcea0f6ab31cb60fe",
+    "development/polybench-pilot/results/official/H1/sveltejs__svelte-1190_result.json": "602b8fca8614d796a225a750fec89328339055c41207253853fdc66cc343fd26",
+    "development/polybench-pilot/results/official/H1/serverless__serverless-2434_result.json": "ad40e6348a40482a509dbff4e1dac68aa8039c7922f1dbbd26fd1c4d4586616e",
+    "development/polybench-pilot/results/official/H1/sveltejs__svelte-5452_result.json": "b367c6b359e9a18c74830c7ac6587f4b5541b8e5e0507fd017a8288a4d112464",
+    "development/polybench-pilot/results/official/H0/provenance.json": "4558cc1468953df205f6b894d158a96d868a7534466ba74feb9690985f99caf8",
+    "development/polybench-pilot/results/official/H0/serverless__serverless-6534_result.json": "3a8be6926218ab8977600f54e5bd7dde7d7dd3f151090aaaebe71257fbdcc630",
+    "development/polybench-pilot/results/official/H0/serverless__serverless-6842_result.json": "d7d2c9c1cf7949a0a35f29860629f69b7d87c6bb66982fb07f5b0e903d99d5bd",
+    "development/polybench-pilot/results/official/H0/strict-application.jsonl": "8d170786479b8117a7676395f7bcfb74e1dfa8332cc980ab052d9da445478059",
+    "development/polybench-pilot/results/official/H0/mui__material-ui-20356_result.json": "acba7fc6435fa630100aa81ade2c64f70edd87f7f8a87c764c837b3039ff4e5f",
+    "development/polybench-pilot/results/official/H0/sveltejs__svelte-1190_result.json": "602b8fca8614d796a225a750fec89328339055c41207253853fdc66cc343fd26",
+    "development/polybench-pilot/results/official/H0/serverless__serverless-2434_result.json": "e0c564e172482c2ff36daee24badb8638433675078cef250efbec488c5b902c9",
+    "development/polybench-pilot/results/official/H0/sveltejs__svelte-5452_result.json": "57af288d7f3d9f6f5dcff4fbc7d4147c638104bef4ace22c771d2a7aab057ede",
+    "development/polybench-pilot/results/official/P/provenance.json": "4558cc1468953df205f6b894d158a96d868a7534466ba74feb9690985f99caf8",
+    "development/polybench-pilot/results/official/P/serverless__serverless-6534_result.json": "3a8be6926218ab8977600f54e5bd7dde7d7dd3f151090aaaebe71257fbdcc630",
+    "development/polybench-pilot/results/official/P/serverless__serverless-6842_result.json": "3beae48f19de343068bdca45e90050ff4ef1c815518bd8fb2756f39c3a61a6d0",
+    "development/polybench-pilot/results/official/P/strict-application.jsonl": "aad9f38520fa05a99fca52dde176ba6744b2d79aca8cc39fb3b5ae6434ae8846",
+    "development/polybench-pilot/results/official/P/mui__material-ui-20356_result.json": "653c651a9fd9f56bfcc73878136df925b9f928c6c79ac76fcea0f6ab31cb60fe",
+    "development/polybench-pilot/results/official/P/sveltejs__svelte-1190_result.json": "602b8fca8614d796a225a750fec89328339055c41207253853fdc66cc343fd26",
+    "development/polybench-pilot/results/official/P/serverless__serverless-2434_result.json": "0d5bd3867d9f7a3854e40403f0a651578c19ebd6d630bf408d5c22af67c882d5",
+    "development/polybench-pilot/results/official/P/sveltejs__svelte-5452_result.json": "ee3b14d6a2eef9ecd0bab44d3891575fa98edba1795e33e415ec12cb56d9ca55",
+    "development/polybench-pilot/frozen-manifest.json": "05e9b6c8e2ad8f56e689b6ffd3102dd8d2a589b65c4cea2cea93f0ffcd2bb505",
+    "development/polybench-pilot/REPORT.md": "db55e7ed1a246205068f1e5e62b9e6852098e0b2326548dfda076f9ec38061b9",
+    "development/polybench-pilot/evaluate.py": "a2021a3064c0528cc88bddf0ac3a5a9faa1b74fb2aef7414a727b6a9fd0b30d7",
+    "development/polybench-pilot/run.mjs": "0687eb93e68653451a369ba33af2771ed5f05db7daae636ee3f4a92a8719aae9",
+    "local/polybench-pilot/batch/freeze.json": "30008a1e389c67a40c4bfee0969b119f7c76cf0ee24a44364af261def605d216",
+    "local/polybench-pilot/batch/outcome.json": "8c1f279fc4b3b2ee0c63d5cc88b9c84ee1cfefdcbd683ab55dfcb95e7ed80402",
+    "local/polybench-pilot/batch/scheduling-paused.json": "69385be23d2edc8776accef8cd2b91cdbdf496a026e37bff9698862e8d29c6bd",
+    "local/polybench-pilot/batch/freeze-commit.json": "09580a67c738a05a5f21f554f2c76fa351e7a835c54bb86e75a99d10934fac86"
+  },
+  "driver_sha256": "82036c696ea63553fde23bb75be36dd4c4576c1c3a2570f00d04b128ec3f5edf",
+  "controls_sha256": "890b1c341fcb85ac5c1088c27616eb1435db7d5bf4079019e0bd447efb74f11c",
+  "protocol_commit": "35939cc51f292099d7c171d40d352c155720f9ab",
+  "manifest_hashes": {
+    "serverless__serverless-6534": "d2024d6075c6628d80c734c60d2008024e2b6271af5c55e84062bc8280cbaa9d",
+    "sveltejs__svelte-1190": "1d45deae23d56e43791ad0cf37b6ea2f6ce1c861226418702bcdc880c81cb804"
+  },
+  "boundary_controls": {
+    "valid_overlay": true,
+    "rejected": [
+      "production rollback",
+      "gold import"
+    ],
+    "missing_author_file_preserves_complete_inventory": true,
+    "unexpected_snapshot_errors_rejected": true
+  },
+  "calibration_passed": true,
+  "historical_inputs_unchanged": true,
+  "created_containers": [
+    "50114aa3e694f6dfaf0936dfc37eab21d62139a87590e36c8f04334c63cd92f1",
+    "cfa1a24991c6803b672a6ec5dfcf934f26d5c3fc7e58786700af8cdcab922cd3",
+    "551bb8b0ef21ad70b1a1303fe409c107ee927f715cd9fbffb8374ee89ce1b996",
+    "3d90248bde3cc273f3840ed5b4fe7eebd53e2d4a14770582c36a4cbcef40f935",
+    "05a1d2378a16dab857f76486974cc5cd6591431dfe73591e2eca5ad17f610d9f",
+    "0dae62ecefd17125a1eb1372468a72b96c85b2559e602a16c0f9bbd17a8d57d0",
+    "0983a76db72a0aa3a744a5c51393e8af8aca93006f499e9363fa8f5d857416bd",
+    "46538d70887011e552ee21f30608396a95d24ad0e90c132dd5414ff34c13d32b",
+    "09a75d7f5fced3123aff56708029cf329f6f49f014c9f8543820e9a6f6ec88d7",
+    "6258ccd02299a8e76bf7a52e3fb1e9f50b18a3a745ce33b3784f70c4b5fbacca"
+  ],
+  "removed_containers": [
+    "cfa1a24991c6803b672a6ec5dfcf934f26d5c3fc7e58786700af8cdcab922cd3",
+    "551bb8b0ef21ad70b1a1303fe409c107ee927f715cd9fbffb8374ee89ce1b996",
+    "3d90248bde3cc273f3840ed5b4fe7eebd53e2d4a14770582c36a4cbcef40f935",
+    "05a1d2378a16dab857f76486974cc5cd6591431dfe73591e2eca5ad17f610d9f",
+    "50114aa3e694f6dfaf0936dfc37eab21d62139a87590e36c8f04334c63cd92f1",
+    "0983a76db72a0aa3a744a5c51393e8af8aca93006f499e9363fa8f5d857416bd",
+    "46538d70887011e552ee21f30608396a95d24ad0e90c132dd5414ff34c13d32b",
+    "09a75d7f5fced3123aff56708029cf329f6f49f014c9f8543820e9a6f6ec88d7",
+    "6258ccd02299a8e76bf7a52e3fb1e9f50b18a3a745ce33b3784f70c4b5fbacca",
+    "0dae62ecefd17125a1eb1372468a72b96c85b2559e602a16c0f9bbd17a8d57d0"
+  ],
+  "seconds": 479.277,
+  "local_summary_sha256": "4303ef851bc79f7f71caedc220f08a04ec519495eba395884a2c91a5ada3aaf9",
+  "historical_commit": "9317ccc9e2e3af6cfe7e876acd4541f3e7445f3b",
+  "not_started": 12
+}

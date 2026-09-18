@@ -1,0 +1,128 @@
+{
+  "id": "53a657cf6ab8",
+  "task": "eventemitter-remove-context",
+  "project": "eventemitter3",
+  "Q": 0,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "patchApplicable": true,
+  "sourcePatchSha256": "c2fffc456d3318a863f36425539aead7b054788f890600c15c920633c5690dfc",
+  "decision": "Full delivery does not satisfy the frozen rubric.",
+  "findings": [
+    {
+      "category": "required-type-test-loss",
+      "reason": "Public declaration supplied, but the explicitly required TypeScript consumer/type regression is absent."
+    }
+  ],
+  "contentReview": {
+    "id": "53a657cf6ab8",
+    "task": "eventemitter-remove-context",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete",
+    "typesReview": "Public declaration is added, but no TypeScript consumer or type regression is supplied. The frozen task explicitly requires applicable type tests.",
+    "retainedTestsReview": "Existing regression cases are retained.",
+    "contentFindings": [
+      {
+        "category": "required-coverage-loss",
+        "requirement": "Deliver applicable public TypeScript declarations/type tests.",
+        "evidence": "Changed files contain only README, declaration, runtime, CJS and ESM runtime tests. No type-use fixture is supplied.",
+        "impact": "The new public method has no delivered type regression."
+      }
+    ],
+    "behaviorReview": "Enumerates string own properties and symbols, filters by stored context with strict equality, uses clearEvent and compacts listener representation without changing existing emit behavior. Runtime confirmation pending.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Same function with two distinct contexts across string/symbol events, duplicate and once registrations; removal count 4 and surviving listener counts asserted."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Distinct first/middle survivors on foo preserve order; empty string/symbol event names disappear; repeated removal, empty emitter, reuse and emit asserted."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Omitted/null/false/zero/empty-string contexts are checked normalized to emitter; removal by undefined returns 0 and by emitter removes all five."
+      }
+    ],
+    "docsReview": "README documents count, strict stored context matching and normalized falsy registration contexts.",
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "53a657cf6ab8",
+    "task": "eventemitter-remove-context",
+    "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "c2fffc456d3318a863f36425539aead7b054788f890600c15c920633c5690dfc",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 7,
+  "arm": "H00",
+  "D": 0,
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "normalHandoff": true,
+    "workflowStatus": "incomplete",
+    "terminalPatchVerification": {
+      "slot": 7,
+      "id": "53a657cf6ab8",
+      "terminalPatchSha256": "eca466d3cfd94da758e9b0fff4ada4dd4b54201e2267e0eabdad2322db0c8cc9",
+      "terminalPatchEqualsApplicableSourcePatch": false,
+      "ordinaryAppliedCopyReverseCheckExit": 0,
+      "diagnostic": "",
+      "nativeHandoffNamesDeliveryAndPatch": true,
+      "ordinaryCleanSourceForwardApplyExit": 0,
+      "terminalPatchDeliversAllAuthorBytesAndModes": true
+    },
+    "finalResponseSha256": "8b5eb5d545f056c3c29ebd0cf1c39575d023b144744a3f8a3d204cac6e10c741",
+    "finalResponseExcerpt": "Native task workflow: incomplete.\nDelivery worktree: /work/repo/.git/harness-task/1a06f1c6-ee43-4daf-95b2-0b560d22e209/worktree.\nTerminal patch: /work/repo/.git/harness-task/1a06f1c6-ee43-4daf-95b2-0b560d22e209/terminal.patch.\nFull report and tool outputs: /work/repo/.git/harness-task/1a06f1c6-ee43-4daf-95b2-0b560d22e209.\nOriginal checkout unchanged by workflow transfer.",
+    "reportFindings": [
+      {
+        "category": "misleading-workflow-report",
+        "evidence": "Normal final response lists successful project commands but says No observed relevant project test/check and Executable project verification unavailable or not observed. Delivery worktree and terminal patch are correctly named and usable; this contradiction does not alone remove D."
+      }
+    ]
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 997,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 0,
+      "elapsedMs": 516,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    }
+  ]
+}

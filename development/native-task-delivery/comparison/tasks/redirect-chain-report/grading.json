@@ -1,0 +1,18 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "chains and cycles reach report",
+    "own keys and empty target"
+  ],
+  "docDelivery": [
+    "Explain own-key graph traversal, terminal/chain cycle convention, independent reports and no network."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Implement follow(start,links) and integrate report(starts,links). This is a local name graph, not HTTP/network. links own string keys map to string names; inherited keys ignored, any string name including __proto__ is allowed. follow visits start then targets until missing outgoing edge or repeat; returns {chain,terminal,cycle}. chain contains each first visited name once; terminal is last name for normal stop, repeated target for cycle. report joins chain with \" -> \"; a cycle adds \" -> [cycle:TERMINAL]\"; join requested starts with LF in input order, no final LF. Independent walks; inputs unchanged; finite <=1000 keys. Empty strings are valid targets.",
+  "manualBehavior": [
+    "report uses follow rather than separate graph traversal"
+  ],
+  "independence": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+}

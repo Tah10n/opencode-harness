@@ -1,0 +1,41 @@
+{
+  "createdAt": "2026-09-14T19:47:22.591Z",
+  "runtimeSha": "46572619e8a9d567f680667bdf6083a2e82be406",
+  "freezeSha256": "c81b2fb0022b7ddd8bf943e9043fb5df604d2ef8fd8e86f5b1b0477eccf512c6",
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "taskDeadlineMs": 900000,
+  "diagnosticBudgetMs": 180000,
+  "order": [
+    "case-a",
+    "case-b",
+    "case-c"
+  ],
+  "inputs": [
+    {
+      "case": "case-a",
+      "project": "denque",
+      "seedSha256": "52f7a5afc7476758e50dafdbe59bff4710a6fea03f604ddc15d0704629619b9a",
+      "promptSha256": "3008efd09b66642026a49f36580e6e0073f5bae02cefe37f549bc3cdd1e5cb5a",
+      "baseManifestSha256": "4867069cdb1892733b8c622dde04c6127006ba2e6eb531ab9ffa4ee7ea14fae9",
+      "patchedManifestSha256": "395e52fab1e4973729ee7340252448b4c15936b6a98072a1fe6fc34cae749e37"
+    },
+    {
+      "case": "case-b",
+      "project": "quick-lru",
+      "seedSha256": "7146d5706d7b46cf1096778264d845d42deb3e2e2d420dfaa492e76f86d6b4e7",
+      "promptSha256": "efdd7aa697c1bc5eac812b52294778a27912aefb9035182a952738e33f5f2648",
+      "baseManifestSha256": "26acccf063bb40f5e3e3dbd1d596d7a7a268aa581391ab95adb1d601ef9b095e",
+      "patchedManifestSha256": "9afeb4e80b6ec5b493e4408935e23dda0bf72751146ec84dd280a3b62ff1cd5f"
+    },
+    {
+      "case": "case-c",
+      "project": "denque",
+      "seedSha256": "d4179fbe5556e631a5c4b068e8adaa049d906c3603c209db25929b44bf82c3e0",
+      "promptSha256": "db2bb16ebeec1a250dcf6a99e66755ea785639705653c99a7f64de74e4c75b83",
+      "baseManifestSha256": "eee1c1c77ee801b321d943c62c431bee48bfcb4b41ed017ce2b246beaf870ef3",
+      "patchedManifestSha256": "fd3cd17303dd77919c1366b0fea2d57706c6c6bdb0ea542002883c9e3f1d0df1"
+    }
+  ],
+  "realProviderRequestsBeforeFreeze": 0
+}

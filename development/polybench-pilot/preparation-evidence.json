@@ -1,0 +1,463 @@
+{
+  "real_provider_requests": 0,
+  "full_preparation_entrypoint_exit_code": 0,
+  "container": {
+    "passed": true,
+    "providerRequests": 0,
+    "opencode": "1.18.26",
+    "projectNode": "16.20.2",
+    "diagnosticNode": "24.19.0",
+    "freshGitHistory": true,
+    "network": "none",
+    "readOnlyRoot": true,
+    "mounts": [
+      {
+        "destination": "/input",
+        "readOnly": true
+      },
+      {
+        "destination": "/relay.mjs",
+        "readOnly": true
+      },
+      {
+        "destination": "/template",
+        "readOnly": true
+      },
+      {
+        "destination": "/opt/opencode",
+        "readOnly": true
+      }
+    ]
+  },
+  "supported_recorder_fixture": {
+    "passed": true,
+    "checks": [
+      {
+        "task": "A",
+        "arm": "OFF",
+        "requests": 16,
+        "portablePatch": true,
+        "sourcePreserved": true,
+        "capture": true,
+        "termination": true
+      },
+      {
+        "task": "A",
+        "arm": "ON",
+        "requests": 16,
+        "portablePatch": true,
+        "sourcePreserved": true,
+        "capture": true,
+        "termination": true,
+        "compat": [
+          {
+            "status": "reproduced-incompatibility",
+            "snapshot": "2136a6fd38f3da13a76af8c8d2185d12c6768fffa9072371caf58ea72e287135"
+          },
+          {
+            "status": "no-difference-in-checked-scope",
+            "snapshot": "60ec60a60741d0ffb2ec91b4697ecdc951dc48c49cf0b39fea42398ca5aa72ab"
+          }
+        ]
+      }
+    ],
+    "realProviderRequests": 0
+  },
+  "instances": {
+    "serverless__serverless-2434": {
+      "passed": true,
+      "checks": [
+        {
+          "arm": "P",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H0",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H1",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": {
+            "enabled": true,
+            "baselineSnapshot": "ce280b3e88e0324ce51677a900e5e1d1be6648fdb1f0855465ccd22d6d170619",
+            "runs": [],
+            "status": "unsupported",
+            "reason": "One explicit public .d.ts entry (types/typings or user path) required",
+            "spentMs": 0,
+            "captureCost": {
+              "readBytes": 0,
+              "files": 0,
+              "captures": 0
+            },
+            "baselinePreparationMs": 29,
+            "baselineInputBytes": 0,
+            "current": false
+          }
+        }
+      ],
+      "realProviderRequests": 0
+    },
+    "serverless__serverless-6534": {
+      "passed": true,
+      "checks": [
+        {
+          "arm": "P",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H0",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H1",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": {
+            "enabled": true,
+            "baselineSnapshot": "38a6b4df94a69e19695a8fd505493f22e677323597c8f6bc420a67acea17d9fe",
+            "runs": [],
+            "status": "unsupported",
+            "reason": "One explicit public .d.ts entry (types/typings or user path) required",
+            "spentMs": 0,
+            "captureCost": {
+              "readBytes": 0,
+              "files": 0,
+              "captures": 0
+            },
+            "baselinePreparationMs": 30,
+            "baselineInputBytes": 0,
+            "current": false
+          }
+        }
+      ],
+      "realProviderRequests": 0
+    },
+    "serverless__serverless-6842": {
+      "passed": true,
+      "checks": [
+        {
+          "arm": "P",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H0",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H1",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": {
+            "enabled": true,
+            "baselineSnapshot": "df86a5423cec075f1dc3603bbb6ed0a6290e6ef54fbb5caf0676563271956565",
+            "runs": [],
+            "status": "unsupported",
+            "reason": "One explicit public .d.ts entry (types/typings or user path) required",
+            "spentMs": 0,
+            "captureCost": {
+              "readBytes": 0,
+              "files": 0,
+              "captures": 0
+            },
+            "baselinePreparationMs": 30,
+            "baselineInputBytes": 0,
+            "current": false
+          }
+        }
+      ],
+      "realProviderRequests": 0
+    },
+    "sveltejs__svelte-5452": {
+      "passed": true,
+      "checks": [
+        {
+          "arm": "P",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H0",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H1",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": {
+            "enabled": true,
+            "baselineSnapshot": "5e525979bde384ab21d0d6fb93fd95f72c8a19800e0788a744e916045af00490",
+            "runs": [],
+            "status": "preparation-error",
+            "reason": "Missing input /work/repo/.git/harness-task/b9a8f325-94a3-4fb7-8bb4-2d04be3923ba/worktree/types/runtime/index.d.ts: ENOENT",
+            "spentMs": 0,
+            "captureCost": {
+              "readBytes": 0,
+              "files": 0,
+              "captures": 0
+            },
+            "baselinePreparationMs": 26,
+            "baselineInputBytes": 0,
+            "current": false
+          }
+        }
+      ],
+      "realProviderRequests": 0
+    },
+    "mui__material-ui-20356": {
+      "passed": true,
+      "checks": [
+        {
+          "arm": "P",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H0",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H1",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": {
+            "enabled": true,
+            "baselineSnapshot": "746922d6ae4eacd0ce67070d30b3fdd9bb6a7b57ed42cc8ed006817ea113d276",
+            "runs": [],
+            "status": "unsupported",
+            "reason": "One explicit public .d.ts entry (types/typings or user path) required",
+            "spentMs": 0,
+            "captureCost": {
+              "readBytes": 0,
+              "files": 0,
+              "captures": 0
+            },
+            "baselinePreparationMs": 27,
+            "baselineInputBytes": 0,
+            "current": false
+          }
+        }
+      ],
+      "realProviderRequests": 0
+    },
+    "sveltejs__svelte-1190": {
+      "passed": true,
+      "checks": [
+        {
+          "arm": "P",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H0",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H1",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": {
+            "enabled": true,
+            "baselineSnapshot": "7b09dab6706059937b4b61f280fea4e5ae1927071b34b15efbfefd7b46426477",
+            "runs": [],
+            "status": "unsupported",
+            "reason": "One explicit public .d.ts entry (types/typings or user path) required",
+            "spentMs": 0,
+            "captureCost": {
+              "readBytes": 0,
+              "files": 0,
+              "captures": 0
+            },
+            "baselinePreparationMs": 40,
+            "baselineInputBytes": 0,
+            "current": false
+          }
+        }
+      ],
+      "realProviderRequests": 0
+    },
+    "mui__material-ui-18141": {
+      "passed": true,
+      "checks": [
+        {
+          "arm": "P",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H0",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H1",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": {
+            "enabled": true,
+            "baselineSnapshot": "f83a7369677fc826b93070d88726ebbece243e9d9002f0363c32d961761e74ae",
+            "runs": [],
+            "status": "unsupported",
+            "reason": "One explicit public .d.ts entry (types/typings or user path) required",
+            "spentMs": 0,
+            "captureCost": {
+              "readBytes": 0,
+              "files": 0,
+              "captures": 0
+            },
+            "baselinePreparationMs": 26,
+            "baselineInputBytes": 0,
+            "current": false
+          }
+        }
+      ],
+      "realProviderRequests": 0
+    },
+    "coder__code-server-4923": {
+      "passed": true,
+      "checks": [
+        {
+          "arm": "P",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H0",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H1",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": {
+            "enabled": true,
+            "baselineSnapshot": "0312fa1f2bb23ec00fb0a956403ba484779f42b0bf2979aaebf0e2f4aa5734cc",
+            "runs": [],
+            "status": "unsupported",
+            "reason": "One explicit public .d.ts entry (types/typings or user path) required",
+            "spentMs": 0,
+            "captureCost": {
+              "readBytes": 0,
+              "files": 0,
+              "captures": 0
+            },
+            "baselinePreparationMs": 30,
+            "baselineInputBytes": 0,
+            "current": false
+          }
+        }
+      ],
+      "realProviderRequests": 0
+    },
+    "microsoft__vscode-136347": {
+      "passed": true,
+      "checks": [
+        {
+          "arm": "P",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H0",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H1",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": {
+            "enabled": true,
+            "baselineSnapshot": "ce67e0fd83b7391c1d3af2752108a30c578f7f5b6572a2ea0a9e2b6f08fc7f66",
+            "runs": [],
+            "status": "unsupported",
+            "reason": "One explicit public .d.ts entry (types/typings or user path) required",
+            "spentMs": 0,
+            "captureCost": {
+              "readBytes": 0,
+              "files": 0,
+              "captures": 0
+            },
+            "baselinePreparationMs": 49,
+            "baselineInputBytes": 0,
+            "current": false
+          }
+        }
+      ],
+      "realProviderRequests": 0
+    },
+    "mui__material-ui-17301": {
+      "passed": true,
+      "checks": [
+        {
+          "arm": "P",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H0",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": null
+        },
+        {
+          "arm": "H1",
+          "nativeStop": true,
+          "dependenciesAvailable": true,
+          "compatibility": {
+            "enabled": true,
+            "baselineSnapshot": "f2bb4104e0c2d137166a04ead3ce839f94f471cd31c86cd82e8bf87f38da8202",
+            "runs": [],
+            "status": "unsupported",
+            "reason": "One explicit public .d.ts entry (types/typings or user path) required",
+            "spentMs": 0,
+            "captureCost": {
+              "readBytes": 0,
+              "files": 0,
+              "captures": 0
+            },
+            "baselinePreparationMs": 30,
+            "baselineInputBytes": 0,
+            "current": false
+          }
+        }
+      ],
+      "realProviderRequests": 0
+    }
+  },
+  "scheduler_check": {
+    "exit_code": 0,
+    "output_sha256": "894b8e3b13ea6057e6cdf64fe4cf866dc3abb10d4598c34970a9108fdf179214"
+  },
+  "scope": "Model-free preparation evidence only; not model-quality, full verifier or CI evidence."
+}

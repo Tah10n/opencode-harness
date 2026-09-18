@@ -1,0 +1,52 @@
+{
+  "initial_diagnostic": {
+    "status": "stopped before patch: image Dockerfile differed from tracked B",
+    "containers": 1,
+    "elapsed_seconds": 13.396
+  },
+  "image_inspection": {
+    "containers": 1,
+    "command_seconds": 0.324,
+    "purpose": "read baked serverless Dockerfile difference"
+  },
+  "final_diagnostic": {
+    "containers": 27,
+    "scenarios": 27,
+    "elapsed_seconds": 331.624
+  },
+  "control_attempts": [
+    {
+      "local_path": "local/polybench-pilot/patch-contract-controls.json",
+      "sha256": "e93cd14860a533929affb62204218090e61c9bd225979f04b5a6113a364f8f6e",
+      "status": "failed: fourth control used invalid/empty patch due to stat cache; only first three captured",
+      "controls_attempted": 4,
+      "elapsed_seconds": 7.303
+    },
+    {
+      "local_path": "local/polybench-pilot/patch-contract-controls-2.json",
+      "sha256": "eaff2d81905ff6f6766eff670f401238ef7258472f1319fd82db12011d48bab4",
+      "status": "failed: empty identical-change patches exposed stat-cache fixture bug",
+      "controls_attempted": 3,
+      "elapsed_seconds": 5.472
+    },
+    {
+      "local_path": "local/polybench-pilot/patch-contract-controls-3.json",
+      "sha256": "927899abc30d7d6a4fe197bcc3bc773367f7b26266b8ea956f6fc2167c5b6223",
+      "status": "failed: five command outcomes correct, artifact assertion omitted ./ prefix",
+      "controls_attempted": 5,
+      "elapsed_seconds": 10.851
+    },
+    {
+      "local_path": "local/polybench-pilot/patch-contract-controls-4.json",
+      "sha256": "eefe498fe9289f97808473fba1a8c908e25aa85593780084d17cb4666c067d66",
+      "status": "passed: five expected outcomes and partial/fallback assertions",
+      "controls_attempted": 5,
+      "elapsed_seconds": 10.934
+    }
+  ],
+  "total_containers_created": 33,
+  "definitive_controls": 5,
+  "provider_calls": 0,
+  "official_test_or_scoring_runs": 0,
+  "monetary_cost": "not inferred"
+}

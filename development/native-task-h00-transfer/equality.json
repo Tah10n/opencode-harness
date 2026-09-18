@@ -1,0 +1,43 @@
+{
+  "P": {
+    "model": "gpt-5.6-luna",
+    "effort": "high",
+    "tools": [
+      "apply_patch",
+      "bash",
+      "glob",
+      "grep",
+      "read",
+      "skill",
+      "task",
+      "todowrite",
+      "webfetch"
+    ],
+    "fullOriginalTaskVerifiedByScriptedProvider": true,
+    "providerBoundary": "/v1/responses -> existing host OAuth endpoint; no token in container",
+    "realProviderRequests": 0,
+    "systemMessageCount": 1,
+    "systemMessagesSha256": "59eeb4bba5ca872f84879bbeee87dfd035c5eef9d0c23e1ee3b8e4479570e674",
+    "taskToolAvailable": true
+  },
+  "H00": {
+    "model": "gpt-5.6-luna",
+    "effort": "high",
+    "tools": [
+      "apply_patch",
+      "bash",
+      "glob",
+      "grep",
+      "read",
+      "skill",
+      "todowrite",
+      "webfetch"
+    ],
+    "fullOriginalTaskVerifiedByScriptedProvider": true,
+    "providerBoundary": "/v1/responses -> existing host OAuth endpoint; no token in container",
+    "realProviderRequests": 0,
+    "systemMessageCount": 1,
+    "systemMessagesSha256": "54efccfaa960a17347de876ce3fa501175e3760ae616aed8c1b79e6cf8348698",
+    "taskToolAvailable": false
+  }
+}

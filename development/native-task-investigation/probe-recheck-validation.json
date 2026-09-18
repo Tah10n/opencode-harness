@@ -1,0 +1,282 @@
+{
+  "passed": true,
+  "realProviderRequests": 0,
+  "parserCases": [
+    {
+      "name": "item-empty-terminal",
+      "passed": true
+    },
+    {
+      "name": "terminal-only",
+      "passed": true
+    },
+    {
+      "name": "deduplicated",
+      "passed": true
+    },
+    {
+      "name": "several-items",
+      "passed": true
+    },
+    {
+      "name": "delta-only",
+      "passed": true
+    },
+    {
+      "name": "item-without-terminal",
+      "passed": true
+    },
+    {
+      "name": "failed",
+      "passed": true
+    },
+    {
+      "name": "incomplete",
+      "passed": true
+    },
+    {
+      "name": "protocol-error",
+      "passed": true
+    },
+    {
+      "name": "foreign-item",
+      "passed": true
+    },
+    {
+      "name": "foreign-response",
+      "passed": true
+    },
+    {
+      "name": "conflicting-text",
+      "passed": true
+    },
+    {
+      "name": "conflicting-index",
+      "passed": true
+    },
+    {
+      "name": "unbound-item",
+      "passed": true
+    },
+    {
+      "name": "delivery-error",
+      "passed": true
+    },
+    {
+      "name": "empty",
+      "passed": true
+    },
+    {
+      "name": "reasoning-not-answer",
+      "passed": true
+    },
+    {
+      "name": "tool-not-answer",
+      "passed": true
+    },
+    {
+      "name": "not-normal-eof",
+      "passed": true
+    },
+    {
+      "name": "handler-unfinished",
+      "passed": true
+    }
+  ],
+  "originalCodeReproducesFalsePause": true,
+  "correctedCodeAcceptsSameBytes": true,
+  "offlineAdmissionScenarios": [
+    {
+      "mode": "valid",
+      "passed": true,
+      "startedSlots": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "wrong-first",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "wrong-second",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "changed-pause",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "old-container-present",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "unstarted-artifact",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "probe-task-artifact",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "changed-bundle",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "changed-history",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "missing-history-hash",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "existing-continuation",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "task-pause",
+      "passed": true,
+      "startedSlots": [
+        3
+      ],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "changed-probe",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "changed-report",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    }
+  ],
+  "httpAdmissionScenarios": [
+    {
+      "mode": "valid",
+      "passed": true,
+      "startedSlots": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "upstreamRequests": 1
+    },
+    {
+      "mode": "failed-probe",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 1
+    },
+    {
+      "mode": "empty-probe",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 1
+    },
+    {
+      "mode": "wrong-first",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "changed-pause",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "old-container-present",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "unstarted-artifact",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "changed-bundle",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "missing-capture",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "changed-history",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "missing-history-hash",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "unallowed-launcher",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "existing-continuation",
+      "passed": true,
+      "startedSlots": [],
+      "upstreamRequests": 0
+    },
+    {
+      "mode": "task-pause",
+      "passed": true,
+      "startedSlots": [
+        3
+      ],
+      "upstreamRequests": 1
+    }
+  ],
+  "review": "One bounded diff review; corrected stale reason on successful admission and reran affected checks. Product and task transport error/deadline rules unchanged.",
+  "fullVerifier": "PROCESS_CONTAINMENT_UNAVAILABLE remains a separate limitation; not rerun."
+}

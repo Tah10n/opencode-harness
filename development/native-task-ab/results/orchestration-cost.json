@@ -1,0 +1,7 @@
+{
+  "observedAt": "2026-09-13T18:05:35Z",
+  "codexGoalTokensUsed": 2577054,
+  "codexGoalTimeUsedSeconds": 22795,
+  "kind": "orchestration counter snapshot before final publication; not executing Luna usage or dollar charge",
+  "limitations": "Includes this development/analysis task and repeated context. Final publication work adds overhead after the snapshot. Not added to provider token totals."
+}

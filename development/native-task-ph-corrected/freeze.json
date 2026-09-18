@@ -1,0 +1,82 @@
+{
+  "kind": "corrected-input-selected-D-final-development-diagnostics",
+  "candidateCommit": "2da6dfe47f0c8c92630146eb29b2daf9fbb05aac",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "low",
+  "budgetMs": 900000,
+  "preflightPassed": true,
+  "frozenFiles": 9110,
+  "schedule": [
+    {
+      "slot": 1,
+      "task": "legacy-runtime-reload",
+      "arm": "P"
+    },
+    {
+      "slot": 2,
+      "task": "legacy-runtime-reload",
+      "arm": "H"
+    },
+    {
+      "slot": 3,
+      "task": "reconnect-revoked",
+      "arm": "H"
+    },
+    {
+      "slot": 4,
+      "task": "reconnect-revoked",
+      "arm": "P"
+    }
+  ],
+  "inputPatches": {
+    "legacy-runtime-reload": "89c7c137cb1e27ed175c10af24d89492b891eda2a07463cfa839a72d01f08748",
+    "reconnect-revoked": "5578826a04112f1c92d826d171bd365f6c09d99f40f14f4a1140a62d09a5e01e"
+  },
+  "inputTreeHashes": {
+    "legacy-runtime-reload-P": "65b8ad596fb1af5119cc55e9901501fffb49db028c6b532afb9b229558a1e297",
+    "legacy-runtime-reload-H": "65b8ad596fb1af5119cc55e9901501fffb49db028c6b532afb9b229558a1e297",
+    "reconnect-revoked-H": "cdaf8d10e30fd62e4f44127ae5706016f27bc2baf2bb87a8c6099e0e9a361d6a",
+    "reconnect-revoked-P": "cdaf8d10e30fd62e4f44127ae5706016f27bc2baf2bb87a8c6099e0e9a361d6a"
+  },
+  "scriptedProviderRequests": 8,
+  "preflightRealProviderCalls": 0,
+  "containerInputs": [
+    {
+      "task": "legacy-runtime-reload",
+      "arm": "P",
+      "filesVerified": 220,
+      "hostAndContainerBytesAndModesMatch": true,
+      "gitRoot": "/work/repo",
+      "openCodeVersion": "1.18.26",
+      "providerRequests": 0
+    },
+    {
+      "task": "legacy-runtime-reload",
+      "arm": "H",
+      "filesVerified": 220,
+      "hostAndContainerBytesAndModesMatch": true,
+      "gitRoot": "/work/repo",
+      "openCodeVersion": "1.18.26",
+      "providerRequests": 0
+    },
+    {
+      "task": "reconnect-revoked",
+      "arm": "P",
+      "filesVerified": 224,
+      "hostAndContainerBytesAndModesMatch": true,
+      "gitRoot": "/work/repo",
+      "openCodeVersion": "1.18.26",
+      "providerRequests": 0
+    },
+    {
+      "task": "reconnect-revoked",
+      "arm": "H",
+      "filesVerified": 224,
+      "hostAndContainerBytesAndModesMatch": true,
+      "gitRoot": "/work/repo",
+      "openCodeVersion": "1.18.26",
+      "providerRequests": 0
+    }
+  ],
+  "grading": "Existing independent behavior checks and predeclared delivery rubric frozen before runs; grader not mounted in model containers."
+}

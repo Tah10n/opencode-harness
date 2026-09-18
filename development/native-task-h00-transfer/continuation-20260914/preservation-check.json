@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-14T11:04:23.345Z",
+  "originalFreezeSha256": "240802e6d4deecca8b7e22096c6f4bccdd41b8c161e380eb32a56b9a42dbd1d6",
+  "amendmentManifestSha256": "4c6bed9e147bde971f1ef30d395ea3828c36f26913b852b79f2d7d28ba7d46c6",
+  "historicalArtifactsVerified": 1444,
+  "frozenFilesVerified": 7724,
+  "explicitAmendedLauncherFiles": 3,
+  "originalPausePreserved": true,
+  "originalRunDirectoriesUnchanged": true,
+  "continuationRunDirectories": 24,
+  "unexpectedRunDirectories": 0,
+  "passed": true
+}

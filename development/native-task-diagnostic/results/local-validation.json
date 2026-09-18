@@ -1,0 +1,23 @@
+{
+  "publicJsonParsed": true,
+  "reportTotalsMatched": true,
+  "frozenEvaluatorPreflightCases": 14,
+  "scriptedContainerPreflights": 2,
+  "realProviderPreflightRequests": 0,
+  "unfilteredStagedWhitespace": {
+    "exit": 2,
+    "reason": "Unified-diff empty context markers (a single space), plus final blank context in schedule-only.diff; evidence bytes preserved."
+  },
+  "nonArtifactStagedWhitespace": {
+    "exit": 0,
+    "excludedOnly": [
+      "results/patches/**",
+      "schedule-only.diff"
+    ]
+  },
+  "runtimeChanged": false,
+  "fullRegressionSuiteRun": false,
+  "manualActions": 0,
+  "fullPlatformMatrix": 0,
+  "historicalArchiveReaudit": false
+}

@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/counter-core.mjs": "export function reduceCounter(state,event){\n const next={...state},effects=[];\n switch(event.type){\n  case 'add':if(!Number.isInteger(event.amount)||Math.abs(event.amount)>200)throw new TypeError('amount');const candidate=Math.min(100,Math.max(-100,next.value+event.amount));if(candidate!==next.value)next.value=candidate;break;\n  case 'reset':if(next.value!==0)next.value=0;break;\n  case 'save':next.savedValue=next.value;effects.push({type:'persist',value:next.value},{type:'notify',event:{type:'saved',value:next.value}});break;\n  default:throw new TypeError('event');\n }\n if(event.type!=='save'&&next.value!==state.value)effects.push({type:'notify',event:{type:'changed',value:next.value}});\n return {state:next,effects};\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "save-notification-before-persist",
+      "file": "src/counter-core.mjs",
+      "replacement": "export function reduceCounter(state,event){\n let value=state.value,savedValue=state.savedValue,effects=[];\n if(event.type==='add'){if(!Number.isInteger(event.amount)||Math.abs(event.amount)>200)throw new TypeError('amount');const next=Math.max(-100,Math.min(100,value+event.amount));if(next!==value)value=next;}\n else if(event.type==='reset'){if(value!==0)value=0;}\n else if(event.type==='save'){savedValue=value;effects=[{type:'notify',event:{type:'saved',value}},{type:'persist',value}];}\n else throw new TypeError('event');\n if(event.type!=='save'&&value!==state.value)effects=[{type:'notify',event:{type:'changed',value}}];\n return {state:{value,savedValue},effects};\n}\n"
+    },
+    {
+      "name": "commit-after-effects",
+      "file": "src/controller.mjs",
+      "replacement": "import {reduceCounter} from './counter-core.mjs';\nexport function createCounter(initialValue,{persist,notify}){\n let state={value:initialValue,savedValue:initialValue};\n return {getState(){return {...state};},dispatch(event){const transition=reduceCounter(state,event);for(const effect of transition.effects){if(effect.type==='persist')persist(effect.value);else notify(effect.event);}state=transition.state;return {...state};}};\n}\n"
+    }
+  ]
+}

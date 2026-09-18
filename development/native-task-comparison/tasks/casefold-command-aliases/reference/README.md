@@ -1,0 +1,3 @@
+# casefold-command-aliases
+
+createCommands snapshots static entries. Canonical names match exactly first; aliases alone match ASCII-insensitively. An alias may overlap a canonical name, whose exact match wins. Duplicate canonical names reject DUPLICATE_COMMAND; folded aliases across commands reject ALIAS_COLLISION, while same-command duplicates are allowed. Valid names follow [A-Za-z_][A-Za-z0-9_-]*; invalid names throw TypeError and unknown valid lookup has UNKNOWN_COMMAND. run forwards arguments/return/throw identity with undefined thisArg and no awaiting. help returns fresh ordered rows/alias arrays, preserving original spelling and duplicate aliases. No later input/help mutation changes routing. Run npm test.

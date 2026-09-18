@@ -1,0 +1,186 @@
+[
+  {
+    "task": "protocol-error-api",
+    "arm": "A",
+    "finalCleanReapplyEqualsGradedBytesAndModes": true,
+    "phases": {
+      "final": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "733f85d53730b3b57e8df530339776404858908420af550ace3afcb2512da25e"
+      }
+    }
+  },
+  {
+    "task": "protocol-error-api",
+    "arm": "B",
+    "finalCleanReapplyEqualsGradedBytesAndModes": true,
+    "phases": {
+      "final": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "443794a48b2f211a1766c701664102470fd945593c18cc3386b904d3b2b03eb8"
+      },
+      "D0": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "60c7739b075556d5332b23a43da857820d5065bcd095bf71cd9b7e37d8674a9d"
+      }
+    }
+  },
+  {
+    "task": "protocol-error-api",
+    "arm": "C",
+    "finalCleanReapplyEqualsGradedBytesAndModes": true,
+    "phases": {
+      "final": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "1ed24e9d95c052bd32ca84d07270efe507f4ccdbdd16af98a9cbf97d949bd784"
+      },
+      "D0": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "c0651dee071f2aa0c35fd22d1674b8de6067a77ef3bce6d4fb45eb138c9c8094"
+      }
+    }
+  },
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "B",
+    "finalCleanReapplyEqualsGradedBytesAndModes": true,
+    "phases": {
+      "final": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "3ab71a8233f62011c1f6bf8593485ef71fd5ff0ced665d0c076bc80a7fa251c4"
+      },
+      "D0": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "249fc816d8c7a26223db94f78ac3c96523d2d302637a4e432769988e3fc9230f"
+      }
+    }
+  },
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "C",
+    "finalCleanReapplyEqualsGradedBytesAndModes": true,
+    "phases": {
+      "final": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "6b0186f6e4ff599afd0355205fa4fdd9e64cd9babf4d149bc1c31e5cdd37d378"
+      },
+      "D0": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "7d7e11e0703142faf17c36c83b0810affe52a0a2bce1104b89d00d1da923d5c5"
+      }
+    }
+  },
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "A",
+    "finalCleanReapplyEqualsGradedBytesAndModes": true,
+    "phases": {
+      "final": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "6c6df593aa13f7841af9c904886e6839de7d93fcfe330bd873acccc575780d7d"
+      }
+    }
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "C",
+    "finalCleanReapplyEqualsGradedBytesAndModes": true,
+    "phases": {
+      "final": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "111389ec6d86f3996a9ef86b0e68a2a40d44c4cfd1431e9a85c16b9abee12cdd"
+      },
+      "D0": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "936642f8f783572f4fc98b5be32da3ea2da059e6cf8f9a274d799165fb0b6435"
+      }
+    }
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "A",
+    "finalCleanReapplyEqualsGradedBytesAndModes": true,
+    "phases": {
+      "final": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "df6f45716e0c42cda7783107a926d768f501a0b252fcbdec0bbb2cafe630bb06"
+      }
+    }
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "B",
+    "finalCleanReapplyEqualsGradedBytesAndModes": true,
+    "phases": {
+      "final": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "9b6c05603f9f5cfe96b7c0484d05e4c7303501a904a97bd05aa80d21ee249a4b"
+      },
+      "D0": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "54605153c689e535ac1d5401111e5c967929de3c646918608bc2a0fb7f188fcb"
+      }
+    }
+  },
+  {
+    "task": "request-module-extraction",
+    "arm": "A",
+    "finalCleanReapplyEqualsGradedBytesAndModes": true,
+    "phases": {
+      "final": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "60e5be51c2fe7ce235708e3aa442851b718d76abf1931bd9567443856b895eb9"
+      }
+    }
+  },
+  {
+    "task": "request-module-extraction",
+    "arm": "C",
+    "finalCleanReapplyEqualsGradedBytesAndModes": true,
+    "phases": {
+      "final": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "96bf60a7465793412caddcae83d7c74fd82c27ff82fcdf368a3138fb017dbb27"
+      },
+      "D0": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "68b2de3b16f46828016e63c986e2be4654184d29f8829ea254807f30cc54c3c8"
+      }
+    }
+  },
+  {
+    "task": "request-module-extraction",
+    "arm": "B",
+    "finalCleanReapplyEqualsGradedBytesAndModes": true,
+    "phases": {
+      "final": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "dcb5035a18b82fab62b02065f7fc54e4be2809c760302309e749db5503a1edcc"
+      },
+      "D0": {
+        "applies": true,
+        "whitespaceClean": true,
+        "patchSha256": "35db80b9ab09890d08a892da4f1c61881e9cc38fe91b81c3c777521d128f43ab"
+      }
+    }
+  }
+]

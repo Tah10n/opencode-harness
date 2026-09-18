@@ -1,0 +1,105 @@
+{
+  "slot": 2,
+  "case": "case-1",
+  "task": "quick-lru-computed",
+  "arm": "H1",
+  "seedSha256": "ef444325ed5d796e0761414388db7734a2dd5e8063a50c36b285e7b277cf4461",
+  "Q": 0,
+  "D": 0,
+  "assessment": {
+    "Q": 0,
+    "reason": "Required default-TTL discrimination remains missing: expiresIn(key) > 0 also accepts Infinity. All 118 delivered runtime tests pass after the isolated expiry-loss mutation. Production behavior and ordinary tests/types pass, but this is an incomplete test delivery.",
+    "ordinaryProjectAndTypesPassed": true,
+    "independentBehaviorPassed": true,
+    "requiredGapDiscriminated": false,
+    "newControlRegression": null,
+    "substantiveObservationUsed": false,
+    "assessmentMethod": "One assessor reviewed the complete delivered diffs, seed-to-final changes, ordinary/independent results and actual failing assertions. The assessor also monitored the runs; no independent blinding claim."
+  },
+  "patch": "patches/02-case-1-H1.patch",
+  "patchSha256": "a2b379401468207e0f3c71face1cc311e00b1a1ac462d6a016fcdcde56090d80",
+  "terminalPatch": "terminal-patches/02-case-1-H1.patch",
+  "terminalPatchSha256": "39f844d6365dcc81bc40b042c975b8840d17e563fd453182a358229e55d7e82a",
+  "handoffNamesPatch": true,
+  "terminalPatchApplicable": true,
+  "changed": [
+    "index.d.ts",
+    "index.js",
+    "index.test-d.ts",
+    "readme.md",
+    "test.js"
+  ],
+  "deleted": [],
+  "omittedPreparationFiles": [],
+  "nativeCompleted": true,
+  "nativeExit": 0,
+  "lastStepFinish": "stop",
+  "workflowStatus": "incomplete",
+  "requests": 14,
+  "toolCalls": 25,
+  "authorSessions": 1,
+  "preparationAndCaptureMs": 4592,
+  "diagnosticElapsedMs": 0,
+  "executionMs": 148976,
+  "cleanupMs": 60,
+  "elapsedMs": 149036,
+  "usage": {
+    "input_tokens": 398367,
+    "output_tokens": 5839,
+    "total_tokens": 404206,
+    "cached_tokens": 64000,
+    "reasoning_tokens": 4109,
+    "unknownRequests": 0
+  },
+  "terminationVerified": true,
+  "containerRemoved": true,
+  "originalDiagnosticCommands": [
+    {
+      "command": "command -v harness-sense",
+      "callID": "call_tgzxqPDh3J30B8c0ZZ7deinL"
+    }
+  ],
+  "sensitivityEvents": [],
+  "checks": {
+    "ordinary": {
+      "exit": 0,
+      "elapsedMs": 7468,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && npm test"
+      ],
+      "outputSha256": "f482a3217e976b88da4ae7384be018a296ac0e002f4bde2be7d6d4e07416ed31",
+      "outputExcerpt": "> quick-lru@7.3.0 test\n  118 tests passed",
+      "realProviderRequests": 0
+    },
+    "independent": {
+      "exit": 0,
+      "elapsedMs": 3575,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && timeout 10s node .independent.cjs"
+      ],
+      "outputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "outputExcerpt": "Independent behavior passed",
+      "realProviderRequests": 0
+    },
+    "sensitivity": {
+      "exit": 0,
+      "elapsedMs": 4135,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && node .diagnostic.cjs && node_modules/.bin/ava"
+      ],
+      "outputSha256": "c47980a79e9d5bbccacc3a42cf8bf4afda70cb7cd0c3816ed56842405b8c2d08",
+      "outputExcerpt": "  118 tests passed",
+      "realProviderRequests": 0
+    }
+  },
+  "authorClaimExcerpt": "\nImplemented and verified `getOrInsertComputed` across:\n\n- Runtime behavior, TTL, eviction, errors, object keys, and cache independence\n- Public TypeScript declaration and inference/error tests\n- README API documentation\n- Required regression scenarios using public APIs\n\nChecks passed:\n\n- Focused AVA regressions: 3 passed\n- `tsd`\n- Full `npm test`: 118 tests passed\n- `git diff --check`\n\n`harness-sense` was unavailable in the environment. No commit or dependency changes were made."
+}

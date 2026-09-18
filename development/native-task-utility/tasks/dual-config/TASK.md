@@ -1,0 +1,7 @@
+# Compatible option extension for CommonJS and ESM
+This local package is used by both require() and import consumers. Extend configuration without splitting behavior.
+1. Preserve `require('./index.cjs')('compact')` and ESM named/default `configure('compact')`. Existing string modes `compact` and `pretty` retain `{mode, indent}` results (0 and 2). Invalid mode strings continue throwing RangeError.
+2. Both entry points additionally accept `{mode, indent?}`. Mode is required and must be compact or pretty. Optional indent must be an integer from 0 through 8, inclusive; 0 is valid even with pretty. Omission derives the legacy default. Reject null, arrays, missing mode, nonnumeric/NaN/fractional/out-of-range indent with TypeError for shape/indent and RangeError for an invalid supplied mode string. Do not mutate caller options.
+3. Route both formats through a single normalization implementation. Keep both package entry points and ESM default AND named configure exports. No third-party dependency or package type change.
+4. `render(value, option)` in each existing consumer entry point must forward strings and objects to configure and serialize with the normalized indent. Preserve JSON.stringify behavior for the value.
+5. Add actual CJS and ESM consumer tests for legacy strings and object options, especially pretty+indent:0, invalid indent and missing mode. Keep old tests. Document both forms and error rules in README.md.

@@ -1,0 +1,983 @@
+{
+  "passed": true,
+  "realProviderRequests": 0,
+  "scenarios": [
+    {
+      "mode": "failed-retry",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": true,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "provider_failed",
+        "slot": 1,
+        "requestIndex": 1,
+        "error": {
+          "code": "server_is_overloaded",
+          "message": "Scripted overload"
+        },
+        "incompleteDetails": null
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "failed-chunks",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "provider_failed",
+        "slot": 1,
+        "requestIndex": 1,
+        "error": {
+          "code": "server_is_overloaded",
+          "message": "Scripted overload"
+        },
+        "incompleteDetails": null
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "failed-hanging",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": true,
+      "stoppedBeforeEOF": true,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "provider_failed",
+        "slot": 1,
+        "requestIndex": 1,
+        "error": {
+          "code": "server_is_overloaded",
+          "message": "Scripted overload"
+        },
+        "incompleteDetails": null
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "failed-usage",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": true,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 5,
+      "unknownUsageRequests": 0,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "provider_failed",
+        "slot": 1,
+        "requestIndex": 1,
+        "error": {
+          "code": "server_is_overloaded",
+          "message": "Scripted overload"
+        },
+        "incompleteDetails": null
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "incomplete",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 5,
+      "unknownUsageRequests": 0,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "provider_incomplete",
+        "slot": 1,
+        "requestIndex": 1,
+        "error": null,
+        "incompleteDetails": {
+          "reason": "max_output_tokens"
+        }
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "protocol-error",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "provider_protocol_error",
+        "slot": 1,
+        "requestIndex": 1,
+        "error": {
+          "code": "server_error",
+          "message": "Scripted protocol error"
+        }
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "wrong-id",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": true,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "provider_protocol_error",
+        "slot": 1,
+        "requestIndex": 1,
+        "reason": "Different response IDs in one request"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "malformed-event",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "provider_protocol_error",
+        "slot": 1,
+        "requestIndex": 1,
+        "reason": "Malformed upstream SSE JSON"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "normal-failed-text",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 2,
+      "startedSlots": [
+        1,
+        2
+      ],
+      "scriptedReportedTokens": 10,
+      "unknownUsageRequests": 0,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": null,
+      "realProviderRequests": 0,
+      "authCalls": 2
+    },
+    {
+      "mode": "installed-failed",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 4,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": "1.18.26",
+      "pause": {
+        "kind": "provider_failed",
+        "slot": 1,
+        "requestIndex": 1,
+        "error": {
+          "code": "server_is_overloaded",
+          "message": "Scripted overload"
+        },
+        "incompleteDetails": null
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1,
+      "nativeBlockedRequests": 2
+    },
+    {
+      "mode": "installed-failed-hanging",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": true,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 4,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": "1.18.26",
+      "pause": {
+        "kind": "provider_failed",
+        "slot": 1,
+        "requestIndex": 1,
+        "error": {
+          "code": "server_is_overloaded",
+          "message": "Scripted overload"
+        },
+        "incompleteDetails": null
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1,
+      "nativeBlockedRequests": 2
+    },
+    {
+      "mode": "503-retry",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "delayed-503",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": true,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "oversized-503",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "200-disconnect",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "reason": "Stream ended without a bound terminal provider response"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "completed-delivery-error",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1,
+        2
+      ],
+      "scriptedReportedTokens": 5,
+      "unknownUsageRequests": 0,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": null,
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "previous-completed-new-unknown",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 2,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 5,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 2,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 2
+    },
+    {
+      "mode": "401",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "provider_refusal",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 401,
+        "reason": "Provider refused request",
+        "type": "unauthorized",
+        "message": "Scripted refusal",
+        "truncated": false,
+        "bodyInterrupted": false,
+        "bodyTimedOut": false
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "403",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "provider_refusal",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 403,
+        "reason": "Provider refused request",
+        "type": "unauthorized",
+        "message": "Scripted refusal",
+        "truncated": false,
+        "bodyInterrupted": false,
+        "bodyTimedOut": false
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "429",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "incomplete_quota",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 429,
+        "reason": "Provider refused request",
+        "type": "usage_limit_reached",
+        "message": "Scripted refusal",
+        "truncated": false,
+        "bodyInterrupted": false,
+        "bodyTimedOut": false
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "queued-title",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "already-forwarded",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 2,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 2,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 2
+    },
+    {
+      "mode": "late-completed-after-pause",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 2,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 5,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 2
+    },
+    {
+      "mode": "successful-duplicate",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 2,
+      "startedSlots": [
+        1,
+        2
+      ],
+      "scriptedReportedTokens": 10,
+      "unknownUsageRequests": 0,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": null,
+      "realProviderRequests": 0,
+      "authCalls": 2
+    },
+    {
+      "mode": "cancelled-before-fetch",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 0,
+      "startedSlots": [
+        1,
+        2
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 0,
+      "blockedRequests": 1,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": null,
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "pause-during-auth",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 0,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 0,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "boundary_refusal",
+        "slot": 1
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "cancelled-in-flight",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "error": "AbortError"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "installed-503",
+      "nativeRetryAttempts": 1,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 3,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": "1.18.26",
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1,
+      "nativeBlockedRequests": 1
+    },
+    {
+      "mode": "installed-delayed-503",
+      "nativeRetryAttempts": 1,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 3,
+      "pausedBeforeDelayedBodyEnded": true,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": "1.18.26",
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "requestIndex": 1,
+        "status": 503,
+        "reason": "Non-200 response without an established provider result"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1,
+      "nativeBlockedRequests": 1
+    },
+    {
+      "mode": "installed-success",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 4,
+      "startedSlots": [
+        1,
+        2
+      ],
+      "scriptedReportedTokens": 20,
+      "unknownUsageRequests": 0,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": "1.18.26",
+      "pause": null,
+      "realProviderRequests": 0,
+      "authCalls": 4,
+      "nativeBlockedRequests": 0
+    },
+    {
+      "mode": "installed-cancel",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": "1.18.26",
+      "pause": {
+        "kind": "unknown_submission",
+        "slot": 1,
+        "error": "AbortError"
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1,
+      "nativeBlockedRequests": 0
+    },
+    {
+      "mode": "installed-hard-deadline",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": "1.18.26",
+      "pause": {
+        "kind": "unattributed_timeout",
+        "slot": 1
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1,
+      "nativeBlockedRequests": 0
+    },
+    {
+      "mode": "historical-failed",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": true,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 2,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "provider_protocol_error",
+        "slot": 1,
+        "requestIndex": 1,
+        "error": {
+          "type": "service_unavailable_error",
+          "code": "server_is_overloaded",
+          "message": "Our servers are currently overloaded. Please try again later.",
+          "param": null
+        }
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "failed-queued-title",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": true,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1
+      ],
+      "scriptedReportedTokens": 0,
+      "unknownUsageRequests": 1,
+      "blockedRequests": 3,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": {
+        "kind": "provider_failed",
+        "slot": 1,
+        "requestIndex": 1,
+        "error": {
+          "code": "server_is_overloaded",
+          "message": "Scripted overload"
+        },
+        "incompleteDetails": null
+      },
+      "realProviderRequests": 0,
+      "authCalls": 1
+    },
+    {
+      "mode": "completed-delivery-abort",
+      "nativeRetryAttempts": 0,
+      "passed": true,
+      "gateBeforeClientEvent": false,
+      "stoppedBeforeEOF": false,
+      "upstreamRequests": 1,
+      "startedSlots": [
+        1,
+        2
+      ],
+      "scriptedReportedTokens": 5,
+      "unknownUsageRequests": 0,
+      "blockedRequests": 0,
+      "pausedBeforeDelayedBodyEnded": false,
+      "partialOutputPreserved": true,
+      "localTerminationVerified": true,
+      "installedOpenCode": null,
+      "pause": null,
+      "realProviderRequests": 0,
+      "authCalls": 1
+    }
+  ],
+  "integrationReview": {
+    "count": 1,
+    "confirmedFindings": 0
+  },
+  "continuation": {
+    "scenarios": 11,
+    "passed": true,
+    "realProviderRequests": 0
+  },
+  "scheduler": {
+    "sensitivityUsage": true,
+    "passed": true
+  },
+  "beforeFix": {
+    "actualUpstreamRequests": 3,
+    "description": "Original request, identical retry, title helper. Current failed fixture forwards only one."
+  },
+  "fullVerifier": {
+    "status": "unavailable",
+    "reason": "PROCESS_CONTAINMENT_UNAVAILABLE",
+    "source": "Existing aggregate verifier limitation; targeted transport checks do not establish full CI pass."
+  },
+  "legacyContinuation": {
+    "passed": true
+  }
+}

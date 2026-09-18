@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert generic error order/identity, falsey errors and first-only short circuit.",
+    "Assert legacy first field error and new full errors with accepted/boundary records unchanged."
+  ],
+  "docDelivery": [
+    "Explain collector pass/error values, order, short circuit and thrown errors.",
+    "Document shared record rule order, local grammar and first/all API behavior."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Ordered synchronous rule collection with nullish pass/falsy errors; fixed local record rules and immutable inputs.",
+  "manualBehavior": [
+    "Verify both record APIs share one ordered rule set and collectErrors; validate must request actual first-error short circuit, not evaluate all then select first."
+  ],
+  "independence": "Refactor fail-fast validation into reusable collection helper with legacy fail-fast wrapper and new all-errors API."
+}

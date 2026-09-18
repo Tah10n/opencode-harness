@@ -1,0 +1,8 @@
+{
+  "name": "text-diff-patch-state",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}

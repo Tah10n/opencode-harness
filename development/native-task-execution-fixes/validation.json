@@ -1,0 +1,591 @@
+{
+  "baseline": "c2e6880a0646b1711629514e08520c4bfc9e4e83",
+  "runtime": {
+    "sha256": "18446e5c1bfe662f058e365fa59128309e41c7777f936de5b2f089ad86532025",
+    "version": "1.18.26"
+  },
+  "installedSourceHashes": {
+    "native-task-plugin.mjs": "d9fd07db2b34fbf658ccc0bc3d6595669beddb981f24beb3a25db4ab4514d5f7",
+    "native-task-workflow.mjs": "10688211fce75592ce22a669b10d49aa067b89aa0dee05da6a2d35b9ceca7ed8",
+    "native-task-observations.mjs": "126a3e695c2dd2ec930a44fca4aa033f0f21e8ae364aae15db39e7f343189de8"
+  },
+  "direct": {
+    "passed": true,
+    "checkFirst": true,
+    "realTemporaryFiles": true,
+    "nativeStateAndPermissions": true,
+    "threeCorrectionBound": true,
+    "realProviderRequests": 0
+  },
+  "commandObservationControls": {
+    "passed": true,
+    "scenarios": 23,
+    "realModelRequests": 0
+  },
+  "installedNewModes": [
+    {
+      "mode": "glob-error",
+      "status": "checks_passed",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 10
+    },
+    {
+      "mode": "glob-parallel",
+      "status": "checks_passed",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 10
+    },
+    {
+      "mode": "glob-compound",
+      "status": "incomplete",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 10
+    },
+    {
+      "mode": "glob-compound-failure",
+      "status": "incomplete",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 10
+    },
+    {
+      "mode": "glob-after-check",
+      "status": "checks_passed",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 10
+    }
+  ],
+  "existingInstalledModes": [
+    {
+      "mode": "missing-read",
+      "status": "checks_passed",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 10
+    },
+    {
+      "mode": "edit-context",
+      "status": "checks_passed",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 11
+    },
+    {
+      "mode": "stateful",
+      "status": "checks_passed",
+      "repairs": 1,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 8
+    },
+    {
+      "mode": "variant",
+      "status": "checks_passed",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 6
+    },
+    {
+      "mode": "both-required",
+      "status": "checks_passed",
+      "repairs": 1,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 8
+    },
+    {
+      "mode": "narrow",
+      "status": "checks_passed",
+      "repairs": 1,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 6
+    },
+    {
+      "mode": "worktree-path",
+      "status": "checks_passed",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 5
+    },
+    {
+      "mode": "external-path",
+      "status": "checks_passed",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 8
+    },
+    {
+      "mode": "external-argument",
+      "status": "checks_passed",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 8
+    },
+    {
+      "mode": "bash-denial",
+      "status": "checks_passed",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 8
+    },
+    {
+      "mode": "second-denial",
+      "status": "incomplete",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 1,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 3
+    },
+    {
+      "mode": "stdout-denial",
+      "status": "checks_passed",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 5
+    },
+    {
+      "mode": "runtime-error",
+      "status": "incomplete",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 5
+    },
+    {
+      "mode": "unknown-error",
+      "status": "incomplete",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 1,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 2
+    },
+    {
+      "mode": "diagnostic",
+      "status": "incomplete",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 5
+    },
+    {
+      "mode": "unresolved",
+      "status": "incomplete",
+      "repairs": 2,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 9
+    },
+    {
+      "mode": "correct",
+      "status": "checks_passed",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 4
+    },
+    {
+      "mode": "two-fixes",
+      "status": "checks_passed",
+      "repairs": 2,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 11
+    },
+    {
+      "mode": "comment-only",
+      "status": "incomplete",
+      "repairs": 2,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 11
+    },
+    {
+      "mode": "defect",
+      "status": "checks_passed",
+      "repairs": 1,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 8
+    },
+    {
+      "mode": "coverage-loss",
+      "status": "checks_passed",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 5
+    },
+    {
+      "mode": "intentional",
+      "status": "checks_passed",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 6
+    },
+    {
+      "mode": "relocation",
+      "status": "checks_passed",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 5
+    },
+    {
+      "mode": "late-check",
+      "status": "checks_passed",
+      "repairs": 1,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 7
+    },
+    {
+      "mode": "final-stale",
+      "status": "incomplete",
+      "repairs": 2,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 11
+    },
+    {
+      "mode": "no-progress",
+      "status": "incomplete",
+      "repairs": 2,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 9
+    },
+    {
+      "mode": "permission",
+      "status": "incomplete",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 1,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 2
+    },
+    {
+      "mode": "cancel",
+      "cancelled": true,
+      "processTerminated": true,
+      "terminalPatchStable": true
+    },
+    {
+      "mode": "budget",
+      "cancelled": true,
+      "processTerminated": true,
+      "terminalPatchStable": true
+    },
+    {
+      "mode": "concurrent-save",
+      "status": "checks_passed",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 5
+    },
+    {
+      "mode": "staged-work",
+      "status": "checks_passed",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 4
+    },
+    {
+      "mode": "external-save",
+      "status": "incomplete",
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 1,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 2
+    }
+  ],
+  "historicalReplays": [
+    {
+      "slot": "quick-lru-take-H",
+      "eventsSha256": "8eec24e382c6b085ee8995d9bef0bf3a0daa9cad70441d6c3b2adf8391f87b01",
+      "historicalReportSha256": "eb1fea95665faacad328f0745fc673c6bc22818994f3d98d7089757b1db6d127",
+      "command": "npm test",
+      "exit": 0,
+      "currentSavedSnapshot": true,
+      "tests": null,
+      "interpretation": "unsupported",
+      "gradesChanged": false
+    },
+    {
+      "slot": "denque-drain-R",
+      "eventsSha256": "b04dc1450690146d5b68dc7d2ad3c22138957ccb2ef31b5117cc9f84a5361ec7",
+      "historicalReportSha256": "e83e3f1bb39bfdef065c7cd1a1d33e1990d9f4219837e3d3b1b653e69adbc827",
+      "command": "npm test",
+      "exit": 0,
+      "currentSavedSnapshot": true,
+      "tests": null,
+      "interpretation": "unsupported",
+      "gradesChanged": false
+    },
+    {
+      "slot": "denque-drain-H",
+      "eventsSha256": "84adbd58afccbbaecff8fee8a7d0ab367c4ea5c4fc87f646f8a7c8a8722caa6e",
+      "historicalReportSha256": "38c46035e8795b7e54ab679e41213661f338939a09212e883b2166657cce8ad1",
+      "command": "npm test",
+      "exit": 0,
+      "currentSavedSnapshot": true,
+      "tests": null,
+      "interpretation": "unsupported",
+      "gradesChanged": false
+    },
+    {
+      "slot": "eventemitter-collect-H",
+      "eventsSha256": "cf7b8ee7f86cacdcf43e7735f0eceb07201b23be9259804db52040a29fd8ca4c",
+      "historicalReportSha256": "450438c5a7338961073568fccc9e970a542cb39c9b4fde943e90c7037e539f71",
+      "command": "npm test",
+      "exit": 0,
+      "currentSavedSnapshot": true,
+      "tests": null,
+      "interpretation": "unsupported",
+      "gradesChanged": false
+    }
+  ],
+  "aggregateVerifier": {
+    "available": false,
+    "reason": "PROCESS_CONTAINMENT_UNAVAILABLE",
+    "firstStageExecuted": false
+  },
+  "realModelRequests": 0,
+  "newModelTaskRuns": 0,
+  "probes": 0,
+  "benchmarks": 0,
+  "historicalResumptions": 0,
+  "limitations": [
+    "Installed/local scripted evidence is not a full CI pass or model-quality evidence.",
+    "Historical EventEmitter/R lacks per-process close and complete pending/live inventory; no retroactive admission claim."
+  ]
+}

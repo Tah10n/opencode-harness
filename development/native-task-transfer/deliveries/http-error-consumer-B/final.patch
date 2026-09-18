@@ -1,0 +1,72 @@
+diff --git a/README.md b/README.md
+index ecd483ebecb946a955286dd235ff0589481e6794..865cef2d75f49dbad277c4977ec1c602e7427697 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,12 @@
+ # http-error-consumer
+ 
+ Small local library. Run `npm test`.
++
++`request(fetcher, url, options)` returns parsed JSON for successful responses.
++Status 204 is returned as `null` without attempting to parse a body. Other
++non-2xx responses throw the exported `HttpError`, whose `status`, `url`, and
++`body` fields describe the failure; an unparseable error body produces a
++`null` body.
++
++`findUser` treats an `HttpError` with status 404 as a missing user and returns
++`null`. All other errors are propagated unchanged.
+diff --git a/src/http.mjs b/src/http.mjs
+index 8effa479ad53808b6692b9197d1c5b0747e4c2e7..02e2915255f17fa0bc906b9e7f13de4ecc547dff 100644
+--- a/src/http.mjs
++++ b/src/http.mjs
+@@ -1 +1,19 @@
+-export async function request(fetcher,url,options={}){const r=await fetcher(url,options);return r.json();}
++export class HttpError extends Error {
++  constructor(status,url,body) {
++    super(`HTTP request failed with status ${status}`);
++    this.name='HttpError';
++    this.status=status;
++    this.url=url;
++    this.body=body;
++  }
++}
++
++export async function request(fetcher,url,options={}) {
++  const response=await fetcher(url,options);
++  if(response.status>=200&&response.status<=299) {
++    return response.status===204?null:response.json();
++  }
++  let body=null;
++  try { body=await response.json(); } catch {}
++  throw new HttpError(response.status,url,body);
++}
+diff --git a/src/users.mjs b/src/users.mjs
+index 76a4eee9d40f76527ae6b3d237f1131559869723..cedb63a126f45e617ca05fded2473f83cf4ef474 100644
+--- a/src/users.mjs
++++ b/src/users.mjs
+@@ -1 +1,10 @@
+-import {request} from './http.mjs';export function findUser(fetcher,base,id,options={}){return request(fetcher,base+'/users/'+id,options);}
++import {HttpError,request} from './http.mjs';
++
++export async function findUser(fetcher,base,id,options={}) {
++  try {
++    return await request(fetcher,base+'/users/'+encodeURIComponent(id),options);
++  } catch(error) {
++    if(error instanceof HttpError&&error.status===404) return null;
++    throw error;
++  }
++}
+diff --git a/test/http.test.mjs b/test/http.test.mjs
+index 1de906a2896c1968b23d445c410ff74dc8863663..784c9524114cad6e154535d52e0cb0c91f96b13a 100644
+--- a/test/http.test.mjs
++++ b/test/http.test.mjs
+@@ -1,2 +1,8 @@
+ import {test} from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';
+-import {findUser} from '../src/users.mjs';test('legacy JSON user',async()=>{assert.deepEqual(await findUser(async url=>({status:200,json:async()=>({url})}),'https://local','a'),{url:'https://local/users/a'});});
++import {findUser} from '../src/users.mjs';
++import {HttpError,request} from '../src/http.mjs';
++
++test('legacy JSON user',async()=>{assert.deepEqual(await findUser(async url=>({status:200,json:async()=>({url})}),'https://local','a'),{url:'https://local/users/a'});});
++test('204 does not parse JSON',async()=>{let parsed=false;assert.equal(await request(async()=>({status:204,json:async()=>{parsed=true;}}),'url'),null);assert.equal(parsed,false);});
++test('malformed error body retains HTTP status',async()=>{await assert.rejects(()=>request(async()=>({status:500,json:async()=>{throw new SyntaxError('bad JSON');}}),'url'),error=>{assert.equal(error.name,'HttpError');assert.equal(error.status,500);assert.equal(error.body,null);return true;});});
++test('findUser handles only encoded-ID 404s',async()=>{const signal=new AbortController().signal;const options={signal,method:'GET'};let calls=[];const missing=await findUser(async(url,received)=>{calls.push([url,received]);return {status:404,json:async()=>({message:'missing'})};},'https://local','a/b',options);assert.equal(missing,null);assert.equal(calls[0][0],'https://local/users/a%2Fb');assert.equal(calls[0][1],options);const failure=new Error('network');let failureCall;await assert.rejects(()=>findUser(async(url,received)=>{failureCall=[url,received];throw failure;},'https://local','a/b',options),error=>error===failure);assert.equal(failureCall[0],'https://local/users/a%2Fb');assert.equal(failureCall[1],options);});

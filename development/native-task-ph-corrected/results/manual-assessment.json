@@ -1,0 +1,40 @@
+[
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "P",
+    "completePatchAcceptable": false,
+    "requestedBehavior": "Exact full layout migration passes existing independent acceptance case; supplemental fresh-process preparation/reload/installed CLI passes.",
+    "deliveredRegression": "Adds repeat preparation through query-string imports in the same process with a prewritten marker; missing unmarked migration and fresh-process reload coverage.",
+    "preservation": "Ordinary and preserved runtime suites pass. Frozen rejection test rejects at lib rather than the expected leaf; subsequent byte/mode assertions in that test are not reached. No claim of full rejection coverage.",
+    "frozenEvaluatorLimitations": [
+      "Reload fixture supplies only two legacy files and incorrectly expects acceptance under an exact-full-layout contract. Failure is retained, not evidence of a required acceptance defect.",
+      "Rejection test requires a leaf error message although rejection occurs at the parent; later unchanged-state assertions do not execute."
+    ]
+  },
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "H",
+    "completePatchAcceptable": false,
+    "requestedBehavior": "Fails full exact-layout migration in both frozen independent migration case and supplemental fresh-process test. Directory nlink is still required to equal 1 in recognizedLegacyRuntimePaths.",
+    "deliveredRegression": "Adds a premarked layout test and repeat import/installHooks in one process; bypasses unmarked migration and does not provide a fresh-process reload regression.",
+    "preservation": "Ordinary and preserved runtime suites pass; same frozen rejection-message mismatch and partial-layout reload mismatch as P.",
+    "workflow": "No correction; successful supported checks but three host-rejected parallel Git calls remain unresolved limits."
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "completePatchAcceptable": false,
+    "requestedBehavior": "Independent revoked 401 and 403 examples pass; delivered reconnect suite still fails with invalid protocol response.",
+    "deliveredRegression": "Retains the disconnected block after revoked pairing without restoring its initial retired mapping; execution fails before completing that scenario.",
+    "preservation": "Five independent lifecycle/source/ownership checks pass. Static contract regression in disableLocalConnection: removeConfig rejection becomes a warning count instead of propagating, while callers can report authorization removed and proceed to pairing. This failure-injection path was not executed by frozen tests.",
+    "corrections": "D1 changes indentation only; D2 equals D1; two unchanged substantive outcomes stop the loop. No complete-patch improvement."
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "P",
+    "completePatchAcceptable": false,
+    "requestedBehavior": "All frozen scoped checks pass, including independent revoked 401/403 and five lifecycle checks.",
+    "deliveredRegression": "Disconnected block follows successful revoked pairing with only the active mapping; fixture now omits the retired mapping when not requested. Independent initial disconnected state was not restored, so the green test no longer exercises retiring the unavailable source.",
+    "preservation": "Same static authorization-removal error swallowing as H; passing scoped tests do not establish this failure path or complete delivery."
+  }
+]

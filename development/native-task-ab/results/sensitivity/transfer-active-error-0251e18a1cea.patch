@@ -1,0 +1,38 @@
+--- a/index.js
++++ b/index.js
+@@ -90,6 +90,7 @@
+ pDebounce.promise = (function_, options = {}) => {
+ 	let currentPromise;
+ 	let queuedCall;
++	let clearedOnce = false;
+ 
+ 	const clearQueue = reason => {
+ 		if (!queuedCall) {
+@@ -97,6 +98,7 @@
+ 		}
+ 
+ 		const {resolvers} = queuedCall;
++		clearedOnce = true;
+ 		queuedCall = undefined;
+ 
+ 		const rejectionReason = reason === undefined ? new Error('The queue was cleared') : reason;
+@@ -136,7 +138,7 @@
+ 				result = await function_.apply(this, arguments_);
+ 			} catch (error) {
+ 				initialError = error;
+-				didReject = true;
++				didReject = !clearedOnce;
+ 			}
+ 
+ 			// Process queued calls regardless of initial result
+@@ -151,8 +153,8 @@
+ 						resolve(queuedResult);
+ 					}
+ 				} catch (error) {
+-					for (const {reject} of call.resolvers) {
+-						reject(error);
++					for (const {resolve, reject} of call.resolvers) {
++						if (clearedOnce) resolve(undefined); else reject(error);
+ 					}
+ 				}
+ 			}

@@ -1,0 +1,148 @@
+{
+  "id": "26ece8019a92",
+  "task": "fastq-on-idle",
+  "project": "fastq",
+  "Q": 0,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "patchApplicable": true,
+  "sourcePatchSha256": "b520cc5bde2ef64720361891538272ae95861d9a4e3d1160713768435cdcc588",
+  "decision": "Full delivery does not satisfy the frozen rubric.",
+  "findings": [
+    {
+      "category": "behavior-defect",
+      "reason": "A subscribed waiter misses the real idle transition caused by kill if unrelated work starts before nextTick; the public-path probe fails while alternative and both controls pass."
+    },
+    {
+      "category": "required-coverage-loss",
+      "reason": "Underlying delivered runtime tests pass with early resolution after kill/killAndDrain while workers remain active. Both control suites fail the same mutation."
+    }
+  ],
+  "contentReview": {
+    "id": "26ece8019a92",
+    "task": "fastq-on-idle",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete",
+    "retainedTestsReview": "Existing regression cases remain unchanged.",
+    "behaviorReview": "Resolvers are independent and drain identity is retained; resolveIdle checks idle then defers and rechecks on process.nextTick. Potential contract issue: a waiter can miss an actual idle transition if unrelated new work is queued before nextTick; the frozen wording says resolve once queue reaches idle. Needs isolated public-path confirmation, not a new runtime-grader edit.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": "pending sensitivity",
+        "evidence": "Callback tests check subscriber flags synchronously after worker completion, then finish remaining work in same stack. Promise variant awaits immediate but never asserts the original subscribers are still pending. These observations may not distinguish early resolution."
+      },
+      {
+        "scenario": 2,
+        "covered": "pending sensitivity",
+        "evidence": "Drain identity/count and reentrant running work asserted, but resolved flag checked synchronously and second worker finished before yielding to Promise reactions."
+      },
+      {
+        "scenario": 3,
+        "covered": "partial",
+        "evidence": "Kill waits checked synchronously before immediately finishing worker. killAndDrain clears paused-only work then new unrelated work is started before its deferred check. Abort with active work gets an actual setImmediate gap. No isolated already-idle abort or active killAndDrain pending observation."
+      }
+    ],
+    "typesReview": "onIdle(): Promise<void> in shared interface; existing consumer calls callback method and awaits promise-queue method.",
+    "docsReview": "README covers independent subscriptions, empty and paused states.",
+    "contentFindings": [
+      {
+        "category": "required-coverage-loss",
+        "requirement": "Waiters must remain pending while running work exists after kill/killAndDrain.",
+        "evidence": "Test checks settled synchronously and completes running worker before Promise callbacks could run.",
+        "confirmationPending": "Independent targeted early-resolution test sensitivity, applied equally to all onIdle patches."
+      },
+      {
+        "category": "behavior-candidate",
+        "requirement": "Every subscription resolves once queue reaches idle after synchronous callbacks.",
+        "evidence": "resolveIdle process.nextTick recheck can postpone a waiter past an actual idle transition; test explicitly starts later work before this recheck.",
+        "confirmationPending": "Public sequence: paused pending task, subscribe, kill reaches idle, start separate blocked work, give event loop a turn and observe first waiter without completing new work."
+      }
+    ],
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "26ece8019a92",
+    "task": "fastq-on-idle",
+    "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "b520cc5bde2ef64720361891538272ae95861d9a4e3d1160713768435cdcc588",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 12,
+  "arm": "P",
+  "D": 0,
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "normalHandoff": true,
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "finalResponseSha256": "61b6859d2e81f1558e8ccb8b0bd337da9c3765f4a601524227402f58ea93852e",
+    "finalResponseExcerpt": "Implemented `onIdle(): Promise<void>` for callback and Promise queues.\n\n- Independent subscriptions resolve only when running and queued work are both empty.\n- Handles pause/resume, kill, killAndDrain, abort, errors, reentrant drain callbacks, and concurrent workers.\n- Preserves `drain` identity and behavior.\n- Added TypeScript declarations, regression tests, and README documentation.\n\nChecks passed:\n\n- `npm test`\n- `npm run typescript`\n- `git diff --check`",
+    "reportFindings": [
+      {
+        "category": "overstated-author-behavior",
+        "evidence": "Author says independent subscriptions handle kill and idle transitions; the post-start public API probe proves a reached idle state can be missed before later independent work starts."
+      }
+    ]
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 5114,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "supplemental/early-kill-test-sensitivity/result.json",
+      "exit": 0,
+      "elapsedMs": 2717,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "",
+      "fullLocalOutputSha256": "2013102233c5eba0a8ce7ebdb186a9708ead378d6bf49bd24b60c07c01fed85d"
+    },
+    {
+      "artifact": "supplemental/idle-transition/result.json",
+      "exit": 1,
+      "elapsedMs": 2614,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "{\"idleTransitionObserved\":true,\"oldSubscriptionResolvedBeforeLaterWorkFinished\":false}\nAssertionError [ERR_ASSERTION]: The subscription must observe the already-reached idle state, not wait for later independent work\n\nfalse !== true\n\n    at /work/repo/.supplemental.cjs:3:448\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n{\"idleTransitionObserved\":true,\"oldSubscriptionResolvedBeforeLaterWorkFinished\":false}\nAssertionError [ERR_ASSERTION]: The subscription must observe the already-reached idle state, not wait for later independent work\n\nfalse !== true\n\n    at /work/repo/.supplemental.cjs:3:448\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,",
+      "fullLocalOutputSha256": "8bd3033d9d2cdf1e591eeac2120febe280737f5fe509056f807bc80281ce7c6b"
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 0,
+      "elapsedMs": 1791,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "retrieved_utc_date": "2026-09-18",
+  "evaluator_revision": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+  "submission_revision": "e7062f4a848ca7775bc1c1313f7aa419bd6a3ec1",
+  "files": {
+    "submission-README.md": "2460dcef7d012d381762a36c0200d4f489045033d5b7244632b33996e693a073",
+    "submission-tree.json": "80539942645b36e4b44729b7e00ea291dfda6bb776cd07eb0cb2364399d4b3cb",
+    "example-predictions.jsonl": "6cf2eeb977feda2f0aeba09d1167678d3652f380c1ca4805183539dfd3c1d63a",
+    "patch-issues.json": "282eef4d8c095ec2e8ae75755d032f289e57b40223cac5aa8da43edebd8bbb8c",
+    "issue14.json": "fb41f3585157041e7691d887af9563756d16980c3dda75779d8de9b1079aa58e",
+    "issue14-comments.json": "42d21a1d53f558a4aa1915555b1b3915becc402cfaa3ad0e62b2cad71c23acfe"
+  },
+  "bounded_issue_search": {
+    "query": "repo:amazon-science/SWE-PolyBench \"patch\"",
+    "returned": 12,
+    "examined_rule_thread": 14
+  },
+  "example": {
+    "path": "evaluation/PBVerified/20251130_prometheus_gpt-5/all_preds.jsonl",
+    "rows": 372,
+    "test_like_path_examples": [
+      {
+        "instance_id": "mrdoob__three.js-14836",
+        "paths": [
+          "test/unit/src/math/Box3.tests.js"
+        ],
+        "patch_sha256": "61a4a065522950255d80303a2c207487f4f88c01ea1f826b73c8037669017823"
+      },
+      {
+        "instance_id": "serverless__serverless-6534",
+        "paths": [
+          "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+        ],
+        "patch_sha256": "a977cec227088035809c36bb494e89be90af40c529a2d76fb6b537ee6562e19f"
+      },
+      {
+        "instance_id": "trinodb__trino-3599",
+        "paths": [
+          "presto-main/src/test/java/io/prestosql/operator/scalar/TestStringFunctions.java"
+        ],
+        "patch_sha256": "47f6aec6b6794700baeefa16c875224989c57ef511e698726dbf353f181a61a4"
+      },
+      {
+        "instance_id": "mui__material-ui-18683",
+        "paths": [
+          "packages/material-ui/src/useMediaQuery/useMediaQuery.test.js"
+        ],
+        "patch_sha256": "ebcc137053e72f3d9ea2cdb9335ac36a32a1a5f227c0708bf95683f81e622fd0"
+      }
+    ]
+  },
+  "upstream_files": {
+    "README.md": "bf5b35a7dc13ccb07de985fad7c523d7050270dd17e62f9b5974cfc9044316d8",
+    "src/poly_bench_evaluation/run_evaluation.py": "0e936bea91d3e5ee3bdb244fc7d9a198fee1a317e319ff90e3d54eed4694b941",
+    "src/poly_bench_evaluation/docker_utils.py": "0b4d763b063b306be0ff1f348740a3bcdfd8b60457bb94a6e5bf400d6056344c",
+    "src/poly_bench_evaluation/polybench_data.py": "7849a1989af5dc391c43ae488ae5efee9120fe58f2a1484bbb65d6ff63836635"
+  }
+}

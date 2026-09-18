@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/board-core.mjs": "function validate(board,from,to){\n const rows=board.length,cols=board[0].length;\n for(const point of [from,to])if(!Array.isArray(point)||point.length!==2||(!Number.isInteger(point[0])||!Number.isInteger(point[1]))||point[0]<0||point[0]>=rows||point[1]<0||point[1]>=cols)throw new RangeError('coordinate');\n if(board[from[0]][from[1]]===null)throw new Error('empty source');\n if(from[0]===to[0]&&from[1]===to[1])return;\n if(board[to[0]][to[1]]!==null)throw new Error('occupied target');\n}\nexport function movedBoard(board,from,to){\n validate(board,from,to);return Array.from(board,(row,r)=>Array.from(row,(cell,c)=>r===to[0]&&c===to[1]?board[from[0]][from[1]]:r===from[0]&&c===from[1]?null:cell));\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "payload-deep-clone",
+      "file": "src/board-core.mjs",
+      "replacement": "function validate(board,from,to){\n const rows=board.length,cols=board[0].length;\n for(const point of [from,to])if(!Array.isArray(point)||point.length!==2||(!Number.isInteger(point[0])||!Number.isInteger(point[1]))||point[0]<0||point[0]>=rows||point[1]<0||point[1]>=cols)throw new RangeError('coordinate');\n if(board[from[0]][from[1]]===null)throw new Error('empty source');\n if(from[0]===to[0]&&from[1]===to[1])return;\n if(board[to[0]][to[1]]!==null)throw new Error('occupied target');\n}\nexport function movedBoard(board,from,to){\n validate(board,from,to);const result=structuredClone(board);\n if(from[0]!==to[0]||from[1]!==to[1]){result[to[0]][to[1]]=result[from[0]][from[1]];result[from[0]][from[1]]=null;}\n return result;\n}\n"
+    },
+    {
+      "name": "wrapper-replaces-rows",
+      "file": "src/board.mjs",
+      "replacement": "import {movedBoard} from './board-core.mjs';\nexport function moveInPlace(board,from,to){\n const result=movedBoard(board,from,to);\n for(let row=0;row<board.length;row++)board[row]=result[row];\n return board;\n}\n"
+    }
+  ]
+}

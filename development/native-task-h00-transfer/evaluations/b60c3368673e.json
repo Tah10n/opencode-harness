@@ -1,0 +1,139 @@
+{
+  "id": "b60c3368673e",
+  "task": "denque-remove-where",
+  "project": "denque",
+  "Q": 0,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "patchApplicable": true,
+  "sourcePatchSha256": "0f1165236f206a77143b9592e84fd3131285139b29b17cf22f4222ce47cf0832",
+  "decision": "Full delivery does not satisfy the frozen rubric.",
+  "findings": [
+    {
+      "category": "required-coverage-loss",
+      "reason": "Delivered suite passes with configured capacity removed after filtering. Both control suites detect this specified error."
+    }
+  ],
+  "contentReview": {
+    "id": "b60c3368673e",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete",
+    "retainedTestsReview": "Existing regression cases remain unchanged.",
+    "task": "denque-remove-where",
+    "behaviorReview": "Evaluates predicates over original logical slots, then compacts only after successful evaluation. Logical forward compaction is safe with wrapped physical indexes. Error identity, references and capacity are retained by inspection. Runtime confirmation pending.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Exact original values/indexes plus mixed/none/all removal counts and survivor arrays."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "First predicate returns true and later throws same Error, with unchanged original sequence; invalid predicate rejected on empty."
+      },
+      {
+        "scenario": 3,
+        "covered": "partial",
+        "evidence": "Wrapped queue explicitly asserts [null,0,false,0,marker] before filtering, count 4 and strict marker identity after. Storage length/mask checked, then unshift/push to length 3; configured capacity 5 is never exercised after filtering."
+      }
+    ],
+    "typesReview": "Public predicate signature with generic T, index and truthy result, plus existing type fixture using string.length and index.",
+    "docsReview": "API docs cover original traversal, atomic error handling, truthy removal and count. README example is brief.",
+    "contentFindings": [
+      {
+        "category": "required-coverage-loss",
+        "requirement": "Preserve configured capacity after filtering in required delivered regression.",
+        "evidence": "Checks backing list length and mask, but not configured cap; all post-filter operations stay below capacity 5.",
+        "impact": "Clearing configured capacity during removeWhere would leave this scenario passing.",
+        "confirmationPending": "Narrow test-sensitivity check in independent copy after scored execution."
+      }
+    ],
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "b60c3368673e",
+    "task": "denque-remove-where",
+    "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "0f1165236f206a77143b9592e84fd3131285139b29b17cf22f4222ce47cf0832",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 3,
+  "arm": "H00",
+  "D": 0,
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "normalHandoff": true,
+    "workflowStatus": "incomplete",
+    "terminalPatchVerification": {
+      "slot": 3,
+      "id": "b60c3368673e",
+      "terminalPatchSha256": "d63c45a534a821b698b4ff5c4d92043e52c6331380de9c2169f4de46e208ed25",
+      "terminalPatchEqualsApplicableSourcePatch": false,
+      "ordinaryAppliedCopyReverseCheckExit": 0,
+      "diagnostic": "",
+      "nativeHandoffNamesDeliveryAndPatch": true,
+      "ordinaryCleanSourceForwardApplyExit": 0,
+      "terminalPatchDeliversAllAuthorBytesAndModes": true
+    },
+    "finalResponseSha256": "fdcc2f9d8d0d73b74a9087a4f4f4a7f5a933b6bc1f17a2ecff62d08f42ddafc9",
+    "finalResponseExcerpt": "Native task workflow: incomplete.\nDelivery worktree: /work/repo/.git/harness-task/a6fde533-074a-4113-8d4e-ba9cd7bea8b2/worktree.\nTerminal patch: /work/repo/.git/harness-task/a6fde533-074a-4113-8d4e-ba9cd7bea8b2/terminal.patch.\nFull report and tool outputs: /work/repo/.git/harness-task/a6fde533-074a-4113-8d4e-ba9cd7bea8b2.\nOriginal checkout unchanged by workflow transfer.",
+    "reportFindings": [
+      {
+        "category": "misleading-workflow-report",
+        "evidence": "Normal final response lists successful project commands but says No observed relevant project test/check and Executable project verification unavailable or not observed. Delivery worktree and terminal patch are correctly named and usable; this contradiction does not alone remove D."
+      }
+    ]
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 1539,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 0,
+      "elapsedMs": 630,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "test-sensitivity/result.json",
+      "exit": 0,
+      "elapsedMs": 1558,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "\n  55 passing (199ms)\n\n=============================================================================\nWriting coverage object [/work/repo/coverage/coverage.json]\nWriting coverage reports at [/work/repo/coverage]\n=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 99.33% ( 296/298 )",
+      "fullLocalOutputSha256": "abb2904f068b28174fdad0cc93d71f90c365afd0e4084b11542ce31010605619"
+    }
+  ]
+}

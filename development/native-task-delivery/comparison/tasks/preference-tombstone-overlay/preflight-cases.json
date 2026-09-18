@@ -1,0 +1,12 @@
+{
+  "alternative": {
+    "src/preferences.mjs": "export function overlay(defaults,patch){const out=JSON.parse(JSON.stringify(defaults));for(const key of Object.keys(patch)){if(patch[key]===null)delete out[key];else Object.defineProperty(out,key,{value:JSON.parse(JSON.stringify(patch[key])),enumerable:true,writable:true,configurable:true});}return out;}export function compose(first,second){const out=JSON.parse(JSON.stringify(first));for(const key of Object.keys(second))Object.defineProperty(out,key,{value:JSON.parse(JSON.stringify(second[key])),enumerable:true,writable:true,configurable:true});return out;}"
+  },
+  "mutants": [
+    {
+      "name": "drop-tombstone-during-compose",
+      "file": "src/preferences.mjs",
+      "replacement": "export function overlay(defaults,patch){const out=structuredClone(defaults);for(const key of Object.keys(patch)){if(patch[key]===null)delete out[key];else Object.defineProperty(out,key,{value:structuredClone(patch[key]),enumerable:true,writable:true,configurable:true});}return out;}export function compose(first,second){const out=structuredClone(first);for(const key of Object.keys(second).filter(k=>second[k]!==null))Object.defineProperty(out,key,{value:structuredClone(second[key]),enumerable:true,writable:true,configurable:true});return out;}"
+    }
+  ]
+}

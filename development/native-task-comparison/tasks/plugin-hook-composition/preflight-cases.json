@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/hooks.mjs": "import {orderHooks} from './order.mjs';export async function runHooks(hooks,input){let state={value:input,trace:[],stopped:false};for(const h of orderHooks(hooks)){const r=await h.run(state.value);state={value:r.value,trace:state.trace.concat(h.id),stopped:r.stop===true};if(state.stopped)break;}return state;}\n"
+  },
+  "mutants": [
+    {
+      "name": "ignore-stop",
+      "file": "src/hooks.mjs",
+      "replacement": "import {orderHooks} from './order.mjs';export async function runHooks(hooks,input){const ordered=orderHooks(hooks),trace=[];let value=input;for(const h of ordered){const result=await h.run(value);trace.push(h.id);value=result.value;if(false)return {value,trace,stopped:true};}return {value,trace,stopped:false};}\n"
+    },
+    {
+      "name": "input-order-only",
+      "file": "src/order.mjs",
+      "replacement": "export function orderHooks(hooks){return [...hooks];}\n"
+    }
+  ]
+}

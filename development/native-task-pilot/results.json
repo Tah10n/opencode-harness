@@ -1,0 +1,1267 @@
+{
+  "candidateCommit": "0f23e03cb1594987a6ae8ac61f7e9f699e8662bc",
+  "freezeCommit": "ce7a4c4",
+  "taskRuns": 12,
+  "retries": 0,
+  "model": "openai/gpt-5.6-luna",
+  "variant": "low",
+  "budgetMs": 900000,
+  "totals": {
+    "A": {
+      "completeDeliveries": 5,
+      "tasks": 6,
+      "elapsedMs": 553588,
+      "requests": 86,
+      "toolCalls": 135,
+      "sessions": 6,
+      "usage": {
+        "inputTokens": 754215,
+        "outputTokens": 21539,
+        "cacheReadTokensIncludedInInput": 320000,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 3015,
+        "unknownRequests": 0
+      }
+    },
+    "B": {
+      "completeDeliveries": 4,
+      "tasks": 6,
+      "elapsedMs": 796691,
+      "requests": 117,
+      "toolCalls": 165,
+      "sessions": 18,
+      "usage": {
+        "inputTokens": 1164991,
+        "outputTokens": 31291,
+        "cacheReadTokensIncludedInInput": 297472,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 4825,
+        "unknownRequests": 0
+      }
+    }
+  },
+  "rows": [
+    {
+      "task": "expense-export",
+      "arm": "A",
+      "exitCode": 0,
+      "timedOut": false,
+      "elapsedMs": 95038,
+      "parseErrors": 0,
+      "requests": 15,
+      "requestsWithoutObservedUsage": 0,
+      "toolCalls": 25,
+      "sessions": 1,
+      "workflowStatus": null,
+      "repairs": 0,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Behavior": null,
+      "d0Preservation": null,
+      "usage": {
+        "inputTokens": 131654,
+        "outputTokens": 3665,
+        "cacheReadTokensIncludedInInput": 17920,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 729,
+        "unknownRequests": 0
+      },
+      "requestsByEffort": {
+        "none": 1,
+        "low": 14
+      },
+      "toolsByName": {
+        "todowrite": 4,
+        "glob": 2,
+        "read": 11,
+        "bash": 4,
+        "grep": 1,
+        "apply_patch": 3
+      },
+      "deliveryAssessment": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "originalCoveragePreserved": true,
+        "sourceCriteriaPassed": true,
+        "complete": true,
+        "missing": [],
+        "evidence": "Independent source review: report.test.mjs covers filtering/invalid values, actual CLI selected/empty/invalid; original mixed CSV test retained verbatim. README documents option and integer cents. Acceptance 3/3, preservation 1/1, ordinary 5/5."
+      },
+      "evidenceSha256": {
+        "result.json": "5baf11818b48bd2eafe767e235540e18f8eae20b89a37f88234d9262e374fe36",
+        "behavior-grading.json": "6c40ca48c2a02d5d7b8332141f63199610687711a7d8c30742b56981c2318c27",
+        "native-evidence.json": "11e75bc87eb5ee3d81b1222ebedb49cbe7ab70253667fa4bfe05c84e1079086d",
+        "provider-metadata.json": "a81e2ebcb5f920fce0e139efef4754bc64481a495f6b9aabb5ab62c88775c84d"
+      }
+    },
+    {
+      "task": "expense-export",
+      "arm": "B",
+      "exitCode": 0,
+      "timedOut": false,
+      "elapsedMs": 147508,
+      "parseErrors": 0,
+      "requests": 22,
+      "requestsWithoutObservedUsage": 0,
+      "toolCalls": 33,
+      "sessions": 3,
+      "workflowStatus": "incomplete",
+      "repairs": 0,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "usage": {
+        "inputTokens": 231345,
+        "outputTokens": 5572,
+        "cacheReadTokensIncludedInInput": 61440,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 699,
+        "unknownRequests": 0
+      },
+      "requestsByEffort": {
+        "none": 1,
+        "low": 21
+      },
+      "toolsByName": {
+        "harness_task": 1,
+        "todowrite": 4,
+        "glob": 4,
+        "read": 14,
+        "bash": 5,
+        "grep": 1,
+        "apply_patch": 4
+      },
+      "deliveryAssessment": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "originalCoveragePreserved": true,
+        "sourceCriteriaPassed": true,
+        "complete": true,
+        "missing": [],
+        "initialErrorsFixed": 0,
+        "postReviewRegressions": 0,
+        "evidence": "Independent review: full behavior/tests/docs on D0; D0.patch equals terminal.patch. Workflow incomplete solely because reviewer unverified says no independent command execution beyond supplied native evidence, despite intended reviewer permissions and final npm test evidence."
+      },
+      "evidenceSha256": {
+        "result.json": "471ac428dda2515bdef0bbc5984034fa33e85feda3f4bdf027cb514778b1b8f8",
+        "behavior-grading.json": "2d6e761f435e2f742a3996e0f29eabcb5f430a13f954fd6a66321b8cf253caf6",
+        "native-evidence.json": "6eb69e1d56dee14b34f409b1677733bfc0bb1c9897b3427fc9676718978bc2f8",
+        "provider-metadata.json": "2b0433567fe17bf79a74897357de4d5b36f991e80c8d0178219232842f5638bb"
+      },
+      "d0EqualsFinal": true,
+      "patchSha256": {
+        "D0.patch": "72f291a6479f9e865ffe9457e60e489be0b8f7ef33aa7484cf164444281502a0",
+        "terminal.patch": "72f291a6479f9e865ffe9457e60e489be0b8f7ef33aa7484cf164444281502a0"
+      },
+      "workflowFailure": null,
+      "workflowLimits": [
+        "No independent command execution beyond supplied native evidence."
+      ]
+    },
+    {
+      "task": "catalog-cache",
+      "arm": "B",
+      "exitCode": 0,
+      "timedOut": false,
+      "elapsedMs": 129297,
+      "parseErrors": 0,
+      "requests": 19,
+      "requestsWithoutObservedUsage": 0,
+      "toolCalls": 29,
+      "sessions": 3,
+      "workflowStatus": "incomplete",
+      "repairs": 0,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "usage": {
+        "inputTokens": 182499,
+        "outputTokens": 5291,
+        "cacheReadTokensIncludedInInput": 36864,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 771,
+        "unknownRequests": 0
+      },
+      "requestsByEffort": {
+        "none": 1,
+        "low": 18
+      },
+      "toolsByName": {
+        "harness_task": 1,
+        "todowrite": 4,
+        "glob": 3,
+        "read": 11,
+        "grep": 1,
+        "bash": 7,
+        "apply_patch": 2
+      },
+      "deliveryAssessment": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "originalCoveragePreserved": true,
+        "sourceCriteriaPassed": true,
+        "complete": true,
+        "missing": [],
+        "initialErrorsFixed": 0,
+        "postReviewRegressions": 0,
+        "evidence": "Independent review: handler/body/header/region and escaped-client/304 tests plus legacy tests retained; README return shapes and exact matching. Full on D0; terminal equals D0. Workflow protocol incomplete due reviewer JSON trailing comma. Reviewer requests for extra branch tests do not extend frozen explicit obligations."
+      },
+      "evidenceSha256": {
+        "result.json": "4b77a28dd1d40b4efcd95686a657ad85fefaa519801f6ab7fc91a11bd4db89eb",
+        "behavior-grading.json": "0f0a6d365c16e206540a4e57bc89d67c4266bdd9b00f0d47d7b4965ae08c7fd0",
+        "native-evidence.json": "7cd78e98b93e198f25fdfa775e0b5683a57bb70ab2e2ef354131c621d183246b",
+        "provider-metadata.json": "23dfff94a43bc0fe06096a8aa591025e7522078e1e9b3a2d8b7a4e1eeff33dd1"
+      },
+      "d0EqualsFinal": true,
+      "patchSha256": {
+        "D0.patch": "d1169a0fa1cb334d3b0fe940114c7002a5a55233e55fe114caa089e1956f96d5",
+        "terminal.patch": "d1169a0fa1cb334d3b0fe940114c7002a5a55233e55fe114caa089e1956f96d5"
+      },
+      "workflowFailure": {
+        "category": "workflow_protocol",
+        "message": "Incomplete structured stage output"
+      },
+      "workflowLimits": [
+        "Incomplete structured stage output"
+      ]
+    },
+    {
+      "task": "catalog-cache",
+      "arm": "A",
+      "exitCode": 0,
+      "timedOut": false,
+      "elapsedMs": 91329,
+      "parseErrors": 0,
+      "requests": 14,
+      "requestsWithoutObservedUsage": 0,
+      "toolCalls": 20,
+      "sessions": 1,
+      "workflowStatus": null,
+      "repairs": 0,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Behavior": null,
+      "d0Preservation": null,
+      "usage": {
+        "inputTokens": 120541,
+        "outputTokens": 3354,
+        "cacheReadTokensIncludedInInput": 50688,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 468,
+        "unknownRequests": 0
+      },
+      "requestsByEffort": {
+        "none": 1,
+        "low": 13
+      },
+      "toolsByName": {
+        "todowrite": 4,
+        "glob": 1,
+        "read": 8,
+        "bash": 5,
+        "apply_patch": 2
+      },
+      "deliveryAssessment": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "originalCoveragePreserved": true,
+        "sourceCriteriaPassed": true,
+        "complete": true,
+        "missing": [],
+        "evidence": "Independent review: original legacy/method/path tests retained, actual handler headers/body/filter/nonmutation, empty304, escaped client304/noJSON and client200. README legacy/new shapes/exact matching. Acceptance3/3 preservation2/2 ordinary6/6."
+      },
+      "evidenceSha256": {
+        "result.json": "07c0bb9d2703c2b7e5089d81ae0bd18002df6f138716b065b16bcfc424cb068a",
+        "behavior-grading.json": "22d8b72305161aeccc426a63a94bdc18af1679c2704941558dc2129bbba7bbe1",
+        "native-evidence.json": "e82241e1464dd469e4edf4da45e72f1d1e2c591b23dbd01d30f07e32bd9e3636",
+        "provider-metadata.json": "2e16748638ffb75b161c25ef6fabb0de26f7551ed48ef258a4556ecc4fb7a193"
+      }
+    },
+    {
+      "task": "bookmark-migration",
+      "arm": "A",
+      "exitCode": 0,
+      "timedOut": false,
+      "elapsedMs": 86590,
+      "parseErrors": 0,
+      "requests": 13,
+      "requestsWithoutObservedUsage": 0,
+      "toolCalls": 21,
+      "sessions": 1,
+      "workflowStatus": null,
+      "repairs": 0,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Behavior": null,
+      "d0Preservation": null,
+      "usage": {
+        "inputTokens": 111756,
+        "outputTokens": 3445,
+        "cacheReadTokensIncludedInInput": 40448,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 592,
+        "unknownRequests": 0
+      },
+      "requestsByEffort": {
+        "none": 1,
+        "low": 12
+      },
+      "toolsByName": {
+        "todowrite": 4,
+        "glob": 2,
+        "read": 8,
+        "bash": 4,
+        "grep": 1,
+        "apply_patch": 2
+      },
+      "deliveryAssessment": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "originalCoveragePreserved": true,
+        "sourceCriteriaPassed": true,
+        "complete": true,
+        "missing": [],
+        "evidence": "Independent review: read-only legacy migration duplicates/Unicode/IDs/order/tags/metadata, v2 round-trip/nonmutation, invalid save bytes, validation; original titles test verbatim. README migration metadata and read-only load. Acceptance3/3 preservation1/1 ordinary5/5."
+      },
+      "evidenceSha256": {
+        "result.json": "fb16379cfb646d8c0c018d69df8680b2208fe750df7aac3d4a71cc8f05305c0b",
+        "behavior-grading.json": "6c40ca48c2a02d5d7b8332141f63199610687711a7d8c30742b56981c2318c27",
+        "native-evidence.json": "f8c61fffa6c603681edaaaacadc6e3216bbc37185229ebb2dd7ff51d07463503",
+        "provider-metadata.json": "54b4d0a13fa79ac0e37e65122f6f12a9d7ee91c9dfa2dab88f22413d6d447baa"
+      }
+    },
+    {
+      "task": "bookmark-migration",
+      "arm": "B",
+      "exitCode": 0,
+      "timedOut": false,
+      "elapsedMs": 133013,
+      "parseErrors": 0,
+      "requests": 18,
+      "requestsWithoutObservedUsage": 0,
+      "toolCalls": 25,
+      "sessions": 3,
+      "workflowStatus": "incomplete",
+      "repairs": 0,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "usage": {
+        "inputTokens": 175506,
+        "outputTokens": 5108,
+        "cacheReadTokensIncludedInInput": 50176,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 695,
+        "unknownRequests": 0
+      },
+      "requestsByEffort": {
+        "none": 1,
+        "low": 17
+      },
+      "toolsByName": {
+        "harness_task": 1,
+        "todowrite": 3,
+        "glob": 4,
+        "read": 8,
+        "bash": 7,
+        "apply_patch": 2
+      },
+      "deliveryAssessment": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "originalCoveragePreserved": true,
+        "sourceCriteriaPassed": false,
+        "complete": false,
+        "missing": [
+          "TASK R2: valid v2 bookmark extra fields are dropped by reconstruction in src/schema.mjs:27; valid v2 must be returned without data loss."
+        ],
+        "initialErrors": 1,
+        "initialErrorsFixed": 0,
+        "postReviewRegressions": 0,
+        "evidence": "Independent source review, no added scored checks: acceptance3/3 preservation1/1 ordinary4/4 miss this extra-field case. Reviewer F-001 agrees, but includes production paths in verificationFiles, rejected before reproduction. D0 equals terminal. Explicit tests/docs supplied; reviewer F-002 does not extend frozen requirements.",
+        "nativeReviewerDetectedIndependentGap": true
+      },
+      "evidenceSha256": {
+        "result.json": "9fbb759858a6d3207c41606af0260e55b97ec5e0777849e6e869d478a2222031",
+        "behavior-grading.json": "07f0a3f5e330fbf3bb0a015d2aa7024512e3a3b1c3c655b09e42ccf6e04782b9",
+        "native-evidence.json": "111680301e56b9512aa42e6155ad90946c9204cc8cbc753e1fbcd3fc3ecde0c6",
+        "provider-metadata.json": "70d905bfe8be856377178fbb6552422a3905cc71ea2fb53e2402e9c3022dc530"
+      },
+      "d0EqualsFinal": true,
+      "patchSha256": {
+        "D0.patch": "b7bab952eac29d70e84a02a5261dc2313da47b9dc9b3773bd80360bd5c23baf6",
+        "terminal.patch": "b7bab952eac29d70e84a02a5261dc2313da47b9dc9b3773bd80360bd5c23baf6"
+      },
+      "workflowFailure": {
+        "category": "workflow_protocol",
+        "message": "Reproduction file list includes an unsupported test/document path"
+      },
+      "workflowLimits": [
+        "v2 bookmark-level unknown-field preservation beyond the reviewed implementation path",
+        "load byte preservation for invalid parsed JSON stores",
+        "Filesystem and malformed-JSON error propagation under tests",
+        "Atomic-write failure cleanup and portability",
+        "Reproduction file list includes an unsupported test/document path"
+      ]
+    },
+    {
+      "task": "delivery-outbox",
+      "arm": "B",
+      "exitCode": 0,
+      "timedOut": false,
+      "elapsedMs": 136415,
+      "parseErrors": 0,
+      "requests": 18,
+      "requestsWithoutObservedUsage": 0,
+      "toolCalls": 26,
+      "sessions": 3,
+      "workflowStatus": "reviewed_delivery",
+      "repairs": 0,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "usage": {
+        "inputTokens": 175311,
+        "outputTokens": 5493,
+        "cacheReadTokensIncludedInInput": 36864,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 989,
+        "unknownRequests": 0
+      },
+      "requestsByEffort": {
+        "none": 1,
+        "low": 17
+      },
+      "toolsByName": {
+        "harness_task": 1,
+        "todowrite": 4,
+        "glob": 3,
+        "read": 8,
+        "bash": 8,
+        "apply_patch": 2
+      },
+      "deliveryAssessment": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "originalCoveragePreserved": true,
+        "sourceCriteriaPassed": true,
+        "complete": true,
+        "missing": [],
+        "initialErrorsFixed": 0,
+        "postReviewRegressions": 0,
+        "evidence": "Independent review: legacy migration, mixed ack/reject/mismatch attempts, restart, invalid states, injected rename failure before second send; original flush test retained. README ack ID and per-attempt persistence. Acceptance3/3 preservation1/1 ordinary6/6 D0 and final; identical patches. Native reviewed_delivery."
+      },
+      "evidenceSha256": {
+        "result.json": "897ffc8ce7deb91eb373f967c32a4a80b127a926e9ae2b45597bf9b73435de2d",
+        "behavior-grading.json": "b948338e1fbe5145e9ff8ee47b7aa9820669c60f29fe11c455fc67789e2a9743",
+        "native-evidence.json": "94ecea596fc1c381563ddf4a0dd769732708704c5a80369a981c12529517929c",
+        "provider-metadata.json": "fbd6f47748be1412a6c92a644ddb1dc982f2e1e534acbde84ae0825b268f1fea"
+      },
+      "d0EqualsFinal": true,
+      "patchSha256": {
+        "D0.patch": "1457c4c6f0ff89152867910cd2e4cfb98dbd35c984ab71c96a7c42fdcd1c299b",
+        "terminal.patch": "1457c4c6f0ff89152867910cd2e4cfb98dbd35c984ab71c96a7c42fdcd1c299b"
+      },
+      "workflowFailure": null,
+      "workflowLimits": []
+    },
+    {
+      "task": "delivery-outbox",
+      "arm": "A",
+      "exitCode": 0,
+      "timedOut": false,
+      "elapsedMs": 112664,
+      "parseErrors": 0,
+      "requests": 15,
+      "requestsWithoutObservedUsage": 0,
+      "toolCalls": 23,
+      "sessions": 1,
+      "workflowStatus": null,
+      "repairs": 0,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Behavior": null,
+      "d0Preservation": null,
+      "usage": {
+        "inputTokens": 135494,
+        "outputTokens": 4767,
+        "cacheReadTokensIncludedInInput": 74752,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 417,
+        "unknownRequests": 0
+      },
+      "requestsByEffort": {
+        "none": 1,
+        "low": 14
+      },
+      "toolsByName": {
+        "todowrite": 3,
+        "glob": 3,
+        "read": 9,
+        "bash": 4,
+        "grep": 1,
+        "apply_patch": 3
+      },
+      "deliveryAssessment": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "originalCoveragePreserved": true,
+        "sourceCriteriaPassed": true,
+        "complete": true,
+        "missing": [],
+        "evidence": "Independent review: original ordered successful delivery assertions retained; mixed ack/reject/mismatch, restart, legacy read-only, invalid states, persistence failure before second send. README exact ack/per-attempt atomic persistence. Acceptance3/3 preservation1/1 ordinary6/6."
+      },
+      "evidenceSha256": {
+        "result.json": "6baa3517b33ff56431b61996920f07d4cdf71ea670d92b9e00d4b41606daebdd",
+        "behavior-grading.json": "f53a5b6aef2749bea8f11e971e72a89e18ee358db5a2cc349e7d71e8b6ab0d90",
+        "native-evidence.json": "a5433e803ff6e68b09f80c9d5ab6203f983b7f0dfdfaf0be6a3264894cb1b9d9",
+        "provider-metadata.json": "56bf1ea6eb2b8bb11f1941360dfe0413a5b3b6b3c355648aadafa00d1cd4fceb"
+      }
+    },
+    {
+      "task": "dual-config",
+      "arm": "A",
+      "exitCode": 0,
+      "timedOut": false,
+      "elapsedMs": 79111,
+      "parseErrors": 0,
+      "requests": 14,
+      "requestsWithoutObservedUsage": 0,
+      "toolCalls": 23,
+      "sessions": 1,
+      "workflowStatus": null,
+      "repairs": 0,
+      "behavior": {
+        "exitCode": 1,
+        "counts": {
+          "tests": 2,
+          "pass": 1,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": false
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Behavior": null,
+      "d0Preservation": null,
+      "usage": {
+        "inputTokens": 115551,
+        "outputTokens": 2954,
+        "cacheReadTokensIncludedInInput": 58880,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 303,
+        "unknownRequests": 0
+      },
+      "requestsByEffort": {
+        "none": 1,
+        "low": 13
+      },
+      "toolsByName": {
+        "todowrite": 4,
+        "glob": 2,
+        "read": 9,
+        "bash": 5,
+        "grep": 1,
+        "apply_patch": 2
+      },
+      "deliveryAssessment": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "originalCoveragePreserved": true,
+        "sourceCriteriaPassed": false,
+        "complete": false,
+        "missing": [
+          "R2: supplied indent:undefined is accepted as omitted; nonnumeric supplied indent must throw TypeError."
+        ],
+        "evidence": "Independent acceptance1/2 missing expected TypeError; preservation1/1 ordinary3/3. Shared normalizer and explicit tests/docs delivered."
+      },
+      "evidenceSha256": {
+        "result.json": "95db67d0dae1a961d71a11c8cb4472fd96ef10073caca5df659a4de45223760f",
+        "behavior-grading.json": "318af262339d365024e9b77853385b513c794324b51ed898e5cb9ec4b91e4402",
+        "native-evidence.json": "8d529f79aea7dd8317806933db3ca3c30362bdfda07f73068fafc459bb6e4d73",
+        "provider-metadata.json": "2b0e3968a864cb66c2dbe6b9cf96a8e373c3762633aecc3b8e9aefce1024ffb7"
+      }
+    },
+    {
+      "task": "dual-config",
+      "arm": "B",
+      "exitCode": 0,
+      "timedOut": false,
+      "elapsedMs": 123869,
+      "parseErrors": 0,
+      "requests": 20,
+      "requestsWithoutObservedUsage": 0,
+      "toolCalls": 25,
+      "sessions": 3,
+      "workflowStatus": "incomplete",
+      "repairs": 0,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "usage": {
+        "inputTokens": 206800,
+        "outputTokens": 4881,
+        "cacheReadTokensIncludedInInput": 46592,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 774,
+        "unknownRequests": 0
+      },
+      "requestsByEffort": {
+        "none": 1,
+        "low": 19
+      },
+      "toolsByName": {
+        "harness_task": 1,
+        "todowrite": 4,
+        "glob": 2,
+        "read": 9,
+        "bash": 6,
+        "apply_patch": 3
+      },
+      "deliveryAssessment": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "originalCoveragePreserved": true,
+        "sourceCriteriaPassed": true,
+        "complete": true,
+        "missing": [],
+        "initialErrorsFixed": 0,
+        "postReviewRegressions": 0,
+        "evidence": "Independent review: acceptance2/2 preservation1/1 ordinary3/3; shared normalization, required tests/docs. D0 equals terminal. Internal protocol error Missing stage field: reproduction."
+      },
+      "evidenceSha256": {
+        "result.json": "4f1ded00febd1cf66935f1fdbbd82efe6e16c69addfafe3460955f8acdb6bdf7",
+        "behavior-grading.json": "c63208c865e306764807679c75bc9da21580e00d4238bc3e0ed4a69ed4d437c9",
+        "native-evidence.json": "a8566f8c0b5051a5d8e242f200e488060e37480e8162b11c23a476b18d9f85a1",
+        "provider-metadata.json": "042ffd74cc8f5cebd26827a31719945a9917bab54a2ccaa4197475060ff4407d"
+      },
+      "d0EqualsFinal": true,
+      "patchSha256": {
+        "D0.patch": "e780decc7fe719c5be30a7a75e15e3883a2b3ef0d80e353305c1c9635afaf8c9",
+        "terminal.patch": "e780decc7fe719c5be30a7a75e15e3883a2b3ef0d80e353305c1c9635afaf8c9"
+      },
+      "workflowFailure": {
+        "category": "workflow_protocol",
+        "message": "Missing stage field: reproduction"
+      },
+      "workflowLimits": [
+        "Missing stage field: reproduction"
+      ]
+    },
+    {
+      "task": "lazy-pagination",
+      "arm": "B",
+      "exitCode": 0,
+      "timedOut": false,
+      "elapsedMs": 126589,
+      "parseErrors": 0,
+      "requests": 20,
+      "requestsWithoutObservedUsage": 0,
+      "toolCalls": 27,
+      "sessions": 3,
+      "workflowStatus": "incomplete",
+      "repairs": 0,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "usage": {
+        "inputTokens": 193530,
+        "outputTokens": 4946,
+        "cacheReadTokensIncludedInInput": 65536,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 897,
+        "unknownRequests": 0
+      },
+      "requestsByEffort": {
+        "none": 1,
+        "low": 19
+      },
+      "toolsByName": {
+        "harness_task": 1,
+        "todowrite": 3,
+        "glob": 5,
+        "read": 9,
+        "bash": 7,
+        "apply_patch": 2
+      },
+      "deliveryAssessment": {
+        "testsDelivered": false,
+        "docsDelivered": true,
+        "originalCoveragePreserved": true,
+        "sourceCriteriaPassed": true,
+        "complete": false,
+        "missing": [
+          "R5: no project test demonstrates successful continuation across an empty intermediate page; sole empty-page scenario immediately repeats a cursor and rejects."
+        ],
+        "initialErrors": 1,
+        "initialErrorsFixed": 0,
+        "postReviewRegressions": 0,
+        "evidence": "Independent review: acceptance4/4 preservation1/1 ordinary5/5, source behavior passes; required empty intermediate-page test missing. D0 equals terminal. VerificationFiles rejected before repair.",
+        "nativeReviewerDetectedIndependentGap": false
+      },
+      "evidenceSha256": {
+        "result.json": "8e9f13fec8b1dcbc87d5db8580a8109d0dabfd4a62ddbb72a17051b259930fa8",
+        "behavior-grading.json": "6b75a2052de6aeca962527eb715870c3a783b85cffb525a374ca1cdc18c8df23",
+        "native-evidence.json": "3fa17b82c7d6147e40d5c0c72f54184a76aa3a55c2981dcef9f6ac7606f22970",
+        "provider-metadata.json": "b4a592d94fff78ff3a46074f5f3618195004d6ea6874971998ec7061e02100fc"
+      },
+      "d0EqualsFinal": true,
+      "patchSha256": {
+        "D0.patch": "dbd1c44aa964bf539ded748a2db91ef47e817a2af85a9095ff93af5790adb0c5",
+        "terminal.patch": "dbd1c44aa964bf539ded748a2db91ef47e817a2af85a9095ff93af5790adb0c5"
+      },
+      "workflowFailure": {
+        "category": "workflow_protocol",
+        "message": "Reproduction file list includes an unsupported test/document path"
+      },
+      "workflowLimits": [
+        "Behavior when the signal is already aborted before first advancement.",
+        "AbortError fallback when an aborted signal has no reason.",
+        "Cancellation through listItems and exportNames.",
+        "Non-mutation of response objects and item arrays.",
+        "Reproduction file list includes an unsupported test/document path"
+      ]
+    },
+    {
+      "task": "lazy-pagination",
+      "arm": "A",
+      "exitCode": 0,
+      "timedOut": false,
+      "elapsedMs": 88856,
+      "parseErrors": 0,
+      "requests": 15,
+      "requestsWithoutObservedUsage": 0,
+      "toolCalls": 23,
+      "sessions": 1,
+      "workflowStatus": null,
+      "repairs": 0,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 7,
+          "pass": 7,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "d0Behavior": null,
+      "d0Preservation": null,
+      "usage": {
+        "inputTokens": 139219,
+        "outputTokens": 3354,
+        "cacheReadTokensIncludedInInput": 77312,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 506,
+        "unknownRequests": 0
+      },
+      "requestsByEffort": {
+        "none": 1,
+        "low": 14
+      },
+      "toolsByName": {
+        "todowrite": 4,
+        "glob": 2,
+        "read": 6,
+        "bash": 8,
+        "apply_patch": 3
+      },
+      "deliveryAssessment": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "originalCoveragePreserved": true,
+        "sourceCriteriaPassed": true,
+        "complete": true,
+        "missing": [],
+        "evidence": "Independent review: acceptance4/4 preservation1/1 ordinary7/7; explicit lazy/early-break, empty page continuation, repeated cursor, signals and consumers tests/docs."
+      },
+      "evidenceSha256": {
+        "result.json": "7a3b5966ffb287c15068809bbf13cc56db1c1ee6bda5b34deddb9a88ea18de67",
+        "behavior-grading.json": "361d4bde51eeada81b00a7f7b066a87304bc48917aa70caf186abf499c197cc3",
+        "native-evidence.json": "2a8080bd695d8ab95c2611a90b4cd1892b9bbd3c4d196e52feb73b78819b4495",
+        "provider-metadata.json": "ad351e2bddb09f9c36af93095d872bb1815a333fcaf1bca41675caf568d1db55"
+      }
+    }
+  ]
+}

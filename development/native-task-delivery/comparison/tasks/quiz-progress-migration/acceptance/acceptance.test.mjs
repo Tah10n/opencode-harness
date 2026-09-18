@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';const root=process.env.PILOT_SOURCE;
+const m0=await import(path.join(root,"src/progress.mjs"));
+test("v1 migration through codec keeps extras",()=>{const v={version:1,answered:['b','a'],meta:{theme:'dark'}};assert.deepEqual(m0.decode(m0.encode(v)),{version:2,answers:[{id:'b',order:0},{id:'a',order:1}],meta:{theme:'dark'}});assert.equal(v.version,1);});
+test("v2 order and deep ownership",()=>{const v={version:2,answers:[{id:'z',order:9}],meta:{items:[1]}};const a=m0.migrate(v);assert.deepEqual(a,v);a.meta.items.push(2);a.answers[0].order=0;assert.equal(v.answers[0].order,9);assert.deepEqual(v.meta.items,[1]);});
+test("version and parse failures",()=>{assert.throws(()=>m0.migrate({version:3}),{name:'RangeError',message:'version'});assert.throws(()=>m0.decode('{'),SyntaxError);assert.deepEqual(m0.migrate({version:1,answered:[]}),{version:2,answers:[]});});

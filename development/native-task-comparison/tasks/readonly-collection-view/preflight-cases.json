@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/view.mjs": "class ReadOnlyMap{\n #source;\n constructor(source){this.#source=source;Object.freeze(this);}\n get size(){return this.#source.size;}\n get(key){return this.#source.get(key);}\n has(key){return this.#source.has(key);}\n keys(){return this.#source.keys();}\n values(){return this.#source.values();}\n entries(){return this.#source.entries();}\n [Symbol.iterator](){return this.entries();}\n forEach(callback,thisArg){for(const [key,value]of this.#source)Reflect.apply(callback,thisArg,[value,key,this]);}\n set(){throw new TypeError('read-only');}\n delete(){throw new TypeError('read-only');}\n clear(){throw new TypeError('read-only');}\n}\nexport function viewMap(source){if(!(source instanceof Map))throw new TypeError('Map source');return new ReadOnlyMap(source);}\n"
+  },
+  "mutants": [
+    {
+      "name": "snapshot-not-live",
+      "file": "src/view.mjs",
+      "replacement": "export function viewMap(source){\n if(!(source instanceof Map))throw new TypeError('Map source');\n source=new Map(source);\n const deny=()=>{throw new TypeError('read-only');};\n const view={get size(){return source.size;},get:key=>source.get(key),has:key=>source.has(key),\n keys:()=>source.keys(),values:()=>source.values(),entries:()=>source.entries(),\n [Symbol.iterator]:()=>source.entries(),\n forEach(callback,thisArg){source.forEach((value,key)=>Reflect.apply(callback,thisArg,[value,key,view]));},\n set:deny,delete:deny,clear:deny};\n return Object.freeze(view);\n}\n"
+    },
+    {
+      "name": "forEach-leaks-source",
+      "file": "src/view.mjs",
+      "replacement": "export function viewMap(source){\n if(!(source instanceof Map))throw new TypeError('Map source');\n const deny=()=>{throw new TypeError('read-only');};\n const view={get size(){return source.size;},get:key=>source.get(key),has:key=>source.has(key),\n keys:()=>source.keys(),values:()=>source.values(),entries:()=>source.entries(),\n [Symbol.iterator]:()=>source.entries(),\n forEach(callback,thisArg){source.forEach((value,key)=>Reflect.apply(callback,thisArg,[value,key,source]));},\n set:deny,delete:deny,clear:deny};\n return Object.freeze(view);\n}\n"
+    }
+  ]
+}

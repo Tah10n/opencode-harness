@@ -1,0 +1,101 @@
+{
+  "slot": 7,
+  "case": "case-4",
+  "task": "denque-remove-where",
+  "arm": "H0",
+  "seedSha256": "d4179fbe5556e631a5c4b068e8adaa049d906c3603c209db25929b44bf82c3e0",
+  "Q": 1,
+  "D": 1,
+  "assessment": {
+    "Q": 1,
+    "reason": "Retained complete control runtime, types, capacity/overflow regression and documentation. Added two valid assertions of queue preservation on predicate failure. No new regression found.",
+    "ordinaryProjectAndTypesPassed": true,
+    "independentBehaviorPassed": true,
+    "requiredGapDiscriminated": true,
+    "newControlRegression": false,
+    "substantiveObservationUsed": false,
+    "assessmentMethod": "One assessor reviewed the complete delivered diffs, seed-to-final changes, ordinary/independent results and actual failing assertions. The assessor also monitored the runs; no independent blinding claim."
+  },
+  "patch": "patches/07-case-4-H0.patch",
+  "patchSha256": "a24f21bbddf3fa7389cf3a0188325e5c3f556b846e540a8233facb138cc5a4e1",
+  "terminalPatch": "terminal-patches/07-case-4-H0.patch",
+  "terminalPatchSha256": "255a8d592a926f6a17f43f6afa6e7c27f0e02dd35a7984bbc788718a90977925",
+  "handoffNamesPatch": true,
+  "terminalPatchApplicable": true,
+  "changed": [
+    "README.md",
+    "docs/api.mdx",
+    "index.d.ts",
+    "index.js",
+    "test/denque.js",
+    "test/type/index.ts"
+  ],
+  "deleted": [],
+  "omittedPreparationFiles": [],
+  "nativeCompleted": true,
+  "nativeExit": 0,
+  "lastStepFinish": "stop",
+  "workflowStatus": "incomplete",
+  "requests": 20,
+  "toolCalls": 40,
+  "authorSessions": 1,
+  "preparationAndCaptureMs": 2212,
+  "diagnosticElapsedMs": 0,
+  "executionMs": 224214,
+  "cleanupMs": 54,
+  "elapsedMs": 224268,
+  "usage": {
+    "input_tokens": 509403,
+    "output_tokens": 7583,
+    "total_tokens": 516986,
+    "cached_tokens": 343552,
+    "reasoning_tokens": 4495,
+    "unknownRequests": 0
+  },
+  "terminationVerified": true,
+  "containerRemoved": true,
+  "originalDiagnosticCommands": [],
+  "sensitivityEvents": [],
+  "checks": {
+    "ordinary": {
+      "exit": 0,
+      "elapsedMs": 1646,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && npm test"
+      ],
+      "outputSha256": "0677edcc05c351542d4816e9ef6a5c2f6f8c5b3ac3f0517e0cdf02ec3503d35e",
+      "outputExcerpt": "> denque@2.1.0 test\n> istanbul cover --report lcov _mocha && npm run typescript\n  55 passing (206ms)\n> denque@2.1.0 typescript\n> tsc --project ./test/type/tsconfig.json",
+      "realProviderRequests": 0
+    },
+    "independent": {
+      "exit": 0,
+      "elapsedMs": 718,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && timeout 10s node .independent.cjs"
+      ],
+      "outputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "outputExcerpt": "Independent behavior passed",
+      "realProviderRequests": 0
+    },
+    "sensitivity": {
+      "exit": 1,
+      "elapsedMs": 734,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && node .diagnostic.cjs && node_modules/.bin/mocha"
+      ],
+      "outputSha256": "86fadc42d84f9d26542a736aa7e5aac8289672fd99feb299a1432b1cc3edea96",
+      "outputExcerpt": "type.removeWhere\n    ✓ should visit values in order with their original indexes\n    ✓ should leave the queue unchanged when the predicate throws\n    1) should filter wrapped capacity queues without losing identity or capacity\n\n  Denque.prototype.remove\n    ✓ Should return undefined when empty denque\n    ✓ remove from the end of the queue if a negative index is provided\n    ✓ Should return undefined if index or count invalid\n    ✓ Should return the item at the front of the denque\n    ✓ Should return the item at the back of the denque\n    ✓ Should return the item somewhere in the middle of the denque\n    ✓ Should remove a number of items at the front of the denque\n    ✓ Should remove a number of items at the back of the denque\n    ✓ Should remove a number of items somewhere in the middle of the denque\n    ✓ Should clear denque\n\n  Denque.prototype.splice\n    ✓ Should remove and add items like native splice method at the front of denque\n    ✓ Should remove and add items like native splice method at the end of denque\n    ✓ Should remove and add items like native splice method somewhere in the middle of denque\n    ✓ Should return undefined when index or count is invalid\n    ✓ Should return undefined when the queue is empty\n    ✓ Should return undefined when trying to remove further than current size\n    ✓ Should remove and add items like native splice method to the empty denque\n    ✓ pop should shrink array when mostly empty\n\n\n  54 passing (31ms)\n  1 failing\n\n  1) Denque.prototype.removeWhere should filter wrapped capacity queues without losing identity or capacity:\n     AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nundefined !== 4\n\n      at Context.<anonymous> (test/denque.js:528:12)\n      at process.processImmediate (node:internal/timers:534:21)\n\n\n\n",
+      "realProviderRequests": 0
+    }
+  },
+  "authorClaimExcerpt": "\nImplemented and verified `removeWhere` across:\n\n- Runtime implementation with atomic predicate evaluation and wrapped/capacity support\n- TypeScript declaration and type test\n- Regression tests\n- README and API documentation\n\nChecks passed:\n\n- Focused `removeWhere`: 3 passing\n- Full `npm test`: 55 passing, TypeScript checks passing\n- `git diff --check`\n\nNo commit or dependency changes made."
+}

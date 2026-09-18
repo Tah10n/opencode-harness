@@ -1,0 +1,137 @@
+{
+  "id": "ed67791a7735",
+  "task": "eventemitter-remove-context",
+  "project": "eventemitter3",
+  "Q": 0,
+  "findings": [
+    {
+      "category": "required-coverage-loss",
+      "reason": "No delivered regression reuses the emitter after it becomes empty; reuse occurs while unrelated events remain."
+    },
+    {
+      "category": "public-type-defect",
+      "reason": "With a typed Context, omitted registration context is allowed, but removeListenersByContext(emitter) fails TS2345. Both historical patches and both controls also fail this supplemental consumer; historical grades remain unchanged."
+    }
+  ],
+  "contentReview": {
+    "id": "ed67791a7735",
+    "task": "eventemitter-remove-context",
+    "project": "eventemitter3",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "behaviorReview": "Iterates own string and symbol keys, matches stored context by strict equality, replaces filtered listener arrays and uses original clearEvent bookkeeping. Original registration normalization and emit snapshot/removal behavior retained.",
+    "retainedTestsReview": "Existing tests preserved, new CJS/ESM and consumer type cases added.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Duplicate string registrations and once symbol registration share target context; same callback with other context on symbol survives and counts/eventNames asserted."
+      },
+      {
+        "scenario": 2,
+        "covered": false,
+        "evidence": "Some tests remove to empty and others exercise reuse, but reuse test retains keep-first/keep-second throughout. No reuse after becoming empty as explicitly required. Repeated removal and nonempty event-name ordering are checked."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Omitted/undefined/null/false/zero/empty contexts normalize to emitter; passing null removes zero, emitter removes six and leaves unrelated context."
+      }
+    ],
+    "typesReview": "Delivered test/types.test-d.ts is a .ts consumer fixture (not a declaration file); verifies object Context and numeric result. Public declaration accepts only Context, which may reject required removal by emitter after omitted-context registration when Context is explicit. Uniform supplemental compile-probe pending for all affected patches and both controls.",
+    "docsReview": "README covers strict stored context, duplicate/once/symbol registrations and emitter normalization, with matching removal example.",
+    "contentFindings": [
+      {
+        "category": "required-coverage-loss",
+        "reason": "No delivered regression reuses the emitter after it becomes empty; reuse occurs while unrelated events remain."
+      }
+    ],
+    "pending": [
+      "ordinary project checks and ESM",
+      "independent public API checks",
+      "ordinary patch applicability",
+      "delivered TypeScript consumer compilation",
+      "supplemental typed normalized-emitter-context contract probe"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "applicability": {
+    "id": "ed67791a7735",
+    "task": "eventemitter-remove-context",
+    "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "7a730a1358a03f74598240fff0301c6ebb396d159941295400ad381523f54a14",
+    "excludedPreparationArtifacts": [],
+    "types": {
+      "compiler": "6.0.3",
+      "exit": 0,
+      "output": "",
+      "fixtures": [
+        "test/types.test-d.ts"
+      ],
+      "scope": "Delivered standalone consumer checked with the same host compiler as calibration; ordinary runtime checks run separately on Linux arm64."
+    }
+  },
+  "sourcePatchSha256": "7a730a1358a03f74598240fff0301c6ebb396d159941295400ad381523f54a14",
+  "sourcePatchBytes": 8067,
+  "assessmentNotes": [],
+  "slot": 31,
+  "repetition": 2,
+  "arm": "P",
+  "D": 0,
+  "verification": [
+    {
+      "artifact": "reviews/ed67791a7735/independent/result.json",
+      "exit": 0,
+      "elapsedMs": 674,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Independent behavior passed",
+      "fullLocalOutputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/ed67791a7735/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 1080,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "\n> eventemitter3@5.0.4 test-esm\n> mocha test/test.mjs\n\n\n\n  ✔ exports `EventEmitter` as default export\n  ✔ exports `EventEmitter` as a named export\n  ✔ exposes `removeListenersByContext` from ESM exports\n\n  3 passing (1ms)\n",
+      "fullLocalOutputSha256": "3674a7548108a5449ff2bfd8b7bf34341bc7ad396fce40c40a45a5a13ca8389f",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "normalHandoff": true,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "lastNativeTextSha256": "c1a1aaa3ded825e301a39445881a4ba2d87f66bc63e444047514dee5ef5a6b38",
+    "normalFinalResponse": true,
+    "finalResponseExcerpt": "Implemented `removeListenersByContext(context): number`.\n\n- Strictly matches stored contexts across string/symbol events.\n- Counts duplicates and `once` registrations.\n- Preserves listener order, event metadata, reuse, and emit mutation behavior.\n- Added CommonJS/ESM tests, declarations, type fixture, and README documentation.\n\nChecks run:\n- `npm test`: 44 passing\n- `npm run test-esm`: 3 passing\n- `npm run rollup`: passed\n- `git diff --check`: passed\n- TypeScript compiler was unavailable, so the declaration fixture was not compiled locally.",
+    "authorExplanationExcerpt": null,
+    "reportFindings": []
+  }
+}

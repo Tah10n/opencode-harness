@@ -1,0 +1,5 @@
+function validate(candidates,ballots){
+ if(new Set(candidates).size!==candidates.length||candidates.some(x=>typeof x!=='string'||! /^[A-Za-z]{1,20}$/.test(x)))throw new TypeError('candidate');const names=new Set(candidates);
+ for(const b of ballots)if(!Number.isSafeInteger(b.weight)||b.weight<0||b.weight>1000000||new Set(b.ranking).size!==b.ranking.length||b.ranking.some(x=>!names.has(x)))throw new TypeError('ballot');
+}
+export function tabulate(candidates,ballots){validate(candidates,ballots);if(!candidates.length)return{winner:null,rounds:[]};const totals=[...candidates].sort().map(candidate=>({candidate,votes:ballots.filter(b=>b.ranking[0]===candidate).reduce((n,b)=>n+b.weight,0)})),activeWeight=totals.reduce((n,x)=>n+x.votes,0),total=ballots.reduce((n,b)=>n+b.weight,0);const winner=activeWeight?[...totals].sort((a,b)=>b.votes-a.votes||a.candidate.localeCompare(b.candidate))[0].candidate:null;return{winner,rounds:[{totals,activeWeight,exhaustedWeight:total-activeWeight,eliminated:null}]};}

@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "realProviderRequests": 0,
+  "rows": [
+    {
+      "name": "A-vacuous-old-test",
+      "exit": 0
+    },
+    {
+      "name": "B-precondition-detects-lost-state",
+      "exit": 1
+    },
+    {
+      "name": "C-restored-setup-and-empty-idempotency",
+      "exit": 0
+    },
+    {
+      "name": "D-postcondition-detects-disabled-transition",
+      "exit": 1
+    },
+    {
+      "name": "E-empty-idempotency-with-disabled-transition",
+      "exit": 0
+    },
+    {
+      "name": "F-precondition-only-is-insufficient",
+      "exit": 0
+    }
+  ]
+}

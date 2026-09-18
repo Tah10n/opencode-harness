@@ -1,0 +1,50 @@
+{
+  "vscode_missing_electron": {
+    "instance_id": "microsoft__vscode-136347",
+    "first_gold": {
+      "resolved": false,
+      "observed_tests": 0,
+      "exit_code": 127,
+      "reason": "Missing .build/electron/code-oss; offline original preparation could not reach GitHub",
+      "official_result_sha256": "08690b30ecea5c60d778be617ab60cbe4c777b670c23ca9de6c19003ec4198ab"
+    },
+    "remediation": "Prepare Electron 13.5.1 using original node build/lib/electron script in a separate unmodified image; archive provided identically to offline authors/evaluators",
+    "prepared_dependency": {
+      "directories": [
+        ".build/electron"
+      ],
+      "sha256": "b744e7740561bf42dd6e1b941e6cc074549dab852d3437a9fde5529ad769dd03",
+      "version": "13.5.1",
+      "preparation": "node build/lib/electron",
+      "reason": "Published image lacks required Electron binary; downloaded by unchanged original project script before offline evaluation."
+    },
+    "gold_after_preparation": {
+      "resolved": true,
+      "official_result_sha256": "2731bba6985585c643b614332e5e3cd5d339c715bd3eb53e45f8e1b7549dab2e"
+    },
+    "test_parser_scoring_modified": false,
+    "real_provider_requests": 0
+  },
+  "code_server_dependencies": {
+    "reason": "Twelve original vendor/modules binary links were broken by node_modules-only extraction",
+    "fix": "Preserve complete vendor/modules from untouched official image for every arm and worktree",
+    "original_probe": "Original image: all twelve links PRESENT",
+    "final_links": {
+      "count": 607,
+      "broken": 0
+    },
+    "old_scripted_preflights_preserved": true,
+    "real_provider_requests": 0
+  },
+  "input_copy_limit": {
+    "original_seconds": 30,
+    "prepared_seconds": 120,
+    "reason": "Full prepared Code Server input exceeded original readiness bound",
+    "author_budget_seconds": 1800,
+    "provider_admission_policy_changed": false
+  },
+  "vscode_original_broken_links": [
+    "extensions/node_modules/.bin/tsserver",
+    "extensions/node_modules/.bin/tsc"
+  ]
+}

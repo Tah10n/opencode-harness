@@ -1,0 +1,163 @@
+diff --git a/packages/connector/README.md b/packages/connector/README.md
+index 00f6948a04e8b345966ae4135eb34ca186a88345..c4add7516fd35bd22d8b166066f81ab6102b086d 100644
+--- a/packages/connector/README.md
++++ b/packages/connector/README.md
+@@ -32,12 +32,12 @@ best-effort per source: one damaged settings file is reported without blocking h
+ initial sync. The final token/config swap is serialized behind any active sync, so an older request
+ cannot restore superseded authorization.
+ 
+-If the server reports that this installation authorization was revoked (including account deletion),
+-`connect` removes the stale local authorization, pending automatic state, and owned hooks through the
+-normal lifecycle cleanup, then starts a fresh pairing without changing the installation identity or
+-local source definitions. Partial auxiliary cleanup is reported as a warning. Other reconciliation
+-errors, including transient network failures, leave the existing connection in place and do not start
+-a replacement pairing.
++If the server reports that this installation authorization was revoked with HTTP 401 or 403 (including
++account deletion), `connect` removes the stale local authorization, pending automatic state, and owned
++hooks through the normal lifecycle cleanup, then starts a fresh pairing without requiring an abandoned
++pairing or changing the installation identity or local source definitions. Partial auxiliary cleanup is
++reported as a warning after the revoked authorization is removed. Other reconciliation errors, including
++transient network failures, leave the existing connection in place and do not start a replacement pairing.
+ 
+ ## Commands
+ 
+diff --git a/packages/connector/bin/viberacing.mjs b/packages/connector/bin/viberacing.mjs
+index e8d53d748b57f51dbc532608039f5f49008d2f21..e9cd485dbeaab7091f18176d236bf1e612c440b5 100755
+--- a/packages/connector/bin/viberacing.mjs
++++ b/packages/connector/bin/viberacing.mjs
+@@ -191,10 +191,14 @@ async function request(origin, path, options = {}, attempts = 1, responseContext
+       } catch (error) {
+         if (
+           error?.code === "invalid_server_response" &&
+-          (response.status >= 500 || response.status === 429)
++          (response.status === 401 ||
++            response.status === 403 ||
++            response.status >= 500 ||
++            response.status === 429)
+         ) {
+           error.status = response.status;
+-          error.retryAfterMs = retryAfterMilliseconds(response);
++          if (response.status >= 500 || response.status === 429)
++            error.retryAfterMs = retryAfterMilliseconds(response);
+         }
+         throw error;
+       }
+diff --git a/packages/connector/test/config.test.mjs b/packages/connector/test/config.test.mjs
+index ef547406fa15767b1075e0cb9678e03758a378b4..6cdad293e34c7f19b057a10cb204081f964c8fb8 100644
+--- a/packages/connector/test/config.test.mjs
++++ b/packages/connector/test/config.test.mjs
+@@ -3413,11 +3413,21 @@ test("reconnect retires only an explicitly disconnected unavailable source befor
+           response.end(JSON.stringify({ error: "unauthorized" }));
+           return;
+         }
++        if (mode === "account-deleted") {
++          response.statusCode = 403;
++          response.end(JSON.stringify({ error: "account_deleted" }));
++          return;
++        }
++        const requestedSourceIds = new Set(body?.sourceIds ?? []);
+         response.end(
+           JSON.stringify(
+             reconciliationResponse([
+-              { ...retiredMapping, status: "disconnected" },
+-              { ...activeMapping, status: "active" },
++              ...(requestedSourceIds.has(retiredMapping.sourceId)
++                ? [{ ...retiredMapping, status: "disconnected" }]
++                : []),
++              ...(requestedSourceIds.has(activeMapping.sourceId)
++                ? [{ ...activeMapping, status: "active" }]
++                : []),
+             ]),
+           ),
+         );
+@@ -3534,8 +3544,24 @@ test("reconnect retires only an explicitly disconnected unavailable source befor
+       },
+     })}\n`,
+   );
++  const hookPath = join(hookRoot, "settings.json");
+   const configBefore = await readFile(join(directory, "config.json"));
+   const hookBefore = await readFile(join(hookRoot, "settings.json"));
++  await mkdir(join(directory, "pending"), { recursive: true });
++  await writeFile(join(directory, "pending", `${activeSourceId}.json`), "{}\n");
++  await writeFile(
++    join(directory, "dirty.json"),
++    `${JSON.stringify({
++      version: 2,
++      sources: {
++        [activeClientSourceId]: {
++          dirtySince: new Date().toISOString(),
++          lastEventAt: new Date().toISOString(),
++          generation: "81818181-8181-4181-8181-818181818181",
++        },
++      },
++    })}\n`,
++  );
+   const environment = connectorEnvironment(home, {
+     NODE_ENV: "test",
+     PATH: "",
+@@ -3555,14 +3581,55 @@ test("reconnect retires only an explicitly disconnected unavailable source befor
+     );
+     assert.deepEqual(await readFile(join(directory, "config.json")), configBefore);
+     assert.deepEqual(await readFile(join(hookRoot, "settings.json")), hookBefore);
++    await access(join(directory, "pending", `${activeSourceId}.json`));
++    await access(join(directory, "dirty.json"));
+     assert.equal(pairingStarts, 0);
+   }
+ 
+   mode = "unauthorized";
++  await writeFile(hookPath, "{invalid-json");
++  const recovered = await execFileAsync(
++    process.execPath,
++    [connectorPath, "connect", "--origin", origin],
++    { env: environment },
++  );
++  assert.match(recovered.stderr, /revoked authorization was removed, but 1 auxiliary cleanup step/);
++  assert.equal(await readFile(hookPath, "utf8"), "{invalid-json");
++  assert.equal(pairingStarts, 1);
++  assert.equal(
++    JSON.parse(await readFile(join(directory, "installation.json"), "utf8")).id,
++    installationId,
++  );
++  assert.equal(
++    JSON.parse(await readFile(join(directory, "config.json"), "utf8")).deviceToken,
++    "dashboard_disconnect_device_token_long_enough",
++  );
++  await assert.rejects(access(join(directory, "pending", `${activeSourceId}.json`)));
++  await assert.rejects(access(join(directory, "dirty.json")));
++
++  await writeFile(
++    hookPath,
++    `${JSON.stringify({
++      hooks: {
++        Stop: [
++          { hooks: [{ command: "keep-foreign" }] },
++          {
++            hooks: [
++              {
++                command: `node hook --viberacing-hook-id=viberacing-hook-v3:${retiredClientSourceId}`,
++              },
++            ],
++          },
++        ],
++      },
++    })}\n`,
++  );
++
++  mode = "account-deleted";
+   await execFileAsync(process.execPath, [connectorPath, "connect", "--origin", origin], {
+     env: environment,
+   });
+-  assert.equal(pairingStarts, 1);
++  assert.equal(pairingStarts, 2);
+   assert.equal(
+     JSON.parse(await readFile(join(directory, "installation.json"), "utf8")).id,
+     installationId,
+@@ -3576,7 +3643,7 @@ test("reconnect retires only an explicitly disconnected unavailable source befor
+   await execFileAsync(process.execPath, [connectorPath, "connect", "--origin", origin], {
+     env: environment,
+   });
+-  assert.equal(pairingStarts, 2);
++  assert.equal(pairingStarts, 3);
+   assert.deepEqual(
+     pairingBody.sources.map((source) => source.clientSourceId),
+     [activeClientSourceId],

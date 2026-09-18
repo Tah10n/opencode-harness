@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "A run spanning row boundaries round-trips and zero-area bitmap encodes canonically.",
+    "Invalid runs and incorrect total coverage reject."
+  ],
+  "docDelivery": [
+    "Row-major alternating positive runs without row reset; empty encoding.",
+    "Dimension/bit/run constraints and distinct validation failures, with detached output."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Width/height integers0..1000 product<=100000; flat dense bit arrays; malformed dimensions/bits/runs included as specified. Packet exact width,height,start,runs, runs dense numeric array. No image library or pixel colors.",
+  "independence": "Implement run-length bitmap encoding/decoding, empty dimensions and invalid-run rejection."
+}

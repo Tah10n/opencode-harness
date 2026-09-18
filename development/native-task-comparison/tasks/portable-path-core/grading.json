@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert relative/absolute dot segments, root clamping, trailing slash and literal backslashes.",
+    "Assert actual Node CLI output/status and invalid-input no-write behavior."
+  ],
+  "docDelivery": [
+    "Explain core string-only POSIX rules and host independence.",
+    "Document CLI usage/status, trailing slash contract and absence of filesystem resolution."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Pure host-independent POSIX string normalization including trailing slash/root clamping; exact existing CLI output/status, no filesystem semantics.",
+  "manualBehavior": [
+    "Verify CLI delegates normalization to core, and core avoids cwd/filesystem/platform-default path behavior. Explicit path.posix implementation is acceptable; exact source structure is not prescribed."
+  ],
+  "independence": "Extract host-independent POSIX path normalization from CLI handling preserving root clamping and trailing slash contracts."
+}

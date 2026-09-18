@@ -1,0 +1,3 @@
+# visitor-expression-printer
+
+visitExpression evaluates each occurrence in left-to-right postorder: visitor.literal(value), visitor.binary(op,leftResult,rightResult) with visitor receiver and unchanged handler results. Shared nodes visited per occurrence, first exact throw stops. printExpression uses visitor with rendering policy. JSON literals; single spaces around operators, */ above +-. Parenthesize lower-precedence children and equal-precedence right binary child, not equal left: preserves exact tree, not algebraic equivalence. Nonnegative safe integer excluding -0 or string literals; strings JSON-escaped including controls/surrogates. Acyclic<=10000 occurrences/depth100, frozen inputs supported. No eval/mutation. Run npm test.

@@ -1,0 +1,133 @@
+{
+  "runtimeSha": "797ce6f1b75af217e00224d1b38790346dee1d19",
+  "realProviderRequests": 0,
+  "preflight": {
+    "passed": true,
+    "arms": [
+      {
+        "arm": "Hbase",
+        "task": "url-search-params",
+        "normalCompletion": true,
+        "terminationVerified": true,
+        "scriptedRequests": 8,
+        "patch": {
+          "portablePatch": true,
+          "originalPreserved": true
+        }
+      },
+      {
+        "arm": "P",
+        "task": "visual-preferences",
+        "normalCompletion": true,
+        "terminationVerified": true,
+        "scriptedRequests": 6,
+        "patch": {
+          "portablePatch": true,
+          "originalPreserved": true
+        }
+      },
+      {
+        "arm": "Htools",
+        "task": "visual-preferences",
+        "normalCompletion": true,
+        "terminationVerified": true,
+        "scriptedRequests": 8,
+        "patch": {
+          "portablePatch": true,
+          "originalPreserved": true
+        }
+      }
+    ]
+  },
+  "calibration": {
+    "visual": [
+      {
+        "label": "reference",
+        "status": 0
+      },
+      {
+        "label": "alternative",
+        "status": 0
+      },
+      {
+        "label": "old-input",
+        "accepted": false,
+        "status": 1
+      },
+      {
+        "label": "delivered-regression-sensitivity",
+        "detected": true
+      },
+      {
+        "label": "reload",
+        "accepted": false,
+        "status": 1
+      }
+    ],
+    "visualBrowser": [
+      {
+        "label": "reference",
+        "browser": 0
+      },
+      {
+        "label": "alternative",
+        "browser": 0
+      }
+    ],
+    "visualOtherWrong": [
+      {
+        "label": "missed-consumer",
+        "accepted": false,
+        "status": 1
+      },
+      {
+        "label": "missing-tests",
+        "accepted": false,
+        "reason": "No delivered regression tests"
+      }
+    ],
+    "ufo": [
+      {
+        "task": "url-search-params",
+        "label": "alternative",
+        "status": 0,
+        "accepted": true
+      },
+      {
+        "task": "url-search-params",
+        "label": "wrong-missed-consumer",
+        "status": 1,
+        "accepted": false
+      },
+      {
+        "task": "url-search-params",
+        "label": "wrong-old-input",
+        "status": 1,
+        "accepted": false
+      },
+      {
+        "task": "url-search-params",
+        "label": "wrong-reload-or-class",
+        "status": 1,
+        "accepted": false
+      }
+    ],
+    "ufoReference": {
+      "testsBuildPassed": true
+    },
+    "missingUfoTests": {
+      "accepted": false
+    }
+  },
+  "generalVerifier": "PROCESS_CONTAINMENT_UNAVAILABLE; historical separate limitation; no bypass or rerun",
+  "excludedLayouts": [
+    "Current VibeRacing test exceeds 512 KiB",
+    "Current personal-site OpenCode-generated project-absolute skill permissions rejected"
+  ],
+  "preparationCorrections": [
+    "CLI positional escaping: P full task now uses native stdin",
+    "Invalid first control mutations were unchanged bytes; corrected before scoring",
+    "Historical site CRLF format failure recorded as baseline"
+  ],
+  "opencodeBinarySha256": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe"
+}

@@ -1,0 +1,267 @@
+{
+  "createdAt": "2026-09-16T19:51:53.993Z",
+  "freezeSha256": "4316ebd19ff7270c865b79ff5034c6b348e397ab470fe1e4654c77543e747fc0",
+  "runtimeSha": "e18db1fe10223db52dcc05b3e769bca140367c2b",
+  "order": [
+    {
+      "slot": 1,
+      "task": "A",
+      "repetition": 1,
+      "arm": "ON",
+      "project": "primus/eventemitter3"
+    },
+    {
+      "slot": 2,
+      "task": "A",
+      "repetition": 1,
+      "arm": "OFF",
+      "project": "primus/eventemitter3"
+    },
+    {
+      "slot": 3,
+      "task": "A",
+      "repetition": 2,
+      "arm": "OFF",
+      "project": "primus/eventemitter3"
+    },
+    {
+      "slot": 4,
+      "task": "A",
+      "repetition": 2,
+      "arm": "ON",
+      "project": "primus/eventemitter3"
+    }
+  ],
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "budgetMs": 1800000,
+  "actualPromptSha256": "b3a1006440f99943e294f0c6272723bacb0e00a66f069028faad5210e396fc56",
+  "inputManifestSha256": "83ef562381f023e38b4f3917c77091cbded64803eb9a4324c2efcdac6c00814a",
+  "config": {
+    "model": "openai/gpt-5.6-luna",
+    "small_model": "openai/gpt-5.6-luna",
+    "provider": {
+      "openai": {
+        "options": {
+          "baseURL": "http://127.0.0.1:4099/v1",
+          "apiKey": "development-no-credential"
+        },
+        "models": {
+          "gpt-5.6-luna": {
+            "options": {
+              "reasoningEffort": "high"
+            },
+            "variants": {
+              "high": {
+                "reasoningEffort": "high"
+              }
+            }
+          }
+        }
+      }
+    },
+    "permission": {
+      "external_directory": {
+        "*": "deny",
+        "/template/node_modules/typescript/lib/*": "allow",
+        "/usr/local/bin/*": "allow"
+      }
+    }
+  },
+  "offlineOverride": {
+    "permission": {
+      "webfetch": "deny"
+    },
+    "agent": {
+      "build": {
+        "permission": {
+          "webfetch": "deny"
+        }
+      }
+    }
+  },
+  "node": "v24.19.0",
+  "typescript": "6.0.3",
+  "image": "sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6",
+  "preflight": {
+    "passed": true,
+    "checks": [
+      {
+        "task": "A",
+        "arm": "OFF",
+        "requests": 16,
+        "portablePatch": true,
+        "sourcePreserved": true,
+        "capture": true,
+        "termination": true
+      },
+      {
+        "task": "A",
+        "arm": "ON",
+        "requests": 16,
+        "portablePatch": true,
+        "sourcePreserved": true,
+        "capture": true,
+        "termination": true,
+        "compat": [
+          {
+            "status": "reproduced-incompatibility",
+            "snapshot": "94b176df231a75a57f99e02fad4e342b66113757b3da73f7368abd13eb1a2727"
+          },
+          {
+            "status": "no-difference-in-checked-scope",
+            "snapshot": "1861fc5595312edef3de74527175a1f2b6946d0b2f12e1b67f5ce6d2237360d6"
+          }
+        ]
+      }
+    ],
+    "realProviderRequests": 0
+  },
+  "audit": {
+    "passed": true,
+    "rows": [
+      {
+        "key": "A-OFF",
+        "ordinaryCommands": true,
+        "noEvaluatorMount": true,
+        "removed": true,
+        "checks": []
+      },
+      {
+        "key": "A-ON",
+        "ordinaryCommands": true,
+        "noEvaluatorMount": true,
+        "removed": true,
+        "checks": [
+          {
+            "snapshot": "94b176df231a75a57f99e02fad4e342b66113757b3da73f7368abd13eb1a2727",
+            "baselineSnapshot": "b559944b1715eefbb7d363c14ed5f67f22e6ed42099c3c36844a7fa3825f2079",
+            "status": "reproduced-incompatibility",
+            "callID": "call_28",
+            "request": "request-13.json",
+            "requestHash": "e4f70fc525c430541e39204147c876c82a4d63c0cd68500ef6b92c277ff642ac"
+          },
+          {
+            "snapshot": "1861fc5595312edef3de74527175a1f2b6946d0b2f12e1b67f5ce6d2237360d6",
+            "baselineSnapshot": "b559944b1715eefbb7d363c14ed5f67f22e6ed42099c3c36844a7fa3825f2079",
+            "status": "no-difference-in-checked-scope",
+            "callID": "call_30",
+            "request": "request-15.json",
+            "requestHash": "ca9e89dbe0537fb4fc2c2813b6466c366d4224e5bbf448fcc7e4262bfcc336d0"
+          }
+        ]
+      }
+    ],
+    "realProviderRequests": 0
+  },
+  "unrelatedContainersPreserved": [
+    "stanradar-check-1789586995-42872-admin-browser",
+    "stanradar-check-1789586995-42872-app-1",
+    "stanradar-check-1789586995-42872-oidc-1",
+    "stanradar-check-1789586995-42872-mailpit-1",
+    "stanradar-check-1789586995-42872-db-1",
+    "stanradar-check-1789586995-42872-cli-db-1"
+  ],
+  "realProviderRequestsBeforeFreeze": 0,
+  "files": {
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-command-hints.mjs": "4ba8f87a18157dfcf794c030d836ce4ca22260eb7a9c1472255b628b19f490bc",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-project-checks.mjs": "ae20921040df6aa27718853028cb11e81875e0fad7adc34004bcb744585606ac",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-project-config.mjs": "c3d758632ab72f7a63c5fec8a13520987a7d1ddc75020a908bd448166fa0167e",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-project-context.mjs": "5f35a51aebc7cdc3e12edf3506c6b590ced57f819a02b09ed6254702f500f394",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-project-feedback.mjs": "c3ed707cc0e6dd4fc40e882dd2895ec631f95de8c30663c262f20b72efdf3cb7",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-project-scope.mjs": "f5dcd760610c97a3fbf49229ea5c4723dce6d3aa0fe160228f908c62d29e8be4",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-review-context.mjs": "8775ae59ef3d3b5b432798f909f94869d43b7561b4b5f144f972e5bcce20e312",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-sensitivity-runner.mjs": "59056d6661c099b4e48b89874bbd7991a3af6b09199cc5bee74b719491f7b1de",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-sensitivity.mjs": "91a918585e5889bba4d0c7299a469da4c0e637ee3b82bf1b6044934ff8827c73",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-task-investigation.mjs": "37185994a4758628eb52f965d9a6327974d925523c73620bfe9b7c83821167cd",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-task-observations.mjs": "126a3e695c2dd2ec930a44fca4aa033f0f21e8ae364aae15db39e7f343189de8",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-task-plugin.mjs": "9a1f4fcd8b99a87402e6116fb287e2e9d32e03b8b4d396f59bb5449370bbb8e8",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-task-workflow.mjs": "10688211fce75592ce22a669b10d49aa067b89aa0dee05da6a2d35b9ceca7ed8",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-type-compat-generator.mjs": "321eff1892c9a5327e7f6e38f23a986c1be3fbaf26da5662b99cd27cac50cc68",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-type-compat-worker.mjs": "c9cc1ff4922488ba1058d11af9f609a3fc5cef4a98aed7941ef5e8fe2f3eafc2",
+    "local/native-type-compat-offline-subscribe/batch/bundle/native-type-compat.mjs": "96f85cbc7ee01f3aeedc31cea51c0dd5c452afe220b4683df1b2d5fd987d9007",
+    "local/native-type-compat-offline-subscribe/batch/bundle/core.md": "9adcc862446ac6c0e5a407ec89e2f65fe4a249aedcc34ba36f143f3589edd4f7",
+    "local/native-type-compat-offline-subscribe/batch/bundle/opencode.json": "24ba3acaf5624fd47447c12a4236ad24481181951100e1df4a0106d94b6f8264",
+    "local/native-type-compat-offline-subscribe/batch/bundle/node_modules/typescript/lib/typescript.js": "569177652966bd528c319171c7dd22860dbf72bde116cbc4f644f1d02bb12e39",
+    "local/native-type-compat-offline-subscribe/batch/bundle/node_modules/typescript/lib/tsc.js": "2cffde0b8c6760dfb0b5b0382bbb7e00ba6a8b2d981b9205b256a700a481d983",
+    "local/native-type-compat-offline-subscribe/batch/bundle/node_modules/typescript/lib/_tsc.js": "1c59e77a54b186ec43fa7f3e0d3c4bb15ca5eb5ba43e96b1d3a267139eddd3e3",
+    "development/native-type-compat-offline-subscribe/PLAN.md": "75c7fe7c3d57cbf9983ff2a18eb095e85f28c82f12ffb4c9e03623082f4d2bfb",
+    "development/native-type-compat-offline-subscribe/account.mjs": "3e53bedf8fd372ee420e5d49d7f897448a1b00f1ed4765c3c0f2ee39198fd302",
+    "development/native-type-compat-offline-subscribe/audit-preflight.mjs": "097828e84a256850df1f467a522de9dc6059da4452c898aa1af2faeee4d2ab9b",
+    "development/native-type-compat-offline-subscribe/calibrate.mjs": "835bdca859ce12d50db21f227d468441f770fe0e6f11031e9a1687425ffd343c",
+    "development/native-type-compat-offline-subscribe/freeze.mjs": "27f85e98d3a7a3eea308ec7d2d729ed890e103b8c8e776c11dab103cb358ef79",
+    "development/native-type-compat-offline-subscribe/grade.mjs": "550988957a13cc6a24cae7b3e0ac84e54dc009a2534a9ed737858e8890d100fb",
+    "development/native-type-compat-offline-subscribe/neutralize.mjs": "7627a711f1e3c270eee4430eb53a4ea990bfc96ee63db34dde483dee768d1ec4",
+    "development/native-type-compat-offline-subscribe/preflight.mjs": "3891d21a7d6c900f67795fbbc45b0064c359780ceb4d0104bee84277829ccc96",
+    "development/native-type-compat-offline-subscribe/prepare.mjs": "6ee95e8f814ce353d59354ce0e6e3040e86553ca07a80eadc0b25889892fb27d",
+    "development/native-type-compat-offline-subscribe/run.mjs": "1472690302a55d1d58e2998dde5a634fc36dc7e86fd8af4895ef7377129a0cac",
+    "development/native-type-compat-comparison/tasks/A.md": "ef1ed2db8a7e7b24248250b887cf642f7209df99bf7e0f00d7456e034a7f940f",
+    "development/native-type-compat-comparison/evaluation/A.cjs": "62576b21c4ba4de98f5aa2e71584784d07c83dd617fb056fa7e0387718434f48",
+    "development/native-type-compat-comparison/evaluation/A.types.ts": "396a6e3616fc8393399822771c3ef2d1e5bcdb228576f35e7a5b6d14bca889a3",
+    "development/native-type-compat-comparison/evaluation/legacy.types.ts": "a233441ca27ff4ecc576d2bf0e88072be548fe91bea920518b26344d163b6424",
+    "local/native-type-compat-comparison/batch/calibration/A/reference/index.js": "fb61b92e4a862daa4654e3b70f46cdf220603a9e6056b4e184d9d4c4c65ca614",
+    "local/native-type-compat-comparison/batch/calibration/A/reference/index.d.ts": "1ec78c4828eb97c1439a9c0b9d261befd1d1b1e1ea20f0fe687d2d58b589e96a",
+    "local/native-type-compat-comparison/batch/calibration/A/reference/test/test.js": "e8f4e8794a992890478b1bda8870ff19ac0784e0e89a106ec027c676951e0918",
+    "local/native-type-compat-comparison/batch/calibration/A/reference/test/test.mjs": "42f516255759ed17b40bc824e40211ce690e809f04f6c89ca1aa2939501e0ff1",
+    "local/native-type-compat-comparison/batch/calibration/A/reference/api.types.ts": "396a6e3616fc8393399822771c3ef2d1e5bcdb228576f35e7a5b6d14bca889a3",
+    "local/native-type-compat-comparison/batch/calibration/A/reference/README.md": "c35171c25f0ef1e9cf42b73b663e9e2ec96e8ebbab79a69670b3e2b54d1ea25a",
+    "local/native-type-compat-comparison/batch/calibration/A/alternative/index.js": "2ec6072f0133129782ce4a9e2c3f3581d47baaf573e0e75187ced7000be9d9b1",
+    "local/native-type-compat-comparison/batch/calibration/A/alternative/index.d.ts": "9ca67fb5d1ff1778e2ea12ef17b7acd7bc2e4b9b4aba79ba8ba1dee8a09f1b2a",
+    "local/native-type-compat-comparison/batch/calibration/A/alternative/test/test.js": "e8f4e8794a992890478b1bda8870ff19ac0784e0e89a106ec027c676951e0918",
+    "local/native-type-compat-comparison/batch/calibration/A/alternative/test/test.mjs": "42f516255759ed17b40bc824e40211ce690e809f04f6c89ca1aa2939501e0ff1",
+    "local/native-type-compat-comparison/batch/calibration/A/alternative/api.types.ts": "396a6e3616fc8393399822771c3ef2d1e5bcdb228576f35e7a5b6d14bca889a3",
+    "local/native-type-compat-comparison/batch/calibration/A/alternative/README.md": "c35171c25f0ef1e9cf42b73b663e9e2ec96e8ebbab79a69670b3e2b54d1ea25a",
+    "local/native-type-compat-comparison/batch/calibration/A/missing/index.js": "1560f251de5d28d2c15ff070215d2c5c0fa06f1a92e8d6522bbee37e06d2a6b5",
+    "local/native-type-compat-comparison/batch/calibration/A/missing/index.d.ts": "27679e96d1bd38c5938178aaf4abe8627493090b63d6bae2ce8436e6a87ebe4d",
+    "local/native-type-compat-comparison/batch/calibration/A/missing/test/test.js": "e8f4e8794a992890478b1bda8870ff19ac0784e0e89a106ec027c676951e0918",
+    "local/native-type-compat-comparison/batch/calibration/A/missing/test/test.mjs": "42f516255759ed17b40bc824e40211ce690e809f04f6c89ca1aa2939501e0ff1",
+    "local/native-type-compat-comparison/batch/calibration/A/missing/api.types.ts": "396a6e3616fc8393399822771c3ef2d1e5bcdb228576f35e7a5b6d14bca889a3",
+    "local/native-type-compat-comparison/batch/calibration/A/missing/README.md": "c35171c25f0ef1e9cf42b73b663e9e2ec96e8ebbab79a69670b3e2b54d1ea25a",
+    "local/native-type-compat-comparison/batch/calibration/A/erased-types/index.js": "fb61b92e4a862daa4654e3b70f46cdf220603a9e6056b4e184d9d4c4c65ca614",
+    "local/native-type-compat-comparison/batch/calibration/A/erased-types/index.d.ts": "b6b1ea42a6de181a8e151ae2a04c268a02b57d83d5b3c84db52f0d776b5e9225",
+    "local/native-type-compat-comparison/batch/calibration/A/erased-types/test/test.js": "e8f4e8794a992890478b1bda8870ff19ac0784e0e89a106ec027c676951e0918",
+    "local/native-type-compat-comparison/batch/calibration/A/erased-types/test/test.mjs": "42f516255759ed17b40bc824e40211ce690e809f04f6c89ca1aa2939501e0ff1",
+    "local/native-type-compat-comparison/batch/calibration/A/erased-types/api.types.ts": "396a6e3616fc8393399822771c3ef2d1e5bcdb228576f35e7a5b6d14bca889a3",
+    "local/native-type-compat-comparison/batch/calibration/A/erased-types/README.md": "c35171c25f0ef1e9cf42b73b663e9e2ec96e8ebbab79a69670b3e2b54d1ea25a",
+    "local/native-type-compat-comparison/batch/calibration/A/legacy-break/index.js": "fb61b92e4a862daa4654e3b70f46cdf220603a9e6056b4e184d9d4c4c65ca614",
+    "local/native-type-compat-comparison/batch/calibration/A/legacy-break/index.d.ts": "da0028afcb6b5d03a01a917a87a0d75f9bcff7295354443d5194f10fcbd741c2",
+    "local/native-type-compat-comparison/batch/calibration/A/legacy-break/test/test.js": "e8f4e8794a992890478b1bda8870ff19ac0784e0e89a106ec027c676951e0918",
+    "local/native-type-compat-comparison/batch/calibration/A/legacy-break/test/test.mjs": "42f516255759ed17b40bc824e40211ce690e809f04f6c89ca1aa2939501e0ff1",
+    "local/native-type-compat-comparison/batch/calibration/A/legacy-break/api.types.ts": "396a6e3616fc8393399822771c3ef2d1e5bcdb228576f35e7a5b6d14bca889a3",
+    "local/native-type-compat-comparison/batch/calibration/A/legacy-break/README.md": "c35171c25f0ef1e9cf42b73b663e9e2ec96e8ebbab79a69670b3e2b54d1ea25a",
+    "local/native-type-compat-comparison/batch/calibration/A/runtime-break/index.js": "bc035b6b4ea88009ec8f7a35398b977e27fc9c1b8a753bb768df303e21879c70",
+    "local/native-type-compat-comparison/batch/calibration/A/runtime-break/index.d.ts": "1ec78c4828eb97c1439a9c0b9d261befd1d1b1e1ea20f0fe687d2d58b589e96a",
+    "local/native-type-compat-comparison/batch/calibration/A/runtime-break/test/test.js": "e8f4e8794a992890478b1bda8870ff19ac0784e0e89a106ec027c676951e0918",
+    "local/native-type-compat-comparison/batch/calibration/A/runtime-break/test/test.mjs": "42f516255759ed17b40bc824e40211ce690e809f04f6c89ca1aa2939501e0ff1",
+    "local/native-type-compat-comparison/batch/calibration/A/runtime-break/api.types.ts": "396a6e3616fc8393399822771c3ef2d1e5bcdb228576f35e7a5b6d14bca889a3",
+    "local/native-type-compat-comparison/batch/calibration/A/runtime-break/README.md": "c35171c25f0ef1e9cf42b73b663e9e2ec96e8ebbab79a69670b3e2b54d1ea25a",
+    "development/native-task-abc/native-run.mjs": "5d691871022fcf4f2117212c33b463849e791d7ebe120adc68e7ca419ee0d293",
+    "development/native-task-integrated/container-session.mjs": "d469b04975c1e9441b1dc5fb5c2a1f6beef451a390e5f020c1b1a6b211cdcd1b",
+    "development/native-task-integrated/container-relay.mjs": "db186a20946348867504c48d7faca8f40a93fdfa122e1102f581e8cf5377f1b3",
+    "development/native-task-ab/capture-candidate.mjs": "d388246826eb92dd408b853c4fe8fc929c259a9d03b89d169b75b2143544c669",
+    "development/native-task-ab/extract-candidate.py": "aa5244bd4a5cc394344b266f0107728d9b70e190bad55de47c46dd10f28603de",
+    "development/native-task-utility/container/stop-workload.mjs": "b21c23f5a334dc54af340e2773e3e56427aa27a946231769d36df249ea54a69e",
+    "development/native-task-offline/build.json": "16c5621afb56082001998a0f17f385ac90e4bdd31a19eeb215926de2e748ee61",
+    "local/native-type-compat-offline-subscribe/batch/experiment-config.json": "2d5290a809ff6e4d2c27639324dd4ef5c161cc799e480365f27a0df79d0202d1",
+    "local/native-type-compat-offline-subscribe/batch/sources.json": "5fc5cdccaae7d383abf16459877e455c2dafd58e1f9b9075360b76cabf3eb5de",
+    "local/native-type-compat-offline-subscribe/batch/verified-calibration.json": "40ecbb9a7c3ce303ebe61320218c658422ebba441c4bee5a8ed0b506a906c156",
+    "local/native-type-compat-offline-subscribe/batch/preflight.json": "9aa8c40a14d702c94ccd086370d132cabaafa988831f1bb15ede00cb246d62b9",
+    "local/native-type-compat-offline-subscribe/batch/preflight-audit.json": "fc29245d051a4bf45f1f59720745ec30fbd9cb8657b5d1656377c97b048b254e",
+    "../verified-change-harness/local/template-toolchain-20260908/package/bin/opencode": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe",
+    "development/native-task-ab/run-comparison.mjs": "60eba717fb6ed914bba56de682c9d02638ffcf9d80f4edf064ca8aabd74597f7",
+    "development/native-type-compat-offline-subscribe/repeatability/PLAN.md": "5731b7c1229203ded3b35b6d75f6be1d245ff286419aa4469e0e80945591f3d6",
+    "development/native-type-compat-offline-subscribe/repeatability/audit-preflight.mjs": "4cfa3c3fdf75c02196a26f3dd90fb2e7b2b6dd9ed560be1dd4d284cfac415bdc",
+    "development/native-type-compat-offline-subscribe/repeatability/freeze.mjs": "aeda532f3facd51e16f0952b9df16c53b6dea9c98e8df455ce4a3af86b1c2c92",
+    "development/native-type-compat-offline-subscribe/repeatability/grade.mjs": "169a3065018f03cca50dcdb32ff03da363b975e66617752af55729c8162c7310",
+    "development/native-type-compat-offline-subscribe/repeatability/manifest.json": "52ad60f4e0f87428bc49e850f65a869e101fba62496f5f0d5e967ce7edb4e360",
+    "development/native-type-compat-offline-subscribe/repeatability/neutralize.mjs": "06a05f8be0091fa388ece0ad0d6f7a7901b6d9fde1137f826ce4cf71322d9fdb",
+    "development/native-type-compat-offline-subscribe/repeatability/preflight.mjs": "fa5ff50fcac31fdc9a2a441e7faa6f62b13785c334ffe2abb6fd093cbabe62ff",
+    "development/native-type-compat-offline-subscribe/repeatability/prepare.mjs": "52f551e1520c39d3410bb58bca0ef5d8c8f7c86e5391023477d192f2902bcda1",
+    "local/native-type-compat-offline-subscribe/repeatability/preflight.json": "8395f2ce57336f9d243adff3037572dd9229d55fbcd35131868884a2e2b39b00",
+    "local/native-type-compat-offline-subscribe/repeatability/preflight-audit.json": "e929ccc468b399694452e3d698f133c5fda9352ead9579d668a8d03db32cd341"
+  },
+  "runtimeManifestHashes": {
+    "local/native-type-compat-offline-subscribe/repeatability/inputs/A": "83ef562381f023e38b4f3917c77091cbded64803eb9a4324c2efcdac6c00814a",
+    "local/native-type-compat-offline-subscribe/batch/bundle": "ffb6d216c29437b20c1f82140d3bd4a07a0f2d3f80ab1f55214fa6a73fcc1746"
+  }
+}

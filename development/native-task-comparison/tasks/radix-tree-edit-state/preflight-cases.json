@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/dictionary.mjs": "export function createDictionary(entries=[]){const rows=[];for(const e of entries){const at=rows.findIndex(r=>r.key===e.key),copy=structuredClone(e);if(at<0)rows.push(copy);else rows[at]=copy;}const make=rows=>({set(key,value){return createDictionary([...rows,{key,value}]);},delete(key){return createDictionary(rows.filter(r=>r.key!==key));},get(key){const r=rows.find(r=>r.key===key);return r?structuredClone(r.value):undefined;},find(prefix,limit=Infinity){return rows.filter(r=>r.key.startsWith(prefix)).sort((a,b)=>a.key<b.key?-1:a.key>b.key?1:0).slice(0,limit).map(r=>structuredClone(r));},entries(){return this.find('');}});return make(rows);}\n"
+  },
+  "mutants": [
+    {
+      "name": "in-place-version-update",
+      "file": "src/dictionary.mjs",
+      "replacement": "export function createDictionary(entries=[]){const initial=new Map();for(const e of entries)initial.set(e.key,structuredClone(e.value));const make=state=>({set(key,value){const next=state;next.set(key,structuredClone(value));return make(next);},delete(key){const next=state;next.delete(key);return make(next);},get(key){return state.has(key)?structuredClone(state.get(key)):undefined;},find(prefix,limit=Infinity){return [...state.keys()].filter(k=>k.startsWith(prefix)).sort().slice(0,limit).map(key=>({key,value:structuredClone(state.get(key))}));},entries(){return this.find('');}});return make(initial);}\n"
+    },
+    {
+      "name": "limit-before-sorting",
+      "file": "src/dictionary.mjs",
+      "replacement": "export function createDictionary(entries=[]){const initial=new Map();for(const e of entries)initial.set(e.key,structuredClone(e.value));const make=state=>({set(key,value){const next=new Map(state);next.set(key,structuredClone(value));return make(next);},delete(key){const next=new Map(state);next.delete(key);return make(next);},get(key){return state.has(key)?structuredClone(state.get(key)):undefined;},find(prefix,limit=Infinity){return [...state.keys()].filter(k=>k.startsWith(prefix)).slice(0,limit).sort().map(key=>({key,value:structuredClone(state.get(key))}));},entries(){return this.find('');}});return make(initial);}\n"
+    }
+  ]
+}

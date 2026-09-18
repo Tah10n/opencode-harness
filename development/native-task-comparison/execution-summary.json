@@ -1,0 +1,2883 @@
+{
+  "assignedSlots": 200,
+  "completedRecords": 200,
+  "allIdentityStopCleanupVerified": true,
+  "firstQuotaAffectedSlot": 167,
+  "quotaAffectedSlots": 34,
+  "missingBDeliveries": 16,
+  "firstErrorType": "usage_limit_reached",
+  "firstErrorMessage": "The usage limit has been reached",
+  "deviation": "Frozen runner stopped on 401/403 and rejected relay requests, but did not stop scheduling on 429. Remaining assigned slots were attempted and failed without model work; no restart or replacement occurred.",
+  "confirmatoryVerdict": "withheld: intended complete model-backed comparison was not obtained",
+  "runtime": "3750b0d448fbfa7db80c459029a98fd221e86f94",
+  "frozenPreparationCommit": "6db1bbdb0e795343c54c76761ec7425d7e5c98da",
+  "frozenInputsUnchanged": true,
+  "startUTC": "2026-09-09T16:50:38.870Z",
+  "endUTC": "2026-09-09T22:23:05.904Z",
+  "independentManualReviews": 255,
+  "availableInspectionPackets": 255,
+  "manualReviewsPending": 0,
+  "unavailableFinalDeliveries": 16,
+  "availableD0": 71,
+  "independentFinalDiscordantRecheck": "completed: same reviewer checked all25 original discordant pairs, all68 source adjudications, saved accounting and frozen arithmetic controls; see independent-review.json",
+  "confirmatoryStatistics": {
+    "effect": null,
+    "pValue": null,
+    "confidenceInterval": null,
+    "reason": "Model-backed series was interrupted by quota failure; completed offline review does not restore missing model work. No confirmatory verdict."
+  },
+  "nativeStatuses": {
+    "reviewed_delivery": 53,
+    "incomplete": 46,
+    "environment_error": 1
+  },
+  "repairs": 0,
+  "evidenceCorrections": 1,
+  "BstageObservations": {
+    "implementation": {
+      "stageRecords": 72,
+      "elapsedMs": 6555917,
+      "nativeObservedTokens": 9908931,
+      "nativeToolCalls": 1351
+    },
+    "review": {
+      "stageRecords": 81,
+      "elapsedMs": 1606691,
+      "nativeObservedTokens": 1928966,
+      "nativeToolCalls": 76
+    },
+    "format": {
+      "stageRecords": 5,
+      "elapsedMs": 69841,
+      "nativeObservedTokens": 17746,
+      "nativeToolCalls": 0
+    },
+    "reproduction/correction": {
+      "stageRecords": 16,
+      "elapsedMs": 431187,
+      "nativeObservedTokens": 1268400,
+      "nativeToolCalls": 56
+    }
+  },
+  "BnativeOutsideAttributedStages": 2890548,
+  "BnativeWrapperSubset": 1168835,
+  "BnativeStillUnattributed": 1721713,
+  "BproviderMinusNativeObserved": 49158,
+  "effortCounts": {
+    "A": {
+      "none": 134,
+      "low": 1030
+    },
+    "B": {
+      "none": 132,
+      "low": 1519
+    }
+  },
+  "artifactDigests": {
+    "scored-runs.log": "a6b0e934e291d968e3e700e453c5a6db856833dd7a380a8adbe485de9d854f11",
+    "final-execution-audit.json": "6ca202e3cd070d37c85ad62da32a3332d1a3048a0787c67f1cbaecd4a1291d08"
+  },
+  "slots": [
+    {
+      "slot": 1,
+      "task": "span-source-map-compose",
+      "arm": "A",
+      "startedAt": "2026-09-09T16:50:38.870Z",
+      "completedAt": "2026-09-09T16:52:20.835Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 2,
+      "task": "span-source-map-compose",
+      "arm": "B",
+      "startedAt": "2026-09-09T16:52:21.189Z",
+      "completedAt": "2026-09-09T16:55:35.379Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 24
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 3,
+      "task": "immutable-board-moves",
+      "arm": "A",
+      "startedAt": "2026-09-09T16:55:35.747Z",
+      "completedAt": "2026-09-09T16:57:09.883Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 13
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 4,
+      "task": "immutable-board-moves",
+      "arm": "B",
+      "startedAt": "2026-09-09T16:57:10.233Z",
+      "completedAt": "2026-09-09T16:59:31.098Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 18
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 5,
+      "task": "conditional-form-errors",
+      "arm": "A",
+      "startedAt": "2026-09-09T16:59:31.447Z",
+      "completedAt": "2026-09-09T17:00:34.954Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 6,
+      "task": "conditional-form-errors",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:00:35.250Z",
+      "completedAt": "2026-09-09T17:02:15.213Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 7,
+      "task": "reservoir-sample-resume",
+      "arm": "A",
+      "startedAt": "2026-09-09T17:02:15.550Z",
+      "completedAt": "2026-09-09T17:03:47.161Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 13
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 8,
+      "task": "reservoir-sample-resume",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:03:47.502Z",
+      "completedAt": "2026-09-09T17:04:40.950Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 9,
+      "task": "unit-conversion-graph",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:04:41.290Z",
+      "completedAt": "2026-09-09T17:09:01.248Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 29
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 10,
+      "task": "unit-conversion-graph",
+      "arm": "A",
+      "startedAt": "2026-09-09T17:09:01.596Z",
+      "completedAt": "2026-09-09T17:10:57.948Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 11,
+      "task": "abortable-delay-consumer",
+      "arm": "A",
+      "startedAt": "2026-09-09T17:10:58.308Z",
+      "completedAt": "2026-09-09T17:12:07.440Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 10
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 12,
+      "task": "abortable-delay-consumer",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:12:07.799Z",
+      "completedAt": "2026-09-09T17:13:55.144Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 13,
+      "task": "path-edit-transaction",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:13:55.498Z",
+      "completedAt": "2026-09-09T17:15:33.753Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 14,
+      "task": "path-edit-transaction",
+      "arm": "A",
+      "startedAt": "2026-09-09T17:15:34.119Z",
+      "completedAt": "2026-09-09T17:17:06.798Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 12
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 15,
+      "task": "symbol-property-copy",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:17:07.145Z",
+      "completedAt": "2026-09-09T17:19:02.325Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 19
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 16,
+      "task": "symbol-property-copy",
+      "arm": "A",
+      "startedAt": "2026-09-09T17:19:02.697Z",
+      "completedAt": "2026-09-09T17:20:26.386Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 13
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 17,
+      "task": "feature-rollout-context",
+      "arm": "A",
+      "startedAt": "2026-09-09T17:20:26.734Z",
+      "completedAt": "2026-09-09T17:21:26.683Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 12
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 18,
+      "task": "feature-rollout-context",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:21:27.031Z",
+      "completedAt": "2026-09-09T17:23:23.095Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 17
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 19,
+      "task": "sliding-session-expiry",
+      "arm": "A",
+      "startedAt": "2026-09-09T17:23:23.438Z",
+      "completedAt": "2026-09-09T17:24:42.479Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 13
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 20,
+      "task": "sliding-session-expiry",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:24:42.823Z",
+      "completedAt": "2026-09-09T17:27:15.711Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 20
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 21,
+      "task": "header-multimap-api",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:27:16.052Z",
+      "completedAt": "2026-09-09T17:29:03.691Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 22,
+      "task": "header-multimap-api",
+      "arm": "A",
+      "startedAt": "2026-09-09T17:29:04.049Z",
+      "completedAt": "2026-09-09T17:30:16.456Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 23,
+      "task": "bounded-lru-persistence",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:30:16.815Z",
+      "completedAt": "2026-09-09T17:31:58.578Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 24,
+      "task": "bounded-lru-persistence",
+      "arm": "A",
+      "startedAt": "2026-09-09T17:31:58.942Z",
+      "completedAt": "2026-09-09T17:32:59.117Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 25,
+      "task": "clock-injected-reminders",
+      "arm": "A",
+      "startedAt": "2026-09-09T17:32:59.481Z",
+      "completedAt": "2026-09-09T17:33:59.847Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 26,
+      "task": "clock-injected-reminders",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:34:00.211Z",
+      "completedAt": "2026-09-09T17:36:34.688Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 21
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 27,
+      "task": "version-vector-relations",
+      "arm": "A",
+      "startedAt": "2026-09-09T17:36:35.029Z",
+      "completedAt": "2026-09-09T17:37:54.738Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 15
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 28,
+      "task": "version-vector-relations",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:37:55.077Z",
+      "completedAt": "2026-09-09T17:39:56.002Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 17
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 29,
+      "task": "lazy-default-arguments",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:39:56.346Z",
+      "completedAt": "2026-09-09T17:41:43.236Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 20
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 30,
+      "task": "lazy-default-arguments",
+      "arm": "A",
+      "startedAt": "2026-09-09T17:41:43.585Z",
+      "completedAt": "2026-09-09T17:42:39.616Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 31,
+      "task": "encoder-decoder-separation",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:42:39.963Z",
+      "completedAt": "2026-09-09T17:44:28.643Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 17
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 32,
+      "task": "encoder-decoder-separation",
+      "arm": "A",
+      "startedAt": "2026-09-09T17:44:28.994Z",
+      "completedAt": "2026-09-09T17:45:53.567Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 12
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 33,
+      "task": "multi-value-query-state",
+      "arm": "A",
+      "startedAt": "2026-09-09T17:45:53.873Z",
+      "completedAt": "2026-09-09T17:47:18.431Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 15
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 34,
+      "task": "multi-value-query-state",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:47:18.778Z",
+      "completedAt": "2026-09-09T17:49:00.767Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 35,
+      "task": "array-like-slice-consumer",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:49:01.113Z",
+      "completedAt": "2026-09-09T17:51:25.025Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 21
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 36,
+      "task": "array-like-slice-consumer",
+      "arm": "A",
+      "startedAt": "2026-09-09T17:51:25.371Z",
+      "completedAt": "2026-09-09T17:53:09.331Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 17
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 37,
+      "task": "immutable-color-transform",
+      "arm": "A",
+      "startedAt": "2026-09-09T17:53:09.665Z",
+      "completedAt": "2026-09-09T17:54:26.930Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 38,
+      "task": "immutable-color-transform",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:54:27.230Z",
+      "completedAt": "2026-09-09T17:56:22.136Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 39,
+      "task": "parcel-shipping-quote",
+      "arm": "A",
+      "startedAt": "2026-09-09T17:56:22.494Z",
+      "completedAt": "2026-09-09T17:57:24.335Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 10
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 40,
+      "task": "parcel-shipping-quote",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:57:24.690Z",
+      "completedAt": "2026-09-09T17:59:30.647Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 17
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 41,
+      "task": "image-transform-pipeline",
+      "arm": "B",
+      "startedAt": "2026-09-09T17:59:31.006Z",
+      "completedAt": "2026-09-09T18:01:43.010Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 17
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 42,
+      "task": "image-transform-pipeline",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:01:43.379Z",
+      "completedAt": "2026-09-09T18:03:03.660Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 13
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 43,
+      "task": "url-resolver-consumers",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:03:04.019Z",
+      "completedAt": "2026-09-09T18:04:15.100Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 10
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 44,
+      "task": "url-resolver-consumers",
+      "arm": "B",
+      "startedAt": "2026-09-09T18:04:15.415Z",
+      "completedAt": "2026-09-09T18:06:56.901Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 19
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 45,
+      "task": "zoned-time-offset-records",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:06:57.249Z",
+      "completedAt": "2026-09-09T18:08:35.435Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 12
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 46,
+      "task": "zoned-time-offset-records",
+      "arm": "B",
+      "startedAt": "2026-09-09T18:08:35.774Z",
+      "completedAt": "2026-09-09T18:11:32.091Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 23
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 47,
+      "task": "incremental-line-index",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:11:32.438Z",
+      "completedAt": "2026-09-09T18:13:11.818Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 48,
+      "task": "incremental-line-index",
+      "arm": "B",
+      "startedAt": "2026-09-09T18:13:12.156Z",
+      "completedAt": "2026-09-09T18:15:03.805Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 17
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 49,
+      "task": "casefold-command-aliases",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:15:04.149Z",
+      "completedAt": "2026-09-09T18:16:23.976Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 50,
+      "task": "casefold-command-aliases",
+      "arm": "B",
+      "startedAt": "2026-09-09T18:16:24.316Z",
+      "completedAt": "2026-09-09T18:18:41.003Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 15
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 51,
+      "task": "breadcrumb-visible-ancestors",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:18:41.361Z",
+      "completedAt": "2026-09-09T18:19:45.262Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 52,
+      "task": "breadcrumb-visible-ancestors",
+      "arm": "B",
+      "startedAt": "2026-09-09T18:19:45.633Z",
+      "completedAt": "2026-09-09T18:21:25.992Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 53,
+      "task": "markdown-heading-navigation",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:21:26.338Z",
+      "completedAt": "2026-09-09T18:23:03.628Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 13
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 54,
+      "task": "markdown-heading-navigation",
+      "arm": "B",
+      "startedAt": "2026-09-09T18:23:03.978Z",
+      "completedAt": "2026-09-09T18:25:38.473Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 19
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 55,
+      "task": "binary-tlv-stream",
+      "arm": "B",
+      "startedAt": "2026-09-09T18:25:38.851Z",
+      "completedAt": "2026-09-09T18:27:04.536Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 56,
+      "task": "binary-tlv-stream",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:27:04.880Z",
+      "completedAt": "2026-09-09T18:28:32.516Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 15
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 57,
+      "task": "optional-result-unwrapping",
+      "arm": "B",
+      "startedAt": "2026-09-09T18:28:32.859Z",
+      "completedAt": "2026-09-09T18:30:06.435Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 15
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 58,
+      "task": "optional-result-unwrapping",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:30:06.780Z",
+      "completedAt": "2026-09-09T18:31:15.659Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 59,
+      "task": "ledger-settlement-reconcile",
+      "arm": "B",
+      "startedAt": "2026-09-09T18:31:16.000Z",
+      "completedAt": "2026-09-09T18:33:28.665Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 20
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 60,
+      "task": "ledger-settlement-reconcile",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:33:29.009Z",
+      "completedAt": "2026-09-09T18:34:52.467Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 13
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 61,
+      "task": "parser-diagnostic-locations",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:34:52.807Z",
+      "completedAt": "2026-09-09T18:36:26.733Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 62,
+      "task": "parser-diagnostic-locations",
+      "arm": "B",
+      "startedAt": "2026-09-09T18:36:27.076Z",
+      "completedAt": "2026-09-09T18:38:28.955Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 17
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 63,
+      "task": "geographic-antimeridian-viewport",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:38:29.297Z",
+      "completedAt": "2026-09-09T18:39:58.273Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 64,
+      "task": "geographic-antimeridian-viewport",
+      "arm": "B",
+      "startedAt": "2026-09-09T18:39:58.612Z",
+      "completedAt": "2026-09-09T18:41:36.878Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 15
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 65,
+      "task": "rolling-checksum-journal",
+      "arm": "B",
+      "startedAt": "2026-09-09T18:41:37.217Z",
+      "completedAt": "2026-09-09T18:43:29.905Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 19
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 66,
+      "task": "rolling-checksum-journal",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:43:30.247Z",
+      "completedAt": "2026-09-09T18:44:27.169Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 10
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 67,
+      "task": "text-diff-patch-state",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:44:27.511Z",
+      "completedAt": "2026-09-09T18:45:47.768Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 68,
+      "task": "text-diff-patch-state",
+      "arm": "B",
+      "startedAt": "2026-09-09T18:45:48.107Z",
+      "completedAt": "2026-09-09T18:47:38.501Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 69,
+      "task": "error-cause-chain-view",
+      "arm": "B",
+      "startedAt": "2026-09-09T18:47:38.842Z",
+      "completedAt": "2026-09-09T18:49:24.567Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 15
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 70,
+      "task": "error-cause-chain-view",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:49:24.912Z",
+      "completedAt": "2026-09-09T18:50:57.122Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 13
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 71,
+      "task": "token-bucket-admission",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:50:57.461Z",
+      "completedAt": "2026-09-09T18:52:05.296Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 10
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 72,
+      "task": "token-bucket-admission",
+      "arm": "B",
+      "startedAt": "2026-09-09T18:52:05.634Z",
+      "completedAt": "2026-09-09T18:53:52.625Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 73,
+      "task": "notification-channel-router",
+      "arm": "B",
+      "startedAt": "2026-09-09T18:53:52.969Z",
+      "completedAt": "2026-09-09T18:56:23.483Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 20
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 74,
+      "task": "notification-channel-router",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:56:23.823Z",
+      "completedAt": "2026-09-09T18:58:14.588Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 19
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 75,
+      "task": "responsive-image-candidates",
+      "arm": "A",
+      "startedAt": "2026-09-09T18:58:14.892Z",
+      "completedAt": "2026-09-09T18:59:22.935Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 76,
+      "task": "responsive-image-candidates",
+      "arm": "B",
+      "startedAt": "2026-09-09T18:59:23.231Z",
+      "completedAt": "2026-09-09T19:01:39.154Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 77,
+      "task": "content-addressed-chunks",
+      "arm": "A",
+      "startedAt": "2026-09-09T19:01:39.492Z",
+      "completedAt": "2026-09-09T19:02:45.707Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 10
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 78,
+      "task": "content-addressed-chunks",
+      "arm": "B",
+      "startedAt": "2026-09-09T19:02:46.054Z",
+      "completedAt": "2026-09-09T19:04:27.848Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 17
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 79,
+      "task": "structured-redaction-walk",
+      "arm": "B",
+      "startedAt": "2026-09-09T19:04:28.185Z",
+      "completedAt": "2026-09-09T19:06:44.173Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 20
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 80,
+      "task": "structured-redaction-walk",
+      "arm": "A",
+      "startedAt": "2026-09-09T19:06:44.505Z",
+      "completedAt": "2026-09-09T19:07:59.584Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 81,
+      "task": "trace-context-propagation",
+      "arm": "A",
+      "startedAt": "2026-09-09T19:07:59.879Z",
+      "completedAt": "2026-09-09T19:09:05.598Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 82,
+      "task": "trace-context-propagation",
+      "arm": "B",
+      "startedAt": "2026-09-09T19:09:05.941Z",
+      "completedAt": "2026-09-09T19:10:55.526Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 83,
+      "task": "deterministic-shuffle-source",
+      "arm": "B",
+      "startedAt": "2026-09-09T19:10:55.868Z",
+      "completedAt": "2026-09-09T19:13:01.421Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 19
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 84,
+      "task": "deterministic-shuffle-source",
+      "arm": "A",
+      "startedAt": "2026-09-09T19:13:01.760Z",
+      "completedAt": "2026-09-09T19:14:28.560Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 85,
+      "task": "subscription-proration-lines",
+      "arm": "A",
+      "startedAt": "2026-09-09T19:14:28.891Z",
+      "completedAt": "2026-09-09T19:15:45.822Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 86,
+      "task": "subscription-proration-lines",
+      "arm": "B",
+      "startedAt": "2026-09-09T19:15:46.164Z",
+      "completedAt": "2026-09-09T19:17:33.208Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 87,
+      "task": "scope-policy-composition",
+      "arm": "B",
+      "startedAt": "2026-09-09T19:17:33.567Z",
+      "completedAt": "2026-09-09T19:19:28.699Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 88,
+      "task": "scope-policy-composition",
+      "arm": "A",
+      "startedAt": "2026-09-09T19:19:29.059Z",
+      "completedAt": "2026-09-09T19:20:55.255Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 10
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 89,
+      "task": "portable-path-core",
+      "arm": "A",
+      "startedAt": "2026-09-09T19:20:55.595Z",
+      "completedAt": "2026-09-09T19:22:13.169Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 12
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 90,
+      "task": "portable-path-core",
+      "arm": "B",
+      "startedAt": "2026-09-09T19:22:13.528Z",
+      "completedAt": "2026-09-09T19:25:27.922Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 26
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 91,
+      "task": "line-ending-input-adapter",
+      "arm": "B",
+      "startedAt": "2026-09-09T19:25:28.265Z",
+      "completedAt": "2026-09-09T19:28:18.240Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 22
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 92,
+      "task": "line-ending-input-adapter",
+      "arm": "A",
+      "startedAt": "2026-09-09T19:28:18.575Z",
+      "completedAt": "2026-09-09T19:29:30.087Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 10
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 93,
+      "task": "shell-word-tokenizer-api",
+      "arm": "A",
+      "startedAt": "2026-09-09T19:29:30.435Z",
+      "completedAt": "2026-09-09T19:30:46.923Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 94,
+      "task": "shell-word-tokenizer-api",
+      "arm": "B",
+      "startedAt": "2026-09-09T19:30:47.276Z",
+      "completedAt": "2026-09-09T19:32:27.453Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 95,
+      "task": "table-driven-http-status",
+      "arm": "A",
+      "startedAt": "2026-09-09T19:32:27.810Z",
+      "completedAt": "2026-09-09T19:33:56.391Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 96,
+      "task": "table-driven-http-status",
+      "arm": "B",
+      "startedAt": "2026-09-09T19:33:56.751Z",
+      "completedAt": "2026-09-09T19:36:16.293Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 19
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 97,
+      "task": "sparse-grid-persistence",
+      "arm": "B",
+      "startedAt": "2026-09-09T19:36:16.656Z",
+      "completedAt": "2026-09-09T19:37:56.832Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 15
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 98,
+      "task": "sparse-grid-persistence",
+      "arm": "A",
+      "startedAt": "2026-09-09T19:37:57.193Z",
+      "completedAt": "2026-09-09T19:39:04.593Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 10
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 99,
+      "task": "route-specificity-dispatch",
+      "arm": "A",
+      "startedAt": "2026-09-09T19:39:04.952Z",
+      "completedAt": "2026-09-09T19:40:18.861Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 12
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 100,
+      "task": "route-specificity-dispatch",
+      "arm": "B",
+      "startedAt": "2026-09-09T19:40:19.214Z",
+      "completedAt": "2026-09-09T19:43:17.183Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 23
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 101,
+      "task": "lazy-file-manifest",
+      "arm": "A",
+      "startedAt": "2026-09-09T19:43:17.544Z",
+      "completedAt": "2026-09-09T19:44:51.459Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 12
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 102,
+      "task": "lazy-file-manifest",
+      "arm": "B",
+      "startedAt": "2026-09-09T19:44:51.806Z",
+      "completedAt": "2026-09-09T19:48:26.298Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 28
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 103,
+      "task": "run-length-bitmap-codec",
+      "arm": "B",
+      "startedAt": "2026-09-09T19:48:26.654Z",
+      "completedAt": "2026-09-09T19:50:50.810Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 15
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 104,
+      "task": "run-length-bitmap-codec",
+      "arm": "A",
+      "startedAt": "2026-09-09T19:50:51.156Z",
+      "completedAt": "2026-09-09T19:51:59.380Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 9
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 105,
+      "task": "dependency-injected-id-source",
+      "arm": "B",
+      "startedAt": "2026-09-09T19:51:59.764Z",
+      "completedAt": "2026-09-09T19:53:50.148Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 106,
+      "task": "dependency-injected-id-source",
+      "arm": "A",
+      "startedAt": "2026-09-09T19:53:50.522Z",
+      "completedAt": "2026-09-09T19:55:04.371Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 10
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 107,
+      "task": "iterative-deep-flatten",
+      "arm": "B",
+      "startedAt": "2026-09-09T19:55:04.714Z",
+      "completedAt": "2026-09-09T19:57:07.658Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 18
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 108,
+      "task": "iterative-deep-flatten",
+      "arm": "A",
+      "startedAt": "2026-09-09T19:57:07.999Z",
+      "completedAt": "2026-09-09T19:59:06.009Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 17
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 109,
+      "task": "meeting-buffer-search",
+      "arm": "B",
+      "startedAt": "2026-09-09T19:59:06.358Z",
+      "completedAt": "2026-09-09T20:01:26.584Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 18
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 110,
+      "task": "meeting-buffer-search",
+      "arm": "A",
+      "startedAt": "2026-09-09T20:01:26.927Z",
+      "completedAt": "2026-09-09T20:02:32.666Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 10
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 111,
+      "task": "bigint-wire-boundary",
+      "arm": "B",
+      "startedAt": "2026-09-09T20:02:33.007Z",
+      "completedAt": "2026-09-09T20:06:01.105Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 23
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 112,
+      "task": "bigint-wire-boundary",
+      "arm": "A",
+      "startedAt": "2026-09-09T20:06:01.449Z",
+      "completedAt": "2026-09-09T20:08:02.579Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 113,
+      "task": "draft-three-way-merge",
+      "arm": "A",
+      "startedAt": "2026-09-09T20:08:02.913Z",
+      "completedAt": "2026-09-09T20:09:21.827Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 114,
+      "task": "draft-three-way-merge",
+      "arm": "B",
+      "startedAt": "2026-09-09T20:09:22.166Z",
+      "completedAt": "2026-09-09T20:11:07.081Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 15
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 115,
+      "task": "radix-tree-edit-state",
+      "arm": "A",
+      "startedAt": "2026-09-09T20:11:07.456Z",
+      "completedAt": "2026-09-09T20:12:06.876Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 10
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 116,
+      "task": "radix-tree-edit-state",
+      "arm": "B",
+      "startedAt": "2026-09-09T20:12:07.227Z",
+      "completedAt": "2026-09-09T20:13:54.113Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 15
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 117,
+      "task": "plugin-hook-composition",
+      "arm": "B",
+      "startedAt": "2026-09-09T20:13:54.457Z",
+      "completedAt": "2026-09-09T20:15:46.917Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 17
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 118,
+      "task": "plugin-hook-composition",
+      "arm": "A",
+      "startedAt": "2026-09-09T20:15:47.265Z",
+      "completedAt": "2026-09-09T20:17:00.649Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 119,
+      "task": "priority-inbox-state",
+      "arm": "B",
+      "startedAt": "2026-09-09T20:17:01.001Z",
+      "completedAt": "2026-09-09T20:18:43.030Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 120,
+      "task": "priority-inbox-state",
+      "arm": "A",
+      "startedAt": "2026-09-09T20:18:43.367Z",
+      "completedAt": "2026-09-09T20:20:00.043Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 12
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 121,
+      "task": "canonical-json-digest",
+      "arm": "B",
+      "startedAt": "2026-09-09T20:20:00.396Z",
+      "completedAt": "2026-09-09T20:21:52.227Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 122,
+      "task": "canonical-json-digest",
+      "arm": "A",
+      "startedAt": "2026-09-09T20:21:52.585Z",
+      "completedAt": "2026-09-09T20:23:20.561Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 13
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 123,
+      "task": "legacy-date-parser",
+      "arm": "A",
+      "startedAt": "2026-09-09T20:23:20.908Z",
+      "completedAt": "2026-09-09T20:24:28.958Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 12
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 124,
+      "task": "legacy-date-parser",
+      "arm": "B",
+      "startedAt": "2026-09-09T20:24:29.299Z",
+      "completedAt": "2026-09-09T20:26:13.508Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 125,
+      "task": "validation-rule-combinators",
+      "arm": "B",
+      "startedAt": "2026-09-09T20:26:13.862Z",
+      "completedAt": "2026-09-09T20:28:20.750Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 18
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 126,
+      "task": "validation-rule-combinators",
+      "arm": "A",
+      "startedAt": "2026-09-09T20:28:21.096Z",
+      "completedAt": "2026-09-09T20:29:36.591Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 127,
+      "task": "lexer-token-spans",
+      "arm": "A",
+      "startedAt": "2026-09-09T20:29:36.959Z",
+      "completedAt": "2026-09-09T20:30:45.759Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 128,
+      "task": "lexer-token-spans",
+      "arm": "B",
+      "startedAt": "2026-09-09T20:30:46.096Z",
+      "completedAt": "2026-09-09T20:32:43.770Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 17
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 129,
+      "task": "sync-async-disposal",
+      "arm": "A",
+      "startedAt": "2026-09-09T20:32:44.120Z",
+      "completedAt": "2026-09-09T20:34:04.397Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 130,
+      "task": "sync-async-disposal",
+      "arm": "B",
+      "startedAt": "2026-09-09T20:34:04.739Z",
+      "completedAt": "2026-09-09T20:36:24.824Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 21
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 131,
+      "task": "bloom-filter-union-state",
+      "arm": "A",
+      "startedAt": "2026-09-09T20:36:25.167Z",
+      "completedAt": "2026-09-09T20:38:10.440Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 15
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 132,
+      "task": "bloom-filter-union-state",
+      "arm": "B",
+      "startedAt": "2026-09-09T20:38:10.784Z",
+      "completedAt": "2026-09-09T20:40:09.786Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 18
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 133,
+      "task": "undo-redo-branching",
+      "arm": "A",
+      "startedAt": "2026-09-09T20:40:10.138Z",
+      "completedAt": "2026-09-09T20:41:15.293Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 134,
+      "task": "undo-redo-branching",
+      "arm": "B",
+      "startedAt": "2026-09-09T20:41:15.637Z",
+      "completedAt": "2026-09-09T20:43:03.668Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 15
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 135,
+      "task": "streaming-summary-fold",
+      "arm": "A",
+      "startedAt": "2026-09-09T20:43:04.013Z",
+      "completedAt": "2026-09-09T20:44:23.793Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 13
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 136,
+      "task": "streaming-summary-fold",
+      "arm": "B",
+      "startedAt": "2026-09-09T20:44:24.139Z",
+      "completedAt": "2026-09-09T20:47:27.143Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 24
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 137,
+      "task": "typed-byte-view-inputs",
+      "arm": "A",
+      "startedAt": "2026-09-09T20:47:27.485Z",
+      "completedAt": "2026-09-09T20:48:52.198Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 138,
+      "task": "typed-byte-view-inputs",
+      "arm": "B",
+      "startedAt": "2026-09-09T20:48:52.546Z",
+      "completedAt": "2026-09-09T20:51:02.339Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 18
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 139,
+      "task": "pure-reducer-effects",
+      "arm": "B",
+      "startedAt": "2026-09-09T20:51:02.682Z",
+      "completedAt": "2026-09-09T20:52:52.188Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 15
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 140,
+      "task": "pure-reducer-effects",
+      "arm": "A",
+      "startedAt": "2026-09-09T20:52:52.525Z",
+      "completedAt": "2026-09-09T20:54:16.744Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 12
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 141,
+      "task": "matrix-layout-strategies",
+      "arm": "A",
+      "startedAt": "2026-09-09T20:54:17.090Z",
+      "completedAt": "2026-09-09T20:55:52.688Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 142,
+      "task": "matrix-layout-strategies",
+      "arm": "B",
+      "startedAt": "2026-09-09T20:55:53.048Z",
+      "completedAt": "2026-09-09T20:58:31.679Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 23
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 143,
+      "task": "normalization-once-pipeline",
+      "arm": "B",
+      "startedAt": "2026-09-09T20:58:32.034Z",
+      "completedAt": "2026-09-09T21:00:22.881Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 17
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 144,
+      "task": "normalization-once-pipeline",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:00:23.222Z",
+      "completedAt": "2026-09-09T21:01:24.205Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 10
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 145,
+      "task": "promise-finalizer-errors",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:01:24.544Z",
+      "completedAt": "2026-09-09T21:02:19.601Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 10
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 146,
+      "task": "promise-finalizer-errors",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:02:19.942Z",
+      "completedAt": "2026-09-09T21:04:09.721Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 20
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 147,
+      "task": "media-type-parameter-api",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:04:10.059Z",
+      "completedAt": "2026-09-09T21:06:50.149Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 24
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 148,
+      "task": "media-type-parameter-api",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:06:50.489Z",
+      "completedAt": "2026-09-09T21:08:14.367Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 149,
+      "task": "record-projection-consumer",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:08:14.700Z",
+      "completedAt": "2026-09-09T21:10:05.953Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 150,
+      "task": "record-projection-consumer",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:10:06.297Z",
+      "completedAt": "2026-09-09T21:11:30.623Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 13
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 151,
+      "task": "mime-inline-attachments",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:11:30.958Z",
+      "completedAt": "2026-09-09T21:13:14.856Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 15
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 152,
+      "task": "mime-inline-attachments",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:13:15.198Z",
+      "completedAt": "2026-09-09T21:14:42.791Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 12
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 153,
+      "task": "node-callback-abort",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:14:43.128Z",
+      "completedAt": "2026-09-09T21:16:03.002Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 154,
+      "task": "node-callback-abort",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:16:03.296Z",
+      "completedAt": "2026-09-09T21:18:07.808Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 18
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 155,
+      "task": "function-receiver-wrapper",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:18:08.147Z",
+      "completedAt": "2026-09-09T21:19:11.298Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 156,
+      "task": "function-receiver-wrapper",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:19:11.644Z",
+      "completedAt": "2026-09-09T21:21:43.952Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 21
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 157,
+      "task": "tiered-meter-invoice",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:21:44.310Z",
+      "completedAt": "2026-09-09T21:23:27.009Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 158,
+      "task": "tiered-meter-invoice",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:23:27.354Z",
+      "completedAt": "2026-09-09T21:24:32.326Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 159,
+      "task": "fractional-order-keys",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:24:32.670Z",
+      "completedAt": "2026-09-09T21:26:30.557Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 18
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 160,
+      "task": "fractional-order-keys",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:26:30.902Z",
+      "completedAt": "2026-09-09T21:27:41.258Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 11
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 161,
+      "task": "iterable-stream-adapter",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:27:41.555Z",
+      "completedAt": "2026-09-09T21:29:13.537Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 14
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 162,
+      "task": "iterable-stream-adapter",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:29:13.904Z",
+      "completedAt": "2026-09-09T21:31:13.615Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 163,
+      "task": "generator-tree-walk",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:31:13.958Z",
+      "completedAt": "2026-09-09T21:32:49.983Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 18
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 164,
+      "task": "generator-tree-walk",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:32:50.330Z",
+      "completedAt": "2026-09-09T21:34:01.946Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 12
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 165,
+      "task": "weighted-ballot-tabulation",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:34:02.299Z",
+      "completedAt": "2026-09-09T21:34:59.544Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 16
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 166,
+      "task": "weighted-ballot-tabulation",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:34:59.894Z",
+      "completedAt": "2026-09-09T21:36:55.033Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 15
+      },
+      "requestsWithoutUsage": 0
+    },
+    {
+      "slot": 167,
+      "task": "readonly-collection-view",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:36:55.381Z",
+      "completedAt": "2026-09-09T21:40:23.478Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "200": 10,
+        "429": 12
+      },
+      "requestsWithoutUsage": 12
+    },
+    {
+      "slot": 168,
+      "task": "readonly-collection-view",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:40:23.814Z",
+      "completedAt": "2026-09-09T21:41:42.446Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 169,
+      "task": "observed-remove-set",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:41:42.793Z",
+      "completedAt": "2026-09-09T21:42:55.710Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": false,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 170,
+      "task": "observed-remove-set",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:42:56.034Z",
+      "completedAt": "2026-09-09T21:44:13.606Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 171,
+      "task": "range-set-canonicalization",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:44:13.898Z",
+      "completedAt": "2026-09-09T21:45:33.742Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": false,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 172,
+      "task": "range-set-canonicalization",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:45:34.025Z",
+      "completedAt": "2026-09-09T21:46:50.281Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 173,
+      "task": "recurrence-exclusion-calendar",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:46:50.617Z",
+      "completedAt": "2026-09-09T21:48:03.012Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 174,
+      "task": "recurrence-exclusion-calendar",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:48:03.343Z",
+      "completedAt": "2026-09-09T21:49:22.812Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": false,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 175,
+      "task": "binary-search-api-bounds",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:49:23.134Z",
+      "completedAt": "2026-09-09T21:50:42.463Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": false,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 176,
+      "task": "binary-search-api-bounds",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:50:42.788Z",
+      "completedAt": "2026-09-09T21:51:55.440Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 177,
+      "task": "fragmented-message-decoder",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:51:55.772Z",
+      "completedAt": "2026-09-09T21:53:13.006Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": false,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 178,
+      "task": "fragmented-message-decoder",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:53:13.327Z",
+      "completedAt": "2026-09-09T21:54:32.629Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 179,
+      "task": "finite-state-transition-log",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:54:32.918Z",
+      "completedAt": "2026-09-09T21:55:52.713Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 180,
+      "task": "finite-state-transition-log",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:55:53.003Z",
+      "completedAt": "2026-09-09T21:57:10.590Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": false,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 181,
+      "task": "central-money-rounding",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:57:10.914Z",
+      "completedAt": "2026-09-09T21:58:27.218Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": false,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 182,
+      "task": "central-money-rounding",
+      "arm": "A",
+      "startedAt": "2026-09-09T21:58:27.540Z",
+      "completedAt": "2026-09-09T21:59:47.705Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 183,
+      "task": "batch-error-aggregation",
+      "arm": "B",
+      "startedAt": "2026-09-09T21:59:48.036Z",
+      "completedAt": "2026-09-09T22:01:00.612Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": false,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 184,
+      "task": "batch-error-aggregation",
+      "arm": "A",
+      "startedAt": "2026-09-09T22:01:00.939Z",
+      "completedAt": "2026-09-09T22:02:21.834Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 185,
+      "task": "stable-sort-comparator",
+      "arm": "A",
+      "startedAt": "2026-09-09T22:02:22.159Z",
+      "completedAt": "2026-09-09T22:03:38.244Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 186,
+      "task": "stable-sort-comparator",
+      "arm": "B",
+      "startedAt": "2026-09-09T22:03:38.538Z",
+      "completedAt": "2026-09-09T22:04:56.646Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": false,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 187,
+      "task": "regexp-filter-state",
+      "arm": "B",
+      "startedAt": "2026-09-09T22:04:56.928Z",
+      "completedAt": "2026-09-09T22:06:10.537Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": false,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 188,
+      "task": "regexp-filter-state",
+      "arm": "A",
+      "startedAt": "2026-09-09T22:06:10.817Z",
+      "completedAt": "2026-09-09T22:07:26.881Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 189,
+      "task": "positional-options-overload",
+      "arm": "B",
+      "startedAt": "2026-09-09T22:07:27.213Z",
+      "completedAt": "2026-09-09T22:08:44.962Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": false,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 190,
+      "task": "positional-options-overload",
+      "arm": "A",
+      "startedAt": "2026-09-09T22:08:45.244Z",
+      "completedAt": "2026-09-09T22:09:58.943Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 191,
+      "task": "visitor-expression-printer",
+      "arm": "A",
+      "startedAt": "2026-09-09T22:09:59.279Z",
+      "completedAt": "2026-09-09T22:11:18.982Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 192,
+      "task": "visitor-expression-printer",
+      "arm": "B",
+      "startedAt": "2026-09-09T22:11:19.321Z",
+      "completedAt": "2026-09-09T22:12:38.537Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": false,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 193,
+      "task": "transport-injected-uploader",
+      "arm": "A",
+      "startedAt": "2026-09-09T22:12:38.818Z",
+      "completedAt": "2026-09-09T22:13:54.571Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 194,
+      "task": "transport-injected-uploader",
+      "arm": "B",
+      "startedAt": "2026-09-09T22:13:54.859Z",
+      "completedAt": "2026-09-09T22:15:16.435Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": false,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 195,
+      "task": "tree-selection-propagation",
+      "arm": "B",
+      "startedAt": "2026-09-09T22:15:16.722Z",
+      "completedAt": "2026-09-09T22:16:30.068Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": false,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 196,
+      "task": "tree-selection-propagation",
+      "arm": "A",
+      "startedAt": "2026-09-09T22:16:30.388Z",
+      "completedAt": "2026-09-09T22:17:52.573Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 197,
+      "task": "unicode-search-snippets",
+      "arm": "B",
+      "startedAt": "2026-09-09T22:17:52.906Z",
+      "completedAt": "2026-09-09T22:19:11.668Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": false,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 198,
+      "task": "unicode-search-snippets",
+      "arm": "A",
+      "startedAt": "2026-09-09T22:19:11.996Z",
+      "completedAt": "2026-09-09T22:20:27.391Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 199,
+      "task": "metric-watermark-windows",
+      "arm": "B",
+      "startedAt": "2026-09-09T22:20:27.726Z",
+      "completedAt": "2026-09-09T22:21:43.523Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": false,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    },
+    {
+      "slot": 200,
+      "task": "metric-watermark-windows",
+      "arm": "A",
+      "startedAt": "2026-09-09T22:21:43.848Z",
+      "completedAt": "2026-09-09T22:23:05.904Z",
+      "terminationVerified": true,
+      "cleanupStatus": 0,
+      "deliveryAvailable": true,
+      "statuses": {
+        "429": 9
+      },
+      "requestsWithoutUsage": 9
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert fixed sampling/PRNG vectors and resumed JSON snapshot equals uninterrupted batch/sample state.",
+    "Assert deep-copy ownership, metadata errors and atomic count-limit rejection."
+  ],
+  "docDelivery": [
+    "Document Algorithm R draw timing, xorshift steps, replacement rule and slot order.",
+    "Explain snapshot schema, deep copies, restore and count-limit behavior."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Deterministic online reservoir sample, persisted PRNG/count/slot state, deep ownership and atomic bounded batch continuation. Numeric -0 recursively normalizes to positive0 on input/restore.",
+  "independence": "Persist and resume bounded online reservoir sampling with deterministic PRNG state and batch equivalence."
+}

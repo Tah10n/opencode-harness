@@ -1,0 +1,3 @@
+# error-cause-chain-view
+
+formatError starts with name + ': ' + message unchanged. Each own cause adds a newline and 'Caused by: '. Error causes recurse; primitive causes use String and terminate. Undefined/missing cause emits no extra line, but null/false/0/empty strings are retained. Inherited causes are ignored. Revisited Error identity emits '[Circular cause]' once and stops; repeated messages are not cycles. No graph mutations or stacks; this is plain unescaped diagnostic text. Same-realm Error graphs have at most200 distinct nodes with stable own data causes and string names/messages. Invalid root throws TypeError. Run npm test.

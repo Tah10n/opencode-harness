@@ -1,0 +1,1 @@
+export function report(starts,links){return starts.join('\n');}

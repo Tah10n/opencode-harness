@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/result.mjs": "export function unwrap(input,fallback,options={}){\n if(options.tagged!==true)return input===undefined?fallback:input;\n if(!input||typeof input!=='object')throw new TypeError('tagged result');\n const own=key=>Object.prototype.hasOwnProperty.call(input,key);\n if(!own('kind'))throw new TypeError('kind');\n if(input.kind==='none')return fallback;\n if(input.kind==='some'&&own('value'))return input.value;\n if(input.kind==='error'&&own('error'))throw input.error;\n throw new TypeError('tagged result');\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "some-undefined-falls-back",
+      "file": "src/result.mjs",
+      "replacement": "export function unwrap(input,fallback,{tagged=false}={}){\n if(!tagged)return input===undefined?fallback:input;\n if(input===null||typeof input!=='object'||!Object.hasOwn(input,'kind'))throw new TypeError('tagged result');\n switch(input.kind){\n  case 'some':if(!Object.hasOwn(input,'value'))throw new TypeError('missing value');return input.value===undefined?fallback:input.value;\n  case 'none':return fallback;\n  case 'error':if(!Object.hasOwn(input,'error'))throw new TypeError('missing error');throw input.error;\n  default:throw new TypeError('unknown kind');\n }\n}\n"
+    },
+    {
+      "name": "swallows-error-tag",
+      "file": "src/result.mjs",
+      "replacement": "export function unwrap(input,fallback,{tagged=false}={}){\n if(!tagged)return input===undefined?fallback:input;\n if(input===null||typeof input!=='object'||!Object.hasOwn(input,'kind'))throw new TypeError('tagged result');\n switch(input.kind){\n  case 'some':if(!Object.hasOwn(input,'value'))throw new TypeError('missing value');return input.value;\n  case 'none':return fallback;\n  case 'error':if(!Object.hasOwn(input,'error'))throw new TypeError('missing error');return fallback;\n  default:throw new TypeError('unknown kind');\n }\n}\n"
+    }
+  ]
+}

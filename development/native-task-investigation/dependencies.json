@@ -1,0 +1,117 @@
+{
+  "realProviderRequests": 0,
+  "historicalBRecomputed": false,
+  "before": {
+    "ordinaryExit": 0,
+    "localDependencyFiles": [
+      ".cache/ava/failing-tests.json",
+      ".cache/xo-linter/tsconfig.2340015805.json",
+      ".cache/xo-linter/xo-cache.json"
+    ],
+    "baseline": {
+      "exit": 127,
+      "signal": null,
+      "status": "command-rejected",
+      "elapsedMs": 53,
+      "output": "\n> quick-lru@7.3.0 test\n> xo && nyc ava && tsd\n\nsh: 1: xo: not found\n"
+    }
+  },
+  "installed": {
+    "opencode": "1.18.26",
+    "ordinarySuiteThenCache": true,
+    "diagnostics": [
+      {
+        "baseline": "passed",
+        "engineExecuted": true,
+        "cost": {
+          "commands": 9,
+          "engineMs": 368,
+          "preparationMs": 48455,
+          "commandMs": 25550,
+          "totalMs": 75291
+        },
+        "variants": [
+          {
+            "original": "{\n\t\tif (this.#cache.has(key)) {\n\t\t\tconst item = this.#cache.get(key);\n\t\t\tif (this.#deleteIfExpired(key, item) === false) {\n\t\t\t\treturn item.value;\n\t\t\t}\n\t\t} else if (this.#oldCache.has(key)) {\n\t\t\tconst item = this.#oldCache.get(key);\n\t\t\tif (this.#deleteIfExpired(key, item) === false) {\n\t\t\t\tthis.#moveToRecent(key, item);\n\t\t\t\treturn item.value;\n\t\t\t}\n\t\t}\n\n\t\tconst value = factory(key);\n\t\tthis.set(key, value);\n\t\treturn value;\n\t}",
+            "replacement": "{}",
+            "status": "command-rejected"
+          },
+          {
+            "original": "this.#cache.has(key)",
+            "replacement": "true",
+            "status": "command-rejected"
+          },
+          {
+            "original": "this.#cache.has(key)",
+            "replacement": "false",
+            "status": "command-rejected"
+          },
+          {
+            "original": "{\n\t\t\tconst item = this.#cache.get(key);\n\t\t\tif (this.#deleteIfExpired(key, item) === false) {\n\t\t\t\treturn item.value;\n\t\t\t}\n\t\t}",
+            "replacement": "{}",
+            "status": "command-rejected"
+          },
+          {
+            "original": "this.#deleteIfExpired(key, item) === false",
+            "replacement": "true",
+            "status": "command-rejected"
+          },
+          {
+            "original": "this.#deleteIfExpired(key, item) === false",
+            "replacement": "false",
+            "status": "command-rejected"
+          },
+          {
+            "original": "this.#deleteIfExpired(key, item) === false",
+            "replacement": "this.#deleteIfExpired(key, item) !== false",
+            "status": "passed"
+          },
+          {
+            "original": "false",
+            "replacement": "true",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "baseline": "passed",
+        "engineExecuted": false,
+        "cost": {
+          "commands": 2,
+          "engineMs": 0,
+          "preparationMs": 10500,
+          "commandMs": 7141,
+          "totalMs": 17872
+        },
+        "variants": [
+          {
+            "original": "this.#deleteIfExpired(key, item) === false",
+            "replacement": "this.#deleteIfExpired(key, item) !== false",
+            "status": "command-rejected"
+          }
+        ]
+      }
+    ],
+    "ordinaryPatchPassed": true
+  },
+  "environment": {
+    "workTmpfsMiB": 1536,
+    "containerMemoryMiB": 3072,
+    "copyByteLimitMiB": 300,
+    "copyEntryLimit": 80000,
+    "diagnosticTaskMs": 180000
+  },
+  "checks": [
+    "no local dependencies",
+    "cache only after ordinary suite",
+    "full local install",
+    "different local package preserves precedence",
+    "missing package remains missing",
+    "read denial",
+    "external symlink denied",
+    "independent dependency writes",
+    "npm pretest/test/posttest",
+    "new project regression rejects real variant",
+    "portable terminal patch"
+  ]
+}

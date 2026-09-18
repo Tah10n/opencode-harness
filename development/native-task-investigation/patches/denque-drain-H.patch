@@ -1,0 +1,221 @@
+diff --git a/README.md b/README.md
+index 3c645d39c5cd12c0482b2ce63ae0bdf9822d17e8..9949c9cae4d2aae8a580301e1ccfa3d2944f3f76 100644
+--- a/README.md
++++ b/README.md
+@@ -41,6 +41,7 @@ const Denque = require("denque");
+ const denque = new Denque([1,2,3,4]);
+ denque.shift(); // 1
+ denque.pop(); // 4
++denque.drain(2); // [2,3]
+ ```
+ 
+ 
+diff --git a/docs/api.mdx b/docs/api.mdx
+index 69d4ecf179ac388bfe4abeff7e438dc908b91a2d..e5b90974631d723d25bb28de331b44ac05bd3d96 100644
+--- a/docs/api.mdx
++++ b/docs/api.mdx
+@@ -101,6 +101,19 @@ denque.shift(); // undefined
+ 
+ 
+ 
++### `drain(count)` -> `array`
++
++Remove items from the front of this queue and return them in FIFO order. If `count` is omitted, all items are removed. An explicit count must be a finite non-negative integer; a count larger than the queue length removes all available items.
++
++```js
++var denque = new Denque([1,2,3,4]);
++denque.drain(2); // [1,2]
++denque.toArray(); // [3,4]
++denque.drain(); // [3,4]
++```
++
++
++
+ ### `toArray()` -> `Array`
+ 
+ Returns the items in the queue as an array. Starting from the item in the front of the queue and ending to the item at the back of the queue.
+diff --git a/index.d.ts b/index.d.ts
+index e125dd471cba71a1b2374333c68f24f0a0173377..5dab55b3caf2e94a39bc2ee222631670ccd9e558 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -15,6 +15,8 @@ declare class Denque<T = any> {
+ 
+   shift(): T | undefined;
+ 
++  drain(count?: number): T[];
++
+   peekBack(): T | undefined;
+ 
+   peekFront(): T | undefined;
+diff --git a/index.js b/index.js
+index 6b2e9d8625b50857d917d3b11366a661744523aa..1e44dc1d5c118cb12ea94d8fb7dd805ce8c7a151 100644
+--- a/index.js
++++ b/index.js
+@@ -129,6 +129,31 @@ Denque.prototype.shift = function shift() {
+   return item;
+ };
+ 
++/**
++ * Remove and return items from the front of the list.
++ * @param count
++ * @returns {array}
++ */
++Denque.prototype.drain = function drain(count) {
++  if (count !== undefined &&
++      (typeof count !== 'number' || !isFinite(count) || count < 0 || count % 1 !== 0)) {
++    throw new RangeError('count must be a finite non-negative integer');
++  }
++
++  var size = this.size();
++  if (count === undefined || count > size) count = size;
++
++  var removed = new Array(count);
++  var head = this._head;
++  for (var i = 0; i < count; i++) {
++    removed[i] = this._list[head];
++    this._list[head] = undefined;
++    head = (head + 1) & this._capacityMask;
++  }
++  this._head = head;
++  return removed;
++};
++
+ /**
+  * Add an item to the bottom of the list.
+  * @param item
+diff --git a/test/denque.js b/test/denque.js
+index 47fbd0f7ad23d958845e891e90ab5a6f80799d0c..d904b1235eeb534bed04ab891dbab3bfc92d3169 100644
+--- a/test/denque.js
++++ b/test/denque.js
+@@ -80,6 +80,117 @@ describe('Denque.prototype.toArray', function () {
+   });
+ });
+ 
++describe('Denque.prototype.drain', function () {
++  it('should drain a bounded number or all remaining items', function () {
++    var a = new Denque([1, 2, 3, 4, 5]);
++
++    assert.deepEqual(a.drain(2), [1, 2]);
++    assert.deepEqual(a.toArray(), [3, 4, 5]);
++    assert.strictEqual(a.length, 3);
++    assert.strictEqual(a.size(), 3);
++    assert.deepEqual(a.drain(100), [3, 4, 5]);
++    assert.strictEqual(a.length, 0);
++    assert.deepEqual(a.drain(), []);
++  });
++
++  it('should accept omitted and explicit undefined counts', function () {
++    var a = new Denque([1, 2]);
++    assert.deepEqual(a.drain(undefined), [1, 2]);
++    assert.deepEqual(a.toArray(), []);
++
++    var b = new Denque([3, 4]);
++    assert.deepEqual(b.drain(), [3, 4]);
++    assert.deepEqual(b.toArray(), []);
++  });
++
++  it('should reject invalid counts without changing the queue', function () {
++    var a = new Denque([1, 2, 3]);
++    var invalid = [-1, 1.5, NaN, Infinity, -Infinity, '1', true, {}];
++
++    invalid.forEach(function (count) {
++      assert.throws(function () {
++        a.drain(count);
++      }, RangeError);
++      assert.deepEqual(a.toArray(), [1, 2, 3]);
++      assert.strictEqual(a.length, 3);
++    });
++  });
++
++  it('should return a fresh empty array for zero without changing the queue', function () {
++    var a = new Denque([1]);
++    var first = a.drain(0);
++    var second = a.drain(-0);
++
++    assert(Array.isArray(first));
++    assert(Array.isArray(second));
++    assert.strictEqual(first.length, 0);
++    assert.strictEqual(second.length, 0);
++    assert.notStrictEqual(first, second);
++    assert.deepEqual(a.toArray(), [1]);
++  });
++
++  it('should preserve special values and object identity', function () {
++    var object = {};
++    var a = new Denque([undefined, null, NaN, object, false]);
++    var drained = a.drain();
++
++    assert.strictEqual(drained.length, 5);
++    assert.strictEqual(drained[0], undefined);
++    assert.strictEqual(drained[1], null);
++    assert(drained[2] !== drained[2]);
++    assert.strictEqual(drained[3], object);
++    assert.strictEqual(drained[4], false);
++    assert.strictEqual(a.length, 0);
++  });
++
++  it('should drain correctly from wrapped grown storage', function () {
++    var a = new Denque();
++    var expected = [];
++    var i;
++
++    for (i = 0; i < 32; i++) {
++      a.push(i);
++      expected.push(i);
++    }
++    for (i = 0; i < 20; i++) {
++      assert.strictEqual(a.shift(), expected.shift());
++    }
++    for (i = 32; i <= 70; i++) {
++      a.push(i);
++      expected.push(i);
++    }
++
++    assert(a._head > a._tail);
++    assert.deepEqual(a.drain(10), expected.splice(0, 10));
++    assert.deepEqual(a.toArray(), expected);
++    assert.strictEqual(a.length, expected.length);
++  });
++
++  it('should leave queues reusable, including capacity-limited queues', function () {
++    var a = new Denque([1, 2, 3], { capacity: 3 });
++    assert.deepEqual(a.drain(), [1, 2, 3]);
++    assert.strictEqual(a.length, 0);
++
++    a.push(4);
++    a.unshift(3);
++    a.push(5);
++    assert.deepEqual(a.toArray(), [3, 4, 5]);
++    assert.strictEqual(a.peek(), 3);
++    assert.strictEqual(a.peekFront(), 3);
++    assert.strictEqual(a.peekBack(), 5);
++    assert.strictEqual(a.pop(), 5);
++    assert.strictEqual(a.shift(), 3);
++    assert.deepEqual(a.toArray(), [4]);
++
++    assert.deepEqual(a.drain(1), [4]);
++    a.push(6);
++    a.unshift(5);
++    assert.deepEqual(a.toArray(), [5, 6]);
++    assert.strictEqual(a.length, 2);
++    assert.strictEqual(a.size(), 2);
++  });
++});
++
+ describe('Denque.prototype.push', function () {
+   it('Should do nothing if no arguments', function () {
+     var a = new Denque();
+diff --git a/test/type/index.ts b/test/type/index.ts
+index 7ee6f37a8caff63356fbeca4cb3a90b09f7b433c..762285b70d09b9e934593899b1c426bc55093943 100644
+--- a/test/type/index.ts
++++ b/test/type/index.ts
+@@ -9,6 +9,9 @@ queue.push("awesome");
+ queue.unshift("typescript");
+ queue.pop();
+ queue.shift();
++const drained: string[] = queue.drain(1);
++const remaining: string[] = queue.drain();
++queue.drain(undefined);
+ queue.toArray();
+ queue.peekBack();
+ queue.peekFront();

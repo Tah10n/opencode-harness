@@ -1,0 +1,272 @@
+{
+  "rows": [
+    {
+      "slot": 1,
+      "task": "A",
+      "arm": "OFF",
+      "project": "unjs/ufo",
+      "status": "locally_stopped",
+      "T": true,
+      "workflowStatus": "incomplete",
+      "providerRequests": 37,
+      "relayRequests": 37,
+      "auxiliaryRequests": 1,
+      "knownUsage": {
+        "input_tokens": 1639380,
+        "output_tokens": 16812,
+        "total_tokens": 1656192,
+        "cached_tokens": 1130496,
+        "reasoning_tokens": 9280
+      },
+      "usageFieldCoverage": {
+        "input_tokens": 37,
+        "output_tokens": 37,
+        "total_tokens": 37,
+        "cached_tokens": 37,
+        "reasoning_tokens": 37
+      },
+      "knownUsageRequests": 37,
+      "unknownUsageRequests": 0,
+      "serverOutcomeUnknownRequests": 0,
+      "nativeTools": 77,
+      "authorTools": 76,
+      "elapsedMs": 417736,
+      "slotWallMs": 421584,
+      "hintCost": null,
+      "hintStatus": null,
+      "dependencyIntegrity": {
+        "entriesBefore": 10511,
+        "entriesAfter": 10511,
+        "unchanged": true,
+        "changes": [],
+        "excludedGeneratedCaches": [
+          ".cache/**",
+          "vitest/dist/tsconfig.tmp.tsbuildinfo"
+        ]
+      },
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "neutralId": "n01",
+      "patch": "patches/n01.patch",
+      "patchSha256": "14cb908e49ec66175ccd69cdc9157c1f53d08c1b06a01d007257d2017a2c6e05",
+      "Q": true,
+      "D": true,
+      "frozenChecksPassed": true,
+      "reason": "Portable patch passes ordinary suite/build and independent behavior/types/package consumers; implementation, requested regression categories, readonly-array type coverage and public docs supplied; no old assertions weakened."
+    },
+    {
+      "slot": 2,
+      "task": "A",
+      "arm": "ON",
+      "project": "unjs/ufo",
+      "status": "locally_stopped",
+      "T": true,
+      "workflowStatus": "incomplete",
+      "providerRequests": 31,
+      "relayRequests": 31,
+      "auxiliaryRequests": 1,
+      "knownUsage": {
+        "input_tokens": 1243965,
+        "output_tokens": 13325,
+        "total_tokens": 1257290,
+        "cached_tokens": 816640,
+        "reasoning_tokens": 7046
+      },
+      "usageFieldCoverage": {
+        "input_tokens": 31,
+        "output_tokens": 31,
+        "total_tokens": 31,
+        "cached_tokens": 31,
+        "reasoning_tokens": 31
+      },
+      "knownUsageRequests": 31,
+      "unknownUsageRequests": 0,
+      "serverOutcomeUnknownRequests": 0,
+      "nativeTools": 61,
+      "authorTools": 60,
+      "elapsedMs": 348750,
+      "slotWallMs": 352243,
+      "hintCost": {
+        "paths": 96,
+        "reads": 4,
+        "bytes": 14750,
+        "elapsedMs": 4.456957999966107,
+        "executions": 0
+      },
+      "hintStatus": "path-found",
+      "dependencyIntegrity": {
+        "entriesBefore": 10511,
+        "entriesAfter": 10511,
+        "unchanged": true,
+        "changes": [],
+        "excludedGeneratedCaches": [
+          ".cache/**",
+          "vitest/dist/tsconfig.tmp.tsbuildinfo"
+        ]
+      },
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "neutralId": "n02",
+      "patch": "patches/n02.patch",
+      "patchSha256": "4e58c021f65b5b52f0cad94e0d517be8f9ebe6db64de59ab697f572f5a9f6dc5",
+      "Q": false,
+      "D": false,
+      "frozenChecksPassed": false,
+      "reason": "Portable semantics/types/build pass, but unchanged delivered test/query.test.ts fails the ordinary Prettier check in npm test. Implementation, regressions/types/docs present; full project gate is not satisfied."
+    },
+    {
+      "slot": 3,
+      "task": "B",
+      "arm": "ON",
+      "project": "primus/eventemitter3",
+      "status": "locally_stopped",
+      "T": true,
+      "workflowStatus": "incomplete",
+      "providerRequests": 31,
+      "relayRequests": 31,
+      "auxiliaryRequests": 1,
+      "knownUsage": {
+        "input_tokens": 1050895,
+        "output_tokens": 17991,
+        "total_tokens": 1068886,
+        "cached_tokens": 695808,
+        "reasoning_tokens": 9421
+      },
+      "usageFieldCoverage": {
+        "input_tokens": 31,
+        "output_tokens": 31,
+        "total_tokens": 31,
+        "cached_tokens": 31,
+        "reasoning_tokens": 31
+      },
+      "knownUsageRequests": 31,
+      "unknownUsageRequests": 0,
+      "serverOutcomeUnknownRequests": 0,
+      "nativeTools": 62,
+      "authorTools": 61,
+      "elapsedMs": 393774,
+      "slotWallMs": 395651,
+      "hintCost": null,
+      "hintStatus": null,
+      "dependencyIntegrity": {
+        "entriesBefore": 1705,
+        "entriesAfter": 1705,
+        "unchanged": true,
+        "changes": [],
+        "excludedGeneratedCaches": [
+          ".cache/**",
+          "vitest/dist/tsconfig.tmp.tsbuildinfo"
+        ]
+      },
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "neutralId": "n03",
+      "patch": "patches/n03.patch",
+      "patchSha256": "8416292e1ed0c14dee8d944db37b0b0691faea0cd9b3011af62b4662ef5b6e28",
+      "Q": false,
+      "D": false,
+      "frozenChecksPassed": true,
+      "reason": "Frozen runtime/build/new-API type fixtures pass, requested implementation/tests/types/docs supplied and old runtime returns retained. Post-hoc validation of the predeclared compatibility contract proves a previously valid listeners() consumer no longer compiles: newly imposed this: Context on existing API yields TS2684."
+    },
+    {
+      "slot": 4,
+      "task": "B",
+      "arm": "OFF",
+      "project": "primus/eventemitter3",
+      "status": "locally_stopped",
+      "T": true,
+      "workflowStatus": "incomplete",
+      "providerRequests": 30,
+      "relayRequests": 30,
+      "auxiliaryRequests": 1,
+      "knownUsage": {
+        "input_tokens": 1017619,
+        "output_tokens": 16983,
+        "total_tokens": 1034602,
+        "cached_tokens": 686080,
+        "reasoning_tokens": 8992
+      },
+      "usageFieldCoverage": {
+        "input_tokens": 30,
+        "output_tokens": 30,
+        "total_tokens": 30,
+        "cached_tokens": 30,
+        "reasoning_tokens": 30
+      },
+      "knownUsageRequests": 30,
+      "unknownUsageRequests": 0,
+      "serverOutcomeUnknownRequests": 0,
+      "nativeTools": 59,
+      "authorTools": 58,
+      "elapsedMs": 472818,
+      "slotWallMs": 474729,
+      "hintCost": null,
+      "hintStatus": null,
+      "dependencyIntegrity": {
+        "entriesBefore": 1705,
+        "entriesAfter": 1705,
+        "unchanged": true,
+        "changes": [],
+        "excludedGeneratedCaches": [
+          ".cache/**",
+          "vitest/dist/tsconfig.tmp.tsbuildinfo"
+        ]
+      },
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "neutralId": "n04",
+      "patch": "patches/n04.patch",
+      "patchSha256": "a67441edab93b14331a55c41005d8481150511d62969514ebe7566db6123d42d",
+      "Q": false,
+      "D": false,
+      "frozenChecksPassed": true,
+      "reason": "Frozen runtime/build/new-API type fixtures pass, requested implementation/tests/types/docs supplied and old runtime returns retained. Same independently confirmed public declaration compatibility regression as n03; repeated cancellation is semantically idempotent despite no active flag."
+    }
+  ],
+  "totals": {
+    "taskRuns": 4,
+    "providerRequests": 129,
+    "knownUsage": {
+      "input_tokens": 4951859,
+      "output_tokens": 65111,
+      "total_tokens": 5016970,
+      "cached_tokens": 3329024,
+      "reasoning_tokens": 34739
+    },
+    "unknownUsageRequests": 0,
+    "cacheAndReasoningAreSubsets": true,
+    "noDollarEstimate": true
+  },
+  "runtimeSha": "c90fc7c78bcdd4d8288550b887f52990bafb11a6",
+  "freezeSha256": "69f26dd40a5c49cad776054cb6253c36ee03fe8f2c16eceb831a0fecfa2a9f5c",
+  "decision": "keep experimental/default-off; no further campaign",
+  "wireCaptureLimitation": "Raw real request/response files were not saved for command-hints experiment kind. Native persisted tool output and subsequent commands support hint use, not wire-level receipt proof."
+}

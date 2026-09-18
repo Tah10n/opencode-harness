@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Missing path omitted while explicit null and false/zero stay present.",
+    "Projected nested values detached from source and other response rows."
+  ],
+  "docDelivery": [
+    "Own-path allowlist, flat renames and absent versus null.",
+    "JSON input domain and deep-copy ownership including special output keys."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Records JSON values rooted in plain own-data objects: no custom methods/getters, cycles, undefined, symbols, sparse arrays, nonfinite numbers or -0. Fields {path,as} nonempty ASCII path segments and unique nonempty ASCII output names, including special keys. Array numeric-index segments allowed as canonical digits.",
+  "independence": "Integrate allowlisted nested field projection, renaming and absent/null distinctions in API response views."
+}

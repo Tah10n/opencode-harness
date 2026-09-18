@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/structure.mjs": "export function copyRedacted(value,shouldRedact,replacement='[REDACTED]'){\n const memo=new Map(),queue=[];function shell(input){if(input===null||typeof input!=='object')return input;if(memo.has(input))return memo.get(input);const output=Array.isArray(input)?[]:Object.create(Object.getPrototypeOf(input));memo.set(input,output);queue.push([input,output]);return output;}\n const result=shell(value);for(let i=0;i<queue.length;i++){const [input,output]=queue[i],array=Array.isArray(input);for(const key of Object.keys(input)){const next=!array&&Reflect.apply(shouldRedact,undefined,[key])?replacement:shell(input[key]);Object.defineProperty(output,key,{value:next,enumerable:true,writable:true,configurable:true});}}return result;\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "case-sensitive-key-policy",
+      "file": "src/redact.mjs",
+      "replacement": "import {copyRedacted} from './structure.mjs';\nexport function redact(value,{keys=['password','token'],mask='[REDACTED]'}={}){\n const selected=new Set(keys.map(key=>key));return copyRedacted(value,key=>selected.has(key),mask);\n}\n"
+    },
+    {
+      "name": "drops-null-prototype",
+      "file": "src/structure.mjs",
+      "replacement": "export function copyRedacted(value,shouldRedact,replacement='[REDACTED]'){\n const seen=new Map();function copy(input){if(input===null||typeof input!=='object')return input;if(seen.has(input))return seen.get(input);const array=Array.isArray(input),out=array?[]:{};seen.set(input,out);for(const key of Object.keys(input)){const next=!array&&Reflect.apply(shouldRedact,undefined,[key])?replacement:copy(input[key]);Object.defineProperty(out,key,{value:next,enumerable:true,writable:true,configurable:true});}return out;}return copy(value);\n}\n"
+    }
+  ]
+}

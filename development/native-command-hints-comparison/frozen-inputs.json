@@ -1,0 +1,286 @@
+{
+  "createdAt": "2026-09-16T11:12:20.396Z",
+  "runtimeSha": "c90fc7c78bcdd4d8288550b887f52990bafb11a6",
+  "freezeSha256": "69f26dd40a5c49cad776054cb6253c36ee03fe8f2c16eceb831a0fecfa2a9f5c",
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "taskDeadlineMs": 1800000,
+  "permission": {
+    "external_directory": "allow"
+  },
+  "authorization": "User explicitly approved identical external_directory allow in isolated OFF/ON containers after the deny eligibility report",
+  "order": [
+    {
+      "slot": 1,
+      "task": "A",
+      "arm": "OFF",
+      "project": "unjs/ufo"
+    },
+    {
+      "slot": 2,
+      "task": "A",
+      "arm": "ON",
+      "project": "unjs/ufo"
+    },
+    {
+      "slot": 3,
+      "task": "B",
+      "arm": "ON",
+      "project": "primus/eventemitter3"
+    },
+    {
+      "slot": 4,
+      "task": "B",
+      "arm": "OFF",
+      "project": "primus/eventemitter3"
+    }
+  ],
+  "inputs": [
+    {
+      "task": "A",
+      "project": "unjs/ufo",
+      "commit": "f06c800d0c59f2a4a1b9ba65eb6cb61a84419be6",
+      "inputManifestSha256": "5344aecef34d797b17890b22d8e4aba1c9866621c59a06239ef600f629c23cf5",
+      "promptSha256": "572f865e27b6b9e144315651e68338a69f3dcb2ca16639fb64d30ac2cb754b7a"
+    },
+    {
+      "task": "B",
+      "project": "primus/eventemitter3",
+      "commit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+      "inputManifestSha256": "52be3be9d41ec35798c8315fb04674c7c57b39d6bcc301b9c482f442837d5580",
+      "promptSha256": "ef1ed2db8a7e7b24248250b887cf642f7209df99bf7e0f00d7456e034a7f940f"
+    }
+  ],
+  "preflight": {
+    "sessions": 4,
+    "localRequests": 44,
+    "passed": true,
+    "realProviderRequests": 0
+  },
+  "calibration": [
+    {
+      "task": "A",
+      "label": "baseline",
+      "accepted": false,
+      "commands": [
+        {
+          "name": "project-0",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "project-1",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "independent-behavior",
+          "status": 1,
+          "error": null
+        },
+        {
+          "name": "package-consumer",
+          "status": 1,
+          "error": null
+        }
+      ]
+    },
+    {
+      "task": "B",
+      "label": "baseline",
+      "accepted": false,
+      "commands": [
+        {
+          "name": "project-0",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "project-1",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "project-2",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "independent-behavior",
+          "status": 1,
+          "error": null
+        },
+        {
+          "name": "independent-types",
+          "status": 2,
+          "error": null
+        }
+      ]
+    },
+    {
+      "task": "B",
+      "label": "reference",
+      "accepted": true,
+      "commands": [
+        {
+          "name": "project-0",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "project-1",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "project-2",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "independent-behavior",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "independent-types",
+          "status": 0,
+          "error": null
+        }
+      ]
+    },
+    {
+      "task": "B",
+      "label": "incomplete",
+      "accepted": false,
+      "commands": [
+        {
+          "name": "project-0",
+          "status": 2,
+          "error": null
+        },
+        {
+          "name": "project-1",
+          "status": 1,
+          "error": null
+        },
+        {
+          "name": "project-2",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "independent-behavior",
+          "status": 1,
+          "error": null
+        },
+        {
+          "name": "independent-types",
+          "status": 0,
+          "error": null
+        }
+      ]
+    },
+    {
+      "task": "A",
+      "label": "reference",
+      "accepted": true,
+      "commands": [
+        {
+          "name": "format",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "project-0",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "project-1",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "independent-behavior",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "independent-types",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "package-consumer",
+          "status": 0,
+          "error": null
+        }
+      ]
+    },
+    {
+      "task": "A",
+      "label": "incomplete",
+      "accepted": false,
+      "commands": [
+        {
+          "name": "format",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "project-0",
+          "status": 1,
+          "error": null
+        },
+        {
+          "name": "project-1",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "independent-behavior",
+          "status": 1,
+          "error": null
+        },
+        {
+          "name": "independent-types",
+          "status": 0,
+          "error": null
+        },
+        {
+          "name": "package-consumer",
+          "status": 0,
+          "error": null
+        }
+      ]
+    }
+  ],
+  "files": {
+    "development/native-command-hints-comparison/PLAN.md": "ab9bcc40e67fd598c5816ad45954df148493ac965a86d92804dc67dbe56326bd",
+    "development/native-command-hints-comparison/audit-preflight.mjs": "8a02d82576017285d59481cf0c328c406df0437f134d230fb22ada6f807c6564",
+    "development/native-command-hints-comparison/calibrate.mjs": "802332885d754e9a5fde29b61c483d4d9e721578239bc524d63bb0d11fcd8a82",
+    "development/native-command-hints-comparison/check-permissions.mjs": "f2b8f9520139ef3b93a75a5ce2ec9d564adf61d8a641ed7dcd45505b813ed9b0",
+    "development/native-command-hints-comparison/freeze.mjs": "6a4b560c468e509e15d471541b336a5e2ce2bbb56202f7ba3c9c38519ebf5993",
+    "development/native-command-hints-comparison/make-calibration.mjs": "7f35cd4f1f89a0014f34bc625eb6782c4848985876d8387b013f181b48666548",
+    "development/native-command-hints-comparison/preflight.mjs": "29f9d675a3f8d63dbbf2fe52ac921c004681837e0089d4f835c21c8cd894e8eb",
+    "development/native-command-hints-comparison/prepare.mjs": "178d112fecfd320f26e1313ae8d993101f9ecbcec432d816d7a0bd614a633bcd",
+    "development/native-command-hints-comparison/run.mjs": "2d54a536f4485a077163b85441ce91d454c714a8fcf97243c4479d8b7545df38",
+    "development/native-command-hints-comparison/tasks/A.md": "572f865e27b6b9e144315651e68338a69f3dcb2ca16639fb64d30ac2cb754b7a",
+    "development/native-command-hints-comparison/tasks/B.md": "ef1ed2db8a7e7b24248250b887cf642f7209df99bf7e0f00d7456e034a7f940f",
+    "development/native-command-hints-comparison/evaluation/A.test.ts": "711e6288598b7141df1a2f87cf1e4fc6df5d51c68d5fa845dd717d03246b0cc4",
+    "development/native-command-hints-comparison/evaluation/A.types.ts": "1e6f13bf94352ab7538997bcccde101777a45a4bd61724ef4df0c4d2643bea6e",
+    "development/native-command-hints-comparison/evaluation/B.cjs": "62576b21c4ba4de98f5aa2e71584784d07c83dd617fb056fa7e0387718434f48",
+    "development/native-command-hints-comparison/evaluation/B.types.ts": "eb8497103c0370f816286d8f310d38b89de74bedb42f5210f1692ec91155019d",
+    "development/native-task-ab/run-comparison.mjs": "f328a8d811ce786a964a729c23c5c8166abefdcf765be8230031b690ca957272",
+    "development/native-task-abc/native-run.mjs": "5d691871022fcf4f2117212c33b463849e791d7ebe120adc68e7ca419ee0d293",
+    "development/native-task-integrated/native-run.mjs": "ac842a7ee1ebb743e0c038000b7f8e769a45578b98cef40d74a59b5c2e0e9bf0",
+    "development/native-task-integrated/container-session.mjs": "d469b04975c1e9441b1dc5fb5c2a1f6beef451a390e5f020c1b1a6b211cdcd1b",
+    "development/native-task-integrated/container-relay.mjs": "db186a20946348867504c48d7faca8f40a93fdfa122e1102f581e8cf5377f1b3",
+    "development/native-task-ab/capture-candidate.mjs": "d388246826eb92dd408b853c4fe8fc929c259a9d03b89d169b75b2143544c669",
+    "development/native-task-ab/extract-candidate.py": "aa5244bd4a5cc394344b266f0107728d9b70e190bad55de47c46dd10f28603de",
+    "development/native-task-utility/container/stop-workload.mjs": "b21c23f5a334dc54af340e2773e3e56427aa27a946231769d36df249ea54a69e"
+  },
+  "priorContainers": [],
+  "realProviderRequestsBeforeFreeze": 0
+}

@@ -1,0 +1,156 @@
+diff --git a/readme.md b/readme.md
+index c011e6c..740c504 100644
+--- a/readme.md
++++ b/readme.md
+@@ -347,7 +347,7 @@ Note that this only limits the number of items waiting to start. There could sti
+ 
+ #### .clear()
+ 
+-Clear the queue.
++Clear the queue and return the number of queued tasks discarded. Active tasks are not included. Returns `0` when the queue is empty.
+ 
+ > [!WARNING]
+ > Any promises returned by `.add()` for tasks that were waiting in the queue (not yet running) will **never settle** after calling `.clear()`. This can cause "unsettled top-level await" warnings or hang your process. If you need the promises to settle, use `AbortSignal` for cancellation instead — aborting rejects the `.add()` promise cleanly.
+diff --git a/source/index.ts b/source/index.ts
+index bf7978c..72ec427 100644
+--- a/source/index.ts
++++ b/source/index.ts
+@@ -611,8 +611,12 @@ export default class PQueue<QueueType extends Queue<RunFunction, EnqueueOptionsT
+ 
+ 	/**
+ 	Clear the queue.
++
++	@returns The number of queued tasks discarded.
+ 	*/
+-	clear(): void {
++	clear(): number {
++		const discardedTaskCount = this.#queue.size;
++
+ 		for (const cleanupQueueAbortHandler of this.#queueAbortListenerCleanupFunctions) {
+ 			cleanupQueueAbortHandler();
+ 		}
+@@ -641,6 +645,8 @@ export default class PQueue<QueueType extends Queue<RunFunction, EnqueueOptionsT
+ 		}
+ 
+ 		this.emit('next');
++
++		return discardedTaskCount;
+ 	}
+ 
+ 	/**
+diff --git a/test-d/index.test-d.ts b/test-d/index.test-d.ts
+index 78da841..9bfe14e 100644
+--- a/test-d/index.test-d.ts
++++ b/test-d/index.test-d.ts
+@@ -4,3 +4,4 @@ import PQueue from '../source/index.js';
+ const queue = new PQueue();
+ 
+ expectType<Promise<string>>(queue.add(async () => '🦄'));
++expectType<number>(queue.clear());
+diff --git a/test/basic.ts b/test/basic.ts
+index 1e90246..54e3157 100644
+--- a/test/basic.ts
++++ b/test/basic.ts
+@@ -8,8 +8,42 @@ import randomInt from 'random-int';
+ import pDefer from 'p-defer';
+ import {TimeoutError} from 'p-timeout';
+ import PQueue from '../source/index.js';
++import {type Queue, type RunFunction} from '../source/queue.js';
++import {type QueueAddOptions} from '../source/options.js';
+ 
+ const fixture = Symbol('fixture');
++type CustomQueueItem = {
++	run: RunFunction;
++	id?: string;
++	priority: number;
++};
++
++class CustomQueue implements Queue<RunFunction, QueueAddOptions> {
++	readonly #queue: CustomQueueItem[] = [];
++
++	enqueue(run: RunFunction, options?: Partial<QueueAddOptions>): void {
++		this.#queue.push({run, id: options?.id, priority: options?.priority ?? 0});
++	}
++
++	dequeue(): RunFunction | undefined {
++		return this.#queue.shift()?.run;
++	}
++
++	filter(options: Readonly<Partial<QueueAddOptions>>): RunFunction[] {
++		return this.#queue.filter(item => options.priority === undefined || item.priority === options.priority).map(item => item.run);
++	}
++
++	setPriority(id: string, priority: number): void {
++		const item = this.#queue.find(item => item.id === id);
++		if (item) {
++			item.priority = priority;
++		}
++	}
++
++	get size(): number {
++		return this.#queue.length;
++	}
++}
+ 
+ test('.add()', async () => {
+ 	const queue = new PQueue();
+@@ -705,8 +739,9 @@ test('.clear()', () => {
+ 	queue.add(async () => delay(20_000));
+ 	assert.equal(queue.size, 4);
+ 	assert.equal(queue.pending, 2);
+-	queue.clear();
++	assert.equal(queue.clear(), 4);
+ 	assert.equal(queue.size, 0);
++	assert.equal(queue.pending, 2);
+ });
+ 
+ test('.clear() resolves onEmpty() and onIdle() waiters', async () => {
+@@ -717,8 +752,13 @@ test('.clear() resolves onEmpty() and onIdle() waiters', async () => {
+ 
+ 	const onEmptyPromise = queue.onEmpty();
+ 	const onIdlePromise = queue.onIdle();
++	const events: string[] = [];
++	queue.on('empty', () => events.push('empty'));
++	queue.on('idle', () => events.push('idle'));
++	queue.on('next', () => events.push('next'));
+ 
+-	queue.clear();
++	assert.equal(queue.size, 2);
++	assert.equal(queue.clear(), 2);
+ 
+ 	await Promise.race([
+ 		Promise.all([onEmptyPromise, onIdlePromise]),
+@@ -730,6 +770,33 @@ test('.clear() resolves onEmpty() and onIdle() waiters', async () => {
+ 
+ 	assert.equal(queue.size, 0);
+ 	assert.equal(queue.pending, 0);
++	assert.deepEqual(events, ['empty', 'idle', 'next']);
++});
++
++test('.clear() returns zero for empty and repeatedly cleared queues', () => {
++	const queue = new PQueue({autoStart: false});
++
++	assert.equal(queue.size, 0);
++	assert.equal(queue.clear(), 0);
++
++	queue.add(async () => fixture);
++	queue.add(async () => fixture);
++	assert.equal(queue.size, 2);
++	assert.equal(queue.clear(), 2);
++	assert.equal(queue.size, 0);
++	assert.equal(queue.clear(), 0);
++});
++
++test('.clear() returns queued count with a custom queue class', () => {
++	const queue = new PQueue({autoStart: false, queueClass: CustomQueue});
++
++	queue.add(async () => fixture);
++	queue.add(async () => fixture);
++	queue.add(async () => fixture);
++	assert.equal(queue.size, 3);
++
++	assert.equal(queue.clear(), 3);
++	assert.equal(queue.size, 0);
+ });
+ 
+ test('.clear() with running tasks emits empty but not idle', async () => {

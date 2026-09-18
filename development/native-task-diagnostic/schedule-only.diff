@@ -1,0 +1,20 @@
+--- existing-stateful-run-comparison.mjs
++++ six-slot-run-comparison.mjs
+@@ -1,4 +1,4 @@
+-// Existing Luna/high launcher, configured for the authorized nine fresh P/H0/H1 slots.
++// Existing Luna/high launcher, configured for the authorized six fresh H0/H1 slots.
+ // Provider forwarding, deadline, stop, capture and cleanup implementation unchanged.
+ import fs from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';
+ import {runTask} from '../../development/native-task-abc/native-run.mjs';
+@@ -7,9 +7,9 @@
+ const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
+ function verify(){
+  for(const [file,digest] of Object.entries(f.files))if(sha(fs.readFileSync(file))!==digest)throw Error('Frozen file changed: '+file);
+- if(f.attempts.length!==9||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==900000||!f.preflightPassed)throw Error('Invalid freeze');
++ if(f.attempts.length!==6||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==900000||!f.preflightPassed)throw Error('Invalid freeze');
+  const groups=new Map();for(const a of f.attempts){const x=groups.get(a.task)??[];x.push(a.arm);groups.set(a.task,x);}
+- if(groups.size!==3||[...groups.values()].some(x=>x.sort().join(',')!=='H0,H1,P'))throw Error('Invalid schedule');
++ if(groups.size!==3||[...groups.values()].some(x=>x.sort().join(',')!=='H0,H1'))throw Error('Invalid schedule');
+ }
+ verify();if(fs.existsSync(path.join(root,'scheduling-paused.json')))throw Error('Paused; no automatic resume');
+ 

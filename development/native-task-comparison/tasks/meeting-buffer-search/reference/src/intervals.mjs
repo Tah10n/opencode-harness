@@ -1,0 +1,1 @@
+export function blocked(reservations,buffer){return reservations.map(([a,b])=>[a-buffer,b+buffer]);}export function earliest(intervals,start,duration){let t=start;for(const [a,b]of [...intervals].sort((x,y)=>x[0]-y[0])){if(t+duration<=a)break;if(t<b&&t+duration>a)t=b;}return t;}

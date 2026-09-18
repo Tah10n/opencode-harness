@@ -1,0 +1,2871 @@
+{
+  "candidate": "e18db1fe10223db52dcc05b3e769bca140367c2b",
+  "scope": "One known-task offline development pair; not historical continuation or cross-project transfer",
+  "outcome": {
+    "status": "finished",
+    "pause": null
+  },
+  "rows": [
+    {
+      "slot": 1,
+      "task": "A",
+      "arm": "OFF",
+      "status": "executed",
+      "executionElapsedMs": 293389,
+      "cleanupElapsedMs": 55,
+      "requests": 23,
+      "workRequests": 22,
+      "titleRequests": 1,
+      "nativeTools": 39,
+      "knownUsage": {
+        "input_tokens": 681815,
+        "output_tokens": 12959,
+        "total_tokens": 694774,
+        "cached_tokens": 229376,
+        "reasoning_tokens": 6887
+      },
+      "requestsWithoutUsage": 0,
+      "unknownServerOutcomes": 0,
+      "internalStatus": "incomplete",
+      "nativeCompleted": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "compiler": null,
+      "requestsEvidence": [
+        {
+          "index": 1,
+          "kind": "title",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 577,
+            "output_tokens": 120,
+            "total_tokens": 697,
+            "cached_tokens": 0,
+            "reasoning_tokens": 110
+          },
+          "responseId": "resp_04f03ec5c164570f016aaad9fbbd8087d284eae1873d1b178f",
+          "requestSha256": "f5ea9a9860414a9736a0f8afb13542a53aca598442a1c0e4e9c22d232d080f7a",
+          "responseSha256": "9a9994563a5bfd3395f0fd285db5bebf55e0e7243ffbf13f5b262ac6a9be0061"
+        },
+        {
+          "index": 2,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6197,
+            "output_tokens": 34,
+            "total_tokens": 6231,
+            "cached_tokens": 0,
+            "reasoning_tokens": 17
+          },
+          "responseId": "resp_06e02a90e65ce715016aaad9fbdeac87d287af7c3f75a7d2e2",
+          "requestSha256": "9fb76b61e70c65ef8ca429a673ca98b712f9af4d323ec81c126ddf5056429954",
+          "responseSha256": "041a336bc5404036eac0279deede9d23e8f2458ff99fff38b80aa176989904d2"
+        },
+        {
+          "index": 3,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6415,
+            "output_tokens": 209,
+            "total_tokens": 6624,
+            "cached_tokens": 0,
+            "reasoning_tokens": 27
+          },
+          "responseId": "resp_01682b99e5ba5e27016aaad9ffd39c87d298d9917f47bd1723",
+          "requestSha256": "bf70bf4830e8dcbc5ffa68340f72353b41408496c427e46dfb9b9c6b3f201a98",
+          "responseSha256": "ac9cfbfbd890a2cbcf43bc2834a8e3bbcbdcd5e9fda6e2fa9433366afd4407dc"
+        },
+        {
+          "index": 4,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6828,
+            "output_tokens": 157,
+            "total_tokens": 6985,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "responseId": "resp_029ceaed189d22fd016aaada05078487d2876f404ff72d2bcd",
+          "requestSha256": "4f39c7c94e231b7bdadb7ed18cf7dc199d0f5d795b6b70d6a79fc7a534f8ea3b",
+          "responseSha256": "c4601c131135492221780d713a19bea7699c86b7b1b707ded407064edea391b7"
+        },
+        {
+          "index": 5,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 9145,
+            "output_tokens": 179,
+            "total_tokens": 9324,
+            "cached_tokens": 0,
+            "reasoning_tokens": 14
+          },
+          "responseId": "resp_000f41e95ce2b4c8016aaada096e9487d2b8b54ab5c7fa5b62",
+          "requestSha256": "e44391a71b71db7bf1725fc340d86fc1bd03205c896cbfc1391fba8151bf9c22",
+          "responseSha256": "b4931248c322e75fde1b6644f0fda2cd62196713abcf8aaca700d200ff0f18de"
+        },
+        {
+          "index": 6,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 22518,
+            "output_tokens": 1535,
+            "total_tokens": 24053,
+            "cached_tokens": 5632,
+            "reasoning_tokens": 1333
+          },
+          "responseId": "resp_0b9cf4f4f4843858016aaada0f490887d2a66f23bb0e622456",
+          "requestSha256": "d77c3a45d54238654bfeda35ec0d350fcc803213ec26636c8e918f6f3c4052da",
+          "responseSha256": "4002bf9986b143645dcd46472b67d551ea684910e42831d6fd47b06523618b80"
+        },
+        {
+          "index": 7,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 25810,
+            "output_tokens": 2422,
+            "total_tokens": 28232,
+            "cached_tokens": 6656,
+            "reasoning_tokens": 770
+          },
+          "responseId": "resp_084b94ea35268b7d016aaada2d6e5c87d2b7e937fd7e721f3e",
+          "requestSha256": "b5fab21f89f6cf2849a21d35110f84d5450d97e5f2515661edb8534a162829a2",
+          "responseSha256": "5f2c94a3e500807791c5588a93fff9352fba94623974592c09b62d44a130116a"
+        },
+        {
+          "index": 8,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 28268,
+            "output_tokens": 179,
+            "total_tokens": 28447,
+            "cached_tokens": 0,
+            "reasoning_tokens": 60
+          },
+          "responseId": "resp_061cbfeccaa5ad75016aaada5a878087d2a8f4f15fea1830fa",
+          "requestSha256": "51addbad3a9ed1c3a262c9461d7aa91ff8a025394b3f1d44acbebccb8fb4fe14",
+          "responseSha256": "7317d5d6483ae71035bf5030dd589f41f34b1be01ba8c11cd8a61a2c2990bfe6"
+        },
+        {
+          "index": 9,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 31970,
+            "output_tokens": 3328,
+            "total_tokens": 35298,
+            "cached_tokens": 0,
+            "reasoning_tokens": 1002
+          },
+          "responseId": "resp_0d80887826d01cab016aaada600c4887d286e9b791e40cb6ae",
+          "requestSha256": "b55485d0aa766e430d25b8cfe54584eb7a6faf5fe4a37868d0e8e0e12dd5725b",
+          "responseSha256": "56b0da2ca4449d32c3c2803517b08e8d417c26299b0c26cac4e683c3a1c7d5a6"
+        },
+        {
+          "index": 10,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 35339,
+            "output_tokens": 148,
+            "total_tokens": 35487,
+            "cached_tokens": 0,
+            "reasoning_tokens": 62
+          },
+          "responseId": "resp_0383271afc38c0bf016aaada9d9dd087d2ad93a6f4fff764c8",
+          "requestSha256": "0752bd610fa96b3ca13ae56ec312b9094a93322e4eed7c665e37a4ea282792b1",
+          "responseSha256": "916cd618b56d692ea23c2efb1c43d7322bbcf57680e5faf3401fa96133692553"
+        },
+        {
+          "index": 11,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 36300,
+            "output_tokens": 60,
+            "total_tokens": 36360,
+            "cached_tokens": 0,
+            "reasoning_tokens": 26
+          },
+          "responseId": "resp_0d06599922e14557016aaadaa20bbc87d2a3172c10ee20f87e",
+          "requestSha256": "a78a36cfae5379ccbc72ad7a99dc4af0111cef4bea3da8f16de9e6c075ca99bc",
+          "responseSha256": "b3fceb4ac138f8a0949cd2e8b0c888a340d535d5d4ce285213cb91d9af27a887"
+        },
+        {
+          "index": 12,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 36438,
+            "output_tokens": 175,
+            "total_tokens": 36613,
+            "cached_tokens": 0,
+            "reasoning_tokens": 29
+          },
+          "responseId": "resp_01deafe25597311c016aaadaa9252887d29fde56f4ba606fca",
+          "requestSha256": "edeb89b931da56d842a78febf2c150fef4794e2c2a96fdb298de337fc4975437",
+          "responseSha256": "6b4970c6dcdcc604cbd1d6aac2ea66aaa2156c2f6573769a596afd3ba2a7f01f"
+        },
+        {
+          "index": 13,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 36627,
+            "output_tokens": 1225,
+            "total_tokens": 37852,
+            "cached_tokens": 0,
+            "reasoning_tokens": 1192
+          },
+          "responseId": "resp_045ad7eee531f251016aaadab6e03c87d29df1ed1375c80112",
+          "requestSha256": "a7435683693797f770000ddbabbc0517eae227f6302be44f9d6980b60b37530d",
+          "responseSha256": "b55ed10ee27ce6e3a933b55917e2b72c12ef07ec912b071762afb7f80670a5f1"
+        },
+        {
+          "index": 14,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 38211,
+            "output_tokens": 236,
+            "total_tokens": 38447,
+            "cached_tokens": 0,
+            "reasoning_tokens": 136
+          },
+          "responseId": "resp_0711cb84f1130735016aaadad010ec87d28b2658098811c2f6",
+          "requestSha256": "cc3242ff177a51907e5ec018e0ea7c6f8004b8425406bdaa732a66299d52eb5d",
+          "responseSha256": "ef2287e6ac7551ef5a56144527cabe1d42e1b1d3c673c85a6525ce9999056ccc"
+        },
+        {
+          "index": 15,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 41625,
+            "output_tokens": 828,
+            "total_tokens": 42453,
+            "cached_tokens": 0,
+            "reasoning_tokens": 719
+          },
+          "responseId": "resp_0940970fbac388d5016aaadad626dc87d2b1f96ab6d0540ad8",
+          "requestSha256": "d6b411d3df123dd159da33c0d098cd0ee1f4dff7874cef0e3ef102ce8cfcf6fe",
+          "responseSha256": "b080d42e6650657f17a9c949c37e33841597db09275fb2daca08a02f966f264a"
+        },
+        {
+          "index": 16,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 42486,
+            "output_tokens": 146,
+            "total_tokens": 42632,
+            "cached_tokens": 8704,
+            "reasoning_tokens": 97
+          },
+          "responseId": "resp_088ffb476873be61016aaadae9053c87d2b4ed2a51a27b9e83",
+          "requestSha256": "4b04d6f2c31d55f5c257e04329c01e2d21b9b55fae76f65a3b4b6073ea0d5049",
+          "responseSha256": "0358adf3c557ff0df51bb470995aa215c280a3afa63dad1b02c1d6b44908168b"
+        },
+        {
+          "index": 17,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 42646,
+            "output_tokens": 204,
+            "total_tokens": 42850,
+            "cached_tokens": 37376,
+            "reasoning_tokens": 99
+          },
+          "responseId": "resp_0ce21c22a6755a4d016aaadaed850887d2abc4a6490a65bab7",
+          "requestSha256": "ecf0d098c84c5616b7878f73e7758f8a28f387f9774fe41daca0be131753649f",
+          "responseSha256": "7c627967fdb2114f529b1ec2bd763ed575d7c4bc35aa2cba3861a34701231acc"
+        },
+        {
+          "index": 18,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 43203,
+            "output_tokens": 29,
+            "total_tokens": 43232,
+            "cached_tokens": 42496,
+            "reasoning_tokens": 0
+          },
+          "responseId": "resp_02c5962382c79f03016aaadaf373dc87d29d59d7334a08dc13",
+          "requestSha256": "9e9029dfb5e2b1df27c24b9e4fe409be76dd07454ab38ba3b8e9aa64662a1e48",
+          "responseSha256": "efa75aabbfbf3ea2743e24aca9b0d8a7fd92e4f03cf2eda47bfe09c0c215e215"
+        },
+        {
+          "index": 19,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 44045,
+            "output_tokens": 1028,
+            "total_tokens": 45073,
+            "cached_tokens": 0,
+            "reasoning_tokens": 882
+          },
+          "responseId": "resp_0ef6e44f2e98ce3a016aaadaf5c14487d2b82dafce308d9718",
+          "requestSha256": "403d487b5bf0c7dcbaf43dfc50310876028fc8bf23a827705ed9823f0397150a",
+          "responseSha256": "4e61598effd9422f43f5a1a2a9babe3364cb73f4edc0501dd0cae49982651066"
+        },
+        {
+          "index": 20,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 45277,
+            "output_tokens": 139,
+            "total_tokens": 45416,
+            "cached_tokens": 41472,
+            "reasoning_tokens": 101
+          },
+          "responseId": "resp_077b73891d48d9be016aaadb0a158487d2bcae40d2bd2f7abc",
+          "requestSha256": "2e87360285b8bb876a2a3212895a3ea027f6759228256c2152373e68847d07bf",
+          "responseSha256": "8feac701b4d4b289771e5218fe80279ef1289a6c76ce58a9a1ab42dd343db41e"
+        },
+        {
+          "index": 21,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 45528,
+            "output_tokens": 171,
+            "total_tokens": 45699,
+            "cached_tokens": 44544,
+            "reasoning_tokens": 26
+          },
+          "responseId": "resp_044c225fc1149fab016aaadb0e670487d28d3b34c8702473e6",
+          "requestSha256": "3d4984452be45b5c2eeffda77756635d5e5b42fe133477dfac5e27e7df694629",
+          "responseSha256": "42283e70b433f94c9fa7a0d515fb4c664d86502f86324b8a5333f60883af2023"
+        },
+        {
+          "index": 22,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 45902,
+            "output_tokens": 257,
+            "total_tokens": 46159,
+            "cached_tokens": 42496,
+            "reasoning_tokens": 125
+          },
+          "responseId": "resp_001a7514caf08ddc016aaadb12f60c87d2a53150cee1131ba8",
+          "requestSha256": "3911e28c4e6e36e7bbb87bbe8313191dd7d2a15c5a39443713266225ee14d2bf",
+          "responseSha256": "64120e804c5cb542d2cfee8b1dd6f23a76fd7107e174fb4c486d52391622f70a"
+        },
+        {
+          "index": 23,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 10460,
+            "output_tokens": 150,
+            "total_tokens": 10610,
+            "cached_tokens": 0,
+            "reasoning_tokens": 60
+          },
+          "responseId": "resp_0f334c7eb8e2b0c9016aaadb1a64bc87d2ac6dc2bbb54c8bcc",
+          "requestSha256": "59346dc60b2733fc08ed9bb495e9aeb4ef1bc40716f730f73331c89be2db8a6e",
+          "responseSha256": "9f9f78d50abd2c96a794dd3c773cb81f60188fe97ff68834c375c66f339f42ce"
+        }
+      ],
+      "neutralID": "n01",
+      "patch": {
+        "path": "patches/A-OFF.patch",
+        "sha256": "e01cef7d916b35bdff0563414c771e5b2efa4861ff6635df0ab834ff8f5f0222",
+        "bytes": 14122,
+        "kind": "terminal"
+      },
+      "Q": false,
+      "T": true,
+      "D": false,
+      "grading": {
+        "id": "n01",
+        "task": "A",
+        "applicable": true,
+        "changed": "M\tREADME.md\nM\tindex.d.ts\nM\tindex.js\nM\ttest/test.js\nM\ttest/test.mjs\nA\ttest/types/subscribe-invalid.ts\nA\ttest/types/subscribe.ts\n",
+        "checksPassed": false,
+        "commands": [
+          {
+            "name": "apply",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "changed",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-0",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-1",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-2",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "evaluation-types",
+            "status": 2,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      "authorTypes": {
+        "id": "n01",
+        "files": [
+          "test/types/subscribe-invalid.ts",
+          "test/types/subscribe.ts"
+        ],
+        "status": 0
+      },
+      "author": {
+        "tools": 38,
+        "bash": [
+          {
+            "callID": "call_ITrCB4tY6rxjDY2wDKVY1r5j",
+            "command": "git status --short && git log --oneline -5",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789581832778,
+              "end": 1789581833015
+            },
+            "outputSha256": "19fa5509d53658cea72d01607401efe9d0edb5de96d726c3520891feee5231b2"
+          },
+          {
+            "callID": "call_QY5QKQaWiU4Pf4Yl7rxg2CUX",
+            "command": "npm test",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789581868026,
+              "end": 1789581868352
+            },
+            "outputSha256": "2b96df4c65b29f314ff3cb46af219120b37eef07fc614e6e29517d2d3dce7a2a"
+          },
+          {
+            "callID": "call_3CnNMAM3DuS1c39XsV3lYuNj",
+            "command": "npm run test-esm",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789581868030,
+              "end": 1789581868507
+            },
+            "outputSha256": "bd8c6455389c6ee06dea4946c6b99185a0e4796d34aa2e156c1dc1a042c8978c"
+          },
+          {
+            "callID": "call_TMbzgTqgLDg28YnFUqQ6x1TW",
+            "command": "npm run rollup",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789581868033,
+              "end": 1789581868907
+            },
+            "outputSha256": "817853b2dcb8b4841a1af67978300a45ca6c884c9821b73a79ffe28484f8af08"
+          },
+          {
+            "callID": "call_6M5icrdaCH3qlHhshSGfN0sw",
+            "command": "git diff --check && git diff --stat",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789581919443,
+              "end": 1789581919618
+            },
+            "outputSha256": "dc1c425f4c0e85fe7b82a4325c1948515532949bbca8912f676b7a00962349f9"
+          },
+          {
+            "callID": "call_skMaqHUCxWiB9dF2tk3bBq7F",
+            "command": "npm test",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789581985322,
+              "end": 1789581985558
+            },
+            "outputSha256": "74031641aea34a75d19cc4dcbe28001420dd6259eab349866b6981b3bb827b0b"
+          },
+          {
+            "callID": "call_DIjrg9tz9bWEVCu2DWQZZHaj",
+            "command": "npm run test-esm",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789581988843,
+              "end": 1789581988982
+            },
+            "outputSha256": "cde4809993c6a05ab3544078d812058d295c83427172707a4f0d5bff3dca1a4f"
+          },
+          {
+            "callID": "call_BdTg5lwdvfq6IZVZXFBNr6Ub",
+            "command": "/usr/local/bin/node /template/node_modules/typescript/lib/tsc.js --ignoreConfig --noEmit --strict --target es2020 --module commonjs --moduleResolution node --ignoreDeprecations 6.0 test/types/subscribe.ts test/types/subscribe-invalid.ts",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582005448,
+              "end": 1789582006223
+            },
+            "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+          },
+          {
+            "callID": "call_SnBbF6rK6YSUXXJMyiZJCwcb",
+            "command": "npm run rollup",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582029800,
+              "end": 1789582030200
+            },
+            "outputSha256": "a2f2849f92c38444151e53febd5c46ca93c5aca82243ec1b33e5a5f845d2a97c"
+          },
+          {
+            "callID": "call_6ZsnvEmFXzgOx7nTddNZ4PZR",
+            "command": "git status --short && git diff --check",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582037414,
+              "end": 1789582037507
+            },
+            "outputSha256": "04d7e3a99302a84f864101f1e72b0c7e2e0ece5e3c6ad2ff92c57538f92c2d69"
+          },
+          {
+            "callID": "call_GBKlY1wo8KnNhnWnMKYPumEC",
+            "command": "git diff -- index.js index.d.ts README.md test/test.js test/test.mjs test/types/subscribe.ts test/types/subscribe-invalid.ts",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582037418,
+              "end": 1789582037556
+            },
+            "outputSha256": "ae578b2117ab8e948d9d63dc01222c3d9196676a8b2231992fe7183a3a8df5a4"
+          },
+          {
+            "callID": "call_ZlKVihhcUv3GO2gecK92tV1D",
+            "command": "./node_modules/.bin/mocha test/test.js --grep 'EventEmitter#subscribe'",
+            "exit": 127,
+            "state": "completed",
+            "time": {
+              "start": 1789582053991,
+              "end": 1789582054036
+            },
+            "outputSha256": "97838720136d9737027a3063f06431c10bffa77308d6a9a8c3068b29e1901062"
+          },
+          {
+            "callID": "call_lAwAoy9YgB3ERjgSUQBUBnHM",
+            "command": "command -v mocha && npm exec -- mocha test/test.js --grep 'EventEmitter#subscribe'",
+            "exit": 1,
+            "state": "completed",
+            "time": {
+              "start": 1789582061065,
+              "end": 1789582061112
+            },
+            "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+          },
+          {
+            "callID": "call_KqrlKTbLFEQRcBpkTztEJdO9",
+            "command": "npm test -- --grep 'EventEmitter#subscribe'",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582066725,
+              "end": 1789582066952
+            },
+            "outputSha256": "c8e8c8a55e748e0e03c10159d24e30af1fa5f5e675f92fcf5f25847b4125be20"
+          },
+          {
+            "callID": "call_SLry9PHBO6a99xkKGrnjyju6",
+            "command": "npm test",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582069063,
+              "end": 1789582069295
+            },
+            "outputSha256": "8a3139f72f18c4855720e779f1ed109c58093e7b793fb4604f911c18dc9cc0bb"
+          },
+          {
+            "callID": "call_U8traBCV95Qz61rJ0TKTgNAM",
+            "command": "git status --short && git diff --check && git diff --stat",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582093866,
+              "end": 1789582093915
+            },
+            "outputSha256": "cbafc23f35086cfec55b04e7f28122383698e0a3bd501a76b4b6c3b6fe8c8fa2"
+          }
+        ],
+        "finals": [
+          "Implemented `subscribe(event, fn, context?)` with exact, idempotent cancellation and preserved emitter semantics.\n\nChanges include:\n- CommonJS/ESM runtime support\n- TypeScript `Unsubscribe` declaration and typed consumer cases\n- Documentation distinguishing cancellation from `off`\n- Runtime regressions for duplicates, cleanup, contexts, symbols, invalid listeners, dispatch, and recursion\n\nChecks passed:\n- `npm test`: 48 passing\n- ESM tests: 3 passing\n- TypeScript strict consumer checks\n- `npm run rollup`\n- Targeted subscribe tests: 8 passing\n\nNo commit was created."
+        ],
+        "claimsMatchExecutedChecks": true,
+        "limitation": "Passing author consumers does not certify all required API typing. No evaluator check is attributed to the author."
+      },
+      "inventories": [
+        {
+          "file": "request-2.json",
+          "role": "parent",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "harness_task",
+            "read",
+            "skill",
+            "task",
+            "todowrite"
+          ],
+          "toolResults": 0,
+          "sha256": "9fb76b61e70c65ef8ca429a673ca98b712f9af4d323ec81c126ddf5056429954"
+        },
+        {
+          "file": "request-3.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 0,
+          "sha256": "bf70bf4830e8dcbc5ffa68340f72353b41408496c427e46dfb9b9c6b3f201a98"
+        },
+        {
+          "file": "request-4.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 1,
+          "sha256": "4f39c7c94e231b7bdadb7ed18cf7dc199d0f5d795b6b70d6a79fc7a534f8ea3b"
+        },
+        {
+          "file": "request-5.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 6,
+          "sha256": "e44391a71b71db7bf1725fc340d86fc1bd03205c896cbfc1391fba8151bf9c22"
+        },
+        {
+          "file": "request-6.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 15,
+          "sha256": "d77c3a45d54238654bfeda35ec0d350fcc803213ec26636c8e918f6f3c4052da"
+        },
+        {
+          "file": "request-7.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 19,
+          "sha256": "b5fab21f89f6cf2849a21d35110f84d5450d97e5f2515661edb8534a162829a2"
+        },
+        {
+          "file": "request-8.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 20,
+          "sha256": "51addbad3a9ed1c3a262c9461d7aa91ff8a025394b3f1d44acbebccb8fb4fe14"
+        },
+        {
+          "file": "request-9.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 24,
+          "sha256": "b55485d0aa766e430d25b8cfe54584eb7a6faf5fe4a37868d0e8e0e12dd5725b"
+        },
+        {
+          "file": "request-10.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 25,
+          "sha256": "0752bd610fa96b3ca13ae56ec312b9094a93322e4eed7c665e37a4ea282792b1"
+        },
+        {
+          "file": "request-11.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 26,
+          "sha256": "a78a36cfae5379ccbc72ad7a99dc4af0111cef4bea3da8f16de9e6c075ca99bc"
+        },
+        {
+          "file": "request-12.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 27,
+          "sha256": "edeb89b931da56d842a78febf2c150fef4794e2c2a96fdb298de337fc4975437"
+        },
+        {
+          "file": "request-13.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 28,
+          "sha256": "a7435683693797f770000ddbabbc0517eae227f6302be44f9d6980b60b37530d"
+        },
+        {
+          "file": "request-14.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 29,
+          "sha256": "cc3242ff177a51907e5ec018e0ea7c6f8004b8425406bdaa732a66299d52eb5d"
+        },
+        {
+          "file": "request-15.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 31,
+          "sha256": "d6b411d3df123dd159da33c0d098cd0ee1f4dff7874cef0e3ef102ce8cfcf6fe"
+        },
+        {
+          "file": "request-16.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 32,
+          "sha256": "4b04d6f2c31d55f5c257e04329c01e2d21b9b55fae76f65a3b4b6073ea0d5049"
+        },
+        {
+          "file": "request-17.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 33,
+          "sha256": "ecf0d098c84c5616b7878f73e7758f8a28f387f9774fe41daca0be131753649f"
+        },
+        {
+          "file": "request-18.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 34,
+          "sha256": "9e9029dfb5e2b1df27c24b9e4fe409be76dd07454ab38ba3b8e9aa64662a1e48"
+        },
+        {
+          "file": "request-19.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 35,
+          "sha256": "403d487b5bf0c7dcbaf43dfc50310876028fc8bf23a827705ed9823f0397150a"
+        },
+        {
+          "file": "request-20.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 36,
+          "sha256": "2e87360285b8bb876a2a3212895a3ea027f6759228256c2152373e68847d07bf"
+        },
+        {
+          "file": "request-21.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 37,
+          "sha256": "3d4984452be45b5c2eeffda77756635d5e5b42fe133477dfac5e27e7df694629"
+        },
+        {
+          "file": "request-22.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 38,
+          "sha256": "3911e28c4e6e36e7bbb87bbe8313191dd7d2a15c5a39443713266225ee14d2bf"
+        },
+        {
+          "file": "request-23.json",
+          "role": "parent",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "harness_task",
+            "read",
+            "skill",
+            "task",
+            "todowrite"
+          ],
+          "toolResults": 1,
+          "sha256": "59346dc60b2733fc08ed9bb495e9aeb4ef1bc40716f730f73331c89be2db8a6e"
+        }
+      ]
+    },
+    {
+      "slot": 2,
+      "task": "A",
+      "arm": "ON",
+      "status": "executed",
+      "executionElapsedMs": 376611,
+      "cleanupElapsedMs": 54,
+      "requests": 39,
+      "workRequests": 38,
+      "titleRequests": 1,
+      "nativeTools": 62,
+      "knownUsage": {
+        "input_tokens": 1426781,
+        "output_tokens": 15644,
+        "total_tokens": 1442425,
+        "cached_tokens": 1001984,
+        "reasoning_tokens": 7464
+      },
+      "requestsWithoutUsage": 0,
+      "unknownServerOutcomes": 0,
+      "internalStatus": "incomplete",
+      "nativeCompleted": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "compiler": {
+        "status": "reproduced-incompatibility",
+        "current": false,
+        "finalLimitation": "Observation belongs to an older snapshot; no late or third run",
+        "spentMs": 8110,
+        "baselinePreparationMs": 117,
+        "captureCost": {
+          "readBytes": 119469364,
+          "files": 540,
+          "captures": 10
+        },
+        "runs": [
+          {
+            "status": "no-difference-in-checked-scope",
+            "callID": "call_5dzvgAeSP8NwX8BJjsEtrODs",
+            "snapshot": "ba9a0a21db07678b800b77a68bb6cc4873a9f3c2521503e8e232950ff0e9ee00",
+            "baselineSnapshot": "084d88e2439b911a05d828471c4153dcc8ae2a59378993070c5417ea9c6b823c",
+            "surfaceHash": "3064c5e9540028eeacbfb6ba86f086de7da283ef8197447bf0e650de6843fe87",
+            "delivered": true,
+            "receipt": {
+              "file": "request-18.json",
+              "sha256": "25d65b4e7e88bae02c5a7ee12ed6c26dea456d44940c01299fa1dd8607e685f1"
+            },
+            "cost": {
+              "elapsedMs": 3987,
+              "transferredInputBytes": 12248112,
+              "outputBytes": 11682,
+              "compilations": 11,
+              "inputBytes": 11947069,
+              "files": 54,
+              "preparationMs": 97,
+              "totalMs": 4174,
+              "readBytes": 35841207,
+              "fileReads": 162
+            },
+            "process": {
+              "exit": 0,
+              "signal": null,
+              "terminationVerified": true
+            },
+            "consumers": [
+              {
+                "id": 0,
+                "status": "no-difference-in-checked-scope",
+                "route": "EventEmitter<{ sample: [string] }, string>.listeners() -> returned[0]",
+                "text": "import { EventEmitter as API3 } from \"./index\";\ndeclare const subject3: API3<{ sample: [string] }, string>;\nconst returned = subject3[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n"
+              },
+              {
+                "id": 1,
+                "status": "no-difference-in-checked-scope",
+                "route": "EventEmitter<{ sample: [string] }, { sample: [string] }>.listeners() -> returned[0]",
+                "text": "import { EventEmitter as API4 } from \"./index\";\ndeclare const subject4: API4<{ sample: [string] }, { sample: [string] }>;\nconst returned = subject4[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n"
+              },
+              {
+                "id": 2,
+                "status": "no-difference-in-checked-scope",
+                "route": "EventEmitter<{ sample: [string] }, { marker: string }>.listeners() -> returned[0]",
+                "text": "import { EventEmitter as API5 } from \"./index\";\ndeclare const subject5: API5<{ sample: [string] }, { marker: string }>;\nconst returned = subject5[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n"
+              }
+            ]
+          },
+          {
+            "status": "reproduced-incompatibility",
+            "callID": "call_LQMAJoelPs0sz8XKn9esqx2A",
+            "snapshot": "4cfb5333365b6d69187cbb9b36409d3ae86a92178eb8023b39eb3d7f4a23e238",
+            "baselineSnapshot": "084d88e2439b911a05d828471c4153dcc8ae2a59378993070c5417ea9c6b823c",
+            "surfaceHash": "fe53da6feb8accb4946325282bad5289944b3c86e3bd4f3b4f65256bfc613d28",
+            "delivered": true,
+            "receipt": {
+              "file": "request-30.json",
+              "sha256": "639f3f1c2698b3596f21c401ec0b140c7ec031fff67237d9e3babe9b97d67163"
+            },
+            "cost": {
+              "elapsedMs": 3770,
+              "transferredInputBytes": 12248121,
+              "outputBytes": 12776,
+              "compilations": 11,
+              "inputBytes": 11947078,
+              "files": 54,
+              "preparationMs": 96,
+              "totalMs": 3936,
+              "readBytes": 35841234,
+              "fileReads": 162
+            },
+            "process": {
+              "exit": 0,
+              "signal": null,
+              "terminationVerified": true
+            },
+            "consumers": [
+              {
+                "id": 0,
+                "status": "reproduced-incompatibility",
+                "route": "EventEmitter<{ sample: [string] }, string>.listeners() -> returned[0]",
+                "text": "import { EventEmitter as API3 } from \"./index\";\ndeclare const subject3: API3<{ sample: [string] }, string>;\nconst returned = subject3[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n"
+              },
+              {
+                "id": 1,
+                "status": "reproduced-incompatibility",
+                "route": "EventEmitter<{ sample: [string] }, { sample: [string] }>.listeners() -> returned[0]",
+                "text": "import { EventEmitter as API4 } from \"./index\";\ndeclare const subject4: API4<{ sample: [string] }, { sample: [string] }>;\nconst returned = subject4[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n"
+              },
+              {
+                "id": 2,
+                "status": "reproduced-incompatibility",
+                "route": "EventEmitter<{ sample: [string] }, { marker: string }>.listeners() -> returned[0]",
+                "text": "import { EventEmitter as API5 } from \"./index\";\ndeclare const subject5: API5<{ sample: [string] }, { marker: string }>;\nconst returned = subject5[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n"
+              }
+            ]
+          }
+        ]
+      },
+      "requestsEvidence": [
+        {
+          "index": 1,
+          "kind": "title",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 577,
+            "output_tokens": 57,
+            "total_tokens": 634,
+            "cached_tokens": 0,
+            "reasoning_tokens": 46
+          },
+          "responseId": "resp_004bb7bbb410455b016aaadb21fc5887d29ad0f2328a4719ef",
+          "requestSha256": "f5ea9a9860414a9736a0f8afb13542a53aca598442a1c0e4e9c22d232d080f7a",
+          "responseSha256": "8d019d83c830cd78f174b00052ea52baf1a04022ad0df8d87f443154a3af8f1c"
+        },
+        {
+          "index": 2,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6197,
+            "output_tokens": 39,
+            "total_tokens": 6236,
+            "cached_tokens": 0,
+            "reasoning_tokens": 22
+          },
+          "responseId": "resp_078aaa89f8310389016aaadb2275b487d2b79cfec425a1ed96",
+          "requestSha256": "674eb614a5dff549e2f7092cdf52e9ff9b5001eb9c92356727926cb76d8caa83",
+          "responseSha256": "9dbb68f990bcce5d9b0fa8df6ddef9d6effb89b24cc4cc82691c6e0eac4a141d"
+        },
+        {
+          "index": 3,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6405,
+            "output_tokens": 238,
+            "total_tokens": 6643,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 33
+          },
+          "responseId": "resp_0e982933e544458b016aaadb255d6487d2b4e2732e772daecc",
+          "requestSha256": "401f9f9f25311513dc01cb3b68022cdf4df0a823bed501f574f21a04c4106314",
+          "responseSha256": "ff0bbbfadeabef2b6f5fad04ce5e47b260699e179ed9010f1fccda2ba24501fb"
+        },
+        {
+          "index": 4,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6840,
+            "output_tokens": 141,
+            "total_tokens": 6981,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 0
+          },
+          "responseId": "resp_0223c356a879c8c5016aaadb2b0ce887d2ba9fa05c6baee167",
+          "requestSha256": "646b90ec32d3640caef2394a51cfa2bac1ffcd15893b9edd46055587187244b5",
+          "responseSha256": "d35dce28a36d7e2afae2e212651e925595de11ec99bf85e077e6fe6e328675bb"
+        },
+        {
+          "index": 5,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 10957,
+            "output_tokens": 163,
+            "total_tokens": 11120,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 8
+          },
+          "responseId": "resp_01506c5334c2c3be016aaadb2f7ddc87d2b0a1feac7df49dd0",
+          "requestSha256": "4ea31fc04ad43f9a7d699a67df686af11954fc326c3065785e78b7d85183d12b",
+          "responseSha256": "8816ecd73a68ada0ff4d9f731553950e100ff3676d80cd9505f9115764ea8767"
+        },
+        {
+          "index": 6,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 23878,
+            "output_tokens": 1152,
+            "total_tokens": 25030,
+            "cached_tokens": 10752,
+            "reasoning_tokens": 935
+          },
+          "responseId": "resp_035d4fd7cf19f244016aaadb34348887d28dc8b29d44a32d7b",
+          "requestSha256": "e0a2be5907c798dd380adb5bbe91ae90df9e50457013b98b57caf4da8d70cd3b",
+          "responseSha256": "a534fa129880e3f90398c437aa74c569dae0c5185f19cc299c027e943aa2857f"
+        },
+        {
+          "index": 7,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 25504,
+            "output_tokens": 148,
+            "total_tokens": 25652,
+            "cached_tokens": 23040,
+            "reasoning_tokens": 52
+          },
+          "responseId": "resp_02b8ef130692bf76016aaadb4aa15487d29013d3de9934e98b",
+          "requestSha256": "999b93c7eab5fc50efa14408884c229bf79354784ef95961708deed44e71bd6b",
+          "responseSha256": "380a3f3a1cb3e70bc408407d7cd08e87ec1ad73bbaefd992a845319ae0e0301a"
+        },
+        {
+          "index": 8,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 26813,
+            "output_tokens": 1397,
+            "total_tokens": 28210,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 1375
+          },
+          "responseId": "resp_0a7ed6256e3694be016aaadb4fc90c87d2b835f669b735d6e3",
+          "requestSha256": "f8d9501b0fa5ad2068c5b7880c099eca618614fa53adf44cbbb77eebc296229a",
+          "responseSha256": "46f6dc5ab386413a6f06c61dbd88c6260efaf8e48a39f074fc9f38385bd922a6"
+        },
+        {
+          "index": 9,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 28303,
+            "output_tokens": 1991,
+            "total_tokens": 30294,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 7
+          },
+          "responseId": "resp_0a96d3426e36ce46016aaadb6b07dc87d2accf897ba9f76806",
+          "requestSha256": "e8538cb41b702f07de777e3af96d4ebc416f941a2fc26a06e4e7fc7bcff07d73",
+          "responseSha256": "f876851a265c74d84ce3a9d7c68a0d183be40e0ec99544df1bafe8398393fa2d"
+        },
+        {
+          "index": 10,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 30330,
+            "output_tokens": 1880,
+            "total_tokens": 32210,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 510
+          },
+          "responseId": "resp_0682f17c1a63240a016aaadb9105bc87d2a41b9b3087b41d00",
+          "requestSha256": "bb1fa9110c4c8e2a9ab827ff8ed4211ba70d79cd5a9fc865e31b73526f6f9de7",
+          "responseSha256": "3521c7f6c842695af63bb9621a15bd71c9c873e102e34c5f569371b2fa89d7a0"
+        },
+        {
+          "index": 11,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 32232,
+            "output_tokens": 938,
+            "total_tokens": 33170,
+            "cached_tokens": 4608,
+            "reasoning_tokens": 357
+          },
+          "responseId": "resp_0076c7fe5f9f5499016aaadbb4809487d282d3e555b2bdd8aa",
+          "requestSha256": "e87e83f0475c02fbac4519b19c48212e0f42da8a73df40c453f22804dd85e9cb",
+          "responseSha256": "d1b49845b317f99d9d26f5f80bef5704d2d68634361adbfd0760706abbd4032a"
+        },
+        {
+          "index": 12,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 33203,
+            "output_tokens": 331,
+            "total_tokens": 33534,
+            "cached_tokens": 5632,
+            "reasoning_tokens": 202
+          },
+          "responseId": "resp_09a75fe08db7f427016aaadbc7682487d2ad7565db8e79d4ef",
+          "requestSha256": "1fd23cbdbfe44d10714d3fadb47986ad8491409da8f09d14772da27cfde5cee0",
+          "responseSha256": "a9c11cc9e4c32f2ecc3bcaea298920db5e9d842e75127fd053900c391949b996"
+        },
+        {
+          "index": 13,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 33567,
+            "output_tokens": 242,
+            "total_tokens": 33809,
+            "cached_tokens": 25088,
+            "reasoning_tokens": 127
+          },
+          "responseId": "resp_044a544015cc7593016aaadbcf20e887d2a5a6732b33d7c6f3",
+          "requestSha256": "9157e61d2c197d25b0feac03cecf4562db7264121e96b5531f50e2cc46c24e11",
+          "responseSha256": "4e9db66adba708a1bdfb0f8e9d849e13b1b09471e73e1621c20de81ec0d23429"
+        },
+        {
+          "index": 14,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 34246,
+            "output_tokens": 170,
+            "total_tokens": 34416,
+            "cached_tokens": 28160,
+            "reasoning_tokens": 130
+          },
+          "responseId": "resp_09742ec82d059a3e016aaadbd50c5887d2b709681c093ab1ad",
+          "requestSha256": "a3458d3200c89f916be0baaa2433b2224289ef2768f3a70b3afb55b39b2325f2",
+          "responseSha256": "2314f4ec466d05efb28319f5bfdf1498fee42e3b0834c1fb8054b9f57f7a5e78"
+        },
+        {
+          "index": 15,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 34767,
+            "output_tokens": 66,
+            "total_tokens": 34833,
+            "cached_tokens": 0,
+            "reasoning_tokens": 23
+          },
+          "responseId": "resp_0f1e7a23a29b2308016aaadbd9a6c887d2a2e8b320236f16e4",
+          "requestSha256": "e08d00877909917aa73c1da7680b6b9da7e81fd052b90c97bf5ea151883fa73a",
+          "responseSha256": "5849d193198a3cd46e13326627c13f9800ef0505fde6c8f188a5b40d1893a42b"
+        },
+        {
+          "index": 16,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 34890,
+            "output_tokens": 174,
+            "total_tokens": 35064,
+            "cached_tokens": 30208,
+            "reasoning_tokens": 87
+          },
+          "responseId": "resp_074289e21411f7e0016aaadbde232c87d298d6173ec1f0939a",
+          "requestSha256": "3d15855e032cbb8ab49211638470e2729edc575e2fd0eedf90d28bf994850dc7",
+          "responseSha256": "638c1de657e383ce664d538c371eecb03ecaff1865c6508977b5890c94d4eafb"
+        },
+        {
+          "index": 17,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 35078,
+            "output_tokens": 159,
+            "total_tokens": 35237,
+            "cached_tokens": 34304,
+            "reasoning_tokens": 31
+          },
+          "responseId": "resp_0acae346a7f8a4cf016aaadbe3612087d29c57f2483b61c783",
+          "requestSha256": "6456d29a5316a430ea66371af55269c523cc1cf77b909294cf928ada7ec60b33",
+          "responseSha256": "7ec10ab3f97f58d9689e2aeb60b42f3b6e97af8db749f2968333e83934a79280"
+        },
+        {
+          "index": 18,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 36241,
+            "output_tokens": 103,
+            "total_tokens": 36344,
+            "cached_tokens": 33280,
+            "reasoning_tokens": 69
+          },
+          "responseId": "resp_077176975288bbdd016aaadbec9cc087d28b1d1035af4d108a",
+          "requestSha256": "25d65b4e7e88bae02c5a7ee12ed6c26dea456d44940c01299fa1dd8607e685f1",
+          "responseSha256": "c58a7c42ce534df13fc78f7ee198124e506790b5cc1250978df2010b08f43fa7"
+        },
+        {
+          "index": 19,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 36418,
+            "output_tokens": 31,
+            "total_tokens": 36449,
+            "cached_tokens": 33280,
+            "reasoning_tokens": 0
+          },
+          "responseId": "resp_012232ccee7c7e8d016aaadbf0233487d2ac8b2953503304d3",
+          "requestSha256": "510713516f5961a872da9a4220bedfcdcf6900efa13c8bea016fb5a333213a0f",
+          "responseSha256": "ebacbf497be62a67a16e66aaa2cd26d350b328b03feabe2e42c7f9fc0ff16f19"
+        },
+        {
+          "index": 20,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 36808,
+            "output_tokens": 235,
+            "total_tokens": 37043,
+            "cached_tokens": 34304,
+            "reasoning_tokens": 59
+          },
+          "responseId": "resp_020dcfdbffbfb32e016aaadbf2c9c887d29a41307f11002ee9",
+          "requestSha256": "d8b2be090126ae2b7defb542c1ec0813456ed717bf988c3ee49e4e46a61aebe4",
+          "responseSha256": "b6fc01ad04c68bc331854e2e22b10e3f9439487cdaeb1c0d1ed19cab0dc0b719"
+        },
+        {
+          "index": 21,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 44428,
+            "output_tokens": 1222,
+            "total_tokens": 45650,
+            "cached_tokens": 35328,
+            "reasoning_tokens": 731
+          },
+          "responseId": "resp_0cf2c4194a2dc27a016aaadbf8f75487d2a8ba5e5ed829f759",
+          "requestSha256": "1e42f399dc0dd514826f6edc6d8d34e1337cabbac242b3c3bf1503c0b8abf05a",
+          "responseSha256": "f096556167089ba2308507e7f2084c1fbcb86ec086b60bb629811bbea54bb3b0"
+        },
+        {
+          "index": 22,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 45677,
+            "output_tokens": 104,
+            "total_tokens": 45781,
+            "cached_tokens": 6656,
+            "reasoning_tokens": 64
+          },
+          "responseId": "resp_02c95e1447c9be6f016aaadc10953487d28510c509a02f8993",
+          "requestSha256": "0bb59a182cf6d44a3ca03f93e68bce91f75e5d31ebbe0e2bcf4e2dbcd05c48b7",
+          "responseSha256": "3257b4f649cdc4ff196fd8ac8f143cceaba82bdbf2d4144d579e901ee2668cff"
+        },
+        {
+          "index": 23,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 46355,
+            "output_tokens": 813,
+            "total_tokens": 47168,
+            "cached_tokens": 43520,
+            "reasoning_tokens": 211
+          },
+          "responseId": "resp_01458c3496a6a820016aaadc14989887d29f3393b5902a3575",
+          "requestSha256": "2321f18686881b79d9ba2e786581b23acbdd46caee89581015fe1a2b163db09e",
+          "responseSha256": "e5c8678b5f79ad455316386eb5751beefdb180ebac54d2825e9380ac9dd4ed5a"
+        },
+        {
+          "index": 24,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 47190,
+            "output_tokens": 49,
+            "total_tokens": 47239,
+            "cached_tokens": 34304,
+            "reasoning_tokens": 9
+          },
+          "responseId": "resp_00f18835c0476d23016aaadc25511887d284a95479667a8a8b",
+          "requestSha256": "efe02f31cc6f8d5391029365d69fe5dda705cc08d8ed5551e7b13f07da42a17e",
+          "responseSha256": "8c410d5b3d14c897e41a72f7417b017f55cf2e010c4e72e058f9b7f9c5cd13a2"
+        },
+        {
+          "index": 25,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 47588,
+            "output_tokens": 532,
+            "total_tokens": 48120,
+            "cached_tokens": 46592,
+            "reasoning_tokens": 344
+          },
+          "responseId": "resp_0dacb64474d316f5016aaadc289cc087d29c405e456fb9a50c",
+          "requestSha256": "91fe7833e50af649d581f49fa7eec2d1f0ff2e28b54bdc76b7fa78a6c1823563",
+          "responseSha256": "9479e038641cdc733817e23ac42dfca244278afc348d8169eb1ed8b2cf617fd1"
+        },
+        {
+          "index": 26,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 48142,
+            "output_tokens": 117,
+            "total_tokens": 48259,
+            "cached_tokens": 26112,
+            "reasoning_tokens": 10
+          },
+          "responseId": "resp_052d0ac36a08b3f8016aaadc3553f487d28ccad93d43a9f95b",
+          "requestSha256": "b25fb22ac375a38d404e608d3421bdb8a92a988d163438eb50ea9730fa0f081d",
+          "responseSha256": "a71c88caf9539d5596fd6df1865673a0fb22fefc51323202f01829a594464d32"
+        },
+        {
+          "index": 27,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 48608,
+            "output_tokens": 41,
+            "total_tokens": 48649,
+            "cached_tokens": 45568,
+            "reasoning_tokens": 0
+          },
+          "responseId": "resp_0615ab8468fe0379016aaadc3dc68887d2b4e3f374f0e94838",
+          "requestSha256": "c44fadf05aba177d1316343b6d3903e1e19f9c294f8a89213ca2c6a3e731a77e",
+          "responseSha256": "c7477b6286f63328128bc1f8c60e2f9dcec6b62830101db14550dde313fb401f"
+        },
+        {
+          "index": 28,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 48706,
+            "output_tokens": 85,
+            "total_tokens": 48791,
+            "cached_tokens": 47616,
+            "reasoning_tokens": 0
+          },
+          "responseId": "resp_0993e0cf41066187016aaadc40369487d2a72e63944ccbd2f3",
+          "requestSha256": "ca9eb203bbce630e2aabcd78bfe8556eb6e0177e54d75454d6fd78dc5af47951",
+          "responseSha256": "7e92b9f6f24e777fcdbbf06e1b891100101a3f3db1d32ba7f301a695033af7ad"
+        },
+        {
+          "index": 29,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 48805,
+            "output_tokens": 29,
+            "total_tokens": 48834,
+            "cached_tokens": 31232,
+            "reasoning_tokens": 0
+          },
+          "responseId": "resp_0c171b4936aa3821016aaadc43e1cc87d292c244814acf471b",
+          "requestSha256": "e36623264dd3616fcb0e9273947146739677046fcdf69cac64920039349daa50",
+          "responseSha256": "99f737e1a290559f7f2a25e0604a0d7fa47de28c9a5d4e33f79fdad81edd14af"
+        },
+        {
+          "index": 30,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 50334,
+            "output_tokens": 723,
+            "total_tokens": 51057,
+            "cached_tokens": 47616,
+            "reasoning_tokens": 546
+          },
+          "responseId": "resp_036c6fb15a0ab4de016aaadc4a382487d2b802e63ddac11d62",
+          "requestSha256": "639f3f1c2698b3596f21c401ec0b140c7ec031fff67237d9e3babe9b97d67163",
+          "responseSha256": "76d0414634590c45d0639d7ea17a5068c1f82763e7800b15dca07296f3331434"
+        },
+        {
+          "index": 31,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 51079,
+            "output_tokens": 117,
+            "total_tokens": 51196,
+            "cached_tokens": 47616,
+            "reasoning_tokens": 30
+          },
+          "responseId": "resp_0e4636e8acd10e64016aaadc5a121087d29a471393ec70a7f8",
+          "requestSha256": "fd0134c6bb512881de1784d1e54631fcc1ef24bd57e26a85efed54f3d383f198",
+          "responseSha256": "bb83de4db9256e7a6f3d8662cce7f74bc8e057d0a6baadb100512ec6984019bb"
+        },
+        {
+          "index": 32,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 51210,
+            "output_tokens": 41,
+            "total_tokens": 51251,
+            "cached_tokens": 32256,
+            "reasoning_tokens": 10
+          },
+          "responseId": "resp_075ca6bd17da9463016aaadc5f186087d287747d6211b6e72b",
+          "requestSha256": "572d5871502f3b009f7918568934bcfc3bdd4d5a4febec354b39fbae86b67921",
+          "responseSha256": "c0ee1f8f508c5b93864a128b5320e7f5ede7f07fc1227378e6d4d1e1d11883af"
+        },
+        {
+          "index": 33,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 52057,
+            "output_tokens": 104,
+            "total_tokens": 52161,
+            "cached_tokens": 49664,
+            "reasoning_tokens": 70
+          },
+          "responseId": "resp_0770762a29a31923016aaadc62d07087d2b1be0a1546c7ea6c",
+          "requestSha256": "9424d37527873c45cde396ed3f959fbd76b1a75e952ca1c63dc0cce953cf1cc2",
+          "responseSha256": "9192f88938c3a4abd430ae38e897fa051793472e020eac0ff47fc8b4febaa73d"
+        },
+        {
+          "index": 34,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 52235,
+            "output_tokens": 31,
+            "total_tokens": 52266,
+            "cached_tokens": 46592,
+            "reasoning_tokens": 0
+          },
+          "responseId": "resp_0a84fbd828a74b02016aaadc66f61887d29f3fc186c98ce620",
+          "requestSha256": "d105c276a2450a67ed736f0f6921085d5291906ad0ba2a059442f378b01d34d3",
+          "responseSha256": "69266f762170b41c5d1df95609ab892fe65ffc7fc19ef92979da5febffae7dfd"
+        },
+        {
+          "index": 35,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 52625,
+            "output_tokens": 917,
+            "total_tokens": 53542,
+            "cached_tokens": 36352,
+            "reasoning_tokens": 808
+          },
+          "responseId": "resp_07eb8b64c8dda016016aaadc69ffa487d283e71a9c02e2a4c6",
+          "requestSha256": "30d6c43a19ed49317182c9e12247316e4ed23e3f18d4d3c0886486ff44319bf4",
+          "responseSha256": "9829311c12c690fe8d840a072deeb7c33fd037455b24735987a605d15099611b"
+        },
+        {
+          "index": 36,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 53891,
+            "output_tokens": 164,
+            "total_tokens": 54055,
+            "cached_tokens": 35328,
+            "reasoning_tokens": 0
+          },
+          "responseId": "resp_04a4ec488f0c02b6016aaadc7e025c87d29b94962138641d1f",
+          "requestSha256": "34b0c47d2b4db363a521dae837b0928cb2f599c9c0b19628dfdfe0f60a18c4b7",
+          "responseSha256": "da9ab11aaf55a7f87a889f9a04a984684f3c5f1b6b95ce67803f3faf598fa6af"
+        },
+        {
+          "index": 37,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 58799,
+            "output_tokens": 333,
+            "total_tokens": 59132,
+            "cached_tokens": 45568,
+            "reasoning_tokens": 195
+          },
+          "responseId": "resp_0611cb5ff98e1558016aaadc83040887d2b2111df6adff3f93",
+          "requestSha256": "a1118f7a3aa91465e78f97e486110e4b076c76e0826e47b63fd6ece6950eccc9",
+          "responseSha256": "1b1694550e7ac73dff045594e2db92733b5ef0c3811be6e8a40b47f3f3a3dd8a"
+        },
+        {
+          "index": 38,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 59328,
+            "output_tokens": 395,
+            "total_tokens": 59723,
+            "cached_tokens": 53760,
+            "reasoning_tokens": 265
+          },
+          "responseId": "resp_0fdeb684d66e6967016aaadc8c5e9c87d2b01b252efdcd76cd",
+          "requestSha256": "b8fdc4bcc9d4ad32b2612b7f0df0e72f72b980564956927c77695b88eb7e1f48",
+          "responseSha256": "26426e58c62ef74ec42a18370a7950df69586b5f27c7a3a71e14366f362fb242"
+        },
+        {
+          "index": 39,
+          "kind": "work",
+          "model": "gpt-5.6-luna",
+          "effort": "high",
+          "status": 200,
+          "serverCompletion": "completed",
+          "usage": {
+            "input_tokens": 6470,
+            "output_tokens": 172,
+            "total_tokens": 6642,
+            "cached_tokens": 0,
+            "reasoning_tokens": 98
+          },
+          "responseId": "resp_0c005ee1b9233b9b016aaadc95392887d28d2513d62eaf871f",
+          "requestSha256": "57ac4466d2bff790fb8ff4b36496e7d2d429817139da85e13b1ed66f7789c04b",
+          "responseSha256": "060915d5194f089ac398c1a21c194135b42a8b108bf6b5acfc980ac53b69a385"
+        }
+      ],
+      "neutralID": "n02",
+      "patch": {
+        "path": "patches/A-ON.patch",
+        "sha256": "56b49b213bd96c6b5e47d414f9c3b0e4efcb7f899e0a6b5df9308e9cfe8a037d",
+        "bytes": 15354,
+        "kind": "terminal"
+      },
+      "Q": true,
+      "T": true,
+      "D": true,
+      "grading": {
+        "id": "n02",
+        "task": "A",
+        "applicable": true,
+        "changed": "M\tREADME.md\nM\tindex.d.ts\nM\tindex.js\nM\ttest/test.js\nM\ttest/test.mjs\nA\ttest/types/subscribe-negative.ts\nA\ttest/types/subscribe-positive.ts\n",
+        "checksPassed": true,
+        "commands": [
+          {
+            "name": "apply",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "changed",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-0",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-1",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-2",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "evaluation-types",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      "authorTypes": {
+        "id": "n02",
+        "files": [
+          "test/types/subscribe-negative.ts",
+          "test/types/subscribe-positive.ts"
+        ],
+        "status": 0
+      },
+      "author": {
+        "tools": 61,
+        "bash": [
+          {
+            "callID": "call_zLny9NBw0X6QiPbeeq9rYz2z",
+            "command": "git status --short && git log --oneline -5",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582153750,
+              "end": 1789582153872
+            },
+            "outputSha256": "eba1e17f3813852274cdaa3ad3a15db01bbefa7c348f34cf6eb80f53de9359f2"
+          },
+          {
+            "callID": "call_yUohMDXk5oBbjTK7gLS87QwD",
+            "command": "ls -la",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582158710,
+              "end": 1789582158781
+            },
+            "outputSha256": "284d4074ea4dee27d311b62997d2f8ca87f7057b1923ee7a125fe6b88116a3c8"
+          },
+          {
+            "callID": "call_cA84BHcZeKLnkuoVY4XZCxsp",
+            "command": "npm test",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582158715,
+              "end": 1789582159144
+            },
+            "outputSha256": "579833ccbf58e1c0d494588a18c629e264f105836c4ce7023940c88dc8c66abe"
+          },
+          {
+            "callID": "call_mx4paiQFg6oMFNY2FSc5pR5G",
+            "command": "npm run test-esm",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582158783,
+              "end": 1789582159291
+            },
+            "outputSha256": "bd8c6455389c6ee06dea4946c6b99185a0e4796d34aa2e156c1dc1a042c8978c"
+          },
+          {
+            "callID": "call_gOazY6TGdL3kFRZqrs2MbW8C",
+            "command": "./node_modules/.bin/mocha test/test.js --grep 'EventEmitter#subscribe'",
+            "exit": 127,
+            "state": "completed",
+            "time": {
+              "start": 1789582286671,
+              "end": 1789582286724
+            },
+            "outputSha256": "97838720136d9737027a3063f06431c10bffa77308d6a9a8c3068b29e1901062"
+          },
+          {
+            "callID": "call_BUSdRjaW7fV1UQSFwttieXqd",
+            "command": "command -v mocha && command -v c8 && npm root -g",
+            "exit": 1,
+            "state": "completed",
+            "time": {
+              "start": 1789582292436,
+              "end": 1789582292519
+            },
+            "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+          },
+          {
+            "callID": "call_Tgs52hUDxFkYWNcQlQlLxOaS",
+            "command": "ls -la /template/node_modules/.bin",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582292440,
+              "end": 1789582292595
+            },
+            "outputSha256": "94c22fc12618106ea75456350a83540c0912582507eb14b655e2ac5f536484c6"
+          },
+          {
+            "callID": "call_ZuiP8QPhhe0FNnugsQCk4v6t",
+            "command": "ls -la /template/node_modules/mocha /template/node_modules/c8",
+            "exit": 2,
+            "state": "completed",
+            "time": {
+              "start": 1789582292443,
+              "end": 1789582292636
+            },
+            "outputSha256": "fcdd341ad8982e35b785c578a4ca8d64da804a51ee881d9083595352d8753f64"
+          },
+          {
+            "callID": "call_aVU9NhoE7O8hG98WiYIsO8dI",
+            "command": "npm test -- --grep 'EventEmitter#subscribe'",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582296950,
+              "end": 1789582297181
+            },
+            "outputSha256": "dccc81ecc2db7e6807a8896b1e90ab9f2da78bd2faaa99cf7cf88e44d6ee7076"
+          },
+          {
+            "callID": "call_4QjUZ9YAbf24On6rvbRv7r9I",
+            "command": "npm run test-esm -- --grep 'subscriptions from ESM'",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582300440,
+              "end": 1789582300586
+            },
+            "outputSha256": "40292994ffb29999323eae26830f027d5769eda53ccc0b8075c10eb6c4ac4cf8"
+          },
+          {
+            "callID": "call_aLkWAITuKkpXdtzTdPFIbzlG",
+            "command": "/usr/local/bin/node /template/node_modules/typescript/lib/tsc.js --ignoreConfig --noEmit --strict --target es2020 --module commonjs --moduleResolution node --ignoreDeprecations 6.0 test/types/subscribe-positive.ts test/types/subscribe-negative.ts",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582306035,
+              "end": 1789582306730
+            },
+            "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+          },
+          {
+            "callID": "call_5dzvgAeSP8NwX8BJjsEtrODs",
+            "command": "npm test",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582311589,
+              "end": 1789582316001
+            },
+            "outputSha256": "59ce3efc2d77916e212a23b872a89725643f350eb93bcb9635b015548205d600"
+          },
+          {
+            "callID": "call_rbhcb2Tks427q2LwncaEytF6",
+            "command": "npm run test-esm",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582319531,
+              "end": 1789582319701
+            },
+            "outputSha256": "8941a9729dabf8b3c1398b1b07a49f43a1796f500b7318cfe713d34a8509be1b"
+          },
+          {
+            "callID": "call_4I76JNnKSjwHsSEoCmGegrT5",
+            "command": "npm run rollup",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582321862,
+              "end": 1789582322309
+            },
+            "outputSha256": "bd44e35085315d6992e6907badc1774f63259c5f773c807bffe834d269ab2016"
+          },
+          {
+            "callID": "call_1KP7whi6AsIuH6UYaajuEEKr",
+            "command": "git diff --check && git status --short && git diff --stat",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582328207,
+              "end": 1789582328401
+            },
+            "outputSha256": "e4a079043f68fcad55d540459869f3944f47d008d55a80564fc96bace490c499"
+          },
+          {
+            "callID": "call_7EIN7mE8rdF2CYhqxPDSq4Uu",
+            "command": "git diff -- index.js index.d.ts README.md test/test.js test/test.mjs test/types/subscribe-positive.ts test/types/subscribe-negative.ts",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582328435,
+              "end": 1789582328479
+            },
+            "outputSha256": "e0a3afee36cb8e7f9062cd82fd63d8790b5ab8f2968b5829fa6f064eb7e49d71"
+          },
+          {
+            "callID": "call_9EYAOU8GS3Nx6x3FW0yFaDl3",
+            "command": "npm test -- --grep 'EventEmitter#subscribe'",
+            "exit": 1,
+            "state": "completed",
+            "time": {
+              "start": 1789582355847,
+              "end": 1789582356085
+            },
+            "outputSha256": "106de5e6b073ef40d81d09e00cb9890efef0638848373b991868ec0c4b069786"
+          },
+          {
+            "callID": "call_Tw8QTLPQdi9sgRD11gkxg6Q2",
+            "command": "npm test -- --grep 'EventEmitter#subscribe'",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582375968,
+              "end": 1789582376212
+            },
+            "outputSha256": "5ac0a26cd956f15cb27b013e1a82d8831fc5bb616bea7b881c114fe32b71c128"
+          },
+          {
+            "callID": "call_0oYPma2hH9HCQ0hPtsl4Jg6v",
+            "command": "npm test -- --grep 'EventEmitter#subscribe'",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582397059,
+              "end": 1789582397289
+            },
+            "outputSha256": "97d8b494708cf9cfc0b5508fac99d5227963d8da5061b302cb520c3e0ab2def8"
+          },
+          {
+            "callID": "call_3kaILQOPIv7MqCM4ctjGSvoN",
+            "command": "npm run test-esm -- --grep 'subscriptions from ESM'",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582399480,
+              "end": 1789582399625
+            },
+            "outputSha256": "40292994ffb29999323eae26830f027d5769eda53ccc0b8075c10eb6c4ac4cf8"
+          },
+          {
+            "callID": "call_t4GXWQKA6KwEIqwwkv5cEM3T",
+            "command": "/usr/local/bin/node /template/node_modules/typescript/lib/tsc.js --ignoreConfig --noEmit --strict --target es2020 --module commonjs --moduleResolution node --ignoreDeprecations 6.0 test/types/subscribe-positive.ts test/types/subscribe-negative.ts",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582402767,
+              "end": 1789582403418
+            },
+            "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+          },
+          {
+            "callID": "call_LQMAJoelPs0sz8XKn9esqx2A",
+            "command": "npm test",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582405428,
+              "end": 1789582409605
+            },
+            "outputSha256": "810fd371146aed4babd5258ee188ebacd9501a08c38f0a39597d35134cf027e7"
+          },
+          {
+            "callID": "call_4cQ7zQzPipM4ThUfpBjNQXYi",
+            "command": "/usr/local/bin/node /template/node_modules/typescript/lib/tsc.js --ignoreConfig --noEmit --strict --target es2020 --module commonjs --moduleResolution node --ignoreDeprecations 6.0 test/types/subscribe-positive.ts test/types/subscribe-negative.ts",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582429151,
+              "end": 1789582429868
+            },
+            "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+          },
+          {
+            "callID": "call_tX7Brd8DQXEGt5ECRJHFUfdt",
+            "command": "npm test",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582433957,
+              "end": 1789582434190
+            },
+            "outputSha256": "76f542e19411507a414a0e6b0ca81a13604dd716b4407ab64d6550ceea9a3653"
+          },
+          {
+            "callID": "call_0OKAaizqrjuUL4BQJiSEseaM",
+            "command": "npm run test-esm",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582438280,
+              "end": 1789582438430
+            },
+            "outputSha256": "8941a9729dabf8b3c1398b1b07a49f43a1796f500b7318cfe713d34a8509be1b"
+          },
+          {
+            "callID": "call_BWqNWdvquugYuxlOL4UIkCOQ",
+            "command": "npm run rollup",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582440788,
+              "end": 1789582441194
+            },
+            "outputSha256": "a144e6715f48bedc144404359178ba2ea0f74410dedf3b127ea01bbf8c75726f"
+          },
+          {
+            "callID": "call_52tQXWEcPRhiKohKRSm5sN17",
+            "command": "npm test -- --grep 'EventEmitter#subscribe'",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582461239,
+              "end": 1789582461472
+            },
+            "outputSha256": "d8880d4ec1d6a7facb43be9f8e72558c7a359c421352773297b5d1a23493d04d"
+          },
+          {
+            "callID": "call_GqYPVkwTnOZtME9JYoHNqlvJ",
+            "command": "git diff --check && git status --short && git diff --stat",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582466311,
+              "end": 1789582466399
+            },
+            "outputSha256": "c2ee7e0f99f945bcb0ae7dff4fdd43b264a7bb202157537a95985f1241259020"
+          },
+          {
+            "callID": "call_dfpIg9QpFzqOREyfQzKWF7DG",
+            "command": "git diff -- index.js index.d.ts README.md test/test.js test/test.mjs && git diff --no-index /dev/null test/types/subscribe-positive.ts; true && git diff --no-index /dev/null test/types/subscribe-negative.ts; true",
+            "exit": 0,
+            "state": "completed",
+            "time": {
+              "start": 1789582466315,
+              "end": 1789582466442
+            },
+            "outputSha256": "4c558b34722dc31508a3f3719185fdbeb9b168e04ef641b6d11dcd86ae0b2641"
+          }
+        ],
+        "finals": [
+          "Implemented `subscribe(event, fn, context?)` with:\n\n- Exact, idempotent unsubscribe behavior\n- Duplicate registration safety and dispatch semantics\n- String/symbol events, contexts, and arbitrary arguments\n- CommonJS/ESM coverage\n- TypeScript declarations and positive/negative consumers\n- README lifecycle documentation\n\nChecks passed:\n\n- Focused subscription tests: 8 passing\n- `npm test`: 48 passing\n- `npm run test-esm`: 3 passing\n- TypeScript 6 strict checks\n- `npm run rollup`\n- `git diff --check`\n\nNo commit created."
+        ],
+        "claimsMatchExecutedChecks": true,
+        "limitation": "Passing author consumers does not certify all required API typing. No evaluator check is attributed to the author."
+      },
+      "inventories": [
+        {
+          "file": "request-2.json",
+          "role": "parent",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "harness_task",
+            "read",
+            "skill",
+            "task",
+            "todowrite"
+          ],
+          "toolResults": 0,
+          "sha256": "674eb614a5dff549e2f7092cdf52e9ff9b5001eb9c92356727926cb76d8caa83"
+        },
+        {
+          "file": "request-3.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 0,
+          "sha256": "401f9f9f25311513dc01cb3b68022cdf4df0a823bed501f574f21a04c4106314"
+        },
+        {
+          "file": "request-4.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 1,
+          "sha256": "646b90ec32d3640caef2394a51cfa2bac1ffcd15893b9edd46055587187244b5"
+        },
+        {
+          "file": "request-5.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 6,
+          "sha256": "4ea31fc04ad43f9a7d699a67df686af11954fc326c3065785e78b7d85183d12b"
+        },
+        {
+          "file": "request-6.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 14,
+          "sha256": "e0a2be5907c798dd380adb5bbe91ae90df9e50457013b98b57caf4da8d70cd3b"
+        },
+        {
+          "file": "request-7.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 19,
+          "sha256": "999b93c7eab5fc50efa14408884c229bf79354784ef95961708deed44e71bd6b"
+        },
+        {
+          "file": "request-8.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 22,
+          "sha256": "f8d9501b0fa5ad2068c5b7880c099eca618614fa53adf44cbbb77eebc296229a"
+        },
+        {
+          "file": "request-9.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 23,
+          "sha256": "e8538cb41b702f07de777e3af96d4ebc416f941a2fc26a06e4e7fc7bcff07d73"
+        },
+        {
+          "file": "request-10.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 24,
+          "sha256": "bb1fa9110c4c8e2a9ab827ff8ed4211ba70d79cd5a9fc865e31b73526f6f9de7"
+        },
+        {
+          "file": "request-11.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 25,
+          "sha256": "e87e83f0475c02fbac4519b19c48212e0f42da8a73df40c453f22804dd85e9cb"
+        },
+        {
+          "file": "request-12.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 26,
+          "sha256": "1fd23cbdbfe44d10714d3fadb47986ad8491409da8f09d14772da27cfde5cee0"
+        },
+        {
+          "file": "request-13.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 27,
+          "sha256": "9157e61d2c197d25b0feac03cecf4562db7264121e96b5531f50e2cc46c24e11"
+        },
+        {
+          "file": "request-14.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 30,
+          "sha256": "a3458d3200c89f916be0baaa2433b2224289ef2768f3a70b3afb55b39b2325f2"
+        },
+        {
+          "file": "request-15.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 31,
+          "sha256": "e08d00877909917aa73c1da7680b6b9da7e81fd052b90c97bf5ea151883fa73a"
+        },
+        {
+          "file": "request-16.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 32,
+          "sha256": "3d15855e032cbb8ab49211638470e2729edc575e2fd0eedf90d28bf994850dc7"
+        },
+        {
+          "file": "request-17.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 33,
+          "sha256": "6456d29a5316a430ea66371af55269c523cc1cf77b909294cf928ada7ec60b33"
+        },
+        {
+          "file": "request-18.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 34,
+          "sha256": "25d65b4e7e88bae02c5a7ee12ed6c26dea456d44940c01299fa1dd8607e685f1"
+        },
+        {
+          "file": "request-19.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 35,
+          "sha256": "510713516f5961a872da9a4220bedfcdcf6900efa13c8bea016fb5a333213a0f"
+        },
+        {
+          "file": "request-20.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 36,
+          "sha256": "d8b2be090126ae2b7defb542c1ec0813456ed717bf988c3ee49e4e46a61aebe4"
+        },
+        {
+          "file": "request-21.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 41,
+          "sha256": "1e42f399dc0dd514826f6edc6d8d34e1337cabbac242b3c3bf1503c0b8abf05a"
+        },
+        {
+          "file": "request-22.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 42,
+          "sha256": "0bb59a182cf6d44a3ca03f93e68bce91f75e5d31ebbe0e2bcf4e2dbcd05c48b7"
+        },
+        {
+          "file": "request-23.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 43,
+          "sha256": "2321f18686881b79d9ba2e786581b23acbdd46caee89581015fe1a2b163db09e"
+        },
+        {
+          "file": "request-24.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 44,
+          "sha256": "efe02f31cc6f8d5391029365d69fe5dda705cc08d8ed5551e7b13f07da42a17e"
+        },
+        {
+          "file": "request-25.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 45,
+          "sha256": "91fe7833e50af649d581f49fa7eec2d1f0ff2e28b54bdc76b7fa78a6c1823563"
+        },
+        {
+          "file": "request-26.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 46,
+          "sha256": "b25fb22ac375a38d404e608d3421bdb8a92a988d163438eb50ea9730fa0f081d"
+        },
+        {
+          "file": "request-27.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 47,
+          "sha256": "c44fadf05aba177d1316343b6d3903e1e19f9c294f8a89213ca2c6a3e731a77e"
+        },
+        {
+          "file": "request-28.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 48,
+          "sha256": "ca9eb203bbce630e2aabcd78bfe8556eb6e0177e54d75454d6fd78dc5af47951"
+        },
+        {
+          "file": "request-29.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 49,
+          "sha256": "e36623264dd3616fcb0e9273947146739677046fcdf69cac64920039349daa50"
+        },
+        {
+          "file": "request-30.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 50,
+          "sha256": "639f3f1c2698b3596f21c401ec0b140c7ec031fff67237d9e3babe9b97d67163"
+        },
+        {
+          "file": "request-31.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 51,
+          "sha256": "fd0134c6bb512881de1784d1e54631fcc1ef24bd57e26a85efed54f3d383f198"
+        },
+        {
+          "file": "request-32.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 52,
+          "sha256": "572d5871502f3b009f7918568934bcfc3bdd4d5a4febec354b39fbae86b67921"
+        },
+        {
+          "file": "request-33.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 53,
+          "sha256": "9424d37527873c45cde396ed3f959fbd76b1a75e952ca1c63dc0cce953cf1cc2"
+        },
+        {
+          "file": "request-34.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 54,
+          "sha256": "d105c276a2450a67ed736f0f6921085d5291906ad0ba2a059442f378b01d34d3"
+        },
+        {
+          "file": "request-35.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 55,
+          "sha256": "30d6c43a19ed49317182c9e12247316e4ed23e3f18d4d3c0886486ff44319bf4"
+        },
+        {
+          "file": "request-36.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 56,
+          "sha256": "34b0c47d2b4db363a521dae837b0928cb2f599c9c0b19628dfdfe0f60a18c4b7"
+        },
+        {
+          "file": "request-37.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 60,
+          "sha256": "a1118f7a3aa91465e78f97e486110e4b076c76e0826e47b63fd6ece6950eccc9"
+        },
+        {
+          "file": "request-38.json",
+          "role": "author",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "read",
+            "skill",
+            "todowrite"
+          ],
+          "toolResults": 61,
+          "sha256": "b8fdc4bcc9d4ad32b2612b7f0df0e72f72b980564956927c77695b88eb7e1f48"
+        },
+        {
+          "file": "request-39.json",
+          "role": "parent",
+          "tools": [
+            "apply_patch",
+            "bash",
+            "glob",
+            "grep",
+            "harness_task",
+            "read",
+            "skill",
+            "task",
+            "todowrite"
+          ],
+          "toolResults": 1,
+          "sha256": "57ac4466d2bff790fb8ff4b36496e7d2d429817139da85e13b1ed66f7789c04b"
+        }
+      ]
+    }
+  ],
+  "tokenAccounting": "cache/reasoning are included subsets, not additional totals; null/missing usage is unknown",
+  "monetaryCost": null,
+  "decision": "Positive bounded signal on known subscribe task: ON adds one full delivery and has an evidence-to-repair chain preserving the new feature. No general lift, causal attribution of initially correct new types, default/runtime change or automatic next campaign."
+}

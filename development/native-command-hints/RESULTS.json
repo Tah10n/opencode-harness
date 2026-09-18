@@ -1,0 +1,122 @@
+{
+  "installed": "1.18.26",
+  "network": "Docker --network none; only loopback scripted HTTP",
+  "results": [
+    {
+      "layout": "local",
+      "installedHash": "4ba8f87a18157dfcf794c030d836ce4ca22260eb7a9c1472255b628b19f490bc",
+      "requests": 11,
+      "authorSteps": 8,
+      "rawExit": 127,
+      "originalUnchanged": true,
+      "received": true,
+      "failureReceived": true,
+      "finalReceipt": true,
+      "route": "<delivery>/node_modules/.bin/pnpm test",
+      "routeScope": "original-script",
+      "independentSuiteCommand": null,
+      "diagnosticCost": {
+        "paths": 94,
+        "reads": 4,
+        "bytes": 14750,
+        "elapsedMs": 2.9285830000003443,
+        "executions": 0
+      },
+      "projectChecks": [
+        {
+          "exit": 127,
+          "durationMs": 76
+        },
+        {
+          "exit": 1,
+          "durationMs": 1617
+        },
+        {
+          "exit": 0,
+          "durationMs": 3409
+        }
+      ],
+      "portableCheckPassed": true,
+      "patchSha256": "7502463228041968fbd5a2fbc196bf7651b5a0350b78f58f46e357f7a0d29c76",
+      "installedPackageBytesUnchanged": true,
+      "generatedCheckCaches": [],
+      "terminalStatus": "incomplete",
+      "terminationVerified": true
+    },
+    {
+      "layout": "ancestor",
+      "installedHash": "4ba8f87a18157dfcf794c030d836ce4ca22260eb7a9c1472255b628b19f490bc",
+      "requests": 12,
+      "authorSteps": 9,
+      "rawExit": 127,
+      "originalUnchanged": true,
+      "received": true,
+      "failureReceived": true,
+      "finalReceipt": true,
+      "route": "<original>/node_modules/.bin/eslint .",
+      "routeScope": "partial-lint",
+      "independentSuiteCommand": "npm test",
+      "diagnosticCost": {
+        "paths": 112,
+        "reads": 6,
+        "bytes": 28920,
+        "elapsedMs": 8.22312600000032,
+        "executions": 0
+      },
+      "projectChecks": [
+        {
+          "exit": 127,
+          "durationMs": 103
+        },
+        {
+          "exit": 1,
+          "durationMs": 1164
+        },
+        {
+          "exit": 0,
+          "durationMs": 988
+        },
+        {
+          "exit": 0,
+          "durationMs": 3584
+        }
+      ],
+      "portableCheckPassed": true,
+      "patchSha256": "7502463228041968fbd5a2fbc196bf7651b5a0350b78f58f46e357f7a0d29c76",
+      "installedPackageBytesUnchanged": true,
+      "generatedCheckCaches": [
+        "vitest/dist/tsconfig.tmp.tsbuildinfo"
+      ],
+      "terminalStatus": "incomplete",
+      "terminationVerified": true
+    },
+    {
+      "layout": "off",
+      "installedHash": "4ba8f87a18157dfcf794c030d836ce4ca22260eb7a9c1472255b628b19f490bc",
+      "requests": 5,
+      "authorSteps": 2,
+      "rawExit": 127,
+      "originalUnchanged": true
+    }
+  ],
+  "runtimeSourceSha256": {
+    "native-command-hints.mjs": "4ba8f87a18157dfcf794c030d836ce4ca22260eb7a9c1472255b628b19f490bc",
+    "native-task-plugin.mjs": "2ca358a2dccf5c9b2526ee2fa57b5c2e2f710278add5cf140f5c9ed3f5f94d9c",
+    "native-project-scope.mjs": "f5dcd760610c97a3fbf49229ea5c4723dce6d3aa0fe160228f908c62d29e8be4",
+    "native-sensitivity.mjs": "91a918585e5889bba4d0c7299a469da4c0e637ee3b82bf1b6044934ff8827c73",
+    "native-task-observations.mjs": "126a3e695c2dd2ec930a44fca4aa033f0f21e8ae364aae15db39e7f343189de8",
+    "native-task-workflow.mjs": "10688211fce75592ce22a669b10d49aa067b89aa0dee05da6a2d35b9ceca7ed8",
+    "native-template.mjs": "0d912db7c96c52d417e018975dad05593cd9da4a6829b0bf8fc4844a50db58fc"
+  },
+  "basis": "Installed resolver hash asserted against source; actual same-session provider receipt/use and native raw event exits asserted. Other source hashes identify the materialization inputs.",
+  "limitations": [
+    "Scripted mechanism evidence only; no Luna/model-quality evidence.",
+    "A uses ordinary local dependency resolution within the workflow delivery checkout; workflow execution itself always uses its isolated Git worktree. Both patches additionally applied and checked in ordinary Git clones.",
+    "Ancestor hint is explicitly partial lint; full npm test was a separate scripted-author decision.",
+    "Original tracked checkout and commit unchanged; only generated Vitest incremental cache may change in the disposable ancestor dependency copy. Saved inputs and host checkout mounted read-only.",
+    "Workflow status remains incomplete; original command failure and unsupported runner scope are not erased.",
+    "No full verify or full platform matrix; historical PROCESS_CONTAINMENT_UNAVAILABLE remains separate."
+  ],
+  "modelFreeControlsPassed": 31,
+  "runtimeCommit": "22ec2be3bf27afb252a1177818ad81518218f01f"
+}

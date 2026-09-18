@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';const root=process.env.PILOT_SOURCE;
+const m0=await import(path.join(root,"src/seats.mjs"));
+test("atomic conflicts and duplicates",()=>{const s=m0.createSeats([2]);assert.equal(s.reserve([1,2]),false);assert.deepEqual(s.snapshot(),[2]);assert.equal(s.reserve([3,3]),false);assert.deepEqual(s.snapshot(),[2]);assert.equal(s.reserve([]),true);});
+test("snapshot restore ownership and sorting",()=>{const source=Object.freeze([10,2]);const s=m0.createSeats(source);const snap=s.snapshot();assert.deepEqual(snap,[2,10]);const r=m0.createSeats(snap);snap.push(99);s.release([2,2,8]);assert.deepEqual(s.snapshot(),[10]);assert.deepEqual(r.snapshot(),[2,10]);assert.deepEqual(source,[10,2]);});
+test("release permits fresh reservation",()=>{const s=m0.createSeats();assert.equal(s.reserve(Object.freeze([0,9])),true);s.release([0]);assert.equal(s.reserve([0]),true);assert.deepEqual(s.snapshot(),[0,9]);});

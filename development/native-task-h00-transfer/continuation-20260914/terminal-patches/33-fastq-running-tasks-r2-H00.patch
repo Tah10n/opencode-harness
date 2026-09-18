@@ -1,0 +1,340 @@
+diff --git a/README.md b/README.md
+index b44cce36ef1e06da8b5987fd9c6dc508afdff166..433db2dc4632ff403731067c3b6b09b16c386bd5 100644
+--- a/README.md
++++ b/README.md
+@@ -135,6 +135,7 @@ async function asyncWorker (arg: Task): Promise<void> {
+ * <a href="#idle"><code>queue#<b>idle()</b></code></a>
+ * <a href="#length"><code>queue#<b>length()</b></code></a>
+ * <a href="#getQueue"><code>queue#<b>getQueue()</b></code></a>
++* <a href="#runningTasks"><code>queue#<b>runningTasks()</b></code></a>
+ * <a href="#kill"><code>queue#<b>kill()</b></code></a>
+ * <a href="#killAndDrain"><code>queue#<b>killAndDrain()</b></code></a>
+ * <a href="#error"><code>queue#<b>error()</b></code></a>
+@@ -204,6 +205,14 @@ Returns the number of tasks waiting to be processed (in the queue).
+ 
+ Returns all the tasks be processed (in the queue). Returns empty array when there are no tasks
+ 
++-------------------------------------------------------
++<a name="runningTasks"></a>
++### queue.runningTasks()
++
++Returns a new array containing the values of tasks whose workers have started and have not
++completed. Values are returned in worker start order, including duplicates and `undefined`.
++Queued or paused tasks are excluded until their workers start.
++
+ -------------------------------------------------------
+ <a name="kill"></a>
+ ### queue.kill()
+diff --git a/index.d.ts b/index.d.ts
+index 262dd0482b2250546479f07e3f0345486d915b36..5a4bfc4e9b17209cc3713cfd60fd5e70de8d5832 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -17,6 +17,8 @@ declare namespace fastq {
+     /** Resume the processing of tasks. */
+     resume(): any
+     running(): number
++    /** Returns a new array containing task values whose workers are currently running, in start order. */
++    runningTasks(): T[]
+     /** Returns `false` if there are tasks being processed or waiting to be processed. `true` otherwise. */
+     idle(): boolean
+     /** Returns the number of tasks waiting to be processed (in the queue). */
+diff --git a/queue.js b/queue.js
+index e1d56c540765991e31a5f5326baa806702dfb85d..4f71a9ddf99a7b52930128cb4d6f635818f7fcd9 100644
+--- a/queue.js
++++ b/queue.js
+@@ -18,6 +18,8 @@ function fastqueue (context, worker, _concurrency) {
+   var cache = reusify(Task)
+   var queueHead = null
+   var queueTail = null
++  var runningHead = null
++  var runningTail = null
+   var _running = 0
+   var errorHandler = null
+ 
+@@ -45,6 +47,7 @@ function fastqueue (context, worker, _concurrency) {
+     },
+ 
+     running: running,
++    runningTasks: runningTasks,
+     resume: resume,
+     idle: idle,
+     length: length,
+@@ -63,6 +66,18 @@ function fastqueue (context, worker, _concurrency) {
+     return _running
+   }
+ 
++  function runningTasks () {
++    var current = runningHead
++    var tasks = []
++
++    while (current) {
++      tasks.push(current.value)
++      current = current.runningNext
++    }
++
++    return tasks
++  }
++
+   function pause () {
+     self.paused = true
+   }
+@@ -117,6 +132,7 @@ function fastqueue (context, worker, _concurrency) {
+     current.value = value
+     current.callback = done || noop
+     current.errorHandler = errorHandler
++    current.remove = removeRunning
+ 
+     if (_running >= _concurrency || self.paused) {
+       if (queueTail) {
+@@ -129,7 +145,7 @@ function fastqueue (context, worker, _concurrency) {
+       }
+     } else {
+       _running++
+-      worker.call(context, current.value, current.worked)
++      start(current)
+     }
+   }
+ 
+@@ -141,6 +157,7 @@ function fastqueue (context, worker, _concurrency) {
+     current.value = value
+     current.callback = done || noop
+     current.errorHandler = errorHandler
++    current.remove = removeRunning
+ 
+     if (_running >= _concurrency || self.paused) {
+       if (queueHead) {
+@@ -153,8 +170,35 @@ function fastqueue (context, worker, _concurrency) {
+       }
+     } else {
+       _running++
+-      worker.call(context, current.value, current.worked)
++      start(current)
++    }
++  }
++
++  function start (task) {
++    task.runningPrev = runningTail
++    task.runningNext = null
++    if (runningTail) {
++      runningTail.runningNext = task
++    } else {
++      runningHead = task
++    }
++    runningTail = task
++    worker.call(context, task.value, task.worked)
++  }
++
++  function removeRunning (task) {
++    if (task.runningPrev) {
++      task.runningPrev.runningNext = task.runningNext
++    } else {
++      runningHead = task.runningNext
++    }
++    if (task.runningNext) {
++      task.runningNext.runningPrev = task.runningPrev
++    } else {
++      runningTail = task.runningPrev
+     }
++    task.runningPrev = null
++    task.runningNext = null
+   }
+ 
+   function release (holder) {
+@@ -169,7 +213,7 @@ function fastqueue (context, worker, _concurrency) {
+         }
+         queueHead = next.next
+         next.next = null
+-        worker.call(context, next.value, next.worked)
++        start(next)
+         if (queueTail === null) {
+           self.empty()
+         }
+@@ -244,6 +288,9 @@ function Task () {
+   this.release = noop
+   this.context = null
+   this.errorHandler = null
++  this.remove = noop
++  this.runningPrev = null
++  this.runningNext = null
+ 
+   var self = this
+ 
+@@ -251,6 +298,7 @@ function Task () {
+     var callback = self.callback
+     var errorHandler = self.errorHandler
+     var val = self.value
++    self.remove(self)
+     self.value = null
+     self.callback = noop
+     if (self.errorHandler) {
+diff --git a/test/example.ts b/test/example.ts
+index a47d4419cdc04144771c747d4c0a66da990e4eaa..8494492d1d55a4913a24fb22d6073d0a5cc63b82 100644
+--- a/test/example.ts
++++ b/test/example.ts
+@@ -34,6 +34,8 @@ queue.resume()
+ 
+ queue.running()
+ 
++queue.runningTasks()
++
+ queue.saturated = () => undefined
+ 
+ queue.unshift('world', (err, result) => {
+@@ -71,6 +73,8 @@ function genericsWorker(this: GenericsContext, task: number, cb: fastq.done<stri
+ 
+ const queue2 = queueAsPromised(asyncWorker, 1)
+ 
++queue2.runningTasks()
++
+ async function asyncWorker(task: any) {
+   return 'hello ' + task
+ }
+diff --git a/test/promise.js b/test/promise.js
+index de9e856caf7f5807ec0ebf3e1d58c50f5a07f91d..81ad5efe27240e4698258acbfc453756ddd5dc40 100644
+--- a/test/promise.js
++++ b/test/promise.js
+@@ -16,6 +16,49 @@ test('concurrency', function (t) {
+   }
+ })
+ 
++test('runningTasks tracks promise fulfillment and rejection', async function (t) {
++  let resolveFirst
++  let rejectSecond
++  let resolveThird
++
++  const queue = buildQueue(worker, 2)
++  const first = queue.push('first')
++  const second = queue.push(undefined)
++  const third = queue.push('third')
++
++  t.deepEqual(queue.runningTasks(), ['first', undefined], 'active promise tasks are listed in order')
++  t.deepEqual(queue.getQueue(), ['third'], 'queued promise tasks are excluded')
++
++  const snapshot = queue.runningTasks()
++  snapshot.pop()
++  t.deepEqual(queue.runningTasks(), ['first', undefined], 'mutating a snapshot does not change state')
++
++  resolveFirst('first')
++  t.equal(await first, 'first', 'fulfilled task keeps its result')
++  t.deepEqual(queue.runningTasks(), [undefined, 'third'], 'fulfillment promotes the queued task')
++
++  rejectSecond(new Error('rejected'))
++  try {
++    await second
++    t.fail('rejected task should reject')
++  } catch (err) {
++    t.equal(err.message, 'rejected', 'rejection is preserved')
++  }
++  t.deepEqual(queue.runningTasks(), ['third'], 'rejection removes only its active task')
++
++  resolveThird('third')
++  t.equal(await third, 'third', 'promoted task fulfills')
++  t.deepEqual(queue.runningTasks(), [], 'settled tasks are absent')
++
++  function worker (arg) {
++    return new Promise(function (resolve, reject) {
++      if (arg === 'first') resolveFirst = resolve
++      else if (arg === undefined) rejectSecond = reject
++      else resolveThird = resolve
++    })
++  }
++})
++
+ test('worker execution', async function (t) {
+   const queue = buildQueue(worker, 1)
+ 
+diff --git a/test/test.js b/test/test.js
+index c59e8c3403c113279d8fde260bdb1455716358b7..20cdb61e014c04c0cbf7a97589e033e16f1f9330 100644
+--- a/test/test.js
++++ b/test/test.js
+@@ -383,6 +383,90 @@ test('getQueue', function (t) {
+   }
+ })
+ 
++test('runningTasks tracks active values and pool reuse', function (t) {
++  t.plan(18)
++
++  var queue = buildQueue(worker, 2)
++  var finish = []
++  var completionStates = [[undefined], [undefined], [], []]
++
++  t.deepEqual(queue.runningTasks(), [], 'nothing is running')
++
++  queue.unshift(undefined, done)
++  queue.push('duplicate', done)
++  queue.push(undefined, done)
++
++  t.deepEqual(queue.runningTasks(), [undefined, 'duplicate'], 'started tasks are listed in order')
++  t.deepEqual(queue.getQueue(), [undefined], 'queued tasks are not listed as running')
++
++  var snapshot = queue.runningTasks()
++  var retained = queue.runningTasks()
++  t.notEqual(snapshot, retained, 'each snapshot is a new array')
++  snapshot[0] = 'changed'
++  snapshot.push('also changed')
++  t.deepEqual(queue.runningTasks(), [undefined, 'duplicate'], 'mutating a snapshot does not change queue state')
++
++  finish[1](null, true)
++  finish.splice(1, 1)
++  t.deepEqual(queue.runningTasks(), [undefined, undefined], 'the queued task is promoted after the duplicate completes')
++  finish.shift()(null, true)
++  t.deepEqual(queue.runningTasks(), [undefined], 'the first task is removed without removing its duplicate')
++  finish.shift()(null, true)
++  t.deepEqual(queue.runningTasks(), [], 'all completed tasks are absent')
++
++  queue.push('reused', done)
++  t.deepEqual(queue.runningTasks(), ['reused'], 'a pooled task can be tracked again')
++  finish.shift()(null, true)
++  t.deepEqual(retained, [undefined, 'duplicate'], 'an old snapshot keeps its values after pool reuse')
++
++  function done (err) {
++    t.error(err, 'completion has no error')
++    t.deepEqual(queue.runningTasks(), completionStates.shift(), 'completion callback sees its task as no longer running')
++  }
++
++  function worker (arg, cb) {
++    finish.push(cb)
++  }
++})
++
++test('runningTasks follows pause, resume, and concurrency changes', function (t) {
++  t.plan(13)
++
++  var queue = buildQueue(worker, 1)
++  var finish = []
++  var completionStates = [['tail'], ['middle'], []]
++
++  queue.pause()
++  queue.unshift('tail', done)
++  queue.push('middle', done)
++  queue.unshift('head', done)
++
++  t.deepEqual(queue.runningTasks(), [], 'paused tasks are not running')
++  t.deepEqual(queue.getQueue(), ['head', 'tail', 'middle'], 'paused tasks remain queued')
++
++  queue.resume()
++  t.deepEqual(queue.runningTasks(), ['head'], 'resume starts the first queued task')
++
++  queue.concurrency = 2
++  t.deepEqual(queue.runningTasks(), ['head', 'tail'], 'increasing concurrency promotes another task')
++
++  finish.shift()(null, true)
++  t.deepEqual(queue.runningTasks(), ['tail', 'middle'], 'completion promotes the next task')
++  finish.shift()(null, true)
++  t.deepEqual(queue.runningTasks(), ['middle'], 'the second active task is removed')
++  finish.shift()(null, true)
++  t.deepEqual(queue.runningTasks(), [], 'the queue is empty after all completions')
++
++  function done (err) {
++    t.error(err, 'completion has no error')
++    t.deepEqual(queue.runningTasks(), completionStates.shift(), 'callback sees only other active tasks')
++  }
++
++  function worker (arg, cb) {
++    finish.push(cb)
++  }
++})
++
+ test('unshift', function (t) {
+   t.plan(8)
+ 

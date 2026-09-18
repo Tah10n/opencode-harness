@@ -1,0 +1,1087 @@
+diff --git a/src/css/Selector.ts b/src/css/Selector.ts
+index 1ca0b240f2669b5bd0a4903b1374f13c6aaee71c..4c29e200a9c87cbe372b62a65f1452c1ddbe14af 100644
+--- a/src/css/Selector.ts
++++ b/src/css/Selector.ts
+@@ -31,7 +31,7 @@ export default class Selector {
+ 
+ 		if (toEncapsulate.length > 0) {
+ 			toEncapsulate.filter((_, i) => i === 0 || i === toEncapsulate.length - 1).forEach(({ node, block }) => {
+-				node._needsCssAttribute = true;
++				node._needsCssClass = true;
+ 				block.shouldEncapsulate = true;
+ 			});
+ 
+diff --git a/src/css/Stylesheet.ts b/src/css/Stylesheet.ts
+index d16af09293faab92343475a9c6e3b9a644d9b47b..5d69c83296cb2e40bb44938beea7beeee29d00d8 100644
+--- a/src/css/Stylesheet.ts
++++ b/src/css/Stylesheet.ts
+@@ -69,7 +69,7 @@ class Rule {
+ 	transform(code: MagicString, id: string, keyframes: Map<string, string>, cascade: boolean) {
+ 		if (this.parent && this.parent.node.type === 'Atrule' && this.parent.node.name === 'keyframes') return true;
+ 
+-		const attr = `[${id}]`;
++		const attr = `.${id}`;
+ 
+ 		if (cascade) {
+ 			this.selectors.forEach(selector => {
+@@ -353,7 +353,7 @@ export default class Stylesheet {
+ 		}
+ 
+ 		if (this.cascade) {
+-			if (stack.length === 0) node._needsCssAttribute = true;
++			if (stack.length === 0) node._needsCssClass = true;
+ 			return;
+ 		}
+ 
+@@ -438,4 +438,4 @@ export default class Stylesheet {
+ 			child.warnOnUnusedSelector(handler);
+ 		});
+ 	}
+-}
+\ No newline at end of file
++}
+diff --git a/src/generators/dom/index.ts b/src/generators/dom/index.ts
+index ada015269cb3de6d5b12e2db0382cd10247457c3..ab11f66e8b3d4bbb228f2cb53937763646f738ef 100644
+--- a/src/generators/dom/index.ts
++++ b/src/generators/dom/index.ts
+@@ -138,7 +138,7 @@ export default function dom(
+ 	if (generator.needsEncapsulateHelper) {
+ 		builder.addBlock(deindent`
+ 			function @encapsulateStyles(node) {
+-				@setAttribute(node, "${generator.stylesheet.id}", "");
++				node.classList.add("${generator.stylesheet.id}");
+ 			}
+ 		`);
+ 	}
+diff --git a/src/generators/nodes/Attribute.ts b/src/generators/nodes/Attribute.ts
+index 08075efee20d719d50829dd0ccb2ee0613e4b288..94152605f1cc377d23b55d1c8cc17dd44133ba34 100644
+--- a/src/generators/nodes/Attribute.ts
++++ b/src/generators/nodes/Attribute.ts
+@@ -80,6 +80,7 @@ export default class Attribute {
+ 
+ 		const isDynamic = this.isDynamic();
+ 		const isLegacyInputType = this.generator.legacy && name === 'type' && this.parent.name === 'input';
++		const isScopedClass = name === 'class' && this.parent._needsCssClass && !this.generator.customElement;
+ 
+ 		const isDataSet = /^data-/.test(name) && !this.generator.legacy && !node.namespace;
+ 		const camelCaseName = isDataSet ? name.replace('data-', '').replace(/(-\w)/g, function (m) {
+@@ -152,6 +153,9 @@ export default class Attribute {
+ 
+ 			let updater;
+ 			const init = shouldCache ? `${last} = ${value}` : value;
++			const scopedValue = isScopedClass
++				? `"${this.generator.stylesheet.id} " + (${shouldCache ? last : value})`
++				: (shouldCache ? last : value);
+ 
+ 			if (isLegacyInputType) {
+ 				block.builders.hydrate.addLine(
+@@ -189,9 +193,9 @@ export default class Attribute {
+ 				block.builders.update.addLine(`${last} = ${value};`);
+ 			} else if (propertyName) {
+ 				block.builders.hydrate.addLine(
+-					`${node.var}.${propertyName} = ${init};`
++					`${node.var}.${propertyName} = ${isScopedClass ? `"${this.generator.stylesheet.id} " + (${init})` : init};`
+ 				);
+-				updater = `${node.var}.${propertyName} = ${shouldCache || isSelectValueAttribute ? last : value};`;
++				updater = `${node.var}.${propertyName} = ${isScopedClass ? scopedValue : (shouldCache || isSelectValueAttribute ? last : value)};`;
+ 			} else if (isDataSet) {
+ 				block.builders.hydrate.addLine(
+ 					`${node.var}.dataset.${camelCaseName} = ${init};`
+@@ -229,9 +233,10 @@ export default class Attribute {
+ 					? `''`
+ 					: stringify(this.value[0].data);
+ 
++			const scopedValue = isScopedClass ? `"${this.generator.stylesheet.id} " + (${value})` : value;
+ 			const statement = (
+ 				isLegacyInputType ? `@setInputType(${node.var}, ${value});` :
+-				propertyName ? `${node.var}.${propertyName} = ${value};` :
++				propertyName ? `${node.var}.${propertyName} = ${scopedValue};` :
+ 					isDataSet ? `${node.var}.dataset.${camelCaseName} = ${value};` :
+ 				`${method}(${node.var}, "${name}", ${value});`
+ 			);
+diff --git a/src/generators/nodes/Element.ts b/src/generators/nodes/Element.ts
+index 2a75f1fc36452b89941e4755b1bd475972132496..02db26fe820dbc9f3e72559527e69947b1ef195f 100644
+--- a/src/generators/nodes/Element.ts
++++ b/src/generators/nodes/Element.ts
+@@ -212,12 +212,16 @@ export default class Element extends Node {
+ 			block.builders.unmount.addLine(`@detachNode(${name});`);
+ 		}
+ 
+-		// add CSS encapsulation attribute
+-		if (this._needsCssAttribute && !this.generator.customElement) {
+-			this.generator.needsEncapsulateHelper = true;
+-			block.builders.hydrate.addLine(
+-				`@encapsulateStyles(${name});`
+-			);
++		// add CSS encapsulation class
++		const hasClassAttribute = this.attributes.some(
++			(attribute: Node) => attribute.type === 'Attribute' && attribute.name === 'class'
++		);
++
++		if (this._needsCssClass && !this.generator.customElement) {
++			if (!hasClassAttribute) {
++				this.generator.needsEncapsulateHelper = true;
++				block.builders.hydrate.addLine(`@encapsulateStyles(${name});`);
++			}
+ 
+ 			if (this._cssRefAttribute) {
+ 				block.builders.hydrate.addLine(
+@@ -429,8 +433,15 @@ export default class Element extends Node {
+ 
+ 			let open = `<${node.name}`;
+ 
+-			if (node._needsCssAttribute) {
+-				open += ` ${generator.stylesheet.id}`;
++			const classAttribute = node.attributes.find(
++				(attr: Node) => attr.type === 'Attribute' && attr.name === 'class'
++			);
++
++			if (node._needsCssClass) {
++				const classValue = classAttribute && classAttribute.value.length > 0
++					? classAttribute.value[0].data
++					: '';
++				open += ` class="${generator.stylesheet.id}${classAttribute ? ` ${classValue}` : ''}"`;
+ 			}
+ 
+ 			if (node._cssRefAttribute) {
+@@ -438,6 +449,7 @@ export default class Element extends Node {
+ 			}
+ 
+ 			node.attributes.forEach((attr: Node) => {
++				if (attr === classAttribute) return;
+ 				open += ` ${fixAttributeCasing(attr.name)}${stringifyAttributeValue(attr.value)}`
+ 			});
+ 
+diff --git a/src/generators/server-side-rendering/visitors/Element.ts b/src/generators/server-side-rendering/visitors/Element.ts
+index 21ec923e3d4d6d3c009a3a9c4911200b9421c4e4..90f8ef3d6317b6f7a69ff546878d599440e33c2a 100644
+--- a/src/generators/server-side-rendering/visitors/Element.ts
++++ b/src/generators/server-side-rendering/visitors/Element.ts
+@@ -24,6 +24,7 @@ export default function visitElement(
+ 
+ 	let openingTag = `<${node.name}`;
+ 	let textareaContents; // awkward special case
++	let hasClassAttribute = false;
+ 
+ 	const slot = node.getStaticAttributeValue('slot');
+ 	if (slot && node.hasAncestor('Component')) {
+@@ -39,6 +40,9 @@ export default function visitElement(
+ 
+ 		if (attribute.name === 'value' && node.name === 'textarea') {
+ 			textareaContents = stringifyAttributeValue(block, attribute.value);
++		} else if (attribute.name === 'class' && node._needsCssClass) {
++			hasClassAttribute = true;
++			openingTag += ` class="${generator.stylesheet.id} ${stringifyAttributeValue(block, attribute.value)}"`;
+ 		} else if (attribute.value === true) {
+ 			openingTag += ` ${attribute.name}`;
+ 		} else if (
+@@ -54,8 +58,8 @@ export default function visitElement(
+ 		}
+ 	});
+ 
+-	if (node._needsCssAttribute) {
+-		openingTag += ` ${generator.stylesheet.id}`;
++	if (node._needsCssClass) {
++		if (!hasClassAttribute) openingTag += ` class="${generator.stylesheet.id}"`;
+ 
+ 		if (node._cssRefAttribute) {
+ 			openingTag += ` svelte-ref-${node._cssRefAttribute}`;
+diff --git a/test/css/samples/attribute-selector-only-name/expected.css b/test/css/samples/attribute-selector-only-name/expected.css
+index 2217e804d9367805b93108f65528090396894596..e2bbf5b48c59e7f83ef86a26d95e3a430e949b91 100644
+--- a/test/css/samples/attribute-selector-only-name/expected.css
++++ b/test/css/samples/attribute-selector-only-name/expected.css
+@@ -1 +1 @@
+-[foo][svelte-xyz]{color:red}[baz][svelte-xyz]{color:blue}
+\ No newline at end of file
++[foo].svelte-xyz{color:red}[baz].svelte-xyz{color:blue}
+\ No newline at end of file
+diff --git a/test/css/samples/attribute-selector-unquoted/expected.css b/test/css/samples/attribute-selector-unquoted/expected.css
+index b52e52d54529b1a6899aa14c3413e8947215c672..9f8f88a352eb426843e01c4dcbc4c1e442b6c64a 100644
+--- a/test/css/samples/attribute-selector-unquoted/expected.css
++++ b/test/css/samples/attribute-selector-unquoted/expected.css
+@@ -1 +1 @@
+-[foo=bar][svelte-xyz]{color:red}
+\ No newline at end of file
++[foo=bar].svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/basic/expected.css b/test/css/samples/basic/expected.css
+index 290ea521e40bc0290d809c1a8da7e6fbc8ddb3b3..49670b1fd54076e4ff0eeaa0a74077e46e3eac7b 100644
+--- a/test/css/samples/basic/expected.css
++++ b/test/css/samples/basic/expected.css
+@@ -1 +1 @@
+-div[svelte-xyz],[svelte-xyz] div{color:red}
+\ No newline at end of file
++div.svelte-xyz,.svelte-xyz div{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/cascade-false-empty-rule-dev/expected.css b/test/css/samples/cascade-false-empty-rule-dev/expected.css
+index 5e2b654711656361f9552f4c1d74f33f2fa406e4..4013e47e5d3ae7b615319c47d3f7c9bb4710884d 100644
+--- a/test/css/samples/cascade-false-empty-rule-dev/expected.css
++++ b/test/css/samples/cascade-false-empty-rule-dev/expected.css
+@@ -1 +1 @@
+-.foo[svelte-xyz]{}
+\ No newline at end of file
++.foo.svelte-xyz{}
+\ No newline at end of file
+diff --git a/test/css/samples/cascade-false-global-keyframes/expected.css b/test/css/samples/cascade-false-global-keyframes/expected.css
+index 111e94b0cc9415e5257d1616a8cf9820b36ec528..8e716d136df4f1a08fcb885628fc43ff7df8637b 100644
+--- a/test/css/samples/cascade-false-global-keyframes/expected.css
++++ b/test/css/samples/cascade-false-global-keyframes/expected.css
+@@ -1 +1 @@
+-@keyframes why{0%{color:red}100%{color:blue}}.animated[svelte-xyz]{animation:why 2s}.also-animated[svelte-xyz]{animation:not-defined-here 2s}
+\ No newline at end of file
++@keyframes why{0%{color:red}100%{color:blue}}.animated.svelte-xyz{animation:why 2s}.also-animated.svelte-xyz{animation:not-defined-here 2s}
+\ No newline at end of file
+diff --git a/test/css/samples/cascade-false-keyframes-from-to/expected.css b/test/css/samples/cascade-false-keyframes-from-to/expected.css
+index 45ae6c35206e373ae8c6b9217b9471ae6fed7e01..c8ee60194c800566d8668e3d29692b893f8aead8 100644
+--- a/test/css/samples/cascade-false-keyframes-from-to/expected.css
++++ b/test/css/samples/cascade-false-keyframes-from-to/expected.css
+@@ -1 +1 @@
+-@keyframes svelte-xyz-why{from{color:red}to{color:blue}}.animated[svelte-xyz]{animation:svelte-xyz-why 2s}
+\ No newline at end of file
++@keyframes svelte-xyz-why{from{color:red}to{color:blue}}.animated.svelte-xyz{animation:svelte-xyz-why 2s}
+\ No newline at end of file
+diff --git a/test/css/samples/cascade-false-keyframes/expected.css b/test/css/samples/cascade-false-keyframes/expected.css
+index 64fa0390eb42152fd14a1fe9fabe6c65d03cfcda..a6a1176dae468ccc0689801ff24b1c43afa6b0de 100644
+--- a/test/css/samples/cascade-false-keyframes/expected.css
++++ b/test/css/samples/cascade-false-keyframes/expected.css
+@@ -1 +1 @@
+-@keyframes svelte-xyz-why{0%{color:red}100%{color:blue}}.animated[svelte-xyz]{animation:svelte-xyz-why 2s}.also-animated[svelte-xyz]{animation:not-defined-here 2s}
+\ No newline at end of file
++@keyframes svelte-xyz-why{0%{color:red}100%{color:blue}}.animated.svelte-xyz{animation:svelte-xyz-why 2s}.also-animated.svelte-xyz{animation:not-defined-here 2s}
+\ No newline at end of file
+diff --git a/test/css/samples/cascade-false-pseudo-element/expected.css b/test/css/samples/cascade-false-pseudo-element/expected.css
+index edafcf9bcd3dc8d8724c51b2c7ec202e0fe94bd3..bb380d40417ca2b3ee65bfdb74d483a5501d5c99 100644
+--- a/test/css/samples/cascade-false-pseudo-element/expected.css
++++ b/test/css/samples/cascade-false-pseudo-element/expected.css
+@@ -1 +1 @@
+-span[svelte-xyz]::after{content:'i am a pseudo-element'}span[svelte-xyz]:first-child{color:red}span[svelte-xyz]:last-child::after{color:blue}
+\ No newline at end of file
++span.svelte-xyz::after{content:'i am a pseudo-element'}span.svelte-xyz:first-child{color:red}span.svelte-xyz:last-child::after{color:blue}
+\ No newline at end of file
+diff --git a/test/css/samples/cascade-false-universal-selector/expected.css b/test/css/samples/cascade-false-universal-selector/expected.css
+index b20339207587495b662a6d52bfff5f1041cec6fd..3eda95e44618e5922e7078b4cade49e1952f0af3 100644
+--- a/test/css/samples/cascade-false-universal-selector/expected.css
++++ b/test/css/samples/cascade-false-universal-selector/expected.css
+@@ -1 +1 @@
+-[svelte-xyz]{color:red}
+\ No newline at end of file
++.svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/cascade-false-universal-selector/expected.html b/test/css/samples/cascade-false-universal-selector/expected.html
+index e274b3e5098dd8f69fbaf222e3310c4e5f9d7271..be0c650916168089bf28b4a1101fd7bbcadbfcc9 100644
+--- a/test/css/samples/cascade-false-universal-selector/expected.html
++++ b/test/css/samples/cascade-false-universal-selector/expected.html
+@@ -1 +1 @@
+-<div svelte-xyz=""></div>
+\ No newline at end of file
++<div class="svelte-xyz"></div>
+\ No newline at end of file
+diff --git a/test/css/samples/cascade-false/expected.css b/test/css/samples/cascade-false/expected.css
+index c10ef8b18b4886816738fa4d7af2ad147f3cb14f..797d245dde8826f551fb70b2546764b61cb3ce77 100644
+--- a/test/css/samples/cascade-false/expected.css
++++ b/test/css/samples/cascade-false/expected.css
+@@ -1 +1 @@
+-div[svelte-xyz]{color:red}div.foo[svelte-xyz]{color:blue}.foo[svelte-xyz]{font-weight:bold}
+\ No newline at end of file
++div.svelte-xyz{color:red}div.foo.svelte-xyz{color:blue}.foo.svelte-xyz{font-weight:bold}
+\ No newline at end of file
+diff --git a/test/css/samples/combinator-child/expected.css b/test/css/samples/combinator-child/expected.css
+index 3f2c64212e4d5ff7f401498f02ddcd120df30d2b..bf6d83d42f9cc74db05f193caed3baf476a2ca66 100644
+--- a/test/css/samples/combinator-child/expected.css
++++ b/test/css/samples/combinator-child/expected.css
+@@ -1 +1 @@
+-.test[svelte-xyz]>div[svelte-xyz]{color:#0af}
+\ No newline at end of file
++.test.svelte-xyz>div.svelte-xyz{color:#0af}
+\ No newline at end of file
+diff --git a/test/css/samples/combinator-child/expected.html b/test/css/samples/combinator-child/expected.html
+index c726b2b5376c032d11333b9f4579c1ddaebb818f..56ce8bbc7d1099f1951f566122dd2e1543c5d96b 100644
+--- a/test/css/samples/combinator-child/expected.html
++++ b/test/css/samples/combinator-child/expected.html
+@@ -1 +1 @@
+-<div svelte-xyz="" class="test"><div svelte-xyz="">Testing...</div></div>
+\ No newline at end of file
++<div class="svelte-xyz test"><div class="svelte-xyz">Testing...</div></div>
+\ No newline at end of file
+diff --git a/test/css/samples/css-vars/expected.css b/test/css/samples/css-vars/expected.css
+index f843bc4eb2ee0ecdce6f42ac36df38128c7bbc2a..1b3a42567a63cae622371cf2a84110fe00eb6779 100644
+--- a/test/css/samples/css-vars/expected.css
++++ b/test/css/samples/css-vars/expected.css
+@@ -1 +1 @@
+-div[svelte-xyz],[svelte-xyz] div{--test:10}
+\ No newline at end of file
++div.svelte-xyz,.svelte-xyz div{--test:10}
+\ No newline at end of file
+diff --git a/test/css/samples/descendant-selector-non-top-level-outer/expected.css b/test/css/samples/descendant-selector-non-top-level-outer/expected.css
+index a321bab611c35bbbd5ec0beefc291f6b94087760..3817f75ebab46306a50ef3d1fcbe9100c8dc9d32 100644
+--- a/test/css/samples/descendant-selector-non-top-level-outer/expected.css
++++ b/test/css/samples/descendant-selector-non-top-level-outer/expected.css
+@@ -1 +1 @@
+-p[svelte-xyz] span[svelte-xyz]{color:red}
+\ No newline at end of file
++p.svelte-xyz span.svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/descendant-selector-non-top-level-outer/expected.html b/test/css/samples/descendant-selector-non-top-level-outer/expected.html
+index 042935653e55335d27cc7d3336112bd6f0f6f966..733f71343a2db3a7a76cfe7b0876c45968cf4f1a 100644
+--- a/test/css/samples/descendant-selector-non-top-level-outer/expected.html
++++ b/test/css/samples/descendant-selector-non-top-level-outer/expected.html
+@@ -1 +1 @@
+-<div><p svelte-xyz=''><span svelte-xyz=''>styled</span></p></div>
+\ No newline at end of file
++<div><p class="svelte-xyz"><span class="svelte-xyz">styled</span></p></div>
+\ No newline at end of file
+diff --git a/test/css/samples/keyframes/expected.css b/test/css/samples/keyframes/expected.css
+index 93b5ba32323ffe2e0ead81142dff948e6478f279..810ba8775131301943ba2158e8a37f1ee008e8e4 100644
+--- a/test/css/samples/keyframes/expected.css
++++ b/test/css/samples/keyframes/expected.css
+@@ -1 +1 @@
+-@keyframes svelte-xyz-why{0%{color:red}100%{color:blue}}[svelte-xyz].animated,[svelte-xyz] .animated{animation:svelte-xyz-why 2s}
+\ No newline at end of file
++@keyframes svelte-xyz-why{0%{color:red}100%{color:blue}}.svelte-xyz.animated,.svelte-xyz .animated{animation:svelte-xyz-why 2s}
+\ No newline at end of file
+diff --git a/test/css/samples/media-query-word/expected.css b/test/css/samples/media-query-word/expected.css
+index 3975992f2a47238ca241ab56c6060c7652911c6c..592ba7e61ddbe46b6f45cccc507738ace1efe55d 100644
+--- a/test/css/samples/media-query-word/expected.css
++++ b/test/css/samples/media-query-word/expected.css
+@@ -1 +1 @@
+-@media only screen and (min-width: 400px){div[svelte-xyz],[svelte-xyz] div{color:red}}
+\ No newline at end of file
++@media only screen and (min-width: 400px){div.svelte-xyz,.svelte-xyz div{color:red}}
+\ No newline at end of file
+diff --git a/test/css/samples/media-query/expected.css b/test/css/samples/media-query/expected.css
+index ea8cce5c00f74158411abdd0a1e5e7f95abadab5..689161de04c34c28293d38abd280c72ed0351ac7 100644
+--- a/test/css/samples/media-query/expected.css
++++ b/test/css/samples/media-query/expected.css
+@@ -1 +1 @@
+-@media(min-width: 400px){[svelte-xyz].large-screen,[svelte-xyz] .large-screen{display:block}}
+\ No newline at end of file
++@media(min-width: 400px){.svelte-xyz.large-screen,.svelte-xyz .large-screen{display:block}}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.css b/test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.css
+index 113585c7c5123e17bf5ce858cc31dd0795b4608b..4d1d8d14ff7c430b39f81a429fb5a6c998e320ea 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.css
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.css
+@@ -1 +1 @@
+-[data-foo*='bar'][svelte-xyz]{color:red}
+\ No newline at end of file
++[data-foo*='bar'].svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.html b/test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.html
+index c69d6b03c98ea707fce194575da804fa8ac36b59..5f113a0b1d9066ef7a51c15618b48ee0da3d9a9e 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.html
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.html
+@@ -1,2 +1,2 @@
+-<div><p svelte-xyz="" data-foo="foobarbaz">this is styled</p>
++<div><p class="svelte-xyz" data-foo="foobarbaz">this is styled</p>
+ 	<p data-foo="fooBARbaz">this is unstyled</p></div>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.css b/test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.css
+index fb8bf750c497428f63b4fc92c3c7a9cc00291e74..80b6feebca1c9855bd74ee741bb96c925e93c22a 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.css
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.css
+@@ -1 +1 @@
+-[data-foo='bar' i][svelte-xyz]{color:red}
+\ No newline at end of file
++[data-foo='bar' i].svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.html b/test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.html
+index 4da16a0c2ff6d23168f874f6468de6d3d8fb06bc..c09c637c8b7c5f188a45e30cd9f9d938ceb9ea35 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.html
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.html
+@@ -1,2 +1,2 @@
+-<div><p svelte-xyz="" data-foo="BAR">this is styled</p>
++<div><p class="svelte-xyz" data-foo="BAR">this is styled</p>
+ 	<p data-foo="BAZ">this is unstyled</p></div>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.css b/test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.css
+index 95966c62586dacc4cd65a405dd8e19f4777a7ed8..fd8a9a15eeb66890fc7fc626210d9070b6ba3b4b 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.css
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.css
+@@ -1 +1 @@
+-[data-foo='bar'][svelte-xyz]{color:red}
+\ No newline at end of file
++[data-foo='bar'].svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.html b/test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.html
+index f9cc8d8b5fa888660b0336e01d78b0c8cf4c4cc8..111d193a89c012e2f47ba8d6b2c5b5286728ca32 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.html
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.html
+@@ -1,2 +1,2 @@
+-<div><p svelte-xyz="" data-foo="whatever">this is styled</p>
++<div><p class="svelte-xyz" data-foo="whatever">this is styled</p>
+ 	<p data-foo="baz">this is unstyled</p></div>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.css b/test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.css
+index 95966c62586dacc4cd65a405dd8e19f4777a7ed8..fd8a9a15eeb66890fc7fc626210d9070b6ba3b4b 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.css
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.css
+@@ -1 +1 @@
+-[data-foo='bar'][svelte-xyz]{color:red}
+\ No newline at end of file
++[data-foo='bar'].svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.html b/test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.html
+index 4579673c467f8a257fc4ce6c185a63aede0ea245..745d610a6f2266d1236c5750551a3b635b4bcb5c 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.html
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.html
+@@ -1,2 +1,2 @@
+-<div><p svelte-xyz="" data-foo="bar">this is styled</p>
++<div><p class="svelte-xyz" data-foo="bar">this is styled</p>
+ 	<p data-foo="baz">this is unstyled</p></div>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.css b/test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.css
+index 2fa0e1f9ab439e77e1a57ea341df16b82a791263..95f6faeb028e29a8c81274687cc81207f7873e26 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.css
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.css
+@@ -1 +1 @@
+-[data-foo|='bar'][svelte-xyz]{color:red}
+\ No newline at end of file
++[data-foo|='bar'].svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.html b/test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.html
+index 37880da66775eb3cd7e94b7b7acfbe369b91cad0..3045becd3b32df0ad3d6c688448e0618c2d73e26 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.html
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.html
+@@ -1,3 +1,3 @@
+-<div><p svelte-xyz="" data-foo="bar">this is styled</p>
+-	<p svelte-xyz="" data-foo="bar-baz">this is styled</p>
++<div><p class="svelte-xyz" data-foo="bar">this is styled</p>
++	<p class="svelte-xyz" data-foo="bar-baz">this is styled</p>
+ 	<p data-foo="baz-bar">this is unstyled</p></div>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.css b/test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.css
+index 59f4342d98c097ab1e50a6e77727a338b19af6d2..3a30f1f017e84a80bceae967ce146510a0e119c5 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.css
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.css
+@@ -1 +1 @@
+-[data-foo^='bar'][svelte-xyz]{color:red}
+\ No newline at end of file
++[data-foo^='bar'].svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.html b/test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.html
+index a929494570e052653e8017095f2fb26cfb487ce8..7a54f457440cf0f24f96e3f1616052cc6d204e92 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.html
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.html
+@@ -1,2 +1,2 @@
+-<div><p svelte-xyz="" data-foo="barbaz">this is styled</p>
++<div><p class="svelte-xyz" data-foo="barbaz">this is styled</p>
+ 	<p data-foo="bazbar">this is unstyled</p></div>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.css b/test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.css
+index 1b47ff560d3d5cb73f76624852768df9864ccf91..de8d18cc3b332862b6470d1088dc2b2da9060670 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.css
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.css
+@@ -1 +1 @@
+-[data-foo$='bar'][svelte-xyz]{color:red}
+\ No newline at end of file
++[data-foo$='bar'].svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.html b/test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.html
+index 71abcb7fa58bdbf35b6091c852731224277c2319..ba757d0bf2c997003e4a134197357ff803683981 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.html
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.html
+@@ -1,2 +1,2 @@
+ <div><p data-foo="barbaz">this is unstyled</p>
+-	<p svelte-xyz="" data-foo="bazbar">this is styled</p></div>
+\ No newline at end of file
++	<p class="svelte-xyz" data-foo="bazbar">this is styled</p></div>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.css b/test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.css
+index 1241c31e7f8d9293403bdcd2e32db4ba7d2a5265..fabcbade4df079a9caf053d3bbae16453c84abd4 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.css
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.css
+@@ -1 +1 @@
+-[data-foo~='bar'][svelte-xyz]{color:red}
+\ No newline at end of file
++[data-foo~='bar'].svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.html b/test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.html
+index 64244097a249a93313ae96cca73b9fadf7fb084a..49555ef404e0e071551c97b258e0072e2b35c6c9 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.html
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.html
+@@ -1,2 +1,2 @@
+-<div><p svelte-xyz="" data-foo="qux bar">this is styled</p>
++<div><p class="svelte-xyz" data-foo="qux bar">this is styled</p>
+ 	<p data-foo="qux baz">this is unstyled</p></div>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector/expected.css b/test/css/samples/omit-scoping-attribute-attribute-selector/expected.css
+index bd48ef22c5a679e23e37f478f2a64d9addb6768b..ddb620207d2bf25fe2dedc626498852e60b15a3a 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector/expected.css
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector/expected.css
+@@ -1 +1 @@
+-[autoplay][svelte-xyz]{color:red}
+\ No newline at end of file
++[autoplay].svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-attribute-selector/expected.html b/test/css/samples/omit-scoping-attribute-attribute-selector/expected.html
+index 6a5b1043889ce223e9a081161b6a2a475ecd1262..52175f98b6600687881ed5af567aba78aff8f31f 100644
+--- a/test/css/samples/omit-scoping-attribute-attribute-selector/expected.html
++++ b/test/css/samples/omit-scoping-attribute-attribute-selector/expected.html
+@@ -1,2 +1,2 @@
+-<div><video svelte-xyz autoplay></video>
++<div><video class="svelte-xyz" autoplay></video>
+ 	<video></video></div>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-class-dynamic/expected.css b/test/css/samples/omit-scoping-attribute-class-dynamic/expected.css
+index 6c4e704d2c466943c591054a15fe6f605aa5827a..431f7041061eed48d07f814aa40bccc7f111edab 100644
+--- a/test/css/samples/omit-scoping-attribute-class-dynamic/expected.css
++++ b/test/css/samples/omit-scoping-attribute-class-dynamic/expected.css
+@@ -1 +1 @@
+-.foo[svelte-xyz]{color:red}
+\ No newline at end of file
++.foo.svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-class-dynamic/expected.html b/test/css/samples/omit-scoping-attribute-class-dynamic/expected.html
+index c45e8d88a614e07ea9870511e6a8349e80b37d4e..7b08b7dd686ac482982788f1e1fc1681c595b7b8 100644
+--- a/test/css/samples/omit-scoping-attribute-class-dynamic/expected.html
++++ b/test/css/samples/omit-scoping-attribute-class-dynamic/expected.html
+@@ -1,2 +1,2 @@
+-<p svelte-xyz="" class="whatever">this is styled</p>
++<p class="svelte-xyz whatever">this is styled</p>
+ <p class="bar">this is unstyled</p>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-class-static/expected.css b/test/css/samples/omit-scoping-attribute-class-static/expected.css
+index 6c4e704d2c466943c591054a15fe6f605aa5827a..431f7041061eed48d07f814aa40bccc7f111edab 100644
+--- a/test/css/samples/omit-scoping-attribute-class-static/expected.css
++++ b/test/css/samples/omit-scoping-attribute-class-static/expected.css
+@@ -1 +1 @@
+-.foo[svelte-xyz]{color:red}
+\ No newline at end of file
++.foo.svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-class-static/expected.html b/test/css/samples/omit-scoping-attribute-class-static/expected.html
+index 24687444c480a496953a2f7b4f5be4a2ebcfd367..dd5e790322eb6ee0d36f58f7d6d60f89bc7a4107 100644
+--- a/test/css/samples/omit-scoping-attribute-class-static/expected.html
++++ b/test/css/samples/omit-scoping-attribute-class-static/expected.html
+@@ -1,2 +1,2 @@
+-<p svelte-xyz="" class="foo">this is styled</p>
++<p class="svelte-xyz foo">this is styled</p>
+ <p class="bar">this is unstyled</p>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.css b/test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.css
+index fb5bc89f3e09a1799bd92bbaf0ae2400ac9caaf8..f3653403a5b9813ebcce1ba5c5b8b9a0ecaa0acf 100644
+--- a/test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.css
++++ b/test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.css
+@@ -1 +1 @@
+-.foo[svelte-xyz] .bar{color:red}
+\ No newline at end of file
++.foo.svelte-xyz .bar{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.html b/test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.html
+index bbe7db594631af52e38c6eb6aa0b18386e473456..1bb946bef87ae3cf21cf08fab7441123790314f3 100644
+--- a/test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.html
++++ b/test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.html
+@@ -1 +1 @@
+-<div svelte-xyz="" class="foo"></div>
+\ No newline at end of file
++<div class="svelte-xyz foo"></div>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.css b/test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.css
+index b7415ff9303c66e9444397d853cc3f408e313c16..74e641549f0e602b6f5557f575fed646590c8561 100644
+--- a/test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.css
++++ b/test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.css
+@@ -1 +1 @@
+-div[svelte-xyz]>p>em{color:red}
+\ No newline at end of file
++div.svelte-xyz>p>em{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.html b/test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.html
+index e274b3e5098dd8f69fbaf222e3310c4e5f9d7271..be0c650916168089bf28b4a1101fd7bbcadbfcc9 100644
+--- a/test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.html
++++ b/test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.html
+@@ -1 +1 @@
+-<div svelte-xyz=""></div>
+\ No newline at end of file
++<div class="svelte-xyz"></div>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.css b/test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.css
+index 79ef8d29dd3a1de4b5821f1bb75551586878d112..338c90ab19ca469914ee18d55170bdb8666f6a21 100644
+--- a/test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.css
++++ b/test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.css
+@@ -1 +1 @@
+-div[svelte-xyz]>p{color:red}
+\ No newline at end of file
++div.svelte-xyz>p{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.html b/test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.html
+index e274b3e5098dd8f69fbaf222e3310c4e5f9d7271..be0c650916168089bf28b4a1101fd7bbcadbfcc9 100644
+--- a/test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.html
++++ b/test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.html
+@@ -1 +1 @@
+-<div svelte-xyz=""></div>
+\ No newline at end of file
++<div class="svelte-xyz"></div>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.css b/test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.css
+index 417e702d4b960086fee738ea90cf5c595462b536..5d1af4c251d34693c0d3fda1731d3f9655465cfc 100644
+--- a/test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.css
++++ b/test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.css
+@@ -1 +1 @@
+-div>section>p[svelte-xyz]{color:red}
+\ No newline at end of file
++div>section>p.svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.html b/test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.html
+index c3b07834462a3a55c8fa231fec0c1817347c790d..033f341a4b9e0e43113952a4d108a93f6fb1746f 100644
+--- a/test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.html
++++ b/test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.html
+@@ -1 +1 @@
+-<p svelte-xyz="">this may or may not be styled</p>
+\ No newline at end of file
++<p class="svelte-xyz">this may or may not be styled</p>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.css b/test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.css
+index e0bbc1d6a139d96420484dd805de57765a7774f0..3666ce8f7fb2e8c26a266e45c4f165b0c587f4b3 100644
+--- a/test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.css
++++ b/test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.css
+@@ -1 +1 @@
+-div>p[svelte-xyz]{color:red}
+\ No newline at end of file
++div>p.svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.html b/test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.html
+index c3b07834462a3a55c8fa231fec0c1817347c790d..033f341a4b9e0e43113952a4d108a93f6fb1746f 100644
+--- a/test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.html
++++ b/test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.html
+@@ -1 +1 @@
+-<p svelte-xyz="">this may or may not be styled</p>
+\ No newline at end of file
++<p class="svelte-xyz">this may or may not be styled</p>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-id/expected.css b/test/css/samples/omit-scoping-attribute-id/expected.css
+index 278f8614abc86f6bb1aedcfd9cdb212dd78558dd..0e9e9f8b2949aa4d63d128cb65d93cd0edc02481 100644
+--- a/test/css/samples/omit-scoping-attribute-id/expected.css
++++ b/test/css/samples/omit-scoping-attribute-id/expected.css
+@@ -1 +1 @@
+-#foo[svelte-xyz]{color:red}
+\ No newline at end of file
++#foo.svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-id/expected.html b/test/css/samples/omit-scoping-attribute-id/expected.html
+index cb6d2f229267e82d15f03ad56d344199d7f5a055..ce31b29b6e1eeb56fc1c7085dcf818a7be8a5224 100644
+--- a/test/css/samples/omit-scoping-attribute-id/expected.html
++++ b/test/css/samples/omit-scoping-attribute-id/expected.html
+@@ -1,2 +1,2 @@
+-<div svelte-xyz="" id="foo"></div>
++<div class="svelte-xyz" id="foo"></div>
+ <div id="bar"></div>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.css b/test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.css
+index f5f64cee75abdd36215f521fe3a3bfff4f142b50..737870905c9a7b45f6ca010d023370e48e3f7f51 100644
+--- a/test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.css
++++ b/test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.css
+@@ -1 +1 @@
+-div[svelte-xyz] section p[svelte-xyz]{color:red}
+\ No newline at end of file
++div.svelte-xyz section p.svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.html b/test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.html
+index 874ad340127bec01e218bd3dc2fe5b50a9c334df..53c470b0c197ba2f3b41491b533b5aeb4b8b20bd 100644
+--- a/test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.html
++++ b/test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.html
+@@ -1 +1 @@
+-<div svelte-xyz=""><section><p svelte-xyz="">this is styled</p></section></div>
+\ No newline at end of file
++<div class="svelte-xyz"><section><p class="svelte-xyz">this is styled</p></section></div>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-whitespace/expected.css b/test/css/samples/omit-scoping-attribute-whitespace/expected.css
+index 8bbb1ab6615448a91f2a1fc0e37b3d44625bf5e2..f8ef9ca56cbf0c167cb34680ce51ca03142d69b3 100644
+--- a/test/css/samples/omit-scoping-attribute-whitespace/expected.css
++++ b/test/css/samples/omit-scoping-attribute-whitespace/expected.css
+@@ -1 +1 @@
+-div[svelte-xyz] p[svelte-xyz]{color:red}
+\ No newline at end of file
++div.svelte-xyz p.svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute-whitespace/expected.html b/test/css/samples/omit-scoping-attribute-whitespace/expected.html
+index 874ad340127bec01e218bd3dc2fe5b50a9c334df..53c470b0c197ba2f3b41491b533b5aeb4b8b20bd 100644
+--- a/test/css/samples/omit-scoping-attribute-whitespace/expected.html
++++ b/test/css/samples/omit-scoping-attribute-whitespace/expected.html
+@@ -1 +1 @@
+-<div svelte-xyz=""><section><p svelte-xyz="">this is styled</p></section></div>
+\ No newline at end of file
++<div class="svelte-xyz"><section><p class="svelte-xyz">this is styled</p></section></div>
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute/expected.css b/test/css/samples/omit-scoping-attribute/expected.css
+index ea93f8a99a5d0d329dc518b9ba2893e511e6f03c..5d8d69ac33a7b313494ab1282fe0f0e62d619db2 100644
+--- a/test/css/samples/omit-scoping-attribute/expected.css
++++ b/test/css/samples/omit-scoping-attribute/expected.css
+@@ -1 +1 @@
+-p[svelte-xyz]{color:red}
+\ No newline at end of file
++p.svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/omit-scoping-attribute/expected.html b/test/css/samples/omit-scoping-attribute/expected.html
+index 60c8d1ce9c555dbb8ed60c4903935f58954d3297..1bc4a66f62b8b1dbfacb83420af01437042f9e36 100644
+--- a/test/css/samples/omit-scoping-attribute/expected.html
++++ b/test/css/samples/omit-scoping-attribute/expected.html
+@@ -1 +1 @@
+-<div><p svelte-xyz="">this is styled</p></div>
+\ No newline at end of file
++<div><p class="svelte-xyz">this is styled</p></div>
+\ No newline at end of file
+diff --git a/test/css/samples/refs-qualified/expected.css b/test/css/samples/refs-qualified/expected.css
+index 005306d25f6e3c32d7aed28411b4adc6ec47ee35..90e58e2a80560058491660ccedef0dbff1d2185f 100644
+--- a/test/css/samples/refs-qualified/expected.css
++++ b/test/css/samples/refs-qualified/expected.css
+@@ -1 +1 @@
+-[svelte-ref-button].active[svelte-xyz]{color:red}
+\ No newline at end of file
++[svelte-ref-button].active.svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/refs-qualified/expected.html b/test/css/samples/refs-qualified/expected.html
+index 8805a8a3a2477b81b1ba1c7d3835aa61deb6424e..c4448668aef340ffedf6808b35434df69240aed9 100644
+--- a/test/css/samples/refs-qualified/expected.html
++++ b/test/css/samples/refs-qualified/expected.html
+@@ -1 +1 @@
+-<button class="active" svelte-ref-button="" svelte-xyz="">deactivate</button>
+\ No newline at end of file
++<button class="svelte-xyz active" svelte-ref-button="">deactivate</button>
+\ No newline at end of file
+diff --git a/test/css/samples/refs/expected.css b/test/css/samples/refs/expected.css
+index 9c5055a064472da851090d3ed75eb1278840e963..c0018c9593e6ea84dc6030e498c3c91f0a9f7b02 100644
+--- a/test/css/samples/refs/expected.css
++++ b/test/css/samples/refs/expected.css
+@@ -1 +1 @@
+-[svelte-ref-a][svelte-xyz]{color:red}[svelte-ref-b][svelte-xyz]{color:green}
+\ No newline at end of file
++[svelte-ref-a].svelte-xyz{color:red}[svelte-ref-b].svelte-xyz{color:green}
+\ No newline at end of file
+diff --git a/test/css/samples/refs/expected.html b/test/css/samples/refs/expected.html
+index cb16a5587926fada5ae931802d814334cb52766f..2b504628c3815380b964650ca0d09a28271bca08 100644
+--- a/test/css/samples/refs/expected.html
++++ b/test/css/samples/refs/expected.html
+@@ -1,3 +1,3 @@
+-<div svelte-xyz='' svelte-ref-a=''></div>
+-<div svelte-xyz='' svelte-ref-b=''></div>
++<div class="svelte-xyz" svelte-ref-a=''></div>
++<div class="svelte-xyz" svelte-ref-b=''></div>
+ <div></div>
+\ No newline at end of file
+diff --git a/test/css/samples/supports-query/expected.css b/test/css/samples/supports-query/expected.css
+index f76c91c4c43ea20a174c7e0bcf65aba7edbffdab..3fdef34d6e31bb2b9cf0a3cbd20cf7bba933df74 100644
+--- a/test/css/samples/supports-query/expected.css
++++ b/test/css/samples/supports-query/expected.css
+@@ -1 +1 @@
+-@supports (display: grid){.maybe-grid[svelte-xyz]{display:grid}}
+\ No newline at end of file
++@supports (display: grid){.maybe-grid.svelte-xyz{display:grid}}
+\ No newline at end of file
+diff --git a/test/css/samples/universal-selector/expected.css b/test/css/samples/universal-selector/expected.css
+index ef584e723a276d33fa77790fc64741d380ada190..70eaaedf3ecc88c4c24c0048fc0abd5a5c4fba65 100644
+--- a/test/css/samples/universal-selector/expected.css
++++ b/test/css/samples/universal-selector/expected.css
+@@ -1 +1 @@
+-[svelte-xyz],[svelte-xyz] *{color:red}
+\ No newline at end of file
++.svelte-xyz,.svelte-xyz *{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/unknown-at-rule/expected.css b/test/css/samples/unknown-at-rule/expected.css
+index bc350108ba993e903f5fa7e377ad36808bdfa68c..d175e2a807331f27ef37d6c8191471f29744b671 100644
+--- a/test/css/samples/unknown-at-rule/expected.css
++++ b/test/css/samples/unknown-at-rule/expected.css
+@@ -1 +1 @@
+-div[svelte-xyz],[svelte-xyz] div{@apply --funky-div;}
+\ No newline at end of file
++div.svelte-xyz,.svelte-xyz div{@apply --funky-div;}
+\ No newline at end of file
+diff --git a/test/css/samples/unused-selector-leading/expected.css b/test/css/samples/unused-selector-leading/expected.css
+index eb0b2678cf7762558d5f7cbf67c811aef7e44a50..ff57dc09b92fdfb51ff3b159b16191b3a13d0300 100644
+--- a/test/css/samples/unused-selector-leading/expected.css
++++ b/test/css/samples/unused-selector-leading/expected.css
+@@ -1 +1 @@
+-.bar[svelte-xyz]{color:red}
+\ No newline at end of file
++.bar.svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/unused-selector-leading/expected.html b/test/css/samples/unused-selector-leading/expected.html
+index 21f585b7e18cac0bcd3f8acfe594184726b5bb73..53d93685845beb5d3a41f2400e574e86f33f8307 100644
+--- a/test/css/samples/unused-selector-leading/expected.html
++++ b/test/css/samples/unused-selector-leading/expected.html
+@@ -1 +1 @@
+-<div svelte-xyz="" class="bar"></div>
+\ No newline at end of file
++<div class="svelte-xyz bar"></div>
+\ No newline at end of file
+diff --git a/test/css/samples/unused-selector-ternary/expected.css b/test/css/samples/unused-selector-ternary/expected.css
+index b6bba2d5f3c97967deb117f9a612d11ace41d0cc..16fbddce586c0e20172dda960ec5f5ff69e9ce1b 100644
+--- a/test/css/samples/unused-selector-ternary/expected.css
++++ b/test/css/samples/unused-selector-ternary/expected.css
+@@ -1 +1 @@
+-.active[svelte-xyz]{color:red}.inactive[svelte-xyz]{color:blue}
+\ No newline at end of file
++.active.svelte-xyz{color:red}.inactive.svelte-xyz{color:blue}
+\ No newline at end of file
+diff --git a/test/css/samples/unused-selector-ternary/expected.html b/test/css/samples/unused-selector-ternary/expected.html
+index 5b0c6b614364dcba89c50e835e62f9c1a193b5ec..ef472f8962e8bc17df8a1703dbbb893875791797 100644
+--- a/test/css/samples/unused-selector-ternary/expected.html
++++ b/test/css/samples/unused-selector-ternary/expected.html
+@@ -1 +1 @@
+-<div svelte-xyz="" class="active"></div>
+\ No newline at end of file
++<div class="svelte-xyz active"></div>
+\ No newline at end of file
+diff --git a/test/css/samples/unused-selector/expected.css b/test/css/samples/unused-selector/expected.css
+index 6c4e704d2c466943c591054a15fe6f605aa5827a..431f7041061eed48d07f814aa40bccc7f111edab 100644
+--- a/test/css/samples/unused-selector/expected.css
++++ b/test/css/samples/unused-selector/expected.css
+@@ -1 +1 @@
+-.foo[svelte-xyz]{color:red}
+\ No newline at end of file
++.foo.svelte-xyz{color:red}
+\ No newline at end of file
+diff --git a/test/css/samples/unused-selector/expected.html b/test/css/samples/unused-selector/expected.html
+index bbe7db594631af52e38c6eb6aa0b18386e473456..1bb946bef87ae3cf21cf08fab7441123790314f3 100644
+--- a/test/css/samples/unused-selector/expected.html
++++ b/test/css/samples/unused-selector/expected.html
+@@ -1 +1 @@
+-<div svelte-xyz="" class="foo"></div>
+\ No newline at end of file
++<div class="svelte-xyz foo"></div>
+\ No newline at end of file
+diff --git a/test/js/samples/collapses-text-around-comments/expected-bundle.js b/test/js/samples/collapses-text-around-comments/expected-bundle.js
+index c1221172854a4cc51252c9278d91aa05722ab43c..58409e9f6aaf91b50a5331f1805b531d04b79b1a 100644
+--- a/test/js/samples/collapses-text-around-comments/expected-bundle.js
++++ b/test/js/samples/collapses-text-around-comments/expected-bundle.js
+@@ -33,10 +33,6 @@ function createText(data) {
+ 	return document.createTextNode(data);
+ }
+ 
+-function setAttribute(node, attribute, value) {
+-	node.setAttribute(attribute, value);
+-}
+-
+ function blankObject() {
+ 	return Object.create(null);
+ }
+@@ -199,13 +195,13 @@ function data() {
+ 	return { foo: 42 }
+ }
+ function encapsulateStyles(node) {
+-	setAttribute(node, "svelte-2794052100", "");
++	node.classList.add("svelte-2794052100");
+ }
+ 
+ function add_css() {
+ 	var style = createElement("style");
+ 	style.id = 'svelte-2794052100-style';
+-	style.textContent = "p[svelte-2794052100],[svelte-2794052100] p{color:red}";
++	style.textContent = "p.svelte-2794052100,.svelte-2794052100 p{color:red}";
+ 	appendNode(style, document.head);
+ }
+ 
+diff --git a/test/js/samples/collapses-text-around-comments/expected.js b/test/js/samples/collapses-text-around-comments/expected.js
+index 1b44fc3493c5d596f9fecf3cd1947814aee3a27e..38715e1938373ead44097a36d6fa198500e24fa0 100644
+--- a/test/js/samples/collapses-text-around-comments/expected.js
++++ b/test/js/samples/collapses-text-around-comments/expected.js
+@@ -1,18 +1,18 @@
+ /* generated by Svelte vX.Y.Z */
+-import { appendNode, assign, createElement, createText, detachNode, init, insertNode, noop, proto, setAttribute } from "svelte/shared.js";
++import { appendNode, assign, createElement, createText, detachNode, init, insertNode, noop, proto } from "svelte/shared.js";
+ 
+ function data() {
+ 	return { foo: 42 }
+ };
+ 
+ function encapsulateStyles(node) {
+-	setAttribute(node, "svelte-2794052100", "");
++	node.classList.add("svelte-2794052100");
+ }
+ 
+ function add_css() {
+ 	var style = createElement("style");
+ 	style.id = 'svelte-2794052100-style';
+-	style.textContent = "p[svelte-2794052100],[svelte-2794052100] p{color:red}";
++	style.textContent = "p.svelte-2794052100,.svelte-2794052100 p{color:red}";
+ 	appendNode(style, document.head);
+ }
+ 
+@@ -64,4 +64,4 @@ function SvelteComponent(options) {
+ }
+ 
+ assign(SvelteComponent.prototype, proto);
+-export default SvelteComponent;
+\ No newline at end of file
++export default SvelteComponent;
+diff --git a/test/js/samples/css-media-query/expected-bundle.js b/test/js/samples/css-media-query/expected-bundle.js
+index da3fbb3ef865785545b00133bb81d305a45057f5..9f5e511e067650d11854d6c7e61827d7a4e4719b 100644
+--- a/test/js/samples/css-media-query/expected-bundle.js
++++ b/test/js/samples/css-media-query/expected-bundle.js
+@@ -29,10 +29,6 @@ function createElement(name) {
+ 	return document.createElement(name);
+ }
+ 
+-function setAttribute(node, attribute, value) {
+-	node.setAttribute(attribute, value);
+-}
+-
+ function blankObject() {
+ 	return Object.create(null);
+ }
+@@ -192,13 +188,13 @@ var proto = {
+ /* generated by Svelte vX.Y.Z */
+ 
+ function encapsulateStyles(node) {
+-	setAttribute(node, "svelte-3905933315", "");
++	node.classList.add("svelte-3905933315");
+ }
+ 
+ function add_css() {
+ 	var style = createElement("style");
+ 	style.id = 'svelte-3905933315-style';
+-	style.textContent = "@media(min-width: 1px){div[svelte-3905933315],[svelte-3905933315] div{color:red}}";
++	style.textContent = "@media(min-width: 1px){div.svelte-3905933315,.svelte-3905933315 div{color:red}}";
+ 	appendNode(style, document.head);
+ }
+ 
+diff --git a/test/js/samples/css-media-query/expected.js b/test/js/samples/css-media-query/expected.js
+index 942d330947e63a4d230276d7781236073eba62df..acf70cc42bf5baa624c21016a16164902ee6aceb 100644
+--- a/test/js/samples/css-media-query/expected.js
++++ b/test/js/samples/css-media-query/expected.js
+@@ -1,14 +1,14 @@
+ /* generated by Svelte vX.Y.Z */
+-import { appendNode, assign, createElement, detachNode, init, insertNode, noop, proto, setAttribute } from "svelte/shared.js";
++import { appendNode, assign, createElement, detachNode, init, insertNode, noop, proto } from "svelte/shared.js";
+ 
+ function encapsulateStyles(node) {
+-	setAttribute(node, "svelte-3905933315", "");
++	node.classList.add("svelte-3905933315");
+ }
+ 
+ function add_css() {
+ 	var style = createElement("style");
+ 	style.id = 'svelte-3905933315-style';
+-	style.textContent = "@media(min-width: 1px){div[svelte-3905933315],[svelte-3905933315] div{color:red}}";
++	style.textContent = "@media(min-width: 1px){div.svelte-3905933315,.svelte-3905933315 div{color:red}}";
+ 	appendNode(style, document.head);
+ }
+ 
+@@ -54,4 +54,4 @@ function SvelteComponent(options) {
+ }
+ 
+ assign(SvelteComponent.prototype, proto);
+-export default SvelteComponent;
+\ No newline at end of file
++export default SvelteComponent;
+diff --git a/test/runtime/samples/css-scoping-class/_config.js b/test/runtime/samples/css-scoping-class/_config.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..e3d5c4e4270e046757cdfda92b71bbf9395516ea
+--- /dev/null
++++ b/test/runtime/samples/css-scoping-class/_config.js
+@@ -0,0 +1,18 @@
++export default {
++	data: {
++		name: 'foo'
++	},
++
++	test(assert, component, target) {
++		const paragraph = target.querySelector('p');
++		const scope = Array.from(paragraph.classList).find(name => /^svelte-\d+$/.test(name));
++
++		assert(scope);
++		assert(paragraph.classList.contains('foo'));
++
++		component.set({ name: 'bar' });
++
++		assert(paragraph.classList.contains(scope));
++		assert(paragraph.classList.contains('bar'));
++	}
++};
+diff --git a/test/runtime/samples/css-scoping-class/main.html b/test/runtime/samples/css-scoping-class/main.html
+new file mode 100644
+index 0000000000000000000000000000000000000000..d7d9f1eac4290022354aabe7780538c385b902ca
+--- /dev/null
++++ b/test/runtime/samples/css-scoping-class/main.html
+@@ -0,0 +1,7 @@
++<p class='{{name}}'>this is styled</p>
++
++<style>
++	p {
++		color: red;
++	}
++</style>
+diff --git a/test/server-side-rendering/samples/styles-nested/_expected.css b/test/server-side-rendering/samples/styles-nested/_expected.css
+index e0b5eb0a7c0e9932d4f7af8536ffc218252cb1be..3098a0db498ab3b5ea1a220a1f19a49b7b1bec39 100644
+--- a/test/server-side-rendering/samples/styles-nested/_expected.css
++++ b/test/server-side-rendering/samples/styles-nested/_expected.css
+@@ -1,2 +1,2 @@
+-div[svelte-724714405],[svelte-724714405] div{color:red}
+-div[svelte-300476157],[svelte-300476157] div{color:green}
+\ No newline at end of file
++div.svelte-724714405,.svelte-724714405 div{color:red}
++div.svelte-300476157,.svelte-300476157 div{color:green}
+\ No newline at end of file
+diff --git a/test/server-side-rendering/samples/styles-nested/_expected.html b/test/server-side-rendering/samples/styles-nested/_expected.html
+index 39dc0d55a459182b3137f71da0009ec06f4a43ee..3c123bd32fe47bf39aba96ea9907133dedb3aa1f 100644
+--- a/test/server-side-rendering/samples/styles-nested/_expected.html
++++ b/test/server-side-rendering/samples/styles-nested/_expected.html
+@@ -1,8 +1,7 @@
+-<div svelte-724714405>red</div>
+-<div svelte-300476157>green: foo</div>
++<div class="svelte-724714405">red</div>
++<div class="svelte-300476157">green: foo</div>
+ 
+ 
+ 
+-<div svelte-300476157>green: bar</div>
+-
++<div class="svelte-300476157">green: bar</div>
+ 
+diff --git a/test/server-side-rendering/samples/styles/_expected.css b/test/server-side-rendering/samples/styles/_expected.css
+index dec1fe76dcc9538a3b84654df57b8fa74fbf3e10..f57e4a0568fbe244724c2edd935593fd731807b4 100644
+--- a/test/server-side-rendering/samples/styles/_expected.css
++++ b/test/server-side-rendering/samples/styles/_expected.css
+@@ -1 +1 @@
+-div[svelte-724714405],[svelte-724714405] div{color:red}
+\ No newline at end of file
++div.svelte-724714405,.svelte-724714405 div{color:red}
+\ No newline at end of file
+diff --git a/test/server-side-rendering/samples/styles/_expected.html b/test/server-side-rendering/samples/styles/_expected.html
+index ce71341c2f3c018e2f01592e2f15573c45bcb761..6f174a635ba27ce2dedff3bfa9874ce0caf5e959 100644
+--- a/test/server-side-rendering/samples/styles/_expected.html
++++ b/test/server-side-rendering/samples/styles/_expected.html
+@@ -1 +1 @@
+-<div svelte-724714405>red</div>
+\ No newline at end of file
++<div class="svelte-724714405">red</div>
+diff --git a/test/sourcemaps/samples/css-cascade-false/output.css b/test/sourcemaps/samples/css-cascade-false/output.css
+index 754b2e7aa208355762641907ae1e62b4bf1bf767..976fe0b43d87ffb2e00a92afad5540cb7be837d5 100644
+--- a/test/sourcemaps/samples/css-cascade-false/output.css
++++ b/test/sourcemaps/samples/css-cascade-false/output.css
+@@ -1,2 +1,2 @@
+-.foo[svelte-1719932608]{color:red}
++.foo.svelte-1719932608{color:red}
+ /*# sourceMappingURL=output.css.map */
+\ No newline at end of file
+diff --git a/test/sourcemaps/samples/css-cascade-false/output.css.map b/test/sourcemaps/samples/css-cascade-false/output.css.map
+index a39731fef4e10d3b7f4b5f3ef3e076e1b76ff2ec..19575fe72a15ae08f63c4aa26e7430c954b50946 100644
+--- a/test/sourcemaps/samples/css-cascade-false/output.css.map
++++ b/test/sourcemaps/samples/css-cascade-false/output.css.map
+@@ -8,5 +8,5 @@
+     "<p class='foo'>red</p>\n\n<style>\n\t.foo {\n\t\tcolor: red;\n\t}\n</style>"
+   ],
+   "names": [],
+-  "mappings": "AAGC,IAAI,mBAAC,CAAC,AACL,KAAK,CAAE,GAAG,AACX,CAAC"
++  "mappings": "AAGC,IAAI,kBAAC,CAAC,AACL,KAAK,CAAE,GAAG,AACX,CAAC"
+ }
+\ No newline at end of file
+diff --git a/test/sourcemaps/samples/css/output.css b/test/sourcemaps/samples/css/output.css
+index acc01832b479f65d9f42bb869e19890a43788358..e511c424eae0edc33dfd3660baac21457291c8bf 100644
+--- a/test/sourcemaps/samples/css/output.css
++++ b/test/sourcemaps/samples/css/output.css
+@@ -1,2 +1,2 @@
+-[svelte-1719932608].foo,[svelte-1719932608] .foo{color:red}
++.svelte-1719932608.foo,.svelte-1719932608 .foo{color:red}
+ /*# sourceMappingURL=output.css.map */
+\ No newline at end of file
+diff --git a/test/sourcemaps/samples/css/output.css.map b/test/sourcemaps/samples/css/output.css.map
+index 35bbb2299a9a3bffe632ee7ed9dc2ea2ced8c4bb..19df3abda0c41f754e96d900aeda4b0fed35ce66 100644
+--- a/test/sourcemaps/samples/css/output.css.map
++++ b/test/sourcemaps/samples/css/output.css.map
+@@ -8,5 +8,5 @@
+     "<p class='foo'>red</p>\n\n<style>\n\t.foo {\n\t\tcolor: red;\n\t}\n</style>"
+   ],
+   "names": [],
+-  "mappings": "AAGC,gDAAK,CAAC,AACL,KAAK,CAAE,GAAG,AACX,CAAC"
++  "mappings": "AAGC,8CAAK,CAAC,AACL,KAAK,CAAE,GAAG,AACX,CAAC"
+ }
+\ No newline at end of file

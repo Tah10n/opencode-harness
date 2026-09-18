@@ -1,0 +1,17 @@
+{
+  "recordedAt": "2026-09-14T20:05:38.947Z",
+  "sessionStartedAt": "2026-09-14T19:36:42.798Z",
+  "usageThroughSnapshot": {
+    "input_tokens": 9074636,
+    "cached_input_tokens": 8807168,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 35981,
+    "reasoning_output_tokens": 7575,
+    "total_tokens": 9110617
+  },
+  "preparationWallBeforeFirstTaskMs": 725476,
+  "threeRunWallSpanMs": 862031,
+  "developerSessionWallThroughUsageSnapshotMs": 1736149,
+  "scope": "Codex developing-agent cumulative usage through timestamp only. It overlaps preparation, waiting and evaluator time; do not add this wall span to native time. Subsequent final report, validation, commit/push and final reply are outside this snapshot. Cached input and reasoning output are subsets. No monetary cost inferred.",
+  "monetaryCost": null
+}

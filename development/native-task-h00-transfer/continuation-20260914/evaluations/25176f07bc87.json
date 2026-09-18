@@ -1,0 +1,128 @@
+{
+  "id": "25176f07bc87",
+  "task": "ufo-query-sort",
+  "project": "ufo",
+  "Q": 0,
+  "findings": [
+    {
+      "category": "empty-delivery",
+      "reason": "No source changes delivered for the requested feature."
+    }
+  ],
+  "contentReview": {
+    "id": "25176f07bc87",
+    "task": "ufo-query-sort",
+    "project": "ufo",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "behaviorReview": "Empty source patch; requested query sort API is not delivered.",
+    "retainedTestsReview": "Pinned baseline unchanged; no new regression cases.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": false,
+        "evidence": "No delivered changes."
+      },
+      {
+        "scenario": 2,
+        "covered": false,
+        "evidence": "No delivered changes."
+      },
+      {
+        "scenario": 3,
+        "covered": false,
+        "evidence": "No delivered changes."
+      }
+    ],
+    "typesReview": "No requested declaration/type consumer changes.",
+    "docsReview": "No requested documentation changes.",
+    "contentFindings": [
+      {
+        "category": "empty-delivery",
+        "reason": "No source changes delivered for the requested feature."
+      }
+    ],
+    "pending": [
+      "ordinary baseline check",
+      "independent missing-feature check",
+      "ordinary patch applicability"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 1,
+  "interpretedIndependentExit": 1,
+  "applicability": {
+    "id": "25176f07bc87",
+    "task": "ufo-query-sort",
+    "sourceCommit": "f06c800d0c59f2a4a1b9ba65eb6cb61a84419be6",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sourcePatchBytes": 0,
+  "assessmentNotes": [],
+  "slot": 41,
+  "repetition": 2,
+  "arm": "H00",
+  "D": 0,
+  "verification": [
+    {
+      "artifact": "reviews/25176f07bc87/independent/result.json",
+      "exit": 1,
+      "elapsedMs": 3498,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Σ Total dist size (byte size): 97.3 kB\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'z=2&z=1&a=0&b=false&c&d'\n- 'a=0&b=false&c&d&z=2&z=1'\n\n    at /work/repo/.h00-independent.cjs:2:212 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 'z=2&z=1&a=0&b=false&c&d',\n  expected: 'a=0&b=false&c&d&z=2&z=1',\n  operator: 'strictEqual',",
+      "fullLocalOutputSha256": "00f0870b4970acf36b12ad79873c81495a9306dc6035e6299dbbd3a6b6c7196e",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/25176f07bc87/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 7421,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "  ─    README.md already up-to-date (164.91ms)\n\nℹ Automatically detected entries: src/index [esm] [cjs] [dts]\nℹ Building ufo\nℹ Cleaning dist directory: ./dist\n✔ Build succeeded for ufo\n  dist/index.cjs (total size: 21.1 kB, chunk size: 21.1 kB, exports: $URL, cleanDoubleSlashes, createURL, decode, decodePath, decodeQueryKey, decodeQueryValue, encode, encodeHash, encodeHost, encodeParam, encodePath, encodeQueryItem, encodeQueryKey, encodeQueryValue, filterQuery, getQuery, hasLeadingSlash, hasProtocol, hasTrailingSlash, isEmptyURL, isEqual, isNonEmptyURL, isRelative, isSamePath, isScriptProtocol, joinRelativeURL, joinURL, normalizeURL, parseAuth, parseFilename, parseHost, parsePath, parseQuery, parseURL, resolveURL, stringifyParsedURL, stringifyQuery, withBase, withFragment, withHttp, withHttps, withLeadingSlash, withProtocol, withQuery, withTrailingSlash, withoutBase, withoutFragment, withoutHost, withoutLeadingSlash, withoutProtocol, withoutTrailingSlash)\n\n  dist/index.mjs (total size: 19.9 kB, chunk size: 19.9 kB, exports: $URL, cleanDoubleSlashes, createURL, decode, decodePath, decodeQueryKey, decodeQueryValue, encode, encodeHash, encodeHost, encodeParam, encodePath, encodeQueryItem, encodeQueryKey, encodeQueryValue, filterQuery, getQuery, hasLeadingSlash, hasProtocol, hasTrailingSlash, isEmptyURL, isEqual, isNonEmptyURL, isRelative, isSamePath, isScriptProtocol, joinRelativeURL, joinURL, normalizeURL, parseAuth, parseFilename, parseHost, parsePath, parseQuery, parseURL, resolveURL, stringifyParsedURL, stringifyQuery, withBase, withFragment, withHttp, withHttps, withLeadingSlash, withProtocol, withQuery, withTrailingSlash, withoutBase, withoutFragment, withoutHost, withoutLeadingSlash, withoutProtocol, withoutTrailingSlash)\n\nΣ Total dist size (byte size): 97.3 kB\n",
+      "fullLocalOutputSha256": "2a074b6524dfdbe7b2b7ab7365f71a87bc961ac365e4b83036b9841ccb2233c2",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": false,
+    "exitCode": 1,
+    "signal": null,
+    "lastStepFinish": "tool-calls",
+    "normalHandoff": false,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": "incomplete",
+    "terminalPatchVerification": null,
+    "lastNativeTextSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "normalFinalResponse": false,
+    "finalResponseExcerpt": "",
+    "authorExplanationExcerpt": null,
+    "reportFindings": [
+      {
+        "category": "no-normal-final-handoff",
+        "evidence": "No normal terminal stop and usable final result. Any interim prose is not a final response. Empty patch stays Q=0/D=0."
+      }
+    ]
+  }
+}

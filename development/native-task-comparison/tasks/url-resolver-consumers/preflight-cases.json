@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/resolve.mjs": "export function resolveLink(base,link){\n const stringify=value=>{if(typeof value==='string')return value;if(value instanceof URL)return value.href;throw new TypeError('URL input');};\n const baseURL=new URL(stringify(base));const allowed=url=>url.protocol==='http:'||url.protocol==='https:';\n if(!allowed(baseURL))throw new TypeError('base protocol');\n const result=new URL(stringify(link),baseURL.href);if(!allowed(result))throw new TypeError('link protocol');return result.toString();\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "consumer-string-only",
+      "file": "src/menu.mjs",
+      "replacement": "import {resolveLink} from './resolve.mjs';\nexport function buildMenu(base,items){if(typeof base!=='string')throw new TypeError('strings');resolveLink(base,'');return items.map(item=>({label:item.label,href:resolveLink(base,item.href)}));}\n"
+    },
+    {
+      "name": "resolves-from-origin",
+      "file": "src/resolve.mjs",
+      "replacement": "export function resolveLink(base,link){\n if((typeof base!=='string'&&!(base instanceof URL))||(typeof link!=='string'&&!(link instanceof URL)))throw new TypeError('URL input');\n const baseURL=new URL(base);if(!['http:','https:'].includes(baseURL.protocol))throw new TypeError('base protocol');\n const result=new URL(link,baseURL.origin);if(!['http:','https:'].includes(result.protocol))throw new TypeError('link protocol');\n return result.href;\n}\n"
+    }
+  ]
+}

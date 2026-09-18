@@ -1,0 +1,390 @@
+{
+  "kind": "three-targeted-development-tasks",
+  "outcome": {
+    "status": "finished",
+    "pause": null
+  },
+  "runtimeSha": "46572619e8a9d567f680667bdf6083a2e82be406",
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "taskDeadlineMs": 900000,
+  "diagnosticBudgetMs": 180000,
+  "totals": {
+    "attempts": 3,
+    "S": 2,
+    "T": 3,
+    "correctCompleted": 2,
+    "providerRequests": 73,
+    "unknownUsageRequests": 0,
+    "inputTokens": 2400350,
+    "outputTokens": 28831,
+    "totalTokens": 2429181,
+    "cachedInputTokens": 1203200,
+    "reasoningTokens": 18045,
+    "toolCalls": 124,
+    "diagnosticCalls": 7,
+    "replayCalls": 1,
+    "executionElapsedMs": 852458,
+    "cleanupElapsedMs": 164,
+    "preparationAndCaptureElapsedMs": 8874
+  },
+  "rows": [
+    {
+      "slot": 1,
+      "case": "case-a",
+      "project": "denque",
+      "runtimeSha": "46572619e8a9d567f680667bdf6083a2e82be406",
+      "advertisedInAllAuthorRequests": true,
+      "authorRequests": 23,
+      "diagnosticCalls": 3,
+      "replayCalls": 0,
+      "patch": "patches/case-a-terminal.patch",
+      "patchSha256": "9b0107b19c5bcabd8856448aac0fac09d719d52cf86c51dee90455582d124dbf",
+      "nativeCompleted": true,
+      "nativeExit": 0,
+      "stopReason": null,
+      "phaseCount": 1,
+      "nativeSessions": 2,
+      "authorSessions": 1,
+      "toolCalls": 46,
+      "workflowStatus": "incomplete",
+      "capturedWorkflowStatus": "incomplete",
+      "workflowRepairs": 0,
+      "completedCommands": [
+        {
+          "command": "npm exec -- _mocha test/denque.js --grep removeWhere",
+          "exit": 0
+        },
+        {
+          "command": "npm test",
+          "exit": 0
+        },
+        {
+          "command": "git status --short && git diff --check",
+          "exit": 0
+        },
+        {
+          "command": "git diff --stat && git diff -- index.js index.d.ts README.md docs/api.mdx test/denque.js test/type/index.ts",
+          "exit": 0
+        }
+      ],
+      "termination": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "usage": {
+        "providerRequests": 26,
+        "requestsWithoutUsage": 0,
+        "inputTokens": 981057,
+        "outputTokens": 10356,
+        "totalTokens": 991413,
+        "cachedInputTokens": 478720,
+        "reasoningTokens": 6630,
+        "cachedSubsetUnknownRequests": 0,
+        "reasoningSubsetUnknownRequests": 0
+      },
+      "executionElapsedMs": 294294,
+      "cleanupElapsedMs": 53,
+      "preparationAndCaptureElapsedMs": 2311,
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "command": [
+          "sh",
+          "-c",
+          "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && npm test"
+        ],
+        "elapsedMs": 1551,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "realProviderRequests": 0
+      },
+      "independent": {
+        "exit": 0,
+        "signal": null,
+        "command": [
+          "sh",
+          "-c",
+          "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && timeout 10s node .independent.cjs"
+        ],
+        "elapsedMs": 765,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "realProviderRequests": 0
+      },
+      "changedFromSeed": [
+        "test/denque.js"
+      ],
+      "terminalApplicable": true,
+      "assessment": {
+        "S": true,
+        "T": true,
+        "deliveredRegression": true,
+        "authorSensitivityVerified": true,
+        "addressedReplayUsed": false,
+        "scenario": "An empty public Denque must visit no values; the delivered predicate returns true and the removal-count assertion rejects the assigned false-to-true variant.",
+        "patch": "Only test/denque.js differs from the seeded input: two ordinary tests were added, with original assertions preserved.",
+        "causality": "The final ordinary suite passes. Both the author's final full sense call and the evaluator's single-variant check fail at test/denque.js:456 with 4 !== 0. No import/setup failure causes this rejection.",
+        "attribution": "The author added the regression after an initial real sensitivity observation, then regenerated all variants instead of using addressed replay. Its self-report incorrectly also credits pre-existing implementation/types/docs; those are seed work.",
+        "limitations": "No general equivalence, original full-task Q, causal formulation improvement or harness lift is inferred. Transient in-process monkeypatch probes are not delivered production edits."
+      }
+    },
+    {
+      "slot": 2,
+      "case": "case-b",
+      "project": "quick-lru",
+      "runtimeSha": "46572619e8a9d567f680667bdf6083a2e82be406",
+      "advertisedInAllAuthorRequests": true,
+      "authorRequests": 19,
+      "diagnosticCalls": 1,
+      "replayCalls": 0,
+      "patch": "patches/case-b-terminal.patch",
+      "patchSha256": "818d31e1a489b1169e85f4403f6650b53612a89d1507065380fb88e75fe97613",
+      "nativeCompleted": true,
+      "nativeExit": 0,
+      "stopReason": null,
+      "phaseCount": 1,
+      "nativeSessions": 2,
+      "authorSessions": 1,
+      "toolCalls": 38,
+      "workflowStatus": "incomplete",
+      "capturedWorkflowStatus": "incomplete",
+      "workflowRepairs": 0,
+      "completedCommands": [
+        {
+          "command": "npx ava test.js --match='*getOrInsertComputed*'",
+          "exit": 0
+        },
+        {
+          "command": "npm test",
+          "exit": 0
+        },
+        {
+          "command": "git diff --check",
+          "exit": 0
+        },
+        {
+          "command": "git status --short && git diff --stat",
+          "exit": 0
+        },
+        {
+          "command": "git diff -- test.js index.js index.d.ts index.test-d.ts readme.md",
+          "exit": 0
+        },
+        {
+          "command": "git status --short",
+          "exit": 0
+        },
+        {
+          "command": "git diff --check && git diff --stat",
+          "exit": 0
+        },
+        {
+          "command": "git diff --name-only",
+          "exit": 0
+        }
+      ],
+      "termination": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "usage": {
+        "providerRequests": 22,
+        "requestsWithoutUsage": 0,
+        "inputTokens": 825752,
+        "outputTokens": 12203,
+        "totalTokens": 837955,
+        "cachedInputTokens": 449536,
+        "reasoningTokens": 8302,
+        "cachedSubsetUnknownRequests": 0,
+        "reasoningSubsetUnknownRequests": 0
+      },
+      "executionElapsedMs": 364823,
+      "cleanupElapsedMs": 57,
+      "preparationAndCaptureElapsedMs": 4469,
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "command": [
+          "sh",
+          "-c",
+          "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && npm test"
+        ],
+        "elapsedMs": 7854,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "realProviderRequests": 0
+      },
+      "independent": {
+        "exit": 0,
+        "signal": null,
+        "command": [
+          "sh",
+          "-c",
+          "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && timeout 10s node .independent.cjs"
+        ],
+        "elapsedMs": 3291,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "realProviderRequests": 0
+      },
+      "changedFromSeed": [
+        "test.js"
+      ],
+      "terminalApplicable": true,
+      "assessment": {
+        "S": false,
+        "T": true,
+        "deliveredRegression": true,
+        "authorSensitivityVerified": false,
+        "addressedReplayUsed": false,
+        "scenario": "A current-generation unexpired key with stored undefined must return undefined without calling the factory. The author discovered and retained this public behavior before diagnostics.",
+        "patch": "Only test.js differs from the seed; three ordinary runtime tests were added. Production and dependency declarations are unchanged, and the original 115 runtime tests remain intact.",
+        "causality": "In a fresh ordinary evaluator copy npm test passes 118 tests plus XO/TSD and independent checks pass. Running the same delivered AVA suite with the assigned condition-false variant fails at test.js:43: computed instead of undefined. This deterministic first rejection does not depend on the additional TTL test's real-time delay.",
+        "attribution": "The regression is author work, but it predates the one failed sense call. The author never received a fresh mutation ref or executed the selected variant, and explicitly reported unresolved sensitivity. Later evaluator success does not turn that unresolved author investigation into S.",
+        "limitations": "Sense baseline selected a worktree-local node_modules containing only cache files and failed with xo: not found. Offline reproduction confirms ordinary npm test creates this state. The author's subsequent npm ci --ignore-scripts failed with EAI_AGAIN inside the network-disabled container; it produced no delivered dependency-file change. Transient node_modules contents are excluded from capture, so their final bytes are not independently certified. No runtime fix or replacement attempt was made."
+      }
+    },
+    {
+      "slot": 3,
+      "case": "case-c",
+      "project": "denque",
+      "runtimeSha": "46572619e8a9d567f680667bdf6083a2e82be406",
+      "advertisedInAllAuthorRequests": true,
+      "authorRequests": 22,
+      "diagnosticCalls": 3,
+      "replayCalls": 1,
+      "patch": "patches/case-c-terminal.patch",
+      "patchSha256": "4f8cdafadbd9c6a0619e5d26287026e66bbaccea2ae743e97c2460720ccf78ba",
+      "nativeCompleted": true,
+      "nativeExit": 0,
+      "stopReason": null,
+      "phaseCount": 1,
+      "nativeSessions": 2,
+      "authorSessions": 1,
+      "toolCalls": 40,
+      "workflowStatus": "incomplete",
+      "capturedWorkflowStatus": "incomplete",
+      "workflowRepairs": 0,
+      "completedCommands": [
+        {
+          "command": "npm exec -- mocha --grep 'removeWhere'",
+          "exit": 0
+        },
+        {
+          "command": "npm exec -- mocha --invert --grep 'removeWhere'",
+          "exit": 0
+        },
+        {
+          "command": "npm run typescript",
+          "exit": 0
+        },
+        {
+          "command": "git diff --check",
+          "exit": 0
+        },
+        {
+          "command": "git status --short",
+          "exit": 0
+        },
+        {
+          "command": "git diff --stat",
+          "exit": 0
+        },
+        {
+          "command": "git diff -- test/denque.js index.d.ts test/type/index.ts README.md docs/api.mdx index.js",
+          "exit": 0
+        }
+      ],
+      "termination": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "usage": {
+        "providerRequests": 25,
+        "requestsWithoutUsage": 0,
+        "inputTokens": 593541,
+        "outputTokens": 6272,
+        "totalTokens": 599813,
+        "cachedInputTokens": 274944,
+        "reasoningTokens": 3113,
+        "cachedSubsetUnknownRequests": 0,
+        "reasoningSubsetUnknownRequests": 0
+      },
+      "executionElapsedMs": 193341,
+      "cleanupElapsedMs": 54,
+      "preparationAndCaptureElapsedMs": 2094,
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "command": [
+          "sh",
+          "-c",
+          "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && npm test"
+        ],
+        "elapsedMs": 1509,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "realProviderRequests": 0
+      },
+      "independent": {
+        "exit": 0,
+        "signal": null,
+        "command": [
+          "sh",
+          "-c",
+          "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && timeout 10s node .independent.cjs"
+        ],
+        "elapsedMs": 578,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "realProviderRequests": 0
+      },
+      "changedFromSeed": [],
+      "terminalApplicable": true,
+      "assessment": {
+        "S": true,
+        "T": true,
+        "deliveredRegression": false,
+        "authorSensitivityVerified": true,
+        "addressedReplayUsed": true,
+        "scenario": "The Error.message differs for an invalid predicate, but the contract requires an Error and does not fix its message.",
+        "patch": "Final source and tests equal the seeded input; the temporary diagnostic message assertion was removed by the author.",
+        "causality": "Author generated a fresh ref, temporarily observed the message through public removeWhere, and used addressed replay: baseline passed and the message variant failed. The author then removed the artificial assertion, reran the suite and sense, and correctly retained the allowed survivor. Evaluator confirms the final suite passes for both implementations.",
+        "attribution": "The author correctly investigated the assigned difference and declined to turn it into a new requirement. This is bounded contract reasoning, not proof that all behavior is equivalent.",
+        "limitations": "No substantive regression was needed. Internal workflow status remains separate from S and T."
+      }
+    }
+  ],
+  "replacements": 0,
+  "additionalRealSmokes": 0,
+  "historicalResultsUnchanged": true,
+  "liftEstablished": false
+}

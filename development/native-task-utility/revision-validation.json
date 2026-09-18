@@ -1,0 +1,67 @@
+{
+  "revision": "FIFO admission of conflicting native tool calls",
+  "review": {
+    "count": 1,
+    "finding": "Queued native pending parts were counted as live execution during terminal read/preflight handling",
+    "remediation": "Queue records exact call ID; excludes only proven not-yet-admitted calls from live-execution predicate",
+    "unknownLiveStillBlocks": true
+  },
+  "scriptedChecks": [
+    {
+      "case": "container-preflight-reviewed",
+      "status": "passed",
+      "requests": 6,
+      "realProviderCalls": 0,
+      "repairs": 0,
+      "statusAfter": "checks_passed",
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      }
+    },
+    {
+      "case": "container-preflight-denial",
+      "status": "passed",
+      "requests": 6,
+      "realProviderCalls": 0,
+      "repairs": 0,
+      "statusAfter": "checks_passed",
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      }
+    }
+  ],
+  "ordinaryPatch": true,
+  "workflowSha256": "949d1735130f6bce3184033c53015c05d6d27c654a6182a33c15437b3456a019",
+  "preservesH1AndAllWorkflowBytes": true,
+  "targeted": {
+    "passed": true,
+    "realTemporaryFiles": true,
+    "nativeStateAndPermissions": true,
+    "threeCorrectionBound": true,
+    "realProviderRequests": 0
+  },
+  "nativeTemplate": {
+    "passed": true,
+    "temporary": "/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/native-template-check-Z1CVb0",
+    "checks": [
+      "two-file bundle",
+      "settings preserved",
+      "dry run",
+      "collision refusal",
+      "symlink refusal",
+      "absolute path",
+      "native CLI without historical code",
+      "unsupported flags refused"
+    ]
+  }
+}

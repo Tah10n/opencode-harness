@@ -1,0 +1,211 @@
+{
+  "modelRuns": {
+    "attempts": 3,
+    "S": 2,
+    "T": 3,
+    "correctCompleted": 2,
+    "providerRequests": 73,
+    "unknownUsageRequests": 0,
+    "inputTokens": 2400350,
+    "outputTokens": 28831,
+    "totalTokens": 2429181,
+    "cachedInputTokens": 1203200,
+    "reasoningTokens": 18045,
+    "toolCalls": 124,
+    "diagnosticCalls": 7,
+    "replayCalls": 1,
+    "executionElapsedMs": 852458,
+    "cleanupElapsedMs": 164,
+    "preparationAndCaptureElapsedMs": 8874
+  },
+  "authorDiagnostics": {
+    "commands": 48,
+    "engineMs": 1258,
+    "preparationMs": 24938,
+    "commandMs": 23717,
+    "totalMs": 51703
+  },
+  "offlineVerification": [
+    {
+      "case": "case-a",
+      "ordinaryMs": 1551,
+      "independentMs": 765,
+      "sensitivity": {
+        "commands": 2,
+        "engineMs": 0,
+        "preparationMs": 700,
+        "commandMs": 1245,
+        "totalMs": 2054
+      }
+    },
+    {
+      "case": "case-b",
+      "ordinaryMs": 7854,
+      "independentMs": 3291,
+      "sensitivity": {
+        "commands": 2,
+        "engineMs": 0,
+        "preparationMs": 4182,
+        "commandMs": 1431,
+        "totalMs": 6115
+      }
+    },
+    {
+      "case": "case-c",
+      "ordinaryMs": 1509,
+      "independentMs": 578,
+      "sensitivity": {
+        "commands": 2,
+        "engineMs": 0,
+        "preparationMs": 702,
+        "commandMs": 1639,
+        "totalMs": 2443
+      }
+    }
+  ],
+  "preparationAdmission": [
+    {
+      "case": "case-2",
+      "cost": {
+        "commands": 9,
+        "engineMs": 318,
+        "preparationMs": 19540,
+        "commandMs": 6510,
+        "totalMs": 28345
+      }
+    },
+    {
+      "case": "case-a",
+      "cost": {
+        "commands": 9,
+        "engineMs": 364,
+        "preparationMs": 3256,
+        "commandMs": 5208,
+        "totalMs": 9285
+      }
+    },
+    {
+      "case": "case-b",
+      "cost": {
+        "commands": 9,
+        "engineMs": 265,
+        "preparationMs": 19867,
+        "commandMs": 6337,
+        "totalMs": 28513
+      }
+    },
+    {
+      "case": "case-c",
+      "cost": {
+        "commands": 9,
+        "engineMs": 259,
+        "preparationMs": 2974,
+        "commandMs": 4268,
+        "totalMs": 7882
+      }
+    }
+  ],
+  "preparationWallMs": 401968,
+  "containerPreflightMs": 5287,
+  "monetaryCost": null,
+  "accounting": "Cache/reasoning are subsets. Author diagnostics are inside native time. Preparation/evaluator are separate model-free work. Developing Codex usage is recorded separately; unknown fields remain unknown.",
+  "transportFixtures": {
+    "realProviderRequests": 0,
+    "scriptedUpstreamRequests": 26,
+    "scenarios": 21,
+    "installed": [
+      {
+        "mode": "installed-503",
+        "slot": 1,
+        "elapsedMs": 6642,
+        "nativeCompleted": false,
+        "terminationVerified": true
+      },
+      {
+        "mode": "installed-cancel",
+        "slot": 1,
+        "elapsedMs": 1680,
+        "nativeCompleted": false,
+        "terminationVerified": true
+      },
+      {
+        "mode": "installed-delayed-503",
+        "slot": 1,
+        "elapsedMs": 7638,
+        "nativeCompleted": false,
+        "terminationVerified": true
+      },
+      {
+        "mode": "installed-hard-deadline",
+        "slot": 1,
+        "elapsedMs": 2573,
+        "nativeCompleted": false,
+        "terminationVerified": true
+      },
+      {
+        "mode": "installed-success",
+        "slot": 1,
+        "elapsedMs": 1848,
+        "nativeCompleted": true,
+        "terminationVerified": true
+      },
+      {
+        "mode": "installed-success",
+        "slot": 2,
+        "elapsedMs": 1917,
+        "nativeCompleted": true,
+        "terminationVerified": true
+      }
+    ]
+  },
+  "containerPreflightScriptedRequests": 15,
+  "preparationAndAdmissionStartedAt": "2026-09-14T19:41:42.480Z",
+  "inputCheckCommands": [
+    {
+      "case": "case-a",
+      "ordinary": [
+        {
+          "command": "npm test",
+          "exit": 0
+        }
+      ],
+      "evaluatorExecutions": 2,
+      "realProviderRequests": 0
+    },
+    {
+      "case": "case-b",
+      "ordinary": [
+        {
+          "command": "npm test",
+          "exit": 0
+        }
+      ],
+      "evaluatorExecutions": 2,
+      "realProviderRequests": 0
+    },
+    {
+      "case": "case-c",
+      "ordinary": [
+        {
+          "command": "npm test",
+          "exit": 0
+        }
+      ],
+      "evaluatorExecutions": 2,
+      "realProviderRequests": 0
+    }
+  ],
+  "bFailureReproduction": {
+    "ordinaryCommands": 1,
+    "sensitivity": {
+      "commands": 1,
+      "engineMs": 0,
+      "preparationMs": 26,
+      "commandMs": 53,
+      "totalMs": 96
+    },
+    "realProviderRequests": 0,
+    "elapsedMsFromArtifactTimestamps": 7777,
+    "timingNote": "Artifact timestamp span; not an independently instrumented timer."
+  }
+}

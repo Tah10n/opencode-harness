@@ -1,0 +1,20 @@
+// Freeze an explicitly authorized launcher-only amendment. No provider access.
+import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {createHash} from 'node:crypto';import {execFileSync} from 'node:child_process';
+const root=path.resolve(process.argv[2]),out=root+'/amendment-2-9.json';
+assert.ok(!fs.existsSync(out),'Never replace an amendment');
+assert.ok(!fs.existsSync(root+'/continuation-2-9'),'Continuation already exists');
+const read=p=>JSON.parse(fs.readFileSync(p)),hash=p=>createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+const frozen=read(root+'/freeze.json'),published=read('development/native-task-investigation/frozen-inputs.json');
+assert.equal(frozen.runtimeSha,'9cd8ffb4dfcfd32f1a7a65ac9c3eaca44728d2e7');assert.equal(hash(root+'/freeze.json'),published.freezeSha256);
+assert.deepEqual(fs.readdirSync(root+'/runs'),['quick-lru-take-P']);
+const old=root+'/runs/quick-lru-take-P',stop=read(old+'/stop-verification.json');assert.ok(stop.terminationVerified&&stop.captureSaved&&stop.forwardingClosed&&stop.relayRemoved&&stop.activeProviderHandlers===0);assert.equal(read(old+'/session/cleanup.json').status,0);
+const container=read(old+'/session/container.json').name;const names=execFileSync('docker',['ps','-a','--format','{{.Names}}'],{encoding:'utf8'}).trim().split('\n');assert.ok(!names.includes(container),'Old container must be absent');
+const changed=['development/native-task-ab/run-comparison.mjs','development/native-task-investigation/run.mjs'].map(p=>path.resolve(p));
+const launcherFiles=Object.fromEntries(changed.map(p=>{assert.ok(frozen.files[p]);return[p,{before:frozen.files[p],after:hash(p)}];}));
+for(const[p,digest]of Object.entries(frozen.files))if(!changed.includes(p))assert.equal(hash(p),digest,p);
+const historicalFiles={};function visit(dir,prefix){for(const e of fs.readdirSync(dir,{withFileTypes:true})){if(e.name==='candidate')continue;const file=dir+'/'+e.name,rel=prefix+e.name;if(e.isDirectory())visit(file,rel+'/');else{assert.ok(e.isFile(),'Unsupported evidence link');historicalFiles[rel]=hash(file);}}}visit(old,'runs/quick-lru-take-P/');
+const amendment={version:1,createdAt:new Date().toISOString(),firstSlot:2,lastSlot:9,runtimeSha:frozen.runtimeSha,launcherCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),originalFreezeSha256:hash(root+'/freeze.json'),originalPauseSha256:hash(root+'/scheduling-paused.json'),launcherFiles,historicalFiles,policy:'Stop further sends before client delivery of failed, incomplete or protocol error. Bound failed/incomplete remain known. Unknown/auth/quota/local execution failures remain fail-closed. No task retries.',historical:{slot:1,Q:false,T:false,D:false,requests:4,knownTokens:6418,unknownUsageRequests:3},order:frozen.attempts.filter(a=>a.slot>=2).map(({slot,task,arm})=>({slot,task,arm}))};
+fs.writeFileSync(out,JSON.stringify(amendment,null,2)+'\n',{flag:'wx',mode:0o600});
+const compact={...amendment,launcherFiles:Object.fromEntries(Object.entries(launcherFiles).map(([p,v])=>[path.relative(process.cwd(),p),v])),historicalFiles:undefined,historicalEvidenceFiles:Object.keys(historicalFiles).length,amendmentSha256:hash(out)};
+fs.writeFileSync('development/native-task-investigation/continuation-amendment.json',JSON.stringify(compact,null,2)+'\n',{flag:'wx'});
+console.log(JSON.stringify({prepared:true,firstSlot:2,lastSlot:9,historicalEvidenceFiles:Object.keys(historicalFiles).length,providerRequests:0}));

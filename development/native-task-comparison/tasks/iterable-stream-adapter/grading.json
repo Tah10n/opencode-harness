@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Exercise both sync and async sources with awaited mapping and index order.",
+    "Assert early-stop cleanup and source or mapper error identity."
+  ],
+  "docDelivery": [
+    "Explain source protocols, sequential mapper and limit defaults/zero.",
+    "Document cleanup timing and failure propagation."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Well-formed sync/async iterables; async values non-promise; options limit and sequential map under visible TASK rules.",
+  "independence": "Support sync and async iterables through one consumer with early-return cleanup and source error identity."
+}

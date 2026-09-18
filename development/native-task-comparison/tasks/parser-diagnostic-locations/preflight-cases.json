@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/assignment-scanner.mjs": "export function scanAssignments(text){\n if(typeof text!=='string')throw new TypeError('text');\n return text.split(/\\r\\n|\\n/).flatMap((row,i)=>{\n  let cursor=0;function space(){while(cursor<row.length&&' \\t'.includes(row[cursor]))cursor++;}function fail(){throw new SyntaxError('Invalid assignment at '+(i+1)+':'+(cursor+1));}\n  space();if(cursor===row.length||row[cursor]==='#')return[];\n  const keyColumn=cursor+1;if(!/[A-Za-z_]/.test(row[cursor]??''))fail();let key=row[cursor++];while(cursor<row.length&&/[A-Za-z0-9_]/.test(row[cursor]))key+=row[cursor++];space();if(row[cursor++]!=='='){cursor--;fail();}space();const valueColumn=cursor+1;let value='';while(cursor<row.length&&/[A-Za-z0-9_.\\/-]/.test(row[cursor]))value+=row[cursor++];if(!value)fail();space();if(cursor<row.length&&row[cursor]!=='#')fail();return[{key,value,line:i+1,keyColumn,valueColumn}];\n });\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "trimmed-location-loss",
+      "file": "src/assignment-scanner.mjs",
+      "replacement": "export function scanAssignments(text){\n if(typeof text!=='string')throw new TypeError('text');\n const output=[];const lines=text.split(/\\r\\n|\\n/);\n for(let index=0;index<lines.length;index++){\n  const line=lines[index].trim();let pos=0;const ws=()=>{while(line[pos]===' '||line[pos]==='\\t')pos++;};\n  const fail=()=>{throw new SyntaxError('Invalid assignment at '+(index+1)+':'+(pos+1));};\n  ws();if(pos===line.length||line[pos]==='#')continue;\n  const keyColumn=pos+1;const key=/^[A-Za-z_][A-Za-z0-9_]*/.exec(line.slice(pos));if(!key)fail();pos+=key[0].length;ws();if(line[pos]!=='=')fail();pos++;ws();const valueColumn=pos+1;\n  const value=/^[A-Za-z0-9_.\\/-]+/.exec(line.slice(pos));if(!value)fail();pos+=value[0].length;ws();if(pos<line.length&&line[pos]!=='#')fail();\n  output.push({key:key[0],value:value[0],line:index+1,keyColumn,valueColumn});\n }\n return output;\n}\n"
+    },
+    {
+      "name": "overwrite-duplicate",
+      "file": "src/config.mjs",
+      "replacement": "import {scanAssignments} from './assignment-scanner.mjs';\nexport function parseConfig(text){\n const entries=scanAssignments(text),result={};\n for(const entry of entries){Object.defineProperty(result,entry.key,{value:entry.value,enumerable:true,writable:true,configurable:true});}\n return result;\n}\n"
+    }
+  ]
+}

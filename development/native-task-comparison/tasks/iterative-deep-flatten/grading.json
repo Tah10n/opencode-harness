@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert sparse holes versus explicit undefined, depth0/1/Infinity and shared identities.",
+    "Assert deep stack safety, finite cut-off and depth-first getter order."
+  ],
+  "docDelivery": [
+    "Document depth, holes, shared values and nonmutation.",
+    "Explain iterative stack safety and valid input/depth limits."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Acyclic sparse nested arrays, finite depth boundaries, opaque identity, own-slot skipping and stack-safe traversal.",
+  "manualBehavior": [
+    "Core traversal is iterative with no recursive call-stack dependence; wrapper delegates same policy."
+  ],
+  "independence": "Replace recursive flattening with stack-based traversal preserving depth limits, ordering and sparse-array rules."
+}

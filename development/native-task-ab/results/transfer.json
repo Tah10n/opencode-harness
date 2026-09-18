@@ -1,0 +1,575 @@
+{
+  "status": "incomplete-transfer-unknown-submission",
+  "scheduled": 8,
+  "started": 6,
+  "notStarted": 2,
+  "nativeCompleted": 5,
+  "rows": [
+    {
+      "slot": 1,
+      "task": "promise-clear-queue",
+      "project": "p-debounce",
+      "repetition": 1,
+      "arm": "P",
+      "id": "0251e18a1cea",
+      "status": "finished",
+      "S": 1,
+      "patch": "patches/transfer-promise-clear-queue-r1-P.patch",
+      "patchBytes": 12289,
+      "patchSHA256": "936401ca1016c3528a39ee6e4a8fc821c894fbb8fde490d608a3d2b174ab19c0",
+      "ordinaryProject": {
+        "exit": 0,
+        "elapsedMs": 12218,
+        "command": "apply exact delivered patch, then npm test"
+      },
+      "independent": {
+        "exit": 0,
+        "elapsedMs": 2672,
+        "command": "apply exact patch, then frozen runtime and TypeScript checks (types run only if runtime passes)"
+      },
+      "review": {
+        "id": "0251e18a1cea",
+        "task": "promise-clear-queue",
+        "S": 1,
+        "manualReview": "No material implementation defect found in full diff. clearQueue detaches only queuedCall, rejects all captured resolvers with exact custom/default AbortError reason and returns caller count; existing currentPromise/drain timing remains unchanged. Timed pDebounce untouched. Delivered tests use controlled gates, multi-caller custom/default reasons, no invocation of discarded calls, active success/rejection, replacement latest receiver/args, explicit later-execution started gate, default shared calls, empty/repeated/idle reuse and separate wrappers. Public callable generic retained with added method type; type tests check callable assignability and exact method/reason/return types. Prior timed API type cases/tests retained. README states queue/active/count/reason/default-mode boundary. Ordinary and independent checks passed.",
+        "reviewBlinding": "Read after first completion, identity inferable from fixed schedule; no claim of blinded transfer review.",
+        "requiredChecks": "ordinary npm test plus unchanged frozen independent runtime/types after series stop"
+      },
+      "execution": {
+        "slot": 1,
+        "task": "promise-clear-queue",
+        "project": "p-debounce",
+        "repetition": 1,
+        "arm": "P",
+        "nativeCompleted": true,
+        "slotWallMs": 540558,
+        "elapsedMs": 536817,
+        "timeout": false,
+        "sessions": 1,
+        "tools": 46,
+        "workflowStatus": null,
+        "stop": {
+          "ownTaskDeadlineTriggered": false,
+          "terminationVerified": true,
+          "captureSaved": true,
+          "forwardingClosed": true,
+          "relayRemoved": true,
+          "activeProviderHandlers": 0,
+          "providerServerStateMayRemainUnknown": false
+        },
+        "providerRequests": 25,
+        "requestsWithoutUsage": 0,
+        "knownUsage": {
+          "input_tokens": 968816,
+          "output_tokens": 23780,
+          "total_tokens": 992596,
+          "cached_tokens": 234496,
+          "reasoning_tokens": 11875
+        },
+        "components": {
+          "A": {
+            "delivered": 0,
+            "elapsedMs": 0
+          },
+          "B": {
+            "events": 0,
+            "executed": 0,
+            "elapsedMs": 0,
+            "statuses": {}
+          }
+        }
+      },
+      "claims": {
+        "task": "promise-clear-queue",
+        "repetition": 1,
+        "arm": "P",
+        "internalStatus": null,
+        "authorSummary": null,
+        "deliveredFinalText": "Implemented `clearQueue(reason?)` for `pDebounce.promise()` wrappers.\n\n- Clears queued calls and rejects them with exact custom reasons.\n- Defaults to an `AbortError` for omitted/undefined reasons.\n- Preserves active executions, coalescing, receivers, arguments, and reuse behavior.\n- Added public TypeScript declarations and type tests.\n- Added comprehensive runtime regressions and README documentation.\n\nValidation: `npm test` passes all 87 runtime tests, XO, and `tsd`. `git diff --check` passes. The existing negative-timeout test emits a non-failing Node warning.",
+        "remaining": null
+      },
+      "falseFullDeliveryClaim": false,
+      "unsupportedAuthorCoverageClaim": false
+    },
+    {
+      "slot": 2,
+      "task": "promise-clear-queue",
+      "project": "p-debounce",
+      "repetition": 1,
+      "arm": "H11",
+      "id": "b62c8c4f27b5",
+      "status": "finished",
+      "S": 0,
+      "patch": "patches/transfer-promise-clear-queue-r1-H11.patch",
+      "patchBytes": 9790,
+      "patchSHA256": "3b6830ab740e3312f38d71977667b02d2d8c4345d2009d5dce8da5efa6cb8ecc",
+      "ordinaryProject": {
+        "exit": 0,
+        "elapsedMs": 12606,
+        "command": "apply exact delivered patch, then npm test"
+      },
+      "independent": {
+        "exit": 0,
+        "elapsedMs": 2762,
+        "command": "apply exact patch, then frozen runtime and TypeScript checks (types run only if runtime passes)"
+      },
+      "review": {
+        "id": "b62c8c4f27b5",
+        "task": "promise-clear-queue",
+        "S": 0,
+        "manualReview": "Runtime diff correctly detaches queuedCall, rejects captured resolvers exactly, returns caller count and preserves currentPromise/drain/timed API; types preserve callable generics and add exact clearQueue method. Controlled tests cover nonempty active/queued state, multi-caller custom/default reasons, later active rejection and default sharing. Docs main semantics accurate; old tests retained. Potential required regression gap: replacement-after-clear test submits only one new queued call, so it cannot distinguish latest receiver/arguments from first receiver/arguments after clearing. Existing coalescing tests do not invoke clearQueue. Independence test clears both wrappers successively and checks each count; this catches shared-queue clearing but does not directly observe the other queued promise remain unaffected. Treat latter as a coverage limitation for review, not automatically another defect. Await ordinary/independent checks and bounded sensitivity evidence before final S.",
+        "coverageConcern": "Requested reuse with latest receiver/arguments has no competing post-clear calls in delivered regressions.",
+        "reviewBlinding": "Read after second completion; H11-r1 inferable from fixed schedule.",
+        "requiredChecks": "ordinary npm test and frozen independent runtime/types after series stop; optional bounded latest-reuse sensitivity control, no author patch repair",
+        "finalAssessment": "Required latest-reuse regression absent after actual clear: only one replacement call. Delivered tests pass first-replacement-wins mutant; frozen independent tests fail. Original implementation passes; S=0 is a required coverage gap. Independence limitation is not an additional scored defect."
+      },
+      "execution": {
+        "slot": 2,
+        "task": "promise-clear-queue",
+        "project": "p-debounce",
+        "repetition": 1,
+        "arm": "H11",
+        "nativeCompleted": true,
+        "slotWallMs": 537924,
+        "elapsedMs": 534446,
+        "timeout": false,
+        "sessions": 2,
+        "tools": 67,
+        "workflowStatus": "incomplete",
+        "stop": {
+          "ownTaskDeadlineTriggered": false,
+          "terminationVerified": true,
+          "captureSaved": true,
+          "forwardingClosed": true,
+          "relayRemoved": true,
+          "activeProviderHandlers": 0,
+          "providerServerStateMayRemainUnknown": false
+        },
+        "providerRequests": 43,
+        "requestsWithoutUsage": 0,
+        "knownUsage": {
+          "input_tokens": 1987215,
+          "output_tokens": 18512,
+          "total_tokens": 2005727,
+          "cached_tokens": 901120,
+          "reasoning_tokens": 7777
+        },
+        "components": {
+          "A": {
+            "delivered": 9,
+            "elapsedMs": 668.8319590000174
+          },
+          "B": {
+            "events": 1,
+            "executed": 1,
+            "elapsedMs": 10163.230878999999,
+            "statuses": {
+              "passed": 1
+            }
+          }
+        }
+      },
+      "claims": {
+        "task": "promise-clear-queue",
+        "repetition": 1,
+        "arm": "H11",
+        "internalStatus": "incomplete",
+        "authorSummary": "Implemented `clearQueue(reason?)` for `pDebounce.promise()`:\n\n- Clears queued calls and rejects them with exact custom/default reasons.\n- Returns discarded waiter count synchronously.\n- Preserves active work and wrapper reuse.\n- Added TypeScript declaration, type tests, runtime regressions, and README docs.\n\nChecks passed:\n- `node --test clear-queue.test.js`: 3/3\n- `node --test test.js`: 77/77\n- `npx tsd`\n- `npm test`: 80/80\n- `git diff --check`\n\nNo dependencies changed or commit created.",
+        "deliveredFinalText": "Native task workflow: incomplete.\nDelivery worktree: /work/repo/.git/harness-task/6051c371-bcd9-42a4-b4cb-88e57201ecc4/worktree.\nTerminal patch: /work/repo/.git/harness-task/6051c371-bcd9-42a4-b4cb-88e57201ecc4/terminal.patch.\nFull report and tool outputs: /work/repo/.git/harness-task/6051c371-bcd9-42a4-b4cb-88e57201ecc4.\nOriginal checkout unchanged by workflow transfer.\nSuccessful native commands on the final captured state (exit 0; not a correctness certificate):\n- \"node --test clear-queue.test.js\"\n- \"node --test test.js\"\n- \"npm test\"\n- \"git diff --check && git status --short\"\n- \"git diff --stat && git diff --numstat\"\nRemaining work: [\"No observed relevant project test/check.\"].\nLimitations: [\"Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified.\",\"Executable project verification unavailable or not observed. Echo, Git status, prose and exit 0 alone are not quality checks.\"].\nAuthor explanation (not independent verification):\nImplemented `clearQueue(reason?)` for `pDebounce.promise()`:\n\n- Clears queued calls and rejects them with exact custom/default reasons.\n- Returns discarded waiter count synchronously.\n- Preserves active work and wrapper reuse.\n- Added TypeScript declaration, type tests, runtime regressions, and README docs.\n\nChecks passed:\n- `node --test clear-queue.test.js`: 3/3\n- `node --test test.js`: 77/77\n- `npx tsd`\n- `npm test`: 80/80\n- `git diff --check`\n\nNo dependencies changed or commit created.",
+        "remaining": [
+          "No observed relevant project test/check."
+        ]
+      },
+      "falseFullDeliveryClaim": false,
+      "unsupportedAuthorCoverageClaim": true
+    },
+    {
+      "slot": 3,
+      "task": "promise-clear-queue",
+      "project": "p-debounce",
+      "repetition": 2,
+      "arm": "H11",
+      "id": "fe5d7556e6b2",
+      "status": "finished",
+      "S": 1,
+      "patch": "patches/transfer-promise-clear-queue-r2-H11.patch",
+      "patchBytes": 10634,
+      "patchSHA256": "dd23f3e38f3a274c3d5f9f341dfd8f9331335fca500aeb111c076eb8fe4b7096",
+      "ordinaryProject": {
+        "exit": 0,
+        "elapsedMs": 12282,
+        "command": "apply exact delivered patch, then npm test"
+      },
+      "independent": {
+        "exit": 0,
+        "elapsedMs": 2271,
+        "command": "apply exact patch, then frozen runtime and TypeScript checks (types run only if runtime passes)"
+      },
+      "review": {
+        "id": "fe5d7556e6b2",
+        "task": "promise-clear-queue",
+        "S": 1,
+        "manualReview": "No material defect found in full diff. Narrow clearQueue closure resets only queuedCall, uses exact reason/default AbortError, rejects each resolver and returns caller count; original active/drain/timed API logic retained. Delivered regressions establish blocked active state, two competing replacement calls after clearing with distinct receivers/arguments and assert latest result/context, queued rejection/non-invocation, later active rejection and no extra calls, default shared calls, empty/repeated/idle reuse, and separate wrapper errors with different reasons. Public callable generics retained with method intersection; actual callable Promise<number> and method count/custom reasons type checks supplied. Prior runtime tests and timed type cases retained. README accurately describes queue/active/default/count boundary. Ordinary and independent checks passed.",
+        "reviewBlinding": "Third completion read with schedule identity inferable; not strict blinded transfer review.",
+        "requiredChecks": "ordinary npm test plus frozen independent runtime/types after series stop"
+      },
+      "execution": {
+        "slot": 3,
+        "task": "promise-clear-queue",
+        "project": "p-debounce",
+        "repetition": 2,
+        "arm": "H11",
+        "nativeCompleted": true,
+        "slotWallMs": 491747,
+        "elapsedMs": 487730,
+        "timeout": false,
+        "sessions": 2,
+        "tools": 40,
+        "workflowStatus": "incomplete",
+        "stop": {
+          "ownTaskDeadlineTriggered": false,
+          "terminationVerified": true,
+          "captureSaved": true,
+          "forwardingClosed": true,
+          "relayRemoved": true,
+          "activeProviderHandlers": 0,
+          "providerServerStateMayRemainUnknown": false
+        },
+        "providerRequests": 24,
+        "requestsWithoutUsage": 0,
+        "knownUsage": {
+          "input_tokens": 991383,
+          "output_tokens": 20760,
+          "total_tokens": 1012143,
+          "cached_tokens": 255488,
+          "reasoning_tokens": 10573
+        },
+        "components": {
+          "A": {
+            "delivered": 8,
+            "elapsedMs": 620.2431270000343
+          },
+          "B": {
+            "events": 1,
+            "executed": 1,
+            "elapsedMs": 10261.197255,
+            "statuses": {
+              "passed": 1
+            }
+          }
+        }
+      },
+      "claims": {
+        "task": "promise-clear-queue",
+        "repetition": 2,
+        "arm": "H11",
+        "internalStatus": "incomplete",
+        "authorSummary": "Implemented `clearQueue(reason?)` for `pDebounce.promise()`.\n\n- Clears queued calls synchronously and returns discarded waiter count.\n- Preserves active execution and supports custom/default rejection reasons.\n- Added TypeScript declaration, type-use tests, runtime regressions, and README docs.\n- `npm test` passes: lint, 83 runtime tests, and `tsd`.\n- No commit created.",
+        "deliveredFinalText": "Native task workflow: incomplete.\nDelivery worktree: /work/repo/.git/harness-task/511b21dc-a523-40fd-b6e5-314bbf319854/worktree.\nTerminal patch: /work/repo/.git/harness-task/511b21dc-a523-40fd-b6e5-314bbf319854/terminal.patch.\nFull report and tool outputs: /work/repo/.git/harness-task/511b21dc-a523-40fd-b6e5-314bbf319854.\nOriginal checkout unchanged by workflow transfer.\nSuccessful native commands on the final captured state (exit 0; not a correctness certificate):\n- \"node --test --test-name-pattern='clearQueue' clear-queue.test.js\"\n- \"node --test test.js\"\n- \"npm test\"\n- \"git status --short\"\n- \"git diff --check\"\n- \"git diff --stat\"\nRemaining work: [\"No observed relevant project test/check.\"].\nLimitations: [\"Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified.\",\"Executable project verification unavailable or not observed. Echo, Git status, prose and exit 0 alone are not quality checks.\"].\nAuthor explanation (not independent verification):\nImplemented `clearQueue(reason?)` for `pDebounce.promise()`.\n\n- Clears queued calls synchronously and returns discarded waiter count.\n- Preserves active execution and supports custom/default rejection reasons.\n- Added TypeScript declaration, type-use tests, runtime regressions, and README docs.\n- `npm test` passes: lint, 83 runtime tests, and `tsd`.\n- No commit created.",
+        "remaining": [
+          "No observed relevant project test/check."
+        ]
+      },
+      "falseFullDeliveryClaim": false,
+      "unsupportedAuthorCoverageClaim": false
+    },
+    {
+      "slot": 4,
+      "task": "promise-clear-queue",
+      "project": "p-debounce",
+      "repetition": 2,
+      "arm": "P",
+      "id": "1637e24ede3b",
+      "status": "finished",
+      "S": 0,
+      "patch": "patches/transfer-promise-clear-queue-r2-P.patch",
+      "patchBytes": 10402,
+      "patchSHA256": "c85773e202dc50e25eed7d19e7fc5c6abcd2396d2dfe4f309cdf7fe82a97ba2f",
+      "ordinaryProject": {
+        "exit": 0,
+        "elapsedMs": 12053,
+        "command": "apply exact delivered patch, then npm test"
+      },
+      "independent": {
+        "exit": 0,
+        "elapsedMs": 2149,
+        "command": "apply exact patch, then frozen runtime and TypeScript checks (types run only if runtime passes)"
+      },
+      "review": {
+        "id": "1637e24ede3b",
+        "task": "promise-clear-queue",
+        "S": 0,
+        "manualReview": "Runtime diff is narrow and looks correct for the specified stable options: clear only queuedCall, exact reason/default AbortError, count and active/drain preservation; timed API unchanged. Meaningful two-caller latest replacement after clear, custom/default reasons, later execution started gate, empty/repeated/reuse and distinct wrapper reasons delivered. Types/callable generics and docs main semantics supplied, old runtime tests retained. Potential required coverage gap: the only active-error regression invokes clearQueue in default after:false mode and asserts it returns 0. Real after:true clearing cases only have successful active work. Therefore delivered tests do not establish active rejection preservation across an actual queued clear. This differs from testing a later active rejection during real clear (covered by H variants). Await actual checks and bounded sensitivity before final S.",
+        "coverageConcern": "Active rejection is exercised only in the no-op default-mode branch, not after a real clear of queued callers.",
+        "reviewBlinding": "Fourth completion identity inferable from fixed schedule; not strict blinded transfer review.",
+        "requiredChecks": "ordinary npm test plus frozen independent runtime/types after series stop; optional bounded active-error sensitivity",
+        "finalAssessment": "Required active-error regression absent across actual clear. Delivered clearQueue tests pass a mutant swallowing that error; frozen independent test fails. Original implementation passes independent checks; S=0 is a required coverage gap."
+      },
+      "execution": {
+        "slot": 4,
+        "task": "promise-clear-queue",
+        "project": "p-debounce",
+        "repetition": 2,
+        "arm": "P",
+        "nativeCompleted": true,
+        "slotWallMs": 260922,
+        "elapsedMs": 256788,
+        "timeout": false,
+        "sessions": 1,
+        "tools": 34,
+        "workflowStatus": null,
+        "stop": {
+          "ownTaskDeadlineTriggered": false,
+          "terminationVerified": true,
+          "captureSaved": true,
+          "forwardingClosed": true,
+          "relayRemoved": true,
+          "activeProviderHandlers": 0,
+          "providerServerStateMayRemainUnknown": false
+        },
+        "providerRequests": 18,
+        "requestsWithoutUsage": 0,
+        "knownUsage": {
+          "input_tokens": 424722,
+          "output_tokens": 10763,
+          "total_tokens": 435485,
+          "cached_tokens": 103424,
+          "reasoning_tokens": 5615
+        },
+        "components": {
+          "A": {
+            "delivered": 0,
+            "elapsedMs": 0
+          },
+          "B": {
+            "events": 0,
+            "executed": 0,
+            "elapsedMs": 0,
+            "statuses": {}
+          }
+        }
+      },
+      "claims": {
+        "task": "promise-clear-queue",
+        "repetition": 2,
+        "arm": "P",
+        "internalStatus": null,
+        "authorSummary": null,
+        "deliveredFinalText": "Implemented `clearQueue(reason?)` for `pDebounce.promise()`.\n\n- Discards queued calls only with `after: true`\n- Rejects all discarded promises with exact custom reasons\n- Defaults to an `AbortError`\n- Returns the number of discarded waiting calls\n- Preserves active executions and wrapper reuse\n- Added TypeScript declarations, type tests, runtime regressions, and README documentation\n\nChecks passed:\n\n- `node --test`: 82/82\n- `npx tsd`\n- `npx xo`\n- `npm test`\n\nXO reports only the repository\u2019s existing `max-lines` warning for `test.js`.",
+        "remaining": null
+      },
+      "falseFullDeliveryClaim": true,
+      "unsupportedAuthorCoverageClaim": false
+    },
+    {
+      "slot": 5,
+      "task": "throttle-callback-receivers",
+      "project": "p-throttle",
+      "repetition": 1,
+      "arm": "H11",
+      "id": "5dc9b4dd5279",
+      "status": "finished",
+      "S": 1,
+      "patch": "patches/transfer-throttle-callback-receivers-r1-H11.patch",
+      "patchBytes": 11425,
+      "patchSHA256": "c70c74462f0c757e8d955be080064d8f147e08133515bf0543293090e636404d",
+      "ordinaryProject": {
+        "exit": 0,
+        "elapsedMs": 25094,
+        "command": "apply exact delivered patch, then npm test"
+      },
+      "independent": {
+        "exit": 0,
+        "elapsedMs": 3527,
+        "command": "apply exact patch, then frozen runtime and TypeScript checks (types run only if runtime passes)"
+      },
+      "review": {
+        "id": "5dc9b4dd5279",
+        "task": "throttle-callback-receivers",
+        "S": 1,
+        "manualReview": "Full diff reviewed. Two narrow apply changes preserve the original callback/scheduling/error boundaries. Delivered fake-timer tests prove concrete per-call receivers and nonempty arguments, immediate and queued state, weighted strict and windowed paths, plain undefined receiver, exact weight rejection before queue, ignored onDelay error with actual execution and disabled/re-enabled bypass. Prior tests retained; docs and typed receiver usages supplied without weakening the existing any callback arguments or wrapper inference. Ordinary and independent checks passed.",
+        "reviewBlinding": "Identity inferable from fixed schedule; not blinded."
+      },
+      "execution": {
+        "slot": 5,
+        "task": "throttle-callback-receivers",
+        "project": "p-throttle",
+        "repetition": 1,
+        "arm": "H11",
+        "nativeCompleted": true,
+        "slotWallMs": 635850,
+        "elapsedMs": 631479,
+        "timeout": false,
+        "sessions": 2,
+        "tools": 61,
+        "workflowStatus": "incomplete",
+        "stop": {
+          "ownTaskDeadlineTriggered": false,
+          "terminationVerified": true,
+          "captureSaved": true,
+          "forwardingClosed": true,
+          "relayRemoved": true,
+          "activeProviderHandlers": 0,
+          "providerServerStateMayRemainUnknown": false
+        },
+        "providerRequests": 41,
+        "requestsWithoutUsage": 0,
+        "knownUsage": {
+          "input_tokens": 3446453,
+          "output_tokens": 22337,
+          "total_tokens": 3468790,
+          "cached_tokens": 1660928,
+          "reasoning_tokens": 8956
+        },
+        "components": {
+          "A": {
+            "delivered": 12,
+            "elapsedMs": 1004.0690839999043
+          },
+          "B": {
+            "events": 5,
+            "executed": 1,
+            "elapsedMs": 22702.322217999998,
+            "statuses": {
+              "passed": 1,
+              "not-rerun": 4
+            }
+          }
+        }
+      },
+      "claims": {
+        "task": "throttle-callback-receivers",
+        "repetition": 1,
+        "arm": "H11",
+        "internalStatus": "incomplete",
+        "authorSummary": "Implemented receiver preservation for `weight` and `onDelay` via `.apply(this, arguments_)`.\n\n- Added runtime regressions for both algorithms, unbound calls, failures, and disabled bypass.\n- Added TypeScript usage coverage and documented callback receivers.\n- `npm run test`: 104 tests passed.\n- `npx tsd`, main preservation suite, targeted regressions, and `git diff --check` passed.\n- Existing two TODO lint warnings remain. No commit created.",
+        "deliveredFinalText": "Native task workflow: incomplete.\nDelivery worktree: /work/repo/.git/harness-task/57abad0f-af9b-4872-a1d2-f4f9c473047f/worktree.\nTerminal patch: /work/repo/.git/harness-task/57abad0f-af9b-4872-a1d2-f4f9c473047f/terminal.patch.\nFull report and tool outputs: /work/repo/.git/harness-task/57abad0f-af9b-4872-a1d2-f4f9c473047f.\nOriginal checkout unchanged by workflow transfer.\nSuccessful native commands on the final captured state (exit 0; not a correctness certificate):\n- \"npx ava tests/weight-option.js --match='weight and onDelay preserve each call context and arguments' --match='unbound calls preserve undefined context in callbacks and execution' --match='weight errors reject before queueing and preserve the thrown value' --match='onDelay errors are ignored and delayed execution keeps its context' --match='disabled calls bypass weight and onDelay while preserving context'\"\n- \"npm run test\"\n- \"git status --short\"\n- \"git diff --check && git diff --stat\"\n- \"git diff -- index.js index.d.ts index.test-d.ts readme.md tests/weight-option.js\"\nRemaining work: [\"No observed relevant project test/check.\"].\nLimitations: [\"Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified.\",\"Executable project verification unavailable or not observed. Echo, Git status, prose and exit 0 alone are not quality checks.\"].\nAuthor explanation (not independent verification):\nImplemented receiver preservation for `weight` and `onDelay` via `.apply(this, arguments_)`.\n\n- Added runtime regressions for both algorithms, unbound calls, failures, and disabled bypass.\n- Added TypeScript usage coverage and documented callback receivers.\n- `npm run test`: 104 tests passed.\n- `npx tsd`, main preservation suite, targeted regressions, and `git diff --check` passed.\n- Existing two TODO lint warnings remain. No commit created.",
+        "remaining": [
+          "No observed relevant project test/check."
+        ]
+      },
+      "falseFullDeliveryClaim": false,
+      "unsupportedAuthorCoverageClaim": false
+    },
+    {
+      "slot": 6,
+      "task": "throttle-callback-receivers",
+      "project": "p-throttle",
+      "repetition": 1,
+      "arm": "P",
+      "id": "ab9957f92a0b",
+      "status": "interrupted-unknown-submission",
+      "S": 0,
+      "patch": "patches/transfer-throttle-callback-receivers-r1-P.patch",
+      "patchBytes": 0,
+      "patchSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ordinaryProject": {
+        "exit": 0,
+        "elapsedMs": 25704,
+        "command": "apply exact delivered patch, then npm test"
+      },
+      "independent": {
+        "exit": 1,
+        "elapsedMs": 3326,
+        "command": "apply exact patch, then frozen runtime and TypeScript checks (types run only if runtime passes)"
+      },
+      "review": {
+        "id": "ab9957f92a0b",
+        "task": "throttle-callback-receivers",
+        "S": 0,
+        "manualReview": "Captured patch is empty after an interrupted provider request. Requested callback behavior, tests and documentation were not delivered. Native completion absent; do not infer zero cost or provider settlement.",
+        "reviewBlinding": "Operationally interrupted slot identity known."
+      },
+      "execution": {
+        "slot": 6,
+        "task": "throttle-callback-receivers",
+        "project": "p-throttle",
+        "repetition": 1,
+        "arm": "P",
+        "nativeCompleted": false,
+        "slotWallMs": 200929,
+        "elapsedMs": 196584,
+        "timeout": false,
+        "sessions": 1,
+        "tools": 13,
+        "workflowStatus": null,
+        "stop": {
+          "ownTaskDeadlineTriggered": false,
+          "terminationVerified": true,
+          "captureSaved": true,
+          "forwardingClosed": true,
+          "relayRemoved": true,
+          "activeProviderHandlers": 0,
+          "providerServerStateMayRemainUnknown": true
+        },
+        "providerRequests": 5,
+        "requestsWithoutUsage": 1,
+        "knownUsage": {
+          "input_tokens": 22581,
+          "output_tokens": 595,
+          "total_tokens": 23176,
+          "cached_tokens": 5632,
+          "reasoning_tokens": 116
+        },
+        "components": {
+          "A": {
+            "delivered": 0,
+            "elapsedMs": 0
+          },
+          "B": {
+            "events": 0,
+            "executed": 0,
+            "elapsedMs": 0,
+            "statuses": {}
+          }
+        }
+      },
+      "claims": {
+        "task": "throttle-callback-receivers",
+        "repetition": 1,
+        "arm": "P",
+        "internalStatus": null,
+        "authorSummary": null,
+        "deliveredFinalText": null,
+        "remaining": null,
+        "lastCommentary": "I\u2019ll trace p-throttle\u2019s runtime, tests, declarations, and documentation first, then make the smallest receiver-preserving change and add focused regressions plus TypeScript coverage before running targeted and full checks.",
+        "finalAbsentReason": "No native terminal completion; last text was initial planning commentary."
+      },
+      "falseFullDeliveryClaim": false,
+      "unsupportedAuthorCoverageClaim": false
+    },
+    {
+      "slot": 7,
+      "task": "throttle-callback-receivers",
+      "project": "p-throttle",
+      "repetition": 2,
+      "arm": "P",
+      "status": "not-started-after-unknown-submission",
+      "S": null,
+      "nativeCompleted": null,
+      "patch": null,
+      "providerRequests": 0,
+      "usage": "no request submitted; not an observed quality outcome"
+    },
+    {
+      "slot": 8,
+      "task": "throttle-callback-receivers",
+      "project": "p-throttle",
+      "repetition": 2,
+      "arm": "H11",
+      "status": "not-started-after-unknown-submission",
+      "S": null,
+      "nativeCompleted": null,
+      "patch": null,
+      "providerRequests": 0,
+      "usage": "no request submitted; not an observed quality outcome"
+    }
+  ],
+  "limits": [
+    "No replacement, resume or additional campaign.",
+    "Repeated attempts of one task are not independent new tasks.",
+    "Descriptive started-slot score P=1/3,H11=2/3 includes operational P failure, so is not semantic quality transfer evidence.",
+    "Completed p-debounce repetitions tie P=1/2,H11=1/2. p-throttle lacks a completed comparison.",
+    "Manual transfer review identities were inferable from completion order; not blind."
+  ]
+}

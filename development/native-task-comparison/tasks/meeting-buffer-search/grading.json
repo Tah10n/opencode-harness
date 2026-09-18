@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "An unsorted multi-room case with cleaning buffers.",
+    "A meeting that exactly touches a reservation boundary."
+  ],
+  "docDelivery": [
+    "Half-open intervals and common availability across all rooms.",
+    "Symmetric buffer expansion and earliest-start semantics."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Finite integer-minute endpoints, start, positive duration, nonnegative buffer; each reservation [start,end] has start<end. Arrays finite, arithmetic safe. All rooms must be free for one common meeting.",
+  "independence": "Integrate half-open room reservations and cleaning buffers into earliest common availability search."
+}

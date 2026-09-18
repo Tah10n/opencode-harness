@@ -1,0 +1,73 @@
+diff --git a/packages/material-ui/src/Select/Select.test.js b/packages/material-ui/src/Select/Select.test.js
+index fc559858e90997e565f1ce3168f7b767f93f16c0..91b396989522157d3c24f7c51916d75b7722cc14 100644
+--- a/packages/material-ui/src/Select/Select.test.js
++++ b/packages/material-ui/src/Select/Select.test.js
+@@ -405,11 +405,10 @@ describe('<Select />', () => {
+       expect(getAllByRole('option')[1]).to.have.attribute('aria-selected', 'true');
+     });
+ 
+-    it('it will fallback to its content for the accessible name when it has no name', () => {
++    it('does not render an empty aria-labelledby attribute when it has no name', () => {
+       const { getByRole } = render(<Select value="" />);
+ 
+-      // TODO what is the accessible name actually?
+-      expect(getByRole('button')).to.have.attribute('aria-labelledby', ' ');
++      expect(getByRole('button')).not.to.have.attribute('aria-labelledby');
+     });
+ 
+     it('is labelled by itself when it has a name', () => {
+@@ -417,7 +416,7 @@ describe('<Select />', () => {
+ 
+       expect(getByRole('button')).to.have.attribute(
+         'aria-labelledby',
+-        ` ${getByRole('button').getAttribute('id')}`,
++        getByRole('button').getAttribute('id'),
+       );
+     });
+ 
+diff --git a/packages/material-ui/src/Select/SelectInput.js b/packages/material-ui/src/Select/SelectInput.js
+index 4bc58297fae498c38256db604b88e8bd3c831074..e7fcc950d6aef4c9ed4db013ecb30832fb14e83c 100644
+--- a/packages/material-ui/src/Select/SelectInput.js
++++ b/packages/material-ui/src/Select/SelectInput.js
+@@ -324,7 +324,7 @@ const SelectInput = React.forwardRef(function SelectInput(props, ref) {
+         tabIndex={tabIndex}
+         role="button"
+         aria-expanded={open ? 'true' : undefined}
+-        aria-labelledby={`${labelId || ''} ${buttonId || ''}`}
++        aria-labelledby={[labelId, buttonId].filter(Boolean).join(' ') || undefined}
+         aria-haspopup="listbox"
+         onKeyDown={handleKeyDown}
+         onMouseDown={disabled || readOnly ? null : handleMouseDown}
+diff --git a/packages/material-ui/src/TablePagination/TablePagination.test.js b/packages/material-ui/src/TablePagination/TablePagination.test.js
+index 7dc3580765b5b6317edb3905e19800615af8c407..268473463a77fe341796e63c0fe919028134396f 100644
+--- a/packages/material-ui/src/TablePagination/TablePagination.test.js
++++ b/packages/material-ui/src/TablePagination/TablePagination.test.js
+@@ -245,6 +245,28 @@ describe('<TablePagination />', () => {
+       assert.strictEqual(wrapper.text().indexOf('Rows per page'), -1);
+       assert.strictEqual(wrapper.find(Select).length, 0);
+     });
++
++    it('should not render a broken aria-labelledby reference on the rows per page selector', () => {
++      const { container } = render(
++        <table>
++          <tfoot>
++            <tr>
++              <TablePagination
++                count={10}
++                page={0}
++                onChangePage={noop}
++                onChangeRowsPerPage={noop}
++                rowsPerPage={10}
++              />
++            </tr>
++          </tfoot>
++        </table>,
++      );
++
++      expect(container.querySelector('[data-mui-test="SelectDisplay"]')).not.to.have.attribute(
++        'aria-labelledby',
++      );
++    });
+   });
+ 
+   describe('prop: count=-1', () => {

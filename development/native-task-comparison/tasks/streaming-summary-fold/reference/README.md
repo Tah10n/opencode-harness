@@ -1,0 +1,3 @@
+# streaming-summary-fold
+
+createSummary retains only constant-size aggregate state. add updates it and returns undefined; snapshot returns detached count/sum/min/max/mean. summarize folds once through this accumulator without collecting values or duplicating logic. Values are integers±1e9, count<=100000; sum is exact, starts+0. Empty min/max/mean are null; mean is sum/count and extrema preserve Math.min/Math.max signed-zero rules. Invalid add/count throws RangeError before state change; later valid adds still work. Source errors retain identity; inputs/snapshots do not mutate state. Run npm test.

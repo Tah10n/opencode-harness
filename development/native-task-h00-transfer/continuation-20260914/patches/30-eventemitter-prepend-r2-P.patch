@@ -1,0 +1,291 @@
+diff --git a/README.md b/README.md
+index e45aa10..5b7ac9b 100644
+--- a/README.md
++++ b/README.md
+@@ -13,8 +13,7 @@ differences:
+   listening.
+ - The `newListener` and `removeListener` events have been removed as they
+   are useful only in some uncommon use-cases.
+-- The `setMaxListeners`, `getMaxListeners`, `prependListener` and
+-  `prependOnceListener` methods are not available.
++- The `setMaxListeners` and `getMaxListeners` methods are not available.
+ - Support for custom context for events so there is no need to use `fn.bind`.
+ - The `removeListener` method removes all matching listeners, not only the
+   first.
+@@ -72,6 +71,18 @@ EE.on('another-event', emitted, context);
+ EE.removeListener('another-event', emitted, context);
+ ```
+ 
++### Prepending listeners
++
++Use `prependListener` or `prependOnceListener` to register a listener before
++all listeners already registered for an event. When multiple listeners are
++prepended, the newest prepended listener runs first.
++
++```js
++EE.on('event-name', emitted);
++EE.prependListener('event-name', emitted, context);
++EE.prependOnceListener('event-name', emitted, context);
++```
++
+ ### Tests and benchmarks
+ 
+ To run tests run `npm test`. To run the benchmarks run `npm run benchmark`.
+diff --git a/index.d.ts b/index.d.ts
+index fab37fd..94e38c8 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -56,6 +56,16 @@ declare class EventEmitter<
+     fn: EventEmitter.EventListener<EventTypes, T>,
+     context?: Context
+   ): this;
++  prependListener<T extends EventEmitter.EventNames<EventTypes>>(
++    event: T,
++    fn: EventEmitter.EventListener<EventTypes, T>,
++    context?: Context
++  ): this;
++  prependOnceListener<T extends EventEmitter.EventNames<EventTypes>>(
++    event: T,
++    fn: EventEmitter.EventListener<EventTypes, T>,
++    context?: Context
++  ): this;
+ 
+   /**
+    * Remove the listeners of a given event.
+diff --git a/index.js b/index.js
+index 6ea485c..1b3641e 100644
+--- a/index.js
++++ b/index.js
+@@ -52,10 +52,11 @@ function EE(fn, context, once) {
+  * @param {Function} fn The listener function.
+  * @param {*} context The context to invoke the listener with.
+  * @param {Boolean} once Specify if the listener is a one-time listener.
++ * @param {Boolean} prepend Specify if the listener should be prepended.
+  * @returns {EventEmitter}
+  * @private
+  */
+-function addListener(emitter, event, fn, context, once) {
++function addListener(emitter, event, fn, context, once, prepend) {
+   if (typeof fn !== 'function') {
+     throw new TypeError('The listener must be a function');
+   }
+@@ -64,8 +65,14 @@ function addListener(emitter, event, fn, context, once) {
+     , evt = prefix ? prefix + event : event;
+ 
+   if (!emitter._events[evt]) emitter._events[evt] = listener, emitter._eventsCount++;
+-  else if (!emitter._events[evt].fn) emitter._events[evt].push(listener);
+-  else emitter._events[evt] = [emitter._events[evt], listener];
++  else if (!emitter._events[evt].fn) {
++    if (prepend) emitter._events[evt].unshift(listener);
++    else emitter._events[evt].push(listener);
++  } else {
++    emitter._events[evt] = prepend
++      ? [listener, emitter._events[evt]]
++      : [emitter._events[evt], listener];
++  }
+ 
+   return emitter;
+ }
+@@ -241,6 +248,32 @@ EventEmitter.prototype.once = function once(event, fn, context) {
+   return addListener(this, event, fn, context, true);
+ };
+ 
++/**
++ * Add a listener for a given event before all existing listeners.
++ *
++ * @param {(String|Symbol)} event The event name.
++ * @param {Function} fn The listener function.
++ * @param {*} [context=this] The context to invoke the listener with.
++ * @returns {EventEmitter} `this`.
++ * @public
++ */
++EventEmitter.prototype.prependListener = function prependListener(event, fn, context) {
++  return addListener(this, event, fn, context, false, true);
++};
++
++/**
++ * Add a one-time listener for a given event before all existing listeners.
++ *
++ * @param {(String|Symbol)} event The event name.
++ * @param {Function} fn The listener function.
++ * @param {*} [context=this] The context to invoke the listener with.
++ * @returns {EventEmitter} `this`.
++ * @public
++ */
++EventEmitter.prototype.prependOnceListener = function prependOnceListener(event, fn, context) {
++  return addListener(this, event, fn, context, true, true);
++};
++
+ /**
+  * Remove the listeners of a given event.
+  *
+diff --git a/test/test.js b/test/test.js
+index e5f8aaa..5c4ca8a 100644
+--- a/test/test.js
++++ b/test/test.js
+@@ -72,6 +72,20 @@ describe('EventEmitter', function tests() {
+     assume(e.emit(event, 'bar')).equals(true);
+   });
+ 
++  if ('undefined' !== typeof Symbol) it('supports prepending listeners for ES6 symbols', function () {
++    var e = new EventEmitter()
++      , event = Symbol('event')
++      , calls = [];
++
++    e.on(event, function () { calls.push('on'); });
++    e.prependListener(event, function () { calls.push('prepend'); });
++    e.prependOnceListener(event, function () { calls.push('prepend-once'); });
++
++    assume(e.emit(event)).equals(true);
++    assume(e.emit(event)).equals(true);
++    assume(calls).deep.equals(['prepend-once', 'prepend', 'on', 'prepend', 'on']);
++  });
++
+   describe('EventEmitter#emit', function () {
+     it('should return false when there are not events to emit', function () {
+       var e = new EventEmitter();
+@@ -320,6 +334,83 @@ describe('EventEmitter', function tests() {
+     });
+   });
+ 
++  describe('EventEmitter#prependListener', function () {
++    it('prepends listeners in reverse registration order and preserves context', function () {
++      var e = new EventEmitter()
++        , calls = []
++        , appendContext = {}
++        , prependContext = {}
++        , onceContext = {}
++        , prependOnceContext = {}
++        , latestPrependContext = {};
++
++      function listener(name, context) {
++        return function (first, second) {
++          calls.push([name, this, first, second]);
++        };
++      }
++
++      assume(e.on('foo', listener('append', appendContext), appendContext)).equals(e);
++      assume(e.prependListener('foo', listener('prepend', prependContext), prependContext)).equals(e);
++      assume(e.once('foo', listener('once', onceContext), onceContext)).equals(e);
++      assume(e.prependOnceListener('foo', listener('prepend-once', prependOnceContext), prependOnceContext)).equals(e);
++      assume(e.prependListener('foo', listener('latest-prepend', latestPrependContext), latestPrependContext)).equals(e);
++
++      e.emit('foo', 'first', 42);
++
++      assume(calls).deep.equals([
++        ['latest-prepend', latestPrependContext, 'first', 42],
++        ['prepend-once', prependOnceContext, 'first', 42],
++        ['prepend', prependContext, 'first', 42],
++        ['append', appendContext, 'first', 42],
++        ['once', onceContext, 'first', 42]
++      ]);
++      assume(e.listeners('foo').length).equals(3);
++
++      calls = [];
++      e.emit('foo', 'second', 7);
++      assume(calls).deep.equals([
++        ['latest-prepend', latestPrependContext, 'second', 7],
++        ['prepend', prependContext, 'second', 7],
++        ['append', appendContext, 'second', 7]
++      ]);
++    });
++
++    it('removes prepended once listeners before recursive emits', function () {
++      var e = new EventEmitter()
++        , calls = [];
++
++      function regular() {
++        calls.push('regular');
++      }
++
++      function once() {
++        calls.push('once');
++        e.emit('foo');
++      }
++
++      e.prependOnceListener('foo', once);
++      e.prependListener('foo', regular);
++
++      e.emit('foo');
++      assume(calls).deep.equals(['regular', 'once', 'regular']);
++      assume(e.removeListener('foo', regular)).equals(e);
++      assume(e.emit('foo')).equals(false);
++    });
++
++    it('does not change existing registrations when the listener is invalid', function () {
++      var e = new EventEmitter()
++        , listener = function () {};
++
++      e.on('foo', listener);
++
++      assume(function () { e.prependListener('foo', 'invalid'); }).throws(TypeError);
++      assume(e.listeners('foo')).deep.equals([listener]);
++      assume(function () { e.prependOnceListener('foo', null); }).throws(TypeError);
++      assume(e.listeners('foo')).deep.equals([listener]);
++    });
++  });
++
+   describe('EventEmitter#once', function () {
+     it('only emits it once', function () {
+       var e = new EventEmitter()
+diff --git a/test/test.mjs b/test/test.mjs
+index 7b50c82..e324cdb 100644
+--- a/test/test.mjs
++++ b/test/test.mjs
+@@ -7,3 +7,24 @@ it('exports `EventEmitter` as default export', () => {
+ it('exports `EventEmitter` as a named export', () => {
+   new EventEmitter();
+ })
++
++it('exposes prepending methods to ESM consumers', () => {
++  const emitter = new EventEmitterDefault();
++  const event = Symbol('event');
++  const calls = [];
++
++  emitter.prependListener(event, function (first, second) {
++    calls.push([this, first, second]);
++  }, emitter);
++
++  emitter.prependOnceListener(event, function (first, second) {
++    calls.push([this, first, second]);
++  }, emitter);
++
++  emitter.emit(event, 'first', 'second');
++  emitter.emit(event, 'third', 'fourth');
++
++  if (calls.length !== 3 || calls[0][1] !== 'first' || calls[0][2] !== 'second') {
++    throw new Error('ESM prepend listener API did not preserve order or arguments');
++  }
++})
+diff --git a/test/types.ts b/test/types.ts
+new file mode 100644
+index 0000000..58c41e7
+--- /dev/null
++++ b/test/types.ts
+@@ -0,0 +1,26 @@
++import EventEmitter from '..';
++
++interface Events {
++  data: [value: string, count: number];
++  done: [];
++}
++
++interface Context {
++  name: string;
++}
++
++const emitter = new EventEmitter<Events, Context>();
++const context: Context = { name: 'test' };
++
++emitter.prependListener('data', (value, count) => {
++  value.toUpperCase();
++  count.toFixed();
++}, context);
++emitter.prependOnceListener('data', (value, count) => {
++  value.toUpperCase();
++  count.toFixed();
++}, context);
++emitter.prependListener('done', () => {}, context);
++
++// @ts-expect-error Event-specific listener arguments must be preserved.
++emitter.prependListener('data', (value: number, count: string) => {}, context);

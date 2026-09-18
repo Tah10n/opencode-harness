@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert pure move with frozen input, all-row isolation and piece identity.",
+    "Assert legacy board/row identities, same-square behavior and no mutation on invalid/occupied/empty moves."
+  ],
+  "docDelivery": [
+    "Document coordinate and occupancy errors, pure copying and payload identity.",
+    "Explain compatibility wrapper identities and failure atomicity."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Rectangular board move with null emptiness, payload identities, complete row-copy isolation, legacy container identity and validation atomicity.",
+  "manualBehavior": [
+    "Legacy mutating wrapper delegates validation/move policy to pure core, retaining only commit of validated result."
+  ],
+  "independence": "Refactor in-place board move logic into pure transitions with legacy mutating wrapper behavior preserved."
+}

@@ -1,0 +1,33 @@
+{
+  "mutants": [
+    {
+      "file": "src/worker.mjs",
+      "old": "q.retry(job.id);",
+      "new": "q.ack(job.id);",
+      "label": "failed-job-lost"
+    },
+    {
+      "file": "src/worker.mjs",
+      "old": "Math.min(limit,q.snapshot().ready.length)",
+      "new": "limit",
+      "label": "retry-processed-twice"
+    },
+    {
+      "file": "src/worker.mjs",
+      "old": "limit=1",
+      "new": "limit=0",
+      "label": "default-broken"
+    },
+    {
+      "file": "src/worker.mjs",
+      "old": "Number.isSafeInteger(limit)",
+      "new": "Number.isInteger(limit)",
+      "label": "unsafe-integer-accepted"
+    }
+  ],
+  "alternative": {
+    "file": "src/worker.mjs",
+    "old": "for(let i=0;i<count;i++)",
+    "new": "for(let remaining=count;remaining>0;remaining--)"
+  }
+}

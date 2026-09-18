@@ -1,0 +1,25 @@
+{
+  "alternative": {
+    "src/store.mjs": "import fs from 'node:fs';\nexport function read(file){return JSON.parse(fs.readFileSync(file,'utf8'));}\nexport class ConflictError extends Error{}\nexport function transact(file,fn,expectedRevision){const current=read(file);if(expectedRevision!==undefined&&expectedRevision!==current.revision)throw new ConflictError('Revision conflict');const draft=JSON.parse(JSON.stringify(current.data));const result=fn(draft);if(result&&typeof result.then==='function')throw new TypeError('Synchronous callback required');const state={revision:current.revision+1,data:draft};const bytes=JSON.stringify(state);const tmp=file+'.tmp';try{fs.writeFileSync(tmp,bytes);fs.renameSync(tmp,file);}finally{if(fs.existsSync(tmp))fs.unlinkSync(tmp);}return {state,result};}\n"
+  },
+  "mutants": [
+    {
+      "name": "ignore-revision",
+      "file": "src/store.mjs",
+      "replacement": "import fs from 'node:fs';\nexport function read(file){return JSON.parse(fs.readFileSync(file,'utf8'));}\nexport class ConflictError extends Error{}\nexport function transact(file,fn,expectedRevision){const current=read(file);if(false)throw new ConflictError('Revision conflict');const draft=structuredClone(current.data);const result=fn(draft);if(result&&typeof result.then==='function')throw new TypeError('Synchronous callback required');const state={revision:current.revision+1,data:draft};const bytes=JSON.stringify(state);const tmp=file+'.tmp';try{fs.writeFileSync(tmp,bytes);fs.renameSync(tmp,file);}finally{if(fs.existsSync(tmp))fs.unlinkSync(tmp);}return {state,result};}\n"
+    },
+    {
+      "name": "accept-thenable",
+      "file": "src/store.mjs",
+      "replacement": "import fs from 'node:fs';\nexport function read(file){return JSON.parse(fs.readFileSync(file,'utf8'));}\nexport class ConflictError extends Error{}\nexport function transact(file,fn,expectedRevision){const current=read(file);if(expectedRevision!==undefined&&expectedRevision!==current.revision)throw new ConflictError('Revision conflict');const draft=structuredClone(current.data);const result=fn(draft);const state={revision:current.revision+1,data:draft};const bytes=JSON.stringify(state);const tmp=file+'.tmp';try{fs.writeFileSync(tmp,bytes);fs.renameSync(tmp,file);}finally{if(fs.existsSync(tmp))fs.unlinkSync(tmp);}return {state,result};}\n"
+    }
+  ],
+  "manualMutants": [
+    {
+      "name": "non-atomic-direct-write",
+      "file": "src/store.mjs",
+      "replacement": "import fs from 'node:fs';\nexport function read(file){return JSON.parse(fs.readFileSync(file,'utf8'));}\nexport class ConflictError extends Error{}\nexport function transact(file,fn,expectedRevision){const current=read(file);if(expectedRevision!==undefined&&expectedRevision!==current.revision)throw new ConflictError('Revision conflict');const draft=structuredClone(current.data);const result=fn(draft);if(result&&typeof result.then==='function')throw new TypeError('Synchronous callback required');const state={revision:current.revision+1,data:draft};const bytes=JSON.stringify(state);const tmp=file+'.tmp';try{fs.writeFileSync(file,bytes);}finally{if(fs.existsSync(tmp))fs.unlinkSync(tmp);}return {state,result};}\n",
+      "expected": "Behavior checks may pass, but task completion must fail manual atomicity review: directly truncates/writes primary instead of sibling temporary + rename."
+    }
+  ]
+}

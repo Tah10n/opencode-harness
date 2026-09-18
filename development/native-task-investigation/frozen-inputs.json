@@ -1,0 +1,74 @@
+{
+  "createdAt": "2026-09-14T21:25:58.542Z",
+  "runtimeSha": "9cd8ffb4dfcfd32f1a7a65ac9c3eaca44728d2e7",
+  "freezeSha256": "198d694521294c5f1eb0255a67f92ad61b8595f4a1b89d74cc4f94911afdd384",
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "taskDeadlineMs": 900000,
+  "diagnosticTaskMs": 180000,
+  "order": [
+    {
+      "slot": 1,
+      "task": "quick-lru-take",
+      "arm": "P"
+    },
+    {
+      "slot": 2,
+      "task": "quick-lru-take",
+      "arm": "R"
+    },
+    {
+      "slot": 3,
+      "task": "quick-lru-take",
+      "arm": "H"
+    },
+    {
+      "slot": 4,
+      "task": "denque-drain",
+      "arm": "R"
+    },
+    {
+      "slot": 5,
+      "task": "denque-drain",
+      "arm": "H"
+    },
+    {
+      "slot": 6,
+      "task": "denque-drain",
+      "arm": "P"
+    },
+    {
+      "slot": 7,
+      "task": "eventemitter-collect",
+      "arm": "H"
+    },
+    {
+      "slot": 8,
+      "task": "eventemitter-collect",
+      "arm": "P"
+    },
+    {
+      "slot": 9,
+      "task": "eventemitter-collect",
+      "arm": "R"
+    }
+  ],
+  "inputs": [
+    {
+      "task": "quick-lru-take",
+      "manifestSha256": "902da4b1fbc8fe7cda8b2a4f1960d28b631f8df01cf8540c541c3bdb2be8eff6",
+      "promptSha256": "6f0b85037581198afba6d0a78402199c8ca4b0cd3a31151af9aa21ad784207a6"
+    },
+    {
+      "task": "denque-drain",
+      "manifestSha256": "ad6bd53ff4a1a679b5de16987b85bfa671037260a6ae281bf3ab4013e4d41baf",
+      "promptSha256": "ff78e2670f0c8881e83e1f23a989b07f961703b0cd344c608c069de861ad6c67"
+    },
+    {
+      "task": "eventemitter-collect",
+      "manifestSha256": "4f6beda5d661f0bd8b65b5bb60aaa62b96d8e3aa8cacbd842cb4b15cd1c5fc73",
+      "promptSha256": "a5546f2b441051513e1f352cab1e95cfd037d16bb5326927a8005dbf7aad5b7b"
+    }
+  ],
+  "realProviderRequestsBeforeFreeze": 0
+}

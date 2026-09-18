@@ -1,0 +1,57 @@
+--- a/packages/connector/test/config.test.mjs
++++ b/packages/connector/test/config.test.mjs
+@@ -3360,7 +3360,7 @@
+   assert.match(await readFile(hookPath, "utf8"), /viberacing-hook-v3/);
+ });
+ 
+-test("reconnect retires only an explicitly disconnected unavailable source before pairing", async (context) => {
++test("reconnect preserves transient failures, retires disconnected sources, and recovers revoked authorization", async (context) => {
+   let mode = "malformed";
+   let pairingStarts = 0;
+   let pairingBody;
+@@ -3404,7 +3404,7 @@
+           return;
+         }
+         if (mode === "unauthorized") {
+-          response.statusCode = 401;
++          response.statusCode = 403;
+           response.end(JSON.stringify({ error: "unauthorized" }));
+           return;
+         }
+@@ -3540,10 +3540,6 @@
+   for (const failure of [
+     ["malformed", /invalid protocol response/],
+     ["transient", /server_error/],
+-    [
+-      "unauthorized",
+-      /Existing installation authorization cannot be reconciled; run `viberacing disconnect`/,
+-    ],
+   ]) {
+     mode = failure[0];
+     await assert.rejects(
+@@ -3575,6 +3571,25 @@
+   const hook = await readFile(join(hookRoot, "settings.json"), "utf8");
+   assert.match(hook, /keep-foreign/);
+   assert.doesNotMatch(hook, new RegExp(retiredClientSourceId));
++
++  const pending = join(directory, "pending");
++  await mkdir(pending, { recursive: true });
++  await writeFile(join(pending, `${activeSourceId}.json`), '{"stale":true}\n');
++  mode = "unauthorized";
++  const reconnected = await execFileAsync(
++    process.execPath,
++    [connectorPath, "connect", "--origin", origin],
++    { env: environment },
++  );
++  assert.match(
++    reconnected.stdout,
++    /reconnect|pairing|authorization/i,
++  );
++  assert.equal(pairingStarts, 2);
++  await assert.rejects(access(join(pending, `${activeSourceId}.json`)));
++  const reconnectedConfig = JSON.parse(await readFile(join(directory, "config.json"), "utf8"));
++  assert.equal(reconnectedConfig.installationId, installationId);
++  assert.equal(reconnectedConfig.deviceToken, "dashboard_disconnect_device_token_long_enough");
+ });
+ 
+ test("hostile pairing response cannot change config, hooks, or local paths", async (context) => {

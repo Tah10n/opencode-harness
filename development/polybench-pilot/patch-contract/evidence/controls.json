@@ -1,0 +1,493 @@
+{
+  "controls": [
+    {
+      "name": "separate-files",
+      "expected_failure": false,
+      "patches": {
+        "test": "diff --git a/test.js b/test.js\nindex 8e08958..2236179 100644\n--- a/test.js\n+++ b/test.js\n@@ -1,4 +1,4 @@\n-assert_1 = 0;\n+assert_1 = 1;\n assert_2 = 0;\n assert_3 = 0;\n assert_4 = 0;\n",
+        "code": "diff --git a/prod.js b/prod.js\nindex 42d27ab..7e89883 100644\n--- a/prod.js\n+++ b/prod.js\n@@ -1 +1 @@\n-value = 0;\n+value = 1;\n"
+      },
+      "commands": [
+        {
+          "cmd": "git apply -v --ignore-whitespace --reject /tmp/patch-control-separate-files/patch_test.diff",
+          "cwd": "/tmp/patch-control-separate-files",
+          "user": "root",
+          "exit_code": 0,
+          "output": "Checking patch test.js...\nApplied patch test.js cleanly.\n",
+          "seconds": 0.0503
+        },
+        {
+          "cmd": "git apply -v --ignore-whitespace --reject /tmp/patch-control-separate-files/patch_code.diff",
+          "cwd": "/tmp/patch-control-separate-files",
+          "user": "root",
+          "exit_code": 0,
+          "output": "Checking patch prod.js...\nApplied patch prod.js cleanly.\n",
+          "seconds": 0.0495
+        }
+      ],
+      "snapshots": [
+        {
+          "label": "after git",
+          "diff_sha256": "678079381bf14224f6924459100e54ad4d43815b5ed31a9d54d6ea4390c64d5e",
+          "changed_files": [
+            "test.js"
+          ],
+          "untracked": [
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        },
+        {
+          "label": "after git",
+          "diff_sha256": "f2a14fc52313b7e6a9583f5574d2cc4d9dab1af48df0886c5d179edb6f53982a",
+          "changed_files": [
+            "prod.js",
+            "test.js"
+          ],
+          "untracked": [
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        }
+      ],
+      "outcome": 0,
+      "final_prod": "value = 1;\n",
+      "final_assertion_1": "assert_1 = 1;\n"
+    },
+    {
+      "name": "same-file-distant-hunks",
+      "expected_failure": false,
+      "patches": {
+        "test": "diff --git a/test.js b/test.js\nindex 8e08958..2236179 100644\n--- a/test.js\n+++ b/test.js\n@@ -1,4 +1,4 @@\n-assert_1 = 0;\n+assert_1 = 1;\n assert_2 = 0;\n assert_3 = 0;\n assert_4 = 0;\n",
+        "code": "diff --git a/test.js b/test.js\nindex 8e08958..fd8e7e1 100644\n--- a/test.js\n+++ b/test.js\n@@ -27,7 +27,7 @@ assert_26 = 0;\n assert_27 = 0;\n assert_28 = 0;\n assert_29 = 0;\n-assert_30 = 0;\n+assert_30 = 1;\n assert_31 = 0;\n assert_32 = 0;\n assert_33 = 0;\n"
+      },
+      "commands": [
+        {
+          "cmd": "git apply -v --ignore-whitespace --reject /tmp/patch-control-same-file-distant-hunks/patch_test.diff",
+          "cwd": "/tmp/patch-control-same-file-distant-hunks",
+          "user": "root",
+          "exit_code": 0,
+          "output": "Checking patch test.js...\nApplied patch test.js cleanly.\n",
+          "seconds": 0.0483
+        },
+        {
+          "cmd": "git apply -v --ignore-whitespace --reject /tmp/patch-control-same-file-distant-hunks/patch_code.diff",
+          "cwd": "/tmp/patch-control-same-file-distant-hunks",
+          "user": "root",
+          "exit_code": 0,
+          "output": "Checking patch test.js...\nApplied patch test.js cleanly.\n",
+          "seconds": 0.0516
+        }
+      ],
+      "snapshots": [
+        {
+          "label": "after git",
+          "diff_sha256": "678079381bf14224f6924459100e54ad4d43815b5ed31a9d54d6ea4390c64d5e",
+          "changed_files": [
+            "test.js"
+          ],
+          "untracked": [
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        },
+        {
+          "label": "after git",
+          "diff_sha256": "4c2af55cb8cbfbe92e815aab95161062959bcbeb3432b81280003b3975b9905e",
+          "changed_files": [
+            "test.js"
+          ],
+          "untracked": [
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        }
+      ],
+      "outcome": 0,
+      "final_prod": "value = 0;\n",
+      "final_assertion_1": "assert_1 = 1;\n"
+    },
+    {
+      "name": "identical-assertion",
+      "expected_failure": true,
+      "patches": {
+        "test": "diff --git a/test.js b/test.js\nindex 8e08958..2236179 100644\n--- a/test.js\n+++ b/test.js\n@@ -1,4 +1,4 @@\n-assert_1 = 0;\n+assert_1 = 1;\n assert_2 = 0;\n assert_3 = 0;\n assert_4 = 0;\n",
+        "code": "diff --git a/test.js b/test.js\nindex 8e08958..2236179 100644\n--- a/test.js\n+++ b/test.js\n@@ -1,4 +1,4 @@\n-assert_1 = 0;\n+assert_1 = 1;\n assert_2 = 0;\n assert_3 = 0;\n assert_4 = 0;\n"
+      },
+      "commands": [
+        {
+          "cmd": "git apply -v --ignore-whitespace --reject /tmp/patch-control-identical-assertion/patch_test.diff",
+          "cwd": "/tmp/patch-control-identical-assertion",
+          "user": "root",
+          "exit_code": 0,
+          "output": "Checking patch test.js...\nApplied patch test.js cleanly.\n",
+          "seconds": 0.0495
+        },
+        {
+          "cmd": "git apply -v --ignore-whitespace --reject /tmp/patch-control-identical-assertion/patch_code.diff",
+          "cwd": "/tmp/patch-control-identical-assertion",
+          "user": "root",
+          "exit_code": 1,
+          "output": "Checking patch test.js...\nerror: while searching for:\nassert_1 = 0;\nassert_2 = 0;\nassert_3 = 0;\nassert_4 = 0;\n\nerror: patch failed: test.js:1\nApplying patch test.js with 1 reject...\nRejected hunk #1.\n",
+          "seconds": 0.052
+        },
+        {
+          "cmd": "patch --batch --fuzz=5 -p1 -f -i /tmp/patch-control-identical-assertion/patch_code.diff",
+          "cwd": "/tmp/patch-control-identical-assertion",
+          "user": "root",
+          "exit_code": 1,
+          "output": "patching file test.js\nHunk #1 FAILED at 1.\n1 out of 1 hunk FAILED -- saving rejects to file test.js.rej\n",
+          "seconds": 0.0427
+        }
+      ],
+      "snapshots": [
+        {
+          "label": "after git",
+          "diff_sha256": "678079381bf14224f6924459100e54ad4d43815b5ed31a9d54d6ea4390c64d5e",
+          "changed_files": [
+            "test.js"
+          ],
+          "untracked": [
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        },
+        {
+          "label": "after git",
+          "diff_sha256": "678079381bf14224f6924459100e54ad4d43815b5ed31a9d54d6ea4390c64d5e",
+          "changed_files": [
+            "test.js"
+          ],
+          "untracked": [
+            "patch_code.diff",
+            "patch_test.diff",
+            "test.js.rej"
+          ],
+          "artifacts": {
+            "./test.js.rej": {
+              "sha256": "1d7c4a9215eb39a2688fc34fa42a9c2af3a5d129650158ce062064b4d0e2070b",
+              "bytes": 133,
+              "text": "diff a/test.js b/test.js\t(rejected hunks)\n@@ -1,4 +1,4 @@\n-assert_1 = 0;\n+assert_1 = 1;\n assert_2 = 0;\n assert_3 = 0;\n assert_4 = 0;\n"
+            }
+          }
+        },
+        {
+          "label": "after patch",
+          "diff_sha256": "678079381bf14224f6924459100e54ad4d43815b5ed31a9d54d6ea4390c64d5e",
+          "changed_files": [
+            "test.js"
+          ],
+          "untracked": [
+            "patch_code.diff",
+            "patch_test.diff",
+            "test.js.orig",
+            "test.js.rej"
+          ],
+          "artifacts": {
+            "./test.js.orig": {
+              "sha256": "f846a7e58a99aaa28dd058c65eb62900ea555704b2dd7ec91514d66d1116785f",
+              "bytes": 591
+            },
+            "./test.js.rej": {
+              "sha256": "ea6353060c10190b8fa02b6de5a89212920eb89f64eba95090801d5e889a0bbe",
+              "bytes": 115,
+              "text": "--- test.js\n+++ test.js\n@@ -1,4 +1,4 @@\n-assert_1 = 0;\n+assert_1 = 1;\n assert_2 = 0;\n assert_3 = 0;\n assert_4 = 0;\n"
+            }
+          }
+        },
+        {
+          "label": "before cleanup",
+          "diff_sha256": "678079381bf14224f6924459100e54ad4d43815b5ed31a9d54d6ea4390c64d5e",
+          "changed_files": [
+            "test.js"
+          ],
+          "untracked": [
+            "patch_code.diff",
+            "patch_test.diff",
+            "test.js.orig",
+            "test.js.rej"
+          ],
+          "artifacts": {
+            "./test.js.orig": {
+              "sha256": "f846a7e58a99aaa28dd058c65eb62900ea555704b2dd7ec91514d66d1116785f",
+              "bytes": 591
+            },
+            "./test.js.rej": {
+              "sha256": "ea6353060c10190b8fa02b6de5a89212920eb89f64eba95090801d5e889a0bbe",
+              "bytes": 115,
+              "text": "--- test.js\n+++ test.js\n@@ -1,4 +1,4 @@\n-assert_1 = 0;\n+assert_1 = 1;\n assert_2 = 0;\n assert_3 = 0;\n assert_4 = 0;\n"
+            }
+          }
+        }
+      ],
+      "outcome": 1,
+      "final_prod": "value = 0;\n",
+      "final_assertion_1": "assert_1 = 1;\n"
+    },
+    {
+      "name": "different-assertion",
+      "expected_failure": true,
+      "patches": {
+        "test": "diff --git a/test.js b/test.js\nindex 8e08958..2236179 100644\n--- a/test.js\n+++ b/test.js\n@@ -1,4 +1,4 @@\n-assert_1 = 0;\n+assert_1 = 1;\n assert_2 = 0;\n assert_3 = 0;\n assert_4 = 0;\n",
+        "code": "diff --git a/test.js b/test.js\nindex 8e08958..de47f6e 100644\n--- a/test.js\n+++ b/test.js\n@@ -1,4 +1,4 @@\n-assert_1 = 0;\n+assert_1 = 2;\n assert_2 = 0;\n assert_3 = 0;\n assert_4 = 0;\n"
+      },
+      "commands": [
+        {
+          "cmd": "git apply -v --ignore-whitespace --reject /tmp/patch-control-different-assertion/patch_test.diff",
+          "cwd": "/tmp/patch-control-different-assertion",
+          "user": "root",
+          "exit_code": 0,
+          "output": "Checking patch test.js...\nApplied patch test.js cleanly.\n",
+          "seconds": 0.0483
+        },
+        {
+          "cmd": "git apply -v --ignore-whitespace --reject /tmp/patch-control-different-assertion/patch_code.diff",
+          "cwd": "/tmp/patch-control-different-assertion",
+          "user": "root",
+          "exit_code": 1,
+          "output": "Checking patch test.js...\nerror: while searching for:\nassert_1 = 0;\nassert_2 = 0;\nassert_3 = 0;\nassert_4 = 0;\n\nerror: patch failed: test.js:1\nApplying patch test.js with 1 reject...\nRejected hunk #1.\n",
+          "seconds": 0.0508
+        },
+        {
+          "cmd": "patch --batch --fuzz=5 -p1 -f -i /tmp/patch-control-different-assertion/patch_code.diff",
+          "cwd": "/tmp/patch-control-different-assertion",
+          "user": "root",
+          "exit_code": 1,
+          "output": "patching file test.js\nHunk #1 FAILED at 1.\n1 out of 1 hunk FAILED -- saving rejects to file test.js.rej\n",
+          "seconds": 0.0428
+        }
+      ],
+      "snapshots": [
+        {
+          "label": "after git",
+          "diff_sha256": "678079381bf14224f6924459100e54ad4d43815b5ed31a9d54d6ea4390c64d5e",
+          "changed_files": [
+            "test.js"
+          ],
+          "untracked": [
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        },
+        {
+          "label": "after git",
+          "diff_sha256": "678079381bf14224f6924459100e54ad4d43815b5ed31a9d54d6ea4390c64d5e",
+          "changed_files": [
+            "test.js"
+          ],
+          "untracked": [
+            "patch_code.diff",
+            "patch_test.diff",
+            "test.js.rej"
+          ],
+          "artifacts": {
+            "./test.js.rej": {
+              "sha256": "c1e23b4c14ccde1f4b33f009ccaaf147b667069cb0a723b3ce08bd8b72a8556b",
+              "bytes": 133,
+              "text": "diff a/test.js b/test.js\t(rejected hunks)\n@@ -1,4 +1,4 @@\n-assert_1 = 0;\n+assert_1 = 2;\n assert_2 = 0;\n assert_3 = 0;\n assert_4 = 0;\n"
+            }
+          }
+        },
+        {
+          "label": "after patch",
+          "diff_sha256": "678079381bf14224f6924459100e54ad4d43815b5ed31a9d54d6ea4390c64d5e",
+          "changed_files": [
+            "test.js"
+          ],
+          "untracked": [
+            "patch_code.diff",
+            "patch_test.diff",
+            "test.js.orig",
+            "test.js.rej"
+          ],
+          "artifacts": {
+            "./test.js.orig": {
+              "sha256": "f846a7e58a99aaa28dd058c65eb62900ea555704b2dd7ec91514d66d1116785f",
+              "bytes": 591
+            },
+            "./test.js.rej": {
+              "sha256": "b3fe3ed4a7fab99940415cbb109891a2548025d657cd028988e873bb26668608",
+              "bytes": 115,
+              "text": "--- test.js\n+++ test.js\n@@ -1,4 +1,4 @@\n-assert_1 = 0;\n+assert_1 = 2;\n assert_2 = 0;\n assert_3 = 0;\n assert_4 = 0;\n"
+            }
+          }
+        },
+        {
+          "label": "before cleanup",
+          "diff_sha256": "678079381bf14224f6924459100e54ad4d43815b5ed31a9d54d6ea4390c64d5e",
+          "changed_files": [
+            "test.js"
+          ],
+          "untracked": [
+            "patch_code.diff",
+            "patch_test.diff",
+            "test.js.orig",
+            "test.js.rej"
+          ],
+          "artifacts": {
+            "./test.js.orig": {
+              "sha256": "f846a7e58a99aaa28dd058c65eb62900ea555704b2dd7ec91514d66d1116785f",
+              "bytes": 591
+            },
+            "./test.js.rej": {
+              "sha256": "b3fe3ed4a7fab99940415cbb109891a2548025d657cd028988e873bb26668608",
+              "bytes": 115,
+              "text": "--- test.js\n+++ test.js\n@@ -1,4 +1,4 @@\n-assert_1 = 0;\n+assert_1 = 2;\n assert_2 = 0;\n assert_3 = 0;\n assert_4 = 0;\n"
+            }
+          }
+        }
+      ],
+      "outcome": 1,
+      "final_prod": "value = 0;\n",
+      "final_assertion_1": "assert_1 = 1;\n"
+    },
+    {
+      "name": "partial-production-and-conflicting-test",
+      "expected_failure": true,
+      "patches": {
+        "test": "diff --git a/test.js b/test.js\nindex 8e08958..2236179 100644\n--- a/test.js\n+++ b/test.js\n@@ -1,4 +1,4 @@\n-assert_1 = 0;\n+assert_1 = 1;\n assert_2 = 0;\n assert_3 = 0;\n assert_4 = 0;\n",
+        "code": "diff --git a/prod.js b/prod.js\nindex 42d27ab..7e89883 100644\n--- a/prod.js\n+++ b/prod.js\n@@ -1 +1 @@\n-value = 0;\n+value = 1;\ndiff --git a/test.js b/test.js\nindex 8e08958..de47f6e 100644\n--- a/test.js\n+++ b/test.js\n@@ -1,4 +1,4 @@\n-assert_1 = 0;\n+assert_1 = 2;\n assert_2 = 0;\n assert_3 = 0;\n assert_4 = 0;\n"
+      },
+      "commands": [
+        {
+          "cmd": "git apply -v --ignore-whitespace --reject /tmp/patch-control-partial-production-and-conflicting-test/patch_test.diff",
+          "cwd": "/tmp/patch-control-partial-production-and-conflicting-test",
+          "user": "root",
+          "exit_code": 0,
+          "output": "Checking patch test.js...\nApplied patch test.js cleanly.\n",
+          "seconds": 0.049
+        },
+        {
+          "cmd": "git apply -v --ignore-whitespace --reject /tmp/patch-control-partial-production-and-conflicting-test/patch_code.diff",
+          "cwd": "/tmp/patch-control-partial-production-and-conflicting-test",
+          "user": "root",
+          "exit_code": 1,
+          "output": "Checking patch prod.js...\nChecking patch test.js...\nerror: while searching for:\nassert_1 = 0;\nassert_2 = 0;\nassert_3 = 0;\nassert_4 = 0;\n\nerror: patch failed: test.js:1\nApplied patch prod.js cleanly.\nApplying patch test.js with 1 reject...\nRejected hunk #1.\n",
+          "seconds": 0.0516
+        },
+        {
+          "cmd": "patch --batch --fuzz=5 -p1 -f -i /tmp/patch-control-partial-production-and-conflicting-test/patch_code.diff",
+          "cwd": "/tmp/patch-control-partial-production-and-conflicting-test",
+          "user": "root",
+          "exit_code": 1,
+          "output": "patching file prod.js\nHunk #1 FAILED at 1.\n1 out of 1 hunk FAILED -- saving rejects to file prod.js.rej\npatching file test.js\nHunk #1 FAILED at 1.\n1 out of 1 hunk FAILED -- saving rejects to file test.js.rej\n",
+          "seconds": 0.0424
+        }
+      ],
+      "snapshots": [
+        {
+          "label": "after git",
+          "diff_sha256": "678079381bf14224f6924459100e54ad4d43815b5ed31a9d54d6ea4390c64d5e",
+          "changed_files": [
+            "test.js"
+          ],
+          "untracked": [
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        },
+        {
+          "label": "after git",
+          "diff_sha256": "f2a14fc52313b7e6a9583f5574d2cc4d9dab1af48df0886c5d179edb6f53982a",
+          "changed_files": [
+            "prod.js",
+            "test.js"
+          ],
+          "untracked": [
+            "patch_code.diff",
+            "patch_test.diff",
+            "test.js.rej"
+          ],
+          "artifacts": {
+            "./test.js.rej": {
+              "sha256": "c1e23b4c14ccde1f4b33f009ccaaf147b667069cb0a723b3ce08bd8b72a8556b",
+              "bytes": 133,
+              "text": "diff a/test.js b/test.js\t(rejected hunks)\n@@ -1,4 +1,4 @@\n-assert_1 = 0;\n+assert_1 = 2;\n assert_2 = 0;\n assert_3 = 0;\n assert_4 = 0;\n"
+            }
+          }
+        },
+        {
+          "label": "after patch",
+          "diff_sha256": "f2a14fc52313b7e6a9583f5574d2cc4d9dab1af48df0886c5d179edb6f53982a",
+          "changed_files": [
+            "prod.js",
+            "test.js"
+          ],
+          "untracked": [
+            "patch_code.diff",
+            "patch_test.diff",
+            "prod.js.orig",
+            "prod.js.rej",
+            "test.js.orig",
+            "test.js.rej"
+          ],
+          "artifacts": {
+            "./prod.js.orig": {
+              "sha256": "78a7872ab551b1a21cd16a18bc44e575f2a019300dbd42374758f3e17453176b",
+              "bytes": 11
+            },
+            "./prod.js.rej": {
+              "sha256": "d96058b5b754de95f9d19954aeaee8d98d15fa332109f763d3a7cdbaa488bd2c",
+              "bytes": 60,
+              "text": "--- prod.js\n+++ prod.js\n@@ -1 +1 @@\n-value = 0;\n+value = 1;\n"
+            },
+            "./test.js.orig": {
+              "sha256": "f846a7e58a99aaa28dd058c65eb62900ea555704b2dd7ec91514d66d1116785f",
+              "bytes": 591
+            },
+            "./test.js.rej": {
+              "sha256": "b3fe3ed4a7fab99940415cbb109891a2548025d657cd028988e873bb26668608",
+              "bytes": 115,
+              "text": "--- test.js\n+++ test.js\n@@ -1,4 +1,4 @@\n-assert_1 = 0;\n+assert_1 = 2;\n assert_2 = 0;\n assert_3 = 0;\n assert_4 = 0;\n"
+            }
+          }
+        },
+        {
+          "label": "before cleanup",
+          "diff_sha256": "f2a14fc52313b7e6a9583f5574d2cc4d9dab1af48df0886c5d179edb6f53982a",
+          "changed_files": [
+            "prod.js",
+            "test.js"
+          ],
+          "untracked": [
+            "patch_code.diff",
+            "patch_test.diff",
+            "prod.js.orig",
+            "prod.js.rej",
+            "test.js.orig",
+            "test.js.rej"
+          ],
+          "artifacts": {
+            "./prod.js.orig": {
+              "sha256": "78a7872ab551b1a21cd16a18bc44e575f2a019300dbd42374758f3e17453176b",
+              "bytes": 11
+            },
+            "./prod.js.rej": {
+              "sha256": "d96058b5b754de95f9d19954aeaee8d98d15fa332109f763d3a7cdbaa488bd2c",
+              "bytes": 60,
+              "text": "--- prod.js\n+++ prod.js\n@@ -1 +1 @@\n-value = 0;\n+value = 1;\n"
+            },
+            "./test.js.orig": {
+              "sha256": "f846a7e58a99aaa28dd058c65eb62900ea555704b2dd7ec91514d66d1116785f",
+              "bytes": 591
+            },
+            "./test.js.rej": {
+              "sha256": "b3fe3ed4a7fab99940415cbb109891a2548025d657cd028988e873bb26668608",
+              "bytes": 115,
+              "text": "--- test.js\n+++ test.js\n@@ -1,4 +1,4 @@\n-assert_1 = 0;\n+assert_1 = 2;\n assert_2 = 0;\n assert_3 = 0;\n assert_4 = 0;\n"
+            }
+          }
+        }
+      ],
+      "outcome": 1,
+      "final_prod": "value = 1;\n",
+      "final_assertion_1": "assert_1 = 1;\n"
+    }
+  ],
+  "elapsed_seconds": 10.934,
+  "containers_created": 1,
+  "test_runs": 0,
+  "scoring_runs": 0
+}

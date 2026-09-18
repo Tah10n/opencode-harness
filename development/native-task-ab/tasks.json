@@ -1,0 +1,32 @@
+[
+  {
+    "id": "limit-function-controls",
+    "project": "p-limit",
+    "taskFile": "development/native-task-ab/tasks/limit-function-controls/TASK.md"
+  },
+  {
+    "id": "bind-methods-atomic",
+    "project": "emittery",
+    "taskFile": "development/native-task-ab/tasks/bind-methods-atomic/TASK.md"
+  },
+  {
+    "id": "abortable-queue-waiters",
+    "project": "p-queue",
+    "taskFile": "development/native-task-ab/tasks/abortable-queue-waiters/TASK.md"
+  },
+  {
+    "id": "clear-queue-reason",
+    "project": "p-limit",
+    "taskFile": "development/native-task-ab/tasks/clear-queue-reason/TASK.md"
+  },
+  {
+    "id": "listener-count-deduplicate",
+    "project": "emittery",
+    "taskFile": "development/native-task-ab/tasks/listener-count-deduplicate/TASK.md"
+  },
+  {
+    "id": "clear-queue-count",
+    "project": "p-queue",
+    "taskFile": "development/native-task-ab/tasks/clear-queue-count/TASK.md"
+  }
+]

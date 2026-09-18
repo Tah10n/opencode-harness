@@ -1,0 +1,3 @@
+# positional-options-overload
+
+formatRange(start,end,step?) retains comma-separated positional behavior. formatRange({start,end,step,separator}) adds options: undefined/missing start=0, step=1, separator=','. End is required. Progressions include an endpoint only when reached, stop before overshoot and are empty when step points away; negative steps descend. Integer start/end bounds are ±10000, nonzero integer step bounds ±20000; invalid numbers throw RangeError. Separator must be a string (TypeError otherwise); empty is valid. No truthiness defaults or mutation; frozen own-data options work. Run npm test.

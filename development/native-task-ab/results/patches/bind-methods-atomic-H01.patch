@@ -1,0 +1,207 @@
+diff --git a/index.d.ts b/index.d.ts
+index 449f402..e8ddea5 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -752,6 +752,8 @@ export default class Emittery<
+ 	/**
+ 	Bind the given `methodNames`, or all `Emittery` methods if `methodNames` is not defined, into the `target` object.
+ 
++	All requested properties are checked before any methods are bound. If a property conflicts with an existing value, cannot be redefined, or cannot be added, the target is left unchanged. Duplicate method names are treated as one binding request.
++
+ 	@example
+ 	```
+ 	import Emittery from 'emittery';
+diff --git a/index.js b/index.js
+index 67a4de3..298b7d0 100644
+--- a/index.js
++++ b/index.js
+@@ -984,17 +984,41 @@ export default class Emittery {
+ 			throw new TypeError('`target` must be an object');
+ 		}
+ 
+-		methodNames = defaultMethodNamesOrAssert(methodNames);
++		methodNames = [...new Set(defaultMethodNamesOrAssert(methodNames))];
++		const descriptors = new Map();
+ 
+ 		for (const methodName of methodNames) {
++			const descriptor = Object.getOwnPropertyDescriptor(target, methodName);
+ 			if (target[methodName] !== undefined) {
+ 				throw new Error(`The property \`${methodName}\` already exists on \`target\``);
+ 			}
+ 
+-			Object.defineProperty(target, methodName, {
++			if (descriptor && !descriptor.configurable) {
++				throw new Error(`The property \`${methodName}\` cannot be redefined on \`target\``);
++			}
++
++			if (!descriptor && !Object.isExtensible(target)) {
++				throw new Error('`target` is not extensible');
++			}
++
++			descriptors.set(methodName, descriptor);
++		}
++
++		for (const methodName of methodNames) {
++			const descriptor = descriptors.get(methodName);
++			const propertyDescriptor = {
+ 				enumerable: false,
+ 				value: this[methodName].bind(this),
+-			});
++			};
++
++			if (descriptor) {
++				propertyDescriptor.configurable = descriptor.configurable;
++				if ('writable' in descriptor) {
++					propertyDescriptor.writable = descriptor.writable;
++				}
++			}
++
++			Object.defineProperty(target, methodName, propertyDescriptor);
+ 		}
+ 	}
+ }
+diff --git a/index.test-d.ts b/index.test-d.ts
+index 6ec455e..6c4291e 100644
+--- a/index.test-d.ts
++++ b/index.test-d.ts
+@@ -312,6 +312,14 @@ class MixinBase {
+ 	test() {}
+ }
+ 
++// BindMethods - supports readonly method-name arrays
++{
++	const ee = new Emittery();
++	const target: Record<string, unknown> = {};
++	const methodNames = ['emit', 'on'] as const;
++	expectType<void>(ee.bindMethods(target, methodNames));
++}
++
+ expectType<typeof MixinBase>(Emittery.mixin('emittery')(MixinBase));
+ 
+ // Mixin - works with parameterized constructor
+diff --git a/readme.md b/readme.md
+index 88805a2..9296958 100644
+--- a/readme.md
++++ b/readme.md
+@@ -657,7 +657,7 @@ emitter.listenerCount(); // 2
+ 
+ #### bindMethods(target, methodNames?)
+ 
+-Bind the given `methodNames`, or all `Emittery` methods if `methodNames` is not defined, into the `target` object.
++Bind the given `methodNames`, or all `Emittery` methods if `methodNames` is not defined, into the `target` object. The target is preflighted before any methods are bound: if a requested property conflicts with an existing value, cannot be redefined, or cannot be added, the target is left unchanged. Duplicate method names are treated as one binding request.
+ 
+ ```js
+ import Emittery from 'emittery';
+diff --git a/test/index.js b/test/index.js
+index f73b0fc..a5741f6 100644
+--- a/test/index.js
++++ b/test/index.js
+@@ -2379,6 +2379,108 @@ test('bindMethods() - must not set already existing fields', t => {
+ 	});
+ });
+ 
++test('bindMethods() - preflights later conflicts atomically', t => {
++	const emitter = new Emittery();
++	const target = {off: true};
++	const before = Object.getOwnPropertyDescriptors(target);
++
++	t.is(Object.getOwnPropertyDescriptor(target, 'on'), undefined);
++	t.is(target.off, true);
++	t.throws(() => {
++		emitter.bindMethods(target, ['on', 'off']);
++	});
++	t.deepEqual(Object.getOwnPropertyDescriptors(target), before);
++});
++
++test('bindMethods() - rejects non-configurable undefined properties atomically', t => {
++	const emitter = new Emittery();
++	const target = {};
++	Object.defineProperty(target, 'off', {
++		value: undefined,
++		configurable: false,
++	});
++	const before = Object.getOwnPropertyDescriptors(target);
++
++	t.is(Object.getOwnPropertyDescriptor(target, 'on'), undefined);
++	t.is(target.off, undefined);
++	t.throws(() => {
++		emitter.bindMethods(target, ['on', 'off']);
++	});
++	t.deepEqual(Object.getOwnPropertyDescriptors(target), before);
++});
++
++test('bindMethods() - rejects inherited conflicts and non-extensible targets atomically', t => {
++	const emitter = new Emittery();
++	const inheritedTarget = Object.create({off: true});
++	const inheritedBefore = Object.getOwnPropertyDescriptors(inheritedTarget);
++
++	t.is(Object.getOwnPropertyDescriptor(inheritedTarget, 'on'), undefined);
++	t.is(inheritedTarget.off, true);
++	t.throws(() => {
++		emitter.bindMethods(inheritedTarget, ['on', 'off']);
++	});
++	t.deepEqual(Object.getOwnPropertyDescriptors(inheritedTarget), inheritedBefore);
++
++	const nonExtensibleTarget = {};
++	Object.preventExtensions(nonExtensibleTarget);
++	const nonExtensibleBefore = Object.getOwnPropertyDescriptors(nonExtensibleTarget);
++
++	t.is(Object.getOwnPropertyDescriptor(nonExtensibleTarget, 'on'), undefined);
++	t.throws(() => {
++		emitter.bindMethods(nonExtensibleTarget, ['on']);
++	});
++	t.deepEqual(Object.getOwnPropertyDescriptors(nonExtensibleTarget), nonExtensibleBefore);
++});
++
++test('bindMethods() - deduplicates names and preserves binding behavior', async t => {
++	const emitter = new Emittery();
++	const target = {};
++
++	t.is(Object.getOwnPropertyDescriptor(target, 'on'), undefined);
++	emitter.bindMethods(target, ['on', 'on', 'emit']);
++
++	t.deepEqual(Object.getOwnPropertyDescriptor(target, 'on'), {
++		value: target.on,
++		writable: false,
++		enumerable: false,
++		configurable: false,
++	});
++
++	let receivedData;
++	target.on('event', event => {
++		receivedData = event.data;
++	});
++	await target.emit('event', 42);
++	t.is(receivedData, 42);
++});
++
++test('bindMethods() - preserves configurable undefined property flags', t => {
++	const emitter = new Emittery();
++	const target = {};
++	Object.defineProperty(target, 'on', {
++		value: undefined,
++		writable: true,
++		enumerable: true,
++		configurable: true,
++	});
++
++	t.deepEqual(Object.getOwnPropertyDescriptor(target, 'on'), {
++		value: undefined,
++		writable: true,
++		enumerable: true,
++		configurable: true,
++	});
++	emitter.bindMethods(target, ['on']);
++
++	t.is(typeof target.on, 'function');
++	t.deepEqual(Object.getOwnPropertyDescriptor(target, 'on'), {
++		value: target.on,
++		writable: true,
++		enumerable: false,
++		configurable: true,
++	});
++});
++
+ test('bindMethods() - target must be an object', t => {
+ 	const emitter = new Emittery();
+ 

@@ -1,0 +1,3 @@
+# span-source-map-compose
+
+Anchors use1-based lines/0-based columns; same-line spans advance original column only, no previous-line carry. composeMaps validates ordered unique anchors and all inner maps, one-hop through own source keys, retaining outer anchors and inserting inner boundaries strictly inside their spans. Null intervals and later remapping preserved; outer endpoint wins, unlisted sources unchanged. Safe integer positions/arithmetic,<=100 anchors/map and20 own data maps; no VLQ or name fields. Inputs/frozen objects unmodified, outputs cloned. createDiagnosticMapper snapshots and maps message/location; unmapped =><generated>, original coordinates,mapped:false. No recursive source-name remapping. Run npm test.

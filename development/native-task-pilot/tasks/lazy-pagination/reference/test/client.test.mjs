@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {listItems} from '../src/client.mjs';import {exportNames} from '../src/export.mjs';
+test('legacy eager list and text consumer',async()=>{const fetch=async cursor=>cursor===undefined?{items:[{name:'A'}],nextCursor:'b'}:{items:[{name:'B'}]};assert.deepEqual(await listItems(fetch),[{name:'A'},{name:'B'}]);assert.equal(await exportNames(fetch),'A\nB\n');assert.equal(await exportNames(async()=>({items:[]})),'');});

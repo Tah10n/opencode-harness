@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/names.mjs": "export function listNames(lookup,ids,callback){const names=[];let index=0;function next(){if(index===ids.length)return callback(null,names);lookup(ids[index++],(err,user)=>{if(err)return callback(err);names.push(user.name);next();});}next();}\nexport async function listNamesAsync(lookup,ids){const out=[];for(const id of ids)out.push((await lookup(id)).name);return out;}\n"
+  },
+  "mutants": [
+    {
+      "name": "callback-multiple",
+      "file": "src/lookup.mjs",
+      "replacement": "export function createLookup(transport){return function lookup(id,callback){const invoke=done=>{let settled=false;const once=(...args)=>{settled=true;done(...args)};try{transport.get(id,once)}catch(e){once(e)}};if(typeof callback==='function'){invoke(callback);return undefined;}return new Promise((resolve,reject)=>invoke((err,value)=>err?reject(err):resolve(value)));};}\n"
+    },
+    {
+      "name": "reverse-consumer",
+      "file": "src/names.mjs",
+      "replacement": "export function listNames(lookup,ids,callback){const names=[];let index=0;function next(){if(index===ids.length)return callback(null,names);lookup(ids[index++],(err,user)=>{if(err)return callback(err);names.push(user.name);next();});}next();}\nexport async function listNamesAsync(lookup,ids){const values=await Promise.all(ids.map(id=>lookup(id)));return values.reverse().map(x=>x.name);}\n"
+    }
+  ]
+}

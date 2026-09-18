@@ -1,0 +1,948 @@
+[
+  {
+    "label": "F6",
+    "slot": 1,
+    "task": "legacy-runtime-reload",
+    "arm": "P",
+    "elapsedMs": 110635,
+    "exitCode": 0,
+    "timedOut": false,
+    "requests": 18,
+    "requestsWithoutUsage": 0,
+    "toolCalls": 28,
+    "sessions": 1,
+    "repairs": null,
+    "workflowStatus": null,
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "reportedWorkflowStatus": null,
+    "reportedRepairs": null,
+    "workflowStatusSource": null,
+    "usage": {
+      "input_tokens": 500834,
+      "output_tokens": 3991,
+      "cached_tokens": 100864,
+      "reasoning_tokens": 840,
+      "total_tokens": 504825
+    },
+    "billedAmount": null,
+    "workflowStopReason": null,
+    "workflowLimits": null,
+    "stages": [],
+    "independentChecks": [
+      {
+        "packet": "F6",
+        "phase": "final",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "legacy-acceptance": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 9,
+              "pass": 9,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": true,
+        "cleanup": 0
+      }
+    ],
+    "experimentValidity": "invalid_input_preparation",
+    "actualInput": "original task baseline; intended D-final was not applied",
+    "validForRequestedComparison": false
+  },
+  {
+    "label": "J3",
+    "slot": 2,
+    "task": "legacy-runtime-reload",
+    "arm": "H",
+    "elapsedMs": 212229,
+    "exitCode": 0,
+    "timedOut": false,
+    "requests": 33,
+    "requestsWithoutUsage": 0,
+    "toolCalls": 42,
+    "sessions": 2,
+    "repairs": 0,
+    "workflowStatus": "incomplete",
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "reportedWorkflowStatus": "incomplete",
+    "reportedRepairs": 0,
+    "workflowStatusSource": "retained host result.json",
+    "usage": {
+      "input_tokens": 1315411,
+      "output_tokens": 7408,
+      "cached_tokens": 202240,
+      "reasoning_tokens": 1195,
+      "total_tokens": 1322819
+    },
+    "billedAmount": null,
+    "workflowStopReason": null,
+    "workflowLimits": [
+      "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified."
+    ],
+    "stages": [
+      {
+        "label": "implementation",
+        "role": "author",
+        "elapsedMs": 204755,
+        "remaining": [],
+        "limits": [
+          "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified."
+        ],
+        "checks": [
+          {
+            "command": "node --test --test-name-pattern='recognizes the exact legacy flat runtime' packages/connector/test/state-security.test.mjs",
+            "requirement": "unresolved",
+            "requirementSource": "Recognized initial project test route; task relevance is not mechanically established",
+            "current": true,
+            "exit": 0,
+            "tests": 1,
+            "successful": true
+          },
+          {
+            "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": 25,
+            "successful": true
+          },
+          {
+            "command": "node --test --test-name-pattern=runtime packages/connector/test/config.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": 2,
+            "successful": true
+          },
+          {
+            "command": "git diff --check",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": null,
+            "successful": true
+          }
+        ],
+        "providerRequests": 30,
+        "providerUsage": {
+          "input_tokens": 1289560,
+          "output_tokens": 7271,
+          "cached_tokens": 202240,
+          "reasoning_tokens": 1195,
+          "total_tokens": 1296831
+        },
+        "costAttribution": "Provider forwardedAt within native stage message timestamps; bootstrap/auxiliary requests outside these windows remain in run totals."
+      }
+    ],
+    "independentChecks": [
+      {
+        "packet": "J3",
+        "phase": "final",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "legacy-acceptance": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 9,
+              "pass": 9,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": true,
+        "cleanup": 0
+      },
+      {
+        "packet": "J3",
+        "phase": "D0",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "legacy-acceptance": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 9,
+              "pass": 9,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": true,
+        "cleanup": 0
+      }
+    ],
+    "experimentValidity": "invalid_input_preparation",
+    "actualInput": "original task baseline; intended D-final was not applied",
+    "validForRequestedComparison": false,
+    "requestsOutsideAuthorStageWindows": 3
+  },
+  {
+    "label": "N8",
+    "slot": 3,
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "elapsedMs": 317853,
+    "exitCode": 0,
+    "timedOut": false,
+    "requests": 50,
+    "requestsWithoutUsage": 0,
+    "toolCalls": 49,
+    "sessions": 2,
+    "repairs": 3,
+    "workflowStatus": "incomplete",
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "reportedWorkflowStatus": null,
+    "reportedRepairs": null,
+    "workflowStatusSource": "retained host result.json",
+    "usage": {
+      "input_tokens": 1859436,
+      "output_tokens": 10764,
+      "cached_tokens": 563712,
+      "reasoning_tokens": 4119,
+      "total_tokens": 1870200
+    },
+    "billedAmount": null,
+    "workflowStopReason": "Two consecutive corrective replies left the same verified problem without substantive new diagnostic evidence.",
+    "workflowLimits": [
+      "Substantive failure has unresolved task relevance; no baseline/environment exception established: node --test --test-concurrency=1 --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+      "Substantive failure has unresolved task relevance; no baseline/environment exception established: node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+      "Required or unresolved project checks failed, lacked test results or were not repeated after the last mutation.",
+      "Two consecutive corrective replies left the same verified problem without substantive new diagnostic evidence."
+    ],
+    "stages": [
+      {
+        "label": "implementation",
+        "role": "author",
+        "elapsedMs": 238454,
+        "remaining": [
+          "Missing final verification after the last mutation: node --test --test-concurrency=1 --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+          "Missing final verification after the last mutation: node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+          "Missing final verification after the last mutation: node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+          "Project check failed or is incomplete: node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+          "Missing final verification after the last mutation: git diff --check"
+        ],
+        "limits": [
+          "Substantive failure has unresolved task relevance; no baseline/environment exception established: node --test --test-concurrency=1 --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+          "Substantive failure has unresolved task relevance; no baseline/environment exception established: node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+          "Required or unresolved project checks failed, lacked test results or were not repeated after the last mutation."
+        ],
+        "checks": [
+          {
+            "command": "node --test --test-concurrency=1 --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+            "requirement": "unresolved",
+            "requirementSource": "Recognized initial project test route; task relevance is not mechanically established",
+            "current": false,
+            "exit": 1,
+            "tests": 1,
+            "successful": false
+          },
+          {
+            "command": "node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+            "requirement": "unresolved",
+            "requirementSource": "Recognized initial project test route; task relevance is not mechanically established",
+            "current": false,
+            "exit": 1,
+            "tests": 5,
+            "successful": false
+          },
+          {
+            "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": false,
+            "exit": 0,
+            "tests": 25,
+            "successful": true
+          },
+          {
+            "command": "node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 1,
+            "tests": 5,
+            "successful": false
+          },
+          {
+            "command": "git diff --check",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": false,
+            "exit": 0,
+            "tests": null,
+            "successful": true
+          }
+        ],
+        "providerRequests": 36,
+        "providerUsage": {
+          "input_tokens": 1115244,
+          "output_tokens": 8421,
+          "cached_tokens": 326144,
+          "reasoning_tokens": 3369,
+          "total_tokens": 1123665
+        },
+        "costAttribution": "Provider forwardedAt within native stage message timestamps; bootstrap/auxiliary requests outside these windows remain in run totals."
+      },
+      {
+        "label": "correction",
+        "role": "author",
+        "elapsedMs": 35059,
+        "remaining": [
+          "Missing final verification after the last mutation: node --test --test-concurrency=1 --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+          "Missing final verification after the last mutation: node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs"
+        ],
+        "limits": [
+          "Substantive failure has unresolved task relevance; no baseline/environment exception established: node --test --test-concurrency=1 --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+          "Substantive failure has unresolved task relevance; no baseline/environment exception established: node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+          "Required or unresolved project checks failed, lacked test results or were not repeated after the last mutation."
+        ],
+        "checks": [
+          {
+            "command": "node --test --test-concurrency=1 --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+            "requirement": "unresolved",
+            "requirementSource": "Recognized initial project test route; task relevance is not mechanically established",
+            "current": false,
+            "exit": 1,
+            "tests": 1,
+            "successful": false
+          },
+          {
+            "command": "node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+            "requirement": "unresolved",
+            "requirementSource": "Recognized initial project test route; task relevance is not mechanically established",
+            "current": false,
+            "exit": 1,
+            "tests": 5,
+            "successful": false
+          },
+          {
+            "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": 25,
+            "successful": true
+          },
+          {
+            "command": "node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": 5,
+            "successful": true
+          },
+          {
+            "command": "git diff --check",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": null,
+            "successful": true
+          }
+        ],
+        "providerRequests": 5,
+        "providerUsage": {
+          "input_tokens": 278056,
+          "output_tokens": 1169,
+          "cached_tokens": 166400,
+          "reasoning_tokens": 525,
+          "total_tokens": 279225
+        },
+        "costAttribution": "Provider forwardedAt within native stage message timestamps; bootstrap/auxiliary requests outside these windows remain in run totals."
+      },
+      {
+        "label": "correction-2",
+        "role": "author",
+        "elapsedMs": 26150,
+        "remaining": [
+          "Missing final verification after the last mutation: node --test --test-concurrency=1 --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+          "Missing final verification after the last mutation: node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs"
+        ],
+        "limits": [
+          "Substantive failure has unresolved task relevance; no baseline/environment exception established: node --test --test-concurrency=1 --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+          "Substantive failure has unresolved task relevance; no baseline/environment exception established: node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+          "Required or unresolved project checks failed, lacked test results or were not repeated after the last mutation."
+        ],
+        "checks": [
+          {
+            "command": "node --test --test-concurrency=1 --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+            "requirement": "unresolved",
+            "requirementSource": "Recognized initial project test route; task relevance is not mechanically established",
+            "current": false,
+            "exit": 1,
+            "tests": 1,
+            "successful": false
+          },
+          {
+            "command": "node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+            "requirement": "unresolved",
+            "requirementSource": "Recognized initial project test route; task relevance is not mechanically established",
+            "current": false,
+            "exit": 1,
+            "tests": 5,
+            "successful": false
+          },
+          {
+            "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": 25,
+            "successful": true
+          },
+          {
+            "command": "node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": 5,
+            "successful": true
+          },
+          {
+            "command": "git diff --check",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": null,
+            "successful": true
+          }
+        ],
+        "providerRequests": 5,
+        "providerUsage": {
+          "input_tokens": 362341,
+          "output_tokens": 785,
+          "cached_tokens": 68608,
+          "reasoning_tokens": 121,
+          "total_tokens": 363126
+        },
+        "costAttribution": "Provider forwardedAt within native stage message timestamps; bootstrap/auxiliary requests outside these windows remain in run totals."
+      },
+      {
+        "label": "correction-3",
+        "role": "author",
+        "elapsedMs": 10389,
+        "remaining": [
+          "Missing final verification after the last mutation: node --test --test-concurrency=1 --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+          "Missing final verification after the last mutation: node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs"
+        ],
+        "limits": [
+          "Substantive failure has unresolved task relevance; no baseline/environment exception established: node --test --test-concurrency=1 --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+          "Substantive failure has unresolved task relevance; no baseline/environment exception established: node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+          "Required or unresolved project checks failed, lacked test results or were not repeated after the last mutation."
+        ],
+        "checks": [
+          {
+            "command": "node --test --test-concurrency=1 --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+            "requirement": "unresolved",
+            "requirementSource": "Recognized initial project test route; task relevance is not mechanically established",
+            "current": false,
+            "exit": 1,
+            "tests": 1,
+            "successful": false
+          },
+          {
+            "command": "node --test --test-concurrency=1 --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+            "requirement": "unresolved",
+            "requirementSource": "Recognized initial project test route; task relevance is not mechanically established",
+            "current": false,
+            "exit": 1,
+            "tests": 5,
+            "successful": false
+          },
+          {
+            "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": 25,
+            "successful": true
+          },
+          {
+            "command": "node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": 5,
+            "successful": true
+          },
+          {
+            "command": "git diff --check",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": null,
+            "successful": true
+          }
+        ],
+        "providerRequests": 1,
+        "providerUsage": {
+          "input_tokens": 89765,
+          "output_tokens": 225,
+          "cached_tokens": 2560,
+          "reasoning_tokens": 14,
+          "total_tokens": 89990
+        },
+        "costAttribution": "Provider forwardedAt within native stage message timestamps; bootstrap/auxiliary requests outside these windows remain in run totals."
+      }
+    ],
+    "independentChecks": [
+      {
+        "packet": "N8",
+        "phase": "final",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 5,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 0,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "lifecycle-preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 5,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance-403": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 0,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": false,
+        "cleanup": 0
+      },
+      {
+        "packet": "N8",
+        "phase": "D0",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 4,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 0,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "lifecycle-preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 5,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance-403": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 0,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": false,
+        "cleanup": 0
+      }
+    ],
+    "experimentValidity": "invalid_input_preparation",
+    "actualInput": "original task baseline; intended D-final was not applied",
+    "validForRequestedComparison": false,
+    "requestsOutsideAuthorStageWindows": 3
+  },
+  {
+    "label": "T2",
+    "slot": 4,
+    "task": "reconnect-revoked",
+    "arm": "P",
+    "elapsedMs": 201134,
+    "exitCode": 0,
+    "timedOut": false,
+    "requests": 32,
+    "requestsWithoutUsage": 0,
+    "toolCalls": 43,
+    "sessions": 1,
+    "repairs": null,
+    "workflowStatus": null,
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "reportedWorkflowStatus": null,
+    "reportedRepairs": null,
+    "workflowStatusSource": null,
+    "usage": {
+      "input_tokens": 921126,
+      "output_tokens": 6320,
+      "cached_tokens": 374784,
+      "reasoning_tokens": 1940,
+      "total_tokens": 927446
+    },
+    "billedAmount": null,
+    "workflowStopReason": null,
+    "workflowLimits": null,
+    "stages": [],
+    "independentChecks": [
+      {
+        "packet": "T2",
+        "phase": "final",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 5,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 0,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "lifecycle-preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 5,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance-403": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 0,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": false,
+        "cleanup": 0
+      }
+    ],
+    "experimentValidity": "invalid_input_preparation",
+    "actualInput": "original task baseline; intended D-final was not applied",
+    "validForRequestedComparison": false
+  }
+]

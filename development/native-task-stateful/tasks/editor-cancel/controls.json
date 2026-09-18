@@ -1,0 +1,27 @@
+{
+  "mutants": [
+    {
+      "file": "src/editor.mjs",
+      "old": "store.cancel(a.id)",
+      "new": "false",
+      "label": "cancel-noop"
+    },
+    {
+      "file": "src/drafts.mjs",
+      "old": "cancel(id){return staged.delete(id);}",
+      "new": "cancel(id){published.delete(id);return staged.delete(id);}",
+      "label": "published-erased"
+    },
+    {
+      "file": "src/editor.mjs",
+      "old": "actions.some(a=>!a||!['publish','cancel'].includes(a.type)||typeof a.id!=='string'||!a.id)",
+      "new": "false",
+      "label": "no-validation"
+    }
+  ],
+  "alternative": {
+    "file": "src/editor.mjs",
+    "old": "a.type==='publish'?store.publish(a.id):store.cancel(a.id)",
+    "new": "store[a.type](a.id)"
+  }
+}

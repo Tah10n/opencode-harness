@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert pure add/reset/save state/effect outputs and input preservation.",
+    "Assert controller effect order, pre-effect state commit and first-error behavior."
+  ],
+  "docDelivery": [
+    "Describe reducer contract and controller delegation/effect order.",
+    "Explain clamping, save-even-unchanged, invalid events and legacy no-rollback error semantics."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Bounded synchronous counter transitions and ordered effects, explicit commit-before-effects error semantics; pure reducer.",
+  "manualBehavior": [
+    "Verify controller delegates transition computation to reduceCounter and executes returned effects; no duplicate event transition implementation remains. Pure core must not call adapters or external state."
+  ],
+  "independence": "Extract deterministic state reducer from an effectful counter controller and preserve effect order via returned actions."
+}

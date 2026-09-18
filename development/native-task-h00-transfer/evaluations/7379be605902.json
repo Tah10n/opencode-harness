@@ -1,0 +1,101 @@
+{
+  "id": "7379be605902",
+  "task": "ufo-query-sort",
+  "project": "ufo",
+  "Q": 1,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "patchApplicable": true,
+  "sourcePatchSha256": "737e3fa241641e6d3d9f3dd75bd73227c3d326176cb1096886e0c0e24a26235b",
+  "decision": "Full required delivery verified.",
+  "findings": [],
+  "contentReview": {
+    "id": "7379be605902",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete",
+    "retainedTestsReview": "Existing regression cases remain unchanged.",
+    "task": "ufo-query-sort",
+    "behaviorReview": "Sorts a fresh Object.keys array only when requested, retains existing encoding/filter chain, passes public options through withQuery after ordinary parse/merge and before URL reconstruction. Public exports already re-export query module.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Default/false/true string orders with Unicode asserted; withQuery merges decoded existing Unicode key and overrides supplied z before sorting."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Repeated array values in input order plus zero/false/empty/null/undefined/object serialization; deep equality checks preserve input object/arrays. Separate withQuery caller-copy assertion."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Absolute host/path/fragment and relative path/fragment asserted; public imports include QueryOptions and type test verifies exact optional boolean shape. Pollution defenses are directly asserted."
+      }
+    ],
+    "typesReview": "Exported QueryOptions interface plus public imported type shape/consumer calls; generated declarations built by ordinary command. Exact interface name is not prescribed and need not match reference.",
+    "docsReview": "README and JSDoc cover options on both APIs, string key order, array value order and post-merge behavior.",
+    "contentFindings": [],
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "7379be605902",
+    "task": "ufo-query-sort",
+    "sourceCommit": "f06c800d0c59f2a4a1b9ba65eb6cb61a84419be6",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "737e3fa241641e6d3d9f3dd75bd73227c3d326176cb1096886e0c0e24a26235b",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 17,
+  "arm": "P",
+  "D": 1,
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "normalHandoff": true,
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "finalResponseSha256": "979ff160bd2db859b1ddf387c48d6f0e2dde05e583c4bf80a632d88f6e1faa46",
+    "finalResponseExcerpt": "Implemented optional query sorting.\n\n- Added public `QueryOptions` with `sort?: boolean`.\n- Threaded options through `stringifyQuery` and `withQuery`.\n- Preserved existing encoding, filtering, array ordering, URL fragments, and pollution defenses.\n- Added runtime and TypeScript regression tests.\n- Updated README/API documentation.\n- Verified generated declarations include `QueryOptions` and updated signatures.\n\nChecks passed:\n- 497 tests, no type errors\n- ESLint and Prettier\n- Automd\n- Unbuild declaration generation\n\nThe global `pnpm` command was unavailable; equivalent local project binaries were used.",
+    "reportFindings": []
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 7765,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 0,
+      "elapsedMs": 3706,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    }
+  ]
+}

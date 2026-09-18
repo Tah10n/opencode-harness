@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/bucket.mjs": "export function createBucket(capacity,rate,now){let available=capacity,stamp=now();return {take(cost=1){const at=now();if(at<stamp)throw new RangeError('clock');const grown=Math.min(capacity,available+(at-stamp)/1000*rate);stamp=at;available=grown;if(cost>capacity)return {allowed:false,retryAfterMs:null};const allowed=cost<=available;if(allowed)available-=cost;return {allowed,retryAfterMs:allowed?0:Math.ceil((cost-available)/rate*1000)};}};}\n"
+  },
+  "mutants": [
+    {
+      "name": "no-refill",
+      "file": "src/bucket.mjs",
+      "replacement": "export function createBucket(capacity,perSecond,now){let tokens=capacity,last=now();return {take(cost=1){const current=now();if(current<last)throw new RangeError('clock moved backwards');tokens=Math.min(capacity,tokens);last=current;if(cost>capacity)return {allowed:false,retryAfterMs:null};if(tokens>=cost){tokens-=cost;return {allowed:true,retryAfterMs:0};}return {allowed:false,retryAfterMs:Math.ceil((cost-tokens)*1000/perSecond)};}};}\n"
+    },
+    {
+      "name": "handler-on-rejection",
+      "file": "src/gate.mjs",
+      "replacement": "import {createBucket} from './bucket.mjs';export function createGate(c,r,n,h){const b=createBucket(c,r,n);return (v,cost=1)=>({...b.take(cost),value:h(v)});}\n"
+    }
+  ]
+}

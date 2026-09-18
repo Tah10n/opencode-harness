@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert inclusive due boundary, disabled/null exclusions and preserved identity/order.",
+    "Assert one clock read including empty input and no ambient time use with injected/core calls."
+  ],
+  "docDelivery": [
+    "Describe pure core and wrapper delegation with clock defaults.",
+    "Document inclusive selection, clock validation/errors and original record identities."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Dense bounded reminder records and nonnegative safe-integer clock, pure deterministic selection, no scheduling.",
+  "manualBehavior": [
+    "Verify src/reminders.mjs delegates selection to exported selectDue from reminder-core.mjs without retaining a second filtering implementation. This visible extraction requirement is checked by source inspection, not by exact source matching."
+  ],
+  "independence": "Replace ambient time reads with injected clock in reminder selection while preserving inclusive due boundaries."
+}

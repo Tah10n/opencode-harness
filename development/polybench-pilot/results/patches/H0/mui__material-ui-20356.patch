@@ -1,0 +1,69 @@
+diff --git a/packages/material-ui/src/TablePagination/TablePagination.js b/packages/material-ui/src/TablePagination/TablePagination.js
+index 019ce8d0bf3f9bf2ddfc156138bbe9492de79bc0..70954eff604bc3bcaef3896f7a6f97b1335ed2a5 100644
+--- a/packages/material-ui/src/TablePagination/TablePagination.js
++++ b/packages/material-ui/src/TablePagination/TablePagination.js
+@@ -69,6 +69,7 @@ export const styles = (theme) => ({
+ const defaultLabelDisplayedRows = ({ from, to, count }) =>
+   `${from}-${to === -1 ? count : to} of ${count !== -1 ? count : `more than ${to}`}`;
+ const defaultRowsPerPageOptions = [10, 25, 50, 100];
++const labelId = 'table-pagination-select-label';
+ 
+ /**
+  * A `TableCell` based component for placing inside `TableFooter` for pagination.
+@@ -109,7 +110,7 @@ const TablePagination = React.forwardRef(function TablePagination(props, ref) {
+       <Toolbar className={classes.toolbar}>
+         <div className={classes.spacer} />
+         {rowsPerPageOptions.length > 1 && (
+-          <Typography color="inherit" variant="body2" className={classes.caption}>
++          <Typography color="inherit" variant="body2" className={classes.caption} id={labelId}>
+             {labelRowsPerPage}
+           </Typography>
+         )}
+@@ -120,6 +121,7 @@ const TablePagination = React.forwardRef(function TablePagination(props, ref) {
+               icon: classes.selectIcon,
+             }}
+             input={<InputBase className={clsx(classes.input, classes.selectRoot)} />}
++            labelId={labelId}
+             value={rowsPerPage}
+             onChange={onChangeRowsPerPage}
+             {...SelectProps}
+diff --git a/packages/material-ui/src/TablePagination/TablePagination.test.js b/packages/material-ui/src/TablePagination/TablePagination.test.js
+index 7dc3580765b5b6317edb3905e19800615af8c407..c6ca810ee5b80aa784ea3cba90693ed690f20206 100644
+--- a/packages/material-ui/src/TablePagination/TablePagination.test.js
++++ b/packages/material-ui/src/TablePagination/TablePagination.test.js
+@@ -109,6 +109,35 @@ describe('<TablePagination />', () => {
+       assert.strictEqual(wrapper.html().includes('Zeilen pro Seite:'), true);
+     });
+ 
++    it('should associate the rows per page label with the select', () => {
++      const { container } = render(
++        <table>
++          <tbody>
++            <tr>
++              <TablePagination
++                count={10}
++                page={0}
++                onChangePage={noop}
++                onChangeRowsPerPage={noop}
++                rowsPerPage={10}
++              />
++            </tr>
++          </tbody>
++        </table>,
++      );
++
++      const select = container.querySelector('[data-mui-test="SelectDisplay"]');
++      expect(select).not.to.equal(null);
++      const labelledBy = select.getAttribute('aria-labelledby').trim().split(/\s+/);
++
++      labelledBy.forEach((id) => {
++        expect(container.querySelector(`#${id}`)).not.to.equal(null);
++      });
++      expect(container.querySelector('#table-pagination-select-label')).to.have.text(
++        'Rows per page:',
++      );
++    });
++
+     it('should disable the back button on the first page', () => {
+       const wrapper = mount(
+         <table>

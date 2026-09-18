@@ -1,0 +1,42 @@
+[
+  {
+    "slot": 1,
+    "task": "A",
+    "arm": "OFF",
+    "project": "unjs/ufo",
+    "status": "not_started",
+    "Q": null,
+    "T": null,
+    "D": null
+  },
+  {
+    "slot": 2,
+    "task": "A",
+    "arm": "ON",
+    "project": "unjs/ufo",
+    "status": "not_started",
+    "Q": null,
+    "T": null,
+    "D": null
+  },
+  {
+    "slot": 3,
+    "task": "B",
+    "arm": "ON",
+    "project": "primus/eventemitter3",
+    "status": "not_started",
+    "Q": null,
+    "T": null,
+    "D": null
+  },
+  {
+    "slot": 4,
+    "task": "B",
+    "arm": "OFF",
+    "project": "primus/eventemitter3",
+    "status": "not_started",
+    "Q": null,
+    "T": null,
+    "D": null
+  }
+]

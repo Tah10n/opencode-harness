@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/walk.mjs": "export function* walkTree(root,{prune=()=>false}={}){\n if(root===null)return;const frames=[{items:[root],index:0}];\n while(frames.length){const frame=frames.at(-1);if(frame.index===frame.items.length){frames.pop();continue;}const node=frame.items[frame.index++];yield node;if(!prune(node)){const children=node.children??[];if(children.length)frames.push({items:children,index:0});}}\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "eager-child-access",
+      "file": "src/walk.mjs",
+      "replacement": "export function* walkTree(root,{prune=()=>false}={}){\n if(root===null)return;const pending=[root];\n while(pending.length){const node=pending.pop();const children=node.children??[];yield node;if(prune(node))continue;for(let i=children.length-1;i>=0;i--)pending.push(children[i]);}\n}\n"
+    },
+    {
+      "name": "reversed-siblings",
+      "file": "src/walk.mjs",
+      "replacement": "export function* walkTree(root,{prune=()=>false}={}){\n if(root===null)return;const pending=[root];\n while(pending.length){const node=pending.pop();yield node;if(prune(node))continue;const children=node.children??[];for(let i=0;i<children.length;i++)pending.push(children[i]);}\n}\n"
+    }
+  ]
+}

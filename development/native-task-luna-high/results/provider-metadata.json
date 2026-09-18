@@ -1,0 +1,1022 @@
+[
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "P",
+    "requests": [
+      {
+        "requestKind": "title",
+        "at": "2026-09-11T09:47:49.857Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 1109,
+          "output_tokens": 76,
+          "total_tokens": 1185,
+          "cached_tokens": 0,
+          "reasoning_tokens": 62
+        },
+        "forwardedAt": "2026-09-11T09:47:49.858Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:47:55.005Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:47:50.259Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 6718,
+          "output_tokens": 191,
+          "total_tokens": 6909,
+          "cached_tokens": 0,
+          "reasoning_tokens": 21
+        },
+        "forwardedAt": "2026-09-11T09:47:50.259Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:47:55.996Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:47:56.059Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 7096,
+          "output_tokens": 158,
+          "total_tokens": 7254,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "forwardedAt": "2026-09-11T09:47:56.060Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:48:05.768Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:48:05.829Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 13781,
+          "output_tokens": 219,
+          "total_tokens": 14000,
+          "cached_tokens": 0,
+          "reasoning_tokens": 22
+        },
+        "forwardedAt": "2026-09-11T09:48:05.830Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:48:11.100Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:48:11.256Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 45886,
+          "output_tokens": 481,
+          "total_tokens": 46367,
+          "cached_tokens": 0,
+          "reasoning_tokens": 279
+        },
+        "forwardedAt": "2026-09-11T09:48:11.257Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:48:21.399Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:48:21.556Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 72456,
+          "output_tokens": 434,
+          "total_tokens": 72890,
+          "cached_tokens": 0,
+          "reasoning_tokens": 100
+        },
+        "forwardedAt": "2026-09-11T09:48:21.557Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:48:31.307Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:48:31.376Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 82477,
+          "output_tokens": 877,
+          "total_tokens": 83354,
+          "cached_tokens": 0,
+          "reasoning_tokens": 697
+        },
+        "forwardedAt": "2026-09-11T09:48:31.376Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:48:51.234Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:48:51.301Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 86676,
+          "output_tokens": 61,
+          "total_tokens": 86737,
+          "cached_tokens": 0,
+          "reasoning_tokens": 20
+        },
+        "forwardedAt": "2026-09-11T09:48:51.302Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:48:56.664Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:48:56.734Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 87784,
+          "output_tokens": 879,
+          "total_tokens": 88663,
+          "cached_tokens": 0,
+          "reasoning_tokens": 839
+        },
+        "forwardedAt": "2026-09-11T09:48:56.735Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:49:13.971Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:49:14.041Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 91641,
+          "output_tokens": 6643,
+          "total_tokens": 98284,
+          "cached_tokens": 0,
+          "reasoning_tokens": 5696
+        },
+        "forwardedAt": "2026-09-11T09:49:14.041Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:51:16.870Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:51:16.959Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 98326,
+          "output_tokens": 176,
+          "total_tokens": 98502,
+          "cached_tokens": 0,
+          "reasoning_tokens": 84
+        },
+        "forwardedAt": "2026-09-11T09:51:16.960Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:51:21.673Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:51:22.626Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 99120,
+          "output_tokens": 2086,
+          "total_tokens": 101206,
+          "cached_tokens": 0,
+          "reasoning_tokens": 2055
+        },
+        "forwardedAt": "2026-09-11T09:51:22.626Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:52:03.855Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:52:03.962Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 103122,
+          "output_tokens": 330,
+          "total_tokens": 103452,
+          "cached_tokens": 0,
+          "reasoning_tokens": 12
+        },
+        "forwardedAt": "2026-09-11T09:52:03.963Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:52:12.705Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:52:12.803Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 103478,
+          "output_tokens": 1454,
+          "total_tokens": 104932,
+          "cached_tokens": 102912,
+          "reasoning_tokens": 872
+        },
+        "forwardedAt": "2026-09-11T09:52:12.804Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:52:40.544Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:52:40.642Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 104959,
+          "output_tokens": 1130,
+          "total_tokens": 106089,
+          "cached_tokens": 0,
+          "reasoning_tokens": 33
+        },
+        "forwardedAt": "2026-09-11T09:52:40.642Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:53:04.827Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:53:04.922Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 106116,
+          "output_tokens": 1390,
+          "total_tokens": 107506,
+          "cached_tokens": 0,
+          "reasoning_tokens": 669
+        },
+        "forwardedAt": "2026-09-11T09:53:04.923Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:53:32.625Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:53:32.716Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 107534,
+          "output_tokens": 950,
+          "total_tokens": 108484,
+          "cached_tokens": 87552,
+          "reasoning_tokens": 15
+        },
+        "forwardedAt": "2026-09-11T09:53:32.717Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:53:52.322Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:53:52.431Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 108512,
+          "output_tokens": 215,
+          "total_tokens": 108727,
+          "cached_tokens": 0,
+          "reasoning_tokens": 86
+        },
+        "forwardedAt": "2026-09-11T09:53:52.431Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:53:58.086Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:53:58.162Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 108913,
+          "output_tokens": 161,
+          "total_tokens": 109074,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "forwardedAt": "2026-09-11T09:53:58.163Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:54:03.986Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:54:04.756Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 110178,
+          "output_tokens": 555,
+          "total_tokens": 110733,
+          "cached_tokens": 0,
+          "reasoning_tokens": 516
+        },
+        "forwardedAt": "2026-09-11T09:54:04.756Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:54:18.686Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:54:18.756Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 111763,
+          "output_tokens": 613,
+          "total_tokens": 112376,
+          "cached_tokens": 86528,
+          "reasoning_tokens": 147
+        },
+        "forwardedAt": "2026-09-11T09:54:18.757Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:54:32.871Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:54:32.947Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 112978,
+          "output_tokens": 756,
+          "total_tokens": 113734,
+          "cached_tokens": 45568,
+          "reasoning_tokens": 693
+        },
+        "forwardedAt": "2026-09-11T09:54:32.948Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:54:50.675Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:54:50.774Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 113762,
+          "output_tokens": 119,
+          "total_tokens": 113881,
+          "cached_tokens": 103936,
+          "reasoning_tokens": 62
+        },
+        "forwardedAt": "2026-09-11T09:54:50.774Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:54:56.803Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:54:56.884Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 114179,
+          "output_tokens": 554,
+          "total_tokens": 114733,
+          "cached_tokens": 0,
+          "reasoning_tokens": 78
+        },
+        "forwardedAt": "2026-09-11T09:54:56.886Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:55:10.311Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:55:10.390Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 114929,
+          "output_tokens": 69,
+          "total_tokens": 114998,
+          "cached_tokens": 102912,
+          "reasoning_tokens": 31
+        },
+        "forwardedAt": "2026-09-11T09:55:10.391Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:55:16.859Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:55:16.935Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 117359,
+          "output_tokens": 553,
+          "total_tokens": 117912,
+          "cached_tokens": 12800,
+          "reasoning_tokens": 177
+        },
+        "forwardedAt": "2026-09-11T09:55:16.936Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:55:29.152Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:55:29.230Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 117963,
+          "output_tokens": 404,
+          "total_tokens": 118367,
+          "cached_tokens": 0,
+          "reasoning_tokens": 269
+        },
+        "forwardedAt": "2026-09-11T09:55:29.231Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:55:40.644Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:55:40.755Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 118393,
+          "output_tokens": 129,
+          "total_tokens": 118522,
+          "cached_tokens": 0,
+          "reasoning_tokens": 9
+        },
+        "forwardedAt": "2026-09-11T09:55:40.756Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:55:45.622Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:55:46.039Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 118901,
+          "output_tokens": 1010,
+          "total_tokens": 119911,
+          "cached_tokens": 117248,
+          "reasoning_tokens": 665
+        },
+        "forwardedAt": "2026-09-11T09:55:46.040Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:56:19.484Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:56:19.582Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 119938,
+          "output_tokens": 222,
+          "total_tokens": 120160,
+          "cached_tokens": 81408,
+          "reasoning_tokens": 102
+        },
+        "forwardedAt": "2026-09-11T09:56:19.583Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:56:25.639Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:56:25.993Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 120711,
+          "output_tokens": 324,
+          "total_tokens": 121035,
+          "cached_tokens": 110080,
+          "reasoning_tokens": 285
+        },
+        "forwardedAt": "2026-09-11T09:56:25.993Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:56:37.462Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:56:37.540Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 121827,
+          "output_tokens": 68,
+          "total_tokens": 121895,
+          "cached_tokens": 117248,
+          "reasoning_tokens": 26
+        },
+        "forwardedAt": "2026-09-11T09:56:37.540Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:56:42.182Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:56:42.271Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 121909,
+          "output_tokens": 82,
+          "total_tokens": 121991,
+          "cached_tokens": 0,
+          "reasoning_tokens": 40
+        },
+        "forwardedAt": "2026-09-11T09:56:42.272Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:56:45.851Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:56:45.938Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 122526,
+          "output_tokens": 689,
+          "total_tokens": 123215,
+          "cached_tokens": 120320,
+          "reasoning_tokens": 73
+        },
+        "forwardedAt": "2026-09-11T09:56:45.939Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:57:08.922Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:57:09.042Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 123241,
+          "output_tokens": 173,
+          "total_tokens": 123414,
+          "cached_tokens": 6656,
+          "reasoning_tokens": 7
+        },
+        "forwardedAt": "2026-09-11T09:57:09.042Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:57:16.343Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:57:16.492Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 124584,
+          "output_tokens": 997,
+          "total_tokens": 125581,
+          "cached_tokens": 121344,
+          "reasoning_tokens": 870
+        },
+        "forwardedAt": "2026-09-11T09:57:16.492Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:57:35.869Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:57:35.952Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 126454,
+          "output_tokens": 290,
+          "total_tokens": 126744,
+          "cached_tokens": 118272,
+          "reasoning_tokens": 61
+        },
+        "forwardedAt": "2026-09-11T09:57:35.953Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:57:43.040Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:58:19.175Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 131303,
+          "output_tokens": 397,
+          "total_tokens": 131700,
+          "cached_tokens": 114176,
+          "reasoning_tokens": 169
+        },
+        "forwardedAt": "2026-09-11T09:58:19.176Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:58:28.865Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:59:04.077Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 136581,
+          "output_tokens": 2105,
+          "total_tokens": 138686,
+          "cached_tokens": 0,
+          "reasoning_tokens": 1941
+        },
+        "forwardedAt": "2026-09-11T09:59:04.077Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:59:46.552Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:59:46.632Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 138936,
+          "output_tokens": 237,
+          "total_tokens": 139173,
+          "cached_tokens": 72192,
+          "reasoning_tokens": 155
+        },
+        "forwardedAt": "2026-09-11T09:59:46.633Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:59:53.093Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:59:53.064Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 2640,
+          "output_tokens": 156,
+          "total_tokens": 2796,
+          "cached_tokens": 0,
+          "reasoning_tokens": 35
+        },
+        "forwardedAt": "2026-09-11T09:59:53.064Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T09:59:57.536Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T09:59:57.583Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 9435,
+          "output_tokens": 232,
+          "total_tokens": 9667,
+          "cached_tokens": 0,
+          "reasoning_tokens": 37
+        },
+        "forwardedAt": "2026-09-11T09:59:57.584Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T10:00:03.199Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T10:00:03.251Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 42919,
+          "output_tokens": 187,
+          "total_tokens": 43106,
+          "cached_tokens": 0,
+          "reasoning_tokens": 38
+        },
+        "forwardedAt": "2026-09-11T10:00:03.252Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T10:00:08.224Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T10:00:08.281Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 52674,
+          "output_tokens": 332,
+          "total_tokens": 53006,
+          "cached_tokens": 0,
+          "reasoning_tokens": 82
+        },
+        "forwardedAt": "2026-09-11T10:00:08.282Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T10:00:15.586Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T10:00:16.882Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 62905,
+          "output_tokens": 1649,
+          "total_tokens": 64554,
+          "cached_tokens": 0,
+          "reasoning_tokens": 1487
+        },
+        "forwardedAt": "2026-09-11T10:00:16.883Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T10:00:48.241Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T10:00:48.305Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 64571,
+          "output_tokens": 1650,
+          "total_tokens": 66221,
+          "cached_tokens": 0,
+          "reasoning_tokens": 1601
+        },
+        "forwardedAt": "2026-09-11T10:00:48.306Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T10:01:20.319Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T10:01:20.392Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 67467,
+          "output_tokens": 37,
+          "total_tokens": 67504,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "forwardedAt": "2026-09-11T10:01:20.393Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T10:01:23.196Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T10:01:23.260Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 70793,
+          "output_tokens": 847,
+          "total_tokens": 71640,
+          "cached_tokens": 0,
+          "reasoning_tokens": 797
+        },
+        "forwardedAt": "2026-09-11T10:01:23.260Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T10:01:40.264Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T10:01:40.333Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 72625,
+          "output_tokens": 123,
+          "total_tokens": 72748,
+          "cached_tokens": 0,
+          "reasoning_tokens": 92
+        },
+        "forwardedAt": "2026-09-11T10:01:40.334Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T10:01:45.928Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T10:01:45.998Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": {
+          "input_tokens": 74664,
+          "output_tokens": 690,
+          "total_tokens": 75354,
+          "cached_tokens": 0,
+          "reasoning_tokens": 648
+        },
+        "forwardedAt": "2026-09-11T10:01:45.999Z",
+        "status": 200,
+        "responseStatus": "completed",
+        "streamEnded": true,
+        "finishedAt": "2026-09-11T10:02:00.559Z"
+      },
+      {
+        "requestKind": "work",
+        "at": "2026-09-11T10:02:00.626Z",
+        "path": "/v1/responses",
+        "model": "gpt-5.6-luna",
+        "effort": "high",
+        "forwarded": true,
+        "usage": null,
+        "forwardedAt": "2026-09-11T10:02:00.626Z",
+        "status": 200,
+        "responseStatus": "in_progress",
+        "error": "AbortError",
+        "finishedAt": "2026-09-11T10:02:48.432Z"
+      }
+    ]
+  }
+]

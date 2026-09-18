@@ -1,0 +1,22 @@
+{
+  "task": "B",
+  "arm": "ON",
+  "snapshotBeforeAnalysis": "e0471362dcce75300a9782eb5a5d7bd31237a2bd80cb3045d2c2932b6cedf8dc",
+  "baselineSnapshot": "aaa206fc4b20ebeef4bd44d01980520fb344247692a5fbf7c8cbb7bfa8c170de",
+  "surfaceHash": "a0a559dcc72df65809e46a9fe4cd14ffc62953d4ed5f84be20f8a0ce3c4d195b",
+  "terminalSnapshot": "e0471362dcce75300a9782eb5a5d7bd31237a2bd80cb3045d2c2932b6cedf8dc",
+  "terminalPatchSha256": "fdcb28cec10a62016df0747331214bf0370ebd977fa4a6d9c848c1e7acb1f2e4",
+  "compilerSha256": "569177652966bd528c319171c7dd22860dbf72bde116cbc4f644f1d02bb12e39",
+  "profile": "returned-callable-strict-v1",
+  "callID": "call_2BsEZ9yJHT8BVbKZxK202EvE",
+  "receipt": {
+    "file": "request-15.json",
+    "sha256": "3169880b861f54e48e7a34623fedd8ceda0df9bdb41cadf502a8c466ca50047a"
+  },
+  "block": "Type compatibility observation (separate from project command):\nPublic entry: index.d.ts. Result: no-difference-in-checked-scope.\nCompiler: TypeScript 6.0.3; explicit profile returned-callable-strict-v1. Baseline aaa206fc4b20ebeef4bd44d01980520fb344247692a5fbf7c8cbb7bfa8c170de; candidate e0471362dcce75300a9782eb5a5d7bd31237a2bd80cb3045d2c2932b6cedf8dc.\n\n69 unsupported/skipped paths; 3 generated consumers (examples are not independent defects).\nScope: bounded class/generic specimens and returned callables only; not full API compatibility or a runtime test. New API types, runtime and task requirements need their own checks. No repair or workflow success is mandated. Full evidence in type-compat.json.\n",
+  "firstRelevantEditAfterReceipt": null,
+  "sourceEditsAfterAnalysis": 0,
+  "repeatAnalysis": null,
+  "current": true,
+  "interpretation": "No incompatibility discovered and no repair chain. Correct feature and declarations preceded the observation. Same snapshot persisted through terminal delivery."
+}

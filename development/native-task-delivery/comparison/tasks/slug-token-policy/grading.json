@@ -1,0 +1,18 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "token policy and truncation through consumer",
+    "empty fallback and repeat ownership"
+  ],
+  "docDelivery": [
+    "Explain ASCII tokens, lowercase/split policy, truncation then trailing-hyphen removal and untitled fallback."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Extract tokens(text) into src/tokens.mjs and wire slug(text,max=40) in src/slug.mjs through it. Preserve existing deliberately ASCII slug policy: lowercase text using JS toLowerCase, split on runs of anything outside ASCII a-z0-9, discard empties; tokens returns fresh array. slug joins tokens with hyphen, then truncates to first max UTF16 units and strips trailing hyphens; if empty return \"untitled\" even when max0. max is integer0..1000 (valid domain), text arbitrary UTF16<=10000. No transliteration, Unicode normalization or underscore preservation. Pure core and no duplicated tokenization in consumer.",
+  "manualBehavior": [
+    "slug uses tokens; no duplicate split/matching policy"
+  ],
+  "independence": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+}

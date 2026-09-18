@@ -1,0 +1,768 @@
+[
+  {
+    "label": "F6",
+    "slot": 1,
+    "task": "legacy-runtime-reload",
+    "arm": "P",
+    "elapsedMs": 196625,
+    "exitCode": 0,
+    "timedOut": false,
+    "requests": 25,
+    "requestsWithoutUsage": 0,
+    "toolCalls": 44,
+    "sessions": 1,
+    "repairs": null,
+    "workflowStatus": null,
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "reportedWorkflowStatus": null,
+    "reportedRepairs": null,
+    "workflowStatusSource": null,
+    "usage": {
+      "input_tokens": 875084,
+      "output_tokens": 7644,
+      "cached_tokens": 248832,
+      "reasoning_tokens": 3735,
+      "total_tokens": 882728
+    },
+    "billedAmount": null,
+    "workflowStopReason": null,
+    "workflowLimits": null,
+    "stages": [],
+    "independentChecks": [
+      {
+        "packet": "F6",
+        "phase": "final",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "legacy-acceptance": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 9,
+              "pass": 8,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 0,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": false,
+        "cleanup": 0
+      }
+    ]
+  },
+  {
+    "label": "J3",
+    "slot": 2,
+    "task": "legacy-runtime-reload",
+    "arm": "H",
+    "elapsedMs": 257927,
+    "exitCode": 0,
+    "timedOut": false,
+    "requests": 36,
+    "requestsWithoutUsage": 0,
+    "toolCalls": 45,
+    "sessions": 2,
+    "repairs": 0,
+    "workflowStatus": "incomplete",
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "reportedWorkflowStatus": "incomplete",
+    "reportedRepairs": 0,
+    "workflowStatusSource": "retained host result.json",
+    "usage": {
+      "input_tokens": 1533588,
+      "output_tokens": 8781,
+      "cached_tokens": 407552,
+      "reasoning_tokens": 2883,
+      "total_tokens": 1542369
+    },
+    "billedAmount": null,
+    "workflowStopReason": null,
+    "workflowLimits": [
+      "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified."
+    ],
+    "stages": [
+      {
+        "label": "implementation",
+        "role": "author",
+        "elapsedMs": 251309,
+        "messageID": "msg_08f974a71001T2XNSi5gtFsZsw",
+        "remaining": [],
+        "limits": [
+          "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified."
+        ],
+        "checks": [
+          {
+            "command": "node --test --test-name-pattern='migrates the exact flat runtime' packages/connector/test/config.test.mjs",
+            "requirement": "unresolved",
+            "requirementSource": "Recognized initial project test route; task relevance is not mechanically established",
+            "current": true,
+            "exit": 0,
+            "tests": 1,
+            "successful": true
+          },
+          {
+            "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": 24,
+            "successful": true
+          },
+          {
+            "command": "node --test --test-name-pattern=runtime packages/connector/test/config.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": 3,
+            "successful": true
+          },
+          {
+            "command": "git diff --check",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": null,
+            "successful": true
+          }
+        ]
+      }
+    ],
+    "independentChecks": [
+      {
+        "packet": "J3",
+        "phase": "final",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "legacy-acceptance": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 9,
+              "pass": 7,
+              "fail": 2,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 0,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": false,
+        "cleanup": 0
+      },
+      {
+        "packet": "J3",
+        "phase": "D0",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 3,
+              "pass": 3,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "legacy-acceptance": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 9,
+              "pass": 7,
+              "fail": 2,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 0,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": false,
+        "cleanup": 0
+      }
+    ]
+  },
+  {
+    "label": "N8",
+    "slot": 3,
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "elapsedMs": 319324,
+    "exitCode": 0,
+    "timedOut": false,
+    "requests": 44,
+    "requestsWithoutUsage": 0,
+    "toolCalls": 52,
+    "sessions": 2,
+    "repairs": 2,
+    "workflowStatus": "incomplete",
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "reportedWorkflowStatus": "incomplete",
+    "reportedRepairs": 2,
+    "workflowStatusSource": "retained host result.json",
+    "usage": {
+      "input_tokens": 1826830,
+      "output_tokens": 9213,
+      "cached_tokens": 498176,
+      "reasoning_tokens": 3429,
+      "total_tokens": 1836043
+    },
+    "billedAmount": null,
+    "workflowStopReason": "Two consecutive corrective replies left the same verified problem without substantive new diagnostic evidence.",
+    "workflowLimits": [
+      "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified.",
+      "Required or unresolved project checks failed, lacked test results or were not repeated after the last mutation.",
+      "Two consecutive corrective replies left the same verified problem without substantive new diagnostic evidence."
+    ],
+    "stages": [
+      {
+        "label": "implementation",
+        "role": "author",
+        "elapsedMs": 212114,
+        "messageID": "msg_08f9aac740017fmzH024TmDWM8",
+        "remaining": [
+          "Project check failed or is incomplete: node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs"
+        ],
+        "limits": [
+          "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified.",
+          "Required or unresolved project checks failed, lacked test results or were not repeated after the last mutation."
+        ],
+        "checks": [
+          {
+            "command": "node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 1,
+            "tests": 5,
+            "successful": false
+          },
+          {
+            "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": 25,
+            "successful": true
+          },
+          {
+            "command": "git diff --check",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": null,
+            "successful": true
+          }
+        ]
+      },
+      {
+        "label": "correction",
+        "role": "author",
+        "elapsedMs": 61013,
+        "messageID": "msg_08f9b9ec20016M7QeDNx4xSqcU",
+        "remaining": [
+          "Project check failed or is incomplete: node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs"
+        ],
+        "limits": [
+          "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified.",
+          "Required or unresolved project checks failed, lacked test results or were not repeated after the last mutation."
+        ],
+        "checks": [
+          {
+            "command": "node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 1,
+            "tests": 5,
+            "successful": false
+          },
+          {
+            "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": 25,
+            "successful": true
+          },
+          {
+            "command": "git diff --check",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": null,
+            "successful": true
+          }
+        ]
+      },
+      {
+        "label": "correction-2",
+        "role": "author",
+        "elapsedMs": 39111,
+        "messageID": "msg_08f9bda0c001HQtxooPJGUAriL",
+        "remaining": [
+          "Project check failed or is incomplete: node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs"
+        ],
+        "limits": [
+          "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified.",
+          "Required or unresolved project checks failed, lacked test results or were not repeated after the last mutation."
+        ],
+        "checks": [
+          {
+            "command": "node --test --test-name-pattern=reconnect packages/connector/test/config.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 1,
+            "tests": 5,
+            "successful": false
+          },
+          {
+            "command": "node --test --test-concurrency=1 packages/connector/test/state-security.test.mjs packages/connector/test/executables.test.mjs packages/connector/test/protocol.test.mjs",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": 25,
+            "successful": true
+          },
+          {
+            "command": "git diff --check",
+            "requirement": "required",
+            "requirementSource": "original task",
+            "current": true,
+            "exit": 0,
+            "tests": null,
+            "successful": true
+          }
+        ]
+      }
+    ],
+    "independentChecks": [
+      {
+        "packet": "N8",
+        "phase": "final",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 4,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "lifecycle-preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 5,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance-403": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": false,
+        "cleanup": 0
+      },
+      {
+        "packet": "N8",
+        "phase": "D0",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 4,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "lifecycle-preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 5,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance-403": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": false,
+        "cleanup": 0
+      }
+    ]
+  },
+  {
+    "label": "T2",
+    "slot": 4,
+    "task": "reconnect-revoked",
+    "arm": "P",
+    "elapsedMs": 190639,
+    "exitCode": 0,
+    "timedOut": false,
+    "requests": 32,
+    "requestsWithoutUsage": 0,
+    "toolCalls": 39,
+    "sessions": 1,
+    "repairs": null,
+    "workflowStatus": null,
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "reportedWorkflowStatus": null,
+    "reportedRepairs": null,
+    "workflowStatusSource": null,
+    "usage": {
+      "input_tokens": 1225563,
+      "output_tokens": 5931,
+      "cached_tokens": 408064,
+      "reasoning_tokens": 3119,
+      "total_tokens": 1231494
+    },
+    "billedAmount": null,
+    "workflowStopReason": null,
+    "workflowLimits": null,
+    "stages": [],
+    "independentChecks": [
+      {
+        "packet": "T2",
+        "phase": "final",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 5,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "lifecycle-preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 5,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance-403": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": true,
+        "cleanup": 0
+      }
+    ]
+  }
+]

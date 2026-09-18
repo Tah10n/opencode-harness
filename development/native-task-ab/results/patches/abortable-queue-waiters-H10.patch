@@ -1,0 +1,328 @@
+diff --git a/readme.md b/readme.md
+index c011e6c..67a568c 100644
+--- a/readme.md
++++ b/readme.md
+@@ -247,30 +247,38 @@ Start (or resume) executing enqueued tasks within concurrency limit. No need to
+ 
+ Returns `this` (the instance).
+ 
+-#### .onEmpty()
++#### .onEmpty(options?)
+ 
+ Returns a promise that settles when the queue becomes empty.
+ 
+ Can be called multiple times. Useful if you for example add additional items at a later time.
+ 
++Pass `{signal}` to reject the promise with `signal.reason` if the signal aborts before the queue becomes empty. An already-aborted signal rejects even if the queue is already empty.
++
+ > [!NOTE]
+ > The promise returned by `.onEmpty()` resolves **once** when the queue becomes empty. If you want to be notified every time the queue becomes empty, use the `empty` event instead: `queue.on('empty', () => {})`.
+ 
+-#### .onIdle()
++#### .onIdle(options?)
+ 
+ Returns a promise that settles when the queue becomes empty, and all promises have completed; `queue.size === 0 && queue.pending === 0`.
+ 
+ The difference with `.onEmpty` is that `.onIdle` guarantees that all work from the queue has finished. `.onEmpty` merely signals that the queue is empty, but it could mean that some promises haven't completed yet.
+ 
++Pass `{signal}` to reject the promise with `signal.reason` if the signal aborts before the queue becomes idle. An already-aborted signal rejects even if the queue is already idle.
++
+ > [!NOTE]
+ > The promise returned by `.onIdle()` resolves **once** when the queue becomes idle. If you want to be notified every time the queue becomes idle, use the `idle` event instead: `queue.on('idle', () => {})`.
+ 
+-#### .onPendingZero()
++#### .onPendingZero(options?)
+ 
+ Returns a promise that settles when all currently running tasks have completed; `queue.pending === 0`.
+ 
+ The difference with `.onIdle` is that `.onPendingZero` only waits for currently running tasks to finish, ignoring queued tasks. This is useful when you want to drain in-flight tasks before mutating shared state.
+ 
++Pass `{signal}` to reject the promise with `signal.reason` if the signal aborts before pending reaches zero. An already-aborted signal rejects even when no tasks are pending.
++
++Cancellation applies only to the waiting promise. It never cancels queued or running tasks or affects other waiters. The queue and abort listeners are removed after the waiter resolves or rejects.
++
+ ```js
+ queue.pause();
+ await queue.onPendingZero();
+diff --git a/source/index.ts b/source/index.ts
+index bf7978c..d6cf55f 100644
+--- a/source/index.ts
++++ b/source/index.ts
+@@ -10,6 +10,10 @@ type Task<TaskResultType> =
+ 
+ type EventName = 'active' | 'idle' | 'empty' | 'add' | 'next' | 'completed' | 'error' | 'pendingZero' | 'rateLimit' | 'rateLimitCleared';
+ 
++type WaitOptions = {
++	readonly signal?: AbortSignal;
++};
++
+ /**
+ Promise queue with concurrency control.
+ */
+@@ -646,15 +650,20 @@ export default class PQueue<QueueType extends Queue<RunFunction, EnqueueOptionsT
+ 	/**
+ 	Can be called multiple times. Useful if you for example add additional items at a later time.
+ 
++	If `options.signal` is provided, the promise rejects with `signal.reason` if the signal aborts before the queue becomes empty. Aborting only cancels this waiter; it does not cancel queued or running tasks or other waiters.
++
+ 	@returns A promise that settles when the queue becomes empty.
+ 	*/
+-	async onEmpty(): Promise<void> {
++	async onEmpty(options?: WaitOptions): Promise<void> {
++		const {signal} = options ?? {};
++		signal?.throwIfAborted();
++
+ 		// Instantly resolve if the queue is empty
+ 		if (this.#queue.size === 0) {
+ 			return;
+ 		}
+ 
+-		await this.#onEvent('empty');
++		await this.#onEvent('empty', undefined, signal);
+ 	}
+ 
+ 	/**
+@@ -679,28 +688,38 @@ export default class PQueue<QueueType extends Queue<RunFunction, EnqueueOptionsT
+ 	/**
+ 	The difference with `.onEmpty` is that `.onIdle` guarantees that all work from the queue has finished. `.onEmpty` merely signals that the queue is empty, but it could mean that some promises haven't completed yet.
+ 
++	If `options.signal` is provided, the promise rejects with `signal.reason` if the signal aborts before the queue becomes idle. Aborting only cancels this waiter; it does not cancel queued or running tasks or other waiters.
++
+ 	@returns A promise that settles when the queue becomes empty, and all promises have completed; `queue.size === 0 && queue.pending === 0`.
+ 	*/
+-	async onIdle(): Promise<void> {
++	async onIdle(options?: WaitOptions): Promise<void> {
++		const {signal} = options ?? {};
++		signal?.throwIfAborted();
++
+ 		// Instantly resolve if none pending and if nothing else is queued
+ 		if (this.#pending === 0 && this.#queue.size === 0) {
+ 			return;
+ 		}
+ 
+-		await this.#onEvent('idle');
++		await this.#onEvent('idle', undefined, signal);
+ 	}
+ 
+ 	/**
+ 	The difference with `.onIdle` is that `.onPendingZero` only waits for currently running tasks to finish, ignoring queued tasks.
+ 
++	If `options.signal` is provided, the promise rejects with `signal.reason` if the signal aborts before pending reaches zero. Aborting only cancels this waiter; it does not cancel queued or running tasks or other waiters.
++
+ 	@returns A promise that settles when all currently running tasks have completed; `queue.pending === 0`.
+ 	*/
+-	async onPendingZero(): Promise<void> {
++	async onPendingZero(options?: WaitOptions): Promise<void> {
++		const {signal} = options ?? {};
++		signal?.throwIfAborted();
++
+ 		if (this.#pending === 0) {
+ 			return;
+ 		}
+ 
+-		await this.#onEvent('pendingZero');
++		await this.#onEvent('pendingZero', undefined, signal);
+ 	}
+ 
+ 	/**
+@@ -766,25 +785,54 @@ export default class PQueue<QueueType extends Queue<RunFunction, EnqueueOptionsT
+ 		});
+ 	}
+ 
+-	async #onEvent(events: EventName | EventName[], filter?: () => boolean): Promise<void> {
++	async #onEvent(events: EventName | EventName[], filter?: () => boolean, signal?: AbortSignal): Promise<void> {
+ 		const eventList = Array.isArray(events) ? events : [events];
+ 
+-		return new Promise(resolve => {
+-			const listener = () => {
+-				if (filter && !filter()) {
+-					return;
+-				}
++		return new Promise((resolve, reject) => {
++			let settled = false;
++			let abortListener: (() => void) | undefined;
+ 
++			const cleanup = () => {
+ 				for (const event of eventList) {
+ 					this.off(event, listener);
+ 				}
+ 
+-				resolve();
++				if (abortListener) {
++					signal?.removeEventListener('abort', abortListener);
++				}
++			};
++
++			const settle = (settlement: () => void) => {
++				if (settled) {
++					return;
++				}
++
++				settled = true;
++				cleanup();
++				settlement();
++			};
++
++			const listener = () => {
++				if (filter && !filter()) {
++					return;
++				}
++
++				settle(resolve);
+ 			};
+ 
+ 			for (const event of eventList) {
+ 				this.on(event, listener);
+ 			}
++
++			if (signal) {
++				abortListener = () => {
++					settle(() => {
++						reject(signal.reason);
++					});
++				};
++
++				signal.addEventListener('abort', abortListener, {once: true});
++			}
+ 		});
+ 	}
+ 
+diff --git a/test-d/index.test-d.ts b/test-d/index.test-d.ts
+index 78da841..8b7c331 100644
+--- a/test-d/index.test-d.ts
++++ b/test-d/index.test-d.ts
+@@ -2,5 +2,12 @@ import {expectType} from 'tsd';
+ import PQueue from '../source/index.js';
+ 
+ const queue = new PQueue();
++const controller = new AbortController();
+ 
+ expectType<Promise<string>>(queue.add(async () => '🦄'));
++expectType<Promise<void>>(queue.onEmpty());
++expectType<Promise<void>>(queue.onEmpty({signal: controller.signal}));
++expectType<Promise<void>>(queue.onIdle());
++expectType<Promise<void>>(queue.onIdle({signal: controller.signal}));
++expectType<Promise<void>>(queue.onPendingZero());
++expectType<Promise<void>>(queue.onPendingZero({signal: controller.signal}));
+diff --git a/test/waiters.ts b/test/waiters.ts
+new file mode 100644
+index 0000000..a949357
+--- /dev/null
++++ b/test/waiters.ts
+@@ -0,0 +1,116 @@
++import {test} from 'node:test';
++import assert from 'node:assert/strict';
++import pDefer from 'p-defer';
++import PQueue from '../source/index.js';
++
++test('abortable waiters distinguish empty, idle, and pending zero', async () => {
++	const queue = new PQueue({concurrency: 1});
++	const firstTask = pDefer<void>();
++	const secondTask = pDefer<void>();
++
++	const first = queue.add(async () => firstTask.promise);
++	const second = queue.add(async () => secondTask.promise);
++	assert.equal(queue.pending, 1);
++	assert.equal(queue.size, 1);
++
++	queue.pause();
++
++	const controller = new AbortController();
++	const reason = new Error('stop waiting');
++	const abortedEmpty = queue.onEmpty({signal: controller.signal});
++	const completingEmpty = queue.onEmpty();
++	const idle = queue.onIdle();
++	const pendingZero = queue.onPendingZero();
++
++	controller.abort(reason);
++	await assert.rejects(abortedEmpty, error => error === reason);
++	assert.equal(queue.listenerCount('empty'), 1);
++	assert.equal(queue.listenerCount('idle'), 1);
++	assert.equal(queue.listenerCount('pendingZero'), 1);
++
++	firstTask.resolve();
++	await pendingZero;
++	assert.equal(queue.pending, 0);
++	assert.equal(queue.size, 1);
++
++	queue.start();
++	await completingEmpty;
++	assert.equal(queue.pending, 1);
++	assert.equal(queue.size, 0);
++
++	secondTask.resolve();
++	await idle;
++	await Promise.all([first, second]);
++	assert.equal(queue.pending, 0);
++});
++
++test('abortable waiters reject with an already-aborted signal', async () => {
++	const queue = new PQueue();
++	assert.equal(queue.size, 0);
++	assert.equal(queue.pending, 0);
++
++	const controller = new AbortController();
++	const reason = new Error('already stopped');
++	controller.abort(reason);
++
++	await Promise.all([
++		assert.rejects(queue.onEmpty({signal: controller.signal}), error => error === reason),
++		assert.rejects(queue.onIdle({signal: controller.signal}), error => error === reason),
++		assert.rejects(queue.onPendingZero({signal: controller.signal}), error => error === reason),
++	]);
++});
++
++test('abortable waiters resolve immediately for satisfied conditions', async () => {
++	const queue = new PQueue();
++	const controller = new AbortController();
++
++	await Promise.all([
++		queue.onEmpty({signal: controller.signal}),
++		queue.onIdle({signal: controller.signal}),
++		queue.onPendingZero({signal: controller.signal}),
++	]);
++
++	assert.equal(queue.listenerCount('empty'), 0);
++	assert.equal(queue.listenerCount('idle'), 0);
++	assert.equal(queue.listenerCount('pendingZero'), 0);
++	controller.abort(new Error('too late'));
++});
++
++test('abortable waiter listeners are removed after abort or resolution', async () => {
++	const abortedQueue = new PQueue({autoStart: false});
++	abortedQueue.add(async () => undefined);
++	const abortedController = new AbortController();
++	let abortedRemoveCount = 0;
++	const removeAbortedListener = abortedController.signal.removeEventListener.bind(abortedController.signal);
++	abortedController.signal.removeEventListener = (...arguments_) => {
++		abortedRemoveCount++;
++		removeAbortedListener(...arguments_);
++	};
++
++	assert.equal(abortedQueue.size, 1);
++	const abortedWaiter = abortedQueue.onEmpty({signal: abortedController.signal});
++	abortedController.abort();
++	await assert.rejects(abortedWaiter);
++	assert.equal(abortedQueue.listenerCount('empty'), 0);
++	assert.equal(abortedRemoveCount, 1);
++	abortedQueue.clear();
++
++	const resolvedQueue = new PQueue({autoStart: false});
++	const task = resolvedQueue.add(async () => undefined);
++	const resolvedController = new AbortController();
++	let resolvedRemoveCount = 0;
++	const removeResolvedListener = resolvedController.signal.removeEventListener.bind(resolvedController.signal);
++	resolvedController.signal.removeEventListener = (...arguments_) => {
++		resolvedRemoveCount++;
++		removeResolvedListener(...arguments_);
++	};
++
++	assert.equal(resolvedQueue.size, 1);
++	const resolvedWaiter = resolvedQueue.onEmpty({signal: resolvedController.signal});
++	resolvedQueue.start();
++	await resolvedWaiter;
++	assert.equal(resolvedQueue.listenerCount('empty'), 0);
++	assert.equal(resolvedRemoveCount, 1);
++	resolvedController.abort(new Error('too late'));
++	await task;
++});

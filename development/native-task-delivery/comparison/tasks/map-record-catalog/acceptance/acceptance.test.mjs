@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';const root=process.env.PILOT_SOURCE;
+const m0=await import(path.join(root,"src/catalog.mjs"));
+test("map order and totals reach exports",()=>{const m=new Map([['10',3],['2',4],['__proto__',1]]);assert.deepEqual(m0.rows(m),[{key:'10',price:3},{key:'2',price:4},{key:'__proto__',price:1}]);assert.equal(m0.total(m),8);assert.equal(m.size,3);assert.deepEqual(m0.rows(new Map([['b',1],['a',2]])).map(x=>x.key),['b','a']);});
+test("invalid entry and independent result",()=>{assert.throws(()=>m0.total(new Map([[1,2]])),TypeError);assert.throws(()=>m0.rows({a:NaN}),TypeError);const x=Object.freeze({a:2});const r=m0.rows(x);r[0].price=9;assert.equal(x.a,2);});
+test("record numeric-key ordering preserved",()=>{assert.deepEqual(m0.rows({'10':1,'2':2}).map(x=>x.key),['2','10']);assert.equal(m0.total(new Map()),0);});

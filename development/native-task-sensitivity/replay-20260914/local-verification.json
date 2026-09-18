@@ -1,0 +1,2651 @@
+{
+  "scope": "Model-free local, installed and container checks; not independent Luna discovery or model quality",
+  "realProviderRequests": 0,
+  "targeted": [
+    {
+      "label": "weak",
+      "report": {
+        "status": "observed",
+        "snapshot": "90fb33362742c4b2279b16b06a1af860bd0abc8535725262da5e556a683828ff",
+        "originalArguments": null,
+        "selectedVariant": null,
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "bb7e2946925c4983ffd1ec060560210d998cbec92bed39c1cc4d250025a65b7d"
+          }
+        ],
+        "baseline": {
+          "exit": 0,
+          "signal": null,
+          "status": "passed",
+          "elapsedMs": 176,
+          "output": "npm notice run test\nnpm notice run node test.mjs\n"
+        },
+        "variants": [
+          {
+            "fileName": "value.mjs",
+            "id": "0",
+            "location": {
+              "start": {
+                "column": 27,
+                "line": 1
+              },
+              "end": {
+                "column": 1,
+                "line": 3
+              }
+            },
+            "mutatorName": "BlockStatement",
+            "replacement": "{}",
+            "sourceSha256": "f118c12a10dea48686a26a7f2cd80e1e4c0fc609b6eb68f85982e7382cd300f6",
+            "original": "{\n  return n >= 2;\n}",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:27 @@\n-{\n-  return n >= 2;\n-}\n+{}",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 137,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ undefined\n- true\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-o3uZ5Z/test/test.mjs:2:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: undefined,\n  expected: true,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished)."
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "1",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "mutatorName": "ConditionalExpression",
+            "replacement": "true",
+            "sourceSha256": "f118c12a10dea48686a26a7f2cd80e1e4c0fc609b6eb68f85982e7382cd300f6",
+            "original": "n >= 2",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 2:9 @@\n-n >= 2\n+true",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 126,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\ntrue !== false\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-o3uZ5Z/test/test.mjs:2:40\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: true,\n  expected: false,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished)."
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "2",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "mutatorName": "ConditionalExpression",
+            "replacement": "false",
+            "sourceSha256": "f118c12a10dea48686a26a7f2cd80e1e4c0fc609b6eb68f85982e7382cd300f6",
+            "original": "n >= 2",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 2:9 @@\n-n >= 2\n+false",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 128,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-o3uZ5Z/test/test.mjs:2:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished)."
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "3",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "mutatorName": "EqualityOperator",
+            "replacement": "n > 2",
+            "sourceSha256": "f118c12a10dea48686a26a7f2cd80e1e4c0fc609b6eb68f85982e7382cd300f6",
+            "original": "n >= 2",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 2:9 @@\n-n >= 2\n+n > 2",
+            "exit": 0,
+            "signal": null,
+            "status": "passed",
+            "elapsedMs": 136,
+            "output": "npm notice run test\nnpm notice run node test.mjs\n",
+            "interpretation": "Tests still pass. Check required observable behavior; this can be equivalent or allowed."
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "4",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "mutatorName": "EqualityOperator",
+            "replacement": "n < 2",
+            "sourceSha256": "f118c12a10dea48686a26a7f2cd80e1e4c0fc609b6eb68f85982e7382cd300f6",
+            "original": "n >= 2",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 2:9 @@\n-n >= 2\n+n < 2",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 134,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-o3uZ5Z/test/test.mjs:2:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished)."
+          }
+        ],
+        "untested": [],
+        "cost": {
+          "commands": 6,
+          "engineMs": 255,
+          "preparationMs": 117,
+          "commandMs": 837,
+          "totalMs": 1642
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": true
+      }
+    },
+    {
+      "label": "strong",
+      "report": {
+        "status": "observed",
+        "snapshot": "b7a4c5083ed07d88ccea8eece077215442a00dc7eca80fd8275c1f78e2f8654c",
+        "originalArguments": null,
+        "selectedVariant": null,
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "6da335eab60f113f6285ae560267dd545f9226b5760636d9aeee47f546e91d7d"
+          }
+        ],
+        "baseline": {
+          "exit": 0,
+          "signal": null,
+          "status": "passed",
+          "elapsedMs": 124,
+          "output": "npm notice run test\nnpm notice run node test.mjs\n"
+        },
+        "variants": [
+          {
+            "fileName": "value.mjs",
+            "id": "0",
+            "location": {
+              "start": {
+                "column": 27,
+                "line": 1
+              },
+              "end": {
+                "column": 1,
+                "line": 3
+              }
+            },
+            "mutatorName": "BlockStatement",
+            "replacement": "{}",
+            "sourceSha256": "f118c12a10dea48686a26a7f2cd80e1e4c0fc609b6eb68f85982e7382cd300f6",
+            "original": "{\n  return n >= 2;\n}",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:27 @@\n-{\n-  return n >= 2;\n-}\n+{}",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 133,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ undefined\n- true\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-TGktFm/test/test.mjs:2:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: undefined,\n  expected: true,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished)."
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "1",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "mutatorName": "ConditionalExpression",
+            "replacement": "true",
+            "sourceSha256": "f118c12a10dea48686a26a7f2cd80e1e4c0fc609b6eb68f85982e7382cd300f6",
+            "original": "n >= 2",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 2:9 @@\n-n >= 2\n+true",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 127,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\ntrue !== false\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-TGktFm/test/test.mjs:2:40\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: true,\n  expected: false,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished)."
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "2",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "mutatorName": "ConditionalExpression",
+            "replacement": "false",
+            "sourceSha256": "f118c12a10dea48686a26a7f2cd80e1e4c0fc609b6eb68f85982e7382cd300f6",
+            "original": "n >= 2",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 2:9 @@\n-n >= 2\n+false",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 132,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-TGktFm/test/test.mjs:2:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished)."
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "3",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "mutatorName": "EqualityOperator",
+            "replacement": "n > 2",
+            "sourceSha256": "f118c12a10dea48686a26a7f2cd80e1e4c0fc609b6eb68f85982e7382cd300f6",
+            "original": "n >= 2",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 2:9 @@\n-n >= 2\n+n > 2",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 147,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-TGktFm/test/test.mjs:3:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished)."
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "4",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "mutatorName": "EqualityOperator",
+            "replacement": "n < 2",
+            "sourceSha256": "f118c12a10dea48686a26a7f2cd80e1e4c0fc609b6eb68f85982e7382cd300f6",
+            "original": "n >= 2",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 2:9 @@\n-n >= 2\n+n < 2",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 134,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-TGktFm/test/test.mjs:2:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished)."
+          }
+        ],
+        "untested": [],
+        "cost": {
+          "commands": 6,
+          "engineMs": 205,
+          "preparationMs": 128,
+          "commandMs": 797,
+          "totalMs": 1551
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": true
+      }
+    },
+    {
+      "label": "addressed",
+      "report": {
+        "status": "observed",
+        "snapshot": "90fb33362742c4b2279b16b06a1af860bd0abc8535725262da5e556a683828ff",
+        "originalArguments": {
+          "path": "value.mjs",
+          "check": "npm test"
+        },
+        "selectedVariant": null,
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "bb7e2946925c4983ffd1ec060560210d998cbec92bed39c1cc4d250025a65b7d"
+          }
+        ],
+        "baseline": {
+          "exit": 0,
+          "signal": null,
+          "status": "passed",
+          "elapsedMs": 132,
+          "output": "npm notice run test\nnpm notice run node test.mjs\n"
+        },
+        "variants": [
+          {
+            "fileName": "value.mjs",
+            "id": "0",
+            "location": {
+              "start": {
+                "column": 27,
+                "line": 1
+              },
+              "end": {
+                "column": 1,
+                "line": 3
+              }
+            },
+            "mutatorName": "BlockStatement",
+            "replacement": "{}",
+            "sourceSha256": "f118c12a10dea48686a26a7f2cd80e1e4c0fc609b6eb68f85982e7382cd300f6",
+            "original": "{\n  return n >= 2;\n}",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:27 @@\n-{\n-  return n >= 2;\n-}\n+{}",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 148,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ undefined\n- true\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-eOGqtC/test/test.mjs:2:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: undefined,\n  expected: true,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+            "ref": "v-7f362e178068-1",
+            "replay": {
+              "variant": "v-7f362e178068-1",
+              "check": "npm test"
+            }
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "1",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "mutatorName": "ConditionalExpression",
+            "replacement": "true",
+            "sourceSha256": "f118c12a10dea48686a26a7f2cd80e1e4c0fc609b6eb68f85982e7382cd300f6",
+            "original": "n >= 2",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 2:9 @@\n-n >= 2\n+true",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 166,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\ntrue !== false\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-eOGqtC/test/test.mjs:2:40\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: true,\n  expected: false,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+            "ref": "v-7f362e178068-2",
+            "replay": {
+              "variant": "v-7f362e178068-2",
+              "check": "npm test"
+            }
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "2",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "mutatorName": "ConditionalExpression",
+            "replacement": "false",
+            "sourceSha256": "f118c12a10dea48686a26a7f2cd80e1e4c0fc609b6eb68f85982e7382cd300f6",
+            "original": "n >= 2",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 2:9 @@\n-n >= 2\n+false",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 133,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-eOGqtC/test/test.mjs:2:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+            "ref": "v-7f362e178068-3",
+            "replay": {
+              "variant": "v-7f362e178068-3",
+              "check": "npm test"
+            }
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "3",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "mutatorName": "EqualityOperator",
+            "replacement": "n > 2",
+            "sourceSha256": "f118c12a10dea48686a26a7f2cd80e1e4c0fc609b6eb68f85982e7382cd300f6",
+            "original": "n >= 2",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 2:9 @@\n-n >= 2\n+n > 2",
+            "exit": 0,
+            "signal": null,
+            "status": "passed",
+            "elapsedMs": 133,
+            "output": "npm notice run test\nnpm notice run node test.mjs\n",
+            "interpretation": "Tests still pass. Check required observable behavior; this can be equivalent or allowed.",
+            "ref": "v-7f362e178068-4",
+            "replay": {
+              "variant": "v-7f362e178068-4",
+              "check": "npm test"
+            }
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "4",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "mutatorName": "EqualityOperator",
+            "replacement": "n < 2",
+            "sourceSha256": "f118c12a10dea48686a26a7f2cd80e1e4c0fc609b6eb68f85982e7382cd300f6",
+            "original": "n >= 2",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 2:9 @@\n-n >= 2\n+n < 2",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 124,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-eOGqtC/test/test.mjs:2:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+            "ref": "v-7f362e178068-5",
+            "replay": {
+              "variant": "v-7f362e178068-5",
+              "check": "npm test"
+            }
+          }
+        ],
+        "untested": [],
+        "cost": {
+          "commands": 6,
+          "engineMs": 225,
+          "preparationMs": 112,
+          "commandMs": 836,
+          "totalMs": 1677
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": true
+      }
+    },
+    {
+      "label": "addressed",
+      "report": {
+        "status": "observed",
+        "snapshot": "e1bf393772b6452624dec657eb1415470f09098780c365cfdb61d466ad5fc54e",
+        "originalArguments": {
+          "variant": "v-7f362e178068-4",
+          "check": "npm test"
+        },
+        "selectedVariant": "v-7f362e178068-4",
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "94a264202c18e013257277259a84990292cbb80b58a4f8e2251c0117c2fcb74f"
+          }
+        ],
+        "baseline": {
+          "exit": 0,
+          "signal": null,
+          "status": "passed",
+          "elapsedMs": 150,
+          "output": "npm notice run test\nnpm notice run node test.mjs\n"
+        },
+        "variants": [
+          {
+            "ref": "v-7f362e178068-4",
+            "fileName": "value.mjs",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "replacement": "n > 2",
+            "mutatorName": "EqualityOperator",
+            "sourceSha256": "f118c12a10dea48686a26a7f2cd80e1e4c0fc609b6eb68f85982e7382cd300f6",
+            "original": "n >= 2",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 2:9 @@\n-n >= 2\n+n > 2",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 141,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-rnJIwD/test/test.mjs:4:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+            "replay": {
+              "variant": "v-7f362e178068-4",
+              "check": "npm test"
+            }
+          }
+        ],
+        "untested": [],
+        "cost": {
+          "commands": 2,
+          "engineMs": 0,
+          "preparationMs": 98,
+          "commandMs": 291,
+          "totalMs": 561
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": false
+      }
+    },
+    {
+      "label": "addressed",
+      "report": {
+        "status": "not-run",
+        "snapshot": null,
+        "originalArguments": {
+          "variant": "v-7f362e178068-4",
+          "check": "npm test"
+        },
+        "selectedVariant": null,
+        "command": null,
+        "argv": null,
+        "tests": null,
+        "baseline": null,
+        "variants": [],
+        "untested": null,
+        "cost": {
+          "commands": 0,
+          "engineMs": 0,
+          "preparationMs": 0,
+          "commandMs": 0,
+          "totalMs": 14
+        },
+        "limits": [
+          "Unknown variant reference in this workflow; run a fresh diagnostic. Example: harness_sense({path: \"changed\", check: \"npm test\"}). Available test scripts: test"
+        ],
+        "terminationVerified": true,
+        "engineExecuted": false
+      }
+    },
+    {
+      "label": "addressed",
+      "report": {
+        "status": "not-run",
+        "snapshot": null,
+        "originalArguments": {
+          "variant": "v-7f362e178068-4",
+          "check": "npm test"
+        },
+        "selectedVariant": null,
+        "command": null,
+        "argv": null,
+        "tests": null,
+        "baseline": null,
+        "variants": [],
+        "untested": null,
+        "cost": {
+          "commands": 0,
+          "engineMs": 0,
+          "preparationMs": 0,
+          "commandMs": 0,
+          "totalMs": 17
+        },
+        "limits": [
+          "Production file changed since this variant was generated; run a fresh diagnostic. Old offsets are not applied."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": false
+      }
+    },
+    {
+      "label": "addressed",
+      "report": {
+        "status": "baseline-not-passed",
+        "snapshot": "164690c6f5173f83f8ca185c1707128a5bea320f5fa3bcb1425d53481e999d03",
+        "originalArguments": {
+          "variant": "v-7f362e178068-4",
+          "check": "npm test"
+        },
+        "selectedVariant": "v-7f362e178068-4",
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "261203114e0ebc3aed82d08bb2628cf2a9738fbcc0647c9b2cb2c22ded892908"
+          }
+        ],
+        "baseline": {
+          "exit": 1,
+          "signal": null,
+          "status": "command-rejected",
+          "elapsedMs": 165,
+          "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/esm/resolve:271\n    throw new ERR_MODULE_NOT_FOUND(\n          ^\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find module '/private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-ibwH3M/test/absent.mjs' imported from /priv\n[truncated]\nsense-ibwH3M/test/test.mjs\n    at finalizeResolution (node:internal/modules/esm/resolve:271:11)\n    at moduleResolve (node:internal/modules/esm/resolve:865:10)\n    at defaultResolve (node:internal/modules/esm/resolve:992:11)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)\n    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)\n    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)\n    at #resolve (node:internal/modules/esm/loader:683:17)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)\n    at ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)\n    at ModuleJob.link (node:internal/modules/esm/module_job:253:17) {\n  code: 'ERR_MODULE_NOT_FOUND',\n  url: 'file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-ibwH3M/test/absent.mjs'\n}\n\nNode.js v24.19.0\n"
+        },
+        "variants": [],
+        "untested": [],
+        "cost": {
+          "commands": 1,
+          "engineMs": 0,
+          "preparationMs": 106,
+          "commandMs": 165,
+          "totalMs": 367
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": false
+      }
+    },
+    {
+      "label": "addressed",
+      "report": {
+        "status": "not-run",
+        "snapshot": null,
+        "originalArguments": {
+          "variant": "v-7f362e178068-4",
+          "check": "test"
+        },
+        "selectedVariant": null,
+        "command": "npm run test",
+        "argv": null,
+        "tests": null,
+        "baseline": null,
+        "variants": [],
+        "untested": null,
+        "cost": {
+          "commands": 0,
+          "engineMs": 0,
+          "preparationMs": 0,
+          "commandMs": 0,
+          "totalMs": 42
+        },
+        "limits": [
+          "Diagnostic task budget exhausted"
+        ],
+        "terminationVerified": true,
+        "engineExecuted": false
+      }
+    },
+    {
+      "label": "addressed",
+      "report": {
+        "status": "partial",
+        "snapshot": "fe76df639e557f96be18b59ac9b7fc0e84c4f9ce28e65b3cbcdf350cd79f3896",
+        "originalArguments": {
+          "variant": "v-7f362e178068-4",
+          "check": "npm test"
+        },
+        "selectedVariant": "v-7f362e178068-4",
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "3b3ef385965d251f4e2019de64d9837c8bb1d051159335641a86adbfb32e680c"
+          }
+        ],
+        "baseline": {
+          "exit": 0,
+          "signal": null,
+          "status": "passed",
+          "elapsedMs": 641,
+          "output": "npm notice run test\nnpm notice run node test.mjs\n"
+        },
+        "variants": [],
+        "untested": [
+          {
+            "fileName": "value.mjs",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "mutatorName": "EqualityOperator",
+            "reason": "budget or cancellation"
+          }
+        ],
+        "cost": {
+          "commands": 1,
+          "engineMs": 0,
+          "preparationMs": 97,
+          "commandMs": 641,
+          "totalMs": 881
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": false
+      }
+    },
+    {
+      "label": "addressed",
+      "report": {
+        "status": "baseline-not-passed",
+        "snapshot": "f5b1ec3df462ea285c10b45a62b301593b4d7df979ed39e7971c9e8dddd7d5fe",
+        "originalArguments": {
+          "variant": "v-7f362e178068-4",
+          "check": "npm test"
+        },
+        "selectedVariant": "v-7f362e178068-4",
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "e2c969093f9d67a5c5bb6e9ddfc60c8e275c493fb9711f5dd4a5b367ac860e0f"
+          }
+        ],
+        "baseline": {
+          "exit": null,
+          "signal": "SIGTERM",
+          "status": "cancelled",
+          "elapsedMs": 370,
+          "output": "npm notice run test\nnpm notice run node test.mjs\nREPLAY_PID=76441\n"
+        },
+        "variants": [],
+        "untested": [],
+        "cost": {
+          "commands": 1,
+          "engineMs": 0,
+          "preparationMs": 102,
+          "commandMs": 370,
+          "totalMs": 565
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": false
+      }
+    },
+    {
+      "label": "addressed",
+      "report": {
+        "status": "not-run",
+        "snapshot": null,
+        "originalArguments": {
+          "check": "npm run test"
+        },
+        "selectedVariant": null,
+        "command": "npm run test",
+        "argv": null,
+        "tests": null,
+        "baseline": null,
+        "variants": [],
+        "untested": null,
+        "cost": {
+          "commands": 0,
+          "engineMs": 0,
+          "preparationMs": 0,
+          "commandMs": 0,
+          "totalMs": 41
+        },
+        "limits": [
+          "Diagnostic task budget exhausted"
+        ],
+        "terminationVerified": true,
+        "engineExecuted": false
+      }
+    },
+    {
+      "label": "addressed",
+      "report": {
+        "status": "observed",
+        "snapshot": "12490318e78a3486e573da986cddd4e7ae5134c9a2bca77e2cb8c903aa210385",
+        "originalArguments": {
+          "path": "value.mjs"
+        },
+        "selectedVariant": null,
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "bcca3f7946ef15afa2e25dab027aa833dfb83b0a7b2be6690fa76ff7a3669925"
+          }
+        ],
+        "baseline": {
+          "exit": 0,
+          "signal": null,
+          "status": "passed",
+          "elapsedMs": 136,
+          "output": "npm notice run test\nnpm notice run node test.mjs\n"
+        },
+        "variants": [
+          {
+            "fileName": "value.mjs",
+            "id": "0",
+            "location": {
+              "start": {
+                "column": 41,
+                "line": 1
+              },
+              "end": {
+                "column": 89,
+                "line": 1
+              }
+            },
+            "mutatorName": "BlockStatement",
+            "replacement": "{}",
+            "sourceSha256": "e159a6e122cb5e58c4febf0e08d4988827264ce18dc2ba7ca53736d2a9d1c171",
+            "original": "{ for (const value of values) callback(value); }",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:41 @@\n-{ for (const value of values) callback(value); }\n+{}",
+            "exit": 0,
+            "signal": null,
+            "status": "passed",
+            "elapsedMs": 133,
+            "output": "npm notice run test\nnpm notice run node test.mjs\n",
+            "interpretation": "Tests still pass. Check required observable behavior; this can be equivalent or allowed.",
+            "ref": "v-7f362e178068-6",
+            "replay": {
+              "variant": "v-7f362e178068-6",
+              "check": "test"
+            }
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "1",
+            "location": {
+              "start": {
+                "column": 71,
+                "line": 1
+              },
+              "end": {
+                "column": 87,
+                "line": 1
+              }
+            },
+            "mutatorName": "CallExpression",
+            "replacement": ";",
+            "sourceSha256": "e159a6e122cb5e58c4febf0e08d4988827264ce18dc2ba7ca53736d2a9d1c171",
+            "original": "callback(value);",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:71 @@\n-callback(value);\n+;",
+            "exit": 0,
+            "signal": null,
+            "status": "passed",
+            "elapsedMs": 156,
+            "output": "npm notice run test\nnpm notice run node test.mjs\n",
+            "interpretation": "Tests still pass. Check required observable behavior; this can be equivalent or allowed.",
+            "ref": "v-7f362e178068-7",
+            "replay": {
+              "variant": "v-7f362e178068-7",
+              "check": "test"
+            }
+          }
+        ],
+        "untested": [],
+        "cost": {
+          "commands": 3,
+          "engineMs": 213,
+          "preparationMs": 87,
+          "commandMs": 425,
+          "totalMs": 954
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": true
+      }
+    },
+    {
+      "label": "addressed",
+      "report": {
+        "status": "observed",
+        "snapshot": "6bf23a042de210a04f2caef3c0a0333e3f317d80e223a38fd6e095501609c453",
+        "originalArguments": {
+          "variant": "v-7f362e178068-6",
+          "check": "test"
+        },
+        "selectedVariant": "v-7f362e178068-6",
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "33303dfbd8ebea479ac02fd42c347dce78e5aefc3ea5fe5f46af6ac0f69c0846"
+          }
+        ],
+        "baseline": {
+          "exit": 0,
+          "signal": null,
+          "status": "passed",
+          "elapsedMs": 138,
+          "output": "npm notice run test\nnpm notice run node test.mjs\n"
+        },
+        "variants": [
+          {
+            "ref": "v-7f362e178068-6",
+            "fileName": "value.mjs",
+            "location": {
+              "start": {
+                "column": 41,
+                "line": 1
+              },
+              "end": {
+                "column": 89,
+                "line": 1
+              }
+            },
+            "replacement": "{}",
+            "mutatorName": "BlockStatement",
+            "sourceSha256": "e159a6e122cb5e58c4febf0e08d4988827264ce18dc2ba7ca53736d2a9d1c171",
+            "original": "{ for (const value of values) callback(value); }",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:41 @@\n-{ for (const value of values) callback(value); }\n+{}",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 129,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-qQ5pXk/test/test.mjs:1:189\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 0,\n  expected: 1,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+            "replay": {
+              "variant": "v-7f362e178068-6",
+              "check": "test"
+            }
+          }
+        ],
+        "untested": [],
+        "cost": {
+          "commands": 2,
+          "engineMs": 0,
+          "preparationMs": 88,
+          "commandMs": 267,
+          "totalMs": 533
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": false
+      }
+    },
+    {
+      "label": "addressed",
+      "report": {
+        "status": "observed",
+        "snapshot": "131df6daa4e110c5c1ea82ad7c0ace0d2ca47857a11bd788d804cc22d664b279",
+        "originalArguments": {
+          "path": "value.mjs"
+        },
+        "selectedVariant": null,
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "b91c616e3c6229bbd614ba492783be8e2d25546e32b30090d747baacd9a2e9bd"
+          }
+        ],
+        "baseline": {
+          "exit": 0,
+          "signal": null,
+          "status": "passed",
+          "elapsedMs": 171,
+          "output": "npm notice run test\nnpm notice run node test.mjs\n"
+        },
+        "variants": [
+          {
+            "fileName": "value.mjs",
+            "id": "0",
+            "location": {
+              "start": {
+                "column": 25,
+                "line": 1
+              },
+              "end": {
+                "column": 60,
+                "line": 1
+              }
+            },
+            "mutatorName": "BlockStatement",
+            "replacement": "{}",
+            "sourceSha256": "c2135742941bc78f45df90874717637bfcd8c45e58c50cc5bb57a0aeb2b599b5",
+            "original": "{ throw new Error('explanation'); }",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:25 @@\n-{ throw new Error('explanation'); }\n+{}",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 138,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Missing expected exception (Error).\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-YH46LN/test/test.mjs:1:83\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: undefined,\n  expected: [Function: Error] { stackTraceLimit: 10 },\n  operator: 'throws',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+            "ref": "v-7f362e178068-8",
+            "replay": {
+              "variant": "v-7f362e178068-8",
+              "check": "test"
+            }
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "2",
+            "location": {
+              "start": {
+                "column": 43,
+                "line": 1
+              },
+              "end": {
+                "column": 56,
+                "line": 1
+              }
+            },
+            "mutatorName": "StringLiteral",
+            "replacement": "\"\"",
+            "sourceSha256": "c2135742941bc78f45df90874717637bfcd8c45e58c50cc5bb57a0aeb2b599b5",
+            "original": "'explanation'",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:43 @@\n-'explanation'\n+\"\"",
+            "exit": 0,
+            "signal": null,
+            "status": "passed",
+            "elapsedMs": 134,
+            "output": "npm notice run test\nnpm notice run node test.mjs\n",
+            "interpretation": "Tests still pass. Check required observable behavior; this can be equivalent or allowed.",
+            "ref": "v-7f362e178068-9",
+            "replay": {
+              "variant": "v-7f362e178068-9",
+              "check": "test"
+            }
+          }
+        ],
+        "untested": [],
+        "cost": {
+          "commands": 3,
+          "engineMs": 207,
+          "preparationMs": 92,
+          "commandMs": 443,
+          "totalMs": 979
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": true
+      }
+    },
+    {
+      "label": "addressed",
+      "report": {
+        "status": "observed",
+        "snapshot": "131df6daa4e110c5c1ea82ad7c0ace0d2ca47857a11bd788d804cc22d664b279",
+        "originalArguments": {
+          "variant": "v-7f362e178068-9",
+          "check": "test"
+        },
+        "selectedVariant": "v-7f362e178068-9",
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "b91c616e3c6229bbd614ba492783be8e2d25546e32b30090d747baacd9a2e9bd"
+          }
+        ],
+        "baseline": {
+          "exit": 0,
+          "signal": null,
+          "status": "passed",
+          "elapsedMs": 138,
+          "output": "npm notice run test\nnpm notice run node test.mjs\n"
+        },
+        "variants": [
+          {
+            "ref": "v-7f362e178068-9",
+            "fileName": "value.mjs",
+            "location": {
+              "start": {
+                "column": 43,
+                "line": 1
+              },
+              "end": {
+                "column": 56,
+                "line": 1
+              }
+            },
+            "replacement": "\"\"",
+            "mutatorName": "StringLiteral",
+            "sourceSha256": "c2135742941bc78f45df90874717637bfcd8c45e58c50cc5bb57a0aeb2b599b5",
+            "original": "'explanation'",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:43 @@\n-'explanation'\n+\"\"",
+            "exit": 0,
+            "signal": null,
+            "status": "passed",
+            "elapsedMs": 140,
+            "output": "npm notice run test\nnpm notice run node test.mjs\n",
+            "interpretation": "Tests still pass. Check required observable behavior; this can be equivalent or allowed.",
+            "replay": {
+              "variant": "v-7f362e178068-9",
+              "check": "test"
+            }
+          }
+        ],
+        "untested": [],
+        "cost": {
+          "commands": 2,
+          "engineMs": 0,
+          "preparationMs": 93,
+          "commandMs": 278,
+          "totalMs": 571
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": false
+      }
+    },
+    {
+      "label": "red-baseline",
+      "report": {
+        "status": "baseline-not-passed",
+        "snapshot": "ce36266a23e348d7b77570a4a34d51000e24f14051b1a7533e7fb656d8c5fb7a",
+        "originalArguments": null,
+        "selectedVariant": null,
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "f1c9ad207d16d4c3d887651b42ed4400195b5cba94044a6ebb692df99ad72534"
+          }
+        ],
+        "baseline": {
+          "exit": 1,
+          "signal": null,
+          "status": "command-rejected",
+          "elapsedMs": 174,
+          "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\ntrue !== false\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-luTuDW/test/test.mjs:3:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: true,\n  expected: false,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n"
+        },
+        "variants": [],
+        "untested": [],
+        "cost": {
+          "commands": 1,
+          "engineMs": 0,
+          "preparationMs": 96,
+          "commandMs": 174,
+          "totalMs": 318
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": false
+      }
+    },
+    {
+      "label": "import-error",
+      "report": {
+        "status": "baseline-not-passed",
+        "snapshot": "9d80121f779f28cb2e55018c649bd6981de378aa77e13cb8f21bb1ef76462863",
+        "originalArguments": null,
+        "selectedVariant": null,
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "abae30f0a82776c76a93c31bff79e2e9c95669de55aa52b68af7b8ea1e7c273d"
+          }
+        ],
+        "baseline": {
+          "exit": 1,
+          "signal": null,
+          "status": "command-rejected",
+          "elapsedMs": 135,
+          "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/esm/resolve:271\n    throw new ERR_MODULE_NOT_FOUND(\n          ^\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find module '/private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-mNotvV/test/missing-module.mjs' imported fr\n[truncated]\notvV/test/test.mjs\n    at finalizeResolution (node:internal/modules/esm/resolve:271:11)\n    at moduleResolve (node:internal/modules/esm/resolve:865:10)\n    at defaultResolve (node:internal/modules/esm/resolve:992:11)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)\n    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)\n    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)\n    at #resolve (node:internal/modules/esm/loader:683:17)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)\n    at ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)\n    at ModuleJob.link (node:internal/modules/esm/module_job:253:17) {\n  code: 'ERR_MODULE_NOT_FOUND',\n  url: 'file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-mNotvV/test/missing-module.mjs'\n}\n\nNode.js v24.19.0\n"
+        },
+        "variants": [],
+        "untested": [],
+        "cost": {
+          "commands": 1,
+          "engineMs": 0,
+          "preparationMs": 85,
+          "commandMs": 135,
+          "totalMs": 266
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": false
+      }
+    },
+    {
+      "label": "timeout",
+      "report": {
+        "status": "baseline-not-passed",
+        "snapshot": "c55ef9bc96abce31fa8fce1eecd8e2c4cc85e5fbcbd5c94dabca5ba2f672c45a",
+        "originalArguments": null,
+        "selectedVariant": null,
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "174c3e0045409140507b191ab7bcf7b915b3f386d486a190b349c8e8d4ec53a2"
+          }
+        ],
+        "baseline": {
+          "exit": null,
+          "signal": "SIGTERM",
+          "status": "timeout",
+          "elapsedMs": 1269,
+          "output": "npm notice run test\nnpm notice run node test.mjs\n"
+        },
+        "variants": [],
+        "untested": [],
+        "cost": {
+          "commands": 1,
+          "engineMs": 0,
+          "preparationMs": 92,
+          "commandMs": 1269,
+          "totalMs": 1405
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": false
+      }
+    },
+    {
+      "label": "cancelled",
+      "report": {
+        "status": "baseline-not-passed",
+        "snapshot": "06a082fa2c45f5870d4085c93fdbdc29cc55ca0cb318da8195137b4cf8f3a221",
+        "originalArguments": null,
+        "selectedVariant": null,
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "f5eaae5371656ca06203d0e20f947814ebd071edd0dfb452499457c3b2e4fa34"
+          }
+        ],
+        "baseline": {
+          "exit": null,
+          "signal": "SIGTERM",
+          "status": "cancelled",
+          "elapsedMs": 412,
+          "output": "npm notice run test\nnpm notice run node test.mjs\nSLEEP_PID=78906\n"
+        },
+        "variants": [],
+        "untested": [],
+        "cost": {
+          "commands": 1,
+          "engineMs": 0,
+          "preparationMs": 88,
+          "commandMs": 412,
+          "totalMs": 551
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": false
+      }
+    },
+    {
+      "label": "partial-budget",
+      "report": {
+        "status": "partial",
+        "snapshot": "edcbbc822a420e8c4a89b0bea519367a8672319b365d555eb53df114192f1d20",
+        "originalArguments": null,
+        "selectedVariant": null,
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "e19fcb5dac38143cfe1b80d05ffaeed54e6b864453364cab36b2fcb52c447b93"
+          }
+        ],
+        "baseline": {
+          "exit": 0,
+          "signal": null,
+          "status": "passed",
+          "elapsedMs": 276,
+          "output": "npm notice run test\nnpm notice run node test.mjs\n"
+        },
+        "variants": [],
+        "untested": [
+          {
+            "fileName": "value.mjs",
+            "location": {
+              "start": {
+                "column": 27,
+                "line": 1
+              },
+              "end": {
+                "column": 1,
+                "line": 3
+              }
+            },
+            "mutatorName": "BlockStatement",
+            "reason": "budget or cancellation"
+          },
+          {
+            "fileName": "value.mjs",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "mutatorName": "ConditionalExpression",
+            "reason": "budget or cancellation"
+          },
+          {
+            "fileName": "value.mjs",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "mutatorName": "ConditionalExpression",
+            "reason": "budget or cancellation"
+          },
+          {
+            "fileName": "value.mjs",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "mutatorName": "EqualityOperator",
+            "reason": "budget or cancellation"
+          },
+          {
+            "fileName": "value.mjs",
+            "location": {
+              "start": {
+                "column": 9,
+                "line": 2
+              },
+              "end": {
+                "column": 15,
+                "line": 2
+              }
+            },
+            "mutatorName": "EqualityOperator",
+            "reason": "budget or cancellation"
+          }
+        ],
+        "cost": {
+          "commands": 1,
+          "engineMs": 203,
+          "preparationMs": 103,
+          "commandMs": 276,
+          "totalMs": 671
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": true
+      }
+    },
+    {
+      "label": "no-standard-operator",
+      "report": {
+        "status": "unsupported-scope",
+        "snapshot": "a691fdd050c7a5f53125fe6d8206364fc5516464ec07658e2507c67877acba63",
+        "originalArguments": null,
+        "selectedVariant": null,
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "58c720e106ce44ab43fe35876160110a1a4576a5e95f16096e1002e2ae5bb01a"
+          }
+        ],
+        "baseline": {
+          "exit": 0,
+          "signal": null,
+          "status": "passed",
+          "elapsedMs": 139,
+          "output": "npm notice run test\nnpm notice run node test.mjs\n"
+        },
+        "variants": [],
+        "untested": [],
+        "cost": {
+          "commands": 1,
+          "engineMs": 197,
+          "preparationMs": 98,
+          "commandMs": 139,
+          "totalMs": 531
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": true
+      }
+    },
+    {
+      "label": "equivalent-good-control",
+      "report": {
+        "status": "observed",
+        "snapshot": "c188c826c3f9164d9017a5468ea49cb705a7dbedcf22b7f507257268a261b80e",
+        "originalArguments": null,
+        "selectedVariant": null,
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "e2e11d96879e809cc0916841096f7ed30812350ba71c1ce7f083882e2e5cbe69"
+          }
+        ],
+        "baseline": {
+          "exit": 0,
+          "signal": null,
+          "status": "passed",
+          "elapsedMs": 131,
+          "output": "npm notice run test\nnpm notice run node test.mjs\n"
+        },
+        "variants": [
+          {
+            "fileName": "value.mjs",
+            "id": "0",
+            "location": {
+              "start": {
+                "column": 26,
+                "line": 1
+              },
+              "end": {
+                "column": 51,
+                "line": 1
+              }
+            },
+            "mutatorName": "BlockStatement",
+            "replacement": "{}",
+            "sourceSha256": "7b83e124316067e45c283613966066f88000130c7b4f28475748e2c0776c0a72",
+            "original": "{ return a < b ? b : a; }",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:26 @@\n-{ return a < b ? b : a; }\n+{}",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 137,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nundefined !== 1\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-RYmN97/test/test.mjs:1:132\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: undefined,\n  expected: 1,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished)."
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "1",
+            "location": {
+              "start": {
+                "column": 35,
+                "line": 1
+              },
+              "end": {
+                "column": 40,
+                "line": 1
+              }
+            },
+            "mutatorName": "ConditionalExpression",
+            "replacement": "true",
+            "sourceSha256": "7b83e124316067e45c283613966066f88000130c7b4f28475748e2c0776c0a72",
+            "original": "a < b",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:35 @@\n-a < b\n+true",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 142,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 2\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-RYmN97/test/test.mjs:1:132\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 1,\n  expected: 2,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished)."
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "2",
+            "location": {
+              "start": {
+                "column": 35,
+                "line": 1
+              },
+              "end": {
+                "column": 40,
+                "line": 1
+              }
+            },
+            "mutatorName": "ConditionalExpression",
+            "replacement": "false",
+            "sourceSha256": "7b83e124316067e45c283613966066f88000130c7b4f28475748e2c0776c0a72",
+            "original": "a < b",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:35 @@\n-a < b\n+false",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 145,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 2\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-RYmN97/test/test.mjs:1:132\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 1,\n  expected: 2,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished)."
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "3",
+            "location": {
+              "start": {
+                "column": 35,
+                "line": 1
+              },
+              "end": {
+                "column": 40,
+                "line": 1
+              }
+            },
+            "mutatorName": "EqualityOperator",
+            "replacement": "a <= b",
+            "sourceSha256": "7b83e124316067e45c283613966066f88000130c7b4f28475748e2c0776c0a72",
+            "original": "a < b",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:35 @@\n-a < b\n+a <= b",
+            "exit": 0,
+            "signal": null,
+            "status": "passed",
+            "elapsedMs": 143,
+            "output": "npm notice run test\nnpm notice run node test.mjs\n",
+            "interpretation": "Tests still pass. Check required observable behavior; this can be equivalent or allowed."
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "4",
+            "location": {
+              "start": {
+                "column": 35,
+                "line": 1
+              },
+              "end": {
+                "column": 40,
+                "line": 1
+              }
+            },
+            "mutatorName": "EqualityOperator",
+            "replacement": "a >= b",
+            "sourceSha256": "7b83e124316067e45c283613966066f88000130c7b4f28475748e2c0776c0a72",
+            "original": "a < b",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:35 @@\n-a < b\n+a >= b",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 143,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 2\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-RYmN97/test/test.mjs:1:132\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 1,\n  expected: 2,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished)."
+          }
+        ],
+        "untested": [],
+        "cost": {
+          "commands": 6,
+          "engineMs": 208,
+          "preparationMs": 104,
+          "commandMs": 841,
+          "totalMs": 1551
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": true
+      }
+    },
+    {
+      "label": "addressed",
+      "report": {
+        "status": "observed",
+        "snapshot": "c188c826c3f9164d9017a5468ea49cb705a7dbedcf22b7f507257268a261b80e",
+        "originalArguments": {
+          "path": "value.mjs"
+        },
+        "selectedVariant": null,
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "e2e11d96879e809cc0916841096f7ed30812350ba71c1ce7f083882e2e5cbe69"
+          }
+        ],
+        "baseline": {
+          "exit": 0,
+          "signal": null,
+          "status": "passed",
+          "elapsedMs": 132,
+          "output": "npm notice run test\nnpm notice run node test.mjs\n"
+        },
+        "variants": [
+          {
+            "fileName": "value.mjs",
+            "id": "0",
+            "location": {
+              "start": {
+                "column": 26,
+                "line": 1
+              },
+              "end": {
+                "column": 51,
+                "line": 1
+              }
+            },
+            "mutatorName": "BlockStatement",
+            "replacement": "{}",
+            "sourceSha256": "7b83e124316067e45c283613966066f88000130c7b4f28475748e2c0776c0a72",
+            "original": "{ return a < b ? b : a; }",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:26 @@\n-{ return a < b ? b : a; }\n+{}",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 127,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nundefined !== 1\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-QHM90e/test/test.mjs:1:132\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: undefined,\n  expected: 1,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+            "ref": "v-7f362e178068-10",
+            "replay": {
+              "variant": "v-7f362e178068-10",
+              "check": "test"
+            }
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "1",
+            "location": {
+              "start": {
+                "column": 35,
+                "line": 1
+              },
+              "end": {
+                "column": 40,
+                "line": 1
+              }
+            },
+            "mutatorName": "ConditionalExpression",
+            "replacement": "true",
+            "sourceSha256": "7b83e124316067e45c283613966066f88000130c7b4f28475748e2c0776c0a72",
+            "original": "a < b",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:35 @@\n-a < b\n+true",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 127,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 2\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-QHM90e/test/test.mjs:1:132\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 1,\n  expected: 2,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+            "ref": "v-7f362e178068-11",
+            "replay": {
+              "variant": "v-7f362e178068-11",
+              "check": "test"
+            }
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "2",
+            "location": {
+              "start": {
+                "column": 35,
+                "line": 1
+              },
+              "end": {
+                "column": 40,
+                "line": 1
+              }
+            },
+            "mutatorName": "ConditionalExpression",
+            "replacement": "false",
+            "sourceSha256": "7b83e124316067e45c283613966066f88000130c7b4f28475748e2c0776c0a72",
+            "original": "a < b",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:35 @@\n-a < b\n+false",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 128,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 2\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-QHM90e/test/test.mjs:1:132\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 1,\n  expected: 2,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+            "ref": "v-7f362e178068-12",
+            "replay": {
+              "variant": "v-7f362e178068-12",
+              "check": "test"
+            }
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "3",
+            "location": {
+              "start": {
+                "column": 35,
+                "line": 1
+              },
+              "end": {
+                "column": 40,
+                "line": 1
+              }
+            },
+            "mutatorName": "EqualityOperator",
+            "replacement": "a <= b",
+            "sourceSha256": "7b83e124316067e45c283613966066f88000130c7b4f28475748e2c0776c0a72",
+            "original": "a < b",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:35 @@\n-a < b\n+a <= b",
+            "exit": 0,
+            "signal": null,
+            "status": "passed",
+            "elapsedMs": 125,
+            "output": "npm notice run test\nnpm notice run node test.mjs\n",
+            "interpretation": "Tests still pass. Check required observable behavior; this can be equivalent or allowed.",
+            "ref": "v-7f362e178068-13",
+            "replay": {
+              "variant": "v-7f362e178068-13",
+              "check": "test"
+            }
+          },
+          {
+            "fileName": "value.mjs",
+            "id": "4",
+            "location": {
+              "start": {
+                "column": 35,
+                "line": 1
+              },
+              "end": {
+                "column": 40,
+                "line": 1
+              }
+            },
+            "mutatorName": "EqualityOperator",
+            "replacement": "a >= b",
+            "sourceSha256": "7b83e124316067e45c283613966066f88000130c7b4f28475748e2c0776c0a72",
+            "original": "a < b",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:35 @@\n-a < b\n+a >= b",
+            "exit": 1,
+            "signal": null,
+            "status": "command-rejected",
+            "elapsedMs": 127,
+            "output": "npm notice run test\nnpm notice run node test.mjs\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 2\n\n    at file:///private/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/harness-sense-QHM90e/test/test.mjs:1:132\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 1,\n  expected: 2,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.19.0\n",
+            "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+            "ref": "v-7f362e178068-14",
+            "replay": {
+              "variant": "v-7f362e178068-14",
+              "check": "test"
+            }
+          }
+        ],
+        "untested": [],
+        "cost": {
+          "commands": 6,
+          "engineMs": 200,
+          "preparationMs": 82,
+          "commandMs": 766,
+          "totalMs": 1404
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": true
+      }
+    },
+    {
+      "label": "addressed",
+      "report": {
+        "status": "observed",
+        "snapshot": "c188c826c3f9164d9017a5468ea49cb705a7dbedcf22b7f507257268a261b80e",
+        "originalArguments": {
+          "variant": "v-7f362e178068-13",
+          "check": "test"
+        },
+        "selectedVariant": "v-7f362e178068-13",
+        "command": "npm run test",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ],
+        "tests": [
+          {
+            "name": "test.mjs",
+            "sha256": "e2e11d96879e809cc0916841096f7ed30812350ba71c1ce7f083882e2e5cbe69"
+          }
+        ],
+        "baseline": {
+          "exit": 0,
+          "signal": null,
+          "status": "passed",
+          "elapsedMs": 136,
+          "output": "npm notice run test\nnpm notice run node test.mjs\n"
+        },
+        "variants": [
+          {
+            "ref": "v-7f362e178068-13",
+            "fileName": "value.mjs",
+            "location": {
+              "start": {
+                "column": 35,
+                "line": 1
+              },
+              "end": {
+                "column": 40,
+                "line": 1
+              }
+            },
+            "replacement": "a <= b",
+            "mutatorName": "EqualityOperator",
+            "sourceSha256": "7b83e124316067e45c283613966066f88000130c7b4f28475748e2c0776c0a72",
+            "original": "a < b",
+            "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:35 @@\n-a < b\n+a <= b",
+            "exit": 0,
+            "signal": null,
+            "status": "passed",
+            "elapsedMs": 128,
+            "output": "npm notice run test\nnpm notice run node test.mjs\n",
+            "interpretation": "Tests still pass. Check required observable behavior; this can be equivalent or allowed.",
+            "replay": {
+              "variant": "v-7f362e178068-13",
+              "check": "test"
+            }
+          }
+        ],
+        "untested": [],
+        "cost": {
+          "commands": 2,
+          "engineMs": 0,
+          "preparationMs": 80,
+          "commandMs": 264,
+          "totalMs": 520
+        },
+        "limits": [
+          "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+          "Standard Stryker operators may miss identity loss or a specific state transition.",
+          "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+          "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+        ],
+        "terminationVerified": true,
+        "engineExecuted": false
+      }
+    }
+  ],
+  "installed": {
+    "preflight-module-final-evidence.json": {
+      "ordinaryPatchPassed": true,
+      "patchSha256": "d17827018b9f62dc0e7db76eba5e6a5697a09eab982ea30776de6f79edf2513c",
+      "observations": [
+        {
+          "status": "observed",
+          "snapshot": "b450b10c43e9b801dd78247590800b67c7125c06435bc69c87fca85aab9e334c",
+          "originalArguments": {
+            "path": "value.mjs"
+          },
+          "selectedVariant": null,
+          "command": "npm run test",
+          "argv": [
+            "npm",
+            "run",
+            "test"
+          ],
+          "tests": [
+            {
+              "name": "consumer.test.mjs",
+              "sha256": "4791e2f6b18a7d69d2951c1d142a6e6d8b6099b78538c960341810663eb5c7d6"
+            }
+          ],
+          "baseline": {
+            "exit": 0,
+            "signal": null,
+            "status": "passed",
+            "elapsedMs": 118,
+            "output": "\n> test\n> node --test\n\n\u2714 consumer (0.3835ms)\n\u2139 tests 1\n\u2139 suites 0\n\u2139 pass 1\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 36.797417\n"
+          },
+          "variants": [
+            {
+              "fileName": "value.mjs",
+              "id": "0",
+              "location": {
+                "start": {
+                  "column": 52,
+                  "line": 1
+                },
+                "end": {
+                  "column": 65,
+                  "line": 1
+                }
+              },
+              "mutatorName": "BlockStatement",
+              "replacement": "{}",
+              "sourceSha256": "8c93efb26cb7b838bf50ee1691a6f2168d5e32e5249265f1331aea0943133d76",
+              "original": "{ return 7; }",
+              "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:52 @@\n-{ return 7; }\n+{}",
+              "exit": 0,
+              "signal": null,
+              "status": "passed",
+              "elapsedMs": 111,
+              "output": "\n> test\n> node --test\n\n\u2714 consumer (0.324ms)\n\u2139 tests 1\n\u2139 suites 0\n\u2139 pass 1\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 32.681333\n",
+              "interpretation": "Tests still pass. Check required observable behavior; this can be equivalent or allowed.",
+              "ref": "v-34fe0ef6b083-1",
+              "replay": {
+                "variant": "v-34fe0ef6b083-1",
+                "check": "test"
+              }
+            }
+          ],
+          "untested": [],
+          "cost": {
+            "commands": 2,
+            "engineMs": 250,
+            "preparationMs": 21,
+            "commandMs": 229,
+            "totalMs": 535
+          },
+          "limits": [
+            "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+            "Standard Stryker operators may miss identity loss or a specific state transition.",
+            "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+            "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+          ],
+          "terminationVerified": true,
+          "engineExecuted": true
+        },
+        {
+          "status": "observed",
+          "snapshot": "9f7a514952111936d482a0757172deb87240dc61822f1f8c9d2734b3765a8dca",
+          "originalArguments": {
+            "variant": "v-34fe0ef6b083-1",
+            "check": "test"
+          },
+          "selectedVariant": "v-34fe0ef6b083-1",
+          "command": "npm run test",
+          "argv": [
+            "npm",
+            "run",
+            "test"
+          ],
+          "tests": [
+            {
+              "name": "consumer.test.mjs",
+              "sha256": "ff81fac729104a36781a1c3a8f9d7915f947a2ccd491be4ae2dfb554085d24eb"
+            }
+          ],
+          "baseline": {
+            "exit": 0,
+            "signal": null,
+            "status": "passed",
+            "elapsedMs": 116,
+            "output": "\n> test\n> node --test\n\n\u2714 consumer (0.370792ms)\n\u2139 tests 1\n\u2139 suites 0\n\u2139 pass 1\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 35.43125\n"
+          },
+          "variants": [
+            {
+              "ref": "v-34fe0ef6b083-1",
+              "fileName": "value.mjs",
+              "location": {
+                "start": {
+                  "column": 52,
+                  "line": 1
+                },
+                "end": {
+                  "column": 65,
+                  "line": 1
+                }
+              },
+              "replacement": "{}",
+              "mutatorName": "BlockStatement",
+              "sourceSha256": "8c93efb26cb7b838bf50ee1691a6f2168d5e32e5249265f1331aea0943133d76",
+              "original": "{ return 7; }",
+              "diff": "--- a/value.mjs\n+++ b/value.mjs\n@@ 1:52 @@\n-{ return 7; }\n+{}",
+              "exit": 1,
+              "signal": null,
+              "status": "command-rejected",
+              "elapsedMs": 112,
+              "output": "\n> test\n> node --test\n\n\u2716 consumer (0.649625ms)\n\u2139 tests 1\n\u2139 suites 0\n\u2139 pass 0\n\u2139 fail 1\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 34.238666\n\n\u2716 failing tests:\n\ntest at consumer.test.mjs:1:111\n\u2716 consumer (0.649625ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  undefined !== 7\n  \n      at TestContext.<anonymous> (file:///work/tmp/harness-sense-ilGpCu/test/consumer.test.mjs:1:161)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1382:25)\n      at Test.start (node:internal/test_runner/test:1242:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: undefined,\n    expected: 7,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
+              "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+              "replay": {
+                "variant": "v-34fe0ef6b083-1",
+                "check": "test"
+              }
+            }
+          ],
+          "untested": [],
+          "cost": {
+            "commands": 2,
+            "engineMs": 0,
+            "preparationMs": 20,
+            "commandMs": 228,
+            "totalMs": 280
+          },
+          "limits": [
+            "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+            "Standard Stryker operators may miss identity loss or a specific state transition.",
+            "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+            "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+          ],
+          "terminationVerified": true,
+          "engineExecuted": false
+        }
+      ]
+    },
+    "preflight-denque-final-evidence.json": {
+      "ordinaryPatchPassed": true,
+      "patchSha256": "84dbc3bed47fa186e31e70c1cd9015213cf794934c3bb3af4030e20b293be2d5",
+      "observations": [
+        {
+          "status": "observed",
+          "snapshot": "841507a88b83e8fea13713d0f7cdebe6ee7dc6d8a4d3883b81bd2a4c443d7ba4",
+          "originalArguments": {
+            "path": "index.js",
+            "check": "npm test"
+          },
+          "selectedVariant": null,
+          "command": "npm run test",
+          "argv": [
+            "npm",
+            "run",
+            "test"
+          ],
+          "tests": [
+            {
+              "name": "test/denque.js",
+              "sha256": "3ecd5ba090555e1a0ec30cb0baf0cbcb6be8c8175f44ea6fd875d57fce8b5905"
+            },
+            {
+              "name": "test/type/index.ts",
+              "sha256": "2bfa7ba40e1ded9a8eadef87bb49cb1e08dd5b0a876ee87e1c1889c4a608591f"
+            },
+            {
+              "name": "test/type/tsconfig.json",
+              "sha256": "aae02e2cc4327a3d832a0209064f773ee4b637ebcf1eb781c070018bb79fb384"
+            }
+          ],
+          "baseline": {
+            "exit": 0,
+            "signal": null,
+            "status": "passed",
+            "elapsedMs": 982,
+            "output": "\n> denque@2.1.0 test\n> istanbul cover --report lcov _mocha && npm run typescript\n\n\n\n  Denque.prototype.constructor\n    \u2713 should take no argument\n    \u2713 should take array argument\n    \u2713 should handle a high volume with no out of memory exception (186ms)\n\n  Denque.prototype.toArray\n    \u2713 should return \n[truncated]\nould return undefined when trying to remove further than current size\n    \u2713 Should remove and add items like native splice method to the empty denque\n    \u2713 pop should shrink array when mostly empty\n\n\n  55 passing (206ms)\n\n=============================================================================\nWriting coverage object [/work/tmp/harness-sense-sy4FDG/test/coverage/coverage.json]\nWriting coverage reports at [/work/tmp/harness-sense-sy4FDG/test/coverage]\n=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 99.3% ( 285/287 )\nBranches     : 98.51% ( 132/134 )\nFunctions    : 100% ( 24/24 )\nLines        : 100% ( 255/255 )\n================================================================================\n\n> denque@2.1.0 typescript\n> tsc --project ./test/type/tsconfig.json\n\n"
+          },
+          "variants": [
+            {
+              "fileName": "index.js",
+              "id": "0",
+              "location": {
+                "start": {
+                  "column": 63,
+                  "line": 209
+                },
+                "end": {
+                  "column": 1,
+                  "line": 236
+                }
+              },
+              "mutatorName": "BlockStatement",
+              "replacement": "{}",
+              "sourceSha256": "aa642225e6b6920bb6b594edd09c4d98b2a9b142df7026e8adf4ad412ebad78e",
+              "original": "{\n  if (typeof predicate !== 'function') {\n    throw new Error('predicate must be a function');\n  }\n\n  var values = this._copyArray(false);\n  var survivors = [];\n  var removed = 0;\n  var i;\n\n  for (i = 0; i < values.length; i++) {\n    if (predicate(values[i], i)) removed++;\n    else survivors.push(values[i]);\n  }\n\n  if (removed === 0) return 0;\n\n  var head = this._head;\n  for (i = 0; i < survivors.length; i++) {\n    this._list[(head + i) & this._capacityMask] = survivors[i];\n  }\n  for (; i < values.length; i++) {\n    this._list[(head + i) & this._capacityMask] = void 0;\n  }\n  this._tail = (head + survivors.length) & this._capacityMask;\n\n  return removed;\n}",
+              "diff": "--- a/index.js\n+++ b/index.js\n@@ 209:63 @@\n-{\n-  if (typeof predicate !== 'function') {\n-    throw new Error('predicate must be a function');\n-  }\n-\n-  var values = this._copyArray(false);\n-  var survivors = [];\n-  var removed = 0;\n-  var i;\n-\n-  for (i = 0; i < values.length; i++) {\n-    if (predicate(values[i], i)) removed++;\n-    else survivors.push(values[i]);\n-  }\n-\n-  if (removed === 0) return 0;\n-\n-  var head = this._head;\n-  for (i = 0; i < survivors.length; i++) {\n-    this._list[(head + i) & this._capacityMask] = survivors[i];\n-  }\n-  for (; i < values.length; i++) {\n-    this._list[(head + i) & this._capacityMask] = void 0;\n-  }\n-  this._tail = (head + survivors.length) & this._capacityMask;\n-\n-  return removed;\n-}\n+{}",
+              "exit": 3,
+              "signal": null,
+              "status": "command-rejected",
+              "elapsedMs": 414,
+              "output": "\n> denque@2.1.0 test\n> istanbul cover --report lcov _mocha && npm run typescript\n\n\n\n  Denque.prototype.constructor\n    \u2713 should take no argument\n    \u2713 should take array argument\n    \u2713 should handle a high volume with no out of memory exception (192ms)\n\n  Denque.prototype.toArray\n    \u2713 should return \n[truncated]\ne.removeWhere should filter wrapped bounded queues without changing capacity:\n     AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nundefined !== 2\n\n      at Context.<anonymous> (test/denque.js:514:12)\n      at process.processImmediate (node:internal/timers:534:21)\n\n\n\n=============================================================================\nWriting coverage object [/work/tmp/harness-sense-sy4FDG/test/coverage/coverage.json]\nWriting coverage reports at [/work/tmp/harness-sense-sy4FDG/test/coverage]\n=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 99.25% ( 266/268 )\nBranches     : 98.44% ( 126/128 )\nFunctions    : 100% ( 24/24 )\nLines        : 100% ( 238/238 )\n================================================================================\n",
+              "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+              "ref": "v-66cea06d07c9-1",
+              "replay": {
+                "variant": "v-66cea06d07c9-1",
+                "check": "npm test"
+              }
+            },
+            {
+              "fileName": "index.js",
+              "id": "1",
+              "location": {
+                "start": {
+                  "column": 6,
+                  "line": 210
+                },
+                "end": {
+                  "column": 37,
+                  "line": 210
+                }
+              },
+              "mutatorName": "ConditionalExpression",
+              "replacement": "true",
+              "sourceSha256": "aa642225e6b6920bb6b594edd09c4d98b2a9b142df7026e8adf4ad412ebad78e",
+              "original": "typeof predicate !== 'function'",
+              "diff": "--- a/index.js\n+++ b/index.js\n@@ 210:6 @@\n-typeof predicate !== 'function'\n+true",
+              "exit": 3,
+              "signal": null,
+              "status": "command-rejected",
+              "elapsedMs": 415,
+              "output": "\n> denque@2.1.0 test\n> istanbul cover --report lcov _mocha && npm run typescript\n\n\n\n  Denque.prototype.constructor\n    \u2713 should take no argument\n    \u2713 should take array argument\n    \u2713 should handle a high volume with no out of memory exception (189ms)\n\n  Denque.prototype.toArray\n    \u2713 should return \n[truncated]\ntype.removeWhere should filter wrapped bounded queues without changing capacity:\n     Error: predicate must be a function\n      at Denque.removeWhere (index.js:9:10918)\n      at Context.<anonymous> (test/denque.js:514:30)\n      at process.processImmediate (node:internal/timers:534:21)\n\n\n\n=============================================================================\nWriting coverage object [/work/tmp/harness-sense-sy4FDG/test/coverage/coverage.json]\nWriting coverage reports at [/work/tmp/harness-sense-sy4FDG/test/coverage]\n=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 93.38% ( 268/287 )\nBranches     : 94.78% ( 127/134 )\nFunctions    : 100% ( 24/24 )\nLines        : 94.12% ( 240/255 )\n================================================================================\n",
+              "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+              "ref": "v-66cea06d07c9-2",
+              "replay": {
+                "variant": "v-66cea06d07c9-2",
+                "check": "npm test"
+              }
+            },
+            {
+              "fileName": "index.js",
+              "id": "2",
+              "location": {
+                "start": {
+                  "column": 6,
+                  "line": 210
+                },
+                "end": {
+                  "column": 37,
+                  "line": 210
+                }
+              },
+              "mutatorName": "ConditionalExpression",
+              "replacement": "false",
+              "sourceSha256": "aa642225e6b6920bb6b594edd09c4d98b2a9b142df7026e8adf4ad412ebad78e",
+              "original": "typeof predicate !== 'function'",
+              "diff": "--- a/index.js\n+++ b/index.js\n@@ 210:6 @@\n-typeof predicate !== 'function'\n+false",
+              "exit": 1,
+              "signal": null,
+              "status": "command-rejected",
+              "elapsedMs": 399,
+              "output": "\n> denque@2.1.0 test\n> istanbul cover --report lcov _mocha && npm run typescript\n\n\n\n  Denque.prototype.constructor\n    \u2713 should take no argument\n    \u2713 should take array argument\n    \u2713 should handle a high volume with no out of memory exception (192ms)\n\n  Denque.prototype.toArray\n    \u2713 should return \n[truncated]\n\n\n  1) Denque.prototype.removeWhere should leave the queue unchanged when the predicate throws:\n     AssertionError [ERR_ASSERTION]: Missing expected exception (Error).\n      at Context.<anonymous> (test/denque.js:492:12)\n      at process.processImmediate (node:internal/timers:534:21)\n\n\n\n=============================================================================\nWriting coverage object [/work/tmp/harness-sense-sy4FDG/test/coverage/coverage.json]\nWriting coverage reports at [/work/tmp/harness-sense-sy4FDG/test/coverage]\n=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 98.95% ( 284/287 )\nBranches     : 97.76% ( 131/134 )\nFunctions    : 100% ( 24/24 )\nLines        : 99.61% ( 254/255 )\n================================================================================\n",
+              "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+              "ref": "v-66cea06d07c9-3",
+              "replay": {
+                "variant": "v-66cea06d07c9-3",
+                "check": "npm test"
+              }
+            },
+            {
+              "fileName": "index.js",
+              "id": "3",
+              "location": {
+                "start": {
+                  "column": 6,
+                  "line": 210
+                },
+                "end": {
+                  "column": 37,
+                  "line": 210
+                }
+              },
+              "mutatorName": "EqualityOperator",
+              "replacement": "typeof predicate === 'function'",
+              "sourceSha256": "aa642225e6b6920bb6b594edd09c4d98b2a9b142df7026e8adf4ad412ebad78e",
+              "original": "typeof predicate !== 'function'",
+              "diff": "--- a/index.js\n+++ b/index.js\n@@ 210:6 @@\n-typeof predicate !== 'function'\n+typeof predicate === 'function'",
+              "exit": 3,
+              "signal": null,
+              "status": "command-rejected",
+              "elapsedMs": 414,
+              "output": "\n> denque@2.1.0 test\n> istanbul cover --report lcov _mocha && npm run typescript\n\n\n\n  Denque.prototype.constructor\n    \u2713 should take no argument\n    \u2713 should take array argument\n    \u2713 should handle a high volume with no out of memory exception (187ms)\n\n  Denque.prototype.toArray\n    \u2713 should return \n[truncated]\ntype.removeWhere should filter wrapped bounded queues without changing capacity:\n     Error: predicate must be a function\n      at Denque.removeWhere (index.js:9:10943)\n      at Context.<anonymous> (test/denque.js:514:30)\n      at process.processImmediate (node:internal/timers:534:21)\n\n\n\n=============================================================================\nWriting coverage object [/work/tmp/harness-sense-sy4FDG/test/coverage/coverage.json]\nWriting coverage reports at [/work/tmp/harness-sense-sy4FDG/test/coverage]\n=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 93.38% ( 268/287 )\nBranches     : 94.78% ( 127/134 )\nFunctions    : 100% ( 24/24 )\nLines        : 94.12% ( 240/255 )\n================================================================================\n",
+              "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+              "ref": "v-66cea06d07c9-4",
+              "replay": {
+                "variant": "v-66cea06d07c9-4",
+                "check": "npm test"
+              }
+            },
+            {
+              "fileName": "index.js",
+              "id": "4",
+              "location": {
+                "start": {
+                  "column": 27,
+                  "line": 210
+                },
+                "end": {
+                  "column": 37,
+                  "line": 210
+                }
+              },
+              "mutatorName": "StringLiteral",
+              "replacement": "\"\"",
+              "sourceSha256": "aa642225e6b6920bb6b594edd09c4d98b2a9b142df7026e8adf4ad412ebad78e",
+              "original": "'function'",
+              "diff": "--- a/index.js\n+++ b/index.js\n@@ 210:27 @@\n-'function'\n+\"\"",
+              "exit": 3,
+              "signal": null,
+              "status": "command-rejected",
+              "elapsedMs": 409,
+              "output": "\n> denque@2.1.0 test\n> istanbul cover --report lcov _mocha && npm run typescript\n\n\n\n  Denque.prototype.constructor\n    \u2713 should take no argument\n    \u2713 should take array argument\n    \u2713 should handle a high volume with no out of memory exception (188ms)\n\n  Denque.prototype.toArray\n    \u2713 should return \n[truncated]\ntype.removeWhere should filter wrapped bounded queues without changing capacity:\n     Error: predicate must be a function\n      at Denque.removeWhere (index.js:9:10935)\n      at Context.<anonymous> (test/denque.js:514:30)\n      at process.processImmediate (node:internal/timers:534:21)\n\n\n\n=============================================================================\nWriting coverage object [/work/tmp/harness-sense-sy4FDG/test/coverage/coverage.json]\nWriting coverage reports at [/work/tmp/harness-sense-sy4FDG/test/coverage]\n=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 93.38% ( 268/287 )\nBranches     : 94.78% ( 127/134 )\nFunctions    : 100% ( 24/24 )\nLines        : 94.12% ( 240/255 )\n================================================================================\n",
+              "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+              "ref": "v-66cea06d07c9-5",
+              "replay": {
+                "variant": "v-66cea06d07c9-5",
+                "check": "npm test"
+              }
+            },
+            {
+              "fileName": "index.js",
+              "id": "5",
+              "location": {
+                "start": {
+                  "column": 39,
+                  "line": 210
+                },
+                "end": {
+                  "column": 3,
+                  "line": 212
+                }
+              },
+              "mutatorName": "BlockStatement",
+              "replacement": "{}",
+              "sourceSha256": "aa642225e6b6920bb6b594edd09c4d98b2a9b142df7026e8adf4ad412ebad78e",
+              "original": "{\n    throw new Error('predicate must be a function');\n  }",
+              "diff": "--- a/index.js\n+++ b/index.js\n@@ 210:39 @@\n-{\n-    throw new Error('predicate must be a function');\n-  }\n+{}",
+              "exit": 1,
+              "signal": null,
+              "status": "command-rejected",
+              "elapsedMs": 399,
+              "output": "\n> denque@2.1.0 test\n> istanbul cover --report lcov _mocha && npm run typescript\n\n\n\n  Denque.prototype.constructor\n    \u2713 should take no argument\n    \u2713 should take array argument\n    \u2713 should handle a high volume with no out of memory exception (190ms)\n\n  Denque.prototype.toArray\n    \u2713 should return \n[truncated]\ning\n\n  1) Denque.prototype.removeWhere should leave the queue unchanged when the predicate throws:\n     AssertionError [ERR_ASSERTION]: Missing expected exception (Error).\n      at Context.<anonymous> (test/denque.js:492:12)\n      at process.processImmediate (node:internal/timers:534:21)\n\n\n\n=============================================================================\nWriting coverage object [/work/tmp/harness-sense-sy4FDG/test/coverage/coverage.json]\nWriting coverage reports at [/work/tmp/harness-sense-sy4FDG/test/coverage]\n=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 99.3% ( 284/286 )\nBranches     : 98.51% ( 132/134 )\nFunctions    : 100% ( 24/24 )\nLines        : 100% ( 254/254 )\n================================================================================\n",
+              "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+              "ref": "v-66cea06d07c9-6",
+              "replay": {
+                "variant": "v-66cea06d07c9-6",
+                "check": "npm test"
+              }
+            },
+            {
+              "fileName": "index.js",
+              "id": "7",
+              "location": {
+                "start": {
+                  "column": 20,
+                  "line": 211
+                },
+                "end": {
+                  "column": 50,
+                  "line": 211
+                }
+              },
+              "mutatorName": "StringLiteral",
+              "replacement": "\"\"",
+              "sourceSha256": "aa642225e6b6920bb6b594edd09c4d98b2a9b142df7026e8adf4ad412ebad78e",
+              "original": "'predicate must be a function'",
+              "diff": "--- a/index.js\n+++ b/index.js\n@@ 211:20 @@\n-'predicate must be a function'\n+\"\"",
+              "exit": 0,
+              "signal": null,
+              "status": "passed",
+              "elapsedMs": 982,
+              "output": "\n> denque@2.1.0 test\n> istanbul cover --report lcov _mocha && npm run typescript\n\n\n\n  Denque.prototype.constructor\n    \u2713 should take no argument\n    \u2713 should take array argument\n    \u2713 should handle a high volume with no out of memory exception (189ms)\n\n  Denque.prototype.toArray\n    \u2713 should return \n[truncated]\nould return undefined when trying to remove further than current size\n    \u2713 Should remove and add items like native splice method to the empty denque\n    \u2713 pop should shrink array when mostly empty\n\n\n  55 passing (210ms)\n\n=============================================================================\nWriting coverage object [/work/tmp/harness-sense-sy4FDG/test/coverage/coverage.json]\nWriting coverage reports at [/work/tmp/harness-sense-sy4FDG/test/coverage]\n=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 99.3% ( 285/287 )\nBranches     : 98.51% ( 132/134 )\nFunctions    : 100% ( 24/24 )\nLines        : 100% ( 255/255 )\n================================================================================\n\n> denque@2.1.0 typescript\n> tsc --project ./test/type/tsconfig.json\n\n",
+              "interpretation": "Tests still pass. Check required observable behavior; this can be equivalent or allowed.",
+              "ref": "v-66cea06d07c9-7",
+              "replay": {
+                "variant": "v-66cea06d07c9-7",
+                "check": "npm test"
+              }
+            },
+            {
+              "fileName": "index.js",
+              "id": "8",
+              "location": {
+                "start": {
+                  "column": 31,
+                  "line": 214
+                },
+                "end": {
+                  "column": 36,
+                  "line": 214
+                }
+              },
+              "mutatorName": "BooleanLiteral",
+              "replacement": "true",
+              "sourceSha256": "aa642225e6b6920bb6b594edd09c4d98b2a9b142df7026e8adf4ad412ebad78e",
+              "original": "false",
+              "diff": "--- a/index.js\n+++ b/index.js\n@@ 214:31 @@\n-false\n+true",
+              "exit": 0,
+              "signal": null,
+              "status": "passed",
+              "elapsedMs": 954,
+              "output": "\n> denque@2.1.0 test\n> istanbul cover --report lcov _mocha && npm run typescript\n\n\n\n  Denque.prototype.constructor\n    \u2713 should take no argument\n    \u2713 should take array argument\n    \u2713 should handle a high volume with no out of memory exception (193ms)\n\n  Denque.prototype.toArray\n    \u2713 should return \n[truncated]\nould return undefined when trying to remove further than current size\n    \u2713 Should remove and add items like native splice method to the empty denque\n    \u2713 pop should shrink array when mostly empty\n\n\n  55 passing (218ms)\n\n=============================================================================\nWriting coverage object [/work/tmp/harness-sense-sy4FDG/test/coverage/coverage.json]\nWriting coverage reports at [/work/tmp/harness-sense-sy4FDG/test/coverage]\n=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 99.3% ( 285/287 )\nBranches     : 98.51% ( 132/134 )\nFunctions    : 100% ( 24/24 )\nLines        : 100% ( 255/255 )\n================================================================================\n\n> denque@2.1.0 typescript\n> tsc --project ./test/type/tsconfig.json\n\n",
+              "interpretation": "Tests still pass. Check required observable behavior; this can be equivalent or allowed.",
+              "ref": "v-66cea06d07c9-8",
+              "replay": {
+                "variant": "v-66cea06d07c9-8",
+                "check": "npm test"
+              }
+            }
+          ],
+          "untested": [],
+          "cost": {
+            "commands": 9,
+            "engineMs": 287,
+            "preparationMs": 6346,
+            "commandMs": 5368,
+            "totalMs": 12446
+          },
+          "limits": [
+            "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+            "Standard Stryker operators may miss identity loss or a specific state transition.",
+            "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+            "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+          ],
+          "terminationVerified": true,
+          "engineExecuted": true
+        },
+        {
+          "status": "observed",
+          "snapshot": "b2f23ec8118b9078e9c82c86b8f8cb46b976f3f57c3432b496c2aa4211e55f88",
+          "originalArguments": {
+            "variant": "v-66cea06d07c9-8",
+            "check": "npm test"
+          },
+          "selectedVariant": "v-66cea06d07c9-8",
+          "command": "npm run test",
+          "argv": [
+            "npm",
+            "run",
+            "test"
+          ],
+          "tests": [
+            {
+              "name": "test/denque.js",
+              "sha256": "3ecd5ba090555e1a0ec30cb0baf0cbcb6be8c8175f44ea6fd875d57fce8b5905"
+            },
+            {
+              "name": "test/empty.js",
+              "sha256": "52572ce596770110005bf6b488a2ab2dffdb5d1618ded4f1e221c6c1c2b8b285"
+            },
+            {
+              "name": "test/type/index.ts",
+              "sha256": "2bfa7ba40e1ded9a8eadef87bb49cb1e08dd5b0a876ee87e1c1889c4a608591f"
+            },
+            {
+              "name": "test/type/tsconfig.json",
+              "sha256": "aae02e2cc4327a3d832a0209064f773ee4b637ebcf1eb781c070018bb79fb384"
+            }
+          ],
+          "baseline": {
+            "exit": 0,
+            "signal": null,
+            "status": "passed",
+            "elapsedMs": 985,
+            "output": "\n> denque@2.1.0 test\n> istanbul cover --report lcov _mocha && npm run typescript\n\n\n\n  Denque.prototype.constructor\n    \u2713 should take no argument\n    \u2713 should take array argument\n    \u2713 should handle a high volume with no out of memory exception (192ms)\n\n  Denque.prototype.toArray\n    \u2713 should return \n[truncated]\nrent size\n    \u2713 Should remove and add items like native splice method to the empty denque\n    \u2713 pop should shrink array when mostly empty\n\n  empty removeWhere contract\n    \u2713 visits no absent values\n\n\n  56 passing (212ms)\n\n=============================================================================\nWriting coverage object [/work/tmp/harness-sense-i6qZwB/test/coverage/coverage.json]\nWriting coverage reports at [/work/tmp/harness-sense-i6qZwB/test/coverage]\n=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 99.3% ( 285/287 )\nBranches     : 98.51% ( 132/134 )\nFunctions    : 100% ( 24/24 )\nLines        : 100% ( 255/255 )\n================================================================================\n\n> denque@2.1.0 typescript\n> tsc --project ./test/type/tsconfig.json\n\n"
+          },
+          "variants": [
+            {
+              "ref": "v-66cea06d07c9-8",
+              "fileName": "index.js",
+              "location": {
+                "start": {
+                  "column": 31,
+                  "line": 214
+                },
+                "end": {
+                  "column": 36,
+                  "line": 214
+                }
+              },
+              "replacement": "true",
+              "mutatorName": "BooleanLiteral",
+              "sourceSha256": "aa642225e6b6920bb6b594edd09c4d98b2a9b142df7026e8adf4ad412ebad78e",
+              "original": "false",
+              "diff": "--- a/index.js\n+++ b/index.js\n@@ 214:31 @@\n-false\n+true",
+              "exit": 1,
+              "signal": null,
+              "status": "command-rejected",
+              "elapsedMs": 389,
+              "output": "\n> denque@2.1.0 test\n> istanbul cover --report lcov _mocha && npm run typescript\n\n\n\n  Denque.prototype.constructor\n    \u2713 should take no argument\n    \u2713 should take array argument\n    \u2713 should handle a high volume with no out of memory exception (182ms)\n\n  Denque.prototype.toArray\n    \u2713 should return \n[truncated]\nre contract visits no absent values:\n\n      AssertionError [ERR_ASSERTION]: empty queue must not call predicate\n\n4 !== 0\n\n      + expected - actual\n\n      -4\n      +0\n      \n      at Context.<anonymous> (test/empty.js:2:200)\n      at process.processImmediate (node:internal/timers:534:21)\n\n\n\n=============================================================================\nWriting coverage object [/work/tmp/harness-sense-i6qZwB/test/coverage/coverage.json]\nWriting coverage reports at [/work/tmp/harness-sense-i6qZwB/test/coverage]\n=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 99.3% ( 285/287 )\nBranches     : 98.51% ( 132/134 )\nFunctions    : 100% ( 24/24 )\nLines        : 100% ( 255/255 )\n================================================================================\n",
+              "interpretation": "Variant rejected by command; cause requires inspection (assertion, import, compilation and other failures are not distinguished).",
+              "replay": {
+                "variant": "v-66cea06d07c9-8",
+                "check": "npm test"
+              }
+            }
+          ],
+          "untested": [],
+          "cost": {
+            "commands": 2,
+            "engineMs": 0,
+            "preparationMs": 1375,
+            "commandMs": 1374,
+            "totalMs": 2841
+          },
+          "limits": [
+            "Only changed production lines and one neighboring line; no cross-package or semantic requirement coverage inference.",
+            "Standard Stryker operators may miss identity loss or a specific state transition.",
+            "Ignored project files are excluded; installed node_modules is copied. Fresh baseline and variant commands; no result cache.",
+            "Nonzero command exits need inspection; no assertion classification or mutation score. Surviving variants may be equivalent or allowed."
+          ],
+          "terminationVerified": true,
+          "engineExecuted": false
+        }
+      ]
+    }
+  },
+  "nativeFixtureModes": [
+    "sensitivity",
+    "sensitivity-parallel",
+    "sensitivity-command-denial",
+    "sensitivity-hook-denial",
+    "sensitivity-read-denial",
+    "sensitivity-cancel",
+    "sensitivity-off"
+  ],
+  "nativeFixturePassed": true,
+  "nativeUnitPassed": true,
+  "templateConfigPassed": true,
+  "containerCancellation": true,
+  "review": {
+    "scope": "Changed sensitivity adapter/runner/native registration, fixtures, usage docs and four-slot schedule only",
+    "reviewer": "primary agent, one bounded final diff review",
+    "result": "No unresolved implementation defects found",
+    "verifiedContracts": [
+      "Workflow-local engine-issued references; model args cannot supply mutation definition",
+      "Full production-file digest before offsets; tests and observations independently snapshot-bound",
+      "Fresh command, source and dependency copies for baseline and exactly one selected variant",
+      "Native read/bash/lifecycle permissions and diagnostic cancellation unchanged",
+      "Task-wide 180-second accounting retained; no new result cache or auto retry",
+      "S0 existing sensitivity and S1 both direct A=0 B=0; identical corrected transport and stop logic",
+      "Frozen acceptance and balanced four-slot schedule"
+    ],
+    "remediation": "Used shared testPath classifier for test-file metadata. Local scripted denque setup corrected for multiline task and source-specific file access before any paid calls.",
+    "fullVerifier": "PROCESS_CONTAINMENT_UNAVAILABLE (sandboxed and elevated); not a full CI pass",
+    "realProviderRequests": 0
+  },
+  "fullVerifier": "PROCESS_CONTAINMENT_UNAVAILABLE in sandbox and elevated execution; unavailable, not passed",
+  "localPreparationFailures": [
+    "Loopback fixture EPERM before elevation; no native model request",
+    "Denque fixture initially compared multiline task to unescaped JSON",
+    "Denque fixture initially evaluated value-module setup before choosing denque calls"
+  ],
+  "knownOfflineCounterexampleInFixture": true
+}

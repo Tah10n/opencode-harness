@@ -1,0 +1,1 @@
+import {lookup} from './lookup.mjs';export function project(record,fields){const out={};for(const f of fields){const r=lookup(record,f.path);if(r.found)out[f.as]=r.value;}return out;}export function responseRows(records,fields){return records.map(r=>project(r,fields));}

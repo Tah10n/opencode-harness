@@ -1,0 +1,167 @@
+diff --git a/docs/providers/aws/guide/variables.md b/docs/providers/aws/guide/variables.md
+index 8cda633ac14fd5ce3842ceedc9374493ec462f26..a0605cf477f733f7b947bdca996b24f2a48fd72b 100644
+--- a/docs/providers/aws/guide/variables.md
++++ b/docs/providers/aws/guide/variables.md
+@@ -103,6 +103,22 @@ functions:
+ 
+ In the above example, you're referencing the entire `myCustomFile.yml` file in the `custom` property. You need to pass the path relative to your service directory. You can also request specific properties in that file as shown in the `schedule` property. It's completely recursive and you can go as deep as you want.
+ 
++You can also keep a function's complete event configuration in a separate file:
++
++```yml
++# handlers/users/config.yml
++events:
++  - http: GET users
++```
++
++```yml
++# serverless.yml
++functions:
++  users:
++    handler: handlers/users/handler.users
++    events: ${file(./handlers/users/config.yml):events}
++```
++
+ ## Multiple Configuration Files
+ 
+ Adding many custom resources to your `serverless.yml` file could bloat the whole file, so you can use the Serverless Variable syntax to split this up.
+@@ -160,4 +176,4 @@ Previously we used the `serverless.env.yml` file to track Serverless Variables.
+ * Using environment variables: You can instead store your variables in environment variables and reference them with `env.someEnvVar`. For more info, you can check the environment variable reference section above.
+ * Making your variables stage/region specific: `serverless.env.yml` allowed you to have different values for the same variable based on the stage/region you're deploying to. You can achieve the same result by using the nesting functionality of the new variable system. For example, if you have two different ARNs, one for `dev` stage and the other for `prod` stage, you can do the following: `${env:${opt:stage}_arn}`. This will make sure the correct env var is referenced based on the stage provided as an option. Of course you'll need to export both `dev_arn` and `prod_arn` env vars on your local system.
+ 
+-Now you don't need `serverless.env.yml` at all, but you can still use it if you want. It's just not required anymore. Migrating to the new variable system is easy and you just need to know how the new system works and make small adjustments to how you store & reference your variables.
+\ No newline at end of file
++Now you don't need `serverless.env.yml` at all, but you can still use it if you want. It's just not required anymore. Migrating to the new variable system is easy and you just need to know how the new system works and make small adjustments to how you store & reference your variables.
+diff --git a/lib/Serverless.js b/lib/Serverless.js
+index 61675bad98785f778767fcd22f0abdef55652318..25fe61d397e9082325dabd488c8b396e4a936112 100644
+--- a/lib/Serverless.js
++++ b/lib/Serverless.js
+@@ -83,6 +83,7 @@ class Serverless {
+     // populate variables after --help, otherwise help may fail to print
+     // (https://github.com/serverless/serverless/issues/2041)
+     this.variables.populateService(this.pluginManager.cliOptions);
++    this.service.validate();
+ 
+     // trigger the plugin lifecycle when there's something which should be processed
+     return this.pluginManager.run(this.processedInput.commands);
+diff --git a/lib/classes/Service.js b/lib/classes/Service.js
+index 9cff995f22be1e4be2b94b3f3c182bc07f04685b..91e1151b9ff2d7cc66efc60423fd599b3460afcf 100644
+--- a/lib/classes/Service.js
++++ b/lib/classes/Service.js
+@@ -146,17 +146,11 @@ class Service {
+         this.provider.region = this.defaults.region;
+         this.provider.variableSyntax = this.defaults.variableSyntax;
+ 
++        this.validate(true);
++
+         // setup function.name property
+         const stageNameForFunction = options.stage || this.provider.stage;
+         _.forEach(that.functions, (functionObj, functionName) => {
+-          if (!functionObj.events) {
+-            that.functions[functionName].events = [];
+-          }
+-          if (!_.isArray(functionObj.events)) {
+-            throw new SError(`Events for "${functionName}" must be an array,` +
+-                             ` not an ${typeof functionObj.events}`);
+-          }
+-
+           if (!functionObj.name) {
+             that.functions[functionName].name =
+               `${that.service}-${stageNameForFunction}-${functionName}`;
+@@ -167,6 +161,21 @@ class Service {
+       });
+   }
+ 
++  validate(allowVariables) {
++    _.forEach(this.functions, (functionObj, functionName) => {
++      if (!functionObj.events) {
++        this.functions[functionName].events = [];
++      }
++
++      const isVariable = allowVariables && typeof functionObj.events === 'string' &&
++        functionObj.events.match(this.defaults.variableSyntax);
++      if (!_.isArray(functionObj.events) && !isVariable) {
++        throw new SError(`Events for "${functionName}" must be an array,` +
++                         ` not an ${typeof functionObj.events}`);
++      }
++    });
++  }
++
+   update(data) {
+     return _.merge(this, data);
+   }
+diff --git a/lib/classes/Service.test.js b/lib/classes/Service.test.js
+index 2a9ce568d60519b812bb3a5d3808e4d0d36b5a7c..f22461eaa6fde505b14015e31d53c2b1d5db771e 100644
+--- a/lib/classes/Service.test.js
++++ b/lib/classes/Service.test.js
+@@ -162,6 +162,70 @@ describe('Service', () => {
+       });
+     });
+ 
++    it('should support loading function events from a file variable', () => {
++      const SUtils = new Utils();
++      const events = [
++        {
++          http: 'GET users',
++        },
++      ];
++      const serverlessYml = {
++        service: 'new-service',
++        provider: 'aws',
++        functions: {
++          users: {
++            handler: 'handlers/users/handler.users',
++            events: '${file(./handlers/users/config.yml):events}',
++          },
++        },
++      };
++
++      SUtils.writeFileSync(path.join(tmpDirPath, 'serverless.yml'),
++        YAML.dump(serverlessYml));
++      SUtils.writeFileSync(path.join(tmpDirPath, 'handlers/users/config.yml'),
++        YAML.dump({ events }));
++
++      const serverless = new Serverless({ servicePath: tmpDirPath });
++
++      return serverless.init().then(() => {
++        expect(serverless.service.functions.users.events)
++          .to.equal('${file(./handlers/users/config.yml):events}');
++
++        serverless.variables.populateService();
++
++        expect(serverless.service.functions.users.events).to.deep.equal(events);
++      });
++    });
++
++    it('should reject a file variable that resolves to a non-array', () => {
++      const SUtils = new Utils();
++      const serverlessYml = {
++        service: 'new-service',
++        provider: 'aws',
++        functions: {
++          users: {
++            events: '${file(./handlers/users/config.yml):events}',
++          },
++        },
++      };
++
++      SUtils.writeFileSync(path.join(tmpDirPath, 'serverless.yml'),
++        YAML.dump(serverlessYml));
++      SUtils.writeFileSync(path.join(tmpDirPath, 'handlers/users/config.yml'),
++        YAML.dump({ events: {} }));
++
++      const serverless = new Serverless({ servicePath: tmpDirPath });
++
++      return serverless.init().then(() => {
++        expect(serverless.service.functions.users.events)
++          .to.equal('${file(./handlers/users/config.yml):events}');
++
++        serverless.variables.populateService();
++
++        expect(() => serverless.service.validate()).to.throw(Error);
++      });
++    });
++
+     it('should make sure function name contains the default stage', () => {
+       const SUtils = new Utils();
+       const serverlessYml = {

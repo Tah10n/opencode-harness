@@ -1,0 +1,194 @@
+diff --git a/README.md b/README.md
+index 4a26073f8052ee6704abf6f7fd97a068def50ea5..d9921cebbd616c43279709ff515dd66c1b184335 100644
+--- a/README.md
++++ b/README.md
+@@ -514,6 +514,19 @@ Removes the protocol from the input.
+ withoutProtocol("http://example.com"); // "example.com"
+ ```
+ 
++### `withoutQuery(input, keys?)`
++
++Removes the complete query, or only fields with the supplied decoded keys, from a URL.
++
++When removing selected keys, the retained query fields are not decoded or reserialized, so their original spelling, values, percent-escape casing, order, and separators are preserved. An empty key list or a query without matching keys returns the input unchanged.
++
++**Example:**
++
++```js
++withoutQuery("/foo?bar=1&baz=2#hash"); // "/foo#hash"
++withoutQuery("/foo?bar=1&baz=2", "bar"); // "/foo?baz=2"
++```
++
+ ### `withoutTrailingSlash(input, respectQueryAndFragment?)`
+ 
+ Removes the trailing slash from the URL or pathname.
+diff --git a/src/utils.ts b/src/utils.ts
+index ea98aba4e7261c2199eeb69e1d5dede3b15a1130..7d8a98f862751e3ed61063f04f6e4856d0c58d3b 100644
+--- a/src/utils.ts
++++ b/src/utils.ts
+@@ -3,6 +3,7 @@ import { QueryObject, parseQuery, stringifyQuery, ParsedQuery } from "./query";
+ import {
+   decode,
+   decodePath,
++  decodeQueryKey,
+   encodeHash,
+   encodeHost,
+   encodePath,
+@@ -380,6 +381,63 @@ export function filterQuery(
+   return stringifyParsedURL(parsed);
+ }
+ 
++/**
++ * Removes the query section of a URL, or selected query keys, while preserving
++ * the raw spelling of the remaining URL and query fields.
++ * When keys are supplied, matching uses decoded query keys. Retained fields
++ * are not decoded or reserialized, so their original spelling, values,
++ * percent-escape casing, order, and separators are preserved. An empty key
++ * list or no matches returns the input unchanged.
++ *
++ * @example
++ *
++ * ```js
++ * withoutQuery("/foo?bar=1&baz=2#hash"); // "/foo#hash"
++ * withoutQuery("/foo?bar=1&baz=2", "bar"); // "/foo?baz=2"
++ * ```
++ *
++ * @group utils
++ */
++export function withoutQuery(
++  input: string,
++  keys?: string | readonly string[],
++): string {
++  const hashIndex = input.indexOf("#");
++  const queryEnd = hashIndex === -1 ? input.length : hashIndex;
++  const queryIndex = input.indexOf("?");
++
++  if (queryIndex === -1 || queryIndex > queryEnd) {
++    return input;
++  }
++
++  if (keys === undefined) {
++    return input.slice(0, queryIndex) + input.slice(queryEnd);
++  }
++
++  const keysToRemove = new Set(typeof keys === "string" ? [keys] : keys);
++  if (keysToRemove.size === 0) {
++    return input;
++  }
++
++  const fields = input.slice(queryIndex + 1, queryEnd).split("&");
++  const retainedFields = fields.filter((field) => {
++    const equalsIndex = field.indexOf("=");
++    const rawKey = equalsIndex === -1 ? field : field.slice(0, equalsIndex);
++    return !keysToRemove.has(decodeQueryKey(rawKey));
++  });
++
++  if (retainedFields.length === fields.length) {
++    return input;
++  }
++
++  const query = retainedFields.join("&");
++  return (
++    input.slice(0, queryIndex) +
++    (query ? `?${query}` : "") +
++    input.slice(queryEnd)
++  );
++}
++
+ /**
+  * Parses and decodes the query object of an input URL into an object.
+  *
+diff --git a/test/query.test.ts b/test/query.test.ts
+index 8ef15e44f0fb7e4099e00787dcb490a467979baa..bfc7765e13c4f685e1782a6f0c6d9174d7fc1592 100644
+--- a/test/query.test.ts
++++ b/test/query.test.ts
+@@ -1,5 +1,5 @@
+ import { describe, expect, test } from "vitest";
+-import { filterQuery, getQuery, withQuery } from "../src";
++import { filterQuery, getQuery, withQuery, withoutQuery } from "../src";
+ 
+ describe("withQuery", () => {
+   const tests = [
+@@ -87,6 +87,60 @@ describe("filterQuery", () => {
+   }
+ });
+ 
++describe("withoutQuery", () => {
++  test("removes the complete query while preserving the prefix and fragment", () => {
++    expect(withoutQuery("/foo?bar=1&baz=2#hash")).toBe("/foo#hash");
++    expect(withoutQuery("/foo?bar=1&baz=2")).toBe("/foo");
++    expect(withoutQuery("/foo#fragment?bar=1")).toBe("/foo#fragment?bar=1");
++  });
++
++  test("removes every matching field and preserves retained raw fields", () => {
++    expect(
++      withoutQuery("/p?a=1&a=2&keep=%2f&&keep=two#f", ["a", "a"]),
++    ).toBe("/p?keep=%2f&&keep=two#f");
++    expect(withoutQuery("/p?x=1&&y=2#f", "x")).toBe("/p?&y=2#f");
++    expect(withoutQuery("/p?bare&x=1", "bare")).toBe("/p?x=1");
++    expect(withoutQuery("/p?x=1&x=2", "x")).toBe("/p");
++  });
++
++  test(
++    "matches decoded, plus-separated, malformed, Unicode, and special keys",
++    () => {
++      expect(withoutQuery("/p?%E2%9C%93=1&other=2", "✓")).toBe(
++        "/p?other=2",
++      );
++      expect(withoutQuery("/p?hello+world=1&other=2", "hello world")).toBe(
++        "/p?other=2",
++      );
++      expect(withoutQuery("/p?bad%ZZ=1&other=2", "bad%ZZ")).toBe(
++        "/p?other=2",
++      );
++      expect(withoutQuery("/p?%3Dfirst=1&other=2", "=first")).toBe(
++        "/p?other=2",
++      );
++      expect(
++        withoutQuery("/p?__proto__=1&constructor=2&keep=3", [
++          "__proto__",
++          "__proto__",
++        ]),
++      ).toBe("/p?constructor=2&keep=3");
++    },
++  );
++
++  test("supports empty keys, empty fields, and no-op calls", () => {
++    expect(withoutQuery("/p?=1&foo=2&=3", "")).toBe("/p?foo=2");
++    expect(withoutQuery("/p?&&", "")).toBe("/p");
++    expect(withoutQuery("/p?x=1&keep=%2F", [])).toBe("/p?x=1&keep=%2F");
++    expect(withoutQuery("/p?x=1&keep=%2F", "missing")).toBe(
++      "/p?x=1&keep=%2F",
++    );
++
++    const keys = ["x"];
++    withoutQuery("/p?x=1", keys);
++    expect(keys).toStrictEqual(["x"]);
++  });
++});
++
+ describe("getQuery", () => {
+   const tests = {
+     "http://foo.com/foo?test=123&unicode=%E5%A5%BD": {
+diff --git a/test/types.test-d.ts b/test/types.test-d.ts
+index e28c503eaa0456b72e8177b9e0a4f3ed5e536916..24444217bf3b2a6cd5bb01503ce4f45ccc8ca653 100644
+--- a/test/types.test-d.ts
++++ b/test/types.test-d.ts
+@@ -1,5 +1,5 @@
+ import { describe, expectTypeOf, test } from "vitest";
+-import { getQuery, parseQuery } from "../src";
++import { getQuery, parseQuery, withoutQuery } from "../src";
+ 
+ describe("query", () => {
+   test("getQuery generic type support", () => {
+@@ -11,4 +11,10 @@ describe("query", () => {
+     const result = parseQuery<{ foo: string }>("http://foo.com/?foo=bar");
+     expectTypeOf(result).toEqualTypeOf<{ foo: string }>();
+   });
++
++  test("withoutQuery supports readonly key arrays and returns a string", () => {
++    const keys: readonly string[] = ["foo"];
++    const result = withoutQuery("/foo?foo=bar", keys);
++    expectTypeOf(result).toEqualTypeOf<string>();
++  });
+ });

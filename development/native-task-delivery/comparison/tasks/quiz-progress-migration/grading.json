@@ -1,0 +1,15 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "v1 migration through codec keeps extras",
+    "v2 order and deep ownership"
+  ],
+  "docDelivery": [
+    "Describe v1-to-v2 order mapping, extra-field preservation, unchanged v2 values, deep copies and parse/version errors."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Implement migrate(value), encode(value), decode(text). v1 progress is {version:1,answered:[unique question ID strings],...extras}; v2 is {version:2,answers:[{id,order}],...extras}. Migrate v1 replaces only answered/version with answers preserving encounter order as zero-based order, retaining all extra JSON data. v1 inputs have no answers field, v2 no answered field; valid v2 answers values/order and extras must be preserved verbatim in value semantics, not renumbered/sorted. Unknown version throws RangeError(\"version\"). Return independent deep copies (JSON-data domain, no special objects); encode is JSON.stringify of migrated value; decode parses JSON then migrates, SyntaxError propagates for invalid text. <=1000 answers, arbitrary JSON extras without cycles. Never mutate input; this is not a general schema validator.",
+  "independence": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+}

@@ -1,0 +1,271 @@
+{
+  "kind": "two-run-selected-usage-check",
+  "outcome": {
+    "status": "paused",
+    "pause": {
+      "kind": "unknown_submission",
+      "slot": 2,
+      "error": "AbortError"
+    }
+  },
+  "safety": {
+    "reason": "Case 1 request 9 HTTP 503 upstream reset before headers: no bound terminal response or usage. Discovered after runner admitted case 2. Stop remaining execution; no retry or replacement.",
+    "localTerminationVerified": true,
+    "remoteExecutionStateUnknown": true,
+    "protocolDeviation": "A request 9 HTTP 503 was forwarded to native client, which replayed the byte-identical request as request 10; scheduler admitted B before unknown execution was detected. B was safety-stopped. No task replacement or extra real smoke."
+  },
+  "runtimeSha": "5001f4cd4bccc1befad8e916580bbfd59443344f",
+  "executionHarnessSha": "ccf2ca3bdfedc3a4425550866099bbd8e5bd8592",
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "budgetMs": 900000,
+  "rows": [
+    {
+      "slot": 1,
+      "case": "case-1",
+      "runtimeSha": "5001f4cd4bccc1befad8e916580bbfd59443344f",
+      "advertisedInAllAuthorRequests": true,
+      "authorRequests": 19,
+      "diagnosticCalls": 1,
+      "authorSummary": "Implemented and verified `removeWhere` across:\n\n- Ring-buffer and capacity-preserving behavior\n- Original value/index predicate ordering\n- Atomic failure when predicates throw\n- Invalid predicate rejection\n- TypeScript declarations and type tests\n- README and API documentation\n- Wrapped queues, duplicates, falsy values, identity, and continued usability\n\nChecks passed:\n\n- Focused `removeWhere` tests: 3 passing\n- `npm run typescript`\n- `npm test`: 55 passing\n- `git diff --check`\n- `harness_sense`: required mutations detected; surviving mutations were contract-equivalent\n\nNo commit or dependency changes made.",
+      "patch": "patches/01-case-1.patch",
+      "patchSha256": "c5296118003820e8d4268d2b6042341bc2517cce7de3978ed1f9db4b595a0a48",
+      "nativeCompleted": true,
+      "nativeExit": 0,
+      "stopReason": null,
+      "phaseCount": 1,
+      "nativeSessions": 2,
+      "authorSessions": 1,
+      "toolCalls": 36,
+      "workflowStatus": "incomplete",
+      "capturedWorkflowStatus": "incomplete",
+      "workflowRepairs": 0,
+      "completedCommands": [
+        {
+          "command": "npm exec -- mocha test/denque.js --grep 'removeWhere'",
+          "exit": 0
+        },
+        {
+          "command": "npm run typescript",
+          "exit": 0
+        },
+        {
+          "command": "npm test",
+          "exit": 0
+        },
+        {
+          "command": "git status --short && git diff --stat && git diff -- test/denque.js && git diff -- index.js index.d.ts test/type/index.ts README.md docs/api.mdx",
+          "exit": 0
+        },
+        {
+          "command": "git diff --check",
+          "exit": 0
+        },
+        {
+          "command": "git status --short && git diff --stat",
+          "exit": 0
+        }
+      ],
+      "termination": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": true
+      },
+      "usage": {
+        "providerRequests": 22,
+        "requestsWithoutUsage": 1,
+        "inputTokens": 565840,
+        "outputTokens": 6646,
+        "totalTokens": 572486,
+        "cachedInputTokens": 371712,
+        "reasoningTokens": 3532,
+        "cachedSubsetUnknownRequests": 1,
+        "reasoningSubsetUnknownRequests": 1
+      },
+      "unknownRequests": [
+        {
+          "requestIndex": 9,
+          "status": 503,
+          "error": null,
+          "responseStatus": null,
+          "serverCompletion": null,
+          "forwardedAt": "2026-09-14T14:59:48.765Z",
+          "finishedAt": "2026-09-14T14:59:52.405Z"
+        }
+      ],
+      "executionElapsedMs": 224725,
+      "cleanupElapsedMs": 72,
+      "preparationAndCaptureElapsedMs": 2526,
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "command": [
+          "sh",
+          "-c",
+          "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && npm test"
+        ],
+        "elapsedMs": 1872,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "realProviderRequests": 0
+      },
+      "independent": {
+        "exit": 0,
+        "signal": null,
+        "command": [
+          "sh",
+          "-c",
+          "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && timeout 10s node .independent.cjs"
+        ],
+        "elapsedMs": 965,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "realProviderRequests": 0
+      },
+      "changedFromSeed": [
+        "test/denque.js"
+      ],
+      "patchKind": "native-terminal",
+      "terminalApplicable": true,
+      "review": {
+        "productionBehaviorPassed": true,
+        "fullPatchAcceptance": false,
+        "normalNativeHandoff": true,
+        "usefulDiagnosticToTestChain": false,
+        "reason": "Required empty-deque callback regression remains missing. The ordinary BooleanLiteral false-to-true variant still passes the final suite but invokes the predicate four times on an empty deque. The public counterexample requires zero calls and rejects that variant by assertion.",
+        "chronology": "Only test/denque.js changed relative to the seed. Wrapped-capacity test edits at tool events 22 and 26 preceded harness_sense at event 30. No edits or repeated author diagnostics followed.",
+        "interpretation": "The author correctly accepted an unspecified error-message mutation but incorrectly called _copyArray(true) equivalent: the empty-deque case was overlooked.",
+        "retainedImprovement": "The wrapped bounded test now retains additional falsy values and checks backing-array length/mask preservation. This local improvement predates the diagnostic and is not attributed to it.",
+        "limitations": "Existing good production, types, docs and tests pass both ordinary and independent checks, but they do not establish requested regression completeness. A request 9 has unknown usage and remote execution state after HTTP 503. Internal incomplete status is retained."
+      }
+    },
+    {
+      "slot": 2,
+      "case": "case-2",
+      "runtimeSha": "5001f4cd4bccc1befad8e916580bbfd59443344f",
+      "advertisedInAllAuthorRequests": true,
+      "authorRequests": 14,
+      "diagnosticCalls": 1,
+      "authorSummary": null,
+      "patch": "patches/02-case-2.patch",
+      "patchSha256": "d4179fbe5556e631a5c4b068e8adaa049d906c3603c209db25929b44bf82c3e0",
+      "nativeCompleted": false,
+      "nativeExit": 143,
+      "stopReason": null,
+      "phaseCount": 1,
+      "nativeSessions": 2,
+      "authorSessions": 1,
+      "toolCalls": 31,
+      "workflowStatus": null,
+      "capturedWorkflowStatus": "incomplete",
+      "workflowRepairs": null,
+      "termination": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": true
+      },
+      "usage": {
+        "providerRequests": 16,
+        "requestsWithoutUsage": 1,
+        "inputTokens": 430805,
+        "outputTokens": 5360,
+        "totalTokens": 436165,
+        "cachedInputTokens": 257536,
+        "reasoningTokens": 3448,
+        "cachedSubsetUnknownRequests": 1,
+        "reasoningSubsetUnknownRequests": 1
+      },
+      "unknownRequests": [
+        {
+          "requestIndex": 16,
+          "status": 200,
+          "error": "AbortError",
+          "responseStatus": "in_progress",
+          "serverCompletion": "unknown",
+          "forwardedAt": "2026-09-14T15:04:59.554Z",
+          "finishedAt": "2026-09-14T15:05:05.942Z"
+        }
+      ],
+      "executionElapsedMs": 191301,
+      "cleanupElapsedMs": 58,
+      "preparationAndCaptureElapsedMs": 2832,
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "command": [
+          "sh",
+          "-c",
+          "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && npm test"
+        ],
+        "elapsedMs": 1819,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "realProviderRequests": 0
+      },
+      "independent": {
+        "exit": 0,
+        "signal": null,
+        "command": [
+          "sh",
+          "-c",
+          "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && timeout 10s node .independent.cjs"
+        ],
+        "elapsedMs": 638,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "realProviderRequests": 0
+      },
+      "changedFromSeed": [],
+      "patchKind": "captured-interrupted-worktree",
+      "terminalApplicable": false,
+      "review": {
+        "productionBehaviorPassed": true,
+        "fullPatchAcceptance": true,
+        "normalNativeHandoff": false,
+        "controlPreserved": true,
+        "usefulDiagnosticToTestChain": false,
+        "reason": "Captured project bytes and modes exactly preserve the supplied correct control patch; no useful assertion was removed and no assertion was added for the allowed error-message variant.",
+        "chronology": "Native harness_sense at tool event 19; no source changes before or after. The full project suite passed before and after diagnosis. Direct runner and forwarded-grep commands failed due to command resolution/TypeScript arguments; a later direct API check passed.",
+        "interpretation": "The author correctly described the only surviving variant, an empty Error message, as allowed by the original contract. No 100 percent score was required.",
+        "limitations": "Safety stop during request 16 interrupted native completion. There is no terminal.patch or author final response. The published patch was reconstructed offline from the captured worktree against the frozen original base and applied in an ordinary copy; it is not autonomous handoff. Usage and remote execution state of that request remain unknown."
+      }
+    }
+  ],
+  "totals": {
+    "attempts": 2,
+    "providerRequests": 38,
+    "unknownUsageRequests": 2,
+    "inputTokens": 996645,
+    "outputTokens": 12006,
+    "totalTokens": 1008651,
+    "cachedInputTokens": 629248,
+    "reasoningTokens": 6980,
+    "toolCalls": 67,
+    "diagnosticCalls": 2,
+    "executionElapsedMs": 416026,
+    "cleanupElapsedMs": 130,
+    "preparationAndCaptureElapsedMs": 5358
+  },
+  "observedAutomaticRequestReplays": 1,
+  "replacements": 0,
+  "additionalRealSmokes": 0,
+  "comparativeBaseline": false,
+  "qualityAdvantageEstablished": false,
+  "historicalResultsUnchanged": true
+}

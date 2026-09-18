@@ -1,0 +1,61 @@
+{
+  "at": "2026-09-14T10:45:37.788289+00:00",
+  "slot": 42,
+  "requestIndex": 6,
+  "kind": "external-upstream-server-error-without-bound-terminal-response",
+  "lastObservedResponseStatus": "in_progress",
+  "upstreamEventTypes": {
+    "response.created": 1,
+    "response.in_progress": 1,
+    "keepalive": 9,
+    "error": 1
+  },
+  "upstreamErrorType": "server_error",
+  "upstreamErrorCode": "server_error",
+  "terminalResponseEventObserved": false,
+  "usage": null,
+  "transportError": {
+    "name": "AbortError",
+    "clientOrRelayCancelled": true,
+    "ownTaskDeadline": false
+  },
+  "clientDelivery": "unconfirmed-after-transport-error",
+  "forwardedAt": "2026-09-14T10:37:17.881Z",
+  "finishedAt": "2026-09-14T10:42:19.907Z",
+  "responseStreamSha256": "3e0d02c6d832caf29089b7d26951b81f1fbbc3391537dfa578b3754fdb8086a8",
+  "responseStreamBytes": 40974,
+  "stop": {
+    "ownTaskDeadlineTriggered": false,
+    "terminationVerified": true,
+    "captureSaved": true,
+    "forwardingClosed": true,
+    "relayRemoved": true,
+    "activeProviderHandlers": 0,
+    "providerServerStateMayRemainUnknown": true
+  },
+  "cleanup": {
+    "status": 0,
+    "stderr": "",
+    "containerStderr": ""
+  },
+  "originalOutcome": {
+    "status": "paused",
+    "pause": {
+      "kind": "unknown_submission",
+      "slot": 42,
+      "error": "AbortError"
+    }
+  },
+  "startedContinuationSlots": 24,
+  "unstartedSlots": [
+    43,
+    44,
+    45,
+    46,
+    47,
+    48
+  ],
+  "realRetries": 0,
+  "newProviderCallsAfterPause": 0,
+  "interpretation": "The server error is observed upstream. It is not a response.failed lifecycle event carrying a terminal status/response binding; last observed response status remains in_progress and final usage is unavailable. Earlier completed request 5 does not establish request 6 completion. Managed task deadline did not trigger. Original unknown-submission stop rule applies; the single authorized amendment does not authorize another runtime change or bypass/resume of this pause. Initiator of subsequent transport cancellation is not separately established."
+}

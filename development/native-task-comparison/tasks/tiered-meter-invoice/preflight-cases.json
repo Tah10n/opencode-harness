@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/meter.mjs": "export function charge(units,bands){let lower=0;return bands.reduce((sum,{upTo,cents})=>{const upper=upTo??units;const quantity=Math.max(0,Math.min(units,upper)-lower);lower=upper;return sum+quantity*cents;},0);}\n"
+  },
+  "mutants": [
+    {
+      "name": "flat-charge",
+      "file": "src/meter.mjs",
+      "replacement": "export function charge(units,bands){return units*bands[0].cents;}\n"
+    },
+    {
+      "name": "uncapped-credit",
+      "file": "src/invoice.mjs",
+      "replacement": "import {charge} from './meter.mjs';export function invoice(entries,bands,credit=0){const lines=entries.map(e=>({id:e.id,cents:charge(e.units,bands)}));const subtotal=lines.reduce((s,e)=>s+e.cents,0);const appliedCredit=credit;return {lines,subtotal,appliedCredit,due:subtotal-appliedCredit};}\n"
+    }
+  ]
+}

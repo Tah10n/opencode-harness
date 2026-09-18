@@ -1,0 +1,101 @@
+{
+  "dependency": "husky@9.1.7",
+  "generatorSha256": "ccd8b0953cd9283575466a6b40d1afccdfeabb4a5ef4415b5be40d9c33a5cdbd",
+  "generatedHashes": {
+    ".husky/_/.gitignore": {
+      "sha256": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1",
+      "executable": false
+    },
+    ".husky/_/applypatch-msg": {
+      "sha256": "34fe496008be71d8fdd446b2cce81e4bb0406109c130eafc583fbd9fe33244e2",
+      "executable": true
+    },
+    ".husky/_/commit-msg": {
+      "sha256": "34fe496008be71d8fdd446b2cce81e4bb0406109c130eafc583fbd9fe33244e2",
+      "executable": true
+    },
+    ".husky/_/h": {
+      "sha256": "70200b200ca709b0622784f93839a5b2872333a917a09afddefd7dc2d8cdc680",
+      "executable": false
+    },
+    ".husky/_/husky.sh": {
+      "sha256": "21122903fca7209a13c991e5be68780636e28f1b8f0ae7ea07ed0065dfe37268",
+      "executable": false
+    },
+    ".husky/_/post-applypatch": {
+      "sha256": "34fe496008be71d8fdd446b2cce81e4bb0406109c130eafc583fbd9fe33244e2",
+      "executable": true
+    },
+    ".husky/_/post-checkout": {
+      "sha256": "34fe496008be71d8fdd446b2cce81e4bb0406109c130eafc583fbd9fe33244e2",
+      "executable": true
+    },
+    ".husky/_/post-commit": {
+      "sha256": "34fe496008be71d8fdd446b2cce81e4bb0406109c130eafc583fbd9fe33244e2",
+      "executable": true
+    },
+    ".husky/_/post-merge": {
+      "sha256": "34fe496008be71d8fdd446b2cce81e4bb0406109c130eafc583fbd9fe33244e2",
+      "executable": true
+    },
+    ".husky/_/post-rewrite": {
+      "sha256": "34fe496008be71d8fdd446b2cce81e4bb0406109c130eafc583fbd9fe33244e2",
+      "executable": true
+    },
+    ".husky/_/pre-applypatch": {
+      "sha256": "34fe496008be71d8fdd446b2cce81e4bb0406109c130eafc583fbd9fe33244e2",
+      "executable": true
+    },
+    ".husky/_/pre-auto-gc": {
+      "sha256": "34fe496008be71d8fdd446b2cce81e4bb0406109c130eafc583fbd9fe33244e2",
+      "executable": true
+    },
+    ".husky/_/pre-commit": {
+      "sha256": "34fe496008be71d8fdd446b2cce81e4bb0406109c130eafc583fbd9fe33244e2",
+      "executable": true
+    },
+    ".husky/_/pre-merge-commit": {
+      "sha256": "34fe496008be71d8fdd446b2cce81e4bb0406109c130eafc583fbd9fe33244e2",
+      "executable": true
+    },
+    ".husky/_/pre-push": {
+      "sha256": "34fe496008be71d8fdd446b2cce81e4bb0406109c130eafc583fbd9fe33244e2",
+      "executable": true
+    },
+    ".husky/_/pre-rebase": {
+      "sha256": "34fe496008be71d8fdd446b2cce81e4bb0406109c130eafc583fbd9fe33244e2",
+      "executable": true
+    },
+    ".husky/_/prepare-commit-msg": {
+      "sha256": "34fe496008be71d8fdd446b2cce81e4bb0406109c130eafc583fbd9fe33244e2",
+      "executable": true
+    }
+  },
+  "ordinaryGitIgnoreVerified": true,
+  "authorSourceUnchanged": true,
+  "rows": [
+    {
+      "id": "9362cee5515b",
+      "excluded": true,
+      "paths": [
+        ".husky/_/.gitignore",
+        ".husky/_/applypatch-msg",
+        ".husky/_/commit-msg",
+        ".husky/_/h",
+        ".husky/_/husky.sh",
+        ".husky/_/post-applypatch",
+        ".husky/_/post-checkout",
+        ".husky/_/post-commit",
+        ".husky/_/post-merge",
+        ".husky/_/post-rewrite",
+        ".husky/_/pre-applypatch",
+        ".husky/_/pre-auto-gc",
+        ".husky/_/pre-commit",
+        ".husky/_/pre-merge-commit",
+        ".husky/_/pre-push",
+        ".husky/_/pre-rebase",
+        ".husky/_/prepare-commit-msg"
+      ]
+    }
+  ]
+}

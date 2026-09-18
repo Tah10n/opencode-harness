@@ -1,0 +1,109 @@
+diff --git a/README.md b/README.md
+index 4a26073..7dccc1a 100644
+--- a/README.md
++++ b/README.md
+@@ -214,6 +214,10 @@ stringifyQuery({ foo: 'bar', baz: undefined })
+ 
+ ### `$URL()`
+ 
++### `appendQuery(input, query)`
++
++Append query values after existing values.
++
+ ### `cleanDoubleSlashes(input)`
+ 
+ Removes double slashes from the URL.
+@@ -580,3 +584,8 @@ Special thanks to Eduardo San Martin Morote ([posva](https://github.com/posva))
+ [codecov-href]: https://codecov.io/gh/unjs/ufo
+ [bundle-src]: https://img.shields.io/bundlephobia/minzip/ufo?style=flat&colorA=18181B&colorB=F0DB4F
+ [bundle-href]: https://bundlephobia.com/result?p=ufo
++
++
++## ufo-append-query
++
++The API provides exported appendQuery(input: string, query: QueryObject): string. Unlike withQuery's replacement behavior, it appends new values after existing values for each key, preserving their order. An absent key is encoded using existing query serialization semantics. Ignore undefined new values and empty new arrays; null/empty string append an empty value, and numbers/booleans retain existing encoding. Do not mutate supplied arrays/objects. Preserve URL pathname, host/protocol and fragment and support relative URLs and repeated encoded keys. Follow parseQuery's existing pollution policy by ignoring __proto__ and constructor keys from both old and new query data. Existing withQuery and parse/stringify behavior must not change. Provide docs, generated public types and meaningful tests.
+diff --git a/src/utils.ts b/src/utils.ts
+index ea98aba..e44d3a9 100644
+--- a/src/utils.ts
++++ b/src/utils.ts
+@@ -773,3 +773,25 @@ export function withoutHost(input: string) {
+   const parsed = parseURL(input);
+   return (parsed.pathname || "/") + parsed.search + parsed.hash;
+ }
++
++/** Append query values after existing values. */
++export function appendQuery(input: string, query: QueryObject): string {
++  const parsed = parseURL(input);
++  const merged: QueryObject = parseQuery(parsed.search);
++  for (const key of Object.keys(query)) {
++    if (key === "__proto__" || key === "constructor") continue;
++    const value = query[key];
++    if (value === undefined || (Array.isArray(value) && value.length === 0))
++      continue;
++    if (Object.prototype.hasOwnProperty.call(merged, key)) {
++      merged[key] = [
++        ...(Array.isArray(merged[key]) ? merged[key] : [merged[key]]),
++        ...(Array.isArray(value) ? value : [value ?? ""]),
++      ];
++    } else {
++      merged[key] = value;
++    }
++  }
++  parsed.search = stringifyQuery(merged);
++  return stringifyParsedURL(parsed);
++}
+diff --git a/test/h00-contract.test.ts b/test/h00-contract.test.ts
+new file mode 100644
+index 0000000..33e7203
+--- /dev/null
++++ b/test/h00-contract.test.ts
+@@ -0,0 +1,36 @@
++// @ts-nocheck -- invalid runtime inputs are intentional; public types are tested separately.
++import * as A from "node:assert/strict";
++import { test } from "vitest";
++import * as api from "../src";
++test("new public contract", async () => {
++  const q = {
++      a: ["3", "4"],
++      none: undefined,
++      empty: [],
++      zero: 0,
++      no: false,
++      nil: null,
++      blank: "",
++    },
++    before = JSON.stringify(q);
++  const result = api.appendQuery("https://x.test/p?a=1&a=2&empty=x#f", q);
++  A.equal(
++    result,
++    "https://x.test/p?a=1&a=2&a=3&a=4&empty=x&zero=0&no=false&nil&blank#f",
++  );
++  A.equal(JSON.stringify(q), before);
++  A.equal(api.withQuery("/p?a=1", { a: "2" }), "/p?a=2");
++  A.equal(
++    api.appendQuery("/p?a+b=1#hash", { "a b": "two three" }),
++    "/p?a+b=1&a+b=two+three#hash",
++  );
++  A.equal(api.appendQuery("/p?x=1", { x: undefined }), "/p?x=1");
++  A.equal(api.appendQuery("/p?x=1", { x: [] }), "/p?x=1");
++  A.equal(api.appendQuery("/p?x=1", { x: null }), "/p?x=1&x=");
++  const bad = Object.create(null);
++  bad.__proto__ = "bad";
++  bad.constructor = "bad";
++  bad.ok = "1";
++  A.equal(api.appendQuery("/?__proto__=x&constructor=y#f", bad), "/?ok=1#f");
++  A.equal(api.appendQuery("/p#f", {}), "/p#f");
++});
+diff --git a/test/types.test-d.ts b/test/types.test-d.ts
+index e28c503..1afeceb 100644
+--- a/test/types.test-d.ts
++++ b/test/types.test-d.ts
+@@ -12,3 +12,8 @@ describe("query", () => {
+     expectTypeOf(result).toEqualTypeOf<{ foo: string }>();
+   });
+ });
++
++import * as addedApi from "../src";
++expectTypeOf(addedApi.appendQuery("/", { x: [1, 2] })).toEqualTypeOf<string>();
++// @ts-expect-error URL must be a string
++addedApi.appendQuery(123, {});

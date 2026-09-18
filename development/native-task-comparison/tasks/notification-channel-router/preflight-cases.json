@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/channels.mjs": "export function planChannels(requested,available,fallback='log'){\n return requested.reduce((out,name)=>{const target=available.includes(name)?name:fallback;if(!available.includes(target))throw new RangeError('unknown channel: '+name);if(!out.includes(target))out.push(target);return out;},[]);\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "no-resolved-dedup",
+      "file": "src/channels.mjs",
+      "replacement": "export function planChannels(requested,available,fallback='log'){\n const known=new Set(available),seen=new Set(),plan=[];\n for(const channel of requested){const target=known.has(channel)?channel:fallback;if(!known.has(target))throw new RangeError('unknown channel: '+channel);plan.push(target);}\n return plan;\n}\n"
+    },
+    {
+      "name": "unknown-channels-dropped",
+      "file": "src/channels.mjs",
+      "replacement": "export function planChannels(requested,available,fallback='log'){\n const known=new Set(available),seen=new Set(),plan=[];\n for(const channel of requested){if(!known.has(channel))continue;const target=channel;if(!known.has(target))throw new RangeError('unknown channel: '+channel);if(!seen.has(target)){seen.add(target);plan.push(target);}}\n return plan;\n}\n"
+    }
+  ]
+}

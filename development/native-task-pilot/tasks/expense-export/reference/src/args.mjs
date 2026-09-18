@@ -1,0 +1,1 @@
+export function parseArgs(args) { if(args.length===1&&!args[0].startsWith('--'))return {file:args[0]}; if(args.length===3&&!args[0].startsWith('--')&&args[1]==='--currency')return {file:args[0],currency:args[2]}; throw new Error('Expected INPUT [--currency EUR|USD]'); }

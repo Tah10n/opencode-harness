@@ -1,0 +1,30 @@
+{
+  "reviewedBeforeMappingAndExplanatoryTraces": true,
+  "at": "2026-09-16T11:44:30.234202+00:00",
+  "reviews": [
+    {
+      "id": "n01",
+      "task": "A",
+      "Q": true,
+      "reason": "Portable patch passes ordinary suite/build and independent behavior/types/package consumers; implementation, requested regression categories, readonly-array type coverage and public docs supplied; no old assertions weakened."
+    },
+    {
+      "id": "n02",
+      "task": "A",
+      "Q": false,
+      "reason": "Portable semantics/types/build pass, but unchanged delivered test/query.test.ts fails the ordinary Prettier check in npm test. Implementation, regressions/types/docs present; full project gate is not satisfied."
+    },
+    {
+      "id": "n03",
+      "task": "B",
+      "Q": false,
+      "reason": "Frozen runtime/build/new-API type fixtures pass, requested implementation/tests/types/docs supplied and old runtime returns retained. Post-hoc validation of the predeclared compatibility contract proves a previously valid listeners() consumer no longer compiles: newly imposed this: Context on existing API yields TS2684."
+    },
+    {
+      "id": "n04",
+      "task": "B",
+      "Q": false,
+      "reason": "Frozen runtime/build/new-API type fixtures pass, requested implementation/tests/types/docs supplied and old runtime returns retained. Same independently confirmed public declaration compatibility regression as n03; repeated cancellation is semantically idempotent despite no active flag."
+    }
+  ]
+}

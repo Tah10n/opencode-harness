@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {encode,decode} from '../src/progress.mjs';test('v2 empty',()=>assert.deepEqual(decode(encode({version:2,answers:[]})),{version:2,answers:[]}));

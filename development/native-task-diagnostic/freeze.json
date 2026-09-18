@@ -1,0 +1,355 @@
+{
+  "candidateCommit": "d482d39b6d922b9c584efda2f335f35a5e5a0ffc",
+  "kind": "directed-stateful-coverage-development",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "high",
+  "budgetMs": 900000,
+  "config": {
+    "model": "openai/gpt-5.6-luna",
+    "small_model": "openai/gpt-5.6-luna",
+    "provider": {
+      "openai": {
+        "options": {
+          "baseURL": "http://127.0.0.1:4099/v1",
+          "apiKey": "development-no-credential"
+        },
+        "models": {
+          "gpt-5.6-luna": {
+            "options": {
+              "reasoningEffort": "high"
+            },
+            "variants": {
+              "high": {
+                "reasoningEffort": "high"
+              }
+            }
+          }
+        }
+      }
+    },
+    "permission": {
+      "external_directory": "deny"
+    }
+  },
+  "inputManifests": {
+    "queue-lost-retry-H0": {
+      "AGENTS.md": {
+        "sha256": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+        "executable": false
+      },
+      "README.md": {
+        "sha256": "d08ff6cea98639c0170f9756071fd552bb03389b6a5864e2c23575abdd983a10",
+        "executable": false
+      },
+      "TASK.md": {
+        "sha256": "dc65e4747220fca4cda900519ecdb87adf7b1c5a359337787ea05bef4cb92e8e",
+        "executable": false
+      },
+      "package.json": {
+        "sha256": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+        "executable": false
+      },
+      "src/queue.mjs": {
+        "sha256": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa",
+        "executable": false
+      },
+      "src/worker.mjs": {
+        "sha256": "6ed1e74cd6531111fb4636216d08f22aa8b18496c18599fec078df33f665d744",
+        "executable": false
+      },
+      "test/worker.test.mjs": {
+        "sha256": "2425598a855b2bf87bebcd0e07379cb4b28d7f589bcfa5dd7bcb99243e2eb70e",
+        "executable": false
+      }
+    },
+    "queue-lost-retry-H1": {
+      "AGENTS.md": {
+        "sha256": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+        "executable": false
+      },
+      "README.md": {
+        "sha256": "d08ff6cea98639c0170f9756071fd552bb03389b6a5864e2c23575abdd983a10",
+        "executable": false
+      },
+      "TASK.md": {
+        "sha256": "dc65e4747220fca4cda900519ecdb87adf7b1c5a359337787ea05bef4cb92e8e",
+        "executable": false
+      },
+      "package.json": {
+        "sha256": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+        "executable": false
+      },
+      "src/queue.mjs": {
+        "sha256": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa",
+        "executable": false
+      },
+      "src/worker.mjs": {
+        "sha256": "6ed1e74cd6531111fb4636216d08f22aa8b18496c18599fec078df33f665d744",
+        "executable": false
+      },
+      "test/worker.test.mjs": {
+        "sha256": "2425598a855b2bf87bebcd0e07379cb4b28d7f589bcfa5dd7bcb99243e2eb70e",
+        "executable": false
+      }
+    },
+    "editor-precompleted-H1": {
+      "AGENTS.md": {
+        "sha256": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+        "executable": false
+      },
+      "README.md": {
+        "sha256": "e591eda1eaad6953c0eed7f74260e1bb41ac1526505623fbe40d061ad53bf2b8",
+        "executable": false
+      },
+      "TASK.md": {
+        "sha256": "0027c5fd7d410a883e679e371a0de32d2d0f77d9206c908afe3feccfbb0813e2",
+        "executable": false
+      },
+      "package.json": {
+        "sha256": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+        "executable": false
+      },
+      "src/drafts.mjs": {
+        "sha256": "a6004483712e4307795ae33ee6e0051c75b69405f4ee5a3052de16cc6422b5e6",
+        "executable": false
+      },
+      "src/editor.mjs": {
+        "sha256": "51fc95d9043cfd977623bc42d72a765f329b238372a79d0510af61e80625108e",
+        "executable": false
+      },
+      "test/editor.test.mjs": {
+        "sha256": "bf2b50220d84f6f23fa2e259a232443613a9113ca9e1ed88306d94acbeeb6494",
+        "executable": false
+      }
+    },
+    "editor-precompleted-H0": {
+      "AGENTS.md": {
+        "sha256": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+        "executable": false
+      },
+      "README.md": {
+        "sha256": "e591eda1eaad6953c0eed7f74260e1bb41ac1526505623fbe40d061ad53bf2b8",
+        "executable": false
+      },
+      "TASK.md": {
+        "sha256": "0027c5fd7d410a883e679e371a0de32d2d0f77d9206c908afe3feccfbb0813e2",
+        "executable": false
+      },
+      "package.json": {
+        "sha256": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+        "executable": false
+      },
+      "src/drafts.mjs": {
+        "sha256": "a6004483712e4307795ae33ee6e0051c75b69405f4ee5a3052de16cc6422b5e6",
+        "executable": false
+      },
+      "src/editor.mjs": {
+        "sha256": "51fc95d9043cfd977623bc42d72a765f329b238372a79d0510af61e80625108e",
+        "executable": false
+      },
+      "test/editor.test.mjs": {
+        "sha256": "bf2b50220d84f6f23fa2e259a232443613a9113ca9e1ed88306d94acbeeb6494",
+        "executable": false
+      }
+    },
+    "queue-valid-empty-H0": {
+      "AGENTS.md": {
+        "sha256": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+        "executable": false
+      },
+      "README.md": {
+        "sha256": "d68e82cec38c69da5c970a68b43995ded1eadcb89eb39cf3ac7f073768a84870",
+        "executable": false
+      },
+      "TASK.md": {
+        "sha256": "dc65e4747220fca4cda900519ecdb87adf7b1c5a359337787ea05bef4cb92e8e",
+        "executable": false
+      },
+      "package.json": {
+        "sha256": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+        "executable": false
+      },
+      "src/queue.mjs": {
+        "sha256": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa",
+        "executable": false
+      },
+      "src/worker.mjs": {
+        "sha256": "6ed1e74cd6531111fb4636216d08f22aa8b18496c18599fec078df33f665d744",
+        "executable": false
+      },
+      "test/worker.test.mjs": {
+        "sha256": "df4ac25063436f35c18f9099d372055b4f7187759e11c193d13ddbeb59d3b986",
+        "executable": false
+      }
+    },
+    "queue-valid-empty-H1": {
+      "AGENTS.md": {
+        "sha256": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+        "executable": false
+      },
+      "README.md": {
+        "sha256": "d68e82cec38c69da5c970a68b43995ded1eadcb89eb39cf3ac7f073768a84870",
+        "executable": false
+      },
+      "TASK.md": {
+        "sha256": "dc65e4747220fca4cda900519ecdb87adf7b1c5a359337787ea05bef4cb92e8e",
+        "executable": false
+      },
+      "package.json": {
+        "sha256": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+        "executable": false
+      },
+      "src/queue.mjs": {
+        "sha256": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa",
+        "executable": false
+      },
+      "src/worker.mjs": {
+        "sha256": "6ed1e74cd6531111fb4636216d08f22aa8b18496c18599fec078df33f665d744",
+        "executable": false
+      },
+      "test/worker.test.mjs": {
+        "sha256": "df4ac25063436f35c18f9099d372055b4f7187759e11c193d13ddbeb59d3b986",
+        "executable": false
+      }
+    }
+  },
+  "schedule": [
+    {
+      "slot": 1,
+      "task": "queue-lost-retry",
+      "arm": "H0"
+    },
+    {
+      "slot": 2,
+      "task": "queue-lost-retry",
+      "arm": "H1"
+    },
+    {
+      "slot": 3,
+      "task": "editor-precompleted",
+      "arm": "H1"
+    },
+    {
+      "slot": 4,
+      "task": "editor-precompleted",
+      "arm": "H0"
+    },
+    {
+      "slot": 5,
+      "task": "queue-valid-empty",
+      "arm": "H0"
+    },
+    {
+      "slot": 6,
+      "task": "queue-valid-empty",
+      "arm": "H1"
+    }
+  ],
+  "frozenAt": "2026-09-11T16:46:01.999360+00:00",
+  "frozenFiles": 11113,
+  "soleMaterializedDifference": [
+    "native-task-workflow.mjs"
+  ],
+  "materializedSource": "../native-task-stateful/materialized",
+  "materializedHashes": {
+    "materialized/H1/native-task-plugin.mjs": "c60fa0ed7793937bac0820240f8a55c260a2ae2faa57c96e295840c6c32ff5e6",
+    "materialized/H1/review-context.mjs": "8775ae59ef3d3b5b432798f909f94869d43b7561b4b5f144f972e5bcce20e312",
+    "materialized/H1/native-review-context.mjs": "8775ae59ef3d3b5b432798f909f94869d43b7561b4b5f144f972e5bcce20e312",
+    "materialized/H1/native-task-workflow.mjs": "08c0352858d9de38056996efe5da165b15811e4ce05b65434ac52ee6f67854c0",
+    "materialized/H1/opencode.json": "b9074880921a1991d14c10e656e42ac56bf6e416a99b4d3c7b3a25a72f4883c2",
+    "materialized/H1/core.md": "9adcc862446ac6c0e5a407ec89e2f65fe4a249aedcc34ba36f143f3589edd4f7",
+    "materialized/H1/native-task-observations.mjs": "85889aa51b8257e649af44b98b356ff1f733628e6be560444b97ead1368bc3a6",
+    "materialized/H0/native-task-plugin.mjs": "c60fa0ed7793937bac0820240f8a55c260a2ae2faa57c96e295840c6c32ff5e6",
+    "materialized/H0/review-context.mjs": "8775ae59ef3d3b5b432798f909f94869d43b7561b4b5f144f972e5bcce20e312",
+    "materialized/H0/native-review-context.mjs": "8775ae59ef3d3b5b432798f909f94869d43b7561b4b5f144f972e5bcce20e312",
+    "materialized/H0/native-task-workflow.mjs": "7845c27e1015dc6a4479d5589c5081481d007c73d2dbe6c76ca7a2848ed211cc",
+    "materialized/H0/opencode.json": "b9074880921a1991d14c10e656e42ac56bf6e416a99b4d3c7b3a25a72f4883c2",
+    "materialized/H0/core.md": "9adcc862446ac6c0e5a407ec89e2f65fe4a249aedcc34ba36f143f3589edd4f7",
+    "materialized/H0/native-task-observations.mjs": "85889aa51b8257e649af44b98b356ff1f733628e6be560444b97ead1368bc3a6"
+  },
+  "taskHashes": {
+    "tasks/editor-precompleted/alternative/README.md": "dc619782b05f481df1920ed75237d14a091c9a43dfd2c5f17cf075e1c62218bd",
+    "tasks/editor-precompleted/alternative/package.json": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+    "tasks/editor-precompleted/alternative/TASK.md": "0027c5fd7d410a883e679e371a0de32d2d0f77d9206c908afe3feccfbb0813e2",
+    "tasks/editor-precompleted/alternative/AGENTS.md": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+    "tasks/editor-precompleted/alternative/test/editor.test.mjs": "705291c019257d76f23b76c8b9ac352c2333cd2290a029f5c4ab5f52c45c23d0",
+    "tasks/editor-precompleted/alternative/src/drafts.mjs": "a6004483712e4307795ae33ee6e0051c75b69405f4ee5a3052de16cc6422b5e6",
+    "tasks/editor-precompleted/alternative/src/editor.mjs": "eb9f3024cf2a43034a8a8e6f6c4c197a430e7b61850e02cf8b9dd1fe2ccd19f7",
+    "tasks/editor-precompleted/initial/README.md": "e591eda1eaad6953c0eed7f74260e1bb41ac1526505623fbe40d061ad53bf2b8",
+    "tasks/editor-precompleted/initial/package.json": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+    "tasks/editor-precompleted/initial/TASK.md": "0027c5fd7d410a883e679e371a0de32d2d0f77d9206c908afe3feccfbb0813e2",
+    "tasks/editor-precompleted/initial/AGENTS.md": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+    "tasks/editor-precompleted/initial/test/editor.test.mjs": "bf2b50220d84f6f23fa2e259a232443613a9113ca9e1ed88306d94acbeeb6494",
+    "tasks/editor-precompleted/initial/src/drafts.mjs": "a6004483712e4307795ae33ee6e0051c75b69405f4ee5a3052de16cc6422b5e6",
+    "tasks/editor-precompleted/initial/src/editor.mjs": "51fc95d9043cfd977623bc42d72a765f329b238372a79d0510af61e80625108e",
+    "tasks/editor-precompleted/reference/README.md": "dc619782b05f481df1920ed75237d14a091c9a43dfd2c5f17cf075e1c62218bd",
+    "tasks/editor-precompleted/reference/package.json": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+    "tasks/editor-precompleted/reference/TASK.md": "0027c5fd7d410a883e679e371a0de32d2d0f77d9206c908afe3feccfbb0813e2",
+    "tasks/editor-precompleted/reference/AGENTS.md": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+    "tasks/editor-precompleted/reference/test/editor.test.mjs": "0d1a2b8a7c911789da2db1372dbf76fda8801bd9e8ede5808b0c708cf08b05a9",
+    "tasks/editor-precompleted/reference/src/drafts.mjs": "a6004483712e4307795ae33ee6e0051c75b69405f4ee5a3052de16cc6422b5e6",
+    "tasks/editor-precompleted/reference/src/editor.mjs": "51fc95d9043cfd977623bc42d72a765f329b238372a79d0510af61e80625108e",
+    "tasks/queue-valid-empty/alternative/README.md": "b39c6a7cdfdd2e6fe617c540c2024a5aceb4f86ad5ce601209f04bcb7b5360e8",
+    "tasks/queue-valid-empty/alternative/package.json": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+    "tasks/queue-valid-empty/alternative/TASK.md": "dc65e4747220fca4cda900519ecdb87adf7b1c5a359337787ea05bef4cb92e8e",
+    "tasks/queue-valid-empty/alternative/AGENTS.md": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+    "tasks/queue-valid-empty/alternative/test/worker.test.mjs": "dee97cc90b41100fb71be0ee3f16207e3d0768a2937adab74642829bd72a0917",
+    "tasks/queue-valid-empty/alternative/src/worker.mjs": "c34cd2ed4e2bb7b899ce079c43c7c856b3b28f9ac4482d7a8cd7e967648d2964",
+    "tasks/queue-valid-empty/alternative/src/queue.mjs": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa",
+    "tasks/queue-valid-empty/initial/README.md": "d68e82cec38c69da5c970a68b43995ded1eadcb89eb39cf3ac7f073768a84870",
+    "tasks/queue-valid-empty/initial/package.json": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+    "tasks/queue-valid-empty/initial/TASK.md": "dc65e4747220fca4cda900519ecdb87adf7b1c5a359337787ea05bef4cb92e8e",
+    "tasks/queue-valid-empty/initial/AGENTS.md": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+    "tasks/queue-valid-empty/initial/test/worker.test.mjs": "df4ac25063436f35c18f9099d372055b4f7187759e11c193d13ddbeb59d3b986",
+    "tasks/queue-valid-empty/initial/src/worker.mjs": "6ed1e74cd6531111fb4636216d08f22aa8b18496c18599fec078df33f665d744",
+    "tasks/queue-valid-empty/initial/src/queue.mjs": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa",
+    "tasks/queue-valid-empty/reference/README.md": "b39c6a7cdfdd2e6fe617c540c2024a5aceb4f86ad5ce601209f04bcb7b5360e8",
+    "tasks/queue-valid-empty/reference/package.json": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+    "tasks/queue-valid-empty/reference/TASK.md": "dc65e4747220fca4cda900519ecdb87adf7b1c5a359337787ea05bef4cb92e8e",
+    "tasks/queue-valid-empty/reference/AGENTS.md": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+    "tasks/queue-valid-empty/reference/test/worker.test.mjs": "df4ac25063436f35c18f9099d372055b4f7187759e11c193d13ddbeb59d3b986",
+    "tasks/queue-valid-empty/reference/src/worker.mjs": "6ed1e74cd6531111fb4636216d08f22aa8b18496c18599fec078df33f665d744",
+    "tasks/queue-valid-empty/reference/src/queue.mjs": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa",
+    "tasks/queue-lost-retry/alternative/README.md": "b39c6a7cdfdd2e6fe617c540c2024a5aceb4f86ad5ce601209f04bcb7b5360e8",
+    "tasks/queue-lost-retry/alternative/package.json": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+    "tasks/queue-lost-retry/alternative/TASK.md": "dc65e4747220fca4cda900519ecdb87adf7b1c5a359337787ea05bef4cb92e8e",
+    "tasks/queue-lost-retry/alternative/AGENTS.md": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+    "tasks/queue-lost-retry/alternative/test/worker.test.mjs": "dee97cc90b41100fb71be0ee3f16207e3d0768a2937adab74642829bd72a0917",
+    "tasks/queue-lost-retry/alternative/src/worker.mjs": "c34cd2ed4e2bb7b899ce079c43c7c856b3b28f9ac4482d7a8cd7e967648d2964",
+    "tasks/queue-lost-retry/alternative/src/queue.mjs": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa",
+    "tasks/queue-lost-retry/initial/README.md": "d08ff6cea98639c0170f9756071fd552bb03389b6a5864e2c23575abdd983a10",
+    "tasks/queue-lost-retry/initial/package.json": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+    "tasks/queue-lost-retry/initial/TASK.md": "dc65e4747220fca4cda900519ecdb87adf7b1c5a359337787ea05bef4cb92e8e",
+    "tasks/queue-lost-retry/initial/AGENTS.md": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+    "tasks/queue-lost-retry/initial/test/worker.test.mjs": "2425598a855b2bf87bebcd0e07379cb4b28d7f589bcfa5dd7bcb99243e2eb70e",
+    "tasks/queue-lost-retry/initial/src/worker.mjs": "6ed1e74cd6531111fb4636216d08f22aa8b18496c18599fec078df33f665d744",
+    "tasks/queue-lost-retry/initial/src/queue.mjs": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa",
+    "tasks/queue-lost-retry/reference/README.md": "b39c6a7cdfdd2e6fe617c540c2024a5aceb4f86ad5ce601209f04bcb7b5360e8",
+    "tasks/queue-lost-retry/reference/package.json": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+    "tasks/queue-lost-retry/reference/TASK.md": "dc65e4747220fca4cda900519ecdb87adf7b1c5a359337787ea05bef4cb92e8e",
+    "tasks/queue-lost-retry/reference/AGENTS.md": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+    "tasks/queue-lost-retry/reference/test/worker.test.mjs": "df4ac25063436f35c18f9099d372055b4f7187759e11c193d13ddbeb59d3b986",
+    "tasks/queue-lost-retry/reference/src/worker.mjs": "6ed1e74cd6531111fb4636216d08f22aa8b18496c18599fec078df33f665d744",
+    "tasks/queue-lost-retry/reference/src/queue.mjs": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa"
+  },
+  "evaluatorSha256": "0ed9fef0fc9afc7847380f8aa55285b5c95779bad3bd81ebf1d361088fbd5cf2",
+  "planSha256": "84e0bcc11f785c014e0c37a808e38a210f0178591f57f4f27c726af0bbbd18a4",
+  "gradingContractSha256": "7bb2524baa16e46fe26184687dab73843218fb9ab7b5a8cd8237719c29062eae",
+  "instructionDiffSha256": "d948591da37130335a326b6c7beefe082b0f956700f7bd8466a9f77ae2555450",
+  "scheduleOnlyDiffSha256": "5fa94302c34773dd5ec43da3154594a02258083ec1ac7886a7cf5e0a6339e353",
+  "scriptedPreflights": {
+    "H0": {
+      "status": "passed",
+      "requests": 8,
+      "realProviderCalls": 0,
+      "elapsedMs": 3372
+    },
+    "H1": {
+      "status": "passed",
+      "requests": 8,
+      "realProviderCalls": 0,
+      "elapsedMs": 3183
+    }
+  },
+  "realProviderCallsBeforeSeries": 0
+}

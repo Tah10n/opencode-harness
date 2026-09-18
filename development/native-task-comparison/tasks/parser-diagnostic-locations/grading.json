@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert scanner locations across comments, tabs and CRLF and retained duplicate entries.",
+    "Assert exact syntax/duplicate positions, eager error precedence and own special keys."
+  ],
+  "docDelivery": [
+    "Document assignment grammar and 1-based UTF16 columns.",
+    "Explain scanner versus parser responsibilities and error precedence."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Limited assignment config language, exact source positions, eager scanning before duplicate validation, own special keys.",
+  "manualBehavior": [
+    "parseConfig consumes shared scanner; lexical/location rules are not duplicated in assembler."
+  ],
+  "independence": "Split configuration tokenization/parsing while preserving exact line/column error locations and accepted grammar."
+}

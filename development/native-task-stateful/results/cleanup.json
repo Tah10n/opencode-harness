@@ -1,0 +1,9 @@
+{
+  "createdContainers": 20,
+  "modelContainers": 9,
+  "offlineGradeContainers": 9,
+  "scriptedPreflightContainers": 2,
+  "allCleanupExitZero": true,
+  "allConfirmedAbsent": true,
+  "remainingTaskContainers": []
+}

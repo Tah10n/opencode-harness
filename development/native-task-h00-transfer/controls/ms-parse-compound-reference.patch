@@ -1,0 +1,70 @@
+diff --git a/README.md b/README.md
+index d752132..73a5d8e 100644
+--- a/README.md
++++ b/README.md
+@@ -205,3 +205,8 @@ export const config = {
+ As always, you can run the tests using: `npm test`
+ 
+ [^1]: Internet Explorer is not supported
++
++
++## ms-parse-compound
++
++The API provides exported parseCompound(str: string): number for human duration sums such as "1h 30m" and "-2 days 4 hours". Accept one or more terms using parse's numeric syntax and case-insensitive unit spellings, but require an explicit unit for every term. Separate adjacent terms by one or more ASCII spaces; allow ASCII spaces between number and unit. A single leading minus applies to the whole sum; reject signs on later terms. Terms may occur in any order and repeat units. No leading/trailing whitespace, plus sign, punctuation separators or partial trailing garbage. Return NaN for malformed nonempty inputs; preserve parse's throw boundary for non-string, empty or >100-character input without requiring an exception subtype/message. Use the existing unit conversions including months/years. Do not broaden parse, parseStrict or ms parsing. Add public export/declarations, docs and regression tests.
+diff --git a/src/h00-contract.test.ts b/src/h00-contract.test.ts
+new file mode 100644
+index 0000000..c8e7a5b
+--- /dev/null
++++ b/src/h00-contract.test.ts
+@@ -0,0 +1,9 @@
++// @ts-nocheck -- invalid runtime inputs are intentional; public types are tested separately.
++import * as A from "node:assert/strict";
++import {test} from "@jest/globals";
++import * as api from "./index";
++test("new public contract", async () => {
++
++A.equal(api.parseCompound('1h 30m'),5400000);A.equal(api.parseCompound('-2 days 4 hours'),-187200000);A.equal(api.parseCompound('.5H 1.5 mins'),1890000);A.equal(api.parseCompound('1m 2h 3m'),7440000);A.equal(api.parseCompound('1 year 1mo'),31557600000+31557600000/12);A.equal(api.parseCompound('0ms'),0);A.equal(api.parseCompound('1  SECOND  2 ms'),1002);for(const bad of ['1','1h2m','1h -2m','+1h',' 1h','1h ','1h, 2m','1h garbage','1h	2m','--1h','1h +2m','1bananas','-'])A.ok(Number.isNaN(api.parseCompound(bad)),bad);for(const bad of ['',null,1,'1'.repeat(101)])A.throws(()=>api.parseCompound(bad));A.ok(Number.isNaN(api.parse('1h 30m')));A.ok(Number.isNaN(api.parseStrict('1h 30m')));A.ok(Number.isNaN(api.ms('1h 30m')));
++
++});
+diff --git a/src/h00-types.ts b/src/h00-types.ts
+new file mode 100644
+index 0000000..80f2f89
+--- /dev/null
++++ b/src/h00-types.ts
+@@ -0,0 +1,4 @@
++import * as api from "./index";
++const value: number = api.parseCompound("1h 30m");
++// @ts-expect-error input must be string
++api.parseCompound(123);
+diff --git a/src/index.ts b/src/index.ts
+index d50e3c7..b4adc30 100644
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -242,3 +242,27 @@ function plural(
+   const isPlural = msAbs >= n * 1.5;
+   return `${Math.round(ms / n)} ${name}${isPlural ? 's' : ''}` as StringValue;
+ }
++
++/** Parse an explicitly unit-bearing duration sum. */
++export function parseCompound(str: string): number {
++  if (typeof str !== 'string' || str.length === 0 || str.length > 100) {
++    throw new Error('Invalid duration input');
++  }
++  const negative = str[0] === '-';
++  const input = negative ? str.slice(1) : str;
++  const terms = /(\d*\.?\d+ *[a-z]+)/gi;
++  let total = 0;
++  let end = 0;
++  let count = 0;
++  for (const match of input.matchAll(terms)) {
++    const gap = input.slice(end, match.index);
++    if (count === 0 ? gap !== '' : !/^ +$/.test(gap)) return NaN;
++    const value = parse(match[0]);
++    if (Number.isNaN(value)) return NaN;
++    total += value;
++    count++;
++    end = match.index! + match[0].length;
++  }
++  if (!count || end !== input.length) return NaN;
++  return negative ? -total : total;
++}

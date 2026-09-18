@@ -1,0 +1,144 @@
+diff --git a/README.md b/README.md
+index d752132..1ae5a1e 100644
+--- a/README.md
++++ b/README.md
+@@ -158,6 +158,22 @@ parse('1h'); // 3600000
+ format(2000); // "2s"
+ ```
+ 
++Compound duration sums can be parsed with `parseCompound`. Each term must include
++a unit, and terms are separated by one or more ASCII spaces.
++
++```ts
++import { parseCompound } from 'ms';
++
++parseCompound('1h 30m');       // 5400000
++parseCompound('-2 days 4 hours'); // -187200000
++```
++
++`parseCompound` accepts the same case-insensitive unit spellings and numeric
++syntax as `parse`, including months and years. A leading minus applies to the
++whole sum. Malformed nonempty input returns `NaN`; non-string, empty, and input
++longer than 100 characters throw an error. Compound syntax is specific to
++`parseCompound` and is not accepted by `parse`, `parseStrict`, or `ms`.
++
+ ### Enhanced Type Safety
+ 
+ If you want strict type checking for the input value, you can use `parseStrict`.
+diff --git a/src/index.ts b/src/index.ts
+index d50e3c7..03f1028 100644
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -146,6 +146,39 @@ export function parse(str: string): number {
+   }
+ }
+ 
++const compoundTerm = String.raw`\d*\.?\d+ *(?:milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|months?|mo|years?|yrs?|y)`;
++const compoundPattern = new RegExp(
++  `^-?${compoundTerm}(?: +${compoundTerm})*$`,
++  'i',
++);
++const compoundTermPattern = new RegExp(`${compoundTerm}(?=$| +)`, 'gi');
++
++/**
++ * Parse a sum of duration terms and return milliseconds.
++ *
++ * @param str - A space-separated sum of duration terms
++ * @returns The parsed value in milliseconds, or `NaN` if the string can't be
++ * parsed
++ */
++export function parseCompound(str: string): number {
++  if (typeof str !== 'string' || str.length === 0 || str.length > 100) {
++    throw new Error(
++      `Value provided to ms.parseCompound() must be a string with length between 1 and 99. value=${JSON.stringify(str)}`,
++    );
++  }
++
++  if (!compoundPattern.test(str)) {
++    return NaN;
++  }
++
++  const total = (str.match(compoundTermPattern) as string[]).reduce(
++    (sum, term) => sum + parse(term),
++    0,
++  );
++
++  return str.startsWith('-') ? -total : total;
++}
++
+ /**
+  * Parse the given StringValue and return milliseconds.
+  *
+diff --git a/src/parse-compound.test.ts b/src/parse-compound.test.ts
+new file mode 100644
+index 0000000..ddc4a3a
+--- /dev/null
++++ b/src/parse-compound.test.ts
+@@ -0,0 +1,67 @@
++import { describe, expect, it } from '@jest/globals';
++import { ms, parse, parseCompound, parseStrict } from './index';
++
++describe('parseCompound(string)', () => {
++  it('should sum mixed-case, spelled, decimal, repeated, and reordered units', () => {
++    const value: number = parseCompound(
++      '-1.5 HOURS 2 days 30 MINUTES 1 HOUR 2 months 1 YEAR 500 milliseconds 2 seconds 1 week 1 day',
++    );
++
++    expect(value).toBe(
++      -(
++        1.5 * 60 * 60 * 1000 +
++        2 * 24 * 60 * 60 * 1000 +
++        30 * 60 * 1000 +
++        1 * 60 * 60 * 1000 +
++        (2 * (365.25 * 24 * 60 * 60 * 1000)) / 12 +
++        365.25 * 24 * 60 * 60 * 1000 +
++        500 +
++        2 * 1000 +
++        7 * 24 * 60 * 60 * 1000 +
++        24 * 60 * 60 * 1000
++      ),
++    );
++  });
++
++  it('should apply a leading minus to the whole sum', () => {
++    expect(parseCompound('-2 days 4 hours')).toBe(-187200000);
++  });
++
++  it('should allow repeated spaces between terms and within terms', () => {
++    expect(parseCompound('1  h   30   minutes')).toBe(5400000);
++  });
++
++  it('should return NaN for malformed compound input', () => {
++    for (const value of [
++      '1h 30',
++      '1 30m',
++      '1h -30m',
++      '-1h +30m',
++      '1h30m',
++      '1h, 30m',
++      '1h 30mgarbage',
++      ' 1h 30m',
++      '1h 30m ',
++      '1h\t30m',
++    ]) {
++      expect(Number.isNaN(parseCompound(value))).toBe(true);
++    }
++  });
++
++  it('should throw for non-string, empty, and oversized input', () => {
++    expect(() => {
++      // @ts-expect-error - We expect this to throw.
++      parseCompound(undefined);
++    }).toThrow();
++    expect(() => parseCompound('')).toThrow();
++    expect(() => parseCompound('1h'.repeat(51))).toThrow();
++  });
++
++  it('should not broaden the existing parsers', () => {
++    expect(Number.isNaN(parse('1h 30m'))).toBe(true);
++    // @ts-expect-error - Compound syntax is not a StringValue.
++    expect(Number.isNaN(parseStrict('1h 30m'))).toBe(true);
++    // @ts-expect-error - Compound syntax is not a StringValue.
++    expect(Number.isNaN(ms('1h 30m'))).toBe(true);
++  });
++});

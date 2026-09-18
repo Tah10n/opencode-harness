@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {createQuery} from '../src/query.mjs';test('duplicates and explicit empty round trip',()=>{const q=createQuery('?a=1&x=&a=2&bare');assert.deepEqual(q.entries(),[['a','1'],['x',''],['a','2'],['bare','']]);assert.deepEqual(createQuery(q.serialize()).entries(),q.entries());});test('set retains first position',()=>{const q=createQuery('x=0&a=1&y=2&a=3');q.set('a','new');assert.deepEqual(q.entries(),[['x','0'],['a','new'],['y','2']]);q.entries()[0][1]='bad';assert.deepEqual(q.getAll('x'),['0']);});

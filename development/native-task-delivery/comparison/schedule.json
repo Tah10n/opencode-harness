@@ -1,0 +1,242 @@
+[
+  {
+    "slot": 1,
+    "task": "css-layer-bundle",
+    "arm": "A",
+    "category": "integration"
+  },
+  {
+    "slot": 2,
+    "task": "css-layer-bundle",
+    "arm": "B",
+    "category": "integration"
+  },
+  {
+    "slot": 3,
+    "task": "inventory-kit-availability",
+    "arm": "B",
+    "category": "integration"
+  },
+  {
+    "slot": 4,
+    "task": "inventory-kit-availability",
+    "arm": "A",
+    "category": "integration"
+  },
+  {
+    "slot": 5,
+    "task": "terminal-table-render",
+    "arm": "A",
+    "category": "integration"
+  },
+  {
+    "slot": 6,
+    "task": "terminal-table-render",
+    "arm": "B",
+    "category": "integration"
+  },
+  {
+    "slot": 7,
+    "task": "calendar-week-summary",
+    "arm": "B",
+    "category": "integration"
+  },
+  {
+    "slot": 8,
+    "task": "calendar-week-summary",
+    "arm": "A",
+    "category": "integration"
+  },
+  {
+    "slot": 9,
+    "task": "redirect-chain-report",
+    "arm": "A",
+    "category": "integration"
+  },
+  {
+    "slot": 10,
+    "task": "redirect-chain-report",
+    "arm": "B",
+    "category": "integration"
+  },
+  {
+    "slot": 11,
+    "task": "seat-reservation-snapshot",
+    "arm": "B",
+    "category": "state"
+  },
+  {
+    "slot": 12,
+    "task": "seat-reservation-snapshot",
+    "arm": "A",
+    "category": "state"
+  },
+  {
+    "slot": 13,
+    "task": "inventory-count-delta",
+    "arm": "A",
+    "category": "state"
+  },
+  {
+    "slot": 14,
+    "task": "inventory-count-delta",
+    "arm": "B",
+    "category": "state"
+  },
+  {
+    "slot": 15,
+    "task": "quiz-progress-migration",
+    "arm": "B",
+    "category": "state"
+  },
+  {
+    "slot": 16,
+    "task": "quiz-progress-migration",
+    "arm": "A",
+    "category": "state"
+  },
+  {
+    "slot": 17,
+    "task": "event-cursor-compaction",
+    "arm": "A",
+    "category": "state"
+  },
+  {
+    "slot": 18,
+    "task": "event-cursor-compaction",
+    "arm": "B",
+    "category": "state"
+  },
+  {
+    "slot": 19,
+    "task": "preference-tombstone-overlay",
+    "arm": "B",
+    "category": "state"
+  },
+  {
+    "slot": 20,
+    "task": "preference-tombstone-overlay",
+    "arm": "A",
+    "category": "state"
+  },
+  {
+    "slot": 21,
+    "task": "percentile-method-options",
+    "arm": "A",
+    "category": "compatibility"
+  },
+  {
+    "slot": 22,
+    "task": "percentile-method-options",
+    "arm": "B",
+    "category": "compatibility"
+  },
+  {
+    "slot": 23,
+    "task": "duration-bigint-adapter",
+    "arm": "B",
+    "category": "compatibility"
+  },
+  {
+    "slot": 24,
+    "task": "duration-bigint-adapter",
+    "arm": "A",
+    "category": "compatibility"
+  },
+  {
+    "slot": 25,
+    "task": "map-record-catalog",
+    "arm": "A",
+    "category": "compatibility"
+  },
+  {
+    "slot": 26,
+    "task": "map-record-catalog",
+    "arm": "B",
+    "category": "compatibility"
+  },
+  {
+    "slot": 27,
+    "task": "set-query-consumer",
+    "arm": "B",
+    "category": "compatibility"
+  },
+  {
+    "slot": 28,
+    "task": "set-query-consumer",
+    "arm": "A",
+    "category": "compatibility"
+  },
+  {
+    "slot": 29,
+    "task": "tuple-point-distance",
+    "arm": "A",
+    "category": "compatibility"
+  },
+  {
+    "slot": 30,
+    "task": "tuple-point-distance",
+    "arm": "B",
+    "category": "compatibility"
+  },
+  {
+    "slot": 31,
+    "task": "roman-format-core",
+    "arm": "B",
+    "category": "refactoring"
+  },
+  {
+    "slot": 32,
+    "task": "roman-format-core",
+    "arm": "A",
+    "category": "refactoring"
+  },
+  {
+    "slot": 33,
+    "task": "bracket-check-core",
+    "arm": "A",
+    "category": "refactoring"
+  },
+  {
+    "slot": 34,
+    "task": "bracket-check-core",
+    "arm": "B",
+    "category": "refactoring"
+  },
+  {
+    "slot": 35,
+    "task": "slug-token-policy",
+    "arm": "B",
+    "category": "refactoring"
+  },
+  {
+    "slot": 36,
+    "task": "slug-token-policy",
+    "arm": "A",
+    "category": "refactoring"
+  },
+  {
+    "slot": 37,
+    "task": "histogram-pure-core",
+    "arm": "A",
+    "category": "refactoring"
+  },
+  {
+    "slot": 38,
+    "task": "histogram-pure-core",
+    "arm": "B",
+    "category": "refactoring"
+  },
+  {
+    "slot": 39,
+    "task": "luhn-checksum-core",
+    "arm": "B",
+    "category": "refactoring"
+  },
+  {
+    "slot": 40,
+    "task": "luhn-checksum-core",
+    "arm": "A",
+    "category": "refactoring"
+  }
+]

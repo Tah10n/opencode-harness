@@ -1,0 +1,152 @@
+{
+  "id": "a4b23cec6afd",
+  "task": "ufo-append-query",
+  "project": "ufo",
+  "Q": 0,
+  "findings": [
+    {
+      "category": "required-coverage-loss",
+      "reason": "The only empty array is emptyArray on an input containing only existing=one; it tests omission for an absent key, not retention for an existing key."
+    }
+  ],
+  "contentReview": {
+    "id": "a4b23cec6afd",
+    "task": "ufo-append-query",
+    "project": "ufo",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "retainedTestsReview": "Original tests remain unchanged; additions only.",
+    "behaviorReview": "Builds URL from parsed old query, emits old then new encoded items per key, omits pollution keys, never writes query/arrays. Null for an existing key serializes as bare repeated key rather than key=; both encode an empty value. Original evaluator exact-byte expectation needs interpretation review, not an automatic behavior failure.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Old repeated tag values plus new array exact append order; same input with withQuery proves replacement retained."
+      },
+      {
+        "scenario": 2,
+        "covered": "partial",
+        "evidence": "Existing key with undefined retains value; new absent emptyArray key is omitted. No test passes [] for an existing key, so loss of existing data specifically for empty arrays is not distinguished. Empty/null/zero/false serialization asserted for new keys."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Absolute and relative URLs, repeated differently encoded keys, fragment, null-prototype pollution keys from old/new data; array content, property identity and object keys checked unchanged."
+      }
+    ],
+    "typesReview": "Public function typed string/QueryObject->string and exposed by existing utils export-star. Delivered expectTypeOf exact public signature fixture. Normal declaration build remains to run.",
+    "docsReview": "API JSDoc/README describe append behavior, ignored values, empty/null and pollution policy with order example.",
+    "contentFindings": [
+      {
+        "category": "required-coverage-loss",
+        "requirement": "Empty new arrays must not erase existing data.",
+        "evidence": "The only empty array is emptyArray on an input containing only existing=one; it tests omission for an absent key, not retention for an existing key.",
+        "confirmationPending": "Narrow test sensitivity for losing existing values only when the new value is [], uniformly across applicable appendQuery patches and controls."
+      }
+    ],
+    "pending": [
+      "ordinary project checks/build/types",
+      "raw independent checks",
+      "empty-append syntax interpretation check",
+      "required empty-array preservation sensitivity",
+      "ordinary source applicability"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 1,
+  "interpretedIndependentExit": 0,
+  "applicability": {
+    "id": "a4b23cec6afd",
+    "task": "ufo-append-query",
+    "sourceCommit": "f06c800d0c59f2a4a1b9ba65eb6cb61a84419be6",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "acf6074a701b3ad5a813351914dcb72cf98a3663061a49ebd1372303b6ed8bc6",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "sourcePatchSha256": "acf6074a701b3ad5a813351914dcb72cf98a3663061a49ebd1372303b6ed8bc6",
+  "sourcePatchBytes": 6244,
+  "assessmentNotes": [
+    "Original empty-value serialization assertion accepts either key or key= for appended empty value. Both controls pass; nonempty author patch passes, empty patch still fails. Q=0 remains due separate required test gap or empty delivery.",
+    "Delivered runtime/type suite accepts deletion of existing values only when appending an empty array; both controls detect the same mutant."
+  ],
+  "slot": 20,
+  "repetition": 1,
+  "arm": "P",
+  "D": 0,
+  "verification": [
+    {
+      "artifact": "reviews/a4b23cec6afd/empty-array-sensitivity/result.json",
+      "exit": 0,
+      "elapsedMs": 5416,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": " ✓ test/resolve.test.ts (12 tests) 3ms\n ✓ test/double-slash.test.ts (5 tests) 2ms\n ✓ test/is-same.test.ts (5 tests) 2ms\n ✓ test/punycode.test.ts (24 tests) 3ms\n ✓  TS  test/types.test-d.ts (3 tests)\n\n Test Files  14 passed (14)\n      Tests  495 passed (495)\nType Errors  no errors\n   Start at  10:54:22\n   Duration  2.03s (transform 125ms, setup 0ms, import 273ms, tests 52ms, environment 1ms, typecheck 905ms)\n",
+      "fullLocalOutputSha256": "b9046a40382f4f341c0285ba8b547d340c7e54aa8d3415c0ad33c0413665967b",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/a4b23cec6afd/independent/result.json",
+      "exit": 1,
+      "elapsedMs": 3888,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Σ Total dist size (byte size): 101 kB\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '/p?x=1&x'\n- '/p?x=1&x='\n           ^\n\n    at /work/repo/.h00-independent.cjs:2:549 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '/p?x=1&x',\n  expected: '/p?x=1&x=',",
+      "fullLocalOutputSha256": "a38afaf13a2f8dc66b8ad4529bfcadbee745419fe3a144eef379602d3a5b598c",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/a4b23cec6afd/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 7753,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "  ─    README.md already up-to-date (168.53ms)\n\nℹ Automatically detected entries: src/index [esm] [cjs] [dts]\nℹ Building ufo\nℹ Cleaning dist directory: ./dist\n✔ Build succeeded for ufo\n  dist/index.cjs (total size: 22.3 kB, chunk size: 22.3 kB, exports: $URL, appendQuery, cleanDoubleSlashes, createURL, decode, decodePath, decodeQueryKey, decodeQueryValue, encode, encodeHash, encodeHost, encodeParam, encodePath, encodeQueryItem, encodeQueryKey, encodeQueryValue, filterQuery, getQuery, hasLeadingSlash, hasProtocol, hasTrailingSlash, isEmptyURL, isEqual, isNonEmptyURL, isRelative, isSamePath, isScriptProtocol, joinRelativeURL, joinURL, normalizeURL, parseAuth, parseFilename, parseHost, parsePath, parseQuery, parseURL, resolveURL, stringifyParsedURL, stringifyQuery, withBase, withFragment, withHttp, withHttps, withLeadingSlash, withProtocol, withQuery, withTrailingSlash, withoutBase, withoutFragment, withoutHost, withoutLeadingSlash, withoutProtocol, withoutTrailingSlash)\n\n  dist/index.mjs (total size: 21.1 kB, chunk size: 21.1 kB, exports: $URL, appendQuery, cleanDoubleSlashes, createURL, decode, decodePath, decodeQueryKey, decodeQueryValue, encode, encodeHash, encodeHost, encodeParam, encodePath, encodeQueryItem, encodeQueryKey, encodeQueryValue, filterQuery, getQuery, hasLeadingSlash, hasProtocol, hasTrailingSlash, isEmptyURL, isEqual, isNonEmptyURL, isRelative, isSamePath, isScriptProtocol, joinRelativeURL, joinURL, normalizeURL, parseAuth, parseFilename, parseHost, parsePath, parseQuery, parseURL, resolveURL, stringifyParsedURL, stringifyQuery, withBase, withFragment, withHttp, withHttps, withLeadingSlash, withProtocol, withQuery, withTrailingSlash, withoutBase, withoutFragment, withoutHost, withoutLeadingSlash, withoutProtocol, withoutTrailingSlash)\n\nΣ Total dist size",
+      "fullLocalOutputSha256": "37913bcf1dc40a66c6736669afe798bb53dd9972b4601446c90b95a104955ae2",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/a4b23cec6afd/supplemental/empty-value-interpretation/result.json",
+      "exit": 0,
+      "elapsedMs": 7283,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Σ Total dist size (byte size): 101 kB\n\nIndependent behavior passed",
+      "fullLocalOutputSha256": "cc72d5d27a07a92df6d08cf2ff514076f2f366a39ae80a7d7ce42d5cbb48876b",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "normalHandoff": true,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "lastNativeTextSha256": "5667c73c9fd074329a9a190e7f616b222b33e1e33fbf18b1e2b89ee756e472ca",
+    "normalFinalResponse": true,
+    "finalResponseExcerpt": "Implemented `appendQuery` with:\n\n- Ordered appending for repeated keys and arrays\n- Existing encoding semantics for null, empty, numbers, and booleans\n- Pollution-key filtering\n- URL/fragment preservation\n- No input mutation\n- Public TypeScript declaration generation\n- README/API documentation and regression/type tests\n\nValidation completed:\n\n- `pnpm test`: 14 files, 495 tests passed, no type errors\n- ESLint and Prettier passed\n- `unbuild` succeeded with `appendQuery` publicly exported\n- No dependencies or commits changed",
+    "authorExplanationExcerpt": null,
+    "reportFindings": []
+  }
+}

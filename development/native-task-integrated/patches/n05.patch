@@ -1,0 +1,397 @@
+diff --git a/README.md b/README.md
+index 4a26073f8052ee6704abf6f7fd97a068def50ea5..ea48ff2213deb60d23fd10c797622e7913616665 100644
+--- a/README.md
++++ b/README.md
+@@ -208,12 +208,24 @@ stringifyQuery({ foo: 'bar', baz: 'qux' })
+ 
+ stringifyQuery({ foo: 'bar', baz: undefined })
+ // 'foo=bar'
++
++const params = new URLSearchParams('tag=one&tag=two&empty=')
++stringifyQuery(params)
++// 'tag=one&tag=two&empty='
+ ```
+ 
+ ## Utils
+ 
+ ### `$URL()`
+ 
++`$URL.query` accepts either a query object or `URLSearchParams`.
++
++```js
++const url = new $URL("/path");
++url.query = new URLSearchParams("tag=one&tag=two");
++url.href; // "/path?tag=one&tag=two"
++```
++
+ ### `cleanDoubleSlashes(input)`
+ 
+ Removes double slashes from the URL.
+@@ -546,6 +558,9 @@ Add/Replace the query section of the URL.
+ 
+ ```js
+ withQuery("/foo?page=a", { token: "secret" }); // "/foo?page=a&token=secret"
++
++withQuery("/foo?page=a", new URLSearchParams("token=secret"));
++// "/foo?page=a&token=secret"
+ ```
+ 
+ ### `withTrailingSlash(input, respectQueryAndFragment?)`
+diff --git a/src/query.ts b/src/query.ts
+index 6fbcaaa10ba8cca86c95ce42df60aa16fcc6641b..1d7bf6160f3d1d2000558a85084c5b07d4df6fb8 100644
+--- a/src/query.ts
++++ b/src/query.ts
+@@ -16,6 +16,8 @@ export type QueryValue =
+ 
+ export type QueryObject = Record<string, QueryValue | QueryValue[]>;
+ 
++export type QueryInput = QueryObject | URLSearchParams;
++
+ export type ParsedQuery = Record<string, string | string[]>;
+ 
+ // const EmptyObject = /* @__PURE__ */ (() => {
+@@ -115,7 +117,7 @@ export function encodeQueryItem(
+ }
+ 
+ /**
+- * Stringfies and encodes a query object into a query string.
++ * Stringfies and encodes a query object or URLSearchParams into a query string.
+  *
+  * @example
+  *
+@@ -125,11 +127,23 @@ export function encodeQueryItem(
+  *
+  * stringifyQuery({ foo: 'bar', baz: undefined })
+  * // 'foo=bar'
++ *
++ * stringifyQuery(new URLSearchParams('tag=one&tag=two'))
++ * // 'tag=one&tag=two'
+  * ```
+  *
+  * @group Query_utils
+  */
+-export function stringifyQuery(query: QueryObject): string {
++export function stringifyQuery(query: QueryInput): string {
++  if (query instanceof URLSearchParams) {
++    return Array.from(query)
++      .map(
++        ([key, value]) =>
++          `${encodeQueryKey(key)}=${encodeQueryValue(value)}`,
++      )
++      .join("&");
++  }
++
+   return Object.keys(query)
+     .filter((k) => query[k] !== undefined)
+     .map((k) => encodeQueryItem(k, query[k]))
+diff --git a/src/url.ts b/src/url.ts
+index 2cf9ffdf85aa8dc901f00dfea1f3a7e14d690dbb..e7e4c92cb43ff1ccdbe873758dd4b7c36847647f 100644
+--- a/src/url.ts
++++ b/src/url.ts
+@@ -1,5 +1,5 @@
+ import { parseURL, parseAuth, parseHost } from "./parse";
+-import { QueryObject, parseQuery, stringifyQuery } from "./query";
++import { QueryInput, parseQuery, stringifyQuery } from "./query";
+ import { withoutLeadingSlash, withTrailingSlash } from "./utils";
+ import {
+   encodeHash,
+@@ -11,13 +11,21 @@ import {
+ 
+ /**
+  * @deprecated use native URL with `new URL(input)` or `ufo.parseURL(input)`
++ *
++ * @example
++ *
++ * ```js
++ * const url = new $URL("/path")
++ * url.query = new URLSearchParams("tag=one&tag=two")
++ * url.href // "/path?tag=one&tag=two"
++ * ```
+  */
+ export class $URL implements URL {
+   protocol: string;
+   host: string;
+   auth: string;
+   pathname: string;
+-  query: QueryObject = {};
++  query: QueryInput = {};
+   hash: string;
+ 
+   constructor(input = "") {
+@@ -67,9 +75,14 @@ export class $URL implements URL {
+   }
+ 
+   get searchParams(): URLSearchParams {
++    const query = this.query;
++    if (query instanceof URLSearchParams) {
++      return new URLSearchParams(query);
++    }
++
+     const p = new URLSearchParams();
+-    for (const name in this.query) {
+-      const value = this.query[name];
++    for (const name in query) {
++      const value = query[name];
+       if (Array.isArray(value)) {
+         for (const v of value) {
+           p.append(name, v);
+@@ -119,7 +132,25 @@ export class $URL implements URL {
+       throw new Error("Cannot append a URL with protocol");
+     }
+ 
+-    Object.assign(this.query, url.query);
++    const query = this.query;
++    if (query instanceof URLSearchParams) {
++      const appendedQuery = new URLSearchParams(stringifyQuery(url.query));
++      const appendedKeys = new Set(appendedQuery.keys());
++      const mergedQuery = new URLSearchParams();
++
++      for (const [key, value] of query) {
++        if (!appendedKeys.has(key)) {
++          mergedQuery.append(key, value);
++        }
++      }
++      for (const [key, value] of appendedQuery) {
++        mergedQuery.append(key, value);
++      }
++
++      this.query = mergedQuery;
++    } else {
++      Object.assign(query, url.query);
++    }
+ 
+     if (url.pathname) {
+       this.pathname =
+diff --git a/src/utils.ts b/src/utils.ts
+index ea98aba4e7261c2199eeb69e1d5dede3b15a1130..ea81812b2b202488f2c8588a50d463f14f5d95d5 100644
+--- a/src/utils.ts
++++ b/src/utils.ts
+@@ -1,8 +1,16 @@
+ import { parseURL, stringifyParsedURL } from "./parse";
+-import { QueryObject, parseQuery, stringifyQuery, ParsedQuery } from "./query";
++import {
++  QueryInput,
++  encodeQueryItem,
++  parseQuery,
++  stringifyQuery,
++  ParsedQuery,
++} from "./query";
+ import {
+   decode,
+   decodePath,
++  decodeQueryKey,
++  decodeQueryValue,
+   encodeHash,
+   encodeHost,
+   encodePath,
+@@ -341,11 +349,47 @@ export function withoutBase(input: string, base: string) {
+  *
+  * ```js
+  * withQuery("/foo?page=a", { token: "secret" }); // "/foo?page=a&token=secret"
++ * withQuery("/foo?page=a", new URLSearchParams("token=secret"));
++ * // "/foo?page=a&token=secret"
+  * ```
+  *
+  * @group utils
+  */
+-export function withQuery(input: string, query: QueryObject): string {
++export function withQuery(input: string, query: QueryInput): string {
++  if (query instanceof URLSearchParams) {
++    if (query.size === 0) {
++      return input;
++    }
++
++    const parsed = parseURL(input);
++    const queryKeys = new Set(query.keys());
++    const existingEntries = parsed.search
++      .replace(/^\?/, "")
++      .split("&")
++      .map((parameter): [string, string] | undefined => {
++        const match = parameter.match(/([^=]+)=?(.*)/);
++        if (!match) {
++          return;
++        }
++        return [
++          decodeQueryKey(match[1]),
++          decodeQueryValue(match[2] || ""),
++        ];
++      })
++      .filter(
++        (entry): entry is [string, string] =>
++          entry !== undefined && !queryKeys.has(entry[0]),
++      );
++
++    parsed.search = [
++      ...existingEntries.map(([key, value]) => encodeQueryItem(key, value)),
++      stringifyQuery(query),
++    ]
++      .filter(Boolean)
++      .join("&");
++    return stringifyParsedURL(parsed);
++  }
++
+   const parsed = parseURL(input);
+   const mergedQuery = { ...parseQuery(parsed.search), ...query };
+   parsed.search = stringifyQuery(mergedQuery);
+diff --git a/test/query.test.ts b/test/query.test.ts
+index 8ef15e44f0fb7e4099e00787dcb490a467979baa..5eedf2469acbec3c6de697426fb454a99f9f8986 100644
+--- a/test/query.test.ts
++++ b/test/query.test.ts
+@@ -1,5 +1,37 @@
+ import { describe, expect, test } from "vitest";
+-import { filterQuery, getQuery, withQuery } from "../src";
++import {
++  filterQuery,
++  getQuery,
++  parseQuery,
++  stringifyQuery,
++  withQuery,
++} from "../src";
++
++describe("stringifyQuery with URLSearchParams", () => {
++  test("preserves ordered, repeated, empty, and escaped entries", () => {
++    const params = new URLSearchParams();
++    params.append("tag", "one");
++    params.append("empty", "");
++    params.append("tag", "two");
++    params.append("escaped", "你好 + & / %");
++
++    expect(stringifyQuery(params)).toBe(
++      "tag=one&empty=&tag=two&escaped=%E4%BD%A0%E5%A5%BD+%2B+%26+%2F+%25",
++    );
++    expect(parseQuery(stringifyQuery(params))).toEqual({
++      tag: ["one", "two"],
++      empty: "",
++      escaped: "你好 + & / %",
++    });
++    expect(Array.from(params)).toEqual([
++      ["tag", "one"],
++      ["empty", ""],
++      ["tag", "two"],
++      ["escaped", "你好 + & / %"],
++    ]);
++    expect(stringifyQuery(new URLSearchParams())).toBe("");
++  });
++});
+ 
+ describe("withQuery", () => {
+   const tests = [
+@@ -70,6 +102,37 @@ describe("withQuery", () => {
+       expect(withQuery(t.input, t.query)).toBe(t.out);
+     });
+   }
++
++  test("does not mutate object input", () => {
++    const query = { foo: "bar", tags: ["one", "two"] };
++    withQuery("/path?existing=value", query);
++    expect(query).toEqual({ foo: "bar", tags: ["one", "two"] });
++  });
++});
++
++describe("withQuery with URLSearchParams", () => {
++  test("overlays ordered entries without changing unrelated URL parts", () => {
++    const params = new URLSearchParams();
++    params.append("replace", "new");
++    params.append("added", "");
++    params.append("replace", "latest");
++
++    const input =
++      "https://user:pass@example.com/path?keep=1&replace=old&keep=2#fragment";
++    expect(withQuery(input, params)).toBe(
++      "https://user:pass@example.com/path?keep=1&keep=2&replace=new&added=&replace=latest#fragment",
++    );
++    expect(Array.from(params)).toEqual([
++      ["replace", "new"],
++      ["added", ""],
++      ["replace", "latest"],
++    ]);
++  });
++
++  test("keeps an empty params query unchanged", () => {
++    const input = "/path?flag#fragment";
++    expect(withQuery(input, new URLSearchParams())).toBe(input);
++  });
+ });
+ 
+ describe("filterQuery", () => {
+diff --git a/test/types.test-d.ts b/test/types.test-d.ts
+index e28c503eaa0456b72e8177b9e0a4f3ed5e536916..f8ff01587712c422ca8b5130152b59914694d31d 100644
+--- a/test/types.test-d.ts
++++ b/test/types.test-d.ts
+@@ -1,5 +1,12 @@
+ import { describe, expectTypeOf, test } from "vitest";
+-import { getQuery, parseQuery } from "../src";
++import {
++  $URL,
++  getQuery,
++  parseQuery,
++  QueryInput,
++  stringifyQuery,
++  withQuery,
++} from "../src";
+ 
+ describe("query", () => {
+   test("getQuery generic type support", () => {
+@@ -11,4 +18,14 @@ describe("query", () => {
+     const result = parseQuery<{ foo: string }>("http://foo.com/?foo=bar");
+     expectTypeOf(result).toEqualTypeOf<{ foo: string }>();
+   });
++
++  test("URLSearchParams query inputs", () => {
++    const params = new URLSearchParams("foo=bar");
++    expectTypeOf(stringifyQuery(params)).toEqualTypeOf<string>();
++    expectTypeOf(withQuery("/", params)).toEqualTypeOf<string>();
++
++    const url = new $URL("/");
++    url.query = params;
++    expectTypeOf(url.query).toEqualTypeOf<QueryInput>();
++  });
+ });
+diff --git a/test/url.test.ts b/test/url.test.ts
+index 076146e12fde31212b57fa4d367e3f3d50dafe3a..045c4bb3f869929a8d3f03e729a18529994141f1 100644
+--- a/test/url.test.ts
++++ b/test/url.test.ts
+@@ -46,6 +46,43 @@ describe("$URL", () => {
+     );
+   });
+ 
++  test("serializes an assigned URLSearchParams query", () => {
++    const params = new URLSearchParams("tag=one&empty=&tag=two");
++    const url = new $URL("https://example.com/path#fragment");
++    url.query = params;
++
++    expect(url.search).toBe("?tag=one&empty=&tag=two");
++    expect(url.fullpath).toBe("/path?tag=one&empty=&tag=two#fragment");
++    expect(url.href).toBe(
++      "https://example.com/path?tag=one&empty=&tag=two#fragment",
++    );
++    expect(url.toString()).toBe(url.href);
++
++    const detachedParams = url.searchParams;
++    detachedParams.append("new", "value");
++    expect(detachedParams.toString()).toBe(
++      "tag=one&empty=&tag=two&new=value",
++    );
++    expect(url.search).toBe("?tag=one&empty=&tag=two");
++  });
++
++  test("appends over a URLSearchParams query", () => {
++    const url = new $URL("https://example.com/base#old");
++    const params = new URLSearchParams("a=one&a=two&keep=value");
++    url.query = params;
++
++    url.append(new $URL("/child?a=final&new=value#new"));
++
++    expect(url.href).toBe(
++      "https://example.com/base/child?keep=value&a=final&new=value#new",
++    );
++    expect(Array.from(params)).toEqual([
++      ["a", "one"],
++      ["a", "two"],
++      ["keep", "value"],
++    ]);
++  });
++
+   test("throws error if appending with another url with protocol", () => {
+     const url = new $URL("https://example.com/path");
+     expect(() => url.append(url)).toThrow("Cannot append a URL with protocol");

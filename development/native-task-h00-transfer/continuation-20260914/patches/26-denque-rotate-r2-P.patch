@@ -1,0 +1,212 @@
+diff --git a/README.md b/README.md
+index 3c645d3..f91e157 100644
+--- a/README.md
++++ b/README.md
+@@ -46,6 +46,23 @@ denque.pop(); // 4
+ 
+ See the [API reference documentation](https://docs.page/invertase/denque/api) for more examples.
+ 
++## API
++
++### `rotate(steps = 1)`
++
++Rotates the queue in place and returns the same queue. Positive `steps` move
++values from the back to the front; negative `steps` move values from the front
++to the back. Counts are finite integers and are normalized modulo the current
++queue length. Empty and single-item queues are unchanged.
++
++```js
++const denque = new Denque([1, 2, 3, 4]);
++denque.rotate();       // [4, 1, 2, 3]
++denque.rotate(-2);     // [1, 2, 3, 4]
++```
++
++Passing a non-number, non-finite number, or non-integer throws an `Error`.
++
+ ---
+ 
+ ## Who's using it?
+diff --git a/index.d.ts b/index.d.ts
+index e125dd4..a2d16b4 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -23,6 +23,8 @@ declare class Denque<T = any> {
+ 
+   get(index: number): T | undefined;
+ 
++  rotate(steps?: number): this;
++
+   remove(index: number, count: number): T[];
+ 
+   removeOne(index: number): T | undefined;
+diff --git a/index.js b/index.js
+index 6b2e9d8..51229ea 100644
+--- a/index.js
++++ b/index.js
+@@ -79,6 +79,39 @@ Denque.prototype.peekBack = function peekBack() {
+   return this.peekAt(-1);
+ };
+ 
++/**
++ * Rotate the queue by moving items from the back to the front for positive
++ * steps, or from the front to the back for negative steps.
++ * @param {number} steps
++ * @returns {Denque}
++ */
++Denque.prototype.rotate = function rotate(steps) {
++  if (steps === void 0) steps = 1;
++  if (typeof steps !== 'number' || steps !== steps || steps % 1 !== 0) {
++    throw new Error('steps must be a finite integer');
++  }
++
++  var size = this.size();
++  if (size < 2) return this;
++
++  var offset = steps % size;
++  if (offset < 0) offset += size;
++  if (offset === 0) return this;
++
++  var rotated = new Array(this._list.length);
++  var source;
++  for (var i = 0; i < size; i++) {
++    source = i - offset;
++    if (source < 0) source += size;
++    rotated[i] = this._list[(this._head + source) & this._capacityMask];
++  }
++
++  this._list = rotated;
++  this._head = 0;
++  this._tail = size;
++  return this;
++};
++
+ /**
+  * Returns the current length of the queue
+  * @return {Number}
+diff --git a/test/denque.js b/test/denque.js
+index 47fbd0f..691889c 100644
+--- a/test/denque.js
++++ b/test/denque.js
+@@ -326,6 +326,108 @@ describe('Deque.prototype.shift', function () {
+   });
+ });
+ 
++describe('Denque.prototype.rotate', function () {
++  it('should rotate in either direction, normalize counts, and return itself', function () {
++    var a = new Denque([1, 2, 3, 4]);
++
++    assert.strictEqual(a.rotate(), a);
++    assert.deepEqual(a.toArray(), [4, 1, 2, 3]);
++    assert.strictEqual(a.rotate(-2), a);
++    assert.deepEqual(a.toArray(), [2, 3, 4, 1]);
++    assert.strictEqual(a.rotate(0), a);
++    assert.deepEqual(a.toArray(), [2, 3, 4, 1]);
++    assert.strictEqual(a.rotate(6), a);
++    assert.deepEqual(a.toArray(), [4, 1, 2, 3]);
++    assert.strictEqual(a.rotate(-5), a);
++    assert.deepEqual(a.toArray(), [1, 2, 3, 4]);
++    assert.strictEqual(a.rotate(9007199254740991), a);
++    assert.deepEqual(a.toArray(), [2, 3, 4, 1]);
++  });
++
++  it('should preserve values in wrapped storage and after deque operations', function () {
++    var a = new Denque([1, 2, 3, 4, 5, 6]);
++    a.shift();
++    a.shift();
++    a.push(7);
++    a.push(8);
++    assert(a._head > a._tail);
++
++    a.rotate(2);
++    assert.deepEqual(a.toArray(), [7, 8, 3, 4, 5, 6]);
++    assert.strictEqual(a.peek(), 7);
++    assert.strictEqual(a.peekBack(), 6);
++    assert.strictEqual(a.shift(), 7);
++    assert.strictEqual(a.pop(), 6);
++    a.unshift(2);
++    a.push(9);
++    assert.deepEqual(a.toArray(), [2, 8, 3, 4, 5, 9]);
++    assert.deepEqual(a.remove(1, 2), [8, 3]);
++    assert.deepEqual(a.toArray(), [2, 4, 5, 9]);
++  });
++
++  it('should preserve configured capacity and order after rotation', function () {
++    var a = new Denque([1, 2, 3, 4], { capacity: 4 });
++    var capacity = a._capacity;
++    a.shift();
++    a.shift();
++    a.push(5);
++    a.push(6);
++    a.push(7);
++    a.push(8);
++    a.rotate();
++
++    assert.strictEqual(a._capacity, capacity);
++    assert.strictEqual(a.length, 4);
++    assert.deepEqual(a.toArray(), [8, 5, 6, 7]);
++    a.push(9);
++    assert.deepEqual(a.toArray(), [5, 6, 7, 9]);
++    a.unshift(4);
++    assert.deepEqual(a.toArray(), [4, 5, 6, 7]);
++  });
++
++  it('should reject invalid counts without changing state', function () {
++    var a = new Denque([{ id: 1 }, { id: 2 }, { id: 3 }]);
++    a.shift();
++    a.push({ id: 4 });
++    var original = a.toArray();
++    a.rotate(1);
++    assert.strictEqual(a.peekFront(), original[original.length - 1]);
++    assert.strictEqual(a.peekBack(), original[original.length - 2]);
++    var before = a.toArray();
++    var list = a._list;
++    var head = a._head;
++    var tail = a._tail;
++    var invalid = [NaN, Infinity, -Infinity, 1.5, '1', null, true, {}, new Number(1)];
++
++    invalid.forEach(function (steps) {
++      assert.throws(function () { a.rotate(steps); }, Error);
++      assert.deepStrictEqual(a.toArray(), before);
++      assert.strictEqual(a._list, list);
++      assert.strictEqual(a._head, head);
++      assert.strictEqual(a._tail, tail);
++    });
++    assert.strictEqual(a.peekFront(), before[0]);
++    assert.strictEqual(a.peekBack(), before[before.length - 1]);
++  });
++
++  it('should leave empty and singleton queues usable', function () {
++    var empty = new Denque();
++    assert.strictEqual(empty.rotate(1000000000), empty);
++    empty.push(1);
++    assert.deepEqual(empty.toArray(), [1]);
++    assert.strictEqual(empty.rotate(-1000000000), empty);
++    assert.strictEqual(empty.pop(), 1);
++
++    var singleton = new Denque([{ value: 1 }]);
++    var item = singleton.peek();
++    assert.strictEqual(singleton.rotate(), singleton);
++    assert.strictEqual(singleton.peek(), item);
++    assert.strictEqual(singleton.shift(), item);
++    singleton.unshift(item);
++    assert.strictEqual(singleton.pop(), item);
++  });
++});
++
+ describe('Denque.prototype.get', function () {
+   it('should return undefined on nonsensical argument', function () {
+     var a = new Denque([1, 2, 3, 4]);
+diff --git a/test/type/index.ts b/test/type/index.ts
+index 7ee6f37..92419e2 100644
+--- a/test/type/index.ts
++++ b/test/type/index.ts
+@@ -13,6 +13,9 @@ queue.toArray();
+ queue.peekBack();
+ queue.peekFront();
+ queue.get(1);
++queue.rotate();
++queue.rotate(-2);
++const rotatedQueue: typeof queue = queue.rotate(1);
+ var entry = queue.peekAt(1);
+ if (entry !== undefined) {
+     entry.length;

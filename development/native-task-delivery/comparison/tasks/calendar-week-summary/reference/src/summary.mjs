@@ -1,0 +1,1 @@
+import {weekStart} from './week.mjs';export function summarize(entries){const m=new Map();for(const e of entries){const w=weekStart(e.day);m.set(w,(m.get(w)??0)+e.minutes);}return [...m].sort(([a],[b])=>a.localeCompare(b)).map(([week,minutes])=>({week,minutes}));}

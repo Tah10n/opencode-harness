@@ -1,0 +1,1900 @@
+[
+  {
+    "slot": 1,
+    "task": "protocol-error-api",
+    "arm": "A",
+    "exitCode": 0,
+    "timedOut": false,
+    "elapsedMs": 117792,
+    "requests": 15,
+    "requestsWithoutUsage": 0,
+    "workflowStatus": null,
+    "repairs": null,
+    "toolCalls": 21,
+    "sessions": 1,
+    "phaseCount": 1,
+    "execution": "completed",
+    "terminationVerified": true,
+    "cleanupVerified": true,
+    "observedUsage": {
+      "input_tokens": 316675,
+      "cached_tokens": 94208,
+      "output_tokens": 2949,
+      "reasoning_tokens": 719,
+      "total_tokens": 319624
+    },
+    "usageComplete": true,
+    "requestEfforts": {
+      "none": 1,
+      "low": 14
+    },
+    "httpStatuses": {
+      "200": 15
+    },
+    "packet": "L8",
+    "delivery": {
+      "patchApplies": true,
+      "changedFiles": [
+        "packages/connector/README.md",
+        "packages/connector/bin/viberacing.mjs",
+        "packages/connector/lib/protocol.mjs",
+        "packages/connector/test/protocol.test.mjs"
+      ],
+      "patchSha256": "c91fc661a9755b67640c8c423cd5ae6b54827197448c52649abe04a637c71b9b"
+    },
+    "grading": {
+      "final": {
+        "packet": "L8",
+        "phase": "final",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 14,
+              "pass": 14,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 14,
+              "pass": 14,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 12,
+              "pass": 12,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": true,
+        "cleanup": 0
+      }
+    },
+    "sourceReview": {
+      "packet": "L8",
+      "assessmentScope": "Final source and delivered tests/README inspection by the integrator who knows the schedule; independent frozen executable checks are reported separately.",
+      "phases": {
+        "final": {
+          "sourceConformsToTask": true,
+          "necessaryCoverageDelivered": true,
+          "documentationDelivered": true,
+          "newRegressionFound": false,
+          "notes": [
+            "parseProtocolResponse validates the body before throwing the new status/code Error; successful parsing and invalid_server_response validation are unchanged.",
+            "The real request path now returns successful parse results and catches thrown valid errors; 429/5xx attach Retry-After metadata before existing backoff. Nonretryable 4xx, timeout and redirect controls remain.",
+            "The old valid-error assertion is adapted to rejection/status/code rather than removed; malformed code and terminal sanitization assertions remain. Existing CLI integration suites still exercise pairing/reconciliation/usage consumers; no redundant new CLI test is demanded solely because its file did not change.",
+            "README explains the public protocol contract."
+          ],
+          "evidence": [
+            "packages/connector/lib/protocol.mjs parseProtocolResponse",
+            "packages/connector/bin/viberacing.mjs request",
+            "packages/connector/test/protocol.test.mjs valid error and invalid code assertions",
+            "packages/connector/test/config.test.mjs existing consumer regressions"
+          ],
+          "oldCoveragePreserved": true,
+          "newRequiredCoverageDelivered": true
+        }
+      }
+    },
+    "publicPathNormalization": "Delivery-worktree runtime prefix normalized; raw local evidence is unchanged.",
+    "assessment": {
+      "final": {
+        "workingBehaviorObserved": true,
+        "deliveredChecksPassed": true,
+        "allFrozenChecksPassed": true,
+        "necessaryCoverageDelivered": true,
+        "oldCoveragePreserved": true,
+        "newRequiredCoverageDelivered": true,
+        "documentationDelivered": true,
+        "completePatchDelivery": true,
+        "newRegressionFound": false
+      }
+    }
+  },
+  {
+    "slot": 2,
+    "task": "protocol-error-api",
+    "arm": "D",
+    "exitCode": 0,
+    "timedOut": false,
+    "elapsedMs": 166071,
+    "requests": 19,
+    "requestsWithoutUsage": 0,
+    "workflowStatus": "incomplete",
+    "repairs": 0,
+    "toolCalls": 21,
+    "sessions": 2,
+    "phaseCount": 1,
+    "execution": "completed",
+    "terminationVerified": true,
+    "cleanupVerified": true,
+    "observedUsage": {
+      "input_tokens": 388263,
+      "cached_tokens": 29184,
+      "output_tokens": 3229,
+      "reasoning_tokens": 661,
+      "total_tokens": 391492
+    },
+    "usageComplete": true,
+    "requestEfforts": {
+      "none": 1,
+      "low": 18
+    },
+    "httpStatuses": {
+      "200": 19
+    },
+    "artifactWorkflowStatus": "incomplete",
+    "artifactRepairs": 0,
+    "nativeToolOutputParsed": true,
+    "stages": [
+      {
+        "label": "implementation",
+        "role": "author",
+        "elapsedMs": 159210
+      }
+    ],
+    "correctionReasons": [],
+    "coverageObservation": null,
+    "limits": [
+      "Native permission boundary rejected a tool; no evidence correction admitted",
+      "Terminal state or processes differ from the observed delivery"
+    ],
+    "phaseChecks": {},
+    "packet": "Q4",
+    "delivery": {
+      "patchApplies": true,
+      "changedFiles": [
+        "packages/connector/README.md",
+        "packages/connector/bin/viberacing.mjs",
+        "packages/connector/lib/protocol.mjs",
+        "packages/connector/test/protocol.test.mjs"
+      ],
+      "patchSha256": "b02e25d620e4b5f9678bfd459f4c4a5d5a03f8fa1ee184befd1cc77a25e586d9"
+    },
+    "grading": {
+      "final": {
+        "packet": "Q4",
+        "phase": "final",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 14,
+              "pass": 14,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 14,
+              "pass": 14,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 12,
+              "pass": 12,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": true,
+        "cleanup": 0
+      }
+    },
+    "sourceReview": {
+      "packet": "Q4",
+      "assessmentScope": "Final source and delivered tests/README inspection by the integrator who knows the schedule; independent frozen executable checks are reported separately.",
+      "phases": {
+        "final": {
+          "sourceConformsToTask": true,
+          "necessaryCoverageDelivered": true,
+          "documentationDelivered": true,
+          "newRegressionFound": false,
+          "notes": [
+            "parseProtocolResponse validates the body before throwing the new status/code Error; successful parsing and invalid_server_response validation are unchanged.",
+            "The real request path now returns successful parse results and catches thrown valid errors; 429/5xx attach Retry-After metadata before existing backoff. Nonretryable 4xx, timeout and redirect controls remain.",
+            "The old valid-error assertion is adapted to rejection/status/code rather than removed; malformed code and terminal sanitization assertions remain. Existing CLI integration suites still exercise pairing/reconciliation/usage consumers; no redundant new CLI test is demanded solely because its file did not change.",
+            "README explains the public protocol contract.",
+            "Additional invalid control-containing 503 response assertion is delivered. Native workflow stopped on a wrong workdir permission denial; no D0 or correction was retained, so D0-to-final change is unavailable."
+          ],
+          "evidence": [
+            "packages/connector/lib/protocol.mjs parseProtocolResponse",
+            "packages/connector/bin/viberacing.mjs request",
+            "packages/connector/test/protocol.test.mjs valid error and invalid code assertions",
+            "packages/connector/test/config.test.mjs existing consumer regressions"
+          ],
+          "oldCoveragePreserved": true,
+          "newRequiredCoverageDelivered": true
+        }
+      }
+    },
+    "D0Available": false,
+    "publicPathNormalization": "Delivery-worktree runtime prefix normalized; raw local evidence is unchanged.",
+    "assessment": {
+      "final": {
+        "workingBehaviorObserved": true,
+        "deliveredChecksPassed": true,
+        "allFrozenChecksPassed": true,
+        "necessaryCoverageDelivered": true,
+        "oldCoveragePreserved": true,
+        "newRequiredCoverageDelivered": true,
+        "documentationDelivered": true,
+        "completePatchDelivery": true,
+        "newRegressionFound": false
+      }
+    },
+    "D0UnavailableReason": "Real native external_directory denial before the initial stage snapshot: author omitted /worktree in the git diff --check workdir. No later author stage was started. Terminal delivery is retained and independently graded; it is not relabeled as D0."
+  },
+  {
+    "slot": 3,
+    "task": "legacy-runtime-reload",
+    "arm": "D",
+    "exitCode": 0,
+    "timedOut": false,
+    "elapsedMs": 372672,
+    "requests": 47,
+    "requestsWithoutUsage": 0,
+    "workflowStatus": null,
+    "repairs": null,
+    "toolCalls": 50,
+    "sessions": 2,
+    "phaseCount": 1,
+    "execution": "completed",
+    "terminationVerified": true,
+    "cleanupVerified": true,
+    "observedUsage": {
+      "input_tokens": 1990350,
+      "cached_tokens": 879104,
+      "output_tokens": 11783,
+      "reasoning_tokens": 4378,
+      "total_tokens": 2002133
+    },
+    "usageComplete": true,
+    "requestEfforts": {
+      "none": 1,
+      "low": 46
+    },
+    "httpStatuses": {
+      "200": 47
+    },
+    "artifactWorkflowStatus": "incomplete",
+    "artifactRepairs": 1,
+    "nativeToolOutputParsed": false,
+    "stages": [
+      {
+        "label": "implementation",
+        "role": "author",
+        "elapsedMs": 275410
+      },
+      {
+        "label": "correction",
+        "role": "author",
+        "elapsedMs": 84926
+      }
+    ],
+    "correctionReasons": [
+      "Missing final verification after the last mutation: node --test packages/connector/test/state-security.test.mjs",
+      "Missing final verification after the last mutation: node --test packages/connector/test/config.test.mjs --test-name-pattern='runtime|state|executable'",
+      "Missing final verification after the last mutation: git diff --check",
+      "Existing test/fixture content changed or was removed; assess necessary scenario preservation using the exact diff and added tests."
+    ],
+    "coverageObservation": "no_existing_test_changes_observed",
+    "limits": [
+      "Some observed project checks failed, lacked test results or were not repeated after the last mutation."
+    ],
+    "phaseChecks": {
+      "D0": {
+        "checksCurrent": false,
+        "changedTestFiles": [
+          "packages/connector/test/state-security.test.mjs"
+        ],
+        "latestChecks": [
+          {
+            "command": "node --test packages/connector/test/state-security.test.mjs",
+            "workdir": ".",
+            "provenance": "initial Node test workflow",
+            "exit": 1,
+            "state": "completed",
+            "current": false,
+            "tests": 10,
+            "successful": false
+          },
+          {
+            "command": "node --test packages/connector/test/config.test.mjs --test-name-pattern='runtime|state|executable'",
+            "workdir": ".",
+            "provenance": "initial Node test workflow",
+            "exit": 1,
+            "state": "completed",
+            "current": false,
+            "tests": 76,
+            "successful": false
+          },
+          {
+            "command": "git diff --check",
+            "workdir": "<delivery-worktree>",
+            "provenance": "explicit original task",
+            "exit": 0,
+            "state": "completed",
+            "current": false,
+            "tests": null,
+            "successful": true
+          }
+        ]
+      },
+      "final": {
+        "checksCurrent": false,
+        "changedTestFiles": [],
+        "latestChecks": [
+          {
+            "command": "node --test packages/connector/test/state-security.test.mjs",
+            "workdir": ".",
+            "provenance": "initial Node test workflow",
+            "exit": 0,
+            "state": "completed",
+            "current": true,
+            "tests": 9,
+            "successful": true
+          },
+          {
+            "command": "node --test packages/connector/test/config.test.mjs --test-name-pattern='runtime|state|executable'",
+            "workdir": ".",
+            "provenance": "initial Node test workflow",
+            "exit": 1,
+            "state": "completed",
+            "current": false,
+            "tests": 76,
+            "successful": false
+          },
+          {
+            "command": "git diff --check",
+            "workdir": "<delivery-worktree>",
+            "provenance": "explicit original task",
+            "exit": 0,
+            "state": "completed",
+            "current": true,
+            "tests": null,
+            "successful": true
+          },
+          {
+            "command": "node --test packages/connector/test/executables.test.mjs packages/connector/test/config.test.mjs --test-name-pattern='runtime|executable|installation identity'",
+            "workdir": ".",
+            "provenance": "initial Node test workflow",
+            "exit": 1,
+            "state": "completed",
+            "current": true,
+            "tests": 82,
+            "successful": false
+          }
+        ]
+      }
+    },
+    "packet": "H2",
+    "delivery": {
+      "patchApplies": true,
+      "changedFiles": [
+        "packages/connector/README.md",
+        "packages/connector/lib/config.mjs"
+      ],
+      "patchSha256": "89c7c137cb1e27ed175c10af24d89492b891eda2a07463cfa839a72d01f08748"
+    },
+    "grading": {
+      "final": {
+        "packet": "H2",
+        "phase": "final",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "legacy-acceptance": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 9,
+              "pass": 7,
+              "fail": 2,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 0,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": false,
+        "cleanup": 0
+      },
+      "D0": {
+        "packet": "H2",
+        "phase": "D0",
+        "checks": {
+          "ordinary": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 16,
+              "pass": 14,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "legacy-acceptance": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 9,
+              "pass": 7,
+              "fail": 2,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 0,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": false,
+        "cleanup": 0
+      }
+    },
+    "sourceReview": {
+      "packet": "H2",
+      "assessmentScope": "Final source and delivered tests/README inspection by the integrator who knows the schedule; independent frozen executable checks are reported separately.",
+      "phases": {
+        "D0": {
+          "sourceConformsToTask": false,
+          "necessaryCoverageDelivered": false,
+          "documentationDelivered": true,
+          "newRegressionFound": true,
+          "notes": [
+            "Frozen full-layout legacy acceptance fails with \"state contains an unrelated entry: lib\" in both phases. recognizedLegacyRuntimePaths applies info.nlink !== 1 to directories as well as files, so the nested adapters directory is rejected on the Linux task filesystem. The complete-layout failure is separate from the subset/cardinality ambiguity.",
+            "No completed new project regression for legacy migration, executable resolution or repeated reload is delivered. Existing tests alone cannot exercise the newly accepted layout.",
+            "README describes the new layout, but says seven lib files while the task and allowlist contain six.",
+            "D0 changes an existing callback closing line to a stray comment terminator and leaves an unfinished added regression in a comment. This corrupts the supplied suite. The exact-layout count condition is false instead of a cardinality check.",
+            "The frozen supplemental reload evaluator uses a subset of known legacy files. Task wording is ambiguous on whole-set presence; preserve this raw failure separately and do not use the cardinality requirement alone to fail the task. Complete-layout acceptance, directory handling and missing delivered regressions are separate questions."
+          ],
+          "evidence": [
+            "packages/connector/lib/config.mjs recognizedLegacyRuntimePaths",
+            "packages/connector/test/state-security.test.mjs",
+            "packages/connector/README.md legacy migration paragraph"
+          ],
+          "oldCoveragePreserved": false,
+          "newRequiredCoverageDelivered": false
+        },
+        "final": {
+          "sourceConformsToTask": false,
+          "necessaryCoverageDelivered": false,
+          "documentationDelivered": true,
+          "newRegressionFound": false,
+          "notes": [
+            "Frozen full-layout legacy acceptance fails with \"state contains an unrelated entry: lib\" in both phases. recognizedLegacyRuntimePaths applies info.nlink !== 1 to directories as well as files, so the nested adapters directory is rejected on the Linux task filesystem. The complete-layout failure is separate from the subset/cardinality ambiguity.",
+            "No completed new project regression for legacy migration, executable resolution or repeated reload is delivered. Existing tests alone cannot exercise the newly accepted layout.",
+            "README describes the new layout, but says seven lib files while the task and allowlist contain six.",
+            "The corrective pass restores state-security.test.mjs byte-for-byte to the original and removes the unfinished regression. It reinstates the exact file cardinality condition. This repairs the damaged old suite but does not supply the required new acceptance/rejection/reload regressions.",
+            "Some native commands passed pattern options after test file arguments and ran broad integration suites with scheduler timeouts. Preserve raw failures; independent targeted checks remain separate.",
+            "The frozen supplemental reload evaluator uses a subset of known legacy files. Task wording is ambiguous on whole-set presence; preserve this raw failure separately and do not use the cardinality requirement alone to fail the task. Complete-layout acceptance, directory handling and missing delivered regressions are separate questions.",
+            "The damaged old suite is repaired (external ordinary check changes from SyntaxError to passed). The required legacy behavior remains unfixed; no additional failing pre-existing product behavior was established by the scoped preservation checks. The second legacy check fails on diagnostic wording before later assertions, so it does not prove a privacy boundary was weakened."
+          ],
+          "evidence": [
+            "packages/connector/lib/config.mjs recognizedLegacyRuntimePaths",
+            "packages/connector/test/state-security.test.mjs",
+            "packages/connector/README.md legacy migration paragraph"
+          ],
+          "oldCoveragePreserved": true,
+          "newRequiredCoverageDelivered": false
+        }
+      }
+    },
+    "D0Available": true,
+    "D0FinalPatchEqual": false,
+    "publicPathNormalization": "Delivery-worktree runtime prefix normalized; raw local evidence is unchanged.",
+    "assessment": {
+      "final": {
+        "workingBehaviorObserved": false,
+        "deliveredChecksPassed": true,
+        "allFrozenChecksPassed": false,
+        "necessaryCoverageDelivered": false,
+        "oldCoveragePreserved": true,
+        "newRequiredCoverageDelivered": false,
+        "documentationDelivered": true,
+        "completePatchDelivery": false,
+        "newRegressionFound": false
+      },
+      "D0": {
+        "workingBehaviorObserved": false,
+        "deliveredChecksPassed": false,
+        "allFrozenChecksPassed": false,
+        "necessaryCoverageDelivered": false,
+        "oldCoveragePreserved": false,
+        "newRequiredCoverageDelivered": false,
+        "documentationDelivered": true,
+        "completePatchDelivery": false,
+        "newRegressionFound": true
+      }
+    },
+    "D0FinalChangedPaths": [
+      "packages/connector/lib/config.mjs",
+      "packages/connector/test/state-security.test.mjs"
+    ],
+    "D0FinalTreeEqual": false
+  },
+  {
+    "slot": 4,
+    "task": "legacy-runtime-reload",
+    "arm": "A",
+    "exitCode": 0,
+    "timedOut": false,
+    "elapsedMs": 167544,
+    "requests": 21,
+    "requestsWithoutUsage": 0,
+    "workflowStatus": null,
+    "repairs": null,
+    "toolCalls": 30,
+    "sessions": 1,
+    "phaseCount": 1,
+    "execution": "completed",
+    "terminationVerified": true,
+    "cleanupVerified": true,
+    "observedUsage": {
+      "input_tokens": 777755,
+      "cached_tokens": 104960,
+      "output_tokens": 4727,
+      "reasoning_tokens": 1283,
+      "total_tokens": 782482
+    },
+    "usageComplete": true,
+    "requestEfforts": {
+      "none": 1,
+      "low": 20
+    },
+    "httpStatuses": {
+      "200": 21
+    },
+    "packet": "V7",
+    "delivery": {
+      "patchApplies": true,
+      "changedFiles": [
+        "packages/connector/README.md",
+        "packages/connector/lib/config.mjs",
+        "packages/connector/test/state-security.test.mjs"
+      ],
+      "patchSha256": "627b6a3bf0950cae60ac4f34ee75e4f0f18f1e37de4bdd48569f5871427c57c2"
+    },
+    "grading": {
+      "final": {
+        "packet": "V7",
+        "phase": "final",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "legacy-acceptance": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 9,
+              "pass": 9,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": true,
+        "cleanup": 0
+      }
+    },
+    "sourceReview": {
+      "packet": "V7",
+      "assessmentScope": "Final source and delivered tests/README inspection by the integrator who knows the schedule; independent frozen executable checks are reported separately.",
+      "phases": {
+        "final": {
+          "sourceConformsToTask": true,
+          "necessaryCoverageDelivered": false,
+          "oldCoveragePreserved": true,
+          "newRequiredCoverageDelivered": false,
+          "documentationDelivered": true,
+          "newRegressionFound": false,
+          "notes": [
+            "The existing ownership predicate gains a normalized, explicit allowlist for known legacy files/directories. Existing link, file type, identity, executable and migration safeguards remain.",
+            "The existing positive state migration fixture is extended with the full legacy file set and mode assertions; prior assertions remain.",
+            "The new legacy fixture initializes only once. No delivered legacy-layout scenario calls prepareRuntime, executes the newly installed launcher and then repeats preparation/reloads the migrated state. Existing normal-layout runtime tests do not cover this combined new path. The external reload evaluator cannot substitute this explicitly requested project regression.",
+            "The task wording does not unambiguously require all known files to exist; accepting a known subset is not automatically a defect. This preserves the historical evaluation boundary.",
+            "README describes the behavior and cursor ownership-only boundary."
+          ],
+          "evidence": [
+            "packages/connector/lib/config.mjs ownedStatePath",
+            "packages/connector/test/state-security.test.mjs first migration case",
+            "packages/connector/test/config.test.mjs installs runnable and incomplete runtime cases",
+            "packages/connector/README.md legacy layout paragraph"
+          ]
+        }
+      }
+    },
+    "publicPathNormalization": "Delivery-worktree runtime prefix normalized; raw local evidence is unchanged.",
+    "assessment": {
+      "final": {
+        "workingBehaviorObserved": true,
+        "deliveredChecksPassed": true,
+        "allFrozenChecksPassed": true,
+        "necessaryCoverageDelivered": false,
+        "oldCoveragePreserved": true,
+        "newRequiredCoverageDelivered": false,
+        "documentationDelivered": true,
+        "completePatchDelivery": false,
+        "newRegressionFound": false
+      }
+    }
+  },
+  {
+    "slot": 5,
+    "task": "reconnect-revoked",
+    "arm": "D",
+    "exitCode": 0,
+    "timedOut": false,
+    "elapsedMs": 195452,
+    "requests": 33,
+    "requestsWithoutUsage": 0,
+    "workflowStatus": "incomplete",
+    "repairs": 1,
+    "toolCalls": 34,
+    "sessions": 2,
+    "phaseCount": 1,
+    "execution": "completed",
+    "terminationVerified": true,
+    "cleanupVerified": true,
+    "observedUsage": {
+      "input_tokens": 946263,
+      "cached_tokens": 281088,
+      "output_tokens": 7239,
+      "reasoning_tokens": 2507,
+      "total_tokens": 953502
+    },
+    "usageComplete": true,
+    "requestEfforts": {
+      "none": 1,
+      "low": 32
+    },
+    "httpStatuses": {
+      "200": 33
+    },
+    "artifactWorkflowStatus": "incomplete",
+    "artifactRepairs": 1,
+    "nativeToolOutputParsed": true,
+    "stages": [
+      {
+        "label": "implementation",
+        "role": "author",
+        "elapsedMs": 143170
+      },
+      {
+        "label": "correction",
+        "role": "author",
+        "elapsedMs": 45134
+      }
+    ],
+    "correctionReasons": [
+      "Missing final verification after the last mutation: node --test --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs"
+    ],
+    "coverageObservation": "changed_scenarios_require_assessment",
+    "limits": [
+      "Some observed project checks failed, lacked test results or were not repeated after the last mutation."
+    ],
+    "phaseChecks": {
+      "D0": {
+        "checksCurrent": false,
+        "changedTestFiles": [],
+        "latestChecks": [
+          {
+            "command": "node --test --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+            "workdir": ".",
+            "provenance": "initial Node test workflow",
+            "exit": 1,
+            "state": "completed",
+            "current": false,
+            "tests": 1,
+            "successful": false
+          },
+          {
+            "command": "node --test packages/connector/test/lifecycle-lock.test.mjs packages/connector/test/owned-lock.test.mjs packages/connector/test/state-security.test.mjs",
+            "workdir": ".",
+            "provenance": "initial Node test workflow",
+            "exit": 0,
+            "state": "completed",
+            "current": true,
+            "tests": 17,
+            "successful": true
+          },
+          {
+            "command": "git diff --check",
+            "workdir": "<delivery-worktree>",
+            "provenance": "explicit original task",
+            "exit": 0,
+            "state": "completed",
+            "current": true,
+            "tests": null,
+            "successful": true
+          }
+        ]
+      },
+      "final": {
+        "checksCurrent": false,
+        "changedTestFiles": [
+          "packages/connector/test/config.test.mjs"
+        ],
+        "latestChecks": [
+          {
+            "command": "node --test --test-name-pattern='reconnect retires only an explicitly disconnected unavailable source before pairing' packages/connector/test/config.test.mjs",
+            "workdir": ".",
+            "provenance": "initial Node test workflow",
+            "exit": 1,
+            "state": "completed",
+            "current": true,
+            "tests": 1,
+            "successful": false
+          },
+          {
+            "command": "node --test packages/connector/test/lifecycle-lock.test.mjs packages/connector/test/owned-lock.test.mjs packages/connector/test/state-security.test.mjs",
+            "workdir": ".",
+            "provenance": "initial Node test workflow",
+            "exit": 0,
+            "state": "completed",
+            "current": true,
+            "tests": 17,
+            "successful": true
+          },
+          {
+            "command": "git diff --check",
+            "workdir": "<delivery-worktree>",
+            "provenance": "explicit original task",
+            "exit": 0,
+            "state": "completed",
+            "current": true,
+            "tests": null,
+            "successful": true
+          }
+        ]
+      }
+    },
+    "packet": "M3",
+    "delivery": {
+      "patchApplies": true,
+      "changedFiles": [
+        "packages/connector/README.md",
+        "packages/connector/bin/viberacing.mjs",
+        "packages/connector/test/config.test.mjs"
+      ],
+      "patchSha256": "5578826a04112f1c92d826d171bd365f6c09d99f40f14f4a1140a62d09a5e01e"
+    },
+    "grading": {
+      "final": {
+        "packet": "M3",
+        "phase": "final",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 4,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "lifecycle-preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 5,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance-403": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": false,
+        "cleanup": 0
+      },
+      "D0": {
+        "packet": "M3",
+        "phase": "D0",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 4,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "lifecycle-preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 5,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance-403": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": false,
+        "cleanup": 0
+      }
+    },
+    "sourceReview": {
+      "packet": "M3",
+      "assessmentScope": "Final source and delivered tests/README inspection by the integrator who knows the schedule; independent frozen executable checks are reported separately.",
+      "phases": {
+        "D0": {
+          "sourceConformsToTask": true,
+          "necessaryCoverageDelivered": false,
+          "oldCoveragePreserved": false,
+          "newRequiredCoverageDelivered": false,
+          "documentationDelivered": true,
+          "newRegressionFound": false,
+          "evidence": [
+            "packages/connector/bin/viberacing.mjs reconcilePreviousConnectionBeforePairing and connect",
+            "packages/connector/test/config.test.mjs reconnect retirement fixture",
+            "packages/connector/README.md revoked authorization paragraph"
+          ],
+          "notes": [
+            "Production now clears revoked authorization through the existing lifecycle cleanup, warns about auxiliary failures, and permits fresh pairing while preserving the original nonrevoked error path.",
+            "The old integration test is unchanged, including its now-obsolete expectation that 401 rejects requiring manual disconnect. That intended API behavior change is not a product regression, but the delivered suite has not been adapted and cannot execute the subsequent disconnected-source scenario.",
+            "README describes the resulting behavior. No completed new 401/403 project regressions are delivered."
+          ]
+        },
+        "final": {
+          "sourceConformsToTask": true,
+          "necessaryCoverageDelivered": false,
+          "oldCoveragePreserved": false,
+          "newRequiredCoverageDelivered": false,
+          "documentationDelivered": true,
+          "newRegressionFound": true,
+          "evidence": [
+            "packages/connector/bin/viberacing.mjs reconcilePreviousConnectionBeforePairing and connect",
+            "packages/connector/test/config.test.mjs reconnect retirement fixture",
+            "packages/connector/README.md revoked authorization paragraph"
+          ],
+          "notes": [
+            "Production behavior is unchanged from D0 except removal of the unused abandonedAttempt binding.",
+            "The correction removes the obsolete 401 rejection and adds a 401 recovery call with installation/token assertions, then runs the old disconnected mode in the same mutated state.",
+            "After 401 pairing, config.sources contains only activeMapping. The following disconnected response still contains retiredMapping plus activeMapping, without restoring the old two-source configuration. This no longer supplies the separate old unavailable-source retirement scenario and fails protocol reconciliation; the native check remains red.",
+            "Keeping the original test name and a mode = disconnected line does not restore its necessary state and behavior. The 403 recovery path also has no delivered dedicated regression.",
+            "No second correction occurs after the failing final test. Original production behavior is evaluated separately with the unchanged external checks.",
+            "The frozen delivered-consumers check confirms invalid protocol response on the old disconnected branch. The frozen observer 401 and 403 scenarios and lifecycle checks pass in D0 and final. This is a delivered-test regression, not evidence that the production disconnected behavior broke."
+          ]
+        }
+      }
+    },
+    "D0Available": true,
+    "D0FinalPatchEqual": false,
+    "publicPathNormalization": "Delivery-worktree runtime prefix normalized; raw local evidence is unchanged.",
+    "assessment": {
+      "final": {
+        "workingBehaviorObserved": true,
+        "deliveredChecksPassed": false,
+        "allFrozenChecksPassed": false,
+        "necessaryCoverageDelivered": false,
+        "oldCoveragePreserved": false,
+        "newRequiredCoverageDelivered": false,
+        "documentationDelivered": true,
+        "completePatchDelivery": false,
+        "newRegressionFound": true
+      },
+      "D0": {
+        "workingBehaviorObserved": true,
+        "deliveredChecksPassed": false,
+        "allFrozenChecksPassed": false,
+        "necessaryCoverageDelivered": false,
+        "oldCoveragePreserved": false,
+        "newRequiredCoverageDelivered": false,
+        "documentationDelivered": true,
+        "completePatchDelivery": false,
+        "newRegressionFound": false
+      }
+    },
+    "D0FinalChangedPaths": [
+      "packages/connector/bin/viberacing.mjs",
+      "packages/connector/test/config.test.mjs"
+    ],
+    "D0FinalTreeEqual": false
+  },
+  {
+    "slot": 6,
+    "task": "reconnect-revoked",
+    "arm": "A",
+    "exitCode": 0,
+    "timedOut": false,
+    "elapsedMs": 248264,
+    "requests": 36,
+    "requestsWithoutUsage": 0,
+    "workflowStatus": null,
+    "repairs": null,
+    "toolCalls": 40,
+    "sessions": 1,
+    "phaseCount": 1,
+    "execution": "completed",
+    "terminationVerified": true,
+    "cleanupVerified": true,
+    "observedUsage": {
+      "input_tokens": 982390,
+      "cached_tokens": 435200,
+      "output_tokens": 7892,
+      "reasoning_tokens": 3842,
+      "total_tokens": 990282
+    },
+    "usageComplete": true,
+    "requestEfforts": {
+      "none": 1,
+      "low": 35
+    },
+    "httpStatuses": {
+      "200": 36
+    },
+    "packet": "R9",
+    "delivery": {
+      "patchApplies": true,
+      "changedFiles": [
+        "packages/connector/README.md",
+        "packages/connector/bin/viberacing.mjs",
+        "packages/connector/test/config.test.mjs"
+      ],
+      "patchSha256": "2c4821ffe43a73a2cc0c22e20ae81c2ee5705411c8c81f571989fdde4853efb6"
+    },
+    "grading": {
+      "final": {
+        "packet": "R9",
+        "phase": "final",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 5,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 0,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "lifecycle-preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 5,
+              "pass": 5,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance-403": {
+            "code": 1,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 0,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": false,
+        "cleanup": 0
+      }
+    },
+    "sourceReview": {
+      "packet": "R9",
+      "assessmentScope": "Final source and delivered tests/README inspection by the integrator who knows the schedule; independent frozen executable checks are reported separately.",
+      "phases": {
+        "final": {
+          "sourceConformsToTask": false,
+          "necessaryCoverageDelivered": false,
+          "oldCoveragePreserved": true,
+          "newRequiredCoverageDelivered": false,
+          "documentationDelivered": true,
+          "newRegressionFound": false,
+          "notes": [
+            "401/403 now removes authorization and proceeds to pairing under existing lifecycle ownership; nonrevoked errors and cancelled-connect invalidation remain.",
+            "Recovery calls disableLocalConnection() with its default clearPending=false. connection-lifecycle.mjs therefore skips clearPendingPayloads; clearAutomaticState removes dirty/scheduler state, not queued payloads. Required stale pending cleanup before new pairing is missing.",
+            "The test change removes the intentionally obsolete 401 rejection and preserves the old disconnected-source scenario and malformed/transient assertions. It adds no positive connect recovery test for 401 or 403, nor a pending cleanup assertion.",
+            "README describes automatic recovery and cleanup, but delivered code/tests do not completely establish that contract.",
+            "The frozen 401 and 403 recovery checks both fail with Invalid pending payload after pairing because stale pending data survives. The delivered reconnect suite remains green, and scoped pre-existing lifecycle checks pass. This is an unimplemented task requirement, not a newly demonstrated failure of previously supported revoked recovery."
+          ],
+          "evidence": [
+            "packages/connector/bin/viberacing.mjs reconcilePreviousConnectionBeforePairing",
+            "packages/connector/lib/connection-lifecycle.mjs disableLocalConnection clearPending default",
+            "packages/connector/lib/runtime.mjs clearAutomaticState and clearPendingPayloads",
+            "packages/connector/test/config.test.mjs original reconnect case"
+          ]
+        }
+      }
+    },
+    "publicPathNormalization": "Delivery-worktree runtime prefix normalized; raw local evidence is unchanged.",
+    "assessment": {
+      "final": {
+        "workingBehaviorObserved": false,
+        "deliveredChecksPassed": true,
+        "allFrozenChecksPassed": false,
+        "necessaryCoverageDelivered": false,
+        "oldCoveragePreserved": true,
+        "newRequiredCoverageDelivered": false,
+        "documentationDelivered": true,
+        "completePatchDelivery": false,
+        "newRegressionFound": false
+      }
+    }
+  },
+  {
+    "slot": 7,
+    "task": "request-module-extraction",
+    "arm": "A",
+    "exitCode": 0,
+    "timedOut": false,
+    "elapsedMs": 194000,
+    "requests": 17,
+    "requestsWithoutUsage": 0,
+    "workflowStatus": null,
+    "repairs": null,
+    "toolCalls": 26,
+    "sessions": 1,
+    "phaseCount": 1,
+    "execution": "completed",
+    "terminationVerified": true,
+    "cleanupVerified": true,
+    "observedUsage": {
+      "input_tokens": 575433,
+      "cached_tokens": 56320,
+      "output_tokens": 6418,
+      "reasoning_tokens": 591,
+      "total_tokens": 581851
+    },
+    "usageComplete": true,
+    "requestEfforts": {
+      "none": 1,
+      "low": 16
+    },
+    "httpStatuses": {
+      "200": 17
+    },
+    "packet": "W1",
+    "delivery": {
+      "patchApplies": true,
+      "changedFiles": [
+        "packages/connector/README.md",
+        "packages/connector/bin/viberacing.mjs",
+        "packages/connector/lib/config.mjs",
+        "packages/connector/lib/http.mjs",
+        "packages/connector/test/config.test.mjs",
+        "packages/connector/test/http.test.mjs"
+      ],
+      "patchSha256": "77149c7182914f5e0a9998bb033a036a43761af3b3ef4cfe10255b1250bb47e6"
+    },
+    "grading": {
+      "final": {
+        "packet": "W1",
+        "phase": "final",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 26,
+              "pass": 25,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 15,
+              "pass": 15,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 15,
+              "pass": 15,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": true,
+        "cleanup": 0
+      }
+    },
+    "sourceReview": {
+      "packet": "W1",
+      "assessmentScope": "Final source and delivered tests/README inspection by the integrator who knows the schedule; independent frozen executable checks are reported separately.",
+      "phases": {
+        "final": {
+          "sourceConformsToTask": true,
+          "necessaryCoverageDelivered": true,
+          "oldCoveragePreserved": true,
+          "newRequiredCoverageDelivered": true,
+          "documentationDelivered": true,
+          "newRegressionFound": false,
+          "notes": [
+            "Both HTTP request/retry and Retry-After logic move from the CLI into one http.mjs module. Protocol validation stays in protocol.mjs; CLI callers import request without signature or flags changes.",
+            "The moved timeout, redirect denial, status/code/messages, retry eligibility, Retry-After cap/test control and exponential backoff retain the original logic.",
+            "The installed-runtime file list includes the new module, and the existing runnable installed CLI test explicitly expects it. Existing consumer and privacy/lifecycle assertions remain.",
+            "New transport tests check bounded/invalid Retry-After and permanent-error single-attempt status/code/message behavior. README describes the shared transport."
+          ],
+          "evidence": [
+            "packages/connector/lib/http.mjs",
+            "packages/connector/bin/viberacing.mjs request import and removed local implementation",
+            "packages/connector/lib/config.mjs installedRuntimeFiles",
+            "packages/connector/test/http.test.mjs",
+            "packages/connector/test/config.test.mjs installed module expectation"
+          ]
+        }
+      }
+    },
+    "publicPathNormalization": "Delivery-worktree runtime prefix normalized; raw local evidence is unchanged.",
+    "assessment": {
+      "final": {
+        "workingBehaviorObserved": true,
+        "deliveredChecksPassed": true,
+        "allFrozenChecksPassed": true,
+        "necessaryCoverageDelivered": true,
+        "oldCoveragePreserved": true,
+        "newRequiredCoverageDelivered": true,
+        "documentationDelivered": true,
+        "completePatchDelivery": true,
+        "newRegressionFound": false
+      }
+    }
+  },
+  {
+    "slot": 8,
+    "task": "request-module-extraction",
+    "arm": "D",
+    "exitCode": 0,
+    "timedOut": false,
+    "elapsedMs": 288010,
+    "requests": 32,
+    "requestsWithoutUsage": 0,
+    "workflowStatus": null,
+    "repairs": null,
+    "toolCalls": 34,
+    "sessions": 2,
+    "phaseCount": 1,
+    "execution": "completed",
+    "terminationVerified": true,
+    "cleanupVerified": true,
+    "observedUsage": {
+      "input_tokens": 1310528,
+      "cached_tokens": 484864,
+      "output_tokens": 8037,
+      "reasoning_tokens": 941,
+      "total_tokens": 1318565
+    },
+    "usageComplete": true,
+    "requestEfforts": {
+      "none": 1,
+      "low": 31
+    },
+    "httpStatuses": {
+      "200": 32
+    },
+    "artifactWorkflowStatus": "incomplete",
+    "artifactRepairs": 1,
+    "nativeToolOutputParsed": false,
+    "stages": [
+      {
+        "label": "implementation",
+        "role": "author",
+        "elapsedMs": 202186
+      },
+      {
+        "label": "correction",
+        "role": "author",
+        "elapsedMs": 76639
+      }
+    ],
+    "correctionReasons": [
+      "Missing final verification after the last mutation: node --test",
+      "Missing final verification after the last mutation: node --test --test-name-pattern='installs a runnable connector copy' test/config.test.mjs",
+      "Missing final verification after the last mutation: git diff --check",
+      "Existing test/fixture content changed or was removed; assess necessary scenario preservation using the exact diff and added tests."
+    ],
+    "coverageObservation": "changed_scenarios_require_assessment",
+    "limits": [
+      "Some observed project checks failed, lacked test results or were not repeated after the last mutation."
+    ],
+    "phaseChecks": {
+      "D0": {
+        "checksCurrent": false,
+        "changedTestFiles": [
+          "packages/connector/test/config.test.mjs"
+        ],
+        "latestChecks": [
+          {
+            "command": "node --test",
+            "workdir": "packages/connector",
+            "provenance": "initial Node test workflow",
+            "exit": 1,
+            "state": "completed",
+            "current": false,
+            "tests": 162,
+            "successful": false
+          },
+          {
+            "command": "node --test --test-name-pattern='installs a runnable connector copy' test/config.test.mjs",
+            "workdir": "packages/connector",
+            "provenance": "initial Node test workflow",
+            "exit": 0,
+            "state": "completed",
+            "current": false,
+            "tests": 1,
+            "successful": true
+          },
+          {
+            "command": "git diff --check",
+            "workdir": "<delivery-worktree>",
+            "provenance": "explicit original task",
+            "exit": 0,
+            "state": "completed",
+            "current": false,
+            "tests": null,
+            "successful": true
+          }
+        ]
+      },
+      "final": {
+        "checksCurrent": false,
+        "changedTestFiles": [
+          "packages/connector/test/config.test.mjs"
+        ],
+        "latestChecks": [
+          {
+            "command": "node --test",
+            "workdir": "packages/connector",
+            "provenance": "initial Node test workflow",
+            "exit": 1,
+            "state": "completed",
+            "current": true,
+            "tests": 163,
+            "successful": false
+          },
+          {
+            "command": "node --test --test-name-pattern='installs a runnable connector copy' test/config.test.mjs",
+            "workdir": "packages/connector",
+            "provenance": "initial Node test workflow",
+            "exit": 0,
+            "state": "completed",
+            "current": true,
+            "tests": 1,
+            "successful": true
+          },
+          {
+            "command": "git diff --check",
+            "workdir": "<delivery-worktree>",
+            "provenance": "explicit original task",
+            "exit": 0,
+            "state": "completed",
+            "current": true,
+            "tests": null,
+            "successful": true
+          }
+        ]
+      }
+    },
+    "packet": "K6",
+    "delivery": {
+      "patchApplies": true,
+      "changedFiles": [
+        "packages/connector/README.md",
+        "packages/connector/bin/viberacing.mjs",
+        "packages/connector/lib/config.mjs",
+        "packages/connector/lib/transport.mjs",
+        "packages/connector/test/config.test.mjs",
+        "packages/connector/test/transport.test.mjs"
+      ],
+      "patchSha256": "620b77755fa6f3dc96726657953fd3ad63f23588ec4655a91e899d58800dc63d"
+    },
+    "grading": {
+      "final": {
+        "packet": "K6",
+        "phase": "final",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 15,
+              "pass": 15,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 15,
+              "pass": 15,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": true,
+        "cleanup": 0
+      },
+      "D0": {
+        "packet": "K6",
+        "phase": "D0",
+        "checks": {
+          "ordinary": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 25,
+              "pass": 24,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 15,
+              "pass": 15,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "preservation": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 24,
+              "pass": 23,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 1
+            }
+          },
+          "preserved-consumers": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 15,
+              "pass": 15,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          },
+          "acceptance": {
+            "code": 0,
+            "timedOut": false,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "passed": true,
+        "cleanup": 0
+      }
+    },
+    "sourceReview": {
+      "packet": "K6",
+      "assessmentScope": "Final source and delivered tests/README inspection by the integrator who knows the schedule; independent frozen executable checks are reported separately.",
+      "phases": {
+        "D0": {
+          "sourceConformsToTask": true,
+          "necessaryCoverageDelivered": true,
+          "oldCoveragePreserved": true,
+          "newRequiredCoverageDelivered": true,
+          "documentationDelivered": true,
+          "newRegressionFound": false,
+          "notes": [
+            "CLI uses one transport module; protocol parsing remains in protocol.mjs. The moved request/retry logic retains timeout, redirect refusal, response/status/code, retry eligibility, bounded Retry-After and exponential backoff.",
+            "The runtime module allowlist and existing runnable installed CLI assertion include transport.mjs. Necessary prior tests and assertions remain.",
+            "A new local-server regression exercises a malformed 429 response followed by 204, bounded Retry-After, two POST attempts and returned completion. README describes transport responsibility.",
+            "D0 leaves the former CLI implementation as a commented block. Its transport test restores the Retry-After control but does not restore NODE_ENV in that test worker. Neither establishes a present behavior or necessary-coverage failure."
+          ],
+          "evidence": [
+            "packages/connector/lib/transport.mjs",
+            "packages/connector/bin/viberacing.mjs",
+            "packages/connector/lib/config.mjs installedRuntimeFiles",
+            "packages/connector/test/config.test.mjs installed module expectation",
+            "packages/connector/test/transport.test.mjs"
+          ]
+        },
+        "final": {
+          "sourceConformsToTask": true,
+          "necessaryCoverageDelivered": true,
+          "oldCoveragePreserved": true,
+          "newRequiredCoverageDelivered": true,
+          "documentationDelivered": true,
+          "newRegressionFound": false,
+          "notes": [
+            "CLI uses one transport module; protocol parsing remains in protocol.mjs. The moved request/retry logic retains timeout, redirect refusal, response/status/code, retry eligibility, bounded Retry-After and exponential backoff.",
+            "The runtime module allowlist and existing runnable installed CLI assertion include transport.mjs. Necessary prior tests and assertions remain.",
+            "A new local-server regression exercises a malformed 429 response followed by 204, bounded Retry-After, two POST attempts and returned completion. README describes transport responsibility.",
+            "Correction removes the obsolete commented CLI copy and restores NODE_ENV in test cleanup. Production transport, installed loading and assertions are unchanged; this is cleanup, not a demonstrated behavior or coverage improvement."
+          ],
+          "evidence": [
+            "packages/connector/lib/transport.mjs",
+            "packages/connector/bin/viberacing.mjs",
+            "packages/connector/lib/config.mjs installedRuntimeFiles",
+            "packages/connector/test/config.test.mjs installed module expectation",
+            "packages/connector/test/transport.test.mjs"
+          ]
+        }
+      }
+    },
+    "D0Available": true,
+    "D0FinalPatchEqual": false,
+    "publicPathNormalization": "Delivery-worktree runtime prefix normalized; raw local evidence is unchanged.",
+    "assessment": {
+      "final": {
+        "workingBehaviorObserved": true,
+        "deliveredChecksPassed": true,
+        "allFrozenChecksPassed": true,
+        "necessaryCoverageDelivered": true,
+        "oldCoveragePreserved": true,
+        "newRequiredCoverageDelivered": true,
+        "documentationDelivered": true,
+        "completePatchDelivery": true,
+        "newRegressionFound": false
+      },
+      "D0": {
+        "workingBehaviorObserved": true,
+        "deliveredChecksPassed": true,
+        "allFrozenChecksPassed": true,
+        "necessaryCoverageDelivered": true,
+        "oldCoveragePreserved": true,
+        "newRequiredCoverageDelivered": true,
+        "documentationDelivered": true,
+        "completePatchDelivery": true,
+        "newRegressionFound": false
+      }
+    },
+    "D0FinalChangedPaths": [
+      "packages/connector/bin/viberacing.mjs",
+      "packages/connector/test/transport.test.mjs"
+    ],
+    "D0FinalTreeEqual": false
+  }
+]

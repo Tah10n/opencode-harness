@@ -1,0 +1,101 @@
+{
+  "slot": 4,
+  "case": "case-2",
+  "task": "denque-remove-where",
+  "arm": "H0",
+  "seedSha256": "52f7a5afc7476758e50dafdbe59bff4710a6fea03f604ddc15d0704629619b9a",
+  "Q": 1,
+  "D": 1,
+  "assessment": {
+    "Q": 1,
+    "reason": "Closed the configured-capacity discrimination by asserting preservation of _capacity, in addition to existing backing-array checks and ordinary post-filter operations. The exact required loss is rejected by a relevant assertion. The frozen rubric accepts configured-capacity discrimination; it did not require every check to use overflow. Types additionally assert the numeric result. No production change or lost seed scenario.",
+    "ordinaryProjectAndTypesPassed": true,
+    "independentBehaviorPassed": true,
+    "requiredGapDiscriminated": true,
+    "newControlRegression": null,
+    "substantiveObservationUsed": false,
+    "assessmentMethod": "One assessor reviewed the complete delivered diffs, seed-to-final changes, ordinary/independent results and actual failing assertions. The assessor also monitored the runs; no independent blinding claim."
+  },
+  "patch": "patches/04-case-2-H0.patch",
+  "patchSha256": "adccc3aec55ca9685fa7dd5529c7cced636313c4eb6ec94a78d13f5a90e53893",
+  "terminalPatch": "terminal-patches/04-case-2-H0.patch",
+  "terminalPatchSha256": "6aaadd8bcca0b220c830dc480a5307b9ec9c29a3a15261e197105a35977829b4",
+  "handoffNamesPatch": true,
+  "terminalPatchApplicable": true,
+  "changed": [
+    "README.md",
+    "docs/api.mdx",
+    "index.d.ts",
+    "index.js",
+    "test/denque.js",
+    "test/type/index.ts"
+  ],
+  "deleted": [],
+  "omittedPreparationFiles": [],
+  "nativeCompleted": true,
+  "nativeExit": 0,
+  "lastStepFinish": "stop",
+  "workflowStatus": "incomplete",
+  "requests": 21,
+  "toolCalls": 40,
+  "authorSessions": 1,
+  "preparationAndCaptureMs": 2968,
+  "diagnosticElapsedMs": 0,
+  "executionMs": 285317,
+  "cleanupMs": 59,
+  "elapsedMs": 285376,
+  "usage": {
+    "input_tokens": 623049,
+    "output_tokens": 8657,
+    "total_tokens": 631706,
+    "cached_tokens": 180224,
+    "reasoning_tokens": 5036,
+    "unknownRequests": 0
+  },
+  "terminationVerified": true,
+  "containerRemoved": true,
+  "originalDiagnosticCommands": [],
+  "sensitivityEvents": [],
+  "checks": {
+    "ordinary": {
+      "exit": 0,
+      "elapsedMs": 1649,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && npm test"
+      ],
+      "outputSha256": "8d0ecbf548917930eb053d10b654a9d5133b0c651031664be4b6caf6388a7205",
+      "outputExcerpt": "> denque@2.1.0 test\n> istanbul cover --report lcov _mocha && npm run typescript\n  55 passing (204ms)\n> denque@2.1.0 typescript\n> tsc --project ./test/type/tsconfig.json",
+      "realProviderRequests": 0
+    },
+    "independent": {
+      "exit": 0,
+      "elapsedMs": 629,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && timeout 10s node .independent.cjs"
+      ],
+      "outputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "outputExcerpt": "Independent behavior passed",
+      "realProviderRequests": 0
+    },
+    "sensitivity": {
+      "exit": 1,
+      "elapsedMs": 698,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && node .diagnostic.cjs && node_modules/.bin/mocha"
+      ],
+      "outputSha256": "ea8362cb873eb7c1b82fe459e6e32a9f487cad9fdcdbac10d9ca3db7bf0eb53d",
+      "outputExcerpt": "ue.prototype.removeWhere\n    ✓ should visit original values and indexes and retain survivors in order\n    ✓ should leave the queue unchanged when the predicate throws\n    1) should filter wrapped bounded queues without changing capacity\n\n  Denque.prototype.remove\n    ✓ Should return undefined when empty denque\n    ✓ remove from the end of the queue if a negative index is provided\n    ✓ Should return undefined if index or count invalid\n    ✓ Should return the item at the front of the denque\n    ✓ Should return the item at the back of the denque\n    ✓ Should return the item somewhere in the middle of the denque\n    ✓ Should remove a number of items at the front of the denque\n    ✓ Should remove a number of items at the back of the denque\n    ✓ Should remove a number of items somewhere in the middle of the denque\n    ✓ Should clear denque\n\n  Denque.prototype.splice\n    ✓ Should remove and add items like native splice method at the front of denque\n    ✓ Should remove and add items like native splice method at the end of denque\n    ✓ Should remove and add items like native splice method somewhere in the middle of denque\n    ✓ Should return undefined when index or count is invalid\n    ✓ Should return undefined when the queue is empty\n    ✓ Should return undefined when trying to remove further than current size\n    ✓ Should remove and add items like native splice method to the empty denque\n    ✓ pop should shrink array when mostly empty\n\n\n  54 passing (29ms)\n  1 failing\n\n  1) Denque.prototype.removeWhere should filter wrapped bounded queues without changing capacity:\n     AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nundefined !== 4\n\n      at Context.<anonymous> (test/denque.js:522:12)\n      at process.processImmediate (node:internal/timers:534:21)\n\n\n\n",
+      "realProviderRequests": 0
+    }
+  },
+  "authorClaimExcerpt": "\nImplemented and completed the existing `removeWhere` patch.\n\n- Verified snapshot-based filtering, atomic predicate errors, wrapped queues, falsy/duplicate values, identity, and capacity.\n- Strengthened JavaScript regressions and TypeScript type coverage.\n- Added README and API documentation.\n- `npm test`: 55 passing\n- `npm run typescript`: passing\n- Focused behavior and preservation smoke checks: passing\n- `git diff --check`: passing\n\n`npm ci` encountered a registry `EAI_AGAIN`, but required tools were available and all project checks passed."
+}

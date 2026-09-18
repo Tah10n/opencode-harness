@@ -1,0 +1,3 @@
+# generator-tree-walk
+
+walkTree is lazy preorder and yields node identity first. Only when resumed it calls prune once, then reads children once unless pruned. Early break/return performs none of that node's deferred work. Getter/prune throws retain identity at resume. collectTree eagerly collects the same core and preserves ordering/pruning. Null root is empty; stable finite acyclic tree<=100000 nodes/depth, dense child arrays or missing/null children, no mutation during traversal. Iterative traversal handles deep trees without recursive JS stack overflow; full collection also prunes leaves. Run npm test.

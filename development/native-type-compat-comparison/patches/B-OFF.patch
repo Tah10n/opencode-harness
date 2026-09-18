@@ -1,0 +1,433 @@
+diff --git a/README.md b/README.md
+index e45aa10..4505d0a 100644
+--- a/README.md
++++ b/README.md
+@@ -72,6 +72,21 @@ EE.on('another-event', emitted, context);
+ EE.removeListener('another-event', emitted, context);
+ ```
+ 
++### Waiting for an event
++
++`EventEmitter.waitFor(event, options)` returns a Promise that resolves with a
++fresh array containing the arguments from the next occurrence of `event`. The
++waiter is registered synchronously, so an emit immediately after `waitFor`
++cannot be missed. Each waiter handles one occurrence and multiple waiters can
++be active independently.
++
++Pass an `AbortSignal` as `options.signal` to cancel a pending waiter. A
++pre-aborted signal rejects immediately, and aborting later rejects with the
++signal's `reason`. The first event or abort settles the Promise, and its abort
++handler is then detached. Calling `off`, `removeListener` or
++`removeAllListeners` does not settle the Promise; it only removes the event
++listener. A signal can still reject that pending Promise later.
++
+ ### Tests and benchmarks
+ 
+ To run tests run `npm test`. To run the benchmarks run `npm run benchmark`.
+diff --git a/index.d.ts b/index.d.ts
+index fab37fd..d4a42d7 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -34,6 +34,15 @@ declare class EventEmitter<
+     ...args: EventEmitter.EventArgs<EventTypes, T>
+   ): boolean;
+ 
++  /**
++   * Return a promise that resolves with the arguments from the next event.
++   * Ordinary listener removal leaves the promise pending.
++   */
++  waitFor<T extends EventEmitter.EventNames<EventTypes>>(
++    event: T,
++    options?: EventEmitter.WaitForOptions
++  ): Promise<EventEmitter.EventArgs<EventTypes, T>>;
++
+   /**
+    * Add a listener for a given event.
+    */
+@@ -128,6 +137,10 @@ declare namespace EventEmitter {
+     K extends EventNames<T>
+   > = Parameters<EventListener<T, K>>;
+ 
++  export interface WaitForOptions {
++    signal?: AbortSignal;
++  }
++
+   export const EventEmitter: EventEmitterStatic;
+ }
+ 
+diff --git a/index.js b/index.js
+index 6ea485c..69bc293 100644
+--- a/index.js
++++ b/index.js
+@@ -215,6 +215,56 @@ EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+   return true;
+ };
+ 
++/**
++ * Wait for the next occurrence of an event.
++ *
++ * @param {(String|Symbol)} event The event name.
++ * @param {Object} [options] Optional cancellation signal.
++ * @returns {Promise<Array>} A promise for the emitted arguments.
++ * @public
++ */
++EventEmitter.prototype.waitFor = function waitFor(event, options) {
++  var emitter = this
++    , signal = options && options.signal;
++
++  return new Promise(function (resolve, reject) {
++    if (signal && signal.aborted) {
++      reject(signal.reason);
++      return;
++    }
++
++    var settled = false;
++
++    function cleanup() {
++      if (signal) signal.removeEventListener('abort', onAbort);
++    }
++
++    function onAbort() {
++      if (settled) return;
++
++      settled = true;
++      emitter.removeListener(event, listener);
++      cleanup();
++      reject(signal.reason);
++    }
++
++    function listener() {
++      if (settled) return;
++
++      settled = true;
++      emitter.removeListener(event, listener);
++      cleanup();
++
++      var args = new Array(arguments.length);
++      for (var i = 0; i < arguments.length; i++) args[i] = arguments[i];
++      resolve(args);
++    }
++
++    emitter.on(event, listener);
++    if (signal) signal.addEventListener('abort', onAbort);
++  });
++};
++
+ /**
+  * Add a listener for a given event.
+  *
+diff --git a/test/test.js b/test/test.js
+index e5f8aaa..879e177 100644
+--- a/test/test.js
++++ b/test/test.js
+@@ -639,4 +639,222 @@ describe('EventEmitter', function tests() {
+       assume(e.eventNames()).eql([s]);
+     });
+   });
++
++  describe('EventEmitter#waitFor', function () {
++    it('registers synchronously and resolves a fresh argument array', function () {
++      var e = new EventEmitter()
++        , object = {}
++        , waiting = e.waitFor('data');
++
++      assume(e.listenerCount('data')).equals(1);
++      e.emit('data', object, 1, 2, 3, 4, 5, 6);
++
++      return waiting.then(function (args) {
++        assume(args).deep.equals([object, 1, 2, 3, 4, 5, 6]);
++        assume(args[0]).equals(object);
++        assume(e.listenerCount('data')).equals(0);
++      });
++    });
++
++    it('supports zero arguments and multiple independent waiters', function () {
++      var e = new EventEmitter()
++        , noArgs = e.waitFor('empty')
++        , first = e.waitFor('value')
++        , second = e.waitFor('value')
++        , value = {};
++
++      e.emit('empty');
++      e.emit('value', value);
++
++      return Promise.all([noArgs, first, second]).then(function (results) {
++        assume(results[0]).deep.equals([]);
++        assume(results[1]).deep.equals([value]);
++        assume(results[2]).deep.equals([value]);
++        assume(results[1] === results[2]).equals(false);
++      });
++    });
++
++    it('supports symbols and removes only its own registration', function () {
++      var e = new EventEmitter()
++        , event = Symbol('event')
++        , regularCalls = 0
++        , onceCalls = 0
++        , first = e.waitFor(event)
++        , second = e.waitFor(event);
++
++      e.on(event, function () { regularCalls++; });
++      e.once(event, function () { onceCalls++; });
++      assume(e.listenerCount(event)).equals(4);
++
++      e.emit(event, 'value');
++
++      return Promise.all([first, second]).then(function (results) {
++        assume(results[0]).deep.equals(['value']);
++        assume(results[1]).deep.equals(['value']);
++        assume(regularCalls).equals(1);
++        assume(onceCalls).equals(1);
++        assume(e.listenerCount(event)).equals(1);
++      });
++    });
++
++    it('does not run again during recursive emission', function () {
++      var e = new EventEmitter()
++        , calls = 0
++        , waiting = e.waitFor('event');
++
++      e.on('event', function () {
++        calls++;
++        if (calls === 1) e.emit('event', 'recursive');
++      });
++
++      e.emit('event', 'first');
++
++      return waiting.then(function (args) {
++        assume(args).deep.equals(['first']);
++        assume(calls).equals(2);
++        assume(e.listenerCount('event')).equals(1);
++      });
++    });
++
++    it('rejects with a pre-aborted reason without registering', function () {
++      var e = new EventEmitter()
++        , signal = makeSignal()
++        , reason = {};
++
++      signal.abort(reason);
++      var waiting = e.waitFor('event', { signal: signal });
++
++      assume(e.listenerCount('event')).equals(0);
++      assume(signal.added).equals(0);
++
++      return waiting.then(function () {
++        throw new Error('waitFor should reject');
++      }, function (error) {
++        assume(error).equals(reason);
++      });
++    });
++
++    it('rejects a pending waiter on abort and cleans up its handler', function () {
++      var e = new EventEmitter()
++        , signal = makeSignal()
++        , reason = {}
++        , waiting = e.waitFor('event', { signal: signal });
++
++      assume(e.listenerCount('event')).equals(1);
++      assume(signal.added).equals(1);
++      signal.abort(reason);
++      assume(e.listenerCount('event')).equals(0);
++      assume(signal.removed).equals(1);
++
++      return waiting.then(function () {
++        throw new Error('waitFor should reject');
++      }, function (error) {
++        assume(error).equals(reason);
++      });
++    });
++
++    it('settles on the first event or abort and detaches the abort handler', function () {
++      var e = new EventEmitter()
++        , eventSignal = makeSignal()
++        , abortSignal = makeSignal()
++        , eventReason = {}
++        , abortReason = {}
++        , eventWaiting = e.waitFor('event', { signal: eventSignal })
++        , abortWaiting = e.waitFor('abort', { signal: abortSignal });
++
++      e.emit('event', 'value');
++      eventSignal.abort(eventReason);
++      abortSignal.abort(abortReason);
++      e.emit('abort', 'late');
++
++      return Promise.all([
++        eventWaiting.then(function (args) {
++          assume(args).deep.equals(['value']);
++          assume(eventSignal.removed).equals(1);
++        }),
++        abortWaiting.then(function () {
++          throw new Error('waitFor should reject');
++        }, function (error) {
++          assume(error).equals(abortReason);
++          assume(abortSignal.removed).equals(1);
++        })
++      ]);
++    });
++
++    it('stays pending after ordinary removal and can still be aborted', function () {
++      var e = new EventEmitter()
++        , signal = makeSignal()
++        , allSignal = makeSignal()
++        , reason = {}
++        , allReason = {}
++        , pending = e.waitFor('event', { signal: signal });
++
++      e.off('event');
++      assume(e.listenerCount('event')).equals(0);
++      var pendingError = pending.then(function () {
++        throw new Error('removed waitFor should not resolve');
++      }, function (error) {
++        return error;
++      });
++
++      var later = e.waitFor('event');
++      signal.abort(reason);
++      assume(e.listenerCount('event')).equals(1);
++      e.emit('event', 'later');
++
++      var allPending = e.waitFor('all', { signal: allSignal });
++      e.removeAllListeners('all');
++      var allPendingError = allPending.then(function () {
++        throw new Error('removeAllListeners should not settle waitFor');
++      }, function (error) {
++        return error;
++      });
++      allSignal.abort(allReason);
++      assume(e.listenerCount('all')).equals(0);
++
++      return Promise.all([
++        pendingError,
++        later.then(function (args) {
++          assume(args).deep.equals(['later']);
++        }),
++        allPendingError
++      ]).then(function (results) {
++        assume(results[0]).equals(reason);
++        assume(results[2]).equals(allReason);
++      });
++    });
++
++    function makeSignal() {
++      var listeners = []
++        , signal = {
++          aborted: false,
++          reason: undefined,
++          added: 0,
++          removed: 0,
++          addEventListener: function (type, listener) {
++            if (type === 'abort') {
++              listeners.push(listener);
++              signal.added++;
++            }
++          },
++          removeEventListener: function (type, listener) {
++            if (type !== 'abort') return;
++            var index = listeners.indexOf(listener);
++            if (index !== -1) {
++              listeners.splice(index, 1);
++              signal.removed++;
++            }
++          },
++          abort: function (reason) {
++            signal.aborted = true;
++            signal.reason = reason;
++            listeners.slice().forEach(function (listener) {
++              listener.call(signal);
++            });
++          }
++        };
++
++      return signal;
++    }
++  });
+ });
+diff --git a/test/test.mjs b/test/test.mjs
+index 7b50c82..2499766 100644
+--- a/test/test.mjs
++++ b/test/test.mjs
+@@ -1,4 +1,5 @@
+ import EventEmitterDefault, { EventEmitter } from '../index.mjs';
++import assert from 'node:assert/strict';
+ 
+ it('exports `EventEmitter` as default export', () => {
+   new EventEmitterDefault();
+@@ -7,3 +8,30 @@ it('exports `EventEmitter` as default export', () => {
+ it('exports `EventEmitter` as a named export', () => {
+   new EventEmitter();
+ })
++
++it('exposes waitFor through the ESM exports', async () => {
++  const emitter = new EventEmitterDefault();
++  const value = {};
++  const waiting = emitter.waitFor('data');
++
++  assert.equal(emitter.listenerCount('data'), 1);
++  emitter.emit('data', value, 42);
++
++  assert.deepEqual(await waiting, [value, 42]);
++});
++
++it('supports independent ESM waiters and symbol events', async () => {
++  const emitter = new EventEmitter();
++  const event = Symbol('event');
++  const first = emitter.waitFor(event);
++  const second = emitter.waitFor(event);
++  const value = {};
++
++  emitter.emit(event, value);
++
++  const [firstArgs, secondArgs] = await Promise.all([first, second]);
++  assert.notEqual(firstArgs, secondArgs);
++  assert.equal(firstArgs[0], value);
++  assert.equal(secondArgs[0], value);
++  assert.equal(emitter.listenerCount(event), 0);
++});
+diff --git a/test/types.ts b/test/types.ts
+new file mode 100644
+index 0000000..84e699a
+--- /dev/null
++++ b/test/types.ts
+@@ -0,0 +1,41 @@
++import EventEmitter from '..';
++
++declare const symbolEvent: unique symbol;
++
++type TupleEvents = {
++  [symbolEvent]: [object];
++  message: [string, number];
++  done: [];
++};
++
++const controller = new AbortController();
++const tupleEmitter = new EventEmitter<TupleEvents>();
++const message: Promise<[string, number]> = tupleEmitter.waitFor('message', {
++  signal: controller.signal
++});
++const symbol: Promise<[object]> = tupleEmitter.waitFor(symbolEvent);
++const done: Promise<[]> = tupleEmitter.waitFor('done');
++
++type FunctionEvents = {
++  message: (value: string, count: number) => void;
++};
++
++const functionEmitter = new EventEmitter<FunctionEvents>();
++const functionMessage: Promise<[string, number]> = functionEmitter.waitFor('message');
++
++const untypedEmitter = new EventEmitter();
++const untyped: Promise<any[]> = untypedEmitter.waitFor(Symbol('event'), {
++  signal: controller.signal
++});
++
++void message;
++void symbol;
++void done;
++void functionMessage;
++void untyped;
++
++// @ts-expect-error Event arguments retain their declared order and types.
++const wrongMessage: Promise<[number, string]> = tupleEmitter.waitFor('message');
++
++// @ts-expect-error waitFor options only support an AbortSignal.
++tupleEmitter.waitFor('message', { timeout: 10 });

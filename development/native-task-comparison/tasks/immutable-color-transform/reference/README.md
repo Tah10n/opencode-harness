@@ -1,0 +1,3 @@
+# immutable-color-transform
+
+parseColor accepts exactly case-insensitive #rgb/#rgba/#rrggbb/#rrggbbaa, no trim; fresh integer byte {r,g,b,a}, default alpha255. Invalid TypeError. shiftColor is pure and supports frozen byte records: amount finite[-1,1], positive c+(255-c)*amount, negative c*(1+amount), Math.round each RGB; alpha unchanged. Endpoints white/black. Invalid amount RangeError. formatColor lowercase six hex plus alpha only when nonopaque, no shorthand. adjustColor composes parse then shift then format, preserving error order. No other CSS/color spaces or fractional channels. Run npm test.

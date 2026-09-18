@@ -1,0 +1,63 @@
+diff --git a/packages/connector/README.md b/packages/connector/README.md
+index 7b955428fbb95f0d66bdbd52d910c6588366c295..00f6948a04e8b345966ae4135eb34ca186a88345 100644
+--- a/packages/connector/README.md
++++ b/packages/connector/README.md
+@@ -32,6 +32,13 @@ best-effort per source: one damaged settings file is reported without blocking h
+ initial sync. The final token/config swap is serialized behind any active sync, so an older request
+ cannot restore superseded authorization.
+ 
++If the server reports that this installation authorization was revoked (including account deletion),
++`connect` removes the stale local authorization, pending automatic state, and owned hooks through the
++normal lifecycle cleanup, then starts a fresh pairing without changing the installation identity or
++local source definitions. Partial auxiliary cleanup is reported as a warning. Other reconciliation
++errors, including transient network failures, leave the existing connection in place and do not start
++a replacement pairing.
++
+ ## Commands
+ 
+ ```text
+diff --git a/packages/connector/bin/viberacing.mjs b/packages/connector/bin/viberacing.mjs
+index 5fde3a9b656377e0266fbde7eda922c752933bdf..97d4588ee4e49f01d26314d3a3200b8e615f6eab 100755
+--- a/packages/connector/bin/viberacing.mjs
++++ b/packages/connector/bin/viberacing.mjs
+@@ -288,7 +288,7 @@ async function exactPairingSources(sources) {
+   return result;
+ }
+ 
+-async function reconcilePreviousConnectionBeforePairing(origin, installationId, options = {}) {
++async function reconcilePreviousConnectionBeforePairing(origin, installationId) {
+   return withLifecycleMutation(async () => {
+     let previousConfig;
+     try {
+@@ -304,14 +304,12 @@ async function reconcilePreviousConnectionBeforePairing(origin, installationId,
+       remote = await requestReconciliation(previousConfig);
+     } catch (error) {
+       if (error?.status === 401 || error?.status === 403) {
+-        if (options.clearAfterCancelledAttempt) {
+-          await disableLocalConnection();
+-          return null;
+-        }
+-        throw new Error(
+-          "Existing installation authorization cannot be reconciled; run `viberacing disconnect` before reconnecting",
+-          { cause: error },
+-        );
++        const cleanupWarnings = await disableLocalConnection(true);
++        if (cleanupWarnings > 0)
++          warning(
++            `Vibe Racing warning: revoked authorization was removed, but ${cleanupWarnings} auxiliary cleanup step(s) need manual inspection.`,
++          );
++        return null;
+       }
+       throw error;
+     }
+@@ -342,9 +340,7 @@ async function connect() {
+   const installedRuntime = await prepareRuntime(import.meta.url);
+   const installation = await readOrCreateInstallation();
+   const abandonedAttempt = await invalidateAndCancelConnectAttempt();
+-  const previousConfig = await reconcilePreviousConnectionBeforePairing(origin, installation.id, {
+-    clearAfterCancelledAttempt: abandonedAttempt.cancellation.status === "confirmed",
+-  });
++  const previousConfig = await reconcilePreviousConnectionBeforePairing(origin, installation.id);
+   const pairingLocalSources = new Map(sources);
+   if (previousConfig !== null) {
+     const localById = new Map(localSources.map((source) => [source.clientSourceId, source]));

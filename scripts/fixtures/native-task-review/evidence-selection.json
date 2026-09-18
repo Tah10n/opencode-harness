@@ -1,0 +1,494 @@
+[
+  {
+    "task": "seat-reservation-snapshot",
+    "historicalStatus": "incomplete",
+    "originalResponseSha256": "7cd1fdb97bfc50fc47d00a24369b325f23beb3b2a3d7d85094ebf060788282e9",
+    "review": {
+      "findings": [],
+      "obligations": [
+        {
+          "requirement": "Implement createSeats API and reservation semantics",
+          "status": "delivered",
+          "evidence": "src/seats.mjs:1-20 implements reserve, release, and snapshot with atomic conflict/duplicate handling."
+        },
+        {
+          "requirement": "Preserve existing behavior and test coverage",
+          "status": "delivered",
+          "evidence": "test/legacy.test.mjs:2 retains the original reservation test."
+        },
+        {
+          "requirement": "Use Node built-ins without dependencies",
+          "status": "delivered",
+          "evidence": "package.json contains no dependencies; implementation uses native Set."
+        },
+        {
+          "requirement": "Add regression tests for atomic conflicts, duplicates, restore ownership, and sorting",
+          "status": "delivered",
+          "evidence": "test/legacy.test.mjs:4-29 covers these cases."
+        },
+        {
+          "requirement": "Update documentation with required API semantics",
+          "status": "delivered",
+          "evidence": "README.md:5-18 documents atomic conflicts, duplicates, idempotent release, numeric snapshots, and independent restore."
+        },
+        {
+          "requirement": "Run npm test after the last source or test change",
+          "status": "delivered",
+          "evidence": "Native call call_UAjS7IzrDipGPSeBhEPH0lA ran npm test successfully with 3 passing tests."
+        }
+      ],
+      "unverified": [],
+      "evidenceLimitations": [
+        "Reviewer did not execute commands; native command evidence was inspected."
+      ],
+      "coverageLost": [],
+      "checks": [
+        {
+          "callID": "call_UAjS7IzrDipGPSeBhEPH0lA",
+          "purpose": "discriminating",
+          "basis": "npm test passed the legacy and newly added regression tests."
+        },
+        {
+          "callID": "call_SeprSero0ntvDQ0kvwsXJXlG",
+          "purpose": "documentation",
+          "basis": "git diff --check passed on the current patch."
+        }
+      ],
+      "proposedVerificationFiles": []
+    },
+    "snapshot": {
+      "snapshotSha256": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9"
+    },
+    "events": [
+      {
+        "callID": "call_vYVE70WxcEDIV8286kGrYVPD",
+        "tool": "todowrite",
+        "state": "completed",
+        "before": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d",
+        "after": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d"
+      },
+      {
+        "callID": "call_PpDjRoAuBv6nuw6jXBcD0nhf",
+        "tool": "glob",
+        "state": "completed",
+        "before": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d",
+        "after": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d"
+      },
+      {
+        "callID": "call_kfaNUz8ymrH3RZGNAEEMg1Kf",
+        "tool": "read",
+        "state": "completed",
+        "before": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d",
+        "after": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d"
+      },
+      {
+        "callID": "call_jNqRPgxJnd9xkA7r17c9l80K",
+        "tool": "read",
+        "state": "completed",
+        "before": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d",
+        "after": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d"
+      },
+      {
+        "callID": "call_KPFmnJylzFTuov6oWgD8zgkI",
+        "tool": "read",
+        "state": "completed",
+        "before": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d",
+        "after": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d"
+      },
+      {
+        "callID": "call_VQtKn5jZWzw6ZjlFWCtGDTgv",
+        "tool": "read",
+        "state": "completed",
+        "before": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d",
+        "after": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d"
+      },
+      {
+        "callID": "call_CipQgrN6ATwCMgC5M8k7gW3d",
+        "tool": "read",
+        "state": "completed",
+        "before": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d",
+        "after": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d"
+      },
+      {
+        "callID": "call_nnkU6f8uziqhePJ7mHrBWZCF",
+        "tool": "read",
+        "state": "completed",
+        "before": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d",
+        "after": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d"
+      },
+      {
+        "callID": "call_0CuhYQAhPlJ32K32B9kpZzws",
+        "tool": "todowrite",
+        "state": "completed",
+        "before": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d",
+        "after": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d"
+      },
+      {
+        "callID": "call_d1YxK2rBIeBQBuJRrOaGOVbl",
+        "tool": "apply_patch",
+        "state": "completed",
+        "before": "4e085eab27196f617db784f4c8ef81c1597aaf33c7aec9da76ae3d1abf183f3d",
+        "after": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9"
+      },
+      {
+        "callID": "call_YMD59nqF93s38IX5q6QjpAPl",
+        "tool": "todowrite",
+        "state": "completed",
+        "before": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9",
+        "after": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9"
+      },
+      {
+        "callID": "call_sq1OWaM4YJ1bGFxZoSFx8UTf",
+        "tool": "bash",
+        "state": "error",
+        "before": null,
+        "after": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9",
+        "stateObservation": {
+          "basis": "host-rejected-before-execution",
+          "snapshot": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9"
+        },
+        "permissionDenied": false,
+        "scopeViolation": false,
+        "args": {
+          "command": "git diff --check && git diff"
+        }
+      },
+      {
+        "callID": "call_UAjS7IzrDipGPSeBhEPH0l0A",
+        "tool": "bash",
+        "state": "completed",
+        "exit": 0,
+        "before": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9",
+        "after": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9",
+        "args": {
+          "command": "npm test"
+        }
+      },
+      {
+        "callID": "call_y7kOwqSrvy5EqBNJTsOmbVPB",
+        "tool": "bash",
+        "state": "error",
+        "before": null,
+        "after": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9",
+        "stateObservation": {
+          "basis": "host-rejected-before-execution",
+          "snapshot": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9"
+        },
+        "permissionDenied": false,
+        "scopeViolation": false,
+        "args": {
+          "command": "git status --short"
+        }
+      },
+      {
+        "callID": "call_D3G6NZWZqoyUn9iYw6kiB36R",
+        "tool": "bash",
+        "state": "error",
+        "before": null,
+        "after": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9",
+        "stateObservation": {
+          "basis": "host-rejected-before-execution",
+          "snapshot": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9"
+        },
+        "permissionDenied": false,
+        "scopeViolation": false,
+        "args": {
+          "command": "git diff --stat"
+        }
+      },
+      {
+        "callID": "call_SeprSero0ntvDQ0kvwsXJXlG",
+        "tool": "bash",
+        "state": "completed",
+        "exit": 0,
+        "before": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9",
+        "after": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9",
+        "args": {
+          "command": "git diff --check"
+        }
+      },
+      {
+        "callID": "call_XNSHfxjB7J22PoKC2v3kmOYA",
+        "tool": "bash",
+        "state": "completed",
+        "exit": 0,
+        "before": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9",
+        "after": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9",
+        "args": {
+          "command": "git status --short"
+        }
+      },
+      {
+        "callID": "call_Y9X0EKfjgL4OSS8CvS0NvjQC",
+        "tool": "bash",
+        "state": "completed",
+        "exit": 0,
+        "before": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9",
+        "after": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9",
+        "args": {
+          "command": "git diff --stat"
+        }
+      },
+      {
+        "callID": "call_dQnr9Yz7ltDiycpG4CUDiDsK",
+        "tool": "todowrite",
+        "state": "completed",
+        "before": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9",
+        "after": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9"
+      },
+      {
+        "callID": "call_6bR0vb0AFPnkRMP9Xz4k3Hr6",
+        "tool": "read",
+        "state": "completed",
+        "before": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9",
+        "after": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9"
+      },
+      {
+        "callID": "call_Yn8t5TYSSm95B7pX2RAwuiji",
+        "tool": "read",
+        "state": "completed",
+        "before": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9",
+        "after": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9"
+      },
+      {
+        "callID": "call_g4GMQcq3G8oAiGQAbaLL81wt",
+        "tool": "read",
+        "state": "completed",
+        "before": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9",
+        "after": "7aca7271c3f00b34c97c3fd4026c5293b5f165af6abd68c8848e7c76635f3de9"
+      }
+    ],
+    "newSelectionEventIndices": [
+      12,
+      15
+    ]
+  },
+  {
+    "task": "map-record-catalog",
+    "historicalStatus": "incomplete",
+    "originalResponseSha256": "426d0aff60ea696c5eed6fbf6758875ecbb855238d204297a66e22113bae1395",
+    "review": {
+      "findings": [],
+      "obligations": [
+        {
+          "requirement": "Support same-realm Map inputs through rows and total with required ordering and validation.",
+          "status": "delivered",
+          "evidence": "src/catalog.mjs lines 2-20; Map regression in test/legacy.test.mjs lines 4-13."
+        },
+        {
+          "requirement": "Preserve record behavior, fresh results, unchanged inputs, empty totals, and frozen-record compatibility.",
+          "status": "delivered",
+          "evidence": "Existing record test retained; implementation uses Object.entries and fresh objects; total reduces to 0 for empty input."
+        },
+        {
+          "requirement": "Add regression tests for Map order/totals and invalid entries/independence.",
+          "status": "delivered",
+          "evidence": "test/legacy.test.mjs lines 4-22."
+        },
+        {
+          "requirement": "Update documentation with ordering, validation, independence, and total behavior.",
+          "status": "delivered",
+          "evidence": "README.md lines 3-10."
+        },
+        {
+          "requirement": "Run npm test after the last source or test change.",
+          "status": "delivered",
+          "evidence": "Native event call_Lu54J0RkMiokF0jOqjpZ1DdP recorded npm test passing after final mutation."
+        }
+      ],
+      "unverified": [],
+      "evidenceLimitations": [
+        "Review is read-only and relies on supplied native command events for execution evidence."
+      ],
+      "coverageLost": [],
+      "checks": [
+        {
+          "callID": "call_Lu54J0RkMiokF0jOqjpZ1DdP",
+          "purpose": "preservation",
+          "basis": "npm test passed all three current tests after the final mutation."
+        },
+        {
+          "callID": "call_Zbj1LJfCctcpRa4oZ4J6HCCa",
+          "purpose": "documentation",
+          "basis": "git diff --check passed on the current patch."
+        },
+        {
+          "callID": "call_9TvgJwTjHhCxYyf6COpAR13",
+          "purpose": "discriminating",
+          "basis": "Final diff inspected for source, tests, documentation, and scope."
+        }
+      ],
+      "proposedVerificationFiles": []
+    },
+    "snapshot": {
+      "snapshotSha256": "15f6e45a6ffa010dce70b6ce7a54638029e13f5afabf5c92b28198ac65285088"
+    },
+    "events": [
+      {
+        "callID": "call_1OM2UK8P6KBqK0AMUnuFKBkc",
+        "tool": "todowrite",
+        "state": "completed",
+        "before": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515",
+        "after": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515"
+      },
+      {
+        "callID": "call_fHAneajgzamDzSm8HqGOm4r1",
+        "tool": "bash",
+        "state": "error",
+        "before": null,
+        "after": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515",
+        "stateObservation": {
+          "basis": "host-rejected-before-execution",
+          "snapshot": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515"
+        },
+        "permissionDenied": false,
+        "scopeViolation": false,
+        "args": {
+          "command": "git status --short"
+        }
+      },
+      {
+        "callID": "call_G9tHPPep70lYEJxnxrmZAiJB",
+        "tool": "glob",
+        "state": "completed",
+        "before": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515",
+        "after": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515"
+      },
+      {
+        "callID": "call_1MuhiXAH0WhodIKHqU8XPX7e",
+        "tool": "read",
+        "state": "completed",
+        "before": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515",
+        "after": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515"
+      },
+      {
+        "callID": "call_FYDgzttUEZsLkxBMtfrfNgw8",
+        "tool": "read",
+        "state": "completed",
+        "before": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515",
+        "after": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515"
+      },
+      {
+        "callID": "call_owRlEDwwVt9eg31kSRZ4rj1K",
+        "tool": "read",
+        "state": "completed",
+        "before": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515",
+        "after": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515"
+      },
+      {
+        "callID": "call_qq8BWAyx2ZxJyHw0CBQB3uIB",
+        "tool": "read",
+        "state": "completed",
+        "before": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515",
+        "after": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515"
+      },
+      {
+        "callID": "call_VpQTX4f36LJsv2GXjNhik6S6",
+        "tool": "read",
+        "state": "completed",
+        "before": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515",
+        "after": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515"
+      },
+      {
+        "callID": "call_sLO6PxeClhEfXpzA6eiUaSUE",
+        "tool": "read",
+        "state": "completed",
+        "before": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515",
+        "after": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515"
+      },
+      {
+        "callID": "call_CmaZkr3YOv0yAZWsFHeHBlDl",
+        "tool": "todowrite",
+        "state": "completed",
+        "before": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515",
+        "after": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515"
+      },
+      {
+        "callID": "call_WPh1wcgk2LbPKJuvhVMpt01O",
+        "tool": "apply_patch",
+        "state": "completed",
+        "before": "d9951b7eca02416fccafc93823e38124445e8e4bf5c62e470ae07b4222fd7515",
+        "after": "15f6e45a6ffa010dce70b6ce7a54638029e13f5afabf5c92b28198ac65285088"
+      },
+      {
+        "callID": "call_pwfl0FqbxsZzCkvcvzG3CA5Y",
+        "tool": "todowrite",
+        "state": "completed",
+        "before": "15f6e45a6ffa010dce70b6ce7a54638029e13f5afabf5c92b28198ac65285088",
+        "after": "15f6e45a6ffa010dce70b6ce7a54638029e13f5afabf5c92b28198ac65285088"
+      },
+      {
+        "callID": "call_z5i4OMVDFmzAuOhbmeFjEnjL",
+        "tool": "bash",
+        "state": "error",
+        "before": null,
+        "after": "15f6e45a6ffa010dce70b6ce7a54638029e13f5afabf5c92b28198ac65285088",
+        "stateObservation": {
+          "basis": "host-rejected-before-execution",
+          "snapshot": "15f6e45a6ffa010dce70b6ce7a54638029e13f5afabf5c92b28198ac65285088"
+        },
+        "permissionDenied": false,
+        "scopeViolation": false,
+        "args": {
+          "command": "git diff --check && git diff"
+        }
+      },
+      {
+        "callID": "call_Lu54J0RkMiokF0jOqjpZ1DdP",
+        "tool": "bash",
+        "state": "completed",
+        "exit": 0,
+        "before": "15f6e45a6ffa010dce70b6ce7a54638029e13f5afabf5c92b28198ac65285088",
+        "after": "15f6e45a6ffa010dce70b6ce7a54638029e13f5afabf5c92b28198ac65285088",
+        "args": {
+          "command": "npm test"
+        }
+      },
+      {
+        "callID": "call_Zbj1LJfCctcpRa4oZ4J6HCCa",
+        "tool": "bash",
+        "state": "completed",
+        "exit": 0,
+        "before": "15f6e45a6ffa010dce70b6ce7a54638029e13f5afabf5c92b28198ac65285088",
+        "after": "15f6e45a6ffa010dce70b6ce7a54638029e13f5afabf5c92b28198ac65285088",
+        "args": {
+          "command": "git diff --check"
+        }
+      },
+      {
+        "callID": "call_9Tvg2JwTjHhCxYyf6COpAR13",
+        "tool": "bash",
+        "state": "completed",
+        "exit": 0,
+        "before": "15f6e45a6ffa010dce70b6ce7a54638029e13f5afabf5c92b28198ac65285088",
+        "after": "15f6e45a6ffa010dce70b6ce7a54638029e13f5afabf5c92b28198ac65285088",
+        "args": {
+          "command": "git diff"
+        }
+      },
+      {
+        "callID": "call_jAxn8DxCKLR6sBYhdRnnzafn",
+        "tool": "bash",
+        "state": "completed",
+        "exit": 0,
+        "before": "15f6e45a6ffa010dce70b6ce7a54638029e13f5afabf5c92b28198ac65285088",
+        "after": "15f6e45a6ffa010dce70b6ce7a54638029e13f5afabf5c92b28198ac65285088",
+        "args": {
+          "command": "git status --short"
+        }
+      },
+      {
+        "callID": "call_nQ3qyFBEdvAloirnn0c4HEFF",
+        "tool": "todowrite",
+        "state": "completed",
+        "before": "15f6e45a6ffa010dce70b6ce7a54638029e13f5afabf5c92b28198ac65285088",
+        "after": "15f6e45a6ffa010dce70b6ce7a54638029e13f5afabf5c92b28198ac65285088"
+      }
+    ],
+    "newSelectionEventIndices": [
+      13,
+      14,
+      15
+    ]
+  }
+]

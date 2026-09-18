@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Stable bucket result and strict percentage threshold boundary.",
+    "Explicit override plus disabled-flag precedence."
+  ],
+  "docDelivery": [
+    "ASCII FNV-1a bucket and seed:user key construction.",
+    "Disabled then override then rollout precedence, sorted consumer output."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "ASCII seeds/user strings; plain own-data dictionary flags and overrides; enabled/override booleans, integer basisPoints 0..10000. No getters or inherited entries.",
+  "independence": "Integrate deterministic seeded user buckets, explicit targeting override and disabled-flag fallback."
+}

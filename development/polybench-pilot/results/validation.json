@@ -1,0 +1,22 @@
+{
+  "artifact_bytes_and_sha256": "passed for all 18 patches, predictions and original official outputs",
+  "assigned_and_unknown": "30 slots; 18 evaluated; 12 not_started excluded from predictions",
+  "paired_R_D_and_usage": "passed independent arithmetic checks",
+  "frozen_implementation": "17 frozen file hashes unchanged",
+  "native_local_stop": "all 18 started slots verified; one remote server completion unknown",
+  "selection_schedule_export": "verify.py passed, including CRLF, empty/missing capture, unknown usage",
+  "scheduler": "verify-scheduler.mjs passed",
+  "python_syntax": "all pilot modules passed",
+  "runtime_profiles": "unchanged from pre-task publication",
+  "official_evaluation": "one pass per arm; all process exit codes 0; 18 per-instance outputs",
+  "limitations": [
+    "No full aggregate or platform CI claim",
+    "Historical PROCESS_CONTAINMENT_UNAVAILABLE remains",
+    "Earlier verify-provider-lifecycle invocation lacked required arguments and failed before executing its checks",
+    "First report packaging attempt failed on local usage-name shadowing; fixed in non-frozen publisher; no model or evaluator rerun"
+  ],
+  "review": "One bounded final diff review, including shared launcher/container changes and safe result export",
+  "javascript_syntax": "all pilot modules passed",
+  "safe_output_scan": "credential patterns absent; no raw provider streams or full source trees staged",
+  "temporary_resources": "no recorded batch author containers or campaign-labelled evaluator containers remain"
+}

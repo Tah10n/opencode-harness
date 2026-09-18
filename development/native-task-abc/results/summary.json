@@ -1,0 +1,285 @@
+{
+  "candidateCommit": "66b7b33fc6bd66201ee24ec84d6e6fcae9daaf28",
+  "preregistrationCommit": "2a4b101f",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "low",
+  "opencode": "1.18.26",
+  "budgetMs": 900000,
+  "runs": 12,
+  "requests": 310,
+  "elapsedMs": 2874695,
+  "timeouts": 0,
+  "retries": 0,
+  "replacements": 0,
+  "quotaPauses": 0,
+  "usageMissingRequests": 0,
+  "gradedSnapshots": 20,
+  "rawBehaviorChecksPassedSnapshots": 17,
+  "adjudicatedDeliveries": {
+    "A": 3,
+    "B": 2,
+    "C": 3
+  },
+  "internalCReviewedDelivery": 0,
+  "limitations": [
+    "Four diagnostic tasks; no statistical superiority inference",
+    "Opaque packets but same integrator; human source review not fully blinded",
+    "One expected Windows-only skip per ordinary/preservation suite; no full platform/web/database matrix",
+    "B legacy subset-layout assertion is an ambiguous task boundary and not the sole failure reason",
+    "C refactor retains dead commented code; functional extraction counted, maintenance debt reported",
+    "No dollar billing inferred from OAuth token usage"
+  ],
+  "arms": {
+    "A": {
+      "elapsedMs": 677783,
+      "requests": 73,
+      "usage": {
+        "input_tokens": 2445729,
+        "cached_tokens": 724992,
+        "output_tokens": 17035,
+        "reasoning_tokens": 3436,
+        "total_tokens": 2462764
+      }
+    },
+    "B": {
+      "elapsedMs": 1024347,
+      "requests": 122,
+      "usage": {
+        "input_tokens": 5001810,
+        "cached_tokens": 1951744,
+        "output_tokens": 27129,
+        "reasoning_tokens": 7381,
+        "total_tokens": 5028939
+      }
+    },
+    "C": {
+      "elapsedMs": 1172565,
+      "requests": 115,
+      "usage": {
+        "input_tokens": 4252830,
+        "cached_tokens": 951808,
+        "output_tokens": 37818,
+        "reasoning_tokens": 7625,
+        "total_tokens": 4290648
+      }
+    }
+  },
+  "rows": [
+    {
+      "label": "K7",
+      "slot": 1,
+      "task": "protocol-error-api",
+      "arm": "A",
+      "verdict": "Delivered",
+      "rawBehaviorChecksPassed": true,
+      "elapsedMs": 119073,
+      "requests": 15,
+      "usage": {
+        "input_tokens": 300244,
+        "cached_tokens": 35328,
+        "output_tokens": 2923,
+        "reasoning_tokens": 486,
+        "total_tokens": 303167
+      },
+      "internalStatus": null
+    },
+    {
+      "label": "M2",
+      "slot": 2,
+      "task": "protocol-error-api",
+      "arm": "B",
+      "verdict": "Delivered",
+      "rawBehaviorChecksPassed": true,
+      "elapsedMs": 160353,
+      "requests": 18,
+      "usage": {
+        "input_tokens": 460509,
+        "cached_tokens": 79872,
+        "output_tokens": 4153,
+        "reasoning_tokens": 1089,
+        "total_tokens": 464662
+      },
+      "internalStatus": null
+    },
+    {
+      "label": "Q9",
+      "slot": 3,
+      "task": "protocol-error-api",
+      "arm": "C",
+      "verdict": "Delivered",
+      "rawBehaviorChecksPassed": true,
+      "elapsedMs": 261161,
+      "requests": 26,
+      "usage": {
+        "input_tokens": 697681,
+        "cached_tokens": 86528,
+        "output_tokens": 7179,
+        "reasoning_tokens": 1452,
+        "total_tokens": 704860
+      },
+      "internalStatus": "incomplete"
+    },
+    {
+      "label": "D4",
+      "slot": 4,
+      "task": "legacy-runtime-reload",
+      "arm": "B",
+      "verdict": "Incomplete: Windows path handling",
+      "rawBehaviorChecksPassed": false,
+      "elapsedMs": 245270,
+      "requests": 34,
+      "usage": {
+        "input_tokens": 1729836,
+        "cached_tokens": 612352,
+        "output_tokens": 7146,
+        "reasoning_tokens": 1873,
+        "total_tokens": 1736982
+      },
+      "internalStatus": null
+    },
+    {
+      "label": "H8",
+      "slot": 5,
+      "task": "legacy-runtime-reload",
+      "arm": "C",
+      "verdict": "Delivered",
+      "rawBehaviorChecksPassed": true,
+      "elapsedMs": 337727,
+      "requests": 30,
+      "usage": {
+        "input_tokens": 1365270,
+        "cached_tokens": 274432,
+        "output_tokens": 11276,
+        "reasoning_tokens": 2724,
+        "total_tokens": 1376546
+      },
+      "internalStatus": "incomplete"
+    },
+    {
+      "label": "P3",
+      "slot": 6,
+      "task": "legacy-runtime-reload",
+      "arm": "A",
+      "verdict": "Delivered",
+      "rawBehaviorChecksPassed": true,
+      "elapsedMs": 146546,
+      "requests": 16,
+      "usage": {
+        "input_tokens": 541284,
+        "cached_tokens": 178688,
+        "output_tokens": 4173,
+        "reasoning_tokens": 837,
+        "total_tokens": 545457
+      },
+      "internalStatus": null
+    },
+    {
+      "label": "W6",
+      "slot": 7,
+      "task": "reconnect-revoked",
+      "arm": "C",
+      "verdict": "Incomplete: lost reconnect coverage",
+      "rawBehaviorChecksPassed": true,
+      "elapsedMs": 276857,
+      "requests": 30,
+      "usage": {
+        "input_tokens": 948363,
+        "cached_tokens": 292864,
+        "output_tokens": 9011,
+        "reasoning_tokens": 1786,
+        "total_tokens": 957374
+      },
+      "internalStatus": "incomplete"
+    },
+    {
+      "label": "J1",
+      "slot": 8,
+      "task": "reconnect-revoked",
+      "arm": "A",
+      "verdict": "Incomplete: stale pending data",
+      "rawBehaviorChecksPassed": false,
+      "elapsedMs": 216773,
+      "requests": 25,
+      "usage": {
+        "input_tokens": 1202374,
+        "cached_tokens": 385536,
+        "output_tokens": 5055,
+        "reasoning_tokens": 1587,
+        "total_tokens": 1207429
+      },
+      "internalStatus": null
+    },
+    {
+      "label": "R5",
+      "slot": 9,
+      "task": "reconnect-revoked",
+      "arm": "B",
+      "verdict": "Incomplete: lost reconnect coverage",
+      "rawBehaviorChecksPassed": true,
+      "elapsedMs": 324887,
+      "requests": 50,
+      "usage": {
+        "input_tokens": 2284886,
+        "cached_tokens": 1077248,
+        "output_tokens": 9471,
+        "reasoning_tokens": 3400,
+        "total_tokens": 2294357
+      },
+      "internalStatus": null
+    },
+    {
+      "label": "V8",
+      "slot": 10,
+      "task": "request-module-extraction",
+      "arm": "A",
+      "verdict": "Delivered",
+      "rawBehaviorChecksPassed": true,
+      "elapsedMs": 195391,
+      "requests": 17,
+      "usage": {
+        "input_tokens": 401827,
+        "cached_tokens": 125440,
+        "output_tokens": 4884,
+        "reasoning_tokens": 526,
+        "total_tokens": 406711
+      },
+      "internalStatus": null
+    },
+    {
+      "label": "F2",
+      "slot": 11,
+      "task": "request-module-extraction",
+      "arm": "C",
+      "verdict": "Delivered; dead-code maintenance note",
+      "rawBehaviorChecksPassed": true,
+      "elapsedMs": 296820,
+      "requests": 29,
+      "usage": {
+        "input_tokens": 1241516,
+        "cached_tokens": 297984,
+        "output_tokens": 10352,
+        "reasoning_tokens": 1663,
+        "total_tokens": 1251868
+      },
+      "internalStatus": "incomplete"
+    },
+    {
+      "label": "N4",
+      "slot": 12,
+      "task": "request-module-extraction",
+      "arm": "B",
+      "verdict": "Delivered",
+      "rawBehaviorChecksPassed": true,
+      "elapsedMs": 293837,
+      "requests": 20,
+      "usage": {
+        "input_tokens": 526579,
+        "cached_tokens": 182272,
+        "output_tokens": 6359,
+        "reasoning_tokens": 1019,
+        "total_tokens": 532938
+      },
+      "internalStatus": null
+    }
+  ]
+}

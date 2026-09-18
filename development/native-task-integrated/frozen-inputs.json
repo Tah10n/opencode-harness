@@ -1,0 +1,114 @@
+{
+  "createdAt": "2026-09-15T12:32:14.459Z",
+  "runtimeSha": "797ce6f1b75af217e00224d1b38790346dee1d19",
+  "freezeSha256": "7bbd0d7c72f99a06d2a2a5ed4ae429efa261f23b0a7ad2659c44a3ce93891b6a",
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "taskDeadlineMs": 1800000,
+  "diagnosticTaskMs": 180000,
+  "order": [
+    {
+      "slot": 1,
+      "task": "visual-preferences",
+      "repetition": 1,
+      "arm": "P"
+    },
+    {
+      "slot": 2,
+      "task": "visual-preferences",
+      "repetition": 1,
+      "arm": "Hbase"
+    },
+    {
+      "slot": 3,
+      "task": "visual-preferences",
+      "repetition": 1,
+      "arm": "Htools"
+    },
+    {
+      "slot": 4,
+      "task": "visual-preferences",
+      "repetition": 2,
+      "arm": "Htools"
+    },
+    {
+      "slot": 5,
+      "task": "visual-preferences",
+      "repetition": 2,
+      "arm": "Hbase"
+    },
+    {
+      "slot": 6,
+      "task": "visual-preferences",
+      "repetition": 2,
+      "arm": "P"
+    },
+    {
+      "slot": 7,
+      "task": "url-search-params",
+      "repetition": 1,
+      "arm": "Hbase"
+    },
+    {
+      "slot": 8,
+      "task": "url-search-params",
+      "repetition": 1,
+      "arm": "P"
+    },
+    {
+      "slot": 9,
+      "task": "url-search-params",
+      "repetition": 1,
+      "arm": "Htools"
+    },
+    {
+      "slot": 10,
+      "task": "url-search-params",
+      "repetition": 2,
+      "arm": "Htools"
+    },
+    {
+      "slot": 11,
+      "task": "url-search-params",
+      "repetition": 2,
+      "arm": "P"
+    },
+    {
+      "slot": 12,
+      "task": "url-search-params",
+      "repetition": 2,
+      "arm": "Hbase"
+    }
+  ],
+  "inputs": [
+    {
+      "task": "visual-preferences",
+      "source": "1198822c5715651cf654c49cae719c92253dd498",
+      "inputManifestSha256": "3dec06deae13791cb3d4a07e1d881b48f3d20a9c454cb0c19699ea558d62d5cb",
+      "promptSha256": "624fcb3454b255ac9b213ee6a563b29547d6059a8cc436b492e51fa491dacf64"
+    },
+    {
+      "task": "url-search-params",
+      "source": "f06c800d0c59f2a4a1b9ba65eb6cb61a84419be6",
+      "inputManifestSha256": "3a80fbbd7524f5a55e779aa76e0cb5a8b797f21129e688f7b69371ebc5013ef6",
+      "promptSha256": "b1f233ca1456b5967b3317a931341ac4604aeb9a2607e7e14640d9bb2b4421ef"
+    }
+  ],
+  "files": {
+    "development/native-task-integrated/PLAN.md": "106eb59321ebfdf240be4c9df2babbe5fc79dd5f3c8bfb230c1bde90dc769e2a",
+    "development/native-task-integrated/container-relay.mjs": "db186a20946348867504c48d7faca8f40a93fdfa122e1102f581e8cf5377f1b3",
+    "development/native-task-integrated/container-session.mjs": "d469b04975c1e9441b1dc5fb5c2a1f6beef451a390e5f020c1b1a6b211cdcd1b",
+    "development/native-task-integrated/freeze.mjs": "66e425ec7e18a0916bfa7810a1adf19da4fbf086927f71c42075e15b9785f818",
+    "development/native-task-integrated/native-run.mjs": "42f5349aeca1d46fa50c66a21e6f7ba81ad49a2f238d82d40992ea70bbaae736",
+    "development/native-task-integrated/preflight.mjs": "69c926d6f17f1772f963d00684ea75d48515c8c0e540e6a0719d4edd7b273dc5",
+    "development/native-task-integrated/run.mjs": "dbb81bbef6e3cef6a558a2940ccc7cda45f48d050993050619dd82b6b1f53c03",
+    "development/native-task-integrated/tasks/visual-preferences.md": "624fcb3454b255ac9b213ee6a563b29547d6059a8cc436b492e51fa491dacf64",
+    "development/native-task-integrated/tasks/url-search-params.md": "b1f233ca1456b5967b3317a931341ac4604aeb9a2607e7e14640d9bb2b4421ef",
+    "development/native-task-ab/run-comparison.mjs": "e344d5e9b51af30275ade0ec816aadd7d11464c58a30ff81410594565b996d66",
+    "development/native-task-abc/native-run.mjs": "5d691871022fcf4f2117212c33b463849e791d7ebe120adc68e7ca419ee0d293",
+    "development/native-task-ab/capture-candidate.mjs": "d388246826eb92dd408b853c4fe8fc929c259a9d03b89d169b75b2143544c669",
+    "development/native-task-ab/extract-candidate.py": "aa5244bd4a5cc394344b266f0107728d9b70e190bad55de47c46dd10f28603de",
+    "development/native-task-utility/container/stop-workload.mjs": "b21c23f5a334dc54af340e2773e3e56427aa27a946231769d36df249ea54a69e"
+  },
+  "realProviderRequestsBeforeFreeze": 0
+}

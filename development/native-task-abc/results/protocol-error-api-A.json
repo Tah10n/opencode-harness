@@ -1,0 +1,120 @@
+{
+  "slot": 1,
+  "task": "protocol-error-api",
+  "arm": "A",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 119073,
+  "phaseCount": 1,
+  "continuationApplied": false,
+  "requests": 15,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": null,
+  "repairs": null,
+  "toolCalls": 24,
+  "sessions": 1,
+  "usage": {
+    "input_tokens": 300244,
+    "cached_tokens": 35328,
+    "output_tokens": 2923,
+    "reasoning_tokens": 486,
+    "total_tokens": 303167
+  },
+  "requestEfforts": {
+    "none": 1,
+    "low": 14
+  },
+  "httpStatuses": {
+    "200": 15
+  },
+  "terminationVerified": true,
+  "packet": "K7",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/bin/viberacing.mjs",
+      "packages/connector/lib/protocol.mjs",
+      "packages/connector/test/protocol.test.mjs"
+    ],
+    "patchSha256": "733f85d53730b3b57e8df530339776404858908420af550ace3afcb2512da25e"
+  },
+  "sourceReview": {
+    "packet": "K7",
+    "sourceReview": {
+      "implementation": "Parser rejects a validated server error with Error/status/code, preserving successful dispatch and validation. CLI central request catches retryable statuses and attaches Retry-After before normal retry policy; all pairing/reconciliation/upload callers continue through this path. Removed obsolete payload.error branch coherently.",
+      "tests": "The existing valid-error assertion is converted to a rejection assertion with message, status and code. All unsafe-code and terminal assertions are retained. No config CLI tests were added; existing real-CLI tests already cover the affected retry/auth consumer behavior and will be rerun independently. Do not demand redundant tests solely to create a test-file delta.",
+      "documentation": "Connector README describes rejection contract, validation boundary and retry/auth integration.",
+      "scope": "Only four relevant connector files changed. No apparent new runtime dependency or packaging change.",
+      "staticDefects": []
+    },
+    "behaviorVerdict": "All executed independent checks passed",
+    "completenessVerdict": "requirements delivered within targeted scope"
+  },
+  "grading": {
+    "final": {
+      "packet": "K7",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 14,
+            "pass": 14,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 14,
+            "pass": 14,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 12,
+            "pass": 12,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    }
+  },
+  "evidenceSelections": []
+}

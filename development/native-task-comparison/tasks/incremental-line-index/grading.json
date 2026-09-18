@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "CRLF/lone-CR normalization and updated starts after replacing across lines.",
+    "Invalid edit preserves text and trailing LF creates empty final line."
+  ],
+  "docDelivery": [
+    "UTF-16 offsets, independent replacement normalization and half-open edits.",
+    "LF endpoint ownership, final empty line, inverse positions and RangeError atomicity."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "UTF-16 code-unit strings up to100000 units, CRLF/CR/LF; edits may split surrogates. Integer offsets including end; invalid positions rejected.",
+  "independence": "Implement text line-start index updates across insert/delete boundaries and CRLF normalization rules."
+}

@@ -1,0 +1,106 @@
+{
+  "slot": 8,
+  "case": "case-4",
+  "task": "denque-remove-where",
+  "arm": "H1",
+  "seedSha256": "d4179fbe5556e631a5c4b068e8adaa049d906c3603c209db25929b44bf82c3e0",
+  "Q": 1,
+  "D": 1,
+  "assessment": {
+    "Q": 1,
+    "reason": "Retained complete control runtime, types and required regressions. Only clarified in README/API docs that reentrant predicate mutation is outside the requested contract. No diagnostic run and no new regression found.",
+    "ordinaryProjectAndTypesPassed": true,
+    "independentBehaviorPassed": true,
+    "requiredGapDiscriminated": true,
+    "newControlRegression": false,
+    "substantiveObservationUsed": false,
+    "assessmentMethod": "One assessor reviewed the complete delivered diffs, seed-to-final changes, ordinary/independent results and actual failing assertions. The assessor also monitored the runs; no independent blinding claim."
+  },
+  "patch": "patches/08-case-4-H1.patch",
+  "patchSha256": "5feae3d18da3057d423b9d38d6ce518f5142fad4397c5d7889d4981a11257260",
+  "terminalPatch": "terminal-patches/08-case-4-H1.patch",
+  "terminalPatchSha256": "cc2609bedec0507d4763974746df96354238e2b5cff2c81cc6b7f3448a32f5de",
+  "handoffNamesPatch": true,
+  "terminalPatchApplicable": true,
+  "changed": [
+    "README.md",
+    "docs/api.mdx",
+    "index.d.ts",
+    "index.js",
+    "test/denque.js",
+    "test/type/index.ts"
+  ],
+  "deleted": [],
+  "omittedPreparationFiles": [],
+  "nativeCompleted": true,
+  "nativeExit": 0,
+  "lastStepFinish": "stop",
+  "workflowStatus": "incomplete",
+  "requests": 19,
+  "toolCalls": 38,
+  "authorSessions": 1,
+  "preparationAndCaptureMs": 2414,
+  "diagnosticElapsedMs": 0,
+  "executionMs": 222928,
+  "cleanupMs": 53,
+  "elapsedMs": 222981,
+  "usage": {
+    "input_tokens": 470066,
+    "output_tokens": 6668,
+    "total_tokens": 476734,
+    "cached_tokens": 289792,
+    "reasoning_tokens": 3785,
+    "unknownRequests": 0
+  },
+  "terminationVerified": true,
+  "containerRemoved": true,
+  "originalDiagnosticCommands": [
+    {
+      "command": "command -v harness-sense",
+      "callID": "call_jBUeSzlJWzvZQSCqwervO8np"
+    }
+  ],
+  "sensitivityEvents": [],
+  "checks": {
+    "ordinary": {
+      "exit": 0,
+      "elapsedMs": 1613,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && npm test"
+      ],
+      "outputSha256": "6e8282d2270e4543d96fa7d2c0186cf7a54c40406568e517e7c78f3cedd676b8",
+      "outputExcerpt": "> denque@2.1.0 test\n> istanbul cover --report lcov _mocha && npm run typescript\n  55 passing (200ms)\n> denque@2.1.0 typescript\n> tsc --project ./test/type/tsconfig.json",
+      "realProviderRequests": 0
+    },
+    "independent": {
+      "exit": 0,
+      "elapsedMs": 638,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && timeout 10s node .independent.cjs"
+      ],
+      "outputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "outputExcerpt": "Independent behavior passed",
+      "realProviderRequests": 0
+    },
+    "sensitivity": {
+      "exit": 1,
+      "elapsedMs": 728,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && node .diagnostic.cjs && node_modules/.bin/mocha"
+      ],
+      "outputSha256": "c4b2fe7adf9485ab7ad6d897a9485715157477d6562e5a47918a4d43f08a82ae",
+      "outputExcerpt": "type.removeWhere\n    ✓ should visit values in order with their original indexes\n    ✓ should leave the queue unchanged when the predicate throws\n    1) should filter wrapped capacity queues without losing identity or capacity\n\n  Denque.prototype.remove\n    ✓ Should return undefined when empty denque\n    ✓ remove from the end of the queue if a negative index is provided\n    ✓ Should return undefined if index or count invalid\n    ✓ Should return the item at the front of the denque\n    ✓ Should return the item at the back of the denque\n    ✓ Should return the item somewhere in the middle of the denque\n    ✓ Should remove a number of items at the front of the denque\n    ✓ Should remove a number of items at the back of the denque\n    ✓ Should remove a number of items somewhere in the middle of the denque\n    ✓ Should clear denque\n\n  Denque.prototype.splice\n    ✓ Should remove and add items like native splice method at the front of denque\n    ✓ Should remove and add items like native splice method at the end of denque\n    ✓ Should remove and add items like native splice method somewhere in the middle of denque\n    ✓ Should return undefined when index or count is invalid\n    ✓ Should return undefined when the queue is empty\n    ✓ Should return undefined when trying to remove further than current size\n    ✓ Should remove and add items like native splice method to the empty denque\n    ✓ pop should shrink array when mostly empty\n\n\n  54 passing (29ms)\n  1 failing\n\n  1) Denque.prototype.removeWhere should filter wrapped capacity queues without losing identity or capacity:\n     AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nundefined !== 4\n\n      at Context.<anonymous> (test/denque.js:526:12)\n      at process.processImmediate (node:internal/timers:534:21)\n\n\n\n",
+      "realProviderRequests": 0
+    }
+  },
+  "authorClaimExcerpt": "\nImplemented and verified `removeWhere(predicate)` across:\n\n- Ring-buffer filtering with original indexes, identity, duplicates, falsy values, and capacity preservation.\n- Error propagation and non-function validation.\n- TypeScript declarations and type tests.\n- README and API documentation, including reentrant mutation scope.\n\nChecks passed:\n\n- Focused `removeWhere` tests: 3 passing.\n- Full `npm test`: 55 passing plus TypeScript.\n- `git diff --check`.\n- `harness-sense` unavailable in the environment."
+}

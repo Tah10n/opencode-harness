@@ -1,0 +1,202 @@
+diff --git a/index.d.ts b/index.d.ts
+index 3e8ac46f0bd2992c19e3bd2ca43d89f06a304e07..b81e4f2f284c53820742102125ac25dd8acd5f80 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -19,7 +19,7 @@ export type Options<KeyType, ValueType> = {
+ 	readonly maxSize: number;
+ 
+ 	/**
+-	Called right before an item is evicted from the cache due to LRU pressure, TTL expiration, or manual eviction via `evict()`.
++	Called right before an item is evicted from the cache due to LRU pressure, TTL expiration, or manual eviction via `evict()` or `pruneExpired()`.
+ 
+ 	Useful for side effects or for items like object URLs that need explicit cleanup (`revokeObjectURL`).
+ 
+@@ -94,6 +94,13 @@ export default class QuickLRU<KeyType, ValueType> extends Map<KeyType, ValueType
+ 	*/
+ 	clear(): void;
+ 
++	/**
++	Remove all expired items without changing the recency order of live items.
++
++	@returns The number of expired items removed.
++	*/
++	pruneExpired(): number;
++
+ 	/**
+ 	Get the remaining time to live (in milliseconds) for the given item, or `undefined` when the item is not in the cache.
+ 
+diff --git a/index.js b/index.js
+index 7f87cf591ada3e59e432a515791a4a4f7f05becb..e701da3d91d94cc233d71a876b07e8802e617ee8 100644
+--- a/index.js
++++ b/index.js
+@@ -178,6 +178,24 @@ export default class QuickLRU extends Map {
+ 		this.#size = 0;
+ 	}
+ 
++	pruneExpired() {
++		let count = 0;
++
++		for (const [key, item] of this.#oldCache) {
++			if (!this.#cache.has(key) && this.#deleteIfExpired(key, item)) {
++				count++;
++			}
++		}
++
++		for (const [key, item] of this.#cache) {
++			if (this.#deleteIfExpired(key, item)) {
++				count++;
++			}
++		}
++
++		return count;
++	}
++
+ 	resize(newSize) {
+ 		if (!(newSize && newSize > 0)) {
+ 			throw new TypeError('`maxSize` must be a number greater than 0');
+diff --git a/index.test-d.ts b/index.test-d.ts
+index bc4b63e49a5ea669aea3c4bd4ed3f989750aaba2..f116386bd8d3b9df3a7ad505ebc17c70f57505da 100644
+--- a/index.test-d.ts
++++ b/index.test-d.ts
+@@ -9,6 +9,7 @@ expectType<boolean>(lru.has('🦄'));
+ expectType<number | undefined>(lru.peek('🦄'));
+ expectType<number | undefined>(lru.expiresIn('🦄'));
+ expectType<boolean>(lru.delete('🦄'));
++expectType<number>(lru.pruneExpired());
+ expectType<number>(lru.size);
+ expectType<number>(lru.maxAge);
+ 
+diff --git a/readme.md b/readme.md
+index bad09c35aa1bcd5af7d0c7b4de822eb8baeb607c..29a27da53fffcc90476482d678dafdf69d753eda 100644
+--- a/readme.md
++++ b/readme.md
+@@ -67,7 +67,7 @@ Individual expiration of an item can be specified by the `set(key, value, option
+ *Optional*\
+ Type: `(key, value) => void`
+ 
+-Called right before an item is evicted from the cache due to LRU pressure, TTL expiration, or manual eviction via `evict()`.
++Called right before an item is evicted from the cache due to LRU pressure, TTL expiration, or manual eviction via `evict()` or `pruneExpired()`.
+ 
+ Useful for side effects or for items like object URLs that need explicit cleanup (`revokeObjectURL`).
+ 
+@@ -108,6 +108,12 @@ Returns `true` if the item is removed or `false` if the item doesn't exist.
+ 
+ Delete all items.
+ 
++#### .pruneExpired()
++
++Remove all expired items from the cache without promoting or reordering live items.
++
++Returns the number of expired items removed. Expired items are removed using the same `onEviction` callback as lazy expiration.
++
+ #### .expiresIn(key)
+ 
+ Get the remaining time to live (in milliseconds) for the given item, or `undefined` if the item is not in the cache.
+diff --git a/test.js b/test.js
+index 0904dc266d45e27d109d4296fdb5aabc011ea1c5..50893c073f6df6bf3d0adf1381b7a03e9d183ae9 100644
+--- a/test.js
++++ b/test.js
+@@ -411,6 +411,103 @@ test('maxAge: calls onEviction for expired non-recent items', async t => {
+ 	t.deepEqual(actualValues, expectedValues);
+ });
+ 
++test('pruneExpired removes expired entries from both generations once and preserves live order', t => {
++	const evicted = [];
++	const lru = new QuickLRU({
++		maxSize: 3,
++		onEviction(key, value) {
++			evicted.push([key, value]);
++		},
++	});
++
++	lru.set('old-expired', 1, {maxAge: -1});
++	lru.set('old-live-1', 2);
++	lru.set('old-live-2', 3);
++	lru.set('current-expired', 4, {maxAge: -1});
++	lru.set('current-live', 5);
++
++	// Check the entries that pruneExpired will inspect without lazily removing them.
++	t.true(lru.__oldCache.has('old-expired'));
++	t.true(lru.__oldCache.get('old-expired').expiry <= Date.now());
++	t.true(lru.expiresIn('current-expired') <= 0);
++
++	t.is(lru.pruneExpired(), 2);
++	t.deepEqual(evicted, [['old-expired', 1], ['current-expired', 4]]);
++	t.deepEqual([...lru.entriesAscending()], [['old-live-1', 2], ['old-live-2', 3], ['current-live', 5]]);
++	t.is(lru.size, 3);
++	t.is(lru.pruneExpired(), 0);
++	t.deepEqual(evicted, [['old-expired', 1], ['current-expired', 4]]);
++});
++
++test('pruneExpired respects current entries that shadow old entries', t => {
++	const firstEvictions = [];
++	const first = new QuickLRU({
++		maxSize: 2,
++		onEviction(key, value) {
++			firstEvictions.push([key, value]);
++		},
++	});
++
++	first.set('shadowed', 'old', {maxAge: -1});
++	first.set('old-live', 1);
++	first.set('shadowed', 'current');
++
++	t.true(first.__oldCache.has('shadowed'));
++	t.true(first.__oldCache.get('shadowed').expiry <= Date.now());
++	t.is(first.pruneExpired(), 0);
++	t.deepEqual(firstEvictions, []);
++	t.is(first.get('shadowed'), 'current');
++	t.deepEqual([...first.entriesAscending()], [['old-live', 1], ['shadowed', 'current']]);
++
++	const secondEvictions = [];
++	const second = new QuickLRU({
++		maxSize: 2,
++		onEviction(key, value) {
++			secondEvictions.push([key, value]);
++		},
++	});
++
++	second.set('shadowed', 'old');
++	second.set('old-live', 1);
++	second.set('shadowed', 'current', {maxAge: -1});
++
++	t.true(second.__oldCache.has('shadowed'));
++	t.is(second.__oldCache.get('shadowed').expiry, undefined);
++	t.true(second.expiresIn('shadowed') <= 0);
++	t.is(second.pruneExpired(), 1);
++	t.deepEqual(secondEvictions, [['shadowed', 'current']]);
++	t.false(second.__oldCache.has('shadowed'));
++	t.false(second.has('shadowed'));
++});
++
++test('pruneExpired handles the expiry boundary, infinite TTL, undefined values, and reuse', t => {
++	const evicted = [];
++	const lru = new QuickLRU({
++		maxSize: 2,
++		onEviction(key, value) {
++			evicted.push([key, value]);
++		},
++	});
++
++	lru.set('boundary', undefined, {maxAge: 0});
++	lru.set('infinite', 'live', {maxAge: Number.POSITIVE_INFINITY});
++
++	t.true(lru.__oldCache.has('boundary'));
++	t.true(lru.expiresIn('boundary') <= 0);
++	t.is(lru.pruneExpired(), 1);
++	t.deepEqual(evicted, [['boundary', undefined]]);
++	t.true(lru.has('infinite'));
++	t.is(lru.get('infinite'), 'live');
++	t.is(lru.pruneExpired(), 0);
++
++	lru.delete('infinite');
++	t.is(lru.size, 0);
++	lru.set('reused', undefined);
++	t.is(lru.pruneExpired(), 0);
++	t.true(lru.has('reused'));
++	t.is(lru.get('reused'), undefined);
++});
++
+ test('maxAge: evicts expired items on resize', async t => {
+ 	t.timeout(1000);
+ 	const expectedKeys = ['1', '2', '3'];
