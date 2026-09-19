@@ -18,6 +18,11 @@ Optional [old TypeScript call observations](TYPE-COMPATIBILITY.md), enabled with
 a project check. They use a frozen task baseline and an explicitly selected
 compiler/profile, with no new tool or model stage. Default is off.
 
+Optional [early preservation advisory](PRESERVATION-NUDGE.md), enabled with
+`HARNESS_TASK_PRESERVATION_NUDGE=1` in direct mode, adds one short receipt block
+after a supported focused new-feature pass. The author chooses the existing
+behavioral check; no automatic command, new stage or trusted-check verdict is added.
+
 Optional [command hints](COMMAND-HINTS.md), enabled with
 `HARNESS_TASK_COMMAND_HINTS=1`, add one host-derived context block after a confirmed
 missing npm/pnpm command. They are off by default and never install, retry or
