@@ -1,0 +1,25 @@
+{
+  "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep '^runtime event-handler-event-methods '",
+  "image": "sha256:010ecf30e97e43904a58a82f9d0c13642825f7ffbe56d3c2331b19aaaf0c3964",
+  "baseTarSha256": "45634ea516ebfb4ebeaf1fc5e963342d6c3b19aa6ba4181ab5436fb2b718b2f8",
+  "patchSha256": "0cf9b1a0ef4c3087c2bfa7afea475056916955bd40afc1dc0251ebb42d577453",
+  "results": [
+    {
+      "arm": "baseline",
+      "exit": 0,
+      "durationSeconds": 14.464574040999999,
+      "freshBuild": true,
+      "logSha256": "03d784ad7ef0a2813af7782103946a07b1eb795f76a608e7adb161f0007b6387"
+    },
+    {
+      "arm": "saved-H1",
+      "exit": 3,
+      "durationSeconds": 14.168338582999999,
+      "freshBuild": true,
+      "logSha256": "c690303a643da28051bd7e33b9af9bcf4eecd1d744247fd4353873ab34b54873"
+    }
+  ],
+  "realProviderCalls": 0,
+  "hiddenTests": false,
+  "historicalPatchRepaired": false
+}

@@ -1,0 +1,291 @@
+{
+  "installed": "1.18.26",
+  "network": "none; loopback scripted provider",
+  "realProviderCalls": 0,
+  "scriptedAuthor": true,
+  "results": [
+    {
+      "mode": "counter",
+      "installed": {
+        "native-task-plugin.mjs": "b36b42d827454ee8121eb08c075699107259b33836b8285374b5bef02ee57740",
+        "native-task-observations.mjs": "31c5338a74cb958fe2a0532dbc81a8822084aadb8068aca44405c6bc92a42eae",
+        "native-preservation-nudge.mjs": "cf31c844bd4229d09e8bb053f439e7a5961f8caef01ee79c9d8363f428a19371"
+      },
+      "requests": 13,
+      "requestEvidence": [
+        {
+          "kind": "feature-receipt",
+          "request": 7,
+          "sha256": "b957d4ca6329b1bfd4f25eead0d647407f4cda4b3e9342e0535921d91b253e31",
+          "advisoryInLastTool": true
+        },
+        {
+          "kind": "existing-check-receipt",
+          "request": 8,
+          "sha256": "d66be246c691db8b7c70ba25a2d4814a1368f73f7e161c84067b3281625ae4cf",
+          "failureInLastTool": true
+        }
+      ],
+      "received": true,
+      "receivedFailure": true,
+      "status": "incomplete",
+      "checks": [
+        {
+          "command": "node --test test/feature.test.js",
+          "exit": 0,
+          "durationMs": 149
+        },
+        {
+          "command": "node --test test/old.test.js",
+          "exit": 1,
+          "durationMs": 85
+        },
+        {
+          "command": "node --test test/feature.test.js",
+          "exit": 0,
+          "durationMs": 80
+        },
+        {
+          "command": "node --test test/old.test.js",
+          "exit": 0,
+          "durationMs": 85
+        },
+        {
+          "command": "npm test",
+          "exit": 0,
+          "durationMs": 256
+        }
+      ],
+      "advisory": {
+        "version": 1,
+        "status": "attached_to_receipt",
+        "baselineSnapshot": "3ac101a316f513b0c560b890642d8f13174888dbf033359685b7843c1cb21540",
+        "considered": 5,
+        "reasons": {
+          "already_attached": 4
+        },
+        "attachedBlocks": 1,
+        "addedBytes": 571,
+        "classificationMs": 0.9468340000003082,
+        "candidate": {
+          "callID": "fixture-6",
+          "baselineSnapshot": "3ac101a316f513b0c560b890642d8f13174888dbf033359685b7843c1cb21540",
+          "snapshot": "57efb09bd465df5898179a9278ba930749c080e378d2081afd03b09947561059",
+          "scope": "test: new double"
+        },
+        "reason": "already_attached"
+      },
+      "portable": {
+        "exit": 0,
+        "durationMs": 135,
+        "patchSha256": "68aaf2ea24f8859697593e5299551a93877117423f88d9ced862de1ac02668b7",
+        "bytesAndModes": true
+      },
+      "originalCheckoutAndIndexUnchanged": true
+    },
+    {
+      "mode": "parcel",
+      "installed": {
+        "native-task-plugin.mjs": "b36b42d827454ee8121eb08c075699107259b33836b8285374b5bef02ee57740",
+        "native-task-observations.mjs": "31c5338a74cb958fe2a0532dbc81a8822084aadb8068aca44405c6bc92a42eae",
+        "native-preservation-nudge.mjs": "cf31c844bd4229d09e8bb053f439e7a5961f8caef01ee79c9d8363f428a19371"
+      },
+      "requests": 13,
+      "requestEvidence": [
+        {
+          "kind": "feature-receipt",
+          "request": 7,
+          "sha256": "1a7facc68a3d59f33cbbfb3ef62d6bc2322a5f2f946dcf4a79a68f8ee75d9f63",
+          "advisoryInLastTool": true
+        },
+        {
+          "kind": "existing-check-receipt",
+          "request": 8,
+          "sha256": "c96da3001b1f66e39182df81a4dfec16c500203cd5b335c4357287b66f7ede4f",
+          "failureInLastTool": true
+        }
+      ],
+      "received": true,
+      "receivedFailure": true,
+      "status": "incomplete",
+      "checks": [
+        {
+          "command": "node --test spec/extension.test.mjs",
+          "exit": 0,
+          "durationMs": 164
+        },
+        {
+          "command": "node --test spec/old.test.js",
+          "exit": 1,
+          "durationMs": 80
+        },
+        {
+          "command": "node --test spec/extension.test.mjs",
+          "exit": 0,
+          "durationMs": 80
+        },
+        {
+          "command": "node --test spec/old.test.js",
+          "exit": 0,
+          "durationMs": 79
+        },
+        {
+          "command": "npm test",
+          "exit": 0,
+          "durationMs": 240
+        }
+      ],
+      "advisory": {
+        "version": 1,
+        "status": "attached_to_receipt",
+        "baselineSnapshot": "0bfb43e4b8bb601611b133940f64c40296f31bacc40dbe81feb8b18e8266f409",
+        "considered": 5,
+        "reasons": {
+          "already_attached": 4
+        },
+        "attachedBlocks": 1,
+        "addedBytes": 572,
+        "classificationMs": 0.9483769999997094,
+        "candidate": {
+          "callID": "fixture-6",
+          "baselineSnapshot": "0bfb43e4b8bb601611b133940f64c40296f31bacc40dbe81feb8b18e8266f409",
+          "snapshot": "3d7ea0589f8bf605974556868ba7389245c49d42a11868ac0d1588863e32d533",
+          "scope": "spec: new inspect"
+        },
+        "reason": "already_attached"
+      },
+      "portable": {
+        "exit": 0,
+        "durationMs": 132,
+        "patchSha256": "6484ed760ed5131736d51f899d649f27ac30a7addd3e2d85651308ed3a2e754e",
+        "bytesAndModes": true
+      },
+      "originalCheckoutAndIndexUnchanged": true
+    },
+    {
+      "mode": "off",
+      "installed": {
+        "native-task-plugin.mjs": "b36b42d827454ee8121eb08c075699107259b33836b8285374b5bef02ee57740",
+        "native-task-observations.mjs": "31c5338a74cb958fe2a0532dbc81a8822084aadb8068aca44405c6bc92a42eae",
+        "native-preservation-nudge.mjs": "cf31c844bd4229d09e8bb053f439e7a5961f8caef01ee79c9d8363f428a19371"
+      },
+      "requests": 13,
+      "requestEvidence": [
+        {
+          "kind": "feature-receipt",
+          "request": 7,
+          "sha256": "f0e2aa622012dae65d4493c2f510440e488256cc9645ed8265f2cde29ec445d5",
+          "advisoryInLastTool": false
+        },
+        {
+          "kind": "existing-check-receipt",
+          "request": 8,
+          "sha256": "e5ff4862d15236cc42cfff42551c06ee66015c0a4778596957d8c8fa4402ef23",
+          "failureInLastTool": true
+        }
+      ],
+      "received": false,
+      "receivedFailure": true,
+      "status": "incomplete",
+      "checks": [
+        {
+          "command": "node --test test/feature.test.js",
+          "exit": 0,
+          "durationMs": 147
+        },
+        {
+          "command": "node --test test/old.test.js",
+          "exit": 1,
+          "durationMs": 81
+        },
+        {
+          "command": "node --test test/feature.test.js",
+          "exit": 0,
+          "durationMs": 79
+        },
+        {
+          "command": "node --test test/old.test.js",
+          "exit": 0,
+          "durationMs": 80
+        },
+        {
+          "command": "npm test",
+          "exit": 0,
+          "durationMs": 245
+        }
+      ],
+      "advisory": null,
+      "portable": {
+        "exit": 0,
+        "durationMs": 133,
+        "patchSha256": "68aaf2ea24f8859697593e5299551a93877117423f88d9ced862de1ac02668b7",
+        "bytesAndModes": true
+      },
+      "originalCheckoutAndIndexUnchanged": true
+    },
+    {
+      "mode": "irrelevant",
+      "installed": {
+        "native-task-plugin.mjs": "b36b42d827454ee8121eb08c075699107259b33836b8285374b5bef02ee57740",
+        "native-task-observations.mjs": "31c5338a74cb958fe2a0532dbc81a8822084aadb8068aca44405c6bc92a42eae",
+        "native-preservation-nudge.mjs": "cf31c844bd4229d09e8bb053f439e7a5961f8caef01ee79c9d8363f428a19371"
+      },
+      "requests": 9,
+      "requestEvidence": [
+        {
+          "kind": "feature-receipt",
+          "request": 7,
+          "sha256": "5c113b87c661228f98cdba66e1a83d284c0ba67f029d9c9629d8b84007a771a6",
+          "advisoryInLastTool": true
+        },
+        {
+          "kind": "existing-check-receipt",
+          "request": 8,
+          "sha256": "fef0a11b769dea7eb19de31d468affd667ce28864be3654876d16b51aa0ddccc",
+          "failureInLastTool": false
+        }
+      ],
+      "received": true,
+      "receivedFailure": false,
+      "status": "incomplete",
+      "checks": [
+        {
+          "command": "node --test test/feature.test.js",
+          "exit": 0,
+          "durationMs": 158
+        },
+        {
+          "command": "node --test test/unrelated.test.js",
+          "exit": 0,
+          "durationMs": 79
+        }
+      ],
+      "advisory": {
+        "version": 1,
+        "status": "attached_to_receipt",
+        "baselineSnapshot": "38d529c526d594122d576384045ac351996773f064a10eadd05d2b8334b1cb8f",
+        "considered": 2,
+        "reasons": {
+          "already_attached": 1
+        },
+        "attachedBlocks": 1,
+        "addedBytes": 571,
+        "classificationMs": 0.9463759999998729,
+        "candidate": {
+          "callID": "fixture-6",
+          "baselineSnapshot": "38d529c526d594122d576384045ac351996773f064a10eadd05d2b8334b1cb8f",
+          "snapshot": "137cdb9e32ab4840711a5bb458ecf350007ef47ea271c6d5f75dc190cede961e",
+          "scope": "test: new double"
+        },
+        "reason": "already_attached"
+      },
+      "portable": {
+        "exit": 1,
+        "durationMs": 207,
+        "patchSha256": "f742d7c4f2aef6f905045ad624b3a237ae09fb0e278f989e4cbe8b3c8949f3f1",
+        "bytesAndModes": true
+      },
+      "originalCheckoutAndIndexUnchanged": true
+    }
+  ]
+}
