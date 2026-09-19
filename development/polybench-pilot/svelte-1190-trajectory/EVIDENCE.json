@@ -1,0 +1,1327 @@
+{
+  "scope": "sveltejs__svelte-1190/H1; saved evidence only",
+  "start_commit": "2ac25116ec2d16d4c73eb0c3c6749a2ab588149b",
+  "output_commit": "9317ccc9e2e3af6cfe7e876acd4541f3e7445f3b",
+  "runtime_commit": "e18db1fe10223db52dcc05b3e769bca140367c2b",
+  "slot": 16,
+  "author_session": {
+    "id": "ses_f507a1021ffetowBTWnB1NuRzt",
+    "parent_id": "ses_f507a545dffenRPbsUH40ovcLn",
+    "directory": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+    "agent": "build",
+    "model": "{\"id\":\"gpt-5.6-luna\",\"providerID\":\"openai\",\"variant\":\"high\"}",
+    "tokens_input": 468178,
+    "tokens_output": 14632,
+    "tokens_reasoning": 12664,
+    "tokens_cache_read": 8727040,
+    "tokens_cache_write": 0
+  },
+  "parent_session": "ses_f507a545dffenRPbsUH40ovcLn",
+  "task_artifact_id": "900b7402-f2bb-413c-b78f-531cbd7efe22",
+  "session_first_messages": [
+    {
+      "session_id": "ses_f507a545dffenRPbsUH40ovcLn",
+      "message_id": "msg_0af85adf1001mEcAlLB4ViedmP",
+      "created_ms": 1789651168754
+    },
+    {
+      "session_id": "ses_f507a1021ffetowBTWnB1NuRzt",
+      "message_id": "msg_0af85eff2001yQk35CH5NCemrO",
+      "created_ms": 1789651185650
+    }
+  ],
+  "clock": {
+    "slot_started_at": "2026-09-17T13:19:19.850Z",
+    "budget_start_ms_derived": 1789651166764,
+    "deadline_ms_derived": 1789652966764,
+    "method": "intersection of [at+maxDurationMs, forwardedAt+maxDurationMs] for all 67 scheduler records; budget=1800s",
+    "precision_limit": "same-host wall timestamps, not an independent measurement of process instruction times"
+  },
+  "baseline": {
+    "upstream_commit": "0c3e44ac05c651c12c94e047bf712cb86278d345",
+    "prepared_commit": "47a9c5cd79f23b6bbf25ba566194735a195ae8a7",
+    "initial_snapshot": "c7eb45a371af5bc3419aff44b1a593009d2f621e27931a620086f7281a41855d",
+    "archive_sha256": "45634ea516ebfb4ebeaf1fc5e963342d6c3b19aa6ba4181ab5436fb2b718b2f8",
+    "files": [
+      {
+        "path": "src/generators/nodes/Element.ts",
+        "baseline_sha256": "51e692d3b647be2451fd9fc1d0d23a36d83b7340a66f775d4553f40b3f11f016",
+        "baseline_blob_sha1": "2a75f1fc36452b89941e4755b1bd475972132496",
+        "delivery_unchanged": false
+      },
+      {
+        "path": "test/runtime/samples/event-handler-event-methods/main.html",
+        "baseline_sha256": "a7358b74f686fe61465a865ec2084749e134cc98a9eb2cee060b7bde2f9bf707",
+        "baseline_blob_sha1": "0aa130e4496f02afe893368a7222a827affbb96d",
+        "delivery_unchanged": true
+      },
+      {
+        "path": "test/runtime/samples/event-handler-event-methods/_config.js",
+        "baseline_sha256": "904e502ba99d31eccbbb99a1360381433b1f4720608a5e6fb22da4156c702f64",
+        "baseline_blob_sha1": "8b701e9825c585b015dc6a849f0fd84e5d90fcb6",
+        "delivery_unchanged": true
+      },
+      {
+        "path": "package.json",
+        "baseline_sha256": "68c157e3d08190b151027775fb8b57a00b6ec81d2be3c2056335d00b498b0f90",
+        "baseline_blob_sha1": "78cd37d6e6e9a099479783a3edbb3540563786a8",
+        "delivery_unchanged": true
+      },
+      {
+        "path": "test/test.js",
+        "baseline_sha256": "fe01b7dcf38f1318d2084603ed01db00866d92e693bb077ee7b83bb02d99ba0b",
+        "baseline_blob_sha1": "b501fd81a03c801f7c4737bb1d41b498374b8643",
+        "delivery_unchanged": true
+      },
+      {
+        "path": "test/setup.js",
+        "baseline_sha256": "38df04c18c584a66aa677b247a8ad5ebab0273dcab0f39ef1bd3b93d7e01440c",
+        "baseline_blob_sha1": "8307fdd67fbb97cc32641eee821a295252af38b3",
+        "delivery_unchanged": true
+      },
+      {
+        "path": "test/helpers.js",
+        "baseline_sha256": "fa717d3a886088933971ae066b29c58e1c9359698c41b9ed08ead3ef5f6c0fc2",
+        "baseline_blob_sha1": "caf78894ce86b34bdf1335128350f4e3b22b3902",
+        "delivery_unchanged": true
+      },
+      {
+        "path": "test/runtime/index.js",
+        "baseline_sha256": "059ae893cec7402acbce931631482c08ecae7f3c411bed591d1ec89cbab890a2",
+        "baseline_blob_sha1": "aaafaff21b2c58696b35f3880ca5c06f9c71446b",
+        "delivery_unchanged": true
+      },
+      {
+        "path": "test/server-side-rendering/index.js",
+        "baseline_sha256": "d4afa3608f5ae82f9cc2df998e29f6b79418e18ef9e03e86539a86d0e9181dfa",
+        "baseline_blob_sha1": "019c452c2fce18d99e3aed2fc5b1b7a5ade5cf19",
+        "delivery_unchanged": true
+      },
+      {
+        "path": "mocha.opts",
+        "baseline_sha256": "a561630bb56b82342bc66697aee2ad96efddcbc9d150665abd6fb7ecb7c0ab2f",
+        "baseline_blob_sha1": "427b029758d3546fad631f6bb7f6de59c9c9f181",
+        "delivery_unchanged": true
+      },
+      {
+        "path": "rollup.config.js",
+        "baseline_sha256": "f18e14d5266f1eb31f914344f4acf906540f780fb370581ac2b1da5d0f2660c8",
+        "baseline_blob_sha1": "1f10cb6a0c097ac12a8584566206ad3303f4203a",
+        "delivery_unchanged": true
+      }
+    ],
+    "package_scripts": {
+      "test": "mocha --opts mocha.opts",
+      "quicktest": "mocha --opts mocha.opts",
+      "precoverage": "export COVERAGE=true && nyc mocha --opts mocha.coverage.opts",
+      "coverage": "nyc report --reporter=text-lcov > coverage.lcov",
+      "codecov": "codecov",
+      "precodecov": "npm run coverage",
+      "lint": "eslint src test/*.js",
+      "build": "node src/shared/_build.js && rollup -c && rollup -c rollup.store.config.js",
+      "prepare": "npm run build",
+      "dev": "node src/shared/_build.js && rollup -c -w",
+      "pretest": "npm run build",
+      "prepublishOnly": "npm run lint && npm test",
+      "prettier": "prettier --write \"src/**/*.ts\""
+    }
+  },
+  "element_edits": [
+    {
+      "event_index": 87,
+      "call_id": "call_roeHeQjDr2CfSEbO1ulmA7QD",
+      "start_ms": 1789651864232,
+      "end_ms": 1789651866262,
+      "relative_start_s": 697.468,
+      "remaining_at_end_s": 1100.502,
+      "edit_receipt_first_request": 24,
+      "recorded_before_snapshot": "42d06603b5261aa9552c47035f4241cbc56e30c88707b2e1a052a87b9aff9c5e",
+      "recorded_after_snapshot": "8929ba337c492d3d95e5548f18cbe7090d69336df24cf65dcb234ad3fc7311ad",
+      "reconstructed_element_before_sha256": "51e692d3b647be2451fd9fc1d0d23a36d83b7340a66f775d4553f40b3f11f016",
+      "reconstructed_element_after_sha256": "9cc5dbc3aa5f5033b1a9f5232e1afa5a0c62dc9746f7cb7d5f1d8a61b139d8b9",
+      "unconditional_class_skip": true
+    },
+    {
+      "event_index": 88,
+      "call_id": "call_mTq3cPqzeNqrqqWt157WSikT",
+      "start_ms": 1789651895652,
+      "end_ms": 1789651897652,
+      "relative_start_s": 728.888,
+      "remaining_at_end_s": 1069.112,
+      "edit_receipt_first_request": 25,
+      "recorded_before_snapshot": "8929ba337c492d3d95e5548f18cbe7090d69336df24cf65dcb234ad3fc7311ad",
+      "recorded_after_snapshot": "926dcec910d6aa06ccd7d6b3f637693d3a56e203dbc44f6cb1fa0b4810c64d49",
+      "reconstructed_element_before_sha256": "9cc5dbc3aa5f5033b1a9f5232e1afa5a0c62dc9746f7cb7d5f1d8a61b139d8b9",
+      "reconstructed_element_after_sha256": "70f0684c9c2e799104bc0ce88a82b0c6c70bfd793f17883985957af3b253b764",
+      "unconditional_class_skip": true
+    },
+    {
+      "event_index": 90,
+      "call_id": "call_4jPUyN7mKubAnwtQJvJOA0ZB",
+      "start_ms": 1789651923062,
+      "end_ms": 1789651925112,
+      "relative_start_s": 756.298,
+      "remaining_at_end_s": 1041.652,
+      "edit_receipt_first_request": 27,
+      "recorded_before_snapshot": "926dcec910d6aa06ccd7d6b3f637693d3a56e203dbc44f6cb1fa0b4810c64d49",
+      "recorded_after_snapshot": "6cda2ed0e7620d6cb8d60165d15a911f4a75fa73bb727052a43d412ca494261e",
+      "reconstructed_element_before_sha256": "70f0684c9c2e799104bc0ce88a82b0c6c70bfd793f17883985957af3b253b764",
+      "reconstructed_element_after_sha256": "6dadcc4948cc4023ae6f40ad65f8939c73c9c03ca9e37f54089885b6e0f2d16e",
+      "unconditional_class_skip": true
+    },
+    {
+      "event_index": 133,
+      "call_id": "call_uIvSsilHkEPiLxSzm7ORzaCn",
+      "start_ms": 1789652483325,
+      "end_ms": 1789652485349,
+      "relative_start_s": 1316.561,
+      "remaining_at_end_s": 481.415,
+      "edit_receipt_first_request": 46,
+      "recorded_before_snapshot": "356e16cc157a8fecd49111063ca9e63e586ba10d359ed62b7e432ef99909b5c1",
+      "recorded_after_snapshot": "498e3157ddde7b6d475d5cda0f06384f39c92592cbe80de16254f121561c5d50",
+      "reconstructed_element_before_sha256": "6dadcc4948cc4023ae6f40ad65f8939c73c9c03ca9e37f54089885b6e0f2d16e",
+      "reconstructed_element_after_sha256": "740ad977c1dba8e4e9f4fd3e34c867241a32d7a14b6b2da3608a4ff0d274e7dd",
+      "unconditional_class_skip": true
+    }
+  ],
+  "element_final_sha256": "740ad977c1dba8e4e9f4fd3e34c867241a32d7a14b6b2da3608a4ff0d274e7dd",
+  "element_final_blob_sha1": "02db26fe820dbc9f3e72559527e69947b1ef195f",
+  "checks": [
+    {
+      "event_index": 77,
+      "call_id": "call_8vXSRVbCCKxElYk37IBy8eey",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep 'css|omit-scoping-attribute-class-dynamic'",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789651680067,
+      "end_ms": 1789651709830,
+      "relative_start_s": 513.303,
+      "relative_end_s": 543.066,
+      "remaining_at_end_s": 1256.934,
+      "before": "c7eb45a371af5bc3419aff44b1a593009d2f621e27931a620086f7281a41855d",
+      "after": "c7eb45a371af5bc3419aff44b1a593009d2f621e27931a620086f7281a41855d",
+      "exit": 1,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "78 passing",
+        "1 failing"
+      ],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "824cfc198a2d3c14d4f8b3d6253bf3407f6a8c69aa4f84864aa20378896bf11f",
+      "first_request": 19,
+      "request_at": "2026-09-17T13:28:30.466Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 79,
+      "call_id": "call_TdDDX4JfckyUjt59ENqi2FVY",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep 'css-scoping-class'",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789651735678,
+      "end_ms": 1789651753951,
+      "relative_start_s": 568.914,
+      "relative_end_s": 587.187,
+      "remaining_at_end_s": 1212.813,
+      "before": "42d06603b5261aa9552c47035f4241cbc56e30c88707b2e1a052a87b9aff9c5e",
+      "after": "42d06603b5261aa9552c47035f4241cbc56e30c88707b2e1a052a87b9aff9c5e",
+      "exit": 3,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "1 passing",
+        "3 failing"
+      ],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "015f5240d4f2fab9ee4ac0a461a87d0128ed2da6dff51aab94210515c11b1228",
+      "first_request": 21,
+      "request_at": "2026-09-17T13:29:14.473Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 91,
+      "call_id": "call_vG5rADJ8E8PPQ33e19xa0rT6",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep 'css-scoping-class'",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789651930974,
+      "end_ms": 1789651949882,
+      "relative_start_s": 764.21,
+      "relative_end_s": 783.118,
+      "remaining_at_end_s": 1016.882,
+      "before": "6cda2ed0e7620d6cb8d60165d15a911f4a75fa73bb727052a43d412ca494261e",
+      "after": "6cda2ed0e7620d6cb8d60165d15a911f4a75fa73bb727052a43d412ca494261e",
+      "exit": 0,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "4 passing"
+      ],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "0fc0e7581fe150903ee6308d7edb37414f56738d6aa9fd61a3d00e43544e2eee",
+      "first_request": 28,
+      "request_at": "2026-09-17T13:32:30.390Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 92,
+      "call_id": "call_nXNorgNfMW2SGcgtA58pKmfz",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep '^css$'",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789651960219,
+      "end_ms": 1789651978662,
+      "relative_start_s": 793.455,
+      "relative_end_s": 811.898,
+      "remaining_at_end_s": 988.102,
+      "before": "6cda2ed0e7620d6cb8d60165d15a911f4a75fa73bb727052a43d412ca494261e",
+      "after": "6cda2ed0e7620d6cb8d60165d15a911f4a75fa73bb727052a43d412ca494261e",
+      "exit": 0,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "0 passing"
+      ],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "596ac7805c7bb093f465fa0dc3b521f8572511a1ae34f6451a883ca477d10cf5",
+      "first_request": 29,
+      "request_at": "2026-09-17T13:32:59.185Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 93,
+      "call_id": "call_ADxB6C47kbNkWqhnreijIlhz",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep 'css '",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789651991666,
+      "end_ms": 1789652001293,
+      "relative_start_s": 824.902,
+      "relative_end_s": 834.529,
+      "remaining_at_end_s": 965.471,
+      "before": "6cda2ed0e7620d6cb8d60165d15a911f4a75fa73bb727052a43d412ca494261e",
+      "after": "6cda2ed0e7620d6cb8d60165d15a911f4a75fa73bb727052a43d412ca494261e",
+      "exit": 44,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "8 passing",
+        "44 failing"
+      ],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "f725e91d7bae958eab81bc6728b70924de5153d7d4139eea24f67953f736f9ba",
+      "first_request": 30,
+      "request_at": "2026-09-17T13:33:21.854Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 106,
+      "call_id": "call_lzCGsguvSWef0u2Tl8Qx7Uak",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep 'css '",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789652164511,
+      "end_ms": 1789652173670,
+      "relative_start_s": 997.747,
+      "relative_end_s": 1006.906,
+      "remaining_at_end_s": 793.094,
+      "before": "898057eadf8d14698ca60aaee145e9723c7cc0cecd2d2ea98abf819fd5f83aff",
+      "after": "898057eadf8d14698ca60aaee145e9723c7cc0cecd2d2ea98abf819fd5f83aff",
+      "exit": 44,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "8 passing",
+        "44 failing"
+      ],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "493981c427db2c68f59dc8f69fcc0dfddd7ab1a2001a987b357097230774ac31",
+      "first_request": 34,
+      "request_at": "2026-09-17T13:36:14.211Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 108,
+      "call_id": "call_dgbV7vhgndZDlDBXNfvo6KVY",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep 'css '",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789652204184,
+      "end_ms": 1789652213462,
+      "relative_start_s": 1037.42,
+      "relative_end_s": 1046.698,
+      "remaining_at_end_s": 753.302,
+      "before": "192fa758b0efa06f2a3444c0abb443867e9d760756663cb30e7af52a71d11dce",
+      "after": "192fa758b0efa06f2a3444c0abb443867e9d760756663cb30e7af52a71d11dce",
+      "exit": 28,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "24 passing",
+        "28 failing"
+      ],
+      "truncated": true,
+      "full_output_path": "/work/data/opencode/tool-output/tool_0af9594320018xM4FhnMMQuZ7I",
+      "output_sha256": "bd4b2dc345b74363e0cd982079c61562cd606b7c4f52a4ffa84de6b7dd195b6a",
+      "first_request": 36,
+      "request_at": "2026-09-17T13:36:54.049Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 111,
+      "call_id": "call_VtrwS4Q2DnmZ04fyircY3VrD",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep 'css '",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789652280106,
+      "end_ms": 1789652289300,
+      "relative_start_s": 1113.342,
+      "relative_end_s": 1122.536,
+      "remaining_at_end_s": 677.464,
+      "before": "b397d2a85c7bf02835e3947b7af7f79c947036248b68ef9f3b124c6baa756299",
+      "after": "b397d2a85c7bf02835e3947b7af7f79c947036248b68ef9f3b124c6baa756299",
+      "exit": 0,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "52 passing"
+      ],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "8efc2ed9ef6595d247da1f4977f6cb7248ca237adb6cdedba3d64c150ca63530",
+      "first_request": 39,
+      "request_at": "2026-09-17T13:38:09.902Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 117,
+      "call_id": "call_WqPYoiS4tL1jTtCOIlVCq5O5",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep 'js (collapses|css-media-query)'",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789652334790,
+      "end_ms": 1789652342796,
+      "relative_start_s": 1168.026,
+      "relative_end_s": 1176.032,
+      "remaining_at_end_s": 623.968,
+      "before": "b397d2a85c7bf02835e3947b7af7f79c947036248b68ef9f3b124c6baa756299",
+      "after": "b397d2a85c7bf02835e3947b7af7f79c947036248b68ef9f3b124c6baa756299",
+      "exit": 2,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "0 passing",
+        "2 failing"
+      ],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "04f8fa157290bcbcae9995ea78ae056d9665f032690d3568932b8b9590739731",
+      "first_request": 41,
+      "request_at": "2026-09-17T13:39:03.330Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 137,
+      "call_id": "call_S0OQ03JmoK2Zj2R7Wrv8ZRuD",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep 'js (collapses|css-media-query)'",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789652525630,
+      "end_ms": 1789652533598,
+      "relative_start_s": 1358.866,
+      "relative_end_s": 1366.834,
+      "remaining_at_end_s": 433.166,
+      "before": "099183c53d29bc5295b5655619d54173d538c04c1f936d3d0ca9fcede00d242d",
+      "after": "099183c53d29bc5295b5655619d54173d538c04c1f936d3d0ca9fcede00d242d",
+      "exit": 2,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "0 passing",
+        "2 failing"
+      ],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "94a162f1148b1e771f11268a3b3e66b9ff086ed0369776aa6de69a3990ef8a01",
+      "first_request": 50,
+      "request_at": "2026-09-17T13:42:14.144Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 143,
+      "call_id": "call_YHkX91cg0aie2iJY6hZoZVNE",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep 'js (collapses|css-media-query)'",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789652579319,
+      "end_ms": 1789652587298,
+      "relative_start_s": 1412.555,
+      "relative_end_s": 1420.534,
+      "remaining_at_end_s": 379.466,
+      "before": "ebf96478ec0caa0d506a6acd1cd8474994870c87f92d2128f09adba74af6b79d",
+      "after": "ebf96478ec0caa0d506a6acd1cd8474994870c87f92d2128f09adba74af6b79d",
+      "exit": 0,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "2 passing"
+      ],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "a256d395929a72a0a8ad44f23834c4714849e74c4fc36d3b510c9ce3f5683cb7",
+      "first_request": 53,
+      "request_at": "2026-09-17T13:43:07.849Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 144,
+      "call_id": "call_8jE7RPZLwkVAHpuNoiYijuLu",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep 'sourcemaps (css|css-cascade-false)'",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789652596849,
+      "end_ms": 1789652604791,
+      "relative_start_s": 1430.085,
+      "relative_end_s": 1438.027,
+      "remaining_at_end_s": 361.973,
+      "before": "ebf96478ec0caa0d506a6acd1cd8474994870c87f92d2128f09adba74af6b79d",
+      "after": "278248b218f17814f31796bcc562b051cc528cb48609c810433f5178ea553c36",
+      "exit": 0,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "2 passing"
+      ],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "e9557a36749460e8b6a49ca15fb06b50156ce4a388c43b800c96bc703b7df502",
+      "first_request": 54,
+      "request_at": "2026-09-17T13:43:25.527Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 155,
+      "call_id": "call_hJhuBibMQDD7PI65DWIhyUh3",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep 'css-scoping-class'",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789652754329,
+      "end_ms": 1789652773636,
+      "relative_start_s": 1587.565,
+      "relative_end_s": 1606.872,
+      "remaining_at_end_s": 193.128,
+      "before": "278248b218f17814f31796bcc562b051cc528cb48609c810433f5178ea553c36",
+      "after": "278248b218f17814f31796bcc562b051cc528cb48609c810433f5178ea553c36",
+      "exit": 0,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "4 passing"
+      ],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "e35c031103ba8a61b58e3c7aee09b411cfaf6c29c6ceefd5a74239682ae11c45",
+      "first_request": 60,
+      "request_at": "2026-09-17T13:46:14.223Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 156,
+      "call_id": "call_Qz3jxiTQeciHBQGXGL7g81t3",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep 'css '",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789652783041,
+      "end_ms": 1789652792133,
+      "relative_start_s": 1616.277,
+      "relative_end_s": 1625.369,
+      "remaining_at_end_s": 174.631,
+      "before": "278248b218f17814f31796bcc562b051cc528cb48609c810433f5178ea553c36",
+      "after": "278248b218f17814f31796bcc562b051cc528cb48609c810433f5178ea553c36",
+      "exit": 0,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "52 passing"
+      ],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "09e47fb36d48d2d963ecf41540a08cf5bfa4991a5118ea405a2cc39e4b41dcc0",
+      "first_request": 61,
+      "request_at": "2026-09-17T13:46:32.690Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 157,
+      "call_id": "call_dU9Nr9HlisaWGHTcfyFF7TgZ",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep 'ssr '",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789652807218,
+      "end_ms": 1789652815979,
+      "relative_start_s": 1640.454,
+      "relative_end_s": 1649.215,
+      "remaining_at_end_s": 150.785,
+      "before": "278248b218f17814f31796bcc562b051cc528cb48609c810433f5178ea553c36",
+      "after": "278248b218f17814f31796bcc562b051cc528cb48609c810433f5178ea553c36",
+      "exit": 2,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "338 passing",
+        "10 pending",
+        "2 failing"
+      ],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "9e12c676becb1b93aab3c1447fd145cc9801b91abd589818659c779ab383e16a",
+      "first_request": 62,
+      "request_at": "2026-09-17T13:46:56.624Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 159,
+      "call_id": "call_P3Z43ZPd8wOJ2cGkCydHqVGV",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep 'ssr '",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789652835413,
+      "end_ms": 1789652843966,
+      "relative_start_s": 1668.649,
+      "relative_end_s": 1677.202,
+      "remaining_at_end_s": 122.798,
+      "before": "ecf2a0f6cb660c50dbba97c09c255b6154ce2c539f47732bce9b8d97bc4ccd29",
+      "after": "ecf2a0f6cb660c50dbba97c09c255b6154ce2c539f47732bce9b8d97bc4ccd29",
+      "exit": 0,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "340 passing",
+        "10 pending"
+      ],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "e18b9fbd3c0d5a3de809fad778c413444eed49c6211e21924077144ffb3dafc9",
+      "first_request": 64,
+      "request_at": "2026-09-17T13:47:24.613Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 160,
+      "call_id": "call_hfMR4jKSXaA3ZEj1WCjFrFCB",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^js '",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789652860831,
+      "end_ms": 1789652870244,
+      "relative_start_s": 1694.067,
+      "relative_end_s": 1703.48,
+      "remaining_at_end_s": 96.52,
+      "before": "ecf2a0f6cb660c50dbba97c09c255b6154ce2c539f47732bce9b8d97bc4ccd29",
+      "after": "ecf2a0f6cb660c50dbba97c09c255b6154ce2c539f47732bce9b8d97bc4ccd29",
+      "exit": 0,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "33 passing"
+      ],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "5f55345e8ef30d82bcafde1a5c0312368a15ffd2b3182072ef546ff7e839c94c",
+      "first_request": 65,
+      "request_at": "2026-09-17T13:47:50.772Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 161,
+      "call_id": "call_UxjR6gdsxrheNF2hgd11Lmed",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^sourcemaps '",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789652877251,
+      "end_ms": 1789652884729,
+      "relative_start_s": 1710.487,
+      "relative_end_s": 1717.965,
+      "remaining_at_end_s": 82.035,
+      "before": "ecf2a0f6cb660c50dbba97c09c255b6154ce2c539f47732bce9b8d97bc4ccd29",
+      "after": "ecf2a0f6cb660c50dbba97c09c255b6154ce2c539f47732bce9b8d97bc4ccd29",
+      "exit": 0,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [
+        "8 passing"
+      ],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "d4b43204c9ae1ccb1e5cfcbc5e47b6e83b79095f78cdbe0929cf3bb62a514839",
+      "first_request": 66,
+      "request_at": "2026-09-17T13:48:05.392Z",
+      "target_runtime_failure_in_delivered_output": false
+    },
+    {
+      "event_index": 162,
+      "call_id": "call_AhQhCjXsseH7osDGBiec6dDR",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm run lint",
+      "cwd": "/work/repo/.git/harness-task/900b7402-f2bb-413c-b78f-531cbd7efe22/worktree",
+      "timeout_ms": 120000,
+      "start_ms": 1789652891262,
+      "end_ms": 1789652898891,
+      "relative_start_s": 1724.498,
+      "relative_end_s": 1732.127,
+      "remaining_at_end_s": 67.873,
+      "before": "ecf2a0f6cb660c50dbba97c09c255b6154ce2c539f47732bce9b8d97bc4ccd29",
+      "after": "ecf2a0f6cb660c50dbba97c09c255b6154ce2c539f47732bce9b8d97bc4ccd29",
+      "exit": 0,
+      "signal": null,
+      "timeout_observation": null,
+      "state": "completed",
+      "counts": [],
+      "truncated": false,
+      "full_output_path": null,
+      "output_sha256": "b538fa37566d4aad3087884d10cd206fe08642bd560269cfc61a12407be79a1f",
+      "first_request": 67,
+      "request_at": "2026-09-17T13:48:19.429Z",
+      "target_runtime_failure_in_delivered_output": false
+    }
+  ],
+  "bash_noncheck_commands": [
+    {
+      "event_index": 29,
+      "call_id": "call_I38pVJMQkPEBHcDdBdiJV1rH",
+      "command": "git log --oneline --all --decorate -12",
+      "before": "c7eb45a371af5bc3419aff44b1a593009d2f621e27931a620086f7281a41855d",
+      "after": "c7eb45a371af5bc3419aff44b1a593009d2f621e27931a620086f7281a41855d"
+    },
+    {
+      "event_index": 30,
+      "call_id": "call_ujzyvtMhtVx0o3CZjgaJH5T5",
+      "command": "git status --short",
+      "before": "c7eb45a371af5bc3419aff44b1a593009d2f621e27931a620086f7281a41855d",
+      "after": "c7eb45a371af5bc3419aff44b1a593009d2f621e27931a620086f7281a41855d"
+    },
+    {
+      "event_index": 46,
+      "call_id": "call_HyAsSO1Qy8UQX591CNYA93tk",
+      "command": "git fsck --no-reflogs --unreachable",
+      "before": "c7eb45a371af5bc3419aff44b1a593009d2f621e27931a620086f7281a41855d",
+      "after": "c7eb45a371af5bc3419aff44b1a593009d2f621e27931a620086f7281a41855d"
+    },
+    {
+      "event_index": 56,
+      "call_id": "call_MrNHC4mXrKC6Y3r8fYOJh8IY",
+      "command": "git remote -v",
+      "before": "c7eb45a371af5bc3419aff44b1a593009d2f621e27931a620086f7281a41855d",
+      "after": "c7eb45a371af5bc3419aff44b1a593009d2f621e27931a620086f7281a41855d"
+    },
+    {
+      "event_index": 76,
+      "call_id": "call_8o5fvel6Iif2MoKtg0HTusmm",
+      "command": "ls",
+      "before": "c7eb45a371af5bc3419aff44b1a593009d2f621e27931a620086f7281a41855d",
+      "after": "c7eb45a371af5bc3419aff44b1a593009d2f621e27931a620086f7281a41855d"
+    },
+    {
+      "event_index": 107,
+      "call_id": "call_XBpXKZ7JfVqCr3ugo13BIaS4",
+      "command": "perl -pi -e 'chomp if eof' test/css/samples/*/expected.css",
+      "before": "898057eadf8d14698ca60aaee145e9723c7cc0cecd2d2ea98abf819fd5f83aff",
+      "after": "192fa758b0efa06f2a3444c0abb443867e9d760756663cb30e7af52a71d11dce"
+    },
+    {
+      "event_index": 110,
+      "call_id": "call_6a98S7CfaoUX83ZELqthoZ7g",
+      "command": "perl -pi -e 'chomp if eof' test/css/samples/*/expected.html",
+      "before": "dae069122aa633bda8efd90e63cbfafafa1d20a271fa8110f0eb2ba7f974b3a1",
+      "after": "b397d2a85c7bf02835e3947b7af7f79c947036248b68ef9f3b124c6baa756299"
+    },
+    {
+      "event_index": 141,
+      "call_id": "call_kdVdA2uf6oL9cwQAFYdZxwIR",
+      "command": "git status --short",
+      "before": "099183c53d29bc5295b5655619d54173d538c04c1f936d3d0ca9fcede00d242d",
+      "after": "099183c53d29bc5295b5655619d54173d538c04c1f936d3d0ca9fcede00d242d"
+    },
+    {
+      "event_index": 151,
+      "call_id": "call_N1iKnlTZO4M6Sm9zaw6VoBqu",
+      "command": "git status --short",
+      "before": "278248b218f17814f31796bcc562b051cc528cb48609c810433f5178ea553c36",
+      "after": "278248b218f17814f31796bcc562b051cc528cb48609c810433f5178ea553c36"
+    },
+    {
+      "event_index": 152,
+      "call_id": "call_1trtH4founQfvEKo4fOgyt3H",
+      "command": "git ls-files test/sourcemaps/samples/css/output.js test/sourcemaps/samples/css/output.css.map",
+      "before": "278248b218f17814f31796bcc562b051cc528cb48609c810433f5178ea553c36",
+      "after": "278248b218f17814f31796bcc562b051cc528cb48609c810433f5178ea553c36"
+    },
+    {
+      "event_index": 153,
+      "call_id": "call_fJ3cXCBNJgdgpTiuePojKl7B",
+      "command": "git diff -- src/css/Selector.ts src/css/Stylesheet.ts src/generators/dom/index.ts src/generators/nodes/Attribute.ts src/generators/nodes/Element.ts src/generators/server-side-rendering/visitors/Element.ts test/runtime/samples/css-scoping-class",
+      "before": "278248b218f17814f31796bcc562b051cc528cb48609c810433f5178ea553c36",
+      "after": "278248b218f17814f31796bcc562b051cc528cb48609c810433f5178ea553c36"
+    },
+    {
+      "event_index": 158,
+      "call_id": "call_xfoWJ3Xsv0CCQJF8VXleg9CI",
+      "command": "perl -pi -e 'chomp if eof' test/server-side-rendering/samples/*/_expected.css",
+      "before": "278248b218f17814f31796bcc562b051cc528cb48609c810433f5178ea553c36",
+      "after": "ecf2a0f6cb660c50dbba97c09c255b6154ce2c539f47732bce9b8d97bc4ccd29"
+    }
+  ],
+  "author_messages": [
+    {
+      "first_request": 4,
+      "text": "I’ll inspect the compiler, scoping tests, and project instructions first, then trace both static and dynamic class generation paths before editing. I’ll add a focused regression for class-based scoping, run it separately from preservation checks, and review the final diff."
+    },
+    {
+      "first_request": 8,
+      "text": "The scoping marker is currently emitted in four places: selector rewriting uses `[id]`, DOM/SSR static HTML emit an attribute, and runtime hydration calls `encapsulateStyles` to add it. Dynamic `class` is handled by the generic attribute renderer, so the change must preserve the scope token when that renderer updates `className`. I’m checking runtime helpers and sample expectations now to identify the smallest compatible hook."
+    },
+    {
+      "first_request": 19,
+      "text": "The required observable change is compiler output, not merely internal metadata: scoped selectors must become `.svelte-*`, rendered elements must carry that class in DOM and SSR, and a later dynamic `class` update must retain it. Existing CSS fixtures assert the old public output, while the runtime harness can verify the state transition after `component.set`; I’ll establish the baseline targeted suite before editing so the new regression is demonstrably sensitive to the old behavior."
+    },
+    {
+      "first_request": 20,
+      "text": "The baseline targeted checks pass all existing CSS, runtime, SSR, and parser scoping scenarios; the only failure is the pre-existing Nightmare custom-element timeout. I’m adding a runtime regression that captures the actual rendered element before and after `component.set`, because a compile-only assertion would not prove the scope class survives a real dynamic class update."
+    },
+    {
+      "first_request": 24,
+      "text": "The regression fails on the baseline exactly where expected: the rendered paragraph has the old `svelte-*` attribute, so no scope class is found, and the generated update would overwrite any manually added class marker. I’ll now switch selector rewriting and HTML emission to class selectors, add the marker through `classList` when no class attribute exists, and prefix static/dynamic `className` assignments when one does."
+    },
+    {
+      "first_request": 27,
+      "text": "The production change is in place. One implementation detail is intentionally split: elements without a user `class` get the scope via the existing hydration hook, while elements with `class` receive the scope in both initial and update assignments so updates cannot erase it. I also corrected the optimized static HTML path to merge the scope and user class into one attribute rather than emitting duplicate `class` attributes."
+    },
+    {
+      "first_request": 41,
+      "text": "All CSS compiler fixtures now pass the new selector and DOM/SSR HTML expectations. The remaining repository assertions are generated snapshots for JS bundles, SSR fixtures, and sourcemaps that embed the old marker form; I’m updating those through their existing test-generation paths, then I’ll run the preservation suites separately."
+    },
+    {
+      "first_request": 50,
+      "text": "The class-based CSS suite passes all 52 targeted cases, including selector forms, cascade behavior, refs, static classes, dynamic classes, DOM, and SSR comparisons. I renamed the internal marker state to reflect its new meaning; before final verification I’m regenerating the two JS snapshots and sourcemap fixtures that encode compiler output, then I’ll rerun the focused regression and preservation suites from the final source."
+    },
+    {
+      "first_request": 59,
+      "text": "The generated output revealed one expected snapshot detail: bundle tests also retain helper functions that are now unused, so those stale `setAttribute` helper blocks were removed from the two affected expected bundles. Sourcemap tests regenerate successfully with class selectors and className initialization. I’m now running the final focused dynamic transition check, followed by independent preservation checks for CSS, SSR, JS snapshots, sourcemaps, and lint."
+    }
+  ],
+  "last_provider_items": [
+    {
+      "id": "msg_05c690f67368ef1b016aabefa97a0487d28045806d2a25d9c6",
+      "type": "message",
+      "status": "completed",
+      "content": [
+        {
+          "type": "output_text",
+          "annotations": [],
+          "logprobs": [],
+          "text": "Final focused checks are green: the new runtime scenario passes shared, hydration, and inline-helper modes; CSS has 52 passing cases; the SSR-inclusive preservation run has 340 passes and 10 expected pending; JS snapshots have 33 passes; sourcemaps have 8 passes; lint has no errors, only the repository’s existing ignored-file warnings. I’m running the complete project test command once to catch cross-suite regressions, then I’ll inspect status and diff scope."
+        }
+      ],
+      "phase": "commentary",
+      "role": "assistant"
+    },
+    {
+      "id": "fc_05c690f67368ef1b016aabefaca68887d2920642f777820f0e",
+      "type": "function_call",
+      "status": "completed",
+      "arguments": "{\"command\":\". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test\",\"workdir\":\".\",\"timeout\":120000}",
+      "call_id": "call_rfPz0xTerbbjnghLTUbg4GM5",
+      "name": "bash"
+    }
+  ],
+  "last_provider": {
+    "requestIndex": 67,
+    "at": "2026-09-17T13:48:19.429Z",
+    "forwardedAt": "2026-09-17T13:48:19.437Z",
+    "finishedAt": "2026-09-17T13:48:29.957Z",
+    "responseId": "resp_05c690f67368ef1b016aabefa3ee0087d29196fbbbdb50fc37",
+    "responseStatus": "completed",
+    "serverCompletion": "completed",
+    "clientDelivery": "stream-forwarded"
+  },
+  "unfinished_full_test": {
+    "call_id": "call_rfPz0xTerbbjnghLTUbg4GM5",
+    "session": "ses_f507a1021ffetowBTWnB1NuRzt",
+    "input": {
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test",
+      "workdir": ".",
+      "timeout": 120000
+    },
+    "state": "running",
+    "start_ms": 1789652911841,
+    "remaining_at_start_s": 54.923,
+    "exit": null,
+    "completed_at": null,
+    "delivered_in_next_request": false,
+    "native_partial_output_sha256": "de858091e3342cd226ea53b7ef86a58a905a8ade52d02852a6587a7dd9963737",
+    "native_partial_output_chars": 4593,
+    "native_partial_output_tail": "    ✓ unused-selector\n    ✓ unused-selector-leading\n    ✓ unused-selector-ternary\n\n  custom-elements\n    1) escaped-css\n    2) html\n    3) html-slots\n"
+  },
+  "stop": {
+    "exitCode": null,
+    "signal": "SIGKILL",
+    "termination": {
+      "terminationVerified": true,
+      "killed": [
+        103,
+        58707,
+        59228,
+        59229,
+        59236
+      ]
+    },
+    "timedOut": true,
+    "stopReason": {
+      "kind": "hard_deadline"
+    },
+    "researchBoundary": "not-reached",
+    "completedAt": 1789652966772,
+    "executionElapsedMs": 1799946,
+    "cleanupElapsedMs": 92,
+    "elapsedMs": 1800038,
+    "parseErrors": 0
+  },
+  "cleanup": {
+    "status": 0,
+    "stderr": "",
+    "containerStderr": ""
+  },
+  "stop_verification": {
+    "ownTaskDeadlineTriggered": true,
+    "terminationVerified": true,
+    "captureSaved": true,
+    "forwardingClosed": true,
+    "relayRemoved": true,
+    "activeProviderHandlers": 0,
+    "providerServerStateMayRemainUnknown": false
+  },
+  "comparison": [
+    {
+      "arm": "P",
+      "serializer_and_full_checks_only": [
+        {
+          "call_id": "call_m1nV2ClK2PlHNHjgVFmF80fR",
+          "time": {
+            "start": 1789653206129,
+            "end": 1789653206144
+          },
+          "patch_sha256": "8707b910fcab7efd57e88db81bc6064c59faf65ec1aaf18a86f12b17db89869e",
+          "adds_unconditional_skip": false
+        },
+        {
+          "call_id": "call_D5FkfnsnXp2KgoCfIa7j9Flo",
+          "time": {
+            "start": 1789653222863,
+            "end": 1789653222872
+          },
+          "patch_sha256": "ec658e24e44daaef44531fe54705be5977374c503881e070eb01ce11b6c7ec31",
+          "adds_unconditional_skip": false
+        },
+        {
+          "call_id": "call_9spkF0TjUVi2Q9Jfvqh77CHU",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^css'",
+          "time": {
+            "start": 1789653253695,
+            "end": 1789653260627
+          },
+          "state": "completed",
+          "exit": 44,
+          "first_request": "request-17.json",
+          "event_sample_lines": [],
+          "counts": [
+            "5 passing",
+            "44 failing"
+          ]
+        },
+        {
+          "call_id": "call_n9v5KcPEANysTjBhkBBHd78P",
+          "time": {
+            "start": 1789653658664,
+            "end": 1789653658669
+          },
+          "patch_sha256": "1967b023d8285de69197efe55afcafe60c52fdb2ce39fbaeae0f91da59f77e9b",
+          "adds_unconditional_skip": false
+        },
+        {
+          "call_id": "call_EssyYs6AnKZt6djkJETgK5eB",
+          "time": {
+            "start": 1789653684121,
+            "end": 1789653684130
+          },
+          "patch_sha256": "7d8df86181ace421c2b9d284e72f32c25748a459385f88844de11f522312cf74",
+          "adds_unconditional_skip": false
+        },
+        {
+          "call_id": "call_gGaGyzhZH1aTyGugPgI2fpnK",
+          "command": "npm run build >/dev/null && ./node_modules/.bin/mocha --opts mocha.opts --grep '^css'",
+          "time": {
+            "start": 1789653701747,
+            "end": 1789653716645
+          },
+          "state": "completed",
+          "exit": 0,
+          "first_request": "request-51.json",
+          "event_sample_lines": [],
+          "counts": [
+            "49 passing"
+          ]
+        },
+        {
+          "call_id": "call_xmK2NbwBJAHpWhp47V2JZWWG",
+          "command": "npm test",
+          "time": {
+            "start": 1789653729497,
+            "end": 1789653843039
+          },
+          "state": "completed",
+          "exit": 15,
+          "first_request": "request-53.json",
+          "event_sample_lines": [
+            "    ✓ event-handler-event-methods"
+          ],
+          "counts": [
+            "1662 passing",
+            "53 pending",
+            "15 failing"
+          ]
+        },
+        {
+          "call_id": "call_1q5oG3WqUxmULoWbE0d6Qn4t",
+          "time": {
+            "start": 1789654007865,
+            "end": 1789654007882
+          },
+          "patch_sha256": "20b1e01aacc3c709619b8d672efb2d41824a1e7e8a9e63065fc300606d390d69",
+          "adds_unconditional_skip": false
+        },
+        {
+          "call_id": "call_GwrMb2Fx7VDIaqhn1EbEjKg3",
+          "command": "npm test -- --grep '^(css|js|ssr)'",
+          "time": {
+            "start": 1789654088160,
+            "end": 1789654107371
+          },
+          "state": "completed",
+          "exit": 0,
+          "first_request": "request-71.json",
+          "event_sample_lines": [
+            "    ✓ event-handler-event-methods"
+          ],
+          "counts": [
+            "421 passing",
+            "10 pending"
+          ]
+        }
+      ],
+      "patch_sha256": "16187e0e46946257ab31de6e62ea5653068e3e6001c4d8c2dc0e9c001b99c6e9",
+      "unconditional_skip_in_patch": false
+    },
+    {
+      "arm": "H0",
+      "serializer_and_full_checks_only": [
+        {
+          "call_id": "call_feHaPQH8E9508BuOi9a8h8gt",
+          "time": {
+            "start": 1789654777708,
+            "end": 1789654777726
+          },
+          "patch_sha256": "1460cba3c121d80384a42e0fb2748cbe56a7921f4cc4687eb33fcbaead20083c",
+          "adds_unconditional_skip": false
+        },
+        {
+          "call_id": "call_O1OD2p5FUv2AStxG0OWM45pI",
+          "time": {
+            "start": 1789654808158,
+            "end": 1789654810228
+          },
+          "patch_sha256": "e162a88cb05f12b683c1257c9e20b12bc71fbf78b69ca2f7d0b2217f65336a68",
+          "adds_unconditional_skip": false
+        },
+        {
+          "call_id": "call_m0AbO985ouebDklymE4bqOcd",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep 'omit-scoping-attribute-class-(static|dynamic)'",
+          "time": {
+            "start": 1789654820445,
+            "end": 1789654840481
+          },
+          "state": "completed",
+          "exit": 2,
+          "first_request": "request-24.json",
+          "event_sample_lines": [],
+          "counts": [
+            "0 passing",
+            "2 failing"
+          ]
+        },
+        {
+          "call_id": "call_CEp3BnHJeF5RD6Qjcrs4TiGP",
+          "time": {
+            "start": 1789655461718,
+            "end": 1789655463719
+          },
+          "patch_sha256": "2e0e8ac2ccda77ebe428f41919f71df64e6fed98b15e6df9c98d85e38a955328",
+          "adds_unconditional_skip": false
+        },
+        {
+          "call_id": "call_mB4z18N9QUzEilXtPeSiMi28",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep '^css '",
+          "time": {
+            "start": 1789655476379,
+            "end": 1789655496393
+          },
+          "state": "completed",
+          "exit": 3,
+          "first_request": "request-52.json",
+          "event_sample_lines": [],
+          "counts": [
+            "46 passing",
+            "3 failing"
+          ]
+        },
+        {
+          "call_id": "call_E6Dhp45lk8cWJLng5hYpNQmX",
+          "time": {
+            "start": 1789655607382,
+            "end": 1789655609428
+          },
+          "patch_sha256": "29f470e70287a54e8bc709eaba90e58f9d882ba010aca1ecfc9fd28ffc059a7f",
+          "adds_unconditional_skip": false
+        },
+        {
+          "call_id": "call_PArlf9Sb2TxTjptWVRzWssqs",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep '^css '",
+          "time": {
+            "start": 1789655616915,
+            "end": 1789655637472
+          },
+          "state": "completed",
+          "exit": 12,
+          "first_request": "request-58.json",
+          "event_sample_lines": [],
+          "counts": [
+            "37 passing",
+            "12 failing"
+          ]
+        },
+        {
+          "call_id": "call_r3F8ff4x3h6NogEA3wMJff1n",
+          "time": {
+            "start": 1789655648169,
+            "end": 1789655650293
+          },
+          "patch_sha256": "9b5b694057a2c4eeee6e07fb634a849e050e228382294e23e30711cd2dc047a8",
+          "adds_unconditional_skip": false
+        },
+        {
+          "call_id": "call_KtHdW2lEU7cXG5016WApD7Yr",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep '^css '",
+          "time": {
+            "start": 1789655663858,
+            "end": 1789655684529
+          },
+          "state": "completed",
+          "exit": 0,
+          "first_request": "request-60.json",
+          "event_sample_lines": [],
+          "counts": [
+            "49 passing"
+          ]
+        },
+        {
+          "call_id": "call_lUUBEMl8tcerOqbyhiHaUjRx",
+          "time": {
+            "start": 1789655869790,
+            "end": 1789655871800
+          },
+          "patch_sha256": "e5edca0485e8b0d70a8dbca1ae2b6669bb8c8f51b224659ce2502c9fd643bca7",
+          "adds_unconditional_skip": false
+        },
+        {
+          "call_id": "call_LghgEtDj1HptFzcFLKDQEYX5",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep '^js '",
+          "time": {
+            "start": 1789655941927,
+            "end": 1789655962628
+          },
+          "state": "completed",
+          "exit": 1,
+          "first_request": "request-73.json",
+          "event_sample_lines": [],
+          "counts": [
+            "32 passing",
+            "1 failing"
+          ]
+        },
+        {
+          "call_id": "call_SSqwNOFVpPLDn0W7HcoVyTZv",
+          "time": {
+            "start": 1789655986338,
+            "end": 1789655988466
+          },
+          "patch_sha256": "35b3b1b98d9415cd0a9c062f6da44797432ed9172f99b77adbe01bbeae17aa70",
+          "adds_unconditional_skip": false
+        }
+      ],
+      "patch_sha256": "2e2c7e4ba5b4cd22a25762e1ddf24f52d0cbc11eea21d118cf71d14039a6ffc2",
+      "unconditional_skip_in_patch": false
+    }
+  ],
+  "limits": [
+    "Ignored compiler outputs were not archived; build logs plus runner imports are historical evidence, not archived build hashes.",
+    "Whole intermediate trees not reconstructed: recorded snapshot IDs are references, not independently recomputed hashes.",
+    "Native live output has no per-line timestamp or flush guarantee; no process-complete stdout for unfinished npm test.",
+    "Full truncation output path is container-local and absent from retained capture; only retained fragments can be verified.",
+    "No hidden reasoning inspected or inferred; only function calls, tool outputs and public assistant text are extracted."
+  ],
+  "current_stage": {
+    "project_test_executions": 0,
+    "builds": 0,
+    "containers": 0,
+    "provider_calls": 0
+  },
+  "originals_sha256": {
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/started.json": "ffd0360b9e8db65dd79ebf434e8c50a94cf486034ca268c0937241634015a26f",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/provider-metadata.json": "4b0fe5d2abed1e27d9f12e0c694c2c6d921977a5143bdccf3a9ea7402de9dd2b",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/task-artifacts/900b7402-f2bb-413c-b78f-531cbd7efe22/initial.json": "8de619a6f583b4eba369df6f7bc8b2f5149784883cdea43e0ecea2e331961284",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/task-artifacts/900b7402-f2bb-413c-b78f-531cbd7efe22/tool-events.json": "81f9894383ffa6148b42f9efb62ad26efcef8ab7ff6beae3c5bb848135d38ef2",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/native-evidence.json": "40374ef717eb2e32da3021dfb3ecdd16dded94b1d164041ff613e70202899337",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-1.json": "f5ea9a9860414a9736a0f8afb13542a53aca598442a1c0e4e9c22d232d080f7a",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-2.json": "368aef75faa993113683d1b81dc422be3d5ab0735edf8f9aafe301dae5d6a2f5",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-3.json": "d7179b598cf4504febd8c47ff8b6adfc9103b6c98580786cff5f1d7826918d0c",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-4.json": "00b109f1011218690cf0880e9581ea6e7def702e2fef8fa33e9a68a57f7dd69d",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-5.json": "8695c3b60457142891d5eb644482fbc61959ae4e1a5fd69c2472b77b460051e6",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-6.json": "fad606fa36c26c0468f19c0cf0a13674feb13c5b81a1fa6992d2c1f6be092353",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-7.json": "15f7e33726dcf75651307f3e4f3df3a6033b7f798d998f7050a93943370dc5f7",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-8.json": "b8f8e2409ec8eafd325d6864386b100f0fdd37275293e38f6fcd7ffd75834ca3",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-9.json": "c2c4ca1e487693784b17c405ba10b72d45786259972e6ef9af0ee0728e9d690f",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-10.json": "d61b6a19f242edf6a6840c32a9a2696e16fe7a0731640c7cb4b6d01b3393f954",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-11.json": "0773f921586d89a94316d9f630c3f44293d5b97f85c57e29a91c91c6daafe53b",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-12.json": "e5d7c54d21d4f8112fbab2f747dfe3cc777e5fbfc1c69f366fa5fc2e026611b2",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-13.json": "806a022a05da94260b372256aaf62522b6757ba42e43d347951b2d33f9022e10",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-14.json": "7a885fc79056f83093ef63d963f6e790d254a55ff646179964cbff93536722cf",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-15.json": "75d8379b712f8d734c09d4c3a0e238302469f47b7068306a1dcbed340a4e72fe",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-16.json": "1dc50a54f3f9d331120c48295d6095977e43a6a172d51792ba640d601c1d878c",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-17.json": "87662ce5c3bd9cbd8dd89712b91309a9e9a74f2c6a41728836a5ed0df61782cf",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-18.json": "4f18c584990a9d70c7dba499ade7553e6c247d1ca9428e2f013eac022bd75c36",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-19.json": "69836c59702cc9cc492b91bbf7e59cc6b0ce4d4990ce2b143a094649d9b04053",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-20.json": "f2b626410eb0406a3ba77f6cafd9a2e0e5b96bb5d046c54541430297c1233913",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-21.json": "b5b5b67ebe200e7eceb0b8d2e2fb9ad6da8d377282c91c728baf68f58e4cc18e",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-22.json": "0e7e1d7722298a1b75d0e3217053aa5347b846815f30c6fb8cf62fd65cf86058",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-23.json": "b105a882ff55defa1998addb3b958f355d0eb88aadc413e87f35d28cd5f4a984",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-24.json": "99795a5a1f890a2ad94682c165426566aa44c256423694dfaf486f8689769b1a",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-25.json": "77fd5b00313964618fb8f037bd6f1f97716ae4b1e110982f8fe98fe5e05e662c",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-26.json": "2adb9101bf3332e7f168d637ac11838cc93761433a96628fc7ff7a0cbea4da9c",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-27.json": "e36b0818f77e4a219d0a52244d3d0dffda7996bdbf30097167607a26fe294e8b",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-28.json": "8994f48ddaf1ae3dafc8f927ec0ad23a96436c1f1e85b33a62ed96e85e844564",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-29.json": "a6614fc8d35d22e77516dcbcdd180b67301f2b29aa437bb9e86cc7b251231f05",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-30.json": "0a7c16c631c903b8585740170ce529654e1057e22eda912bc727e884b7a0a8b8",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-31.json": "b84f37bbcf157eb36e518d811b06e8a64fc3d21a0c830e05879debb8450b9150",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-32.json": "d859d7624becdc62d54f7eb3ac1f169af79d23c5f873dcc49592d5758308949b",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-33.json": "cca3e9c16cf7571b5ad37934c119a62d0d05659e11a8217474ef7019af1aff5b",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-34.json": "3de98013d2cd4a225ed750025bf308e56941d06513618c00d705318c63d7cf7b",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-35.json": "ccc5055e471b1a564009048016e586a1cf63b9600ff66077c3edef354f237c91",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-36.json": "057d330e99bf8fc67452be94028a63e033074cf11714a6dea50b7eb3b21e4f2b",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-37.json": "9f615c2b3abb7f2a899546d8804764b8030224f454ade361f485c693b472c5fe",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-38.json": "6ed643eb1e70ebddb1b38d3fddabf34c707953c7436f74e99514fda066c2cb98",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-39.json": "920d21a6552d3b20614cf907bea6fc13f1725e2f2fc88b0420f88a70615760e9",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-40.json": "aca2a41258303a68d5f57239a172c22eb31ff83e68553a84a34727b3d4bc9863",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-41.json": "d9997ce5df28c5315ab991125e6b6697233433ab70659c0ce09b96f07beb2d10",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-42.json": "198b2bc4194a970da38fe9d770ada6eca14701ad40a27512b43909fe8842a2d1",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-43.json": "d28606e6e0371ca577325e44aaaa04b431861a48c70fe35a117b2d9a4bf23011",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-44.json": "8bc86fced12abce5d0d7d9b6c60d764286a25818a60c6721f8bf3881cb1686fb",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-45.json": "2dfee79c472ea4817a4710929e5cd3199aad982e692c9c024b086324fe9bfdc8",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-46.json": "1363cde234c4519bf2c50f85dd3de170df5ec4f37aa3f1029e6bfac6f3f742e6",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-47.json": "ac3d513b70685f743175e882cf910b3efe5d585adf662c533e2f0d39c9c890a4",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-48.json": "b4324cd807582c9e7bc663aef7beff4be7fb1fb369ca32f7d10c8d13071eb6de",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-49.json": "8e5f83585afaecf576f300d87741c20d1cdbf8520acd0645eae2874ba37388e0",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-50.json": "84584f9d33a758274d2643b6c9e90a0cc682b891e8bf5bf9314e805eedf4059b",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-51.json": "3f9db3fedb6eb6669f49cdedbf55c2bc5a36e2ae0238eae10e006043be8abb53",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-52.json": "e4940f618a28acf8da728ab13e2b3f8d7cc0b70b2ff817c31aaf929473342c3c",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-53.json": "cf4a0b9177cc3bed41366571fc5d6d76fce2fee9d707d3ced08fac2dbeac22d5",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-54.json": "979a5ae10a19222102a9ea4ae1349d2ddde14b3b8b8beee0e824458a819794ed",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-55.json": "8aa3e8476703ad7680321a018d47e48b07e64d743315ceaeb0b747c3b9f2325f",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-56.json": "fd8d62d750381a449efd4ae503f9be9f3641755132f44251a1cb26b283e3f7d4",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-57.json": "8c57b4257d474633377caef316658df3247c5569eeddb26f0c5b9ba45bed8b36",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-58.json": "23c34661e049e6aa42f6e947be199d3864327955989493c07787cfd97cd541d9",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-59.json": "9a32f396d8fa8db1e82b6d186697e9996fd916370d8b5accf01cf84faeba312a",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-60.json": "c3164db6605ec56f2b2f92410b2ee4d5d751b8acc22204939578bb03d9c6117c",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-61.json": "cadc07d87e12dcb94dceb8eae5c91e39d63f6353dcea620a9b41c70e455c6c40",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-62.json": "e88663511c7f1cf0298c80c68e81f63cef4b2321baaf0dc35726588694f9fbfc",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-63.json": "a3f63b4489179f77258088b7da27d96f6a3baeb097dfa7201960f83e80bc4f92",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-64.json": "7631c7764ded3137a4837032647fbbf5be4475fe3093d91d0b80bd583a2c9a9d",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-65.json": "686d0d1d9caf5842964383227633f0c0de8dfc7c78309aa028a8eb8b926f4b5f",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-66.json": "9fbaddacd271de96216f97037d95c528a31a65957759d04ff56296d96bf34c0a",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/request-67.json": "763ce95bcaeef197c6f135ed791db50906bb97185955d94d2e3c2f4f13f25089",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/response-67.sse": "cc04d329b6622f5fa4dc223a72cd6e034ee965533146f60ea2a63185f99cfb49",
+    "git:2ac25116ec2d16d4c73eb0c3c6749a2ab588149b:development/polybench-pilot/frozen-manifest.json": "05e9b6c8e2ad8f56e689b6ffd3102dd8d2a589b65c4cea2cea93f0ffcd2bb505",
+    "local/polybench-pilot/author-inputs/sveltejs__svelte-1190/base.tar": "45634ea516ebfb4ebeaf1fc5e963342d6c3b19aa6ba4181ab5436fb2b718b2f8",
+    "git:9317ccc9e2e3af6cfe7e876acd4541f3e7445f3b:development/polybench-pilot/results/patches/H1/sveltejs__svelte-1190.patch": "0cf9b1a0ef4c3087c2bfa7afea475056916955bd40afc1dc0251ebb42d577453",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/model.patch": "0cf9b1a0ef4c3087c2bfa7afea475056916955bd40afc1dc0251ebb42d577453",
+    "git:2ac25116ec2d16d4c73eb0c3c6749a2ab588149b:development/polybench-pilot/results/patches/H1/sveltejs__svelte-1190.patch": "0cf9b1a0ef4c3087c2bfa7afea475056916955bd40afc1dc0251ebb42d577453",
+    "local/polybench-pilot/author-inputs/sveltejs__svelte-1190/source/src/generators/nodes/Element.ts": "51e692d3b647be2451fd9fc1d0d23a36d83b7340a66f775d4553f40b3f11f016",
+    "local/polybench-pilot/author-inputs/sveltejs__svelte-1190/source/test/runtime/samples/event-handler-event-methods/main.html": "a7358b74f686fe61465a865ec2084749e134cc98a9eb2cee060b7bde2f9bf707",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/task-artifacts/900b7402-f2bb-413c-b78f-531cbd7efe22/original-tests/test/runtime/samples/event-handler-event-methods/main.html": "a7358b74f686fe61465a865ec2084749e134cc98a9eb2cee060b7bde2f9bf707",
+    "local/polybench-pilot/author-inputs/sveltejs__svelte-1190/source/test/runtime/samples/event-handler-event-methods/_config.js": "904e502ba99d31eccbbb99a1360381433b1f4720608a5e6fb22da4156c702f64",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/task-artifacts/900b7402-f2bb-413c-b78f-531cbd7efe22/original-tests/test/runtime/samples/event-handler-event-methods/_config.js": "904e502ba99d31eccbbb99a1360381433b1f4720608a5e6fb22da4156c702f64",
+    "local/polybench-pilot/author-inputs/sveltejs__svelte-1190/source/package.json": "68c157e3d08190b151027775fb8b57a00b6ec81d2be3c2056335d00b498b0f90",
+    "local/polybench-pilot/author-inputs/sveltejs__svelte-1190/source/test/test.js": "fe01b7dcf38f1318d2084603ed01db00866d92e693bb077ee7b83bb02d99ba0b",
+    "local/polybench-pilot/author-inputs/sveltejs__svelte-1190/source/test/setup.js": "38df04c18c584a66aa677b247a8ad5ebab0273dcab0f39ef1bd3b93d7e01440c",
+    "local/polybench-pilot/author-inputs/sveltejs__svelte-1190/source/test/helpers.js": "fa717d3a886088933971ae066b29c58e1c9359698c41b9ed08ead3ef5f6c0fc2",
+    "local/polybench-pilot/author-inputs/sveltejs__svelte-1190/source/test/runtime/index.js": "059ae893cec7402acbce931631482c08ecae7f3c411bed591d1ec89cbab890a2",
+    "local/polybench-pilot/author-inputs/sveltejs__svelte-1190/source/test/server-side-rendering/index.js": "d4afa3608f5ae82f9cc2df998e29f6b79418e18ef9e03e86539a86d0e9181dfa",
+    "local/polybench-pilot/author-inputs/sveltejs__svelte-1190/source/mocha.opts": "a561630bb56b82342bc66697aee2ad96efddcbc9d150665abd6fb7ecb7c0ab2f",
+    "local/polybench-pilot/author-inputs/sveltejs__svelte-1190/source/rollup.config.js": "f18e14d5266f1eb31f914344f4acf906540f780fb370581ac2b1da5d0f2660c8",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-P/native-evidence.json": "0510ecce9a8cbcd3dcdd4253ae80616d867dd65b6350ae2772068c5e8cec1fca",
+    "git:9317ccc9e2e3af6cfe7e876acd4541f3e7445f3b:development/polybench-pilot/results/patches/P/sveltejs__svelte-1190.patch": "16187e0e46946257ab31de6e62ea5653068e3e6001c4d8c2dc0e9c001b99c6e9",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-P/request-17.json": "b6fe7029e2307548c195b926da29574b70a70c04ed86dc05153813d06eb6c027",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-P/request-51.json": "0a95c92bd4ba3f485d8d0ea06d355554f99893a9752533e86c5ad34db9d33ede",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-P/request-53.json": "99a466a726b8e087fb7906a1ff8f77aeaf01ac4e788b893093b81877735ab487",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-P/request-71.json": "7deddc57b76a9faf938ce769dbe6489f1b3423b30d1a0aeebfe4127a8a37abac",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H0/native-evidence.json": "eb7f051dc5c25fa00417a9653b533fe8422b92fe40d1f8b15880609daa824dd9",
+    "git:9317ccc9e2e3af6cfe7e876acd4541f3e7445f3b:development/polybench-pilot/results/patches/H0/sveltejs__svelte-1190.patch": "2e2c7e4ba5b4cd22a25762e1ddf24f52d0cbc11eea21d118cf71d14039a6ffc2",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H0/request-24.json": "13a2becd973558ccc4203fd0c5b7a55f0ecea0dabcae7b9f1e4a002c610de8d2",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H0/request-52.json": "d4171c20a174588d78eb53b738f23e3af40703767b6959336efca9edf7456cee",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H0/request-58.json": "4b716b5067b0b391957aed9e7b9832b11e9f71dafa7777047a8703caa09b392e",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H0/request-60.json": "67a868faba4f1f956f328924aebe9cd1830076c14446488a9778392e85b356ae",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H0/request-73.json": "93aa85ad06ae9fd3d94d6ad350601f605fff5968658d5e93832c202d3d79c3f5",
+    "git:2ac25116ec2d16d4c73eb0c3c6749a2ab588149b:development/polybench-pilot/REPORT.md": "db55e7ed1a246205068f1e5e62b9e6852098e0b2326548dfda076f9ec38061b9",
+    "git:2ac25116ec2d16d4c73eb0c3c6749a2ab588149b:development/polybench-pilot/two-world-diagnostic/REPORT.md": "94c2d08e6609c14546e3a4e251df3c50bf30f5c05a85082b3648424d2079eab4",
+    "git:2ac25116ec2d16d4c73eb0c3c6749a2ab588149b:development/polybench-pilot/two-world-diagnostic/evidence/failure-analysis.json": "c0409612022ba651d2d901e4a2875c272719f387840e586611bbfd2c82a65f48",
+    "git:2ac25116ec2d16d4c73eb0c3c6749a2ab588149b:development/native-task-ab/run-comparison.mjs": "8b6fca776a322e3f303c818df44c6b25db91597f8d902a93ad6c273f97b32722",
+    "git:2ac25116ec2d16d4c73eb0c3c6749a2ab588149b:development/native-task-abc/native-run.mjs": "5d691871022fcf4f2117212c33b463849e791d7ebe120adc68e7ca419ee0d293",
+    "git:2ac25116ec2d16d4c73eb0c3c6749a2ab588149b:development/polybench-pilot/run.mjs": "0687eb93e68653451a369ba33af2771ed5f05db7daae636ee3f4a92a8719aae9",
+    "git:2ac25116ec2d16d4c73eb0c3c6749a2ab588149b:development/polybench-pilot/capture.mjs": "c80a89d93cd03fa6b2bbbafb2f2ba7a40e7fc0fc57a9b684f4165f4cda5c540e",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/session/finished.json": "d8d5ac36ec77ce1d9e93832b5e47862f01fd31ad6d49883484c498a86ad2aab7",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/session/cleanup.json": "a1b289a69f5bd9c40924b5395e29df6870f9fab8b04e38f1cedc106eff144916",
+    "local/polybench-pilot/batch/runs/sveltejs__svelte-1190-H1/stop-verification.json": "eaade25bb482fc2d08f9f5179c98c544f3125e45d4c29eb45a4c6389a641f8cb"
+  }
+}
