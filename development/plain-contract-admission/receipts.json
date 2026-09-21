@@ -1,0 +1,464 @@
+{
+  "version": 1,
+  "kind": "bounded_contract_admission",
+  "dataset_revision": "b3fca77b637379f0c01ad86d18753a7ac1998b53",
+  "evaluator_sha": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+  "starting_head": "840e57a771986de7e388a06626c0bfe413314ffe",
+  "candidate_order": [
+    "mui__material-ui-18141",
+    "coder__code-server-4923",
+    "microsoft__vscode-136347",
+    "mui__material-ui-17301"
+  ],
+  "historical_controls_only": true,
+  "fresh_evaluator_runs": 0,
+  "alternative_gold_runs": 0,
+  "new_plain_task_runs": 0,
+  "new_plain_requests": 0,
+  "new_plain_tools": 0,
+  "new_plain_elapsed_seconds": 0,
+  "new_plain_usage": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cached_tokens_included_in_input": 0,
+    "reasoning_tokens_included_in_output": 0,
+    "unknown_requests": 0,
+    "money": null
+  },
+  "developing_agent_usage": "separate; not measured by plain launcher",
+  "selected_tasks": [],
+  "new_slots": [
+    {
+      "slot": 1,
+      "instance_id": null,
+      "status": "not_started"
+    },
+    {
+      "slot": 2,
+      "instance_id": null,
+      "status": "not_started"
+    }
+  ],
+  "stop_reason": "No admissible pair from different repositories: code-server and VS Code fail contract admission; both MUI candidates share one repository. MUI 17301 independently fails admission.",
+  "plan": {
+    "path": "development/plain-contract-admission/PLAN.md",
+    "sha256": "47495b5d443fa80b467755c3f7a67ebf865d949ff12426e35d83f859e51b856b",
+    "bytes": 2856
+  },
+  "historical_accounting": {
+    "path": "development/polybench-pilot/results/accounting.json",
+    "sha256": "b5223305df650bcc54709e3b7cf0daaed3e5dd1884ba42db8cfd58610a72f112",
+    "bytes": 393036
+  },
+  "preserved_local_stop_state": [
+    {
+      "path": "local/polybench-pilot/batch/freeze.json",
+      "sha256": "30008a1e389c67a40c4bfee0969b119f7c76cf0ee24a44364af261def605d216",
+      "bytes": 283684399
+    },
+    {
+      "path": "local/polybench-pilot/batch/outcome.json",
+      "sha256": "8c1f279fc4b3b2ee0c63d5cc88b9c84ee1cfefdcbd683ab55dfcb95e7ed80402",
+      "bytes": 118
+    },
+    {
+      "path": "local/polybench-pilot/batch/scheduling-paused.json",
+      "sha256": "69385be23d2edc8776accef8cd2b91cdbdf496a026e37bff9698862e8d29c6bd",
+      "bytes": 73
+    },
+    {
+      "path": "local/polybench-pilot/batch/freeze-commit.json",
+      "sha256": "09580a67c738a05a5f21f554f2c76fa351e7a835c54bb86e75a99d10934fac86",
+      "bytes": 54
+    }
+  ],
+  "candidates": [
+    {
+      "instance_id": "mui__material-ui-18141",
+      "source_row": {
+        "path": "local/polybench-pilot/mui__material-ui-18141.csv",
+        "sha256": "3cb68af2b6869d716defa3c82aa832b58696a84aa313e788f4721928b0d75b87",
+        "bytes": 16229
+      },
+      "base_commit": "13b3a0d31947ccdb20108febb5432d4f46f5a677",
+      "problem_sha256": "b56e116c30b4223e1e22da90ed55cb485a4b11e138120096f4f71f41b999c163",
+      "test_patch_sha256": "058f4881b30fa531ba0219b21f521e5226aae60d9b81d989234a2e61b63f29af",
+      "gold_patch_sha256": "ba0d927909713f9de184c8a03bfe6bf94fae07141dbe2e1b6509edb916c76aea",
+      "official_image_digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-18141@sha256:319eff3e5967de69dc2dd76754cdfb20cc8947957fb53dbbfc2d59883d099c27",
+      "historical_slots": [
+        {
+          "slot": 19,
+          "arm": "P",
+          "status": "not_started",
+          "requests": 0
+        },
+        {
+          "slot": 20,
+          "arm": "H0",
+          "status": "not_started",
+          "requests": 0
+        },
+        {
+          "slot": 21,
+          "arm": "H1",
+          "status": "not_started",
+          "requests": 0
+        }
+      ],
+      "batch_run_directories": [],
+      "f2p": [
+        "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: select associates the label with the <select /> when `native={true}` and `id`"
+      ],
+      "p2p_count": 18,
+      "controls": {
+        "baseline": {
+          "receipt": {
+            "path": "local/polybench-pilot/controls/mui__material-ui-18141-baseline/results/mui__material-ui-18141_result.json",
+            "sha256": "2d8e22df3b399c00abc653bcb7a76e12c4d65ab32b9778f31b76215a48cdfe49",
+            "bytes": 2924
+          },
+          "provenance": {
+            "path": "local/polybench-pilot/controls/mui__material-ui-18141-baseline/provenance.json",
+            "sha256": "22cd9b7bbc943d683185d178dcfb6d44c4cf093171df30e2ea5f8e4527f90052",
+            "bytes": 892
+          },
+          "raw_output": {
+            "path": "local/polybench-pilot/controls/mui__material-ui-18141-baseline/mui__material-ui-18141.log",
+            "sha256": "e2dba39ce6bd88a4bf5f4ac06e10ddaf64ac944997241b4687591bdbc46af7af",
+            "bytes": 60893
+          },
+          "resolved": false,
+          "passed_count": 18,
+          "failed": [
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: select associates the label with the <select /> when `native={true}` and `id`"
+          ],
+          "f2p_passed": false,
+          "no_p2p_failed": true,
+          "p2p_exact_ids_absent_count": 0
+        },
+        "gold": {
+          "receipt": {
+            "path": "local/polybench-pilot/controls/mui__material-ui-18141-gold/results/mui__material-ui-18141_result.json",
+            "sha256": "de9d6542bed0e3077e18b10e62596e0d2614b751eb4159d1104da55d47089a84",
+            "bytes": 2918
+          },
+          "provenance": {
+            "path": "local/polybench-pilot/controls/mui__material-ui-18141-gold/provenance.json",
+            "sha256": "5ce33aaa041ba1be75281549caa27f56a7d52cd24febe0482430ec221c31fa70",
+            "bytes": 888
+          },
+          "raw_output": {
+            "path": "local/polybench-pilot/controls/mui__material-ui-18141-gold/run_logs_typescript/mui__material-ui-18141_run.log",
+            "sha256": "73e39308260225aeebeac94802a7009b57b073cdc3708c62ad14d0d7755bab50",
+            "bytes": 49202
+          },
+          "resolved": true,
+          "passed_count": 19,
+          "failed": [],
+          "f2p_passed": true,
+          "no_p2p_failed": true,
+          "p2p_exact_ids_absent_count": 0
+        }
+      }
+    },
+    {
+      "instance_id": "coder__code-server-4923",
+      "source_row": {
+        "path": "local/polybench-pilot/coder__code-server-4923.csv",
+        "sha256": "ab863c933804e5ae244357261e99efca6739ffea8b38ca0992926c31a757cafc",
+        "bytes": 30622
+      },
+      "base_commit": "78658f1cf48a5e019a82cde937cfa8feed8b986b",
+      "problem_sha256": "014905be54eaee83df4b77a93f0966a90adc8209117360077f07cec386067b0d",
+      "test_patch_sha256": "8e7f18a496360f43b460351d44851b8faa782ba7c514486c0e18dd18a01d5f2d",
+      "gold_patch_sha256": "1de0e71adf585810a82049707cadad867e5b990e208c02de0aaf8c72b99f3cea",
+      "official_image_digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.coder__code-server-4923@sha256:5cf5eee9954b51d5d6fc48de1331272c52b6d046d772ccffd3719ac664672453",
+      "historical_slots": [
+        {
+          "slot": 22,
+          "arm": "H0",
+          "status": "not_started",
+          "requests": 0
+        },
+        {
+          "slot": 23,
+          "arm": "H1",
+          "status": "not_started",
+          "requests": 0
+        },
+        {
+          "slot": 24,
+          "arm": "P",
+          "status": "not_started",
+          "requests": 0
+        }
+      ],
+      "batch_run_directories": [],
+      "f2p": [
+        "/testbed/test/unit/node/cli.test.ts->parser should parse all available options",
+        "/testbed/test/unit/node/cli.test.ts->parser should override with --link"
+      ],
+      "p2p_count": 186,
+      "controls": {
+        "baseline": {
+          "receipt": {
+            "path": "local/polybench-pilot/controls/coder__code-server-4923-baseline/results/coder__code-server-4923_result.json",
+            "sha256": "0eafbe5f322773e37938881a025fe2bad7318c5e2675bf2baee015d577ea9421",
+            "bytes": 20240
+          },
+          "provenance": {
+            "path": "local/polybench-pilot/controls/coder__code-server-4923-baseline/provenance.json",
+            "sha256": "65c5306f9d0a255591e77cba40d53dbfc2d57250f9d70733be266beb10ca120f",
+            "bytes": 896
+          },
+          "raw_output": {
+            "path": "local/polybench-pilot/controls/coder__code-server-4923-baseline/coder__code-server-4923.log",
+            "sha256": "e7a4553a9e587b2638cdc336c91b80c8893c85e5b218c4ff16ca444fc6261bd3",
+            "bytes": 334649
+          },
+          "resolved": false,
+          "passed_count": 177,
+          "failed": [
+            "/testbed/test/unit/node/cli.test.ts->parser should parse all available options",
+            "/testbed/test/unit/node/cli.test.ts->parser should override with --link",
+            "/testbed/test/unit/node/routes/vscode.test.ts->vscode should load all route variations",
+            "/testbed/test/unit/node/routes/vscode.test.ts->vscode should redirect to the passed in workspace using human-readable query",
+            "/testbed/test/unit/node/routes/vscode.test.ts->vscode should redirect to the passed in folder using human-readable query",
+            "/testbed/test/unit/node/routes/vscode.test.ts->vscode should redirect to last query folder/workspace",
+            "/testbed/test/unit/node/routes/vscode.test.ts->vscode should do nothing when nothing is passed in",
+            "/testbed/test/unit/node/routes/vscode.test.ts->vscode should not redirect when last opened is ignored"
+          ],
+          "f2p_passed": false,
+          "no_p2p_failed": true,
+          "p2p_exact_ids_absent_count": 186
+        },
+        "gold": {
+          "receipt": {
+            "path": "local/polybench-pilot/controls/coder__code-server-4923-gold/results/coder__code-server-4923_result.json",
+            "sha256": "2a093cdcf1db7062ae3afe4f13f4feea68640a1211c1be4d77d5afce789a192d",
+            "bytes": 22014
+          },
+          "provenance": {
+            "path": "local/polybench-pilot/controls/coder__code-server-4923-gold/provenance.json",
+            "sha256": "052f5023d97b1c7ba54913dfa5a89b58b35c56eefe4cac44420cb326b5a77e11",
+            "bytes": 892
+          },
+          "raw_output": {
+            "path": "local/polybench-pilot/controls/coder__code-server-4923-gold/run_logs_typescript/coder__code-server-4923_run.log",
+            "sha256": "64cf6928a8376ae3e471bae8d3b680689456d82e8a599473429d1e3f5ec2b971",
+            "bytes": 336654
+          },
+          "resolved": true,
+          "passed_count": 193,
+          "failed": [
+            "/testbed/test/unit/node/app.test.ts->createApp should unlink a socket before listening on the socket",
+            "/testbed/test/unit/node/routes/vscode.test.ts->vscode should load all route variations",
+            "/testbed/test/unit/node/routes/vscode.test.ts->vscode should redirect to the passed in workspace using human-readable query",
+            "/testbed/test/unit/node/routes/vscode.test.ts->vscode should redirect to the passed in folder using human-readable query",
+            "/testbed/test/unit/node/routes/vscode.test.ts->vscode should redirect to last query folder/workspace",
+            "/testbed/test/unit/node/routes/vscode.test.ts->vscode should do nothing when nothing is passed in",
+            "/testbed/test/unit/node/routes/vscode.test.ts->vscode should not redirect when last opened is ignored"
+          ],
+          "f2p_passed": true,
+          "no_p2p_failed": true,
+          "p2p_exact_ids_absent_count": 186
+        }
+      }
+    },
+    {
+      "instance_id": "microsoft__vscode-136347",
+      "source_row": {
+        "path": "local/polybench-pilot/microsoft__vscode-136347.csv",
+        "sha256": "1da3076cb52a07a01d829f8fb4e3a58bb3e75adeb9ac4d512663f6b57a2e13c2",
+        "bytes": 24210
+      },
+      "base_commit": "4bbec283c36a51cf80f9b77c7a81c140a76a363b",
+      "problem_sha256": "f847ffa45d3d089e6d4e048c325933211f59ad0184b62fa770309ccfc5f652e9",
+      "test_patch_sha256": "e81b7aff8384ddec50fef14c7a6f1ec72ca412f7206a34a073185151fa756fd3",
+      "gold_patch_sha256": "f0a640a8b19664d8c8b3d9cac1214a522ed862b5704f9d37f16c3b08298e764c",
+      "official_image_digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-136347@sha256:2388ebcc73d506fd65f0458d12a5358167d7b9e32b073439b95b523b85d0e96e",
+      "historical_slots": [
+        {
+          "slot": 25,
+          "arm": "H1",
+          "status": "not_started",
+          "requests": 0
+        },
+        {
+          "slot": 26,
+          "arm": "P",
+          "status": "not_started",
+          "requests": 0
+        },
+        {
+          "slot": 27,
+          "arm": "H0",
+          "status": "not_started",
+          "requests": 0
+        }
+      ],
+      "batch_run_directories": [],
+      "f2p": [
+        "viewLineRenderer.renderLine 2 issue #116939: Important control characters aren't rendered"
+      ],
+      "p2p_count": 68,
+      "controls": {
+        "baseline": {
+          "receipt": {
+            "path": "local/polybench-pilot/controls/microsoft__vscode-136347-baseline/results/microsoft__vscode-136347_result.json",
+            "sha256": "877b1692a18c0621c4672507c6f98196543bbb894cb6dd6ecb0a70b97a74af18",
+            "bytes": 7236
+          },
+          "provenance": {
+            "path": "local/polybench-pilot/controls/microsoft__vscode-136347-baseline/provenance.json",
+            "sha256": "cbda30cb2b850a4957e89ec1159b08861d0e958094659eb01fab84f4220d3699",
+            "bytes": 1420
+          },
+          "raw_output": {
+            "path": "local/polybench-pilot/controls/microsoft__vscode-136347-baseline/microsoft__vscode-136347.log",
+            "sha256": "4a5a432537104ff7e1ca0e9e704b8bb012ba762ec12ced8c7ff7d3fcd3a83541",
+            "bytes": 52815
+          },
+          "resolved": false,
+          "passed_count": 68,
+          "failed": [
+            "viewLineRenderer.renderLine 2 issue #116939: Important control characters aren't rendered"
+          ],
+          "f2p_passed": false,
+          "no_p2p_failed": true,
+          "p2p_exact_ids_absent_count": 0
+        },
+        "gold": {
+          "receipt": {
+            "path": "local/polybench-pilot/controls/microsoft__vscode-136347-gold/results/microsoft__vscode-136347_result.json",
+            "sha256": "2731bba6985585c643b614332e5e3cd5d339c715bd3eb53e45f8e1b7549dab2e",
+            "bytes": 7230
+          },
+          "provenance": {
+            "path": "local/polybench-pilot/controls/microsoft__vscode-136347-gold/provenance.json",
+            "sha256": "5d578151a3de5bcb8db27c1015d75cc982e11aec7b6b4dafff1d25299e35844e",
+            "bytes": 896
+          },
+          "raw_output": {
+            "path": "local/polybench-pilot/controls/microsoft__vscode-136347-gold/run_logs_typescript/microsoft__vscode-136347_run.log",
+            "sha256": "2da1c6151d35a32e74f9383575b6f9ebd46765329d503109392b229339b882d4",
+            "bytes": 51152
+          },
+          "resolved": true,
+          "passed_count": 69,
+          "failed": [],
+          "f2p_passed": true,
+          "no_p2p_failed": true,
+          "p2p_exact_ids_absent_count": 0
+        }
+      }
+    },
+    {
+      "instance_id": "mui__material-ui-17301",
+      "source_row": {
+        "path": "local/polybench-pilot/mui__material-ui-17301.csv",
+        "sha256": "12d07418ff20de2c4d221efdfa6ef9a2d280894cf930218324fd15d21041cdc0",
+        "bytes": 105344
+      },
+      "base_commit": "0ddd56f5d389bfd19120d38fc4302f32f238be6f",
+      "problem_sha256": "3db7975502aa59b42d8590218e7c33a1b6a3c59ba8f09c0cd2fa1aae8c9a42a9",
+      "test_patch_sha256": "2619c2190ef12a91dfbf93181c5b9a0ba56929996862b5b808d7758ed880cd43",
+      "gold_patch_sha256": "1c8c2e997825202a0fff63ccc91e91f78d03c1c92e0ecdfcb54f36fd80ef6dbb",
+      "official_image_digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-17301@sha256:aa9e3ccf22f27b3267b5fc3429267327cd85d3acc01c2315b693c65482c724c5",
+      "historical_slots": [
+        {
+          "slot": 28,
+          "arm": "P",
+          "status": "not_started",
+          "requests": 0
+        },
+        {
+          "slot": 29,
+          "arm": "H0",
+          "status": "not_started",
+          "requests": 0
+        },
+        {
+          "slot": 30,
+          "arm": "H1",
+          "status": "not_started",
+          "requests": 0
+        }
+      ],
+      "batch_run_directories": [],
+      "f2p": [
+        "packages/material-ui-lab/src/SpeedDial/SpeedDial.test.js-><SpeedDial /> dial focus actions navigation ignores array keys orthogonal to the direction",
+        "packages/material-ui-lab/src/SpeedDialAction/SpeedDialAction.test.js-><SpeedDialAction /> should render the button with the fab class",
+        "packages/material-ui-lab/src/SpeedDial/SpeedDial.test.js-><SpeedDial /> should pass the open prop to its children",
+        "packages/material-ui-lab/src/SpeedDialAction/SpeedDialAction.test.js-><SpeedDialAction /> should render the button with the fab and fabClosed classes",
+        "packages/material-ui-lab/src/SpeedDial/SpeedDial.test.js-><SpeedDial /> dial focus first item selection considers arrow keys with the same initial orientation",
+        "packages/material-ui-lab/src/SpeedDial/SpeedDial.test.js-><SpeedDial /> dial focus displays the actions on focus gain",
+        "packages/material-ui-lab/src/SpeedDial/SpeedDial.test.js-><SpeedDial /> dial focus actions navigation does not wrap around",
+        "packages/material-ui-lab/src/SpeedDialAction/SpeedDialAction.test.js-><SpeedDialAction /> Material-UI component API ref attaches the ref",
+        "packages/material-ui-lab/src/SpeedDial/SpeedDial.test.js-><SpeedDial /> dial focus actions navigation considers the first arrow key press as forward navigation",
+        "packages/material-ui/src/Tooltip/Tooltip.test.js-><Tooltip /> Material-UI component API ref attaches the ref"
+      ],
+      "p2p_count": 61,
+      "controls": {
+        "baseline": {
+          "receipt": {
+            "path": "local/polybench-pilot/controls/mui__material-ui-17301-baseline/results/mui__material-ui-17301_result.json",
+            "sha256": "324dade2af72e9ac0acd980effb8d4aa9f12366cd5667bfd0b670671a4963b08",
+            "bytes": 10116
+          },
+          "provenance": {
+            "path": "local/polybench-pilot/controls/mui__material-ui-17301-baseline/provenance.json",
+            "sha256": "4c040bca6fa2729b7f90008fc0fd611df9068a43dc39d8d773e72cec32982c0d",
+            "bytes": 1011
+          },
+          "raw_output": {
+            "path": "local/polybench-pilot/controls/mui__material-ui-17301-baseline/mui__material-ui-17301.log",
+            "sha256": "c5ab292aa74a4700eb03a8310b89b1885739170097c9a695807d1db78bbc393e",
+            "bytes": 219058
+          },
+          "resolved": false,
+          "passed_count": 60,
+          "failed": [
+            "packages/material-ui/src/Tooltip/Tooltip.test.js-><Tooltip /> Material-UI component API ref attaches the ref",
+            "packages/material-ui/src/Tooltip/Tooltip.test.js-><Tooltip /> touch screen should open on long press",
+            "packages/material-ui-lab/src/SpeedDialAction/SpeedDialAction.test.js-><SpeedDialAction /> should render the button with the fab class",
+            "packages/material-ui-lab/src/SpeedDialAction/SpeedDialAction.test.js-><SpeedDialAction /> should render the button with the fab and fabClosed classes",
+            "packages/material-ui-lab/src/SpeedDialAction/SpeedDialAction.test.js-><SpeedDialAction /> Material-UI component API ref attaches the ref",
+            "packages/material-ui-lab/src/SpeedDial/SpeedDial.test.js-><SpeedDial /> should pass the open prop to its children",
+            "packages/material-ui-lab/src/SpeedDial/SpeedDial.test.js-><SpeedDial /> dial focus displays the actions on focus gain",
+            "packages/material-ui-lab/src/SpeedDial/SpeedDial.test.js-><SpeedDial /> dial focus first item selection considers arrow keys with the same initial orientation",
+            "packages/material-ui-lab/src/SpeedDial/SpeedDial.test.js-><SpeedDial /> dial focus actions navigation considers the first arrow key press as forward navigation",
+            "packages/material-ui-lab/src/SpeedDial/SpeedDial.test.js-><SpeedDial /> dial focus actions navigation ignores array keys orthogonal to the direction",
+            "packages/material-ui-lab/src/SpeedDial/SpeedDial.test.js-><SpeedDial /> dial focus actions navigation does not wrap around"
+          ],
+          "f2p_passed": false,
+          "no_p2p_failed": false,
+          "p2p_exact_ids_absent_count": 0
+        },
+        "gold": {
+          "receipt": {
+            "path": "local/polybench-pilot/controls/mui__material-ui-17301-gold/results/mui__material-ui-17301_result.json",
+            "sha256": "d309a23fa56346b46d9b3f1157b51fda093c819fcd8a8bce077dd87a5df3ff5e",
+            "bytes": 10109
+          },
+          "provenance": {
+            "path": "local/polybench-pilot/controls/mui__material-ui-17301-gold/provenance.json",
+            "sha256": "17f84f4df483c0d3997cf9c4110bf3369cf6d56ad0abe8ea1032f8e4f386a80d",
+            "bytes": 1007
+          },
+          "raw_output": {
+            "path": "local/polybench-pilot/controls/mui__material-ui-17301-gold/run_logs_typescript/mui__material-ui-17301_run.log",
+            "sha256": "ad9e9129fb8ece214e8083e1dd03819a46f4ce129c33ce25ed8d212cd1009505",
+            "bytes": 68063
+          },
+          "resolved": true,
+          "passed_count": 71,
+          "failed": [],
+          "f2p_passed": true,
+          "no_p2p_failed": true,
+          "p2p_exact_ids_absent_count": 0
+        }
+      }
+    }
+  ]
+}
