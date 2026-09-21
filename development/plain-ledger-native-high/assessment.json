@@ -1,0 +1,532 @@
+{
+  "Q": false,
+  "basis": "Frozen original retention, conservative migration, identity, privacy and fail-closed clauses; no requirement based on reference field names.",
+  "frozenBehavioralScore": {
+    "tests": 23,
+    "pass": 10,
+    "fail": 13,
+    "skipped": 0
+  },
+  "literalFailureInterpretation": {
+    "observableRetentionMigrationOrCutoverFailures": 12,
+    "exactDiagnosticNameMismatch": 1,
+    "diagnosticNameMismatchAloneDeterminesQ": false
+  },
+  "findings": [
+    {
+      "id": "retention-api",
+      "requirement": "Retain accepted events and preserve public collection entry points",
+      "input": "ledger-lifecycle.test.mjs:24; source={dataPath}, JSON-reloaded nextState, moved/truncated files",
+      "expected": "2026-08-10=15 and 2026-08-11=7",
+      "actual": "Only 2026-08-11=7; all five JSONL lifecycle tests fail",
+      "implementation": [
+        "packages/connector/lib/adapters/shared.mjs:370",
+        "packages/connector/lib/adapters/shared.mjs:541",
+        "packages/connector/lib/adapters/claude.mjs:109",
+        "packages/connector/lib/adapters/claude.mjs:260"
+      ]
+    },
+    {
+      "id": "migration",
+      "requirement": "Conservatively migrate accepted 0.4.3 state",
+      "input": "migration-contract.test.mjs:20 and kimi-migration.test.mjs:12; actual baseline-generated state and exact historical fixture, then JSON reload/source replacement or copy",
+      "expected": "Retain old accepted daily totals and count new identities once",
+      "actual": "Claude/Gemini/Qwen/Antigravity lose the accepted 15; Kimi copied state doubles 20/21 into 40/42. Supplemental full source/account-ID cases also lose old 15 while reporting complete.",
+      "implementation": [
+        "packages/connector/lib/adapters/shared.mjs:520",
+        "packages/connector/lib/adapters/shared.mjs:521",
+        "packages/connector/lib/adapters/claude.mjs:241",
+        "packages/connector/lib/adapters/claude.mjs:242"
+      ]
+    },
+    {
+      "id": "identity-remap",
+      "requirement": "Account switching must not count a previously observed event twice",
+      "input": "diagnose.mjs: same unchanged event of 10 tokens, same physical source, JSON reload and changed valid agentAccountId",
+      "expected": "10 tokens",
+      "actual": "20 tokens, complete; author-added regression explicitly expects that duplication",
+      "implementation": [
+        "packages/connector/lib/adapters/shared.mjs:88",
+        "packages/connector/lib/adapters/shared.mjs:95",
+        "packages/connector/bin/viberacing.mjs:1323"
+      ]
+    },
+    {
+      "id": "cutover",
+      "requirement": "OpenCode exact-ID cutover remains fail closed",
+      "input": "migration-contract.test.mjs:41; accepted server baseline of 100, empty database and no confirmed exact-ID cutover",
+      "expected": "Fail closed rather than accept an empty authoritative collection",
+      "actual": "No rejection; supplemental observation returns empty entries with completeness complete",
+      "implementation": [
+        "packages/connector/lib/adapters/opencode.mjs:74",
+        "packages/connector/lib/adapters/opencode.mjs:95",
+        "packages/connector/lib/adapters/opencode.mjs:115"
+      ]
+    },
+    {
+      "id": "corrupt-state",
+      "requirement": "Preserve fail-closed accounting state validation",
+      "input": "diagnose.mjs: JSON-reload the implementation-produced accepted SQLite state, corrupt its ledger version and delete database rows",
+      "expected": "Reject or return explicit partial/unavailable state; do not silently erase accepted usage",
+      "actual": "Empty entries with completeness complete",
+      "implementation": [
+        "packages/connector/lib/adapters/shared.mjs:122",
+        "packages/connector/lib/adapters/shared.mjs:136"
+      ]
+    },
+    {
+      "id": "diagnostic-consumer",
+      "requirement": "Preserve diagnostic semantics through existing consumers",
+      "input": "diagnose.mjs: first tuple 15, conflicting replacement 150 and unrelated valid event 7",
+      "expected": "First tuple retained, total 22, partial, conflict diagnostic survives normalization",
+      "actual": "22 and partial are correct; event_ledger_conflict is discarded by normalizeAdapterDiagnostics. The frozen exact-name assertion is not itself treated as a defect.",
+      "implementation": [
+        "packages/connector/lib/adapters/opencode.mjs:125",
+        "packages/connector/lib/diagnostics.mjs:66",
+        "packages/connector/lib/diagnostics.mjs:74",
+        "packages/connector/bin/viberacing.mjs:1374"
+      ]
+    },
+    {
+      "id": "privacy",
+      "requirement": "No raw provider IDs/content in persisted accounting state",
+      "input": "privacy-observation.mjs: valid Claude event ID consisting of 64 hexadecimal characters",
+      "expected": "Raw ID absent after JSON serialization",
+      "actual": "Raw ID remains in returned Claude state; helper mistakes an already hexadecimal raw ID for a digest",
+      "implementation": [
+        "packages/connector/lib/adapters/claude.mjs:19",
+        "packages/connector/lib/adapters/claude.mjs:23",
+        "packages/connector/bin/viberacing.mjs:1369"
+      ]
+    }
+  ],
+  "sourceReview": {
+    "scope": "All nine changed files; collection callers, diagnostic normalization and serialized state consumers; no M edits",
+    "boundedness": "Explicit 65,536-entry/16 MiB ledger limits and existing scan bounds remain. This establishes finite bounds by source review, not an exhaustive performance test. Corrupt-state fail-closed behavior fails.",
+    "range": "Ledger output filters requested dates; original range/component tests pass. Later conflict/range assertions in the five failing lifecycle chains were not reached; no success is inferred for them.",
+    "codex": "Codex primary totals come from account/usage/read with account_max. It is unchanged and covered by original tests; no provider-account-discovery requirement was added.",
+    "scopePreservation": "No product dependencies, versions, server code or Codex identity APIs changed. Existing reader assertions were retained; one new regression was added.",
+    "ordinaryPath": "Fresh-state CLI disk persistence and isolation of two distinct configured source mappings pass for all six event adapters."
+  },
+  "supplementalDiagnostics": {
+    "purpose": "Confirm consequences of the already declared source-review and failing behavioral clauses; not additional frozen tests and not fed back to author",
+    "scriptReceipts": [
+      {
+        "path": "development/plain-ledger-native-high/diagnose.mjs",
+        "sha256": "19229830e3faea90f4515ebc88b5344a0e3b83c0a4ed6338e8fe5e5399dbc6c8",
+        "bytes": 5223
+      },
+      {
+        "path": "development/plain-ledger-native-high/privacy-observation.mjs",
+        "sha256": "7b1c2ca4dfc986dc031016110e30fe4ed6e0a4ad9ad4eeeb2370c1c8074560d4",
+        "bytes": 1127
+      }
+    ],
+    "observations": [
+      {
+        "label": "diagnose-candidate",
+        "receipt": {
+          "path": "local/plain-ledger-native-high/evaluation/diagnose-candidate.json",
+          "sha256": "eb555331cfcc67a0fe636275f60dbbf41b6b0b4f0226169853caa8f1f11a8f4a",
+          "bytes": 4344
+        },
+        "exitCode": 0,
+        "data": {
+          "observations": [
+            {
+              "case": "bound-source-legacy-migration",
+              "agentId": "claude_code",
+              "old": [
+                [
+                  "2026-08-10",
+                  "15"
+                ]
+              ],
+              "expected": [
+                [
+                  "2026-08-10",
+                  "15"
+                ],
+                [
+                  "2026-08-11",
+                  "15"
+                ]
+              ],
+              "actual": [
+                [
+                  "2026-08-11",
+                  "15"
+                ]
+              ],
+              "completeness": "complete"
+            },
+            {
+              "case": "bound-source-legacy-migration",
+              "agentId": "gemini_cli",
+              "old": [
+                [
+                  "2026-08-10",
+                  "15"
+                ]
+              ],
+              "expected": [
+                [
+                  "2026-08-10",
+                  "15"
+                ],
+                [
+                  "2026-08-11",
+                  "15"
+                ]
+              ],
+              "actual": [
+                [
+                  "2026-08-11",
+                  "15"
+                ]
+              ],
+              "completeness": "complete"
+            },
+            {
+              "case": "bound-source-legacy-migration",
+              "agentId": "qwen_code",
+              "old": [
+                [
+                  "2026-08-10",
+                  "15"
+                ]
+              ],
+              "expected": [
+                [
+                  "2026-08-10",
+                  "15"
+                ],
+                [
+                  "2026-08-11",
+                  "15"
+                ]
+              ],
+              "actual": [
+                [
+                  "2026-08-11",
+                  "15"
+                ]
+              ],
+              "completeness": "complete"
+            },
+            {
+              "case": "bound-source-legacy-migration",
+              "agentId": "antigravity",
+              "old": [
+                [
+                  "2026-08-10",
+                  "15"
+                ]
+              ],
+              "expected": [
+                [
+                  "2026-08-10",
+                  "15"
+                ],
+                [
+                  "2026-08-11",
+                  "15"
+                ]
+              ],
+              "actual": [
+                [
+                  "2026-08-11",
+                  "15"
+                ]
+              ],
+              "completeness": "complete"
+            },
+            {
+              "case": "same-observed-event-after-account-remap",
+              "expected": [
+                [
+                  "2026-08-10",
+                  "10"
+                ]
+              ],
+              "actual": [
+                [
+                  "2026-08-10",
+                  "20"
+                ]
+              ],
+              "completeness": "complete"
+            },
+            {
+              "case": "conflict-diagnostic-consumer",
+              "expectedTotals": [
+                [
+                  "2026-08-10",
+                  "22"
+                ]
+              ],
+              "actual": [
+                [
+                  "2026-08-10",
+                  "22"
+                ]
+              ],
+              "completeness": "partial",
+              "adapterDiagnostics": [
+                {
+                  "code": "event_ledger_conflict",
+                  "phase": "collect"
+                }
+              ],
+              "normalizedDiagnostics": []
+            },
+            {
+              "case": "missing-exact-cutover",
+              "expected": "fail closed",
+              "actual": [],
+              "completeness": "complete",
+              "rejected": false
+            },
+            {
+              "case": "corrupt-reloaded-state",
+              "expected": "fail closed",
+              "actual": [],
+              "completeness": "complete",
+              "rejected": false
+            }
+          ]
+        }
+      },
+      {
+        "label": "diagnose-corrected-reference",
+        "receipt": {
+          "path": "local/plain-ledger-native-high/evaluation/diagnose-corrected-reference.json",
+          "sha256": "a0a9ab54fc914d4ba5bf7df3483fb5e574fd388a9b69d2c7680f7ed1f2c9b320",
+          "bytes": 4741
+        },
+        "exitCode": 0,
+        "data": {
+          "observations": [
+            {
+              "case": "bound-source-legacy-migration",
+              "agentId": "claude_code",
+              "old": [
+                [
+                  "2026-08-10",
+                  "15"
+                ]
+              ],
+              "expected": [
+                [
+                  "2026-08-10",
+                  "15"
+                ],
+                [
+                  "2026-08-11",
+                  "15"
+                ]
+              ],
+              "actual": [
+                [
+                  "2026-08-10",
+                  "15"
+                ],
+                [
+                  "2026-08-11",
+                  "15"
+                ]
+              ],
+              "completeness": "complete"
+            },
+            {
+              "case": "bound-source-legacy-migration",
+              "agentId": "gemini_cli",
+              "old": [
+                [
+                  "2026-08-10",
+                  "15"
+                ]
+              ],
+              "expected": [
+                [
+                  "2026-08-10",
+                  "15"
+                ],
+                [
+                  "2026-08-11",
+                  "15"
+                ]
+              ],
+              "actual": [
+                [
+                  "2026-08-10",
+                  "15"
+                ],
+                [
+                  "2026-08-11",
+                  "15"
+                ]
+              ],
+              "completeness": "complete"
+            },
+            {
+              "case": "bound-source-legacy-migration",
+              "agentId": "qwen_code",
+              "old": [
+                [
+                  "2026-08-10",
+                  "15"
+                ]
+              ],
+              "expected": [
+                [
+                  "2026-08-10",
+                  "15"
+                ],
+                [
+                  "2026-08-11",
+                  "15"
+                ]
+              ],
+              "actual": [
+                [
+                  "2026-08-10",
+                  "15"
+                ],
+                [
+                  "2026-08-11",
+                  "15"
+                ]
+              ],
+              "completeness": "complete"
+            },
+            {
+              "case": "bound-source-legacy-migration",
+              "agentId": "antigravity",
+              "old": [
+                [
+                  "2026-08-10",
+                  "15"
+                ]
+              ],
+              "expected": [
+                [
+                  "2026-08-10",
+                  "15"
+                ],
+                [
+                  "2026-08-11",
+                  "15"
+                ]
+              ],
+              "actual": [
+                [
+                  "2026-08-10",
+                  "15"
+                ],
+                [
+                  "2026-08-11",
+                  "15"
+                ]
+              ],
+              "completeness": "complete"
+            },
+            {
+              "case": "same-observed-event-after-account-remap",
+              "expected": [
+                [
+                  "2026-08-10",
+                  "10"
+                ]
+              ],
+              "actual": [
+                [
+                  "2026-08-10",
+                  "10"
+                ]
+              ],
+              "completeness": "complete"
+            },
+            {
+              "case": "conflict-diagnostic-consumer",
+              "expectedTotals": [
+                [
+                  "2026-08-10",
+                  "22"
+                ]
+              ],
+              "actual": [
+                [
+                  "2026-08-10",
+                  "22"
+                ]
+              ],
+              "completeness": "partial",
+              "adapterDiagnostics": [
+                {
+                  "code": "local_event_identity_conflict",
+                  "phase": "collect"
+                }
+              ],
+              "normalizedDiagnostics": [
+                {
+                  "code": "local_event_identity_conflict",
+                  "phase": "collect"
+                }
+              ]
+            },
+            {
+              "case": "missing-exact-cutover",
+              "expected": "fail closed",
+              "rejected": true,
+              "diagnosticCode": "opencode_cutover_required"
+            },
+            {
+              "case": "corrupt-reloaded-state",
+              "expected": "fail closed",
+              "rejected": true,
+              "diagnosticCode": "local_store_unreadable"
+            }
+          ]
+        }
+      },
+      {
+        "label": "privacy-candidate",
+        "receipt": {
+          "path": "local/plain-ledger-native-high/evaluation/privacy-candidate.json",
+          "sha256": "b7026f5a785dffdb6e757046840f604950ba18bbc45e4e0c825730e92229fb33",
+          "bytes": 1307
+        },
+        "exitCode": 0,
+        "data": {
+          "case": "valid-64-hex-provider-id",
+          "total": "15",
+          "completeness": "complete",
+          "expectedRawIdPersisted": false,
+          "rawIdPersisted": true
+        }
+      },
+      {
+        "label": "privacy-corrected-reference",
+        "receipt": {
+          "path": "local/plain-ledger-native-high/evaluation/privacy-corrected-reference.json",
+          "sha256": "4bc55b2e216ea4f02032b679d79ca5ed33611898b835e67040a80e5744679d0d",
+          "bytes": 1318
+        },
+        "exitCode": 0,
+        "data": {
+          "case": "valid-64-hex-provider-id",
+          "total": "15",
+          "completeness": "complete",
+          "expectedRawIdPersisted": false,
+          "rawIdPersisted": false
+        }
+      }
+    ]
+  },
+  "limitations": [
+    "Full corepack pnpm verify unavailable due to uncached pinned pnpm/web dependencies and disabled network.",
+    "Ten passing frozen tests and finite source bounds do not establish the whole task.",
+    "Reference compatibility repair is separate from M; historical reference is not claimed universally correct."
+  ]
+}

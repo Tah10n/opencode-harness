@@ -1,107 +1,166 @@
-# Compatibility repair update
+# One native plain account-switch-ledger attempt
 
-At the user's subsequent request, the Antigravity defect is fixed in a separate
-reference-derived copy. See [REFERENCE-COMPATIBILITY.md](REFERENCE-COMPATIBILITY.md)
-and [reference-compatibility.patch](reference-compatibility.patch). The historical
-reference, archived failures and author baseline are unchanged. The identified
-compatibility obstacle is resolved; full task calibration is still incomplete,
-and no author run or push has occurred.
+**The complete task was not satisfied: Q=false, T=true, D=false.** One ordinary
+native attempt ended normally and delivered a portable, unchanged patch. Its
+project suites pass, but independent checks reproduce lost accepted usage,
+duplicate accounting and incomplete compatibility. This is a deliberately
+revisited development example, not held-out evidence or a reliability estimate.
+Material UI 18141 remains a separate successful control and was not rerun.
 
-The following is the retained pre-repair admission record, not the current status
-of the supplementary corrected copy.
+## Run and delivery
 
-# Admission blocked by reference compatibility failure
+The exact archived task (1,468 bytes; SHA-256
+c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb)
+and baseline 2b16b6a8ad75b6b852adc5e2189e6d4a8d93eabd were restored from the
+historical archive. The technical environment block is separate. The author
+received the full public baseline, original task and verified environment; no
+reference, old solution, evaluator or historical failure was supplied.
 
-The full original account-switch-ledger task has **not** been executed. No Luna
-request or scripted preflight has been made. The source/task provenance is
-established, but reference calibration does not satisfy the user's pre-run
-condition for all mandatory behavior. This is neither a new plain-model failure
-nor a replacement for the requested full task-run.
+The single scripted preflight passed native read/edit/bash, ordinary Git diff,
+203 original tests, spill retention, capture and termination. Its eight requests
+were handled locally; it made zero real provider calls. The task, acceptance,
+hashes, configuration, one slot and 1800-second budget were committed locally in
+1648f34c before the first real request.
 
-The exact archived task is 1,468 bytes, SHA-256
-`c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb`.
-All baseline test/fixture hashes match the historical `before.json`. The archive
-was read without changing historical experiments. Both public commits exist in
-the local VibeRacing Git database; execution copies were extracted from exact
-`git archive` outputs. No VibeRacing source was edited or published.
+One OpenCode 1.18.26 / openai/gpt-5.6-luna high attempt used the pinned Node
+v24.19.0/Git 2.39.5 image recorded in [manifest.json](manifest.json). The complete
+project was writable in an isolated tmpfs with a fresh one-commit Git history
+and no remote. Webfetch stayed denied globally and for build. No harness plugin,
+advisory, externally assigned reviewer, intervention, continuation or second
+attempt was used. The author independently invoked the ordinary native read-only
+explore tool once; both build/explore sessions and their requests are counted.
 
-## Fresh observations
+Native execution lasted **1,737.870 seconds**, and the whole slot 1,740.187
+seconds. It ended with exit 0 and an ordinary stop before the deadline. Capture
+and termination are verified, the relay/container was removed, and no provider
+handler remained. The corrected collector reported complete evidence. This real
+run produced no native spill files; spill retention was exercised by the
+scripted preflight, not inferred from the real run.
 
-| Check | Baseline | Reference | Meaning |
-| --- | --- | --- | --- |
-| Original saved SQLite probe | 0/1 | 1/1 | Deletion retention, fresh event and replay after JSON roundtrip |
-| Original saved five-adapter lifecycle probe | 0/5 | 5/5 | Claude, Gemini, Antigravity, Qwen, Kimi; move/truncation/replay/ranges; stable-ID conflicts and privacy |
-| Historical Kimi 0.4.3 migration with JSON reload | 0/1 | 1/1 | Baseline double-counts copied accepted events; reference preserves 20/21 totals through copy/move/truncation |
-| Public Antigravity compatibility probe | 2/2 | 0/2 | Reference silently drops supported old input forms |
-| Each revision's reader/config/protocol suites | 203/203 | 241/246 | Different inventories; reference's five failures require unavailable historical npm packages, so not five product defects |
+[M](model.patch) changes nine files, with 355 insertions and 45 deletions. All
+patch bytes and modes were applied without repair to an exact baseline Git copy
+F. E is a separate identical implementation copy with external probes. Its
+implementation hashes match F before and after evaluation. No VibeRacing source
+repository was edited or published.
 
-The two saved probes are unchanged, including their `/workspace` import target;
-that mount points directly to the corresponding extracted revision. They use
-real adapters and SQLite, without mocks. The lifecycle/SQLite probes serialize
-nextState and use the restored object on the next call. No test-count aggregate
-is used to claim whole-task calibration. CLI persistence, complete migration,
-remaining independent old-input paths, account boundaries, overflow/corruption
-and upload privacy remain incompletely calibrated as itemized in PLAN.md.
+## Observed checks
 
-All checks used the existing native launcher image
-`sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6`,
-Node v24.19.0 and Git 2.39.5. `/tmp` stayed noexec; TMPDIR was the task's writable
-exec tmpfs `/work`. No owner check or containment policy was disabled. Standalone
-image `rg` is absent; the existing launcher normally supplies its prepared `rg`.
-The complete native execution environment and project-wide `pnpm verify` were
-not certified. Connector baseline scoped checks need no external npm packages.
+| Check on final unchanged M | Result | Scope |
+| --- | --- | --- |
+| F readers / config / protocol | 87/87 + 103/103 + 14/14 | 204 project tests pass |
+| F corepack pnpm verify | Unavailable | Pinned pnpm/web dependencies not cached; network disabled |
+| E saved SQLite lifecycle probe | 1/1 | Deletion retention, new event, JSON reload and replay |
+| E five JSONL lifecycle probes | 0/5 | Accepted old day is lost after move/truncation |
+| E legacy Antigravity input | 2/2 | Baseline-supported aliases and JSON reload |
+| E historical Kimi 0.4.3 migration | 0/1 | Copy doubles 20/21 into 40/42 |
+| E other migration/cutover/conflict checks | 1/8 | Confirmed-cutover fixture passes; six behavioral failures and one diagnostic-name mismatch |
+| E real CLI persistence | 6/6 | Four separate sync processes per adapter, disk reload, deletion/new events and two isolated source mappings |
 
-## Concrete reference defect
+The frozen E inventory is **10 pass / 13 fail / 0 skipped, 23 tests**. Twelve
+failures demonstrate retention, migration or cutover violations. The thirteenth
+requires the reference spelling of a new conflict diagnostic; that spelling
+alone is **not** treated as a product defect or used to determine Q. First-tuple
+retention and unrelated valid SQLite usage pass that case. A separate consumer
+observation confirms that the author's diagnostic is actually discarded by the
+existing normalization path, which is an integration consequence rather than a
+name preference.
 
-Two separate one-record JSONL inputs are accepted by the public baseline parser
-and collector:
+Some later conflict/range assertions in the five lifecycle chains were not
+reached after earlier failures. No pass is inferred for those assertions. Range
+filters and finite scan/storage bounds were inspected in source, and ordinary
+range/component tests pass; this is not an exhaustive load or performance test.
 
-```json
-{"id":"private-legacy-event","timestamp":"2026-08-10T12:00:00Z","usage":{"input_tokens":10,"output_tokens":5,"total_tokens":15}}
-{"session_id":"private-legacy-event","date":"2026-08-10","usage":{"input_tokens":10,"output_tokens":5,"total_tokens":15}}
-```
+The author's final reader check followed its last Claude edit and passed 87/87.
+Its config/protocol checks passed before that final edit. Independent F confirms
+all 204 tests on the actual final M; evaluator success is not attributed to the
+author. The author also attempted and accurately reported the unavailable
+repository-wide gate. These are local results, not CI certification.
 
-With range 2026-07-15 through 2026-08-14, expected output is date 2026-08-10,
-total 15, input 10, output 5, zero remaining components. Baseline collection
-returns it and preserves it through JSON serialization/replay. Reference's
-parser also returns it, but reference's collector returns `entries: []` with
-`completeness: complete` in both cases. The failure occurs before reference
-serialization assertions; no reference roundtrip success is claimed.
+## Concrete consequences
 
-Reference `adapters/antigravity.mjs:73-82` accepts only literal `id` and `date`
-when building the event key, although its public parser accepts `session_id`
-and timestamps. Reference `adapters/shared.mjs:491-503` puts such records into
-`unseenLines`; its later parser call checks unsupported counts but does not add
-parsed totals to the returned ledger-derived entries. This is observable silent
-loss, not a ledger-name or metadata assertion. Baseline preservation in the
-original task is the criterion; the historical solution is not an oracle here.
+All inputs, expected/actual observations, receipts and final-source locations
+are recorded in [assessment.json](assessment.json). The additional reproductions
+confirm the already declared clauses; they do not alter the frozen E score and
+were never returned to the author.
 
-The reference's separate five config-suite failures name missing
-`@viberacing/connector-0.4.3` / `connector-0.4.4` npm aliases. Full outputs remain
-private with hashes in calibration-receipts.json. No dependencies were upgraded,
-no assertions removed, and no reference repair was attempted.
+- **Public collection retention:** shared JSONL and independent Claude use the
+  ledger only when source/account ID is present. Existing collection calls with
+  only dataPath lose the accepted 15-token day after a move or truncation.
+- **Migration with full source/account metadata also fails:** baseline-generated
+  accepted state containing an old 15-token day, followed by source replacement
+  and JSON reload, returns only the new day as complete for Claude, Gemini,
+  Qwen and Antigravity. Rescanning surviving files is not a conservative migration
+  of accepted data that has disappeared. Kimi's historical copied-state case
+  additionally double-counts accepted usage.
+- **Account remap duplicates an observed event:** the same unchanged 10-token
+  event becomes 20 after a valid account ID changes. Account-dependent hashing
+  creates another ledger identity while both tuples remain in the returned
+  aggregate. The author-added regression itself expects this duplication.
+- **OpenCode cutover is not fail closed:** an accepted server baseline of 100,
+  empty database and missing confirmed exact-ID cutover yield empty entries with
+  complete status. A corrupted serialized ledger also becomes an empty, complete
+  result instead of rejection or explicit partial/unavailable accounting.
+- **Diagnostic integration is incomplete:** a conflicting 150-token rewrite
+  correctly retains the first 15 plus an unrelated 7 and reports partial, but
+  normalizeAdapterDiagnostics removes the new unregistered diagnostic before
+  the CLI's diagnostic state/outbox consumer.
+- **A supported ID shape leaks into persisted state:** a raw Claude provider ID
+  containing 64 hexadecimal characters is mistaken for an existing digest and
+  remains in serialized state. The same record returns 15 tokens in both M and
+  the corrected reference; only M retains the raw ID.
 
-## Status and accounting
+The supplemental corrected-reference observations preserve the accepted totals,
+avoid remap duplication, retain the conflict diagnostic and reject invalid
+cutover/state. They also omit the raw hexadecimal ID. This does not make the
+historical reference a universal oracle: its real Antigravity compatibility
+defect was separately reproduced and fixed at the user's request in
+[reference-compatibility.patch](reference-compatibility.patch). The historical
+reference and author baseline remain intact; that repair is not part of M.
+[The earlier preparation record](PREPARATION-HISTORY.md) is retained separately.
 
-One intended slot, `account-switch-ledger / P / high`, remains `not_started`.
-`delivery_apply`, `delivered_checks`, `assessment_integrity`, Q, T and D are null;
-there is no M or author final response. Contract evaluation on an author patch
-is NOT RUN. Requested 1800-second author budget remains unused. Scripted native
-preflight, real task runs, author/title/service provider requests, author tokens
-and author tools are zero because dispatch never occurred, not because unknown
-usage was replaced with zero. Developing-agent work and eight local calibration
-commands are separate; monetary cost is unavailable and not estimated.
+## Supported trajectory conclusion
 
-No current author trajectory exists, so no mechanism addition is proposed.
-Material UI 18141 remains its separate successful control. Historical outcomes
-and pauses are unchanged. The unresolved decision is whether to preserve the
-strict all-reference-pass admission condition or explicitly permit the single
-run with baseline-backed compatibility oracles and the reference defect exposed.
-No model dispatch or final push is performed while that question is pending.
+The relevant existing truncation-test failure reached actual author requests
+45 and 49, including the retained old day and the old expectation that it vanish.
+The first attempt to add an identity gate failed as a patch operation; successful
+shared/Claude gate edits followed, with success receipts in requests 52/53. The
+author explicitly said it isolated persistence to identity-bearing sources so
+ordinary tests kept their old behavior. The final patch retains that split.
+[trajectory.json](trajectory.json) binds the selected calls to delivered receipts.
 
-The additional Kimi migration check selects the observable portions of public
-PR #50 readers.test.mjs:4313-4367, with unchanged historical input fixture and
-expected totals. Internal `ledger`/`legacyBaseline` assertions are not imported;
-every next-state continuation additionally uses a JSON roundtrip. The baseline
-reaches copy and doubles totals from 20/21 to 40/42. Reference passes all steps.
-This does not certify the other migration or CLI persistence paths.
+For this retention defect, the evidence supports a wrong compatibility boundary
+chosen while satisfying an old assertion explicitly superseded by the task.
+It does not support blaming missing context, lost stdout or a stale final reader
+result. Migration, cutover, privacy and diagnostic issues have their own code
+causes; this one trajectory decision is not asserted to explain all of them.
+
+One minimal process proposal follows: within the **existing final task/diff
+review**, classify an old assertion that contradicts an explicitly requested
+behavior as superseded, and verify the replacement through the same public
+caller before adding a compatibility fallback. No new phase, reviewer, nudge or
+mechanism has been implemented, and no additional comparison is assigned.
+
+## Accounting and limits
+
+| Provider accounting for this one real attempt | Value |
+| --- | ---: |
+| Requests | 90: 89 work, 1 title |
+| Input tokens, including cached input | 13,513,241 |
+| Output tokens, including reasoning | 50,472 |
+| Cached input subset | 9,839,616 |
+| Reasoning output subset | 29,410 |
+| Requests with unknown usage | 0 |
+| Native tool calls / sessions | 162 / 2 |
+
+Cached/reasoning subsets are not added again. No monetary cost is estimated
+without billing evidence. Preparation, local evaluator work and developing-agent
+work are separate from these author numbers; their token/billing totals are not
+available. Full private captures remain local; [result.json](result.json) exports
+safe hashes, counts and statuses, and [evaluation.json](evaluation.json) retains
+the actual check receipts.
+
+The task remains a concrete incomplete plain implementation under the specified
+current conditions. It is not a replacement for the historical low/old-environment
+result, a causal reasoning-level comparison, an estimate such as “1 of 2,” or
+evidence of general harness superiority or uselessness. No repair of M, model
+repeat, availability probe, merge, release or product-default change was made.

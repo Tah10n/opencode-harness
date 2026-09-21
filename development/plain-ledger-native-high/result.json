@@ -1,35 +1,1202 @@
 {
-  "stage": "prepared_preflight_passed",
+  "stage": "evaluated",
   "slots": [
     {
       "slot": 1,
       "task": "account-switch-ledger",
       "arm": "P",
-      "reasoning": "high",
-      "status": "not_started"
+      "status": "completed"
     }
   ],
-  "delivery_apply": null,
-  "delivered_checks": null,
-  "assessment_integrity": null,
-  "contract_results": "NOT RUN on author patch",
-  "Q": null,
-  "T": null,
-  "D": null,
-  "authorRuns": 0,
+  "freezeCommit": "1648f34ca077b248ee4da18a0b33a3d02109642b",
+  "delivery_apply": true,
+  "delivered_checks": [
+    {
+      "file": "local/plain-ledger-native-high/evaluation/F-readers.json",
+      "sha256": "551c0694b1d5e50a4da38e7a6ad9c2185b2cc89e013743560ff7b81dfc5e273f",
+      "exitCode": 0,
+      "counts": {
+        "tests": 87,
+        "pass": 87,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/evaluation/F-config.json",
+      "sha256": "c5e871991519bb87c5019a946508ff16ae5b6bfc76d73c205be5bab17015b575",
+      "exitCode": 0,
+      "counts": {
+        "tests": 103,
+        "pass": 103,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/evaluation/F-protocol.json",
+      "sha256": "32203791446315a6bc3d0e767c849901a483b429339018b9289e68cd63f689fa",
+      "exitCode": 0,
+      "counts": {
+        "tests": 14,
+        "pass": 14,
+        "fail": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "projectVerify": {
+    "file": "local/plain-ledger-native-high/evaluation/F-project-verify.json",
+    "sha256": "0a31d32d162abd48dff5179d2ca35e84bab875af7f473639e13033c588a5054c",
+    "exitCode": 1,
+    "counts": {
+      "tests": null,
+      "pass": null,
+      "fail": null,
+      "skipped": null
+    }
+  },
+  "assessment_integrity": "verified",
+  "contract_results": [
+    {
+      "file": "local/plain-ledger-native-high/evaluation/E-account-switch-ledger.json",
+      "sha256": "9b4114062458b645d587abb19db861acc862a80a3dac05136da468e554520571",
+      "exitCode": 0,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/evaluation/E-ledger-lifecycle.json",
+      "sha256": "239000228e3b0ef9950072378759a2e0f0b6e34b96f302f5f41d0193516025ea",
+      "exitCode": 1,
+      "counts": {
+        "tests": 5,
+        "pass": 0,
+        "fail": 5,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/evaluation/E-legacy-input.json",
+      "sha256": "03bcb1139ef436c011f68fd11e8b9621622783fe5e8b56d186f35691a1065aad",
+      "exitCode": 0,
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/evaluation/E-kimi-migration.json",
+      "sha256": "f85b86618b147a1ffd858e31136f6a2b10dc873725008c0dc17ceb31f2f3ca77",
+      "exitCode": 1,
+      "counts": {
+        "tests": 1,
+        "pass": 0,
+        "fail": 1,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/evaluation/E-migration-contract.json",
+      "sha256": "8d8ba7ee3d9471da94fbdd00982885357190fa1bbf76df7a538b0144d3ba64d3",
+      "exitCode": 1,
+      "counts": {
+        "tests": 8,
+        "pass": 1,
+        "fail": 7,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/evaluation/E-cli-persistence.json",
+      "sha256": "6952513bbf1a8348a196ca2fed39535d6542be6f87a4e891e2452dea852d1052",
+      "exitCode": 0,
+      "counts": {
+        "tests": 6,
+        "pass": 6,
+        "fail": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "contractTests": {
+    "tests": 23,
+    "pass": 10,
+    "fail": 13,
+    "skipped": 0
+  },
+  "Q": false,
+  "T": true,
+  "D": false,
+  "authorRuns": 1,
   "scriptedPreflights": 1,
-  "providerRequests": 0,
-  "authorTokens": 0,
-  "authorToolCalls": 0,
-  "authorElapsedSeconds": 0,
-  "localCalibrationCommands": 14,
+  "scriptedProviderRequests": 8,
+  "scriptedRealProviderRequests": 0,
+  "providerRequests": 90,
+  "requestsByKind": {
+    "title": 1,
+    "work": 89
+  },
+  "unknownServerCompletion": 0,
+  "usage": {
+    "requests": 90,
+    "input_tokens": {
+      "observed": 13513241,
+      "unknown_requests": 0
+    },
+    "output_tokens": {
+      "observed": 50472,
+      "unknown_requests": 0
+    },
+    "cached_tokens": {
+      "observed": 9839616,
+      "unknown_requests": 0
+    },
+    "reasoning_tokens": {
+      "observed": 29410,
+      "unknown_requests": 0
+    },
+    "subsetNote": "Cached tokens are included in input; reasoning tokens are included in output. Do not add them again.",
+    "monetaryCost": null,
+    "monetaryCostReason": "No provider billing record supplied; no inferred dollar estimate."
+  },
+  "nativeTools": 162,
+  "toolsByKind": {
+    "todowrite": 4,
+    "task": 1,
+    "glob": 5,
+    "grep": 20,
+    "read": 69,
+    "bash": 31,
+    "apply_patch": 32
+  },
+  "nativeSessions": 2,
+  "nativeExecutionMs": 1737870,
+  "slotElapsedMs": 1740187,
+  "termination": {
+    "ownTaskDeadlineTriggered": false,
+    "terminationVerified": true,
+    "captureSaved": true,
+    "forwardingClosed": true,
+    "relayRemoved": true,
+    "activeProviderHandlers": 0,
+    "providerServerStateMayRemainUnknown": false
+  },
+  "patch": {
+    "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/model.patch",
+    "bytes": 31778,
+    "sha256": "203f503a88faaa37d0e1a3b4f884507355b9efef0c92bab1e6a1af9819b173b5"
+  },
+  "rawCaptureReceipts": [
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/candidate.tar",
+      "bytes": 10240,
+      "sha256": "84ff92691f909a05b224e1c56abb4864f01b4f8e3c854e4bb4c7baf1d3f6d652"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/capture.json",
+      "bytes": 76,
+      "sha256": "f23124d52211ac1c0e1060ceb0551bd584b7963264747a9edd0fd75e1cb27ebc"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/completed.json",
+      "bytes": 291,
+      "sha256": "7091e5c8f7d3b41826450f3c29d193fe328af707cce8ab2887bf7a4faf1e2c7b"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/evidence-capture.json",
+      "bytes": 105,
+      "sha256": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/input-verification.json",
+      "bytes": 60,
+      "sha256": "890659f31d3ae486aa524f7e3e6a56383a5330220a9b8800d18ef5455a111fce"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/model.patch",
+      "bytes": 31778,
+      "sha256": "203f503a88faaa37d0e1a3b4f884507355b9efef0c92bab1e6a1af9819b173b5"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/native-evidence.json",
+      "bytes": 2936067,
+      "sha256": "b220816f37b85a3e4272f3d60f65edd60e3de05c9087d5db1634c95bf70d412d"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/native-output/attempt-29344eee-f39f-409b-b54f-1d8065566f86.json",
+      "bytes": 472,
+      "sha256": "13b0ae93c65f74ef5880052772311601c5116c667236a44bfe9bd2116585d47c"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/native-output/manifest.json",
+      "bytes": 472,
+      "sha256": "13b0ae93c65f74ef5880052772311601c5116c667236a44bfe9bd2116585d47c"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/patch-capture-process.json",
+      "bytes": 33,
+      "sha256": "5c846afdf4d73aa66f9d740f78f3495333be054db21f33555ca11b4a26b599a6"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/patch-capture.json",
+      "bytes": 113,
+      "sha256": "a5d51b78d6844623fc01a018e63395af00e4c6d19312228eaf942920936f55f0"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/provider-metadata.json",
+      "bytes": 107955,
+      "sha256": "9dbc0ee06fe59986807234fd138b066a465a8b82567bb83461aa6f03687ab44a"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-1.json",
+      "bytes": 4668,
+      "sha256": "e3f294da0a4988ef30577f341a98f399dcafc238ef226184ae788f9a3fc8084a"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-10.json",
+      "bytes": 570845,
+      "sha256": "d99732470aa2d4e98b9ddd57965c286785967ae6dda98b98232c7653f62b56a5"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-11.json",
+      "bytes": 618885,
+      "sha256": "31a0dbf8806a0e69f36b1fd10afc119391fe2d4bc4e5c413966bff3037100517"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-12.json",
+      "bytes": 626678,
+      "sha256": "1ec2d98e637ab3170e63989d925f024232f597b374683705ef0a89a27b696b57"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-13.json",
+      "bytes": 662826,
+      "sha256": "7c05adbd4867d96175bb4199bf1e680ca8d37af1fda9223acb9dd06d9a71bc61"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-14.json",
+      "bytes": 57897,
+      "sha256": "43b4d6b3a79f45ff2344ab005b4feb5354edff012319759e5839d807223d75ba"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-15.json",
+      "bytes": 204716,
+      "sha256": "fab10bba55153d5e3f085107ae9f4cdd122819ff6050365765587d008a2f2bb7"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-16.json",
+      "bytes": 291039,
+      "sha256": "5181fcec5387fd9b581e08d45e75bba6ea5eee6ffaf1161ae98817b3011fd741"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-17.json",
+      "bytes": 367269,
+      "sha256": "d235265cb0b3f32474f943df68db18b9ee7ba0213a3dbeb5bf62fca4063b8ad7"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-18.json",
+      "bytes": 452745,
+      "sha256": "646257198f691c038f21f25b371fab759b2f7b6a3b003e1dfd3185a6dd60cf29"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-19.json",
+      "bytes": 489607,
+      "sha256": "7a9b87289cffe2756215eba84247db6c80f2ef4bf28e989707208f6e0e2ca0c2"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-2.json",
+      "bytes": 31429,
+      "sha256": "2ec0eba49891366603f62dff6749b73a8f09c2722b1308fd91b7498a0cd3a198"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-20.json",
+      "bytes": 493632,
+      "sha256": "1991b39affbcc6cf56277ebe8b031b08672c70e0e2c7cfff4326d05804b838e1"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-21.json",
+      "bytes": 581316,
+      "sha256": "8c947916d9cdd52bbadda02e498cd337b102e38125aa90c197fb70601ca796e0"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-22.json",
+      "bytes": 583856,
+      "sha256": "be99732dac1ba6aa1fad75dcc152be6edda3add2563af39c83763c57df1ac78e"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-23.json",
+      "bytes": 592413,
+      "sha256": "3803308adda7ed243a6aac40b4aece8394800ffa821dbebdfe83418c9ada6bd8"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-24.json",
+      "bytes": 609080,
+      "sha256": "1fcc9d94d7a1e4195c1610a60065a1c9042c1d5f589d9e86884ddc2687eb8407"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-25.json",
+      "bytes": 613067,
+      "sha256": "b9545bf3cf4888b3f014b8592aa8fea75437de4e2d6744fc2b037630e5841cd9"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-26.json",
+      "bytes": 615884,
+      "sha256": "34c1d02728e6df8211337f2f328cdb11a54199aae86e10a907147d4ce725fa30"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-27.json",
+      "bytes": 620959,
+      "sha256": "328c6c8c8243ba0ecb5966d1b40bb02e4d37a961eebfca9717972835290194e9"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-28.json",
+      "bytes": 624960,
+      "sha256": "4fe9a5b0ac90cdcb907b55b02587ec60db35749f15b2ed6f9f1e065d7c01a08c"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-29.json",
+      "bytes": 631094,
+      "sha256": "67e9256b6e6e939d695e975d969a1f464c2a6bccf96cbd40556d96b9c9f03871"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-3.json",
+      "bytes": 34711,
+      "sha256": "fae06a631a9cde0ac4bb27926bdf5774b67e840792882e78f1829741473f301a"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-30.json",
+      "bytes": 633787,
+      "sha256": "e86d4fa8b9b1b12c53aec5b8c09176f3446bd255e54fcd4b9209111cc4ba89ab"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-31.json",
+      "bytes": 642941,
+      "sha256": "4e9bfe8b705c42f4bd1dc4ab1de664f4a3383c0dcfddcf682d3776834bc90503"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-32.json",
+      "bytes": 665030,
+      "sha256": "737850d2a709ed0e10baf75531e34d229f32094306de7d0217d47165d10a0196"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-33.json",
+      "bytes": 669175,
+      "sha256": "79f20e7eafa2c8f14bf6fc7986ff0352ed056633dc9babb663d1cdda88c6cd1b"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-34.json",
+      "bytes": 673929,
+      "sha256": "98fbf132a49dd8f0b8b852c05f8a50092b5b6a0b1d0a73ef7a47700bdc28c705"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-35.json",
+      "bytes": 676705,
+      "sha256": "b471af49cb2ccfd05f5e6ecebed07df125cf6808ab5bcb50885ad2e25e99ba29"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-36.json",
+      "bytes": 679319,
+      "sha256": "3c48077627a46a1bc8299ee16cbdeec386cae7cea6625fec81a4429439a810e1"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-37.json",
+      "bytes": 682467,
+      "sha256": "717fe6d4a6cc4695af3769256ad03be9eb7d1821c91f8e186f40bae1a1592bcd"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-38.json",
+      "bytes": 684522,
+      "sha256": "1837ce1d60b3f3de1db316f3b455e280049247ea8c2b2d1def9f363ffc87eb72"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-39.json",
+      "bytes": 702226,
+      "sha256": "51fbcff6cb35cec7410a85bbe4bf5b664b0f6d9ff3ebe8012399c7974afe3093"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-4.json",
+      "bytes": 12005,
+      "sha256": "f6bef0fc733e7487c7d7eb0cd0d14f8abe4f5b1ebbbe589c31d7b0a44c542d3b"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-40.json",
+      "bytes": 710526,
+      "sha256": "7c37ece2e6bb90e8eb1f284d1b01ccb886f23985fd991fb85fd137a9b76494b5"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-41.json",
+      "bytes": 715606,
+      "sha256": "d3c83199d7160b6ecd30dcc165b8ff126fbb620d490b5dacbcfaaadd6b798681"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-42.json",
+      "bytes": 720517,
+      "sha256": "3f628ee7310ac7c72eee1a743444e4cb348d66e4ee71dad018cb76f6f1b1b4d0"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-43.json",
+      "bytes": 726078,
+      "sha256": "6aba955d555d9a42cb0429fa69f44607528e7c529969945fca3200b24362e175"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-44.json",
+      "bytes": 728859,
+      "sha256": "8892774a56e85376f798890c5a43cdd7364b7f259656faf52a5c3f281de2b9f5"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-45.json",
+      "bytes": 740737,
+      "sha256": "85152e5cc98bbe87bff61cda1d6d06f11e8bc9db015689d5fdd54e7d30a67290"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-46.json",
+      "bytes": 744252,
+      "sha256": "e81381234c3ccbae920e8743fa1cfbc25a11880668b357571316d7dd2ad6141a"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-47.json",
+      "bytes": 755166,
+      "sha256": "542e4be61d4175c57f513428f3c4fb5f83a5a551c2efa25fcd5a5d2afb3bc184"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-48.json",
+      "bytes": 763949,
+      "sha256": "2bba6151dbcbd3f8b44eebff4bd6d96a1aee8620b4c575c7c5efe83f42231c45"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-49.json",
+      "bytes": 775652,
+      "sha256": "709e49182582eec196ea6de186c1efe4b76d07f1017e348136aa4fde36f5fb27"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-5.json",
+      "bytes": 24986,
+      "sha256": "32f07da3940f1739034a31466dd9ac4b2ccec0131814ca788fa58fca6b430b9a"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-50.json",
+      "bytes": 784234,
+      "sha256": "268fce076a12ce0a02a6b6efcc23a9cd3f57a83d88ca38e20e521ae1efad5b28"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-51.json",
+      "bytes": 789266,
+      "sha256": "90a1dfb594d9aa62e0007cc3f7dfea0f77722395b26346791e4d679639e99938"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-52.json",
+      "bytes": 790735,
+      "sha256": "0a36919fbad658b9b655714035aaf76a08abc713cad4413f736269453691a3b7"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-53.json",
+      "bytes": 793665,
+      "sha256": "75610e53b3a2e05679fce2d8b9b41107f5ecff3dedf8697c884a2d99736fccc2"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-54.json",
+      "bytes": 800515,
+      "sha256": "d7e0608b53068d9472b37df13adb63dfe6cb9bcf409ad8ffa0ced577e7805ca5"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-55.json",
+      "bytes": 803630,
+      "sha256": "ee0bd182cdfaf3265ec219f9e36ee1540be92ba1bb82276f28f8de6d88489d70"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-56.json",
+      "bytes": 813315,
+      "sha256": "770f3a96c77fc6df9b36bf4e6f84815536a11b4aaecf1c4170175b61b7207bd1"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-57.json",
+      "bytes": 822560,
+      "sha256": "04c9956437ebe65ef126a72da8e9c4b9af326dc7937256040007b4f480e9b658"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-58.json",
+      "bytes": 825814,
+      "sha256": "13e337aa640f34cbc3a59b8d3a6cfb66e90daa0b550143768fd65cbb17d47d65"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-59.json",
+      "bytes": 831811,
+      "sha256": "26f77e48ec6d862a22af2fef3cfbb936c7022de9896734ce072cb13bf0a2edb1"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-6.json",
+      "bytes": 140452,
+      "sha256": "cc77ce78f90ffc936719d0835d3a51d608c5394d5b824d17c7e6ce90e787cbbc"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-60.json",
+      "bytes": 837721,
+      "sha256": "93a408b7612875cdf58a805687909fa88c04ddcfe949898f7e0e6d49317c17a0"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-61.json",
+      "bytes": 842355,
+      "sha256": "b5070bd89a77751bec0ddb046e130859b256d07491e676e86d078a4ec45e70b1"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-62.json",
+      "bytes": 854724,
+      "sha256": "558a73e6a5610d74250fab8f86c5f8283ebbcfdaf590f5f225e3624b1167aae8"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-63.json",
+      "bytes": 859267,
+      "sha256": "6681cb60ce83464a5a8db1b93b25ef30d65f4d14538d4a574304cedca35d1dd1"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-64.json",
+      "bytes": 861357,
+      "sha256": "ef0a9c04ce1d588fc1d4922a265bcf31ddb96e96df7c57b429f2c2aff6fb0caf"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-65.json",
+      "bytes": 865610,
+      "sha256": "43ff14770d43daa2de275f99ee14efd3c4a28b635f2e0fc9de73f7d8050c7773"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-66.json",
+      "bytes": 869219,
+      "sha256": "de43157d9fc8ef038a0f30d9ba7383170202c028b9b006df2a3425beafebf770"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-67.json",
+      "bytes": 875239,
+      "sha256": "a72ea9cf27f4aeed525ce220d88d9e7d1faa02c049a9879b116c18cb5b308951"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-68.json",
+      "bytes": 884376,
+      "sha256": "0a65a4549dcd7751f7240e46baf994960decee5b44f99e91eea2df916f8ea877"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-69.json",
+      "bytes": 887646,
+      "sha256": "4d0097c3d744699a2b75e6f11ee70c14611789b3870444243749d6b45f7e42d5"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-7.json",
+      "bytes": 264503,
+      "sha256": "ddb13bb9aba01f30b419179b4c9455730b671265e66cb14f97c3f68cc88fb2f3"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-70.json",
+      "bytes": 890290,
+      "sha256": "8d4a0eae5ea6663ac4ef21cb02c1f24f188ff9925574791899db3329d22b38cc"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-71.json",
+      "bytes": 891568,
+      "sha256": "bfbe4fc66262c1b642602d286305838456d2afb19478f38efc26dafb756ca8fb"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-72.json",
+      "bytes": 894718,
+      "sha256": "0e33ed0f6858825aee7f2c713008d56fb37f7366440020f88984fca2dc36f3c5"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-73.json",
+      "bytes": 897965,
+      "sha256": "b102923016accf530a8f46728d5d286a678b241bca1e08d17d47287e4c595d2c"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-74.json",
+      "bytes": 907156,
+      "sha256": "876fbf7cee013cf9132c189272264b943652c0f7da1df02f47f275046c30e714"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-75.json",
+      "bytes": 914971,
+      "sha256": "1e786e59d06a6f2e51c71f28231e06fdc9eb805bab2fbfd9d2fd24245d4c85c2"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-76.json",
+      "bytes": 927495,
+      "sha256": "057fb0f01fe99de5b4f08ad3441b43a26954e5478e316b34f6001770334e306c"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-77.json",
+      "bytes": 940557,
+      "sha256": "8577bd4edbebee37e6dd110dce21b933e34c99c9426015fcfe7b85cdfbc10264"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-78.json",
+      "bytes": 974988,
+      "sha256": "2207adc60af95978e254ad5954ee5c9d47b08916f4d484d129befddba501903b"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-79.json",
+      "bytes": 979953,
+      "sha256": "957abb371c127bbbcd82e6e07e9e73a09471e8ecc30a1bca696a2e939a918ea3"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-8.json",
+      "bytes": 417186,
+      "sha256": "317cec45067e13664d6d5f9db81089cc4dcb7867442e729d64099c1b16a89371"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-80.json",
+      "bytes": 982264,
+      "sha256": "23148c00b7096856cbe62a4ae9251616e5f2f6d9d031afedff6e12f13f27c3fd"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-81.json",
+      "bytes": 992096,
+      "sha256": "46b63d4f024114a60b0fb5895d34e4749ad4e7190948fd9809a504aa3266d161"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-82.json",
+      "bytes": 994608,
+      "sha256": "3d493a55cfa87360c38e33b7971368f79a7408ae400bd41d42c48d2dbf59d66d"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-83.json",
+      "bytes": 1007847,
+      "sha256": "28a04d071a41f16dc200a5ced54b1198607c9b4dc2634903a196c6f6dd618a48"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-84.json",
+      "bytes": 1013764,
+      "sha256": "012b8f5e2b444d49666b638fb5b0095b37f88c439149e76acd4253ef7a26ee97"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-85.json",
+      "bytes": 1015433,
+      "sha256": "b91223f686912daa66842cfbf293ba09ac64dad91ebec95731107e5dc33673b2"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-86.json",
+      "bytes": 1029838,
+      "sha256": "d5b0a2016e92f7badaec02898ecf6ca97efe5bc088f3ce9de048777c88acaca6"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-87.json",
+      "bytes": 1037651,
+      "sha256": "4c657af510f5eb2f910882151197e29482c610cb8d07a6adf9f0b438eb5c7b88"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-88.json",
+      "bytes": 1047371,
+      "sha256": "e3a0a137341042e327692e02d6d151221cffbddbf3fbe2124ffc41315ce99326"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-89.json",
+      "bytes": 1050285,
+      "sha256": "78848301a3ea84d4539416e53083bb2ea05df686282d33c90c80b7212954e54d"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-9.json",
+      "bytes": 453852,
+      "sha256": "6894a0134e5ba09287175915525057f020a10791c024ff0c20069120083f3d65"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/request-90.json",
+      "bytes": 1053107,
+      "sha256": "9f30893236cb4f459742c527f8f3e2cf58b114d7c7b6120ba02a8e29b8253bec"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-1.sse",
+      "bytes": 12921,
+      "sha256": "4fdf1cf35936783c3000ff5a6a74070bf47bdf2496402fe113e604bc3fac353f"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-10.sse",
+      "bytes": 60474,
+      "sha256": "aef651b40e9713567f6424ba0a7bb0cf057edaa14d788d3020ef1381fd1cf5b7"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-11.sse",
+      "bytes": 63377,
+      "sha256": "1871c9b5af19d9cb402bbb6eb267b6924f1c840d2477bb67a6ff831e06f66790"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-12.sse",
+      "bytes": 74943,
+      "sha256": "27335aae020196bbb9add0864b9bd5e144cc6b923f3115d89a9feaefc750196c"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-13.sse",
+      "bytes": 731522,
+      "sha256": "4a3a7ccfca9da66d2bad1e2607546bfa2c322000ea82eaef7e0388cb2fc33569"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-14.sse",
+      "bytes": 86337,
+      "sha256": "b1475ff11a2acc9f74296976f4a6abd54a7406ad493ee2d95001873032e80f0a"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-15.sse",
+      "bytes": 72943,
+      "sha256": "347cd7f595a87a6514862f31352e8f3ab3feedfd202e98aaf577f7893e90c76d"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-16.sse",
+      "bytes": 74458,
+      "sha256": "791f9fbbf4a4aa82edf166ab1d678baf03882fd5b08687d07d5ba5466b204095"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-17.sse",
+      "bytes": 79807,
+      "sha256": "baefa8aafd3c59e6f982414f992c998475ce0b8a07df496a236740e162035a99"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-18.sse",
+      "bytes": 100743,
+      "sha256": "349217f0ad32b4539b7d27e75e40ec9cb0bb0b0ea55e5589d00d93dc319e9bd2"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-19.sse",
+      "bytes": 78008,
+      "sha256": "7648873eb18b7201fa801b4772fd166311c80a393bc28fc3d2fb4a4e80dd9cff"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-2.sse",
+      "bytes": 101155,
+      "sha256": "9072a0efb42b971a5f5dc019d1ecf11c4add4363a4bd786ed29c2396ed0ac458"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-20.sse",
+      "bytes": 246789,
+      "sha256": "d4e6522f4f795bc585899f457a468dda3688176bff51797796b9c260af4e2d89"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-21.sse",
+      "bytes": 88165,
+      "sha256": "f6fc0616252caa26a40c72da815ddc2057b261d69a55baca38fa0654b3c5c1e0"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-22.sse",
+      "bytes": 80708,
+      "sha256": "336ea57c02f63b45a6fa365238372a1238bfa8156b8b700b85cf6c266ea18afe"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-23.sse",
+      "bytes": 373651,
+      "sha256": "d5523c9d57be4140077549e1f16298f3e7049a51d9c03133aef0be673b65b056"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-24.sse",
+      "bytes": 228063,
+      "sha256": "7108dd2f14e496cfb430daa56eb2b84e335d1cbb246ac3e9b986f4e9dbad57b8"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-25.sse",
+      "bytes": 121477,
+      "sha256": "950a24541b49a68ab47d93fe180dbe3cccfdd997a8fbdf25c5e814a1320da338"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-26.sse",
+      "bytes": 293390,
+      "sha256": "877a57613880829d6abfd4962c79e14f4caebe88ff65bf4d181f31d65823a320"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-27.sse",
+      "bytes": 104468,
+      "sha256": "7d6f9dd2a11941e3b28a6ed3f16d3e719b85462f1a55f2b206766b9cea1e3611"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-28.sse",
+      "bytes": 235500,
+      "sha256": "80afdf9e5d14b20bb4a6ff7a67a36a0c119d1d3d35db1438d864bc71bb1644df"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-29.sse",
+      "bytes": 116931,
+      "sha256": "b3da1e38b9fd1e0bceebd7b7a2ea3b79b9427331007578f7cc5a0f9ccee113f5"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-3.sse",
+      "bytes": 63501,
+      "sha256": "8f5aa30fb6d9d531082aa064567e83a2b4567645b1fe16a89b4e2fb0bd407bf6"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-30.sse",
+      "bytes": 399708,
+      "sha256": "04f7bed59ba9189bb9a64191b993ac9eddf8ce75fadd3807c950a70cf3b6619e"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-31.sse",
+      "bytes": 94464,
+      "sha256": "ba6b828d955be3b7c5e46eabbadd2f5c5f1c7b577a1375bee47f2bc9d354d2e7"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-32.sse",
+      "bytes": 146466,
+      "sha256": "5ff1686c40aa77bf2625e168bb0237e96a7b0e7172becc0902eb5e76106ad817"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-33.sse",
+      "bytes": 92466,
+      "sha256": "726b0ecb0ea6449ccb181b0043eca731ee3f7967a827d102f8509dacff4883a6"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-34.sse",
+      "bytes": 124208,
+      "sha256": "69c8d1e5a89afd404997c1198b3dcd498ef8af5c1e5c8f7f6ad2fd696fa0af25"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-35.sse",
+      "bytes": 115516,
+      "sha256": "3c38c212531aa04baa039005112407cafa611ee33feec6dc2e9c1c1a1a9d8431"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-36.sse",
+      "bytes": 92914,
+      "sha256": "f95d92d151bd3e4702ccdfc934797a74dffab5bca135436c2e1809e41117e632"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-37.sse",
+      "bytes": 117924,
+      "sha256": "d5f1ea09b0346eb2106df71cec7f9db71a8c8845b82d3bcccf6abf385f22252c"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-38.sse",
+      "bytes": 93482,
+      "sha256": "6193900065ccee6b0af23706dac090562a862c367091f5eabc5fa3b5cc868cd2"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-39.sse",
+      "bytes": 144616,
+      "sha256": "3551a8e9d94a98400d6845ec44f57113ab44deb951e1c42c1d21da75af6162b7"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-4.sse",
+      "bytes": 40709,
+      "sha256": "1b027b2924f25f1e3b52475d561c172388468439ca9ed279bae1034eb6f71e76"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-40.sse",
+      "bytes": 95160,
+      "sha256": "0858c556e96d8a58ea7f7cc7d1dde5a8a1fd0afef9608298eaf4db83ba0a7b58"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-41.sse",
+      "bytes": 91070,
+      "sha256": "a0559d3688969a9ea3bbdc369c6f9943a0bbdce910b25cafdb6b17b79824b8be"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-42.sse",
+      "bytes": 166631,
+      "sha256": "0cd28d8bd544cc0f4d83df7c66904d048cf7d0f0a62a6db9c05329e18134eab3"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-43.sse",
+      "bytes": 135256,
+      "sha256": "9fb6f76a7a6e76136cef2f54050132937dc06207fec48807f64b5cbadd379f10"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-44.sse",
+      "bytes": 98055,
+      "sha256": "f601029f9d9e665a89b277c3ad05f51fe25b0a1cb65226ccf56db35351650134"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-45.sse",
+      "bytes": 143354,
+      "sha256": "34a5c6dd86212b66c51253eff92850352c100f0588509b3ee8c7fde88da57344"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-46.sse",
+      "bytes": 99174,
+      "sha256": "b4647c1adb2526b2d8eb7ef31486ad8bc1ad90d58ccc70a7b6bb7bb96cd96ff1"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-47.sse",
+      "bytes": 156271,
+      "sha256": "83a8376beae8d21c0af8df8b87e231c90450e85defc820defccaea8e10cf931d"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-48.sse",
+      "bytes": 99757,
+      "sha256": "119ab2f9077c597c4564720ac8c04f5060860e7a419b0374e1b091c65aabf775"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-49.sse",
+      "bytes": 188039,
+      "sha256": "7ec770e01e540ccaefa517e8c9e375c7c8380d969289809c1638351ca3d8affd"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-5.sse",
+      "bytes": 45775,
+      "sha256": "4b5af4ad5525198d5c3ed760584deb2d6f977c7379474386938abc1a3c9c4c6f"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-50.sse",
+      "bytes": 98992,
+      "sha256": "3ebcd581fa9700974622691b05626acb5c3e1cafcedd14c9af15afb5e7ff3627"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-51.sse",
+      "bytes": 163218,
+      "sha256": "7e4c28ff1eeb93ab81d8afc0cd13830ee04707b9f276dda0db77342072f80658"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-52.sse",
+      "bytes": 171601,
+      "sha256": "e0f234ac00053b98719cc6e4b98f36984ba4ae8ccb8250a89a36a0f05c1c96b6"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-53.sse",
+      "bytes": 216312,
+      "sha256": "12fa85dacb18b390c7284ea006a5d33cd9a789e8d5d5cb3a8370a25c0cba0df8"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-54.sse",
+      "bytes": 144532,
+      "sha256": "3c53e315a4faa5170c3d56cfa37b54a1c0a8526a18d5c179e27b15a4127ae0e4"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-55.sse",
+      "bytes": 103931,
+      "sha256": "b7f1a430b78ff3943f54693611b6e485b09b68cda50e428336104b60e07b070d"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-56.sse",
+      "bytes": 184187,
+      "sha256": "a3455b7279d62c5a4f879a0bfc644102c4f7ce055936bc66f3b5cbfac3a2276b"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-57.sse",
+      "bytes": 127636,
+      "sha256": "714f61b50d83753e48a65d3586c588c38384f03bb271212a73023e324bac3196"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-58.sse",
+      "bytes": 229730,
+      "sha256": "cb5db865b99a7d708c775923baf0e491b7108cd45997749f759462515ad45e2e"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-59.sse",
+      "bytes": 202659,
+      "sha256": "42dc65f171b77bd15dc9a7d629d134791c8f1c913b6d6cd8f170bd5f03d564c5"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-6.sse",
+      "bytes": 48190,
+      "sha256": "179bfe7c492438f60209f4909681954b40258ed8119cada54a2874fe148c5720"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-60.sse",
+      "bytes": 124433,
+      "sha256": "19d52ecb35676439548de7af91cd02362d223006950eba4a1f12ffc96780f90d"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-61.sse",
+      "bytes": 98359,
+      "sha256": "253c6eee86e64d417aba79a6d3cbf42e765f7f4b2647b88e868a261da00c33ff"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-62.sse",
+      "bytes": 113735,
+      "sha256": "29dd74ae7242b4bed37a4e45d55716fb8b7d46714b1f504a5320942b0b4aed64"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-63.sse",
+      "bytes": 103039,
+      "sha256": "db58fba90e0433e5b3845a2537741416f8772fd99a153893ab30575cb411b509"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-64.sse",
+      "bytes": 107968,
+      "sha256": "8f6e6d914ddfb0cf2cf4b1b71ba8a22e5fdede45689dd2ae6ad8a943e1c59fad"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-65.sse",
+      "bytes": 137034,
+      "sha256": "307234d884043ea584a319f22e1db39ab0538a4774870315a62fea0e94254026"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-66.sse",
+      "bytes": 111746,
+      "sha256": "3094e9def0ff2eadef2bf6b82b19ea839fb0a3846ae47dc4e2463e8ccf06e9e5"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-67.sse",
+      "bytes": 223030,
+      "sha256": "eb1869736561eae3fd3d4380e45151c8c1167110dd9d412f07680e3f0472edbd"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-68.sse",
+      "bytes": 155971,
+      "sha256": "450024246f38ccbb315ae72f6d85fa543c70c276e3d817b2db96306ce8062199"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-69.sse",
+      "bytes": 110935,
+      "sha256": "7be43fb94d0006b710a91832b1c71254dbc41a0a4a65a2be38385e867904935c"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-7.sse",
+      "bytes": 50613,
+      "sha256": "94717d184977ae223e4ddd3f050cea2df48a99d45038e65f7c15e6a301b77e62"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-70.sse",
+      "bytes": 162622,
+      "sha256": "8a0adac45dca261f7f50e0dda6f02b071a7d87ef7ad16550ae4df66f813ac6f3"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-71.sse",
+      "bytes": 199085,
+      "sha256": "cd9c48eb04c6c8b7166dc3fe0606891614a04f008b2a1d49354b0204b6200a73"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-72.sse",
+      "bytes": 200425,
+      "sha256": "35072baee20f77b37a68ec31876bc454dea17c2936849a08fc9e0ac00b967ec3"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-73.sse",
+      "bytes": 320030,
+      "sha256": "64686ed08126aaa2dc23384eb8e998a3fce7be4ef3b85c8414a8918a64320363"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-74.sse",
+      "bytes": 148067,
+      "sha256": "75e71a80e24fd7c791beb411aa88eb6735f3edc9564853889561518a90cb55da"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-75.sse",
+      "bytes": 113174,
+      "sha256": "a11117d016b77f6d02f3cf36e2d31e546038b068b0a11597c62007c849392502"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-76.sse",
+      "bytes": 110106,
+      "sha256": "72414f2471bd107e76b26547d920a3b4806746cf0e4b49acd9f1fad4defc754e"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-77.sse",
+      "bytes": 129747,
+      "sha256": "0a71cba575dfb796497fedf5fb9c406adb1b59877ce3f205d626724fc8039128"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-78.sse",
+      "bytes": 169708,
+      "sha256": "f62b4d63fadfce5b321b51246768fdd515166e0c477007a9de9bab98e5ab019a"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-79.sse",
+      "bytes": 133134,
+      "sha256": "5c707a228460b1b3994a166ecd02a9ba9f9e0760d2b28c378596ae521f8fcb57"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-8.sse",
+      "bytes": 53524,
+      "sha256": "9f87c29f76a941a4a588636111ebc33024eb21c948af21895884fbe9d8ab8e31"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-80.sse",
+      "bytes": 151694,
+      "sha256": "c28aff02b1dc8a23b85b4086058e24c83c655669ed6bfaa8c7fa2b610814cf08"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-81.sse",
+      "bytes": 155886,
+      "sha256": "4c8869097e97e70051f1135a07ff73b685ba0dd370396b7137b01df1e1428053"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-82.sse",
+      "bytes": 121950,
+      "sha256": "f2dcb2ddcedd636aabcbd26b5ae5d57d508f3d731af4ce51db983b530eaeaeea"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-83.sse",
+      "bytes": 144381,
+      "sha256": "81662086a9b16d1befe7d71612b470686d309de75467ff12c5eaef77de9ed45b"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-84.sse",
+      "bytes": 114766,
+      "sha256": "c376cd54ad18215604cdf28f54592b66ef57ff02889589bf0de85408c8316694"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-85.sse",
+      "bytes": 118024,
+      "sha256": "68b156a6e34d2929058bd39741391b5c78f97d0d7a9783b8ad0708b1a6bc38d7"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-86.sse",
+      "bytes": 207848,
+      "sha256": "02f35344446f385a1d37dec5b3fb732ddc77e187c7eb6ce3b9678f812ee36414"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-87.sse",
+      "bytes": 124129,
+      "sha256": "430e9cdc6802c7af1c0a7559be4db425a9f038258b7be15b54fd52de76d9e01f"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-88.sse",
+      "bytes": 123054,
+      "sha256": "72fef5ebab2a880ec8fc392a847c040aa05ffd03a14020a60d2c1c1a552af0fe"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-89.sse",
+      "bytes": 140992,
+      "sha256": "cfe001d98261e23c0697bd7b5d4ba7dfa3120e5865b7d44ece585a4008a00b92"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-9.sse",
+      "bytes": 58378,
+      "sha256": "ad2ae2ad54242120c9807c1779171250f589bc70f63fe6d870f5abb24f5f3c29"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/response-90.sse",
+      "bytes": 175284,
+      "sha256": "bbed07c5196be345a769fdd269aeed41062b1ad082883922c958e5dd9ab7f648"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/result.json",
+      "bytes": 820,
+      "sha256": "fe86bdd01406f563be14062a72430aab69f0fbbf633ed6c747a86a34db20a522"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/session/cleanup.json",
+      "bytes": 58,
+      "sha256": "a1b289a69f5bd9c40924b5395e29df6870f9fab8b04e38f1cedc106eff144916"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/session/container.json",
+      "bytes": 1847,
+      "sha256": "6a0585e6e3e0cf32fdfae58d365d4b1f46704c59de0e62ca0741e63f143edd9b"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/session/events.jsonl",
+      "bytes": 1518596,
+      "sha256": "2e840219033b3da9a45789ab18f79532c758806483945690ba2ab84686367de5"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/session/finished.json",
+      "bytes": 326,
+      "sha256": "051ce6339efd560dd4325871d1170a0440b59efeacfe93a7375c229cf6f7f595"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/session/stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/started.json",
+      "bytes": 260,
+      "sha256": "e0334618ca55f2c65f74a86f2748d45bd7f5d26651c946f6e0300e13fccc0d7e"
+    },
+    {
+      "path": "local/plain-ledger-native-high/batch/runs/account-switch-ledger-P/stop-verification.json",
+      "bytes": 225,
+      "sha256": "52fe5323a7721048db9c6f77a774173b862430ddd3637f53737e02cb3d350d1d"
+    }
+  ],
+  "modelPatchUnchanged": true,
+  "sourceReview": "assessment.json",
   "monetaryCost": null,
-  "blocker": null,
-  "compatibilityRepair": {
-    "historicalReferenceUnchanged": true,
-    "supplementaryPatch": "reference-compatibility.patch",
-    "targetedChecksPassed": 143,
-    "projectVerify": "unavailable: pinned pnpm 11.7.0 not cached; network disabled",
-    "fullTaskCalibrationComplete": true
-  }
+  "developingAgentAccounting": "Preparation, evaluator and developing-agent work are separate from author usage; no reliable per-task token or billing record is exported for that work."
 }

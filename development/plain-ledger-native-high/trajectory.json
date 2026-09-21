@@ -1,0 +1,223 @@
+{
+  "scope": "Only the observed preservation split and final verification chain, not a general trajectory postmortem",
+  "selectedEvents": [
+    {
+      "toolIndex": 106,
+      "callID": "call_hfXmgTeUHOL5vGg1JEoJeBdb",
+      "partID": "prt_0c5bf625000140ByIOVXEnvysm",
+      "sessionID": "ses_f3a4f6bcdffeaezBdviQNrO9IU",
+      "tool": "bash",
+      "status": "completed",
+      "exit": 1,
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "inputSha256": "312fb9a95d713d529e72b65b45904d6b5be058265338b376f59c92722195dae6",
+      "delivery": {
+        "toolIndex": 106,
+        "firstRequest": 45,
+        "bytes": 9643,
+        "sha256": "f315ca9b1830a21f1032b6dbfc28087f5d69ccccba5d02fb88031be066f0064e",
+        "hasTruncationFailure": true,
+        "hasPriorDay": true
+      }
+    },
+    {
+      "toolIndex": 110,
+      "callID": "call_HyxjFEUc7axSuAWjhssMNnRv",
+      "partID": "prt_0c5c04fa7001R99HCW7mj20pmX",
+      "sessionID": "ses_f3a4f6bcdffeaezBdviQNrO9IU",
+      "tool": "bash",
+      "status": "completed",
+      "exit": 1,
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "inputSha256": "312fb9a95d713d529e72b65b45904d6b5be058265338b376f59c92722195dae6",
+      "delivery": {
+        "toolIndex": 110,
+        "firstRequest": 49,
+        "bytes": 9768,
+        "sha256": "75b20fb69469a414b3da5dab53aa68f6bab455b6f1a8c19ebd849284c8a813f1",
+        "hasTruncationFailure": true,
+        "hasPriorDay": true
+      }
+    },
+    {
+      "toolIndex": 111,
+      "callID": "call_yQfui2Vghk9Kkh3UgmshMEYh",
+      "partID": "prt_0c5c082650015Y3PpsCGWqXpQE",
+      "sessionID": "ses_f3a4f6bcdffeaezBdviQNrO9IU",
+      "tool": "apply_patch",
+      "status": "error",
+      "exit": null,
+      "command": null,
+      "inputSha256": "61a0151ad5ce45686808fbf34a9bd39391a1715c41a50d095a5ce1dac5b2064c",
+      "delivery": {
+        "toolIndex": 111,
+        "firstRequest": 50,
+        "bytes": 247,
+        "sha256": "72bc106ad779899daa0ab9e2363e7b18976948b00db18aa1f36683ee44cff061",
+        "hasTruncationFailure": false,
+        "hasPriorDay": false
+      }
+    },
+    {
+      "toolIndex": 113,
+      "callID": "call_EcZBHhXSznZwgXpNgfOLitSd",
+      "partID": "prt_0c5c0bae5001J5xfBm19ME14om",
+      "sessionID": "ses_f3a4f6bcdffeaezBdviQNrO9IU",
+      "tool": "apply_patch",
+      "status": "completed",
+      "exit": null,
+      "command": null,
+      "inputSha256": "325a84afb46ef7f4d6b7980215e4e6243e73c09f346a361a44cbb1030fb8ff8e",
+      "delivery": {
+        "toolIndex": 113,
+        "firstRequest": 52,
+        "bytes": 82,
+        "sha256": "571cd1b0510462ece0d8eaec38d23d7106e33aca2300f3cc51c9493385c52c0a",
+        "hasTruncationFailure": false,
+        "hasPriorDay": false
+      }
+    },
+    {
+      "toolIndex": 114,
+      "callID": "call_J5jjDak7szHqYMfDTAZwocgZ",
+      "partID": "prt_0c5c0dddb001SdOPogwsyf1Y9g",
+      "sessionID": "ses_f3a4f6bcdffeaezBdviQNrO9IU",
+      "tool": "apply_patch",
+      "status": "completed",
+      "exit": null,
+      "command": null,
+      "inputSha256": "789d15619b64989e877bb04e0f197092991e8f80b2c5a0b6d30738c4cd75caa0",
+      "delivery": {
+        "toolIndex": 114,
+        "firstRequest": 53,
+        "bytes": 82,
+        "sha256": "6cbadba139b1ddc0c6c6547cd34bd952910bba376eb8ffc3c9f0e84004ce3ccb",
+        "hasTruncationFailure": false,
+        "hasPriorDay": false
+      }
+    },
+    {
+      "toolIndex": 139,
+      "callID": "call_dw7IQi3RqYlyqDcUSPJNJygm",
+      "partID": "prt_0c5c6960b001xrX7pYLVKQ827H",
+      "sessionID": "ses_f3a4f6bcdffeaezBdviQNrO9IU",
+      "tool": "bash",
+      "status": "completed",
+      "exit": 0,
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "inputSha256": "312fb9a95d713d529e72b65b45904d6b5be058265338b376f59c92722195dae6",
+      "delivery": {
+        "toolIndex": 139,
+        "firstRequest": 76,
+        "bytes": 7565,
+        "sha256": "29b3e50e8cb5bca75c735b628afce096b38e5a1550bd84fce7a1d459ab09a62f",
+        "hasTruncationFailure": false,
+        "hasPriorDay": false
+      }
+    },
+    {
+      "toolIndex": 154,
+      "callID": "call_2TyvPRfPpXYhG4ViVZ3DAMCS",
+      "partID": "prt_0c5c92a76001yWJa2Lpnvwq0jN",
+      "sessionID": "ses_f3a4f6bcdffeaezBdviQNrO9IU",
+      "tool": "bash",
+      "status": "completed",
+      "exit": 1,
+      "command": "corepack pnpm verify",
+      "inputSha256": "4a1bdaaefbba21bdc67856806c0daef38e534f9bdd223dc9639f4ade6219e71f",
+      "delivery": null
+    },
+    {
+      "toolIndex": 155,
+      "callID": "call_7vpHNfo2I54p3wwcYDfRXmLz",
+      "partID": "prt_0c5c94376001Y73xbBtmBGvggH",
+      "sessionID": "ses_f3a4f6bcdffeaezBdviQNrO9IU",
+      "tool": "bash",
+      "status": "completed",
+      "exit": 0,
+      "command": "node --test packages/connector/test/config.test.mjs",
+      "inputSha256": "a0719fb30283dea2cccbd463b75e5b20dee7f4f4dc5c75ab91100aebaa84db9f",
+      "delivery": {
+        "toolIndex": 155,
+        "firstRequest": 86,
+        "bytes": 9449,
+        "sha256": "92e17450d2d60f69a6be19aa2aec12c68461a5a4ffa1edad9a6106c038912b26",
+        "hasTruncationFailure": false,
+        "hasPriorDay": false
+      }
+    },
+    {
+      "toolIndex": 156,
+      "callID": "call_qzKp4TAkrvTh3Pdu5htiGAX1",
+      "partID": "prt_0c5c943a3001yeTQnluC4y51UB",
+      "sessionID": "ses_f3a4f6bcdffeaezBdviQNrO9IU",
+      "tool": "bash",
+      "status": "completed",
+      "exit": 0,
+      "command": "node --test packages/connector/test/protocol.test.mjs",
+      "inputSha256": "ff9a784b7929c1052f4cb05b282df4201157f44c182f572a9e27c4fd25e47f9b",
+      "delivery": {
+        "toolIndex": 156,
+        "firstRequest": 86,
+        "bytes": 1368,
+        "sha256": "32ee30ea3ab96d29b1c2b1f684b2d60992fd940da511627de709334c1c5217db",
+        "hasTruncationFailure": false,
+        "hasPriorDay": false
+      }
+    },
+    {
+      "toolIndex": 158,
+      "callID": "call_qMIXrxniD9xXOjungDOxA6OM",
+      "partID": "prt_0c5ca055d001CbAGv2HbHP2eOr",
+      "sessionID": "ses_f3a4f6bcdffeaezBdviQNrO9IU",
+      "tool": "apply_patch",
+      "status": "completed",
+      "exit": null,
+      "command": null,
+      "inputSha256": "ec68e493e369d0cb4f901e8f539094c4956771192773eabfa2eb62c7ba936d3b",
+      "delivery": null
+    },
+    {
+      "toolIndex": 159,
+      "callID": "call_B39wza21JHjgkE0g12YZkdMW",
+      "partID": "prt_0c5ca33e8001PMf9I2nvwPAzIe",
+      "sessionID": "ses_f3a4f6bcdffeaezBdviQNrO9IU",
+      "tool": "bash",
+      "status": "completed",
+      "exit": 0,
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "inputSha256": "312fb9a95d713d529e72b65b45904d6b5be058265338b376f59c92722195dae6",
+      "delivery": {
+        "toolIndex": 159,
+        "firstRequest": 88,
+        "bytes": 7585,
+        "sha256": "9b66f69e3c8e5cb31c4f4093e43c071235c8f609bfdf1ed2e15ee171e0fad3b3",
+        "hasTruncationFailure": false,
+        "hasPriorDay": false
+      }
+    },
+    {
+      "toolIndex": 161,
+      "callID": "call_RVQqNUBkTPOZakVNVOqJHJnV",
+      "partID": "prt_0c5ca54f5001HzN7vaKuwypofs",
+      "sessionID": "ses_f3a4f6bcdffeaezBdviQNrO9IU",
+      "tool": "todowrite",
+      "status": "completed",
+      "exit": null,
+      "command": null,
+      "inputSha256": "90322fa58a6298421996e70a40668fa048364183c90034a108f5d0dad0e2c08c",
+      "delivery": null
+    }
+  ],
+  "facts": [
+    "The reader failure retaining 2026-08-10 against an old truncation expectation reached actual requests 45 and 49.",
+    "The first gating patch failed (tool 111); successful shared/Claude gates are tools 113/114 and their success receipts reached requests 52/53.",
+    "The author explicitly described isolating persistence to sources carrying account identity so ordinary parser-only tests retain established behavior. These calls were real adapter collection APIs.",
+    "Final readers 87/87 followed the last Claude edit and reached request 88. Config 103/103 and protocol 14/14 passed before that last edit and reached request 86; independent F confirms all 204 on final M.",
+    "Author attempted corepack pnpm verify and honestly reported unavailable package-manager download.",
+    "Author created one native read-only explore session; no externally assigned reviewer, harness plugin or continuation was used."
+  ],
+  "cause": "For the public-API retention failures, the evidence supports an intentional compatibility split to satisfy a superseded old assertion. The requirement and received failure were available; this is not established as missing context or lost stdout. Migration, cutover and diagnostic defects have separate code causes and are not all attributed to this one decision.",
+  "singleProcessProposal": "Within the existing final task/diff review, classify an old assertion that contradicts an explicitly requested behavior as superseded, and verify the replacement behavior through the same public caller before adding a compatibility fallback. No new phase, reviewer or mechanism is implemented.",
+  "proposalImplemented": false
+}
