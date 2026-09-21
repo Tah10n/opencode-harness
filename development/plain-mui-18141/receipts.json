@@ -223,7 +223,15 @@
       "sha256": "a1b289a69f5bd9c40924b5395e29df6870f9fab8b04e38f1cedc106eff144916"
     }
   },
-  "real_run": {
+  "preparation_evaluator_seconds": 444.911,
+  "additional_preparation_overhead_seconds": null,
+  "developing_agent_usage": "separate platform goal snapshot in developing-agent-accounting.json; not author provider usage",
+  "money": null,
+  "policy_rejections": 2,
+  "rejections_started_process": false,
+  "old_pause_hashes_verified": true,
+  "old_reports_results_prompts_unchanged": true,
+  "pre_dispatch_status": {
     "status": "not_started",
     "reason": "execution permission auto-review rejected before process creation; awaiting direct user confirmation",
     "attempts": 0,
@@ -244,12 +252,40 @@
     "T": null,
     "D": null
   },
-  "preparation_evaluator_seconds": 444.91099999999994,
-  "additional_preparation_overhead_seconds": null,
-  "developing_agent_usage": "separate, not measured by author launcher",
-  "money": null,
-  "policy_rejections": 2,
-  "rejections_started_process": false,
-  "old_pause_hashes_verified": true,
-  "old_reports_results_prompts_unchanged": true
+  "real_run": {
+    "status": "finished",
+    "delivery_apply": true,
+    "F_checks": "passed",
+    "assessment_integrity": "verified",
+    "acceptance_diag": true,
+    "Q": true,
+    "T": true,
+    "D": true,
+    "usage": {
+      "requests": 15,
+      "requests_without_usage": 0,
+      "input_tokens": {
+        "observed": 472182,
+        "unknown_requests": 0
+      },
+      "output_tokens": {
+        "observed": 5002,
+        "unknown_requests": 0
+      },
+      "cached_tokens": {
+        "observed": 146432,
+        "unknown_requests": 0
+      },
+      "reasoning_tokens": {
+        "observed": 2525,
+        "unknown_requests": 0
+      },
+      "money": null
+    },
+    "native_tools": 33,
+    "execution_elapsed_ms": 471502,
+    "native_cleanup_elapsed_ms": 58,
+    "evaluator_seconds": 87.177
+  },
+  "direct_user_confirmation_received": true
 }

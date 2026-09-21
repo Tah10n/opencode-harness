@@ -1,0 +1,10 @@
+{
+  "source": "Codex get_goal tool snapshot before final publication",
+  "thread_id": "01a0c4cb-2323-7463-ab6c-1287aa026716",
+  "tokens_used": 387907,
+  "time_used_seconds": 1936,
+  "snapshot_unix_seconds": 1790018407,
+  "scope": "Developing-agent goal accounting through this snapshot; includes preparation/reporting and earlier blocked turns. This is a platform goal metric, not the plain author provider usage or an invoice. Later publication work is outside this snapshot.",
+  "plain_author_usage_included": false,
+  "money": null
+}
