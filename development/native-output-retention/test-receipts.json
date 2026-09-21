@@ -1,0 +1,1209 @@
+{
+  "realProviderRequests": 0,
+  "historicalMissingFilesRestored": 0,
+  "attempts": [
+    {
+      "attempt": "baseline-1789980270204",
+      "assertionsPassed": true,
+      "scriptedRequests": 3,
+      "container": "template-dev-e75c3acb-ca1a-4542-a23d-eef508fc880f",
+      "baselineFiles": [
+        {
+          "name": "tool_0c3236b0f001x9Kmi195Yjyc46",
+          "bytes": 353899,
+          "sha256": "20f0acd6e38c39f3a94b84afdd9a19b2621aa2b7b585a15340051f9d8674dfb1",
+          "hidden": true
+        }
+      ],
+      "finalResourceState": "removed"
+    },
+    {
+      "attempt": "baseline-1789981056194",
+      "assertionsPassed": true,
+      "scriptedRequests": 3,
+      "container": "template-dev-27f53f3f-fcf5-40ab-baee-09fa41132299",
+      "baselineFiles": [
+        {
+          "name": "tool_0c32f678c001c683fu44YkDK9Q",
+          "bytes": 353899,
+          "sha256": "20f0acd6e38c39f3a94b84afdd9a19b2621aa2b7b585a15340051f9d8674dfb1",
+          "hidden": true
+        }
+      ],
+      "finalResourceState": "removed"
+    },
+    {
+      "attempt": "baseline-1789981162977",
+      "assertionsPassed": true,
+      "scriptedRequests": 3,
+      "container": "template-dev-de41d036-e413-4b81-a1b3-fc3068d8c3ab",
+      "baselineFiles": [
+        {
+          "name": "tool_0c33109130013mzBC8WzExGCz5",
+          "bytes": 353899,
+          "sha256": "20f0acd6e38c39f3a94b84afdd9a19b2621aa2b7b585a15340051f9d8674dfb1",
+          "hidden": true
+        }
+      ],
+      "finalResourceState": "removed"
+    },
+    {
+      "attempt": "boundaries-1789980842712",
+      "assertionsPassed": true,
+      "scriptedRequests": 0,
+      "container": "template-dev-9cdb9708-a804-4335-951a-350de777cf46",
+      "baselineFiles": null,
+      "finalResourceState": "removed"
+    },
+    {
+      "attempt": "boundaries-1789981059613",
+      "assertionsPassed": true,
+      "scriptedRequests": 0,
+      "container": "template-dev-586076d4-ab64-4de6-b254-682e305eb6b8",
+      "baselineFiles": null,
+      "finalResourceState": "removed"
+    },
+    {
+      "attempt": "boundaries-1789981166489",
+      "assertionsPassed": true,
+      "scriptedRequests": 0,
+      "container": "template-dev-3e04a57e-710e-439b-90e0-646bd893012b",
+      "baselineFiles": null,
+      "finalResourceState": "removed"
+    },
+    {
+      "attempt": "cancel-1789980776395",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "unattributed_timeout",
+          "slot": 1
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-ba6ec3ad-ccd8-4d1a-a404-a85136d40d27",
+          "receivedRequests": 4,
+          "scriptedRequests": 4,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 354109,
+          "exportMs": 134,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "cancel-1789981095184",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "unattributed_timeout",
+          "slot": 1
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-67ec3486-d377-4d31-9402-cd60fde6205c",
+          "receivedRequests": 4,
+          "scriptedRequests": 4,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 354144,
+          "exportMs": 126,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "cancel-1789981201909",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "unattributed_timeout",
+          "slot": 1
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-9160919a-b133-44ed-b199-a65190dc9e0e",
+          "receivedRequests": 4,
+          "scriptedRequests": 4,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 354151,
+          "exportMs": 124,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "copy-failure-1789980660134",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "evidence_incomplete: Output copy failed: injected disk write failure"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-f17e86a3-e35e-4dce-a08b-dd727da59aa2",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 133,
+          "retainedForRecovery": true,
+          "recovered": true,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "copy-failure-1789981072740",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "evidence_incomplete: Output copy failed: injected disk write failure"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-2d499908-99b0-4668-aeec-65c7aa77f5b1",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 130,
+          "retainedForRecovery": true,
+          "recovered": true,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "copy-failure-1789981179564",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "evidence_incomplete: Output copy failed: injected disk write failure"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-8ed0881e-c2fd-4645-b058-7c602f476a27",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 131,
+          "retainedForRecovery": true,
+          "recovered": true,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "corrupt-1789980664122",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "evidence_incomplete: Output size/hash mismatch"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-e9297a21-86f3-488f-8511-fff71ac9ec2b",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 127,
+          "retainedForRecovery": true,
+          "recovered": true,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "corrupt-1789981077201",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "evidence_incomplete: Output size/hash mismatch"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-a9474947-c9d8-4137-ab8e-4a9c0c4755fa",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 132,
+          "retainedForRecovery": true,
+          "recovered": true,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "corrupt-1789981184165",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "evidence_incomplete: Output size/hash mismatch"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-a42b66e6-32ab-4ed0-acee-d32c7124dfa9",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 133,
+          "retainedForRecovery": true,
+          "recovered": true,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "limit-1789980668019",
+      "assertionsPassed": false,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "evidence_incomplete: Output byte limit"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-441b3a37-e1fb-41f9-87f4-2e9c85fe37ec",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 1,
+            "kind": "evidence_incomplete",
+            "patchStatus": 0,
+            "outputStatus": 1,
+            "errors": [
+              "Output byte limit"
+            ]
+          },
+          "exportedFiles": 0,
+          "exportedBytes": 0,
+          "exportMs": 77,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": {
+            "error": "Relay suspension unverified",
+            "possibleDataLoss": true
+          },
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "limit-1789980763750",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "evidence_incomplete: Output byte limit"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-888e0293-0d21-4822-8a2c-05dd4b7090ea",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 131,
+          "retainedForRecovery": true,
+          "recovered": true,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "limit-1789981081701",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "evidence_incomplete: Output byte limit"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-4cf37fb7-b288-4856-95d7-53c8997f42f0",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 130,
+          "retainedForRecovery": true,
+          "recovered": true,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "limit-1789981188629",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "evidence_incomplete: Output byte limit"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-f800223e-d1ca-43f5-8489-a9a2b2067828",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 129,
+          "retainedForRecovery": true,
+          "recovered": true,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "metadata-failure-1789980675764",
+      "assertionsPassed": false,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "Native accounting extraction failed"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-d9411e64-ab5b-4eff-bb69-db1cb9c90a5b",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 1,
+            "kind": "evidence_incomplete",
+            "patchStatus": 0,
+            "outputStatus": 1,
+            "errors": [
+              "Native linkage unavailable: ENOENT: no such file or directory, open '<fixture-worktree>/local/native-output-retention/metadata-failure-1789980675764/runs/output-fixture-P/native-evidence.json'"
+            ]
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 130,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": {
+            "error": "Relay suspension unverified",
+            "possibleDataLoss": true
+          },
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "metadata-failure-1789980772392",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "Native accounting extraction failed"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-15e951f2-20ea-4120-906e-57edea85beff",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 130,
+          "retainedForRecovery": true,
+          "recovered": true,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "metadata-failure-1789981090640",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "Native accounting extraction failed"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-52640010-c533-47de-b723-a9e2e6806602",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 126,
+          "retainedForRecovery": true,
+          "recovered": true,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "metadata-failure-1789981197452",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "Native accounting extraction failed"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-de8833e8-d167-4abd-8b5d-a1709f13a443",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 131,
+          "retainedForRecovery": true,
+          "recovered": true,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "metadata-failure-1789981244341",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "Native accounting extraction failed"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-9f558c68-40d8-4f6f-b61b-b66bebfd3608",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 126,
+          "retainedForRecovery": true,
+          "recovered": true,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "patch-failure-1789980671870",
+      "assertionsPassed": false,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "evidence_incomplete: Patch/task capture failed"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-a3ae8b66-b545-4487-a588-ff8dc2ebad3f",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 1,
+            "kind": "evidence_incomplete",
+            "patchStatus": 1,
+            "outputStatus": 0,
+            "errors": [
+              "Patch/task capture failed"
+            ]
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 131,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": {
+            "error": "Relay suspension unverified",
+            "possibleDataLoss": true
+          },
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "patch-failure-1789980768573",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "evidence_incomplete: Patch/task capture failed"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-18f6a669-40df-403e-a8df-a3ce51cbb58b",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 129,
+          "retainedForRecovery": true,
+          "recovered": true,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "patch-failure-1789981086244",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "evidence_incomplete: Patch/task capture failed"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-1a353eb0-1d12-4169-bfe8-09096ae36ba9",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 128,
+          "retainedForRecovery": true,
+          "recovered": true,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "patch-failure-1789981193064",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "evidence_incomplete: Patch/task capture failed"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-6d1255cc-53c2-4680-9252-74e5baea4dd4",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 132,
+          "retainedForRecovery": true,
+          "recovered": true,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "patch-failure-1789981253614",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "execution_or_capture_error",
+          "slot": 1,
+          "message": "evidence_incomplete: Patch/task capture failed"
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-03410a5b-3fa8-44cf-82ae-3af59ddf744a",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 129,
+          "retainedForRecovery": true,
+          "recovered": true,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "success-1789980524672",
+      "assertionsPassed": false,
+      "outcome": {
+        "status": "paused",
+        "pause": {
+          "kind": "boundary_refusal",
+          "slot": 1
+        }
+      },
+      "slots": [
+        {
+          "slot": 1,
+          "container": "template-dev-888ecacb-c0e0-4a0b-8efe-c40b01394705",
+          "receivedRequests": 5,
+          "scriptedRequests": 0,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 0,
+          "exportedBytes": 0,
+          "exportMs": 72,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "success-1789980592485",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "finished",
+        "pause": null
+      },
+      "slots": [
+        {
+          "slot": 2,
+          "container": "template-dev-fa403ba9-c3ff-45c4-888f-b0dcefe03fbc",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 0,
+          "exportedBytes": 0,
+          "exportMs": 72,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        },
+        {
+          "slot": 3,
+          "container": "template-dev-448947af-1cf7-4018-8ddc-8dd61eabbc80",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 131,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        },
+        {
+          "slot": 1,
+          "container": "template-dev-82b5a3a7-fd1f-4f9f-802e-cfa1af54cdd1",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 138,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "success-1789981060600",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "finished",
+        "pause": null
+      },
+      "slots": [
+        {
+          "slot": 2,
+          "container": "template-dev-fa88b5d8-79a1-4fae-b3c9-1e89850e8ba4",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 0,
+          "exportedBytes": 0,
+          "exportMs": 71,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        },
+        {
+          "slot": 3,
+          "container": "template-dev-a25923e1-d238-456c-887c-6c6615855fe8",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 131,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        },
+        {
+          "slot": 1,
+          "container": "template-dev-32841812-c2d9-4f78-94a0-588734402f0a",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 133,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "success-1789981167466",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "finished",
+        "pause": null
+      },
+      "slots": [
+        {
+          "slot": 2,
+          "container": "template-dev-295c95e9-5b87-4630-8e34-fe6dac1142da",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 0,
+          "exportedBytes": 0,
+          "exportMs": 71,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        },
+        {
+          "slot": 3,
+          "container": "template-dev-ff9a7014-515f-4800-8989-6b33bd5f4ccb",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 128,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        },
+        {
+          "slot": 1,
+          "container": "template-dev-46394ec5-6706-4614-8d05-d0c8a78d397e",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 130,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    },
+    {
+      "attempt": "success-1789981234693",
+      "assertionsPassed": true,
+      "outcome": {
+        "status": "finished",
+        "pause": null
+      },
+      "slots": [
+        {
+          "slot": 2,
+          "container": "template-dev-41c69f78-9764-486c-9194-0e1ba36d88f5",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 0,
+          "exportedBytes": 0,
+          "exportMs": 71,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        },
+        {
+          "slot": 3,
+          "container": "template-dev-8b2b9f0e-503c-4901-8a25-28219d7be435",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 132,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        },
+        {
+          "slot": 1,
+          "container": "template-dev-39f87268-faab-4b4b-a15f-a0b1fae9ab78",
+          "receivedRequests": 6,
+          "scriptedRequests": 6,
+          "capture": {
+            "status": 0,
+            "kind": "evidence_complete",
+            "patchStatus": 0,
+            "outputStatus": 0,
+            "errors": []
+          },
+          "exportedFiles": 1,
+          "exportedBytes": 353899,
+          "exportMs": 133,
+          "retainedForRecovery": false,
+          "recovered": false,
+          "retentionFailure": null,
+          "finalResourceState": "removed"
+        }
+      ]
+    }
+  ],
+  "scriptedRequestsTotal": 213,
+  "unknownRequestCounts": 0,
+  "resourceVerification": {
+    "allFixtureContainersAbsent": true,
+    "count": 42,
+    "retainedAtEnd": 0,
+    "verifiedAt": "2026-09-21T09:02:48.071900+00:00"
+  },
+  "localRecoveryAttempts": {
+    "successful": 17,
+    "failed": 1,
+    "failedReason": "Initial recovery check also matched PID 1; refused before copying/deletion. Corrected to recorded trusted relay PID.",
+    "newProviderRequests": 0
+  },
+  "unitSchedulerRequests": {
+    "runs": 4,
+    "scriptedFetchCallsPerRun": 7,
+    "total": 28,
+    "separateFromInstalledRequests": true
+  },
+  "unitContinuationRequests": {
+    "integratedRuns": 2,
+    "scriptedFetchCallsPerRun": 1,
+    "total": 2,
+    "abContinuationRequests": 0,
+    "separateFromInstalledRequests": true
+  }
+}
