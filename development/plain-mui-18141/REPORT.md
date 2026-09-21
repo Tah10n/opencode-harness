@@ -39,8 +39,43 @@ OpenCode's native quote wrapper. Linux OpenCode version is 1.18.26; project
 Node/npm are 18.8.0/8.18.0. The initial host --version command returned ENOEXEC
 because the pinned executable is Linux; verification ran in its Linux image.
 
+## Fresh calibration
+
+| Case | F passed/failed | E passed/failed | E integrity |
+| --- | --- | --- | --- |
+| Baseline | 18/0 | 18/2 | verified |
+| Gold | 18/0 | 20/0 | verified |
+| Gold with author test assertions removed | not needed | 20/0 | verified |
+
+Baseline E fails the unchanged label query and the separate literal ID check:
+select.id is empty while label.htmlFor is labelled-select. Gold E observes both
+as labelled-select and resolves the select by label. All 18 declared P2P and the
+F2P are present in parsed results. Overlap restores the independent expectation
+without modifying production. Source bytes/modes outside the surface, actual
+module paths and unchanged assertions were checked; no production build output
+is used by this Babel-register source test path. All calibration containers were
+removed; nested creation/removal order is compared as a set of identities.
+
+The successful calibration took 257.818 seconds including container preparation
+and cleanup. [receipts.json](receipts.json) also retains the failed first
+preparation's time and hashes separately. No historical 18/1 → 19/0 receipt was
+changed. The old 12 unstarted slots and two unassigned admission slots remain
+historical and are not the new slot.
+
 ## Execution status
 
-Pending completed calibration and local freeze commit. No real task-run or
-provider request has started at this report revision. Exactly one new P slot is
-authorized; no availability probe, retry, fallback or harness comparison.
+Conditions were frozen locally in e0ebb4fe before any real dispatch. The slot
+remains **not_started**: automatic permission review rejected the launch twice
+before process creation. The first rejection treated the public Material UI
+payload as private repository data; the second did not accept the authorization
+in the user-provided attachment plus local provenance evidence as trusted
+payload/destination approval. A direct user confirmation is pending. No endpoint,
+account, permissions, transport or runtime workaround was attempted.
+
+Real task-runs, provider requests, author tools/tokens, author execution and
+cleanup time are all zero. M does not exist. delivery_apply, acceptance_diag,
+Q, T and D are null; F_checks and assessment_integrity for the author are not_run.
+Preparation success does not establish model success or failure. Developing-agent
+work and preparation/evaluator costs are separate; monetary cost is unknown.
+Exactly one new P slot remains authorized by the original task; no availability
+probe, retry, fallback or harness comparison was assigned.
