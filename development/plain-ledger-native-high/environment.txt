@@ -1,0 +1,9 @@
+
+Execution environment (separate from the historical task above):
+The complete baseline project is writable in /work/repo with fresh local Git.
+Node v24.19.0 and Git 2.39.5 are installed. TMPDIR is configured for this run.
+Use the ordinary Node commands in the task; connector reader/config/protocol
+tests need no package installation. Network access is disabled. The pinned
+pnpm 11.7.0 and web-workspace dependencies are not cached, so the repository-wide
+corepack pnpm verify command may be unavailable. Report unavailable checks
+honestly; do not upgrade dependencies. Native tools and your own todo are available.

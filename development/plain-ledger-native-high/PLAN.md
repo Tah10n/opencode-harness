@@ -18,26 +18,26 @@ The user subsequently authorized correcting the compatibility defect. A separate
 reference-derived copy now has `reference-compatibility.patch`; the historical
 reference and the author baseline remain unchanged. Two baseline-supported
 Antigravity shapes and pre-fix checkpoint recovery pass in that corrected copy.
-This removes the identified compatibility obstacle, but does not constitute
-complete task calibration or an execution freeze. Remaining paths below still
-require preparation; the model has not been launched.
+This removes the identified compatibility obstacle. Behavioral calibration below
+uses the unchanged reference where it passes and the explicitly corrected copy
+for complete compatibility. The model has not been launched.
 
 ## Requirement → real execution path → observation
 
 All clauses below come from the archived task's requirement/preservation text.
-The listed incomplete observations are obligations, not claimed passes.
+Automated behavioral checks and bounded source review are separate evidence.
 
 | Required contract | Actual execution path | Observable check / status |
 | --- | --- | --- |
 | Retain accepted events on file moves/truncation, count new events once | Claude independent collector; Gemini, Antigravity, Qwen and Kimi decoders through shared JSONL collection | Unchanged five-adapter lifecycle probe, baseline 0/5 and reference 5/5 |
 | Retain accepted database usage after deletion, count new IDs once | OpenCode independent SQLite collector via `adapterFor('opencode').collect` | Unchanged SQLite public probe, baseline 0/1 and reference 1/1 |
-| State survives serialization and is reused | Each probe passes `JSON.parse(JSON.stringify(nextState))` to the next collection | Exercised by the six probes; actual config/CLI persistence still needs separate calibration |
-| First tuple wins on conflict; unrelated new events continue; range and privacy preserved | Four stable-ID JSONL paths in lifecycle probe | Reference reaches all assertions; baseline stops earlier. SQLite conflict and Kimi legacy coverage remain to calibrate |
+| State survives serialization and is reused | Each probe passes `JSON.parse(JSON.stringify(nextState))` to the next collection | Six probes plus cli-persistence.test.mjs: four distinct sync processes per adapter, disk reload and two isolated source mappings; baseline 0/6, corrected reference 6/6 |
+| First tuple wins on conflict; unrelated new events continue; range and privacy preserved | Four stable-ID JSONL paths in lifecycle probe | Reference reaches lifecycle assertions; migration-contract.test.mjs covers SQLite conflict and Kimi legacy replacement after JSON reload (complete migration suite baseline 0/8, corrected reference 8/8) |
 | Existing parser APIs and supported older inputs stay valid | Public parser exports and independent adapter collection | Two Antigravity legacy forms pass baseline, fail reference; historical discrepancy is retained, supplementary corrected copy passes |
-| Conservative 0.4.3 migration | Claude state, shared JSONL state, Kimi/Gemini historical fixtures, OpenCode confirmed exact-ID cutover | Kimi 0.4.3 behavioral migration calibrated (baseline duplicates copy, reference passes JSON-reloaded transitions); other historical regressions located; complete acceptance not yet frozen |
-| Account/source boundaries and collection/config propagation | CLI sync → adapter state keyed by source ID → runtime `writeState/readState`; config source mapping | Original reader/config/protocol baseline suite passes 203/203. New ledger transition through this whole route remains unproven |
-| Bounded scans/storage, partial/error semantics, corruption fail-closed | Adapter scan bounds and persisted state validation | Original suites plus selected public diagnostics/source review; new representation-independent storage check still needs calibration |
-| No raw IDs/content in persisted accounting/upload | Adapter state, CLI snapshot construction, protocol | Lifecycle probes reject raw fixture IDs in returned state; end-to-end upload and migration checks still need calibration |
+| Conservative 0.4.3 migration | Claude state, shared JSONL state, Kimi/Gemini historical fixtures, OpenCode confirmed exact-ID cutover | Exact Kimi 0.4.3 fixture plus baseline-generated Claude/Gemini/Qwen/Antigravity accepted states, Kimi legacy input and OpenCode confirmed/missing cutover; preserved totals and new events after JSON reload |
+| Account/source boundaries and collection/config propagation | CLI sync → adapter state keyed by source ID → runtime `writeState/readState`; config source mapping | Original baseline suite 203/203; cli-persistence.test.mjs verifies actual sync and disk persistence for all six adapters, two source IDs with the same event ID and distinct tuples, source deletion and new events |
+| Bounded scans/storage, partial/error semantics, corruption fail-closed | Adapter scan bounds and persisted state validation | Original tests plus source review: separate Claude/SQLite paths and shared JSONL enforce scan and ledger bounds, validate persisted tuples before use and report partial/fail closed. Candidate review follows the procedure below without requiring reference limits or layout |
+| No raw IDs/content in persisted accounting/upload | Adapter state, CLI snapshot construction, protocol | Lifecycle and migration checks reject raw fixture IDs in state; real CLI tests reject IDs/source paths in uploads and raw IDs in stored state |
 | No unrelated Codex identity/server/release changes | Final complete patch against baseline | Final diff review; no patch yet |
 
 Account switching must follow existing adapter identity and aggregation contracts.
@@ -63,7 +63,7 @@ acceptance. Documentation and author regression tests have no new mandatory
 criterion beyond the original task and project AGENTS.md. That file requests
 `corepack pnpm verify`; any unavailable dependency/check is reported separately.
 
-## Intended run and result rule (not an execution freeze)
+## Run and result rule
 
 Exactly one fresh slot: account-switch-ledger / native plain / high,
 OpenCode 1.18.26, openai/gpt-5.6-luna, 1800 seconds for the whole run.
@@ -90,3 +90,40 @@ Keep request roles, known/unknown usage and cached/reasoning subsets distinct;
 never sum subsets twice or estimate money. Preparation/evaluator/developing
 agent work is separate from Luna. Publish compact safe evidence only, with one
 ordinary final push/update to draft PR #25, keeping base/main and history.
+
+## Frozen assessment procedure
+
+F is an exact baseline Git checkout plus the entire unmodified captured M,
+including new files, modes and deletions. Apply without repair or exclusions;
+record apply failures separately. Run delivered reader, config and protocol
+suites there, and attempt the repository verify gate without dependency upgrades.
+All real failures stay in receipts. A unavailable web-workspace dependency is an
+environment limitation, not a model failure or an invented project-gate pass.
+
+E is an independent copy of that same F implementation. Mount this directory
+read-only at /workspace, the exact old baseline at /baseline for old-state input
+generation, and evaluator probes separately at /probes. Execute unchanged
+account-switch-ledger.test.mjs, ledger-lifecycle.test.mjs, legacy-input.test.mjs,
+kimi-migration.test.mjs, migration-contract.test.mjs and cli-persistence.test.mjs.
+Together they contain 23 behavioral tests. Loopback HTTP in the CLI probe supplies
+protocol acknowledgements; the CLI, collectors, state loading and writes are real.
+This tests configured source isolation, not excluded provider-account discovery.
+
+Review M against the original preservation clauses, tracing each changed reader
+through collection and persisted-state consumers. For boundedness, inspect scan
+and storage caps, overflow handling, retention of already accepted tuples and
+validation before using reloaded state in Claude, SQLite and the shared paths.
+Different finite limits and internal representations are acceptable; no hidden
+reference schema or numeric cap is mandatory. Record exact source locations and
+any gap. Existing diagnostic tests referring to representation do not substitute
+for this review. Baseline lacks an accepted-event ledger; the reference validates
+bounded hashed tuples in shared.mjs and its independent Claude/SQLite paths,
+with partial/error behavior at limits (covered by its existing reader suite).
+
+Q=true only when all applicable user-contract checks and preservation review
+pass. Q=false requires an observed contract violation; unavailable or invalid
+evidence is unknown. T requires an ordinary native stop, complete capture and
+verified termination; report deadline/transport/unknown submission independently.
+D=Q AND T with unknown propagated unless a known false determines the result.
+An unavailable full web gate limits verification claims even if the scoped task
+contract is satisfied. No evaluator failure is returned to the author for repair.

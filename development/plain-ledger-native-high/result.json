@@ -1,5 +1,5 @@
 {
-  "stage": "preparation_incomplete_compatibility_repaired",
+  "stage": "prepared_preflight_passed",
   "slots": [
     {
       "slot": 1,
@@ -17,12 +17,12 @@
   "T": null,
   "D": null,
   "authorRuns": 0,
-  "scriptedPreflights": 0,
+  "scriptedPreflights": 1,
   "providerRequests": 0,
   "authorTokens": 0,
   "authorToolCalls": 0,
   "authorElapsedSeconds": 0,
-  "localCalibrationCommands": 8,
+  "localCalibrationCommands": 14,
   "monetaryCost": null,
   "blocker": null,
   "compatibilityRepair": {
@@ -30,6 +30,6 @@
     "supplementaryPatch": "reference-compatibility.patch",
     "targetedChecksPassed": 143,
     "projectVerify": "unavailable: pinned pnpm 11.7.0 not cached; network disabled",
-    "fullTaskCalibrationComplete": false
+    "fullTaskCalibrationComplete": true
   }
 }
