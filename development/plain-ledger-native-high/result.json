@@ -22,7 +22,7 @@
   "authorTokens": 0,
   "authorToolCalls": 0,
   "authorElapsedSeconds": 0,
-  "localCalibrationCommands": 6,
+  "localCalibrationCommands": 8,
   "monetaryCost": null,
   "blocker": "Reference silently loses baseline-supported Antigravity input; all-mandatory-scenarios reference calibration cannot be certified."
 }

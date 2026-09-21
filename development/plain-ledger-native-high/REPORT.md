@@ -19,6 +19,7 @@ the local VibeRacing Git database; execution copies were extracted from exact
 | --- | --- | --- | --- |
 | Original saved SQLite probe | 0/1 | 1/1 | Deletion retention, fresh event and replay after JSON roundtrip |
 | Original saved five-adapter lifecycle probe | 0/5 | 5/5 | Claude, Gemini, Antigravity, Qwen, Kimi; move/truncation/replay/ranges; stable-ID conflicts and privacy |
+| Historical Kimi 0.4.3 migration with JSON reload | 0/1 | 1/1 | Baseline double-counts copied accepted events; reference preserves 20/21 totals through copy/move/truncation |
 | Public Antigravity compatibility probe | 2/2 | 0/2 | Reference silently drops supported old input forms |
 | Each revision's reader/config/protocol suites | 203/203 | 241/246 | Different inventories; reference's five failures require unavailable historical npm packages, so not five product defects |
 
@@ -76,7 +77,7 @@ there is no M or author final response. Contract evaluation on an author patch
 is NOT RUN. Requested 1800-second author budget remains unused. Scripted native
 preflight, real task runs, author/title/service provider requests, author tokens
 and author tools are zero because dispatch never occurred, not because unknown
-usage was replaced with zero. Developing-agent work and six local calibration
+usage was replaced with zero. Developing-agent work and eight local calibration
 commands are separate; monetary cost is unavailable and not estimated.
 
 No current author trajectory exists, so no mechanism addition is proposed.
@@ -85,3 +86,10 @@ and pauses are unchanged. The unresolved decision is whether to preserve the
 strict all-reference-pass admission condition or explicitly permit the single
 run with baseline-backed compatibility oracles and the reference defect exposed.
 No model dispatch or final push is performed while that question is pending.
+
+The additional Kimi migration check selects the observable portions of public
+PR #50 readers.test.mjs:4313-4367, with unchanged historical input fixture and
+expected totals. Internal `ledger`/`legacyBaseline` assertions are not imported;
+every next-state continuation additionally uses a JSON roundtrip. The baseline
+reaches copy and doubles totals from 20/21 to 40/42. Reference passes all steps.
+This does not certify the other migration or CLI persistence paths.

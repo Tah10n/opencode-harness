@@ -34,6 +34,13 @@
       "probe": "ledger-lifecycle.test.mjs",
       "sha256": "0f049d12080a488c159b26716f43275b0d66751102d71521dcf77fbe88411ceb",
       "unchanged": true
+    },
+    {
+      "fixture": "migration-0.4.3.json",
+      "sourceCommit": "9e389a6dbc1b0c9813599fb61eceb6958d8c4de4",
+      "sourcePath": "packages/connector/test/fixtures/migration-0.4.3.json",
+      "sha256": "7c0b0ef89805cd301173b07d611ffe1fa0c163e909ad142f21028b39ccdde4c7",
+      "unchanged": true
     }
   ],
   "baselineOriginalTestsVerified": true,

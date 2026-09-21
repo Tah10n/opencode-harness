@@ -74,6 +74,30 @@
         "fail": 0,
         "skipped": 0
       }
+    },
+    {
+      "file": "local/plain-ledger-native-high/baseline-kimi-migration.json",
+      "sha256": "494f9883c6b5f15e2050df369625d614fa0aa9ba5a49b4730ca240978d751ec5",
+      "bytes": 2163,
+      "exitCode": 1,
+      "counts": {
+        "tests": 1,
+        "pass": 0,
+        "fail": 1,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-kimi-migration.json",
+      "sha256": "51a93edc7c9e293f89fc26e844bb2f8085f55363ee0efb8d450f82e6d2af9219",
+      "bytes": 1239,
+      "exitCode": 0,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0
+      }
     }
   ]
 }
