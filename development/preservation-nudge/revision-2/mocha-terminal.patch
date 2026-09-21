@@ -1,0 +1,16 @@
+diff --git a/index.js b/index.js
+index f5bcacd61f1c3f73cc6ae99abb8391ea8cdec528..5f0c82951d475d98b74f2ca5663d974fe2b14257 100644
+--- a/index.js
++++ b/index.js
+@@ -1 +1,3 @@
+ exports.increment = n => n + 1;
++exports.double = n => n * 2;
++// user draft retained
+diff --git a/test/feature.test.js b/test/feature.test.js
+index 9a53820ee250158e1bbbaf583885969346c5c362..17f35582078153ded7ad54becf91f8e0b1d9182c 100644
+--- a/test/feature.test.js
++++ b/test/feature.test.js
+@@ -1,2 +1,2 @@
+ const assert = require('node:assert/strict'), api = require('../index');
+-describe('arithmetic', () => { it('public arithmetic', () => { assert.equal(typeof api.increment, 'function'); }); });
++describe('arithmetic', () => { it('public arithmetic', () => { assert.equal(typeof api.increment, 'function'); assert.equal(api.double(4), 8); }); });

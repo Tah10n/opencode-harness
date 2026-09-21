@@ -1,0 +1,928 @@
+{
+  "revision1Actual": {
+    "considered": 47,
+    "reasons": {
+      "no_production_change": 3,
+      "scope_or_origin_unknown": 31,
+      "unconfirmed_or_changed_execution": 13
+    },
+    "attachedBlocks": 0
+  },
+  "kind": "offline ON-only form replay, not historical delivery",
+  "revision": 2,
+  "events": 47,
+  "formPasses": 4,
+  "firstFormPass": 53,
+  "firstFullyEligibleEvent": null,
+  "fullEligibility": "unknown: no preserved intermediate full snapshot/configuration for first form pass; no invented replacement",
+  "historicalAdvisoryAttached": 0,
+  "realProviderCalls": 0,
+  "rows": [
+    {
+      "event": 7,
+      "callID": "call_QCmXPQgLQfDOqqTb1KMjkMOa",
+      "command": "git status --short && git log --oneline -5",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 1748.637,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": "initial",
+      "receiptSha256": "62ea851d3ef0a9134ccc968bc4bdbb54aad79102408faa4b66b090319ce3e4b5"
+    },
+    {
+      "event": 39,
+      "callID": "call_8u0PvkP4VmCAkyU3PnEyd31c",
+      "command": "git log --all --oneline --decorate -20",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 1612.586,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": "initial",
+      "receiptSha256": "5730d345319d2c21daddbd65b08f39ffe013fccf210b46b9efa25e2147b9da33"
+    },
+    {
+      "event": 40,
+      "callID": "call_77J2RF6M8rLsWGcbsWuGpBcY",
+      "command": "git fsck --no-reflogs --unreachable",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 1573.785,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": "initial",
+      "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+    },
+    {
+      "event": 46,
+      "callID": "call_YmLTUtxRNMLo93DkhKbLMZqJ",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm run build",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 1385.715,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "f66fafd29953afd6d96f8ee4bb5aacdc5dda66fe09fa25baa27f942e3f6df151"
+    },
+    {
+      "event": 47,
+      "callID": "call_8oxsWvXGtcqKcj2r4S9bBGzI",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/css/index.js --grep 'omit-scoping-attribute-class-(static|dynamic)'",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": true,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": false,
+        "remainingSeconds": 1372.085,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unconfirmed_or_changed_execution"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "586183530cf43c50def7f852acf8c29d3779d89a3531cd72363758025460cd09"
+    },
+    {
+      "event": 49,
+      "callID": "call_LpqEanr8AKCR39FHprSnSWze",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/css/index.js --grep 'omit-scoping-attribute-class-(static|dynamic)'",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": true,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": false,
+        "remainingSeconds": 1348.846,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unconfirmed_or_changed_execution"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "9329de3b7163c91d47a1c8407d77d3abf08b72eceec2bca682bc369ffab88d05"
+    },
+    {
+      "event": 50,
+      "callID": "call_5UfvCBeYwufSwTI3thQovw2F",
+      "command": "od -An -t x1 test/css/samples/omit-scoping-attribute-class-static/expected.css && od -An -t x1 test/css/samples/basic/expected.css",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 1338.837,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "218e353b2b624acc4aeb0aab1305af22291a307888afefe2453daa372ea4d95c"
+    },
+    {
+      "event": 51,
+      "callID": "call_A05pqduI2R1fINea8wCWDYwB",
+      "command": "git show HEAD:test/css/samples/omit-scoping-attribute-class-static/expected.css | od -An -t x1",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 1329.037,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "25d39e575e49751b6dc6b1054307d2ebd4c659bb18aac7a677ed010d46ae9220"
+    },
+    {
+      "event": 52,
+      "callID": "call_gERH2B40g2yYYj44lwZ3lio2",
+      "command": "perl -pi -e 'chomp if eof' test/css/samples/omit-scoping-attribute-class-static/expected.css test/css/samples/omit-scoping-attribute-class-dynamic/expected.css",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": false,
+        "remainingSeconds": 1315.426,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+    },
+    {
+      "event": 53,
+      "callID": "call_cxzkGwDjpVz9Cy8pLtXePOi8",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/css/index.js --grep 'omit-scoping-attribute-class-(static|dynamic)'",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": true,
+        "observedCount": 2,
+        "observedCases": [
+          {
+            "suite": "css",
+            "name": "omit-scoping-attribute-class-dynamic"
+          },
+          {
+            "suite": "css",
+            "name": "omit-scoping-attribute-class-static"
+          }
+        ],
+        "completedStable": true,
+        "remainingSeconds": 1303.487,
+        "formPass": true,
+        "fullEligibility": "unknown",
+        "reason": "intermediate_snapshot_and_configuration_unavailable"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "f4c69335323d0eda65c646019ae3f5f1ffc9c2157afdee4273753423b5d6e81a"
+    },
+    {
+      "event": 65,
+      "callID": "call_epRil3gmz6dHmIIyr1n5ggJ3",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/css/index.js --grep 'omit-scoping-attribute-class-(static|dynamic)'",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": true,
+        "observedCount": 2,
+        "observedCases": [
+          {
+            "suite": "css",
+            "name": "omit-scoping-attribute-class-dynamic"
+          },
+          {
+            "suite": "css",
+            "name": "omit-scoping-attribute-class-static"
+          }
+        ],
+        "completedStable": true,
+        "remainingSeconds": 1207.816,
+        "formPass": true,
+        "fullEligibility": "unknown",
+        "reason": "intermediate_snapshot_and_configuration_unavailable"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "5bc16455a1a3f8d6af1a55f3b4166f3a2d2f55d32513e901b7152e13da950aaa"
+    },
+    {
+      "event": 66,
+      "callID": "call_6z0HEhRyoNOh1YWyCNfYhEo5",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/css/index.js",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": true,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": false,
+        "remainingSeconds": 1099.238,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unconfirmed_or_changed_execution"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "d6e359d81f38b8b6dd0cdfbe1e05f0424fc56932cbb1a9585f7b281d2e1a9c47"
+    },
+    {
+      "event": 67,
+      "callID": "call_Dqp6ZhgNtKU0pHfHtSimntYI",
+      "command": "git status --short",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 1087.233,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "b89b3bb7ec6ddc75940ebfbc3fd5f7b22cc66cc9c121b550562d04d2be095c1d"
+    },
+    {
+      "event": 68,
+      "callID": "call_AumIgkeb3JUTdfI8hxdR0Qhl",
+      "command": "git diff --stat && git diff -- test/sourcemaps/samples/css/output.css test/sourcemaps/samples/css-cascade-false/output.css",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 1072.139,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "7554ac6bae87cd9c2cd4df5998826b435a7b9c1b03535627dd9459b53aac081d"
+    },
+    {
+      "event": 71,
+      "callID": "call_ngkkfD8LLfMxzcCH0pjtc8pg",
+      "command": "git diff -- src/generators/nodes/Attribute.ts src/generators/nodes/Element.ts src/generators/server-side-rendering/visitors/Element.ts",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 1060.848,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "86ae36852c60b2ee67387c10aacf1996459fb807aaabc854daebd180a328dffd"
+    },
+    {
+      "event": 72,
+      "callID": "call_6lGtwckbCvIzNbZ9M4bSnfKl",
+      "command": "for actual in test/css/samples/*/_actual.css; do expected=${actual/_actual.css/expected.css}; if [ -f \"$expected\" ]; then cp \"$actual\" \"$expected\"; fi; done; cp test/sourcemaps/samples/css/output.css test/sourcemaps/samples/css/output.css; cp test/sourcemaps/samples/css-cascade-false/output.css test/sourcemaps/samples/css-cascade-false/output.css",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": false,
+        "remainingSeconds": 1035.707,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "8c80f0017dc02f40c8a34830054e7f30af7225e38692eafde05acaa99471123c"
+    },
+    {
+      "event": 73,
+      "callID": "call_IaI1n0rjFxwJyf5yqb6XMeK0",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/css/index.js --grep '^((?!custom-elements).)*$'",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": false,
+        "remainingSeconds": 1007.105,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "3b0410e4c0c5ff420adc9d0d880b30a65b7600ca266bc0514154072d19265c02"
+    },
+    {
+      "event": 74,
+      "callID": "call_CDUEERxCCQ6HpmwqOA81B3X9",
+      "command": "for expected in test/css/samples/*/expected.css; do perl -pi -e 's/svelte-\\d+/svelte-xyz/g' \"$expected\"; done",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": false,
+        "remainingSeconds": 991.862,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+    },
+    {
+      "event": 75,
+      "callID": "call_jr5TnPVeX4ZnktdNxMKrgdAo",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/css/index.js --grep '^((?!custom-elements).)*$'",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": false,
+        "remainingSeconds": 965.09,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "ed5edee8f3b8dc81f79531ea5d2dcc6d86ec2bedaef2a2551d5e177c525fe489"
+    },
+    {
+      "event": 77,
+      "callID": "call_WC6NdUydJMzxpsvzQ6mJ2E2m",
+      "command": "for actual in test/css/samples/*/_actual.html; do expected=${actual/_actual.html/expected.html}; if [ -f \"$expected\" ]; then cp \"$actual\" \"$expected\"; perl -pi -e 's/svelte-\\d+/svelte-xyz/g' \"$expected\"; fi; done",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": false,
+        "remainingSeconds": 943.517,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+    },
+    {
+      "event": 78,
+      "callID": "call_XkKVCHpjuBzxHMqEzk97Z1rL",
+      "command": "for sample in collapses-text-around-comments css-media-query; do cp \"test/js/samples/$sample/_actual.js\" \"test/js/samples/$sample/expected.js\"; cp \"test/js/samples/$sample/_actual-bundle.js\" \"test/js/samples/$sample/expected-bundle.js\"; done",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": false,
+        "remainingSeconds": 925.486,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+    },
+    {
+      "event": 80,
+      "callID": "call_QuWuEFXMb6khUgl1FkaiiUKL",
+      "command": "for sample in styles styles-nested; do cp \"test/server-side-rendering/samples/$sample/_actual.html\" \"test/server-side-rendering/samples/$sample/_expected.html\"; cp \"test/server-side-rendering/samples/$sample/_actual.css\" \"test/server-side-rendering/samples/$sample/_expected.css\"; done",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": false,
+        "remainingSeconds": 907.362,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+    },
+    {
+      "event": 82,
+      "callID": "call_q1E6YZIcOwJBj0THNSVHiens",
+      "command": "git status --short",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 880.035,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "71fdb643b27169fbe7e7512c504058064798dac8ae77ddf6479cf1d1db9b5470"
+    },
+    {
+      "event": 83,
+      "callID": "call_VX37xNWFE6PSUV58w3ZoJRJW",
+      "command": "git diff --stat",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 875.012,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "a3b10013f1039c877775b4cfef5cff72c7398e40d7dc121a4e7a7ffe844569dc"
+    },
+    {
+      "event": 84,
+      "callID": "call_ov7u3ogzPs2uoRFzMMMQv5pk",
+      "command": "git diff -- src/css/Stylesheet.ts src/generators/dom/index.ts test/css/index.js test/css/samples/omit-scoping-attribute-class-dynamic/_config.js",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 869.969,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "48eac9f28f537982117d3bb3b1555d3119da3fea0e2ccb22d370c068842455e8"
+    },
+    {
+      "event": 90,
+      "callID": "call_GaxDnxFOZdl8FBUqxtZ3FLxI",
+      "command": "git diff --check",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 839.539,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+    },
+    {
+      "event": 91,
+      "callID": "call_2CYc5xitkAbyNPrjII1cUcOd",
+      "command": "git diff --numstat | sort -nr | head -20",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 834.416,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "68fe09fd679c8a0b891d11d00ec619d413e1fd1d78b028a8d0c718af4635ed67"
+    },
+    {
+      "event": 92,
+      "callID": "call_AGUQUmfyKDNVHJ5wlkkZnE3H",
+      "command": "git show HEAD:test/css/samples/refs-qualified/expected.html && printf '\\n--- actual ---\\n' && od -An -c test/css/samples/refs-qualified/expected.html",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 824.711,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "55e4ccebf94b1381d634177b60a7569a26fb6db340619ba13443dc010f7a067e"
+    },
+    {
+      "event": 93,
+      "callID": "call_JMOyhjjZv9qijgBzafZcrPZS",
+      "command": "git diff -- test/css/samples -- '*.html'",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 813.601,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "924c757bc06eab7f85650506a09785b1d03b473cc96d36eb5d5d2d1213982a33"
+    },
+    {
+      "event": 97,
+      "callID": "call_XszPsZY2RErJQfGfbWhDqC7h",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm run build",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 740.347,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "ddabe186a21ba9b5b478acd72598ca863ad91b2a76b4d53858979c0d80a0db98"
+    },
+    {
+      "event": 98,
+      "callID": "call_DT9KsNOSYwGQay7ejDIi9SI1",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^css omit-scoping-attribute-class-(static|dynamic)$'",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 727.277,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "50573599358542527dbdf66a6be6f30e46a891a391c7e615ea42062764e1c8c5"
+    },
+    {
+      "event": 99,
+      "callID": "call_2D7OO0Zr669WrL93g2TO48Xp",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^css '",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": true,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": false,
+        "remainingSeconds": 709.88,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unconfirmed_or_changed_execution"
+      },
+      "savedSnapshot": null,
+      "receiptSha256": "e0d54e7cf1f89b1888ce7ad1d742f2d6e445dd90e8d32acef0e794dfe1eae57a"
+    },
+    {
+      "event": 102,
+      "callID": "call_M0Nyva25F4howHxhYLmxGvTu",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm run build",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 661.074,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": "terminal",
+      "receiptSha256": "b375499e9197cae14404e65d55aa508689412fdeef4d916d9b9e7dbb23c85c3d"
+    },
+    {
+      "event": 103,
+      "callID": "call_22td8TnlyCGtSVeig0isplEe",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^css omit-scoping-attribute-class-(static|dynamic)$'",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 648.939,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": "terminal",
+      "receiptSha256": "4c927d469cc199b7a425b2adab91944c73ab75e2df15ff4c56ffcbe000ff9df0"
+    },
+    {
+      "event": 104,
+      "callID": "call_5Rfv4y8VFNihiwEEDwH6P2f8",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^css '",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": true,
+        "observedCount": 49,
+        "observedCases": [
+          {
+            "suite": "css",
+            "name": "attribute-selector-only-name"
+          },
+          {
+            "suite": "css",
+            "name": "attribute-selector-unquoted"
+          },
+          {
+            "suite": "css",
+            "name": "basic"
+          },
+          {
+            "suite": "css",
+            "name": "cascade-false"
+          },
+          {
+            "suite": "css",
+            "name": "cascade-false-empty-rule"
+          }
+        ],
+        "completedStable": true,
+        "remainingSeconds": 635.097,
+        "formPass": true,
+        "fullEligibility": "unknown",
+        "reason": "intermediate_snapshot_and_configuration_unavailable"
+      },
+      "savedSnapshot": "terminal",
+      "receiptSha256": "e5e52e8b6739eddd9acf73b0864f3c4f17f7fd8ebc0d946a2242f0e89d666b6e"
+    },
+    {
+      "event": 105,
+      "callID": "call_RfH5nk5n3A9ofuyDCyZljG7M",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^js '",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": true,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 616.398,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_or_incomplete_report"
+      },
+      "savedSnapshot": "terminal",
+      "receiptSha256": "4457c514275e6dad3501a2fff49022d657657c2d4554c183ec7669ee54dc9558"
+    },
+    {
+      "event": 106,
+      "callID": "call_GhTgmxBq4BnzUvDB9PdesTlk",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^(styles|styles-nested)$'",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 602.443,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": "terminal",
+      "receiptSha256": "9c6407abb15ef3a8182410efa8f457877f1d7c47bd1b9fb91a285184ff6c6495"
+    },
+    {
+      "event": 107,
+      "callID": "call_50hvutl2kpUWc8wqqnOxrGx3",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^ssr (styles|styles-nested)$'",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 588.023,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": "terminal",
+      "receiptSha256": "4ae7bc5b041ce8be766bb5c58e1042ea9fadfc3a49148392970c775c49d1f5cb"
+    },
+    {
+      "event": 110,
+      "callID": "call_oa2sVk7RyxhLMoHOcazNSWgh",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^sourcemaps '",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": true,
+        "observedCount": 8,
+        "observedCases": [
+          {
+            "suite": "sourcemaps",
+            "name": "basic"
+          },
+          {
+            "suite": "sourcemaps",
+            "name": "binding"
+          },
+          {
+            "suite": "sourcemaps",
+            "name": "binding-shorthand"
+          },
+          {
+            "suite": "sourcemaps",
+            "name": "css"
+          },
+          {
+            "suite": "sourcemaps",
+            "name": "css-cascade-false"
+          }
+        ],
+        "completedStable": true,
+        "remainingSeconds": 530.589,
+        "formPass": true,
+        "fullEligibility": "unknown",
+        "reason": "intermediate_snapshot_and_configuration_unavailable"
+      },
+      "savedSnapshot": "terminal",
+      "receiptSha256": "c8892cf0d4d1b9a1d2842ded1d3f3d46efa36d5a64fb283d20d08272a5a1d319"
+    },
+    {
+      "event": 111,
+      "callID": "call_CRRF1csOgOvdkmC2ZABxqESQ",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm run lint",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 515.159,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": "terminal",
+      "receiptSha256": "ccfe0d04456fd625d8977ef121772ea8c7257f6a4d646829e14e98e0e2cdb108"
+    },
+    {
+      "event": 112,
+      "callID": "call_3ySBqiAOo59OPjqgJZi9uNDC",
+      "command": "git diff --check && git status --short",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 496.363,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": "terminal",
+      "receiptSha256": "71fdb643b27169fbe7e7512c504058064798dac8ae77ddf6479cf1d1db9b5470"
+    },
+    {
+      "event": 113,
+      "callID": "call_4XBggCUUMdznuP0HKvtG2WD2",
+      "command": "git diff -- src/generators/nodes/Attribute.ts src/generators/nodes/Element.ts src/generators/server-side-rendering/visitors/Element.ts",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 491.302,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": "terminal",
+      "receiptSha256": "e4eda9b987c675c4b8974c853e11d30ebba25b5827905d3b38ad274a87ff05d2"
+    },
+    {
+      "event": 114,
+      "callID": "call_zRyyI1N0Tzy2Ll7Aw1oLbq01",
+      "command": "git diff -- test/js/samples/collapses-text-around-comments/expected.js test/js/samples/css-media-query/expected.js test/server-side-rendering/samples/styles/_expected.html test/server-side-rendering/samples/styles-nested/_expected.html",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 486.234,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": "terminal",
+      "receiptSha256": "8efdc30aa779aacdc6f2e0bd44d4d54f8e61237165e44a6d9677e972e44861ff"
+    },
+    {
+      "event": 117,
+      "callID": "call_O6aHYVYv94WdPdW7inwDDnAq",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": false,
+        "remainingSeconds": 360.291,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": "terminal",
+      "receiptSha256": "dcf9f966c2aac28b9572cdfa5a6b0e15398808138d1b45aa79f21c7d6212a2ab"
+    },
+    {
+      "event": 118,
+      "callID": "call_UoCh7jQVIRUcgWhzDctbAs7E",
+      "command": "git status --short && git diff --check",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 342.281,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": "terminal",
+      "receiptSha256": "71fdb643b27169fbe7e7512c504058064798dac8ae77ddf6479cf1d1db9b5470"
+    },
+    {
+      "event": 119,
+      "callID": "call_cHcZRw4aWN0BuWrhT2DvqVCO",
+      "command": "git diff --stat",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 337.239,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": "terminal",
+      "receiptSha256": "e50278c89249e3771c2a0ec0bb6531fda3251aed59d860f6abd0a3715bec1d57"
+    },
+    {
+      "event": 120,
+      "callID": "call_zbkS99TQCCp8khr6MbFENXs3",
+      "command": "git diff -- test/sourcemaps/samples/css/output.css.map test/sourcemaps/samples/css-cascade-false/output.css.map",
+      "revision1": "unsupported_command_before_origin_analysis",
+      "revision2": {
+        "recognized": false,
+        "observedCount": null,
+        "observedCases": null,
+        "completedStable": true,
+        "remainingSeconds": 332.184,
+        "formPass": false,
+        "fullEligibility": "not_eligible_on_available_inputs",
+        "reason": "unsupported_command"
+      },
+      "savedSnapshot": "terminal",
+      "receiptSha256": "251e427dbd174080b878ba419c765a1188b0decb89839f02467de62167fcb6c3"
+    }
+  ]
+}

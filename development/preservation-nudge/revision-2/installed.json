@@ -1,0 +1,368 @@
+{
+  "revision": 2,
+  "installed": "1.18.26",
+  "network": "none; loopback scripted provider",
+  "realProviderCalls": 0,
+  "scriptedAuthor": true,
+  "results": [
+    {
+      "mode": "mocha",
+      "baselineCaseModified": true,
+      "installed": {
+        "native-task-plugin.mjs": "b36b42d827454ee8121eb08c075699107259b33836b8285374b5bef02ee57740",
+        "native-task-observations.mjs": "31c5338a74cb958fe2a0532dbc81a8822084aadb8068aca44405c6bc92a42eae",
+        "native-preservation-nudge.mjs": "77d37df386654e567ae39f9c04fcbaef00eeec4f275193cc78f5e2217cbbdaa6"
+      },
+      "requests": 14,
+      "requestEvidence": [
+        {
+          "kind": "feature-receipt",
+          "request": 8,
+          "sha256": "58e38db5e14d350f34e61dc74bc9dc2b8997c5d034a6e9b5cde6e2bd5004786a",
+          "advisoryInLastTool": true,
+          "advisorySha256": "a315ab17a676489219275af0536bc81d00886718f4d29e9f2fe9fe2952f69c0b",
+          "advisoryBytes": 611
+        },
+        {
+          "kind": "existing-check-receipt",
+          "request": 9,
+          "sha256": "b5c70abcca111d510c526d68e2d43e12ba374b937271e78ec34568ee1467f9ef",
+          "failureInLastTool": true
+        }
+      ],
+      "received": true,
+      "receivedFailure": true,
+      "status": "incomplete",
+      "checks": [
+        {
+          "command": "ln -s /work/runner-deps/node_modules node_modules",
+          "exit": 0,
+          "durationMs": 98
+        },
+        {
+          "command": "./node_modules/.bin/mocha --opts mocha.opts test/feature.test.js --grep 'public arithmetic'",
+          "exit": 0,
+          "durationMs": 113
+        },
+        {
+          "command": "./node_modules/.bin/mocha --opts mocha.opts test/old.test.js --grep 'existing increment'",
+          "exit": 1,
+          "durationMs": 111
+        },
+        {
+          "command": "./node_modules/.bin/mocha --opts mocha.opts test/feature.test.js --grep 'public arithmetic'",
+          "exit": 0,
+          "durationMs": 117
+        },
+        {
+          "command": "./node_modules/.bin/mocha --opts mocha.opts test/old.test.js --grep 'existing increment'",
+          "exit": 0,
+          "durationMs": 107
+        },
+        {
+          "command": "npm test",
+          "exit": 0,
+          "durationMs": 255
+        }
+      ],
+      "advisory": {
+        "version": 2,
+        "additionalReads": 4,
+        "eligibleEvents": 1,
+        "status": "attached_to_receipt",
+        "baselineSnapshot": "6701c92f35f79f52f5b57964989820f68b467d4b10a990e7ce5483d7b8d54c70",
+        "considered": 6,
+        "reasons": {
+          "no_production_change": 1,
+          "already_attached": 4
+        },
+        "attachedBlocks": 1,
+        "addedBytes": 611,
+        "classificationMs": 1.9594170000000304,
+        "reason": "already_attached",
+        "candidate": {
+          "callID": "fixture-7",
+          "baselineSnapshot": "6701c92f35f79f52f5b57964989820f68b467d4b10a990e7ce5483d7b8d54c70",
+          "snapshot": "7302abc41d831b650f272f3d73ad93b656f6497155f0090f4d1fa9e4d95d3e1f",
+          "scope": "arithmetic: public arithmetic",
+          "observedCount": 1,
+          "selection": {
+            "runner": "mocha",
+            "route": "direct",
+            "opts": "mocha.opts",
+            "files": [
+              "test/feature.test.js"
+            ],
+            "filter": "public arithmetic"
+          }
+        }
+      },
+      "portable": {
+        "exit": 0,
+        "durationMs": 122,
+        "patchSha256": "a1b0aff27be8c2286b32a2be5daf61496003ef36f2d7b64f675d2097e98d8866",
+        "bytesAndModes": true
+      },
+      "originalCheckoutAndIndexUnchanged": true
+    },
+    {
+      "mode": "parcel",
+      "baselineCaseModified": true,
+      "installed": {
+        "native-task-plugin.mjs": "b36b42d827454ee8121eb08c075699107259b33836b8285374b5bef02ee57740",
+        "native-task-observations.mjs": "31c5338a74cb958fe2a0532dbc81a8822084aadb8068aca44405c6bc92a42eae",
+        "native-preservation-nudge.mjs": "77d37df386654e567ae39f9c04fcbaef00eeec4f275193cc78f5e2217cbbdaa6"
+      },
+      "requests": 14,
+      "requestEvidence": [
+        {
+          "kind": "feature-receipt",
+          "request": 8,
+          "sha256": "659deeeeb420e2357de23f54185a3c3cb62c9adcedb0c165953b5e18084a7c28",
+          "advisoryInLastTool": true,
+          "advisorySha256": "c8f72ea1611a9569598992ab75d3bd816e11b255e1fb5c3f62e9be435b2ec941",
+          "advisoryBytes": 624
+        },
+        {
+          "kind": "existing-check-receipt",
+          "request": 9,
+          "sha256": "6ce22facad42db5d649b1e415b590ec1ceffc221b3fecebb7ca1dde6ca47ccc7",
+          "failureInLastTool": true
+        }
+      ],
+      "received": true,
+      "receivedFailure": true,
+      "status": "checks_passed",
+      "checks": [
+        {
+          "command": "node -e 'for(let i=0;i<5000;i++)console.log((i===0?\"BEGIN\":i===2500?\"HIDDEN_MIDDLE\":i===4999?\"END\":\"LINE\")+\":\"+i+\":\"+\"x\".repeat(60))'",
+          "exit": 0,
+          "durationMs": 157
+        },
+        {
+          "command": "node --test spec/extension.test.mjs",
+          "exit": 0,
+          "durationMs": 101
+        },
+        {
+          "command": "node --test spec/old.test.js",
+          "exit": 1,
+          "durationMs": 104
+        },
+        {
+          "command": "node --test spec/extension.test.mjs",
+          "exit": 0,
+          "durationMs": 105
+        },
+        {
+          "command": "node --test spec/old.test.js",
+          "exit": 0,
+          "durationMs": 105
+        },
+        {
+          "command": "npm test",
+          "exit": 0,
+          "durationMs": 309
+        }
+      ],
+      "advisory": {
+        "version": 2,
+        "additionalReads": 2,
+        "eligibleEvents": 1,
+        "status": "attached_to_receipt",
+        "baselineSnapshot": "e3296a7a3ff27829777a29b75c5bc0797480ed1b49e222d7bfcc2b17c60d805b",
+        "considered": 6,
+        "reasons": {
+          "no_production_change": 1,
+          "already_attached": 4
+        },
+        "attachedBlocks": 1,
+        "addedBytes": 624,
+        "classificationMs": 1.1447920000000522,
+        "reason": "already_attached",
+        "candidate": {
+          "callID": "fixture-7",
+          "baselineSnapshot": "e3296a7a3ff27829777a29b75c5bc0797480ed1b49e222d7bfcc2b17c60d805b",
+          "snapshot": "f68197281c3183b2ddf6e1ee61d640d0b906fb1a6fd1cfe11c4e922ad9868dc2",
+          "scope": "spec/extension.test.mjs: public arithmetic",
+          "observedCount": 1,
+          "selection": {
+            "runner": "node",
+            "file": "spec/extension.test.mjs"
+          }
+        }
+      },
+      "portable": {
+        "exit": 0,
+        "durationMs": 178,
+        "patchSha256": "ab3ac7e2837d18fc73c04944280491f96f022163b64c9236841929c5d5015400",
+        "bytesAndModes": true
+      },
+      "originalCheckoutAndIndexUnchanged": true
+    },
+    {
+      "mode": "off",
+      "baselineCaseModified": true,
+      "installed": {
+        "native-task-plugin.mjs": "b36b42d827454ee8121eb08c075699107259b33836b8285374b5bef02ee57740",
+        "native-task-observations.mjs": "31c5338a74cb958fe2a0532dbc81a8822084aadb8068aca44405c6bc92a42eae",
+        "native-preservation-nudge.mjs": "77d37df386654e567ae39f9c04fcbaef00eeec4f275193cc78f5e2217cbbdaa6"
+      },
+      "requests": 14,
+      "requestEvidence": [
+        {
+          "kind": "feature-receipt",
+          "request": 8,
+          "sha256": "5795bec3c12edd9af0044998606dd52b73b07acdbd2ce9b9ac474f40465dbb14",
+          "advisoryInLastTool": false
+        },
+        {
+          "kind": "existing-check-receipt",
+          "request": 9,
+          "sha256": "e9abde706ea960f31d61526a237589637b0da9bf9c29bf89d63b5fb5d61d471d",
+          "failureInLastTool": true
+        }
+      ],
+      "received": false,
+      "receivedFailure": true,
+      "status": "incomplete",
+      "checks": [
+        {
+          "command": "ln -s /work/runner-deps/node_modules node_modules",
+          "exit": 0,
+          "durationMs": 94
+        },
+        {
+          "command": "./node_modules/.bin/mocha --opts mocha.opts test/feature.test.js --grep 'public arithmetic'",
+          "exit": 0,
+          "durationMs": 108
+        },
+        {
+          "command": "./node_modules/.bin/mocha --opts mocha.opts test/old.test.js --grep 'existing increment'",
+          "exit": 1,
+          "durationMs": 109
+        },
+        {
+          "command": "./node_modules/.bin/mocha --opts mocha.opts test/feature.test.js --grep 'public arithmetic'",
+          "exit": 0,
+          "durationMs": 111
+        },
+        {
+          "command": "./node_modules/.bin/mocha --opts mocha.opts test/old.test.js --grep 'existing increment'",
+          "exit": 0,
+          "durationMs": 106
+        },
+        {
+          "command": "npm test",
+          "exit": 0,
+          "durationMs": 254
+        }
+      ],
+      "advisory": null,
+      "portable": {
+        "exit": 0,
+        "durationMs": 121,
+        "patchSha256": "a1b0aff27be8c2286b32a2be5daf61496003ef36f2d7b64f675d2097e98d8866",
+        "bytesAndModes": true
+      },
+      "originalCheckoutAndIndexUnchanged": true
+    },
+    {
+      "mode": "irrelevant",
+      "baselineCaseModified": true,
+      "installed": {
+        "native-task-plugin.mjs": "b36b42d827454ee8121eb08c075699107259b33836b8285374b5bef02ee57740",
+        "native-task-observations.mjs": "31c5338a74cb958fe2a0532dbc81a8822084aadb8068aca44405c6bc92a42eae",
+        "native-preservation-nudge.mjs": "77d37df386654e567ae39f9c04fcbaef00eeec4f275193cc78f5e2217cbbdaa6"
+      },
+      "requests": 10,
+      "requestEvidence": [
+        {
+          "kind": "feature-receipt",
+          "request": 8,
+          "sha256": "de886a72b55184ec080e6d92e4d576dfa1ac58f691c76ec15fa14e61d53c5cdd",
+          "advisoryInLastTool": true,
+          "advisorySha256": "a315ab17a676489219275af0536bc81d00886718f4d29e9f2fe9fe2952f69c0b",
+          "advisoryBytes": 611
+        },
+        {
+          "kind": "existing-check-receipt",
+          "request": 9,
+          "sha256": "ef6afd46df526f49034b7318f1692f3d532978766c177e1947997a8fc7705ee9",
+          "failureInLastTool": false
+        }
+      ],
+      "received": true,
+      "receivedFailure": false,
+      "status": "incomplete",
+      "checks": [
+        {
+          "command": "ln -s /work/runner-deps/node_modules node_modules",
+          "exit": 0,
+          "durationMs": 98
+        },
+        {
+          "command": "./node_modules/.bin/mocha --opts mocha.opts test/feature.test.js --grep 'public arithmetic'",
+          "exit": 0,
+          "durationMs": 105
+        },
+        {
+          "command": "./node_modules/.bin/mocha --opts mocha.opts test/unrelated.test.js --grep 'constant behavior'",
+          "exit": 0,
+          "durationMs": 111
+        }
+      ],
+      "advisory": {
+        "version": 2,
+        "additionalReads": 4,
+        "eligibleEvents": 1,
+        "status": "attached_to_receipt",
+        "baselineSnapshot": "c57869de4e2d85a88537f4c0fd8e6c9fe5e1dc2ab6a674f6cb2261673469f695",
+        "considered": 3,
+        "reasons": {
+          "no_production_change": 1,
+          "already_attached": 1
+        },
+        "attachedBlocks": 1,
+        "addedBytes": 611,
+        "classificationMs": 1.0594579999997222,
+        "reason": "already_attached",
+        "candidate": {
+          "callID": "fixture-7",
+          "baselineSnapshot": "c57869de4e2d85a88537f4c0fd8e6c9fe5e1dc2ab6a674f6cb2261673469f695",
+          "snapshot": "7705e0017e4ed22552f0bc2e2d96430300965f4e1ff3c184101a4d4ee3f14538",
+          "scope": "arithmetic: public arithmetic",
+          "observedCount": 1,
+          "selection": {
+            "runner": "mocha",
+            "route": "direct",
+            "opts": "mocha.opts",
+            "files": [
+              "test/feature.test.js"
+            ],
+            "filter": "public arithmetic"
+          }
+        }
+      },
+      "portable": {
+        "exit": 1,
+        "durationMs": 217,
+        "patchSha256": "6c5482edc4a48a8a91c6961e22c513c0f1d5c0b3d3b6599632daf967c3fe1ead",
+        "bytesAndModes": true
+      },
+      "originalCheckoutAndIndexUnchanged": true
+    }
+  ],
+  "retention": {
+    "evidenceComplete": true,
+    "files": [
+      {
+        "size": 353899,
+        "sha256": "20f0acd6e38c39f3a94b84afdd9a19b2621aa2b7b585a15340051f9d8674dfb1",
+        "archiveComplete": true,
+        "linkStatus": "linked"
+      }
+    ],
+    "hiddenTailInRequests": false
+  }
+}
