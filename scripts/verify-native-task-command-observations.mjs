@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import {spawnSync} from 'node:child_process';
+import childProcess, {spawnSync} from 'node:child_process';
+import {syncBuiltinESMExports} from 'node:module';
 import {prepareObservations} from '../lib/native-task-observations.mjs';
 import {compactTaskResult,taskResultText} from '../lib/native-task-plugin.mjs';
 import {finalChecks} from '../lib/native-task-workflow.mjs';
@@ -71,5 +72,56 @@ try {
   assert.match(taskResultText(result,details),/Internal runner results not interpreted/);
   assert.ok(!taskResultText(result,details).includes('not observed: npm test'));
  }
- console.log(JSON.stringify({passed:true,scenarios:scenarios.length,realModelRequests:0}));
+ // A bind-mounted host worktree's .git pointer is not a portable source bundle.
+ // Reproduce the Linux launcher failure without mounting host Git metadata, then
+ // verify the corrected source-export cwd with the very same observer and files.
+ {
+  const cwd=process.cwd(),source=path.join(temp,'source-export'),dir=path.join(temp,'diff-inputs');
+  fs.mkdirSync(source);fs.mkdirSync(dir);
+  const git=(...args)=>{const r=spawnSync('git',args,{cwd:dir,encoding:'utf8'});assert.equal(r.status,0,r.stderr);};
+  git('init','-q');
+  const file=path.join(dir,'value.test.mjs'),committed='assert.equal(value(), 1);\n';
+  fs.writeFileSync(file,committed);git('add','.');
+  git('-c','user.name=Fixture','-c','user.email=fixture@local','commit','-qm','base');
+  const dirty=committed+'assert.equal(userWork(), 2);\n';fs.writeFileSync(file,dirty);
+  const artifacts=path.join(dir,'.git/observations');fs.mkdirSync(artifacts);
+  const observe=prepareObservations({directory:dir,artifacts,permissionRules:rules});
+  const snapshot={snapshotSha256:'fixture'};
+  const realSpawn=childProcess.spawnSync;
+  try {
+   process.chdir(source);
+   assert.deepEqual(observe([],snapshot).testChanges,[]);
+   const before=path.join(artifacts,'original-tests/value.test.mjs');
+   const equal=realSpawn('git',['diff','--no-index','--no-ext-diff','--no-textconv','--',before,file],{encoding:'utf8',timeout:15000,maxBuffer:8*1024*1024});
+   assert.equal(equal.status,0,equal.stderr);assert.equal(equal.stdout,'');
+   fs.writeFileSync(file,committed+'assert.equal(userWork(), 3);\n');
+   const gitfile=path.join(source,'.git');fs.writeFileSync(gitfile,'gitdir: '+path.join(temp,'unmounted-host-gitdir')+'\n');
+   assert.throws(()=>observe([],snapshot),/Cannot capture exact test diff/);
+   // Only the owned, invalid source metadata changes; project/snapshot bytes stay.
+   fs.unlinkSync(gitfile);
+   const facts=observe([],snapshot);assert.equal(facts.testChanges.length,1);
+   const change=facts.testChanges[0];assert.equal(change.originalRetained,true);
+   assert.equal(change.removedOrChangedLines,true);
+   assert.match(change.diff,/^-assert\.equal\(userWork\(\), 2\);$/m);
+   assert.match(change.diff,/^\+assert\.equal\(userWork\(\), 3\);$/m);
+   assert.match(change.before,/userWork\(\), 2/);assert.match(change.after,/userWork\(\), 3/);
+   assert.equal(fs.readFileSync(before,'utf8'),dirty);
+   // Real Git covers the defect and success. Inject only unavailable process
+   // outcomes, ensuring neither an empty nor a partial output becomes evidence.
+   for(const failure of [
+    {status:null,signal:null,error:Object.assign(new Error('fixture spawn failure'),{code:'ENOENT'}),stdout:'',stderr:''},
+    {status:null,signal:'SIGTERM',stdout:'',stderr:''},
+    {status:null,signal:'SIGTERM',error:Object.assign(new Error('fixture buffer failure'),{code:'ENOBUFS'}),stdout:change.diff.slice(0,40),stderr:''},
+   ]) {
+    let injected=0;
+    childProcess.spawnSync=(exe,args,options)=>{
+     if(exe==='git'&&args[0]==='diff'&&args[1]==='--no-index'){injected++;return failure;}
+     return realSpawn(exe,args,options);
+    };
+    syncBuiltinESMExports();
+    assert.throws(()=>observe([],snapshot),/Cannot capture exact test diff/);assert.equal(injected,1);
+   }
+  } finally {childProcess.spawnSync=realSpawn;syncBuiltinESMExports();process.chdir(cwd);}
+ }
+ console.log(JSON.stringify({passed:true,scenarios:scenarios.length,exactDiffBoundaries:true,portableSourceCwd:true,realModelRequests:0}));
 }finally{fs.rmSync(temp,{recursive:true,force:true});}

@@ -161,3 +161,7 @@ installed containers were removed after evidence export.
 
 These are local engineering/integration observations, not full aggregate CI,
 autonomous model test selection, model-quality lift, release or deployment.
+
+Subsequent Linux diagnosis and completed controller validation are recorded in
+[VALIDATION-FOLLOWUP.md](VALIDATION-FOLLOWUP.md). The original failures above
+remain unchanged.
