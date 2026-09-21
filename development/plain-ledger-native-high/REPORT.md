@@ -1,3 +1,15 @@
+# Compatibility repair update
+
+At the user's subsequent request, the Antigravity defect is fixed in a separate
+reference-derived copy. See [REFERENCE-COMPATIBILITY.md](REFERENCE-COMPATIBILITY.md)
+and [reference-compatibility.patch](reference-compatibility.patch). The historical
+reference, archived failures and author baseline are unchanged. The identified
+compatibility obstacle is resolved; full task calibration is still incomplete,
+and no author run or push has occurred.
+
+The following is the retained pre-repair admission record, not the current status
+of the supplementary corrected copy.
+
 # Admission blocked by reference compatibility failure
 
 The full original account-switch-ledger task has **not** been executed. No Luna

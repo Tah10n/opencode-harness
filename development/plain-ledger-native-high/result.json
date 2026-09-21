@@ -1,5 +1,5 @@
 {
-  "stage": "admission_blocked_pending_user_decision",
+  "stage": "preparation_incomplete_compatibility_repaired",
   "slots": [
     {
       "slot": 1,
@@ -24,5 +24,12 @@
   "authorElapsedSeconds": 0,
   "localCalibrationCommands": 8,
   "monetaryCost": null,
-  "blocker": "Reference silently loses baseline-supported Antigravity input; all-mandatory-scenarios reference calibration cannot be certified."
+  "blocker": null,
+  "compatibilityRepair": {
+    "historicalReferenceUnchanged": true,
+    "supplementaryPatch": "reference-compatibility.patch",
+    "targetedChecksPassed": 143,
+    "projectVerify": "unavailable: pinned pnpm 11.7.0 not cached; network disabled",
+    "fullTaskCalibrationComplete": false
+  }
 }

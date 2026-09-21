@@ -1,0 +1,62 @@
+{
+  "referenceCommit": "9e389a6dbc1b0c9813599fb61eceb6958d8c4de4",
+  "historicalReferenceUnchanged": true,
+  "patchSha256": "05105df0eafad600895060197ce2343fead52e7fe6781d748ef4c5ec51591d13",
+  "historicalAdapterSha256": "e74cfedb00969e77d7914a64b0218bf783446a1263f35590104bc53dcba5ae2d",
+  "fixedAdapterSha256": "1a0f266f1f376db2b079343c3730c5afe198c8a9130550395a956a27d612359d",
+  "modelRequests": 0,
+  "receipts": [
+    {
+      "file": "local/plain-ledger-native-high/reference-compat-fix-checks.json",
+      "sha256": "c30f9473bc54ec614c7600a6027078b72bfffaa81caab94a7099c4b4389d0266",
+      "exitCode": 125,
+      "counts": {
+        "tests": null,
+        "pass": null,
+        "fail": null,
+        "skipped": null
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/compat-fix-before.json",
+      "sha256": "7c0668df4882a3ed2b5752dc33aa56f6c10df5e4c7a77184d2cfea667b9cd4be",
+      "exitCode": 1,
+      "counts": {
+        "tests": 6,
+        "pass": 2,
+        "fail": 4,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-compat-fixed-compat-fix-checks.json",
+      "sha256": "037bab8959293989a5ec46457a9e9d004046e01e12c0c1c0cda2648f306aaa8a",
+      "exitCode": 0,
+      "counts": {
+        "tests": 143,
+        "pass": 143,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/compat-fix-verify.json",
+      "sha256": "d0c7b27c23cb9db6a625473a4a99a2fd2e64a5a2861e5cf457e1e717012d44e0",
+      "exitCode": 1,
+      "counts": {
+        "tests": null,
+        "pass": null,
+        "fail": null,
+        "skipped": null
+      }
+    }
+  ],
+  "fullPatchApply": {
+    "passed": true,
+    "appliedBytesMatchTestedCopy": true,
+    "files": [
+      "packages/connector/lib/adapters/antigravity.mjs",
+      "packages/connector/test/antigravity-compatibility.test.mjs"
+    ]
+  }
+}

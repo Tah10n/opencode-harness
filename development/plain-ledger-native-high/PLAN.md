@@ -14,11 +14,13 @@ No reference code, historical patch, failure, evaluator, or this research plan
 may enter the author copy. A source archive with newly initialized Git history
 must be used; no origin, old objects, reflogs, or neighboring evaluator.
 
-Admission is currently unresolved: the reference fails preservation of two
-baseline-supported Antigravity input forms. No model call, scripted preflight,
-execution freeze, or launcher change has been made. The user was asked whether
-to stop on this requirement or explicitly allow baseline-backed compatibility
-oracles despite incomplete reference calibration. Silence does not admit a run.
+The user subsequently authorized correcting the compatibility defect. A separate
+reference-derived copy now has `reference-compatibility.patch`; the historical
+reference and the author baseline remain unchanged. Two baseline-supported
+Antigravity shapes and pre-fix checkpoint recovery pass in that corrected copy.
+This removes the identified compatibility obstacle, but does not constitute
+complete task calibration or an execution freeze. Remaining paths below still
+require preparation; the model has not been launched.
 
 ## Requirement → real execution path → observation
 
@@ -31,7 +33,7 @@ The listed incomplete observations are obligations, not claimed passes.
 | Retain accepted database usage after deletion, count new IDs once | OpenCode independent SQLite collector via `adapterFor('opencode').collect` | Unchanged SQLite public probe, baseline 0/1 and reference 1/1 |
 | State survives serialization and is reused | Each probe passes `JSON.parse(JSON.stringify(nextState))` to the next collection | Exercised by the six probes; actual config/CLI persistence still needs separate calibration |
 | First tuple wins on conflict; unrelated new events continue; range and privacy preserved | Four stable-ID JSONL paths in lifecycle probe | Reference reaches all assertions; baseline stops earlier. SQLite conflict and Kimi legacy coverage remain to calibrate |
-| Existing parser APIs and supported older inputs stay valid | Public parser exports and independent adapter collection | Two Antigravity legacy forms pass baseline, fail reference; blocking discrepancy is retained |
+| Existing parser APIs and supported older inputs stay valid | Public parser exports and independent adapter collection | Two Antigravity legacy forms pass baseline, fail reference; historical discrepancy is retained, supplementary corrected copy passes |
 | Conservative 0.4.3 migration | Claude state, shared JSONL state, Kimi/Gemini historical fixtures, OpenCode confirmed exact-ID cutover | Kimi 0.4.3 behavioral migration calibrated (baseline duplicates copy, reference passes JSON-reloaded transitions); other historical regressions located; complete acceptance not yet frozen |
 | Account/source boundaries and collection/config propagation | CLI sync → adapter state keyed by source ID → runtime `writeState/readState`; config source mapping | Original reader/config/protocol baseline suite passes 203/203. New ledger transition through this whole route remains unproven |
 | Bounded scans/storage, partial/error semantics, corruption fail-closed | Adapter scan bounds and persisted state validation | Original suites plus selected public diagnostics/source review; new representation-independent storage check still needs calibration |
