@@ -1,0 +1,36 @@
+{
+  "source": "2b16b6a8ad75b6b852adc5e2189e6d4a8d93eabd",
+  "checks": [
+    "readers",
+    "config",
+    "protocol"
+  ],
+  "tests": {
+    "packages/connector/test/origin.test.mjs": "546ca5eb3df8d044c74fb0c6768b3fe2cc64765690cb00bec60379dd1f7b0638",
+    "packages/connector/test/hook-security.test.mjs": "442807fea853127a65a2b1919d251130cdddce4c42c1cf90be9d4044a22e6b1b",
+    "packages/connector/test/discovery.test.mjs": "041da5bb80a7e6db9c5800799d6d99b3e113e082503c850936fdb9abf7a0d100",
+    "packages/connector/test/readers.test.mjs": "e69acea023cf759208200f983332340ebb0e655fd622be5d2182f2667d0aba94",
+    "packages/connector/test/codex-hooks.test.mjs": "b74cac05b63962520e3bbfe90e048800a18ca76e30e99e876eaf8f3877fc0ef7",
+    "packages/connector/test/executables.test.mjs": "e5fdf348a038889339314ac54e628da1924dadc1c4f17776b9e1ebf64db8b85b",
+    "packages/connector/test/browser.test.mjs": "f34ace35b7445e03281cf5061324b2840f8bea2f622a31c0e3824007fb30d45c",
+    "packages/connector/test/registry.test.mjs": "9e7d8cb0b2d10314bf67ae2742cdf7d1e7e08e98a077d5b3c376f3fe5b8ef83f",
+    "packages/connector/test/diagnostics.test.mjs": "15d6cf611032aeae73cfc85b235be021e6e414a5b9dd91bbae18e3ac2e1159ac",
+    "packages/connector/test/protocol.test.mjs": "e26184279b7b1aa584fef1c3185a99b83a60d7434a75776684e0ca9a06d77aef",
+    "packages/connector/test/lifecycle-lock.test.mjs": "87d2dfe63dd7de3e81dfc87fe003d3dc5b9e38b0337c9907da2e7ca3867cc963",
+    "packages/connector/test/owned-lock.test.mjs": "a8f47023a983c8c433be25f65bce571bc94e6bba9a8d2c3c5a4a92c88d124b6b",
+    "packages/connector/test/config.test.mjs": "234b6c4e2a621704967221b81efadd932a3513d90c4d498491eddb5c75ab515b",
+    "packages/connector/test/browser-integration.test.mjs": "2d8cfa33e14cf2ca956a952133849d0c69ec4023440de2f86bb895e51dc2c7ae",
+    "packages/connector/test/browser-integration.macos.test.mjs": "f900f8a6ea7564041055a24aaa5e01dd498494a712ed42c4dccb36124d00f6ae",
+    "packages/connector/test/claude-security.test.mjs": "14b225ec60f724610544d0df68e1b472d6886c143cfbec0dea65ecaa94dc7e96",
+    "packages/connector/test/state-security.test.mjs": "278d7281ce87750455bf0e3a0b41d1bdf100a3ef7323871416fcf40ae4841777",
+    "packages/connector/test/windows-security.test.mjs": "8ac3f994e29df4cdd46f3b6274daaa5e9401179bc46952acd6efe91b8ce82e1d",
+    "packages/connector/test/fixtures/qwen.jsonl": "f163637fe9f0f64d83abe96c98f8ad7fe2c53fcbf04447d3a617aca4c49ce68f",
+    "packages/connector/test/fixtures/claude.jsonl": "d492f9178a83142efbb4ba112029bccd3f504f5d559fb2baca3faaf406012e4a",
+    "packages/connector/test/fixtures/kimi.jsonl": "9da9ea7604e4d68c46d14d25975e15f7d5dac03561aa29c0150d9951bb16513e",
+    "packages/connector/test/fixtures/gemini.json": "8b56dfae23928879fe0be7dcd2e811d350e05fde0382e53344d625c0b7a1ac15",
+    "packages/connector/test/fixtures/opencode.json": "c6a3c112d5024f9e5917980b257c85620dbb4a002cca6be89f6129dc29051bd7",
+    "packages/connector/test/fixtures/kimi-legacy.jsonl": "c2f7a0b20bb3c0db2c1206e5027fae979b65ebd3a744f29ebe2390b41d6dc64d",
+    "packages/connector/test/fixtures/antigravity.jsonl": "b867c22aff652f28ef28b8961cf10757e67f34519025c615293ea29dc480a388",
+    "packages/connector/test/fixtures/codex.json": "a19039990248d072393961c222b9836adace77e0f7319054e468c6df2a8d9e88"
+  }
+}

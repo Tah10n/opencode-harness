@@ -1,0 +1,28 @@
+{
+  "stage": "admission_blocked_pending_user_decision",
+  "slots": [
+    {
+      "slot": 1,
+      "task": "account-switch-ledger",
+      "arm": "P",
+      "reasoning": "high",
+      "status": "not_started"
+    }
+  ],
+  "delivery_apply": null,
+  "delivered_checks": null,
+  "assessment_integrity": null,
+  "contract_results": "NOT RUN on author patch",
+  "Q": null,
+  "T": null,
+  "D": null,
+  "authorRuns": 0,
+  "scriptedPreflights": 0,
+  "providerRequests": 0,
+  "authorTokens": 0,
+  "authorToolCalls": 0,
+  "authorElapsedSeconds": 0,
+  "localCalibrationCommands": 6,
+  "monetaryCost": null,
+  "blocker": "Reference silently loses baseline-supported Antigravity input; all-mandatory-scenarios reference calibration cannot be certified."
+}
