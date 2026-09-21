@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "stage": "frozen_before_model_requests",
+  "startingHead": "711f91185eca48059ff4fcd0d031cf3963501a5a",
+  "freezeSha256": "5ddcf582ecad7403ef467a7ef2e4be0de0f3b9e4896905ec6eefe10861795bb8",
+  "runtimeSha": "e18db1fe10223db52dcc05b3e769bca140367c2b",
+  "opencode": "1.18.26",
+  "model": "openai/gpt-5.6-luna",
+  "reasoning": "high",
+  "budgetSeconds": 1800,
+  "slots": [
+    {
+      "slot": 1,
+      "instance_id": "mui__material-ui-18141",
+      "arm": "P",
+      "status": "not_started",
+      "Q": null,
+      "T": null,
+      "D": null
+    }
+  ],
+  "input": {
+    "task": {
+      "instance_id": "mui__material-ui-18141",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "13b3a0d31947ccdb20108febb5432d4f46f5a677",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-18141:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-18141@sha256:319eff3e5967de69dc2dd76754cdfb20cc8947957fb53dbbfc2d59883d099c27",
+        "id": "sha256:319eff3e5967de69dc2dd76754cdfb20cc8947957fb53dbbfc2d59883d099c27",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 8813714399,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:29aa626187f0b83e0d542617504065f7183bc475025551f4aa7167723c11d46e",
+      "projectNode": "v18.8.0",
+      "npm": "8.18.0",
+      "promptSha256": "ab341de14ddb7feb9e9141282b32ec16824b4daf3a8fffb5e5960fe74c9ebe02",
+      "originalRowCsvSha256": "3cb68af2b6869d716defa3c82aa832b58696a84aa313e788f4721928b0d75b87",
+      "lfsAuditSha256": "017a5d324be8071929baf33bc971c39999d241f1297d3ade22dd90b6e3491eb7",
+      "archives": {
+        "base.tar": "c39f689c083a3ee0f9b58e9525971ac49c0d45c6e2f7fcfc18c5296f61b30c79",
+        "dependencies.tar": "a23142948a5e327c3db29d19632ae0fa59034238b4bb8afe92e93806088da450"
+      },
+      "submodules": [],
+      "preparedExtra": null,
+      "controls": {
+        "gold": {
+          "resultSha256": "de9d6542bed0e3077e18b10e62596e0d2614b751eb4159d1104da55d47089a84",
+          "resolved": true,
+          "passed": 19,
+          "failed": 0
+        },
+        "baseline": {
+          "resultSha256": "2d8e22df3b399c00abc653bcb7a76e12c4d65ab32b9778f31b76215a48cdfe49",
+          "resolved": false,
+          "passed": 18,
+          "failed": 1
+        }
+      },
+      "scriptedPreflightSha256": "187e7a19ad9c79c257173ed5d62bb996978b4e81c0848bfdb437cc9975e75f19",
+      "isolationSha256": "8604c44f227c34d6266f7eabe2cd64703c51cd60d9b576fc475f11d982bf7ac0"
+    },
+    "sourceManifestSha256": "58942cfd5d4bd2faf773150509ca1e9f3131d8fb67f5e16232c3db6aaf29a96e",
+    "plainDependencyManifestSha256": "9ffe7e4785dea3e53e9a3248fddddabb7df675022ae3466439c9c8296c07d5fd",
+    "promptBytes": 1649,
+    "promptUnchanged": true,
+    "realProviderRequests": 0
+  },
+  "config": {
+    "model": "openai/gpt-5.6-luna",
+    "small_model": "openai/gpt-5.6-luna",
+    "provider": {
+      "openai": {
+        "options": {
+          "baseURL": "http://127.0.0.1:4099/v1",
+          "apiKey": "development-no-credential"
+        },
+        "models": {
+          "gpt-5.6-luna": {
+            "options": {
+              "reasoningEffort": "high"
+            },
+            "variants": {
+              "high": {
+                "reasoningEffort": "high"
+              }
+            }
+          }
+        }
+      }
+    },
+    "permission": {
+      "external_directory": {
+        "*": "deny",
+        "/template/node_modules/typescript/lib/*": "allow",
+        "/diagnostic/*": "allow"
+      }
+    }
+  },
+  "offlineConfig": {
+    "permission": {
+      "webfetch": "deny"
+    },
+    "agent": {
+      "build": {
+        "permission": {
+          "webfetch": "deny"
+        }
+      }
+    }
+  },
+  "authorHarness": false,
+  "calibrationSha256": "8631cdff171acc5cbc07ce13739fb9b59615360f9401ca0c5482d5d23599a371",
+  "preflightSha256": "efc48fcb5787c824de9a468e2bea2071e3389c57ad756ad4b6f1199199805083",
+  "files": {
+    "development/plain-mui-18141/PLAN.md": "4c7cb45906efd070886aed3c17d53ab695d802516f94fa644ee4782a5d50e2d0",
+    "development/plain-mui-18141/fe-manifest.json": "4edde1368f87d8afc5889e3b41829cb09577c520bec48d7eee91206b04f40185",
+    "development/plain-mui-18141/id-observation.test.js": "08d32d4244db18f330c6e313e1935edaf997c4fee8f6994e10d30ecb4c62a89a",
+    "development/plain-mui-18141/prepare.py": "97dd318d638f2fbbfcd366c794dafa08e7c979af5224988857223929ec81ccc1",
+    "development/plain-mui-18141/prepare-input.mjs": "0c8dfec9e4e6ce6318c8b7a1af3fc5994ccb722352847a46752858a372c94a84",
+    "development/plain-mui-18141/preflight.mjs": "e053070716a754647c2a395188f6b7dbd7cd678a894eec4f8a3c2d4df9c6b754",
+    "development/plain-mui-18141/freeze.mjs": "b24af317d0f1aa3b822269866aec7f1cd141095a433bd29fc79918c129484833",
+    "development/plain-mui-18141/verify.py": "a966982d9b19eea73fc802194d1fd309c1026874b373a4916bde19fd00f05c7c",
+    "development/polybench-pilot/run.mjs": "351fc8fbd3f9237666936d4f634cb232cd55538ab5b5b5aa557b7faaac1853aa",
+    "development/native-task-ab/run-comparison.mjs": "b52eae8f7dfdb721c166bd29d2a774b3b7435909434a74255d55b27eb52db8ba",
+    "development/native-task-abc/native-run.mjs": "5d691871022fcf4f2117212c33b463849e791d7ebe120adc68e7ca419ee0d293",
+    "development/native-task-integrated/container-session.mjs": "60b2d069bd284868da431e17c85852b2c1c8753951aedef7ad3a69f9f1c71e72",
+    "development/native-task-integrated/container-relay.mjs": "db186a20946348867504c48d7faca8f40a93fdfa122e1102f581e8cf5377f1b3",
+    "development/native-task-utility/container/stop-workload.mjs": "b21c23f5a334dc54af340e2773e3e56427aa27a946231769d36df249ea54a69e",
+    "development/polybench-pilot/capture.mjs": "8ce3f0344bf45f8e25ef0317c914c21a566db717357e2d490803bc4dc2e3c7bc",
+    "development/polybench-pilot/dependencies.mjs": "2819e63bc1364837123f0d240cd7186c8af1ba22662c62681a330f240677f79b",
+    "development/native-output-retention/output-files.mjs": "bcc90984aa4e3ddc4048fc674f7762c245d5c0fb25ad8d053aae17a598ce0477",
+    "development/native-task-ab/extract-candidate.py": "aa5244bd4a5cc394344b266f0107728d9b70e190bad55de47c46dd10f28603de",
+    "development/native-task-offline/build.json": "16c5621afb56082001998a0f17f385ac90e4bdd31a19eeb215926de2e748ee61",
+    "development/polybench-pilot/two-world-diagnostic/driver.py": "9568e9dcab74f9b0d5841921fc995a9cf0ff5ed2612e7345f1f1bf9623a25a84",
+    "opencode": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe",
+    "local/polybench-pilot/batch/freeze.json": "30008a1e389c67a40c4bfee0969b119f7c76cf0ee24a44364af261def605d216",
+    "local/polybench-pilot/batch/freeze-commit.json": "09580a67c738a05a5f21f554f2c76fa351e7a835c54bb86e75a99d10934fac86",
+    "local/polybench-pilot/batch/scheduling-paused.json": "69385be23d2edc8776accef8cd2b91cdbdf496a026e37bff9698862e8d29c6bd",
+    "local/polybench-pilot/batch/outcome.json": "8c1f279fc4b3b2ee0c63d5cc88b9c84ee1cfefdcbd683ab55dfcb95e7ed80402"
+  },
+  "realProviderRequestsBeforeFreeze": 0,
+  "priorLocalExecutionAbsent": true,
+  "priorPausesUnchanged": true
+}

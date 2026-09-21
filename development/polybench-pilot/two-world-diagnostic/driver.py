@@ -178,6 +178,11 @@ class Runner:
         # Only known image build artifact, outside source B; never a host deletion.
         if task['instance_id'].startswith('svelte'):
             self.cmd(c, ['rm', '-f', '/testbed/Dockerfile'])
+        if task.get('mui_plain_preparation'):
+            untracked = self.cmd(c, ['git', 'ls-files', '--others', '--exclude-standard']).output.decode().splitlines()
+            assert sorted(untracked) == ['Dockerfile', 'custom-reporter.js']
+            self.cmd(c, ['mv', '/testbed/custom-reporter.js', '/tmp/custom-reporter.js'])
+            self.cmd(c, ['rm', '/testbed/Dockerfile'])
         assert not self.cmd(c, ['git', 'status', '--porcelain']).output
         return overlay
 

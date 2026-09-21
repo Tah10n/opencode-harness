@@ -30,12 +30,12 @@ export async function runTask(session,options){
 }
 export async function run(root,extra={}){
  const freeze=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
- if(!extra.fetchImpl && freeze.experimentKind!=='polybench-pilot')throw Error('Scripted preparation cannot access provider');
+ if(!extra.fetchImpl && !['polybench-pilot','plain-mui-18141'].includes(freeze.experimentKind))throw Error('Scripted preparation cannot access provider');
  if(!extra.fetchImpl){
   if(freeze.controlsPassed!==true||freeze.authorIsolationPassed!==true)throw Error('Real admission requires controls and isolation');
   const commit=JSON.parse(fs.readFileSync(path.join(root,'freeze-commit.json'))).commit;
   if(!/^[a-f0-9]{40}$/.test(commit))throw Error('Invalid freeze commit');
-  const file='development/polybench-pilot/frozen-manifest.json';
+  const file=freeze.experimentKind==='plain-mui-18141'?'development/plain-mui-18141/manifest.json':'development/polybench-pilot/frozen-manifest.json';
   const committed=execFileSync('git',['show',commit+':'+file]);
   if(!committed.equals(fs.readFileSync(file)))throw Error('Committed freeze changed');
   const manifest=JSON.parse(committed);
