@@ -5,7 +5,7 @@ import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 import plugin from '../lib/native-task-plugin.mjs';
 const temp=fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'preservation-hooks-'))),savedEnv={...process.env};
-const modes=['parallel','cancel-in-hook','denial','off','second-workflow','combined'];
+const modes=['parallel','cancel-in-hook','denial','off','second-workflow','combined','advisory-error'];
 const receipts=[];
 try {
 Object.assign(process.env,{HARNESS_TASK_STRATEGY:'direct',HARNESS_TASK_CONTEXT:'0',HARNESS_TASK_CHECKS:'0',HARNESS_TASK_TYPE_COMPAT:'0',HARNESS_TASK_COMMAND_HINTS:'0',HARNESS_TASK_SENSITIVITY:'0',HARNESS_TASK_INVESTIGATION:'0'});
@@ -22,7 +22,7 @@ for(const mode of modes) {
  const command=(bin,args,cwd=directory)=>{const r=spawnSync(bin,args,{cwd,encoding:'utf8'});assert.equal(r.status,0,r.stderr);return r.stdout;};
  command('git',['init','-q']);command('git',['add','.']);command('git',['-c','user.name=Fixture','-c','user.email=fixture@local','commit','-qm','base']);
  Object.assign(process.env,{HARNESS_TASK_FILE:directory+'/TASK.md',HARNESS_TASK_STRATEGY:'direct',HARNESS_TASK_TIMEOUT_MS:'240000',HARNESS_TASK_PRESERVATION_NUDGE:mode==='off'?'0':'1',HARNESS_TASK_TYPE_COMPAT:mode==='combined'?'1':'0',HARNESS_TASK_COMMAND_HINTS:mode==='combined'?'1':'0'});
- let hooks,worktree,output;const controller=new AbortController(),child='child-'+mode,parent='parent-'+mode;
+ let hooks,worktree,output,promptCompleted=false;const controller=new AbortController(),child='child-'+mode,parent='parent-'+mode;
  const input=(callID,tool)=>({sessionID:child,callID,tool});
  const client={app:{agents:async()=>({data:[{name:'build',permission:[{permission:'*',pattern:'*',action:'allow'}]}]})},session:{
  get:async()=>({data:{permission:[]}}),create:async({query})=>{worktree=query.directory;return{data:{id:child}};},abort:async()=>({data:true}),messages:async()=>({data:[]}),
@@ -39,18 +39,20 @@ for(const mode of modes) {
   if(mode==='denial')await hooks.event({event:{type:'permission.replied',properties:{sessionID:child,reply:'reject'}}});
   const write=fs.writeFileSync;
   try {
+   if(mode==='advisory-error')fs.writeFileSync=function(file,data,...rest){if(String(file).endsWith('/preservation-nudge.json'))throw Error('Injected advisory persistence failure');return write.call(this,file,data,...rest);};
    if(mode==='cancel-in-hook')fs.writeFileSync=function(file,data,...rest){const result=write.call(this,file,data,...rest);if(String(file).endsWith('/preservation-nudge.json')&&JSON.parse(data).status==='eligible')controller.abort();return result;};
    await hooks['tool.execute.after']({...input('check','bash'),args},output);
   } finally {fs.writeFileSync=write;}
   await queued;
-  if(admitted){await hooks['shell.env']({...input('next','bash'),cwd:worktree},{env:{}});const second={output:command(process.execPath,['--test','test/feature.test.js'],worktree),metadata:{exit:0}};await hooks['tool.execute.after']({...input('next','bash'),args},second);assert.ok(!second.output.includes('Preservation advisory:'));}
+  if(admitted){await hooks['shell.env']({...input('next','bash'),cwd:worktree},{env:{}});const second={output:command(process.execPath,['--test','test/feature.test.js'],worktree),metadata:{exit:0}};await hooks['tool.execute.after']({...input('next','bash'),args},second);assert.equal(second.output.includes('Preservation advisory:'),mode==='advisory-error');}
   assert.equal(output.output.includes('Preservation advisory:'),['parallel','second-workflow','combined'].includes(mode));
-  return{data:{info:{finish:'stop'},parts:[{type:'text',text:'Fixture finished'}]}};
+  promptCompleted=true;return{data:{info:{finish:'stop'},parts:[{type:'text',text:'Fixture finished'}]}};
  }}};
  hooks=await plugin({client,directory});await hooks['command.execute.before']({command:'harness-task',arguments:'',sessionID:parent});
  try {
   await hooks['chat.message']({sessionID:parent},{message:{agent:'build',model:{providerID:'fixture',modelID:'fixture'}}});
   const result=JSON.parse(await hooks.tool.harness_task.execute({},{sessionID:parent,abort:controller.signal,ask:async()=>{},metadata:async()=>{}}));
+  assert.equal(promptCompleted,true,'Hook control assertions must finish rather than be swallowed by workflow: '+mode);
   assert.equal(result.termination.verified,true);
   const raw=JSON.parse(fs.readFileSync(result.artifacts+'/tool-events.json'));assert.ok(!JSON.stringify(raw).includes('Preservation advisory:'));
   const file=result.artifacts+'/preservation-nudge.json';const state=fs.existsSync(file)?JSON.parse(fs.readFileSync(file)):null;

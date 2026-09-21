@@ -14,11 +14,11 @@ function fixture({active=()=>true,remainingMs=()=>200000,changed=false,deny=fals
   const originals=new Map([['test/old.test.js',files.get('test/old.test.js')]]);
   if(changed) originals.set('test/feature.test.js',"test('feature',()=>{});\n// original comment\n");
   return createPreservationNudge({directory:'/project',initial:base,save(){},active,remainingMs,inputs:{
-    read:p=>{if(deny)throw Error('denied');return files.get(p)??null;},initialFiles:new Set(['package.json','index.js',...originals.keys()]),originals,packages:new Map([['.',pkg]]),packageBytes:new Map([['.',JSON.stringify(pkg)]]),npmConfigs:new Map([['.',null]])}});
+    read:p=>{if(p.startsWith('test/'))throw Error('Test body discovery forbidden');if(deny)throw Error('denied');return files.get(p)??null;},initialFiles:new Set(['package.json','index.js',...originals.keys()]),originals,packages:new Map([['.',pkg]]),packageBytes:new Map([['.',JSON.stringify(pkg)]]),npmConfigs:new Map([['.',null]])}});
 }
 const run=(options={},e=event,s=snapshot,history=[edit,e])=>fixture(options).after(e,s,history);
 assert.match(run(),/Preservation advisory/);checks++;
-for(const options of [{active:()=>false},{remainingMs:()=>119999},{changed:true},{deny:true}]) {assert.equal(run(options),null);checks++;}
+for(const options of [{active:()=>false},{remainingMs:()=>119999},{deny:true}]) {assert.equal(run(options),null);checks++;}
 for(const delta of [{exit:1},{executionAdmitted:false},{state:'error'},{timeout:true},{after:'changed'},{admittedArgs:{}},{output:tap.replace('# tests 1','# tests 0')},{output:tap.replace('# skipped 0','# skipped 1')},{output:'1 passing'},{output:tap.slice(0,-30)}]) {const e={...event,...delta};assert.equal(run({},e),null);checks++;}
 assert.equal(run({},event,{snapshotSha256:'edited',diff:diff('test/feature.test.js')}),null);checks++;
 assert.equal(run({},event,snapshot,[event]),null);checks++;
@@ -28,10 +28,10 @@ for(const command of ["echo '4 passing'",'npm test -- --grep abc | cat','npm tes
 assert.deepEqual(mochaReport('\n  alpha\n    ✓ one\n\n  beta\n    ✓ one\n\n  2 passing (1ms)\n'),[{suite:'alpha',name:'one'},{suite:'beta',name:'one'}]);checks++;
 for(const output of ['  0 passing (1ms)\n','  1 passing (1ms)\n','  a\n    - one\n  0 passing (1ms)\n  1 pending\n','  a\n    ✓ one\n']) {assert.equal(mochaReport(output),null);checks++;}
 console.log(JSON.stringify({passed:true,checks,realProviderCalls:0}));
-// Same-scope current old execution suppresses only this advisory condition.
+// Prior checks do not justify a semantic coverage claim or force a repeat.
 const oldArgs={command:'node --test test/old.test.js',workdir:'.'};
 const oldEvent={...event,callID:'old',args:oldArgs,admittedArgs:oldArgs,output:tap.replaceAll('feature','old')};
-assert.equal(run({},event,snapshot,[edit,oldEvent,event]),null);
+assert.match(run({},event,snapshot,[edit,oldEvent,event]),/if already checked/);
 const stale={...oldEvent,before:'base',after:'base'};
 assert.match(run({},event,snapshot,[stale,edit,event]),/Preservation advisory/);
 const baselineFailure={...stale,exit:1};
@@ -58,11 +58,39 @@ const mSnapshot={snapshotSha256:'edited',diff:diff('index.js')+diff('test/cases/
 const feature=mochaEvent('feature','extension','  screen\n    ✓ extension\n  server\n    ✓ extension\n');
 const server=mochaEvent('server','existing','  server\n    ✓ existing\n');
 const screen=mochaEvent('screen','existing','  screen\n    ✓ existing\n');
-const partial=makeMocha().after(feature,mSnapshot,[edit,server,feature]);assert.match(partial,/screen: extension/);assert.ok(!partial.includes('server: extension'));
-assert.equal(makeMocha().after(feature,mSnapshot,[edit,server,screen,feature]),null);
+const partial=makeMocha().after(feature,mSnapshot,[edit,server,feature]);assert.match(partial,/screen: extension/);assert.ok(partial.includes('server: extension'));
+assert.match(makeMocha().after(feature,mSnapshot,[edit,server,screen,feature]),/if already checked/);
 assert.match(makeMocha().after(feature,mSnapshot,[edit,feature]),/Preservation advisory/);
 const changedConfig=makeMocha();mochaFiles.set('rollup.config.js','// changed recipe');assert.equal(changedConfig.after(feature,mSnapshot,[edit,feature]),null);
 console.log(JSON.stringify({mochaScopeControls:4,passed:true}));
 
 assert.equal(run({},{...event,output:tap.replace('# tests 1','# tests 0\n# tests 1')}),null);
 console.log(JSON.stringify({contradictoryTapControl:true,passed:true}));
+
+assert.match(run({changed:true}),/Preservation advisory/);
+const directArgs={command:"source /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/screen/index.js --grep 'extension|existing'",workdir:'.'};
+const direct={...feature,args:directArgs,admittedArgs:directArgs,output:'Now using node v16.20.2 (npm v8.19.4)\n\n  screen\n    ✓ existing\n    ✓ extension\n\n  2 passing (1ms)\n'};
+mochaFiles.set('rollup.config.js','// recipe');
+assert.match(makeMocha().after(direct,mSnapshot,[edit,direct]),/screen: existing/);
+for(const command of ["./node_modules/.bin/mocha --opts mocha.opts", "./node_modules/.bin/mocha --opts ../outside --grep x", "./node_modules/.bin/mocha --opts mocha.opts --grep x --exit", "source /usr/local/nvm/nvm.sh; nvm use 16.20.2; node --test test/a.js"]) assert.equal(advisoryCommand(command),null);
+for(const delta of [{cancelled:true},{cancellation:true},{permissionDenied:true},{signal:'SIGTERM'},{callID:null}]) assert.equal(run({},{...event,...delta}),null);
+const userBaseline=createPreservationNudge({directory:'/project',initial:snapshot,inputs:{packages:new Map()},save(){},active:()=>true,remainingMs:()=>200000});
+assert.equal(userBaseline.after(event,snapshot,[event]),null);assert.equal(userBaseline.state.reason,'no_production_change');
+const msg=run();assert.ok(!/new-feature|do not confirm|not covered|regression/.test(msg));assert.ok(msg.split(/\s+/).length<120);
+console.log(JSON.stringify({revision:2,changedExistingDirectMocha:true,priorCoverageNotInferred:true,passed:true}));
+
+for(const total of ['  1 passing (1ms)','  2 passing (1ms)','  1 pending','  1 failing']) assert.equal(mochaReport('  suite\n    ✓ actual\n'+total+'\n  1 passing (1ms)\n'),null);
+console.log(JSON.stringify({duplicateMochaTotalsRejected:true,passed:true}));
+
+assert.match(run({},oldEvent,snapshot,[edit,oldEvent]),/old/);
+const positionalArgs={command:'./node_modules/.bin/mocha --opts mocha.opts test/screen/index.js',workdir:'.'};
+const positional={...direct,args:positionalArgs,admittedArgs:positionalArgs,output:'  server\n    ✓ extra suite loaded by opts\n\n  1 passing (1ms)\n'};
+assert.match(makeMocha().after(positional,mSnapshot,[edit,positional]),/server: extra suite loaded by opts/);
+assert.equal(advisoryCommand('node --test '+ 'x'.repeat(181)+'.js'),null);
+assert.equal(advisoryCommand('node --test test/test.js '+ ' '.repeat(4096)),null);
+const fake={...positional,args:{command:"echo '1 passing'"},admittedArgs:{command:"echo '1 passing'"}};
+assert.equal(makeMocha().after(fake,mSnapshot,[edit,fake]),null);
+const longName='a '.repeat(80).trim();const longOutput='  '+longName+'\n    ✓ '+longName+'\n\n  1 passing (1ms)\n';
+const bounded=makeMocha().after({...positional,output:longOutput},mSnapshot,[edit]);assert.equal(bounded,null);
+const named={...positional,output:longOutput};assert.ok(makeMocha().after(named,mSnapshot,[edit,named]).split(/\s+/).length<=120);
+console.log(JSON.stringify({unchangedCase:true,noTestBodyReads:true,positionalDoesNotLimitSuites:true,boundedNames:true,passed:true}));
