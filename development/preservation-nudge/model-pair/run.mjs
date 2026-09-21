@@ -36,7 +36,7 @@ export async function run(root,extra={}){
   if(freeze.controlsPassed!==true||freeze.authorIsolationPassed!==true)throw Error('Real admission requires controls and isolation');
   const commit=JSON.parse(fs.readFileSync(path.join(root,'freeze-commit.json'))).commit;
   if(!/^[a-f0-9]{40}$/.test(commit))throw Error('Invalid freeze commit');
-  const file='development/preservation-nudge/model-pair/manifest.json';
+  const file=freeze.preservationRevision===2?'development/preservation-nudge/revision-2/model-pair/manifest.json':'development/preservation-nudge/model-pair/manifest.json';
   const committed=execFileSync('git',['show',commit+':'+file]);
   if(!committed.equals(fs.readFileSync(file)))throw Error('Committed freeze changed');
   const manifest=JSON.parse(committed);
