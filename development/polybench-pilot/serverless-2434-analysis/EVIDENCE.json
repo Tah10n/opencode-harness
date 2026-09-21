@@ -1,0 +1,1573 @@
+{
+  "scope": "Local diagnosis only; official score unchanged; no provider calls",
+  "runReceipt": "local/polybench-pilot/serverless-2434-analysis-run-1/receipt.json",
+  "sourceHead": "3665d279c19c36da9e884a507b9561f9799a717c",
+  "pins": {
+    "instance_id": "serverless__serverless-2434",
+    "repo": "serverless/serverless",
+    "language": "JavaScript",
+    "task_category": "Bug Fix",
+    "base_commit": "cf927bf8a68496f762a55e5222415c808aa6087b",
+    "officialImage": {
+      "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-2434:v1.1",
+      "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-2434@sha256:8785107b8605e443d82f4b6c2baac5f739163c277124c68d8b7a65bfc448052f",
+      "id": "sha256:8785107b8605e443d82f4b6c2baac5f739163c277124c68d8b7a65bfc448052f",
+      "architecture": "amd64",
+      "os": "linux",
+      "size": 5124369073,
+      "workdir": "/testbed"
+    },
+    "authorImage": "sha256:23d4df1befdcb6395e782aa0d20cc14efd15f561ead13a9ffc6a9f14aaf304a7",
+    "projectNode": "v16.20.2",
+    "npm": "8.19.4",
+    "promptSha256": "e4412fe64f9334d944b86b1f709642ded9db41144146653c1177d5d18320ffc5",
+    "originalRowCsvSha256": "15311e3cbb916c7fa7057a6be8f285568042e52b2bf23f2ca719fca21dbb3015",
+    "lfsAuditSha256": "2393b592ce0e19ce067dec79bb81fca71bb7b22e3278346b791f001710d09c79",
+    "archives": {
+      "base.tar": "0e257d5595729d98babaab803e010e47283c37b9813d8ed04e983607982dc9db",
+      "dependencies.tar": "8685a88b41b9d2e9a94a10b43b4e198d24ad1f09cb6564f592a182d9ee7b2d13"
+    },
+    "submodules": [],
+    "preparedExtra": null,
+    "controls": {
+      "gold": {
+        "resultSha256": "14bf2e1849173f6dcaeb295e86aae0013e5d09feabf5e00efee1f9b7a19b813a",
+        "resolved": true,
+        "passed": 25,
+        "failed": 1
+      },
+      "baseline": {
+        "resultSha256": "b6d159a173ecf83f5490e4f3062f5e46a0c8c5de75e187466cdaf80c0130ed48",
+        "resolved": false,
+        "passed": 24,
+        "failed": 2
+      }
+    },
+    "scriptedPreflightSha256": "43d7fe4a2201efad735d6d9897b4abc62aa16dabf6a701b1d4aa900bbe1794d4",
+    "isolationSha256": "d381587cc3f58d84c0cb1ea526ede99fb1735fa3d9f1fe96aaae5904245d2984"
+  },
+  "datasetRevision": "b3fca77b637379f0c01ad86d18753a7ac1998b53",
+  "evaluatorSha": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+  "boundary": {
+    "network": "none",
+    "capDrop": [
+      "ALL"
+    ],
+    "noNewPrivileges": true,
+    "memory": "8g",
+    "cpus": 4,
+    "mounts": []
+  },
+  "originalClassification": {
+    "F2P": [
+      "Service #load() should throw error if a function's event is not an array or a variable"
+    ],
+    "F2F": [
+      "Service #load() should not throw error if functions property is missing"
+    ],
+    "P2P": [
+      "Service #load() should throw error if frameworkVersion is not satisfied",
+      "Service #load() should support Serverless file with a .yaml extension",
+      "Service #getFunction() should return function object",
+      "Service #getAllFunctions() should return an array of function names in Service",
+      "Service #constructor() should attach serverless instance",
+      "Service #constructor() should construct with defaults",
+      "Service #load() should make sure function name contains the default stage",
+      "Service #load() should support Serverless file with a non-aws provider",
+      "Service #load() should resolve if no servicePath is found",
+      "Service #load() should load from filesystem",
+      "Service #getFunction() should throw error if function does not exist",
+      "Service #constructor() should support object based provider config",
+      "Service #load() should pass if frameworkVersion is satisfied",
+      "Service #update() should update service instance data",
+      "Service #getEventInFunction() should throw error if event doesnt exist in function",
+      "Service #getEventInFunction() should throw error if function does not exist in service",
+      "Service #load() should support Serverless file with a .yml extension",
+      "Service #constructor() should support string based provider config",
+      "Service #load() should throw error if provider property is invalid",
+      "Service #constructor() should construct with data",
+      "Service #load() should throw error if provider property is missing",
+      "Service #load() should throw error if service property is missing",
+      "Service #getAllEventsInFunction() should return an array of events in a specified function",
+      "Service #getEventInFunction() should return an event object based on provided function"
+    ]
+  },
+  "arms": [
+    {
+      "arm": "baseline",
+      "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "commands": [
+        {
+          "label": "identity",
+          "command": ". /usr/local/nvm/nvm.sh && git rev-parse HEAD && node --version && npm --version",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 1.596,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/baseline-identity.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/baseline-identity.stderr",
+          "stdoutSha256": "322d22f341ca28637a72a0891a3cc45ee1e1c98169c47390939763047333f919",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "label": "apply-test",
+          "command": "git apply -v --ignore-whitespace --reject /testbed/patch_test.diff",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 0.097,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/baseline-apply-test.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/baseline-apply-test.stderr",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "5586022720b5bf83e4235e7251d12af8237014af60cd9f0078e7ce63bf22106e"
+        },
+        {
+          "label": "official-service",
+          "command": "/bin/bash /testbed/eval.sh",
+          "cwd": "/testbed",
+          "exitCode": 2,
+          "signal": null,
+          "timeout": false,
+          "seconds": 2.735,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/baseline-official-service.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/baseline-official-service.stderr",
+          "stdoutSha256": "fdcf621b25c6ed378fdb35db4e3e29f7307f7c81932b35e2df6f340769bb9dc0",
+          "stderrSha256": "353256e4a116a78c0352e8dd2a7b09f073558cb546360d3576f12e6c801b6597"
+        },
+        {
+          "label": "variables",
+          "command": ". /usr/local/nvm/nvm.sh && npx mocha lib/classes/Variables.test.js --reporter json",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 2.548,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/baseline-variables.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/baseline-variables.stderr",
+          "stdoutSha256": "ed42da38927528c72d1e0a9bb83c3e6426433dba3c61c87394fa5661a0cbc53f",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "label": "probe",
+          "command": ". /usr/local/nvm/nvm.sh && node /testbed/analysis-probe.js baseline",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 1.39,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/baseline-probe.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/baseline-probe.stderr",
+          "stdoutSha256": "fbdcf1ef0c4dca84ffd3f15a3050c6b57ab4ac8c20bf421600fabd85d95d9b64",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "containerId": "838814b37e23d184c6de710438f71e9e9d74264bd5d48f69c869b6abe8e4a89f",
+      "removed": true,
+      "observed": {
+        "official-service": {
+          "passes": 24,
+          "failures": [
+            {
+              "title": "Service #load() should not throw error if functions property is missing",
+              "error": {
+                "message": "expected 1 to equal 2",
+                "showDiff": true,
+                "actual": 1,
+                "expected": 2,
+                "stack": "AssertionError: expected 1 to equal 2\n    at lib/classes/Service.test.js:409:22"
+              }
+            },
+            {
+              "title": "Service #load() should throw error if a function's event is not an array or a variable",
+              "error": {
+                "stack": "ServerlessError: Events for \"functionA\" must be an array, not an string\n    at lib/classes/Service.js:156:19\n    at node_modules/lodash/lodash.js:4917:15\n    at baseForOwn (node_modules/lodash/lodash.js:2979:24)\n    at node_modules/lodash/lodash.js:4886:18\n    at Function.forEach (node_modules/lodash/lodash.js:9289:14)\n    at lib/classes/Service.js:151:11",
+                "message": "Events for \"functionA\" must be an array, not an string",
+                "name": "ServerlessError"
+              }
+            }
+          ]
+        },
+        "variables": {
+          "passes": 34,
+          "failures": []
+        }
+      },
+      "probe": {
+        "arm": "baseline",
+        "assertions": "passed",
+        "results": [
+          {
+            "name": "missing-functions",
+            "input": {
+              "service": "service-name",
+              "provider": "aws"
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "returned"
+              },
+              {
+                "stage": "populateService",
+                "outcome": "returned"
+              },
+              {
+                "stage": "postPopulateValidation",
+                "outcome": "returned"
+              }
+            ],
+            "functions": {}
+          },
+          {
+            "name": "literal-invalid-events",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "functionA": {
+                  "events": "not an array or a variable"
+                }
+              }
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "threw",
+                "error": {
+                  "name": "ServerlessError",
+                  "message": "Events for \"functionA\" must be an array, not an string"
+                }
+              }
+            ],
+            "functions": {
+              "functionA": {
+                "events": "not an array or a variable"
+              }
+            }
+          },
+          {
+            "name": "public-old-object-events",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "functionA": {
+                  "events": {}
+                }
+              }
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "threw",
+                "error": {
+                  "name": "ServerlessError",
+                  "message": "Events for \"functionA\" must be an array, not an object"
+                }
+              }
+            ],
+            "functions": {
+              "functionA": {
+                "events": {}
+              }
+            }
+          },
+          {
+            "name": "requested-file-array",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "users": {
+                  "handler": "handlers/users/handler.users",
+                  "events": "${file(./events.yml):events}"
+                }
+              }
+            },
+            "file": {
+              "events": [
+                {
+                  "http": {
+                    "path": "users",
+                    "method": "get"
+                  }
+                }
+              ]
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "threw",
+                "error": {
+                  "name": "ServerlessError",
+                  "message": "Events for \"users\" must be an array, not an string"
+                }
+              }
+            ],
+            "functions": {
+              "users": {
+                "handler": "handlers/users/handler.users",
+                "events": "${file(./events.yml):events}"
+              }
+            }
+          },
+          {
+            "name": "file-object-rejected",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "users": {
+                  "events": "${file(./events.yml):events}"
+                }
+              }
+            },
+            "file": {
+              "events": {}
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "threw",
+                "error": {
+                  "name": "ServerlessError",
+                  "message": "Events for \"users\" must be an array, not an string"
+                }
+              }
+            ],
+            "functions": {
+              "users": {
+                "events": "${file(./events.yml):events}"
+              }
+            }
+          },
+          {
+            "name": "unmasked-independent-missing-functions-body",
+            "previousFunctions": {},
+            "sameInstance": false,
+            "currentFunctions": {},
+            "outcome": "threw",
+            "error": {
+              "name": "TypeError",
+              "message": "serviceInstance.validate is not a function"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "arm": "gold",
+      "patchSha256": "512e6e5f4955e96d1cb5f796c6dca954589df60dd650cdaacd0374233bc152ca",
+      "commands": [
+        {
+          "label": "identity",
+          "command": ". /usr/local/nvm/nvm.sh && git rev-parse HEAD && node --version && npm --version",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 1.447,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/gold-identity.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/gold-identity.stderr",
+          "stdoutSha256": "322d22f341ca28637a72a0891a3cc45ee1e1c98169c47390939763047333f919",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "label": "apply-test",
+          "command": "git apply -v --ignore-whitespace --reject /testbed/patch_test.diff",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 0.094,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/gold-apply-test.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/gold-apply-test.stderr",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "5586022720b5bf83e4235e7251d12af8237014af60cd9f0078e7ce63bf22106e"
+        },
+        {
+          "label": "apply-code",
+          "command": "git apply -v --ignore-whitespace --reject /testbed/patch_code.diff",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 0.09,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/gold-apply-code.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/gold-apply-code.stderr",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e6cd90b5a2caf14ea429508b150c466e2ae652ed0969f29a5bd002e88d3fc5b6"
+        },
+        {
+          "label": "official-service",
+          "command": "/bin/bash /testbed/eval.sh",
+          "cwd": "/testbed",
+          "exitCode": 1,
+          "signal": null,
+          "timeout": false,
+          "seconds": 2.623,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/gold-official-service.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/gold-official-service.stderr",
+          "stdoutSha256": "faf8105669659f83c8ea53a4d92fd4e3ef0a47372b2b5b80883cbe18483329e8",
+          "stderrSha256": "697e04094ab5a30f626f99cf438d2e8b52eda8e6b823f7843774626adb44de1d"
+        },
+        {
+          "label": "variables",
+          "command": ". /usr/local/nvm/nvm.sh && npx mocha lib/classes/Variables.test.js --reporter json",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 2.567,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/gold-variables.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/gold-variables.stderr",
+          "stdoutSha256": "1f51be82c157164e578d7c26eccb6bbd5895b8b805b08af416b0b0ad635ca9d5",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "label": "probe",
+          "command": ". /usr/local/nvm/nvm.sh && node /testbed/analysis-probe.js gold",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 1.384,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/gold-probe.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/gold-probe.stderr",
+          "stdoutSha256": "24863e9a41ca2e2a488deb4df8be81e091c4ab26775cbcba5b55e3b4d4313d8b",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "containerId": "604efba61443ef366cf232e5ba754f03ab1a42567e78ca77a5fa871a3254373e",
+      "removed": true,
+      "observed": {
+        "official-service": {
+          "passes": 25,
+          "failures": [
+            {
+              "title": "Service #load() should not throw error if functions property is missing",
+              "error": {
+                "message": "expected 1 to equal 2",
+                "showDiff": true,
+                "actual": 1,
+                "expected": 2,
+                "stack": "AssertionError: expected 1 to equal 2\n    at lib/classes/Service.test.js:409:22"
+              }
+            }
+          ]
+        },
+        "variables": {
+          "passes": 34,
+          "failures": []
+        }
+      },
+      "probe": {
+        "arm": "gold",
+        "assertions": "passed",
+        "results": [
+          {
+            "name": "missing-functions",
+            "input": {
+              "service": "service-name",
+              "provider": "aws"
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "returned"
+              },
+              {
+                "stage": "populateService",
+                "outcome": "returned"
+              },
+              {
+                "stage": "postPopulateValidation",
+                "outcome": "returned"
+              }
+            ],
+            "functions": {}
+          },
+          {
+            "name": "literal-invalid-events",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "functionA": {
+                  "events": "not an array or a variable"
+                }
+              }
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "returned"
+              },
+              {
+                "stage": "populateService",
+                "outcome": "returned"
+              },
+              {
+                "stage": "postPopulateValidation",
+                "outcome": "threw",
+                "error": {
+                  "name": "ServerlessError",
+                  "message": "Events for \"functionA\" must be an array, not an string"
+                }
+              }
+            ],
+            "functions": {
+              "functionA": {
+                "events": "not an array or a variable",
+                "name": "service-name-dev-functionA"
+              }
+            }
+          },
+          {
+            "name": "public-old-object-events",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "functionA": {
+                  "events": {}
+                }
+              }
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "returned"
+              },
+              {
+                "stage": "populateService",
+                "outcome": "returned"
+              },
+              {
+                "stage": "postPopulateValidation",
+                "outcome": "threw",
+                "error": {
+                  "name": "ServerlessError",
+                  "message": "Events for \"functionA\" must be an array, not an object"
+                }
+              }
+            ],
+            "functions": {
+              "functionA": {
+                "events": {},
+                "name": "service-name-dev-functionA"
+              }
+            }
+          },
+          {
+            "name": "requested-file-array",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "users": {
+                  "handler": "handlers/users/handler.users",
+                  "events": "${file(./events.yml):events}"
+                }
+              }
+            },
+            "file": {
+              "events": [
+                {
+                  "http": {
+                    "path": "users",
+                    "method": "get"
+                  }
+                }
+              ]
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "returned"
+              },
+              {
+                "stage": "populateService",
+                "outcome": "returned"
+              },
+              {
+                "stage": "postPopulateValidation",
+                "outcome": "returned"
+              }
+            ],
+            "functions": {
+              "users": {
+                "handler": "handlers/users/handler.users",
+                "events": [
+                  {
+                    "http": {
+                      "path": "users",
+                      "method": "get"
+                    }
+                  }
+                ],
+                "name": "service-name-dev-users"
+              }
+            }
+          },
+          {
+            "name": "file-object-rejected",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "users": {
+                  "events": "${file(./events.yml):events}"
+                }
+              }
+            },
+            "file": {
+              "events": {}
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "returned"
+              },
+              {
+                "stage": "populateService",
+                "outcome": "returned"
+              },
+              {
+                "stage": "postPopulateValidation",
+                "outcome": "threw",
+                "error": {
+                  "name": "ServerlessError",
+                  "message": "Events for \"users\" must be an array, not an object"
+                }
+              }
+            ],
+            "functions": {
+              "users": {
+                "events": {},
+                "name": "service-name-dev-users"
+              }
+            }
+          },
+          {
+            "name": "unmasked-independent-missing-functions-body",
+            "previousFunctions": {},
+            "sameInstance": false,
+            "currentFunctions": {},
+            "outcome": "threw",
+            "error": {
+              "name": "TypeError",
+              "message": "Cannot read properties of undefined (reading 'events')"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "arm": "P",
+      "patchSha256": "40881166d3b82c68d1fb368263da20e6c244fdf7dc2a1111a5981e6fcd1db4f1",
+      "commands": [
+        {
+          "label": "identity",
+          "command": ". /usr/local/nvm/nvm.sh && git rev-parse HEAD && node --version && npm --version",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 1.463,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/P-identity.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/P-identity.stderr",
+          "stdoutSha256": "322d22f341ca28637a72a0891a3cc45ee1e1c98169c47390939763047333f919",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "label": "apply-test",
+          "command": "git apply -v --ignore-whitespace --reject /testbed/patch_test.diff",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 0.088,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/P-apply-test.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/P-apply-test.stderr",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "5586022720b5bf83e4235e7251d12af8237014af60cd9f0078e7ce63bf22106e"
+        },
+        {
+          "label": "apply-code",
+          "command": "git apply -v --ignore-whitespace --reject /testbed/patch_code.diff",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 0.11,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/P-apply-code.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/P-apply-code.stderr",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "52c1afb2649aeab79e64dff65383ffd398a201bf212e07594057cc025cd763a6"
+        },
+        {
+          "label": "official-service",
+          "command": "/bin/bash /testbed/eval.sh",
+          "cwd": "/testbed",
+          "exitCode": 2,
+          "signal": null,
+          "timeout": false,
+          "seconds": 2.645,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/P-official-service.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/P-official-service.stderr",
+          "stdoutSha256": "29bd0bd7f94324355ab3ab02f381a9dd8016c4846f155e382033414e99175d48",
+          "stderrSha256": "17ebd35a88a2502c398b942c36fc47882a4adb8fbe597cca7327ce9d79683ff8"
+        },
+        {
+          "label": "variables",
+          "command": ". /usr/local/nvm/nvm.sh && npx mocha lib/classes/Variables.test.js --reporter json",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 2.585,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/P-variables.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/P-variables.stderr",
+          "stdoutSha256": "b024ee45f3e4d88409664c9d9edf9967fab56bea271c4a2b94fdb59983619c75",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "label": "probe",
+          "command": ". /usr/local/nvm/nvm.sh && node /testbed/analysis-probe.js P",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 1.409,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/P-probe.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/P-probe.stderr",
+          "stdoutSha256": "41d7757b967adfc73b2520b4789d99c626b16a3300601c80995220b902bfd4ba",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "containerId": "9c0836602e9215da4b8e87e14c64388b8fb019505cf81e2de0584f836a862c56",
+      "removed": true,
+      "observed": {
+        "official-service": {
+          "passes": 27,
+          "failures": [
+            {
+              "title": "Service #load() should not throw error if functions property is missing",
+              "error": {
+                "message": "expected 1 to equal 2",
+                "showDiff": true,
+                "actual": 1,
+                "expected": 2,
+                "stack": "AssertionError: expected 1 to equal 2\n    at lib/classes/Service.test.js:446:22"
+              }
+            },
+            {
+              "title": "Service #load() should throw error if a function's event is not an array or a variable",
+              "error": {
+                "stack": "ServerlessError: Events for \"functionA\" must be an array, not an string\n    at lib/classes/Service.js:159:19\n    at node_modules/lodash/lodash.js:4917:15\n    at baseForOwn (node_modules/lodash/lodash.js:2979:24)\n    at node_modules/lodash/lodash.js:4886:18\n    at Function.forEach (node_modules/lodash/lodash.js:9289:14)\n    at lib/classes/Service.js:151:11",
+                "message": "Events for \"functionA\" must be an array, not an string",
+                "name": "ServerlessError"
+              }
+            }
+          ]
+        },
+        "variables": {
+          "passes": 34,
+          "failures": []
+        }
+      },
+      "probe": {
+        "arm": "P",
+        "assertions": "passed",
+        "results": [
+          {
+            "name": "missing-functions",
+            "input": {
+              "service": "service-name",
+              "provider": "aws"
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "returned"
+              },
+              {
+                "stage": "populateService",
+                "outcome": "returned"
+              },
+              {
+                "stage": "postPopulateValidation",
+                "outcome": "returned"
+              }
+            ],
+            "functions": {}
+          },
+          {
+            "name": "literal-invalid-events",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "functionA": {
+                  "events": "not an array or a variable"
+                }
+              }
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "threw",
+                "error": {
+                  "name": "ServerlessError",
+                  "message": "Events for \"functionA\" must be an array, not an string"
+                }
+              }
+            ],
+            "functions": {
+              "functionA": {
+                "events": "not an array or a variable"
+              }
+            }
+          },
+          {
+            "name": "public-old-object-events",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "functionA": {
+                  "events": {}
+                }
+              }
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "threw",
+                "error": {
+                  "name": "ServerlessError",
+                  "message": "Events for \"functionA\" must be an array, not an object"
+                }
+              }
+            ],
+            "functions": {
+              "functionA": {
+                "events": {}
+              }
+            }
+          },
+          {
+            "name": "requested-file-array",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "users": {
+                  "handler": "handlers/users/handler.users",
+                  "events": "${file(./events.yml):events}"
+                }
+              }
+            },
+            "file": {
+              "events": [
+                {
+                  "http": {
+                    "path": "users",
+                    "method": "get"
+                  }
+                }
+              ]
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "returned"
+              },
+              {
+                "stage": "populateService",
+                "outcome": "returned"
+              },
+              {
+                "stage": "postPopulateValidation",
+                "outcome": "returned"
+              }
+            ],
+            "functions": {
+              "users": {
+                "handler": "handlers/users/handler.users",
+                "events": [
+                  {
+                    "http": {
+                      "path": "users",
+                      "method": "get"
+                    }
+                  }
+                ],
+                "name": "service-name-dev-users"
+              }
+            }
+          },
+          {
+            "name": "file-object-rejected",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "users": {
+                  "events": "${file(./events.yml):events}"
+                }
+              }
+            },
+            "file": {
+              "events": {}
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "returned"
+              },
+              {
+                "stage": "populateService",
+                "outcome": "threw",
+                "error": {
+                  "name": "ServerlessError",
+                  "message": "Events for \"users\" must be an array, not an object"
+                }
+              }
+            ],
+            "functions": {
+              "users": {
+                "events": {},
+                "name": "service-name-dev-users"
+              }
+            }
+          },
+          {
+            "name": "unmasked-independent-missing-functions-body",
+            "previousFunctions": {},
+            "sameInstance": false,
+            "currentFunctions": {},
+            "outcome": "threw",
+            "error": {
+              "name": "TypeError",
+              "message": "serviceInstance.validate is not a function"
+            }
+          }
+        ]
+      },
+      "historicalFailureNamesAndMessagesMatch": true
+    },
+    {
+      "arm": "H0",
+      "patchSha256": "847bead55c4b7207391adad266006ae85f6a9921e817626d5569e507190f1b73",
+      "commands": [
+        {
+          "label": "identity",
+          "command": ". /usr/local/nvm/nvm.sh && git rev-parse HEAD && node --version && npm --version",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 1.477,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/H0-identity.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/H0-identity.stderr",
+          "stdoutSha256": "322d22f341ca28637a72a0891a3cc45ee1e1c98169c47390939763047333f919",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "label": "apply-test",
+          "command": "git apply -v --ignore-whitespace --reject /testbed/patch_test.diff",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 0.09,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/H0-apply-test.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/H0-apply-test.stderr",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "5586022720b5bf83e4235e7251d12af8237014af60cd9f0078e7ce63bf22106e"
+        },
+        {
+          "label": "apply-code",
+          "command": "git apply -v --ignore-whitespace --reject /testbed/patch_code.diff",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 0.092,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/H0-apply-code.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/H0-apply-code.stderr",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "2bb29952f2bc04bb9e54c744951fee31081018ea31a7ee36b6b1ba82d467d6ce"
+        },
+        {
+          "label": "official-service",
+          "command": "/bin/bash /testbed/eval.sh",
+          "cwd": "/testbed",
+          "exitCode": 2,
+          "signal": null,
+          "timeout": false,
+          "seconds": 2.697,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/H0-official-service.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/H0-official-service.stderr",
+          "stdoutSha256": "2360869bca4b5e70ef750565e8a9d338f09fb3dce7cb3ba30fe5453c353e19d3",
+          "stderrSha256": "af714614c946c073983c20190b30befe509c47e778887369bd598916a9edaa62"
+        },
+        {
+          "label": "variables",
+          "command": ". /usr/local/nvm/nvm.sh && npx mocha lib/classes/Variables.test.js --reporter json",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 2.585,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/H0-variables.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/H0-variables.stderr",
+          "stdoutSha256": "2c616be668e8a7eeef1f5361a4db1a9a04a0522fe9b65909ca98b7e4abe447d4",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "label": "probe",
+          "command": ". /usr/local/nvm/nvm.sh && node /testbed/analysis-probe.js H0",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 1.378,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/H0-probe.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/H0-probe.stderr",
+          "stdoutSha256": "69a7f70e257067458cfed1aaf0afc7ffae9f38d0a180fa1abaa068753e4aa02b",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "containerId": "033d871e6cef9b75f15d90cf50f6b05baf43049fb10980f19d82e8e4ac5a3cf7",
+      "removed": true,
+      "observed": {
+        "official-service": {
+          "passes": 25,
+          "failures": [
+            {
+              "title": "Service #load() should not throw error if functions property is missing",
+              "error": {
+                "message": "expected 1 to equal 2",
+                "showDiff": true,
+                "actual": 1,
+                "expected": 2,
+                "stack": "AssertionError: expected 1 to equal 2\n    at lib/classes/Service.test.js:409:22"
+              }
+            },
+            {
+              "title": "Service #load() should throw error if a function's event is not an array or a variable",
+              "error": {
+                "stack": "ServerlessError: Events for \"functionA\" must be an array, not an string\n    at lib/classes/Service.js:158:19\n    at node_modules/lodash/lodash.js:4917:15\n    at baseForOwn (node_modules/lodash/lodash.js:2979:24)\n    at node_modules/lodash/lodash.js:4886:18\n    at Function.forEach (node_modules/lodash/lodash.js:9289:14)\n    at lib/classes/Service.js:151:11",
+                "message": "Events for \"functionA\" must be an array, not an string",
+                "name": "ServerlessError"
+              }
+            }
+          ]
+        },
+        "variables": {
+          "passes": 34,
+          "failures": []
+        }
+      },
+      "probe": {
+        "arm": "H0",
+        "assertions": "passed",
+        "results": [
+          {
+            "name": "missing-functions",
+            "input": {
+              "service": "service-name",
+              "provider": "aws"
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "returned"
+              },
+              {
+                "stage": "populateService",
+                "outcome": "returned"
+              },
+              {
+                "stage": "postPopulateValidation",
+                "outcome": "returned"
+              }
+            ],
+            "functions": {}
+          },
+          {
+            "name": "literal-invalid-events",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "functionA": {
+                  "events": "not an array or a variable"
+                }
+              }
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "threw",
+                "error": {
+                  "name": "ServerlessError",
+                  "message": "Events for \"functionA\" must be an array, not an string"
+                }
+              }
+            ],
+            "functions": {
+              "functionA": {
+                "events": "not an array or a variable"
+              }
+            }
+          },
+          {
+            "name": "public-old-object-events",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "functionA": {
+                  "events": {}
+                }
+              }
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "threw",
+                "error": {
+                  "name": "ServerlessError",
+                  "message": "Events for \"functionA\" must be an array, not an object"
+                }
+              }
+            ],
+            "functions": {
+              "functionA": {
+                "events": {}
+              }
+            }
+          },
+          {
+            "name": "requested-file-array",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "users": {
+                  "handler": "handlers/users/handler.users",
+                  "events": "${file(./events.yml):events}"
+                }
+              }
+            },
+            "file": {
+              "events": [
+                {
+                  "http": {
+                    "path": "users",
+                    "method": "get"
+                  }
+                }
+              ]
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "returned"
+              },
+              {
+                "stage": "populateService",
+                "outcome": "returned"
+              },
+              {
+                "stage": "postPopulateValidation",
+                "outcome": "returned"
+              }
+            ],
+            "functions": {
+              "users": {
+                "handler": "handlers/users/handler.users",
+                "events": [
+                  {
+                    "http": {
+                      "path": "users",
+                      "method": "get"
+                    }
+                  }
+                ],
+                "name": "service-name-dev-users"
+              }
+            }
+          },
+          {
+            "name": "file-object-rejected",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "users": {
+                  "events": "${file(./events.yml):events}"
+                }
+              }
+            },
+            "file": {
+              "events": {}
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "returned"
+              },
+              {
+                "stage": "populateService",
+                "outcome": "returned"
+              },
+              {
+                "stage": "postPopulateValidation",
+                "outcome": "threw",
+                "error": {
+                  "name": "ServerlessError",
+                  "message": "Events for \"users\" must be an array, not an object"
+                }
+              }
+            ],
+            "functions": {
+              "users": {
+                "events": {},
+                "name": "service-name-dev-users"
+              }
+            }
+          },
+          {
+            "name": "unmasked-independent-missing-functions-body",
+            "previousFunctions": {},
+            "sameInstance": false,
+            "currentFunctions": {},
+            "outcome": "threw",
+            "error": {
+              "name": "TypeError",
+              "message": "serviceInstance.validate is not a function"
+            }
+          }
+        ]
+      },
+      "historicalFailureNamesAndMessagesMatch": true
+    },
+    {
+      "arm": "H1",
+      "patchSha256": "73d5a2ccb1a776e43369d1390d57fb7e5af2e1eb69960cdd4ce2b75fc81370aa",
+      "commands": [
+        {
+          "label": "identity",
+          "command": ". /usr/local/nvm/nvm.sh && git rev-parse HEAD && node --version && npm --version",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 1.45,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/H1-identity.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/H1-identity.stderr",
+          "stdoutSha256": "322d22f341ca28637a72a0891a3cc45ee1e1c98169c47390939763047333f919",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "label": "apply-test",
+          "command": "git apply -v --ignore-whitespace --reject /testbed/patch_test.diff",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 0.091,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/H1-apply-test.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/H1-apply-test.stderr",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "5586022720b5bf83e4235e7251d12af8237014af60cd9f0078e7ce63bf22106e"
+        },
+        {
+          "label": "apply-code",
+          "command": "git apply -v --ignore-whitespace --reject /testbed/patch_code.diff",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 0.094,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/H1-apply-code.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/H1-apply-code.stderr",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "e749eea21c19b457189dc0cf512cdd8ae2b38127f791e1b6b426fbb33a97d70f"
+        },
+        {
+          "label": "official-service",
+          "command": "/bin/bash /testbed/eval.sh",
+          "cwd": "/testbed",
+          "exitCode": 2,
+          "signal": null,
+          "timeout": false,
+          "seconds": 2.751,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/H1-official-service.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/H1-official-service.stderr",
+          "stdoutSha256": "b8f3704a34cf74ca82988079355530c3e1efb97b8d3f79ddcdb680ffd8c18ef1",
+          "stderrSha256": "e48a98239291bd5f0ebfc7cd72a63855a69e3e14d2889a46eebd0e87ac52a8c3"
+        },
+        {
+          "label": "variables",
+          "command": ". /usr/local/nvm/nvm.sh && npx mocha lib/classes/Variables.test.js --reporter json",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 2.619,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/H1-variables.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/H1-variables.stderr",
+          "stdoutSha256": "bc2f8cf2e3bb993b8892e7ed38572c94593555428d69cf81b8547c85d5e7ea27",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "label": "probe",
+          "command": ". /usr/local/nvm/nvm.sh && node /testbed/analysis-probe.js H1",
+          "cwd": "/testbed",
+          "exitCode": 0,
+          "signal": null,
+          "timeout": false,
+          "seconds": 1.396,
+          "stdout": "local/polybench-pilot/serverless-2434-analysis-run-1/H1-probe.stdout",
+          "stderr": "local/polybench-pilot/serverless-2434-analysis-run-1/H1-probe.stderr",
+          "stdoutSha256": "f1bdce72b47b16c8592776b425273e17b07ec83a85dbe287a5c1bd1e137d347e",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "containerId": "da424cc64474344338377ba79e6498640cfc7f9a9312ff44566ada33a038054e",
+      "removed": true,
+      "observed": {
+        "official-service": {
+          "passes": 26,
+          "failures": [
+            {
+              "title": "Service #load() should not throw error if functions property is missing",
+              "error": {
+                "message": "expected 1 to equal 2",
+                "showDiff": true,
+                "actual": 1,
+                "expected": 2,
+                "stack": "AssertionError: expected 1 to equal 2\n    at lib/classes/Service.test.js:473:22"
+              }
+            },
+            {
+              "title": "Service #load() should throw error if a function's event is not an array or a variable",
+              "error": {
+                "stack": "ServerlessError: Events for \"functionA\" must be an array, not an string\n    at lib/classes/Service.js:173:15\n    at node_modules/lodash/lodash.js:4917:15\n    at baseForOwn (node_modules/lodash/lodash.js:2979:24)\n    at node_modules/lodash/lodash.js:4886:18\n    at Function.forEach (node_modules/lodash/lodash.js:9289:14)\n    at Service.validate (lib/classes/Service.js:165:7)\n    at lib/classes/Service.js:149:14",
+                "message": "Events for \"functionA\" must be an array, not an string",
+                "name": "ServerlessError"
+              }
+            }
+          ]
+        },
+        "variables": {
+          "passes": 34,
+          "failures": []
+        }
+      },
+      "probe": {
+        "arm": "H1",
+        "assertions": "passed",
+        "results": [
+          {
+            "name": "missing-functions",
+            "input": {
+              "service": "service-name",
+              "provider": "aws"
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "returned"
+              },
+              {
+                "stage": "populateService",
+                "outcome": "returned"
+              },
+              {
+                "stage": "postPopulateValidation",
+                "outcome": "returned"
+              }
+            ],
+            "functions": {}
+          },
+          {
+            "name": "literal-invalid-events",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "functionA": {
+                  "events": "not an array or a variable"
+                }
+              }
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "threw",
+                "error": {
+                  "name": "ServerlessError",
+                  "message": "Events for \"functionA\" must be an array, not an string"
+                }
+              }
+            ],
+            "functions": {
+              "functionA": {
+                "events": "not an array or a variable"
+              }
+            }
+          },
+          {
+            "name": "public-old-object-events",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "functionA": {
+                  "events": {}
+                }
+              }
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "threw",
+                "error": {
+                  "name": "ServerlessError",
+                  "message": "Events for \"functionA\" must be an array, not an object"
+                }
+              }
+            ],
+            "functions": {
+              "functionA": {
+                "events": {}
+              }
+            }
+          },
+          {
+            "name": "requested-file-array",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "users": {
+                  "handler": "handlers/users/handler.users",
+                  "events": "${file(./events.yml):events}"
+                }
+              }
+            },
+            "file": {
+              "events": [
+                {
+                  "http": {
+                    "path": "users",
+                    "method": "get"
+                  }
+                }
+              ]
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "returned"
+              },
+              {
+                "stage": "populateService",
+                "outcome": "returned"
+              },
+              {
+                "stage": "postPopulateValidation",
+                "outcome": "returned"
+              }
+            ],
+            "functions": {
+              "users": {
+                "handler": "handlers/users/handler.users",
+                "events": [
+                  {
+                    "http": {
+                      "path": "users",
+                      "method": "get"
+                    }
+                  }
+                ],
+                "name": "service-name-dev-users"
+              }
+            }
+          },
+          {
+            "name": "file-object-rejected",
+            "input": {
+              "service": "service-name",
+              "provider": "aws",
+              "functions": {
+                "users": {
+                  "events": "${file(./events.yml):events}"
+                }
+              }
+            },
+            "file": {
+              "events": {}
+            },
+            "stages": [
+              {
+                "stage": "load",
+                "outcome": "returned"
+              },
+              {
+                "stage": "populateService",
+                "outcome": "returned"
+              },
+              {
+                "stage": "postPopulateValidation",
+                "outcome": "threw",
+                "error": {
+                  "name": "ServerlessError",
+                  "message": "Events for \"users\" must be an array, not an object"
+                }
+              }
+            ],
+            "functions": {
+              "users": {
+                "events": {},
+                "name": "service-name-dev-users"
+              }
+            }
+          },
+          {
+            "name": "unmasked-independent-missing-functions-body",
+            "previousFunctions": {},
+            "sameInstance": false,
+            "currentFunctions": {},
+            "outcome": "threw",
+            "error": {
+              "name": "TypeError",
+              "message": "Cannot read properties of undefined (reading 'events')"
+            }
+          }
+        ]
+      },
+      "historicalFailureNamesAndMessagesMatch": true
+    }
+  ],
+  "accounting": {
+    "containersCreated": 5,
+    "containersRemoved": 5,
+    "retries": 0,
+    "modelRequests": 0,
+    "scriptedAuthorRequests": 0,
+    "commandSeconds": 41.591,
+    "executionCommands": 29,
+    "newLunaUsage": 0,
+    "developingAgentUsage": "separate; no reliable monetary bill; historical unknown usage unchanged"
+  }
+}
