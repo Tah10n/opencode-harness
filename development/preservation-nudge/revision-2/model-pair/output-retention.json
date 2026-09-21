@@ -1,0 +1,69 @@
+{
+  "ON": {
+    "version": 1,
+    "runID": "template-dev-8066e0e7-9716-4d4b-96a2-de6152f65943",
+    "containerID": "ab562581288ba92a8e4f9ac62f883b14c06564311944e10a9df676f9fc28dc6c",
+    "sourceRoot": "/work/data/opencode/tool-output",
+    "sourceKind": "native combined tool output",
+    "limits": {
+      "fileBytes": 67108864,
+      "totalBytes": 268435456,
+      "files": 128,
+      "exportMs": 30000
+    },
+    "files": [
+      {
+        "sourceReference": "/work/data/opencode/tool-output/tool_0c406b9fd0015f5XG3IFeW9zgw",
+        "links": [
+          {
+            "sessionID": "ses_f3c1441bfffe5lHjFMVTGy2iLP",
+            "callID": "call_skgyiMA2qkycqWv2xUAH9cKR",
+            "partID": "prt_0c4050a96001fO2e2jwo65R1Qx",
+            "status": "completed",
+            "exit": 11
+          }
+        ],
+        "destination": "native-output/c93f714a6ec9ee25b4a8e4cc343ee2367c06c6bc2f0647f387a0366a830f4024.bin",
+        "status": "copied",
+        "archiveComplete": true,
+        "sourceCompleteness": "unknown",
+        "sourceCompletenessReason": "Native file bytes verified separately; command completion alone does not exclude internal output limits",
+        "linkStatus": "linked",
+        "size": 99808,
+        "sha256": "11483d1c22058101eeab4854bb8ad0853e0684f2cfd0f93df15628f1aa084969",
+        "savedAt": "2026-09-21T12:53:09.176Z"
+      },
+      {
+        "sourceReference": "/work/data/opencode/tool-output/tool_0c3fa8fd90015mkfy0EnflI4s4",
+        "links": [
+          {
+            "sessionID": "ses_f3c1441bfffe5lHjFMVTGy2iLP",
+            "callID": "call_z9XTTvFD73Kd7imx0CI8SrJx",
+            "partID": "prt_0c3f8e82a001DEKzWQjsg427Dz",
+            "status": "completed",
+            "exit": 15
+          }
+        ],
+        "destination": "native-output/24691cee4ee5221a027e905d399e5ff654202d864e0b86650dfdd21ea6ebc668.bin",
+        "status": "copied",
+        "archiveComplete": true,
+        "sourceCompleteness": "unknown",
+        "sourceCompletenessReason": "Native file bytes verified separately; command completion alone does not exclude internal output limits",
+        "linkStatus": "linked",
+        "size": 115876,
+        "sha256": "3c65d6e8622567698e610a3c9046aade4a8b5665fbe38ca0435df1b75f0996e9",
+        "savedAt": "2026-09-21T12:53:09.235Z"
+      }
+    ],
+    "errors": [],
+    "evidenceComplete": true,
+    "elapsedMs": 207,
+    "bytes": 215684
+  },
+  "OFF": {
+    "status": "not_started",
+    "files": []
+  },
+  "fullCapturesPrivate": true,
+  "researcherBytesDoNotProveModelDelivery": true
+}
