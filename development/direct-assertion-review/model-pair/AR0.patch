@@ -1,0 +1,891 @@
+diff --git a/packages/connector/bin/viberacing.mjs b/packages/connector/bin/viberacing.mjs
+index fdde4386ba859ab26d7e4ea6ee59f03619da0633..038948cd81f1d2efd290cb9ee68c11aa07e8f754 100755
+--- a/packages/connector/bin/viberacing.mjs
++++ b/packages/connector/bin/viberacing.mjs
+@@ -642,6 +642,20 @@ async function connect() {
+             sources: mapped,
+             protocol: result.protocol,
+           };
++          const localState = await readState();
++          localState.adapters ??= {};
++          localState.sourceClientIds ??= {};
++          for (const previous of previousConfig?.sources ?? []) {
++            const next = mapped.find(
++              (source) => source.clientSourceId === previous.clientSourceId,
++            );
++            if (!next || next.sourceId === previous.sourceId) continue;
++            const previousState = localState.adapters[previous.sourceId];
++            if (previousState && localState.adapters[next.sourceId] === undefined)
++              localState.adapters[next.sourceId] = previousState;
++            localState.sourceClientIds[next.sourceId] = next.clientSourceId;
++          }
++          await writeState(localState);
+           const currentLocalSources = await commitConnectionState(nextConfig, localSources, {
+             connectAttempt: attempt,
+             beforeCommit:
+@@ -1277,6 +1291,7 @@ async function sync(providedConfig, options = {}) {
+       state = await reconcileServerState(config, state);
+       const range = snapshotRange();
+       state.adapters ??= {};
++      state.sourceClientIds ??= {};
+       state.fingerprints ??= {};
+       state.collectionWarnings ??= {};
+       const mappedSources = config.sources.filter((source) => typeof source.sourceId === "string");
+@@ -1315,6 +1330,14 @@ async function sync(providedConfig, options = {}) {
+         const adapter = adapterFor(source.agentId);
+         if (!adapter || !adapter.collectionMethods.includes(source.collectionMethod))
+           throw new Error(`Unsupported configured source ${source.agentId}`);
++        if (state.adapters[source.sourceId] === undefined) {
++          const previousSourceId = Object.entries(state.sourceClientIds).find(
++            ([, clientSourceId]) => clientSourceId === source.clientSourceId,
++          )?.[0];
++          if (previousSourceId !== undefined) {
++            state.adapters[source.sourceId] = state.adapters[previousSourceId];
++          }
++        }
+         return {
+           source,
+           result: await adapter.collect(source, range, state.adapters[source.sourceId] ?? {}),
+@@ -1354,6 +1377,7 @@ async function sync(providedConfig, options = {}) {
+         successfullyChecked.push(source.clientSourceId);
+         successfullyCheckedSourceIds.push(source.sourceId);
+         state.adapters[source.sourceId] = outcome.value.result.nextState ?? {};
++        state.sourceClientIds[source.sourceId] = source.clientSourceId;
+         reconcileDiagnosticPhase(
+           state,
+           source.sourceId,
+diff --git a/packages/connector/lib/adapters/antigravity.mjs b/packages/connector/lib/adapters/antigravity.mjs
+index ecc6bf51a427b96d94bf61d484ddb7a09923ec90..ec95a76cb588facb2db3c20845827099adce2b96 100644
+--- a/packages/connector/lib/adapters/antigravity.mjs
++++ b/packages/connector/lib/adapters/antigravity.mjs
+@@ -14,6 +14,7 @@ const antigravityParserVersion = 1;
+ function analyzeAntigravityLines(lines) {
+   const seen = new Set();
+   const entries = [];
++  const records = [];
+   let candidateRecords = 0;
+   let parsedRecords = 0;
+   let unsupportedCandidates = 0;
+@@ -52,6 +53,7 @@ function analyzeAntigravityLines(lines) {
+         continue;
+       }
+       parsedRecords += 1;
++      records.push({ id, date, entry });
+       if (seen.has(id)) continue;
+       seen.add(id);
+       entries.push(entry);
+@@ -64,6 +66,7 @@ function analyzeAntigravityLines(lines) {
+     candidateRecords,
+     parsedRecords,
+     unsupportedCandidates,
++    records,
+   );
+ }
+ 
+@@ -97,7 +100,7 @@ export const antigravityAdapter = Object.freeze({
+       source,
+       analyzeAntigravityLines,
+       () => true,
+-      stateCompatible ? state : {},
++      state,
+       range,
+       captureEventKey,
+     );
+diff --git a/packages/connector/lib/adapters/claude.mjs b/packages/connector/lib/adapters/claude.mjs
+index 33aa989b9041ee9426d5df2e0428be9fcc0392f9..0072fc132fd390fbb3e75738d7df910865b5d65a 100644
+--- a/packages/connector/lib/adapters/claude.mjs
++++ b/packages/connector/lib/adapters/claude.mjs
+@@ -1,8 +1,12 @@
++import { createHash } from "node:crypto";
+ import { join, resolve } from "node:path";
+ import { homedir } from "node:os";
+ import {
+   componentEntry,
++  acceptEventRecords,
+   diagnosePath,
++  eventLedgerEntries,
++  eventLedgerState,
+   findFile,
+   jsonLinesChunk,
+   mergeEntries,
+@@ -13,6 +17,10 @@ import {
+ 
+ const claudeParserVersion = 1;
+ 
++function identityKey(id) {
++  return createHash("sha256").update(id).digest("hex");
++}
++
+ function classifiedContribution(line) {
+   let record;
+   try {
+@@ -81,13 +89,21 @@ export async function collectClaude(
+   { maximumBytes = 100_000_000, readChunk = jsonLinesChunk, fingerprint = tailFingerprint } = {},
+ ) {
+   const stateCompatible = state.parserVersion === claudeParserVersion;
+-  const compatibleState = stateCompatible ? state : {};
++  const compatibleState = state;
++  const ledger = eventLedgerState(
++    state,
++    Object.values(state.messages ?? {}),
++    Object.keys(state.messages ?? {}).map(identityKey),
++  );
+   const discovered = await walk(source.dataPath, [".jsonl"], 10_000);
+   const nextState = {
+     files: { ...(compatibleState.files ?? {}) },
+-    messages: Object.assign(Object.create(null), compatibleState.messages ?? {}),
++    messages: Object.create(null),
++    eventLedger: ledger,
+   };
+   let partial = discovered.incomplete;
++  let eventConflict = false;
++  let ledgerBounded = false;
+   let schemaUnsupported = false;
+   let unreadable = discovered.issues.some((issue) => issue.reason === "unreadable");
+   let limited = discovered.issues.some((issue) => ["limit", "oversized"].includes(issue.reason));
+@@ -143,14 +159,18 @@ export async function collectClaude(
+       if (hasUnterminatedTail) {
+         if (!previous || appended)
+           for (const value of analysis.records)
+-            if (!ids.has(value.id)) provisionalMessages[value.id] = value.entry;
++            if (!ids.has(identityKey(value.id))) provisionalMessages[value.id] = value.entry;
+         continue;
+       }
++      const accepted = acceptEventRecords(ledger, analysis.records);
++      eventConflict ||= accepted.conflict;
++      ledgerBounded ||= accepted.bounded;
+       const messages = Object.create(null);
+       for (const value of analysis.records) {
+-        if (!ids.has(value.id)) {
+-          messages[value.id] = value.entry;
+-          ids.add(value.id);
++        const key = identityKey(value.id);
++        if (!ids.has(key)) {
++          messages[key] = value.entry;
++          ids.add(key);
+         }
+       }
+       const fileState = {
+@@ -179,14 +199,15 @@ export async function collectClaude(
+   }
+   for (const [id, entry] of Object.entries(nextState.messages))
+     if (entry.date < range.rangeStart || entry.date > range.rangeEnd) delete nextState.messages[id];
++  nextState.messages = Object.assign(
++    Object.create(null),
++    Object.fromEntries(Object.entries(ledger.events)),
++  );
+   if (!stateCompatible && partial && Object.keys(state.files ?? {}).length > 0) {
+-    const previousMessages = Object.values(state.messages ?? {}).filter(
+-      (entry) => entry.date >= range.rangeStart && entry.date <= range.rangeEnd,
+-    );
+     return {
+-      entries: mergeEntries(previousMessages),
++      entries: eventLedgerEntries(ledger, range),
+       completeness: "partial",
+-      nextState: state,
++      nextState,
+       warnings: ["unreadable_or_unbounded_session_data"],
+       diagnostics: [
+         ...(unreadable ? [{ code: "local_store_unreadable", phase: "collect" }] : []),
+@@ -199,19 +220,23 @@ export async function collectClaude(
+   }
+   return {
+     entries: mergeEntries([
+-      ...Object.values(nextState.messages),
++      ...eventLedgerEntries(ledger, range),
+       ...Object.values(provisionalMessages),
+     ]),
+-    completeness: partial ? "partial" : "complete",
++    completeness: partial || eventConflict || ledgerBounded ? "partial" : "complete",
+     nextState: { ...nextState, parserVersion: claudeParserVersion },
+     warnings: [
+       ...(partial ? ["unreadable_or_unbounded_session_data"] : []),
+       ...(schemaUnsupported ? ["unsupported_usage_records"] : []),
++      ...(eventConflict ? ["conflicting_event_usage"] : []),
++      ...(ledgerBounded ? ["unreadable_or_unbounded_session_data"] : []),
+     ],
+     diagnostics: [
+       ...(unreadable ? [{ code: "local_store_unreadable", phase: "collect" }] : []),
+       ...(limited ? [{ code: "local_store_scan_limit", phase: "collect" }] : []),
+       ...(schemaUnsupported ? [{ code: "local_store_schema_unsupported", phase: "collect" }] : []),
++      ...(eventConflict ? [{ code: "event_usage_conflict", phase: "collect" }] : []),
++      ...(ledgerBounded ? [{ code: "local_store_scan_limit", phase: "collect" }] : []),
+     ],
+   };
+ }
+diff --git a/packages/connector/lib/adapters/gemini.mjs b/packages/connector/lib/adapters/gemini.mjs
+index 9cc8a596d25668dfebf85def2628b5f07409f254..e88f2f99cb070f9353ba0af6890955bf6b67d4a3 100644
+--- a/packages/connector/lib/adapters/gemini.mjs
++++ b/packages/connector/lib/adapters/gemini.mjs
+@@ -23,13 +23,14 @@ function hasGeminiUsageContainer(record) {
+   );
+ }
+ 
+-function analyzeGeminiRecords(records, malformedJsonRecords = 0) {
++function analyzeGeminiRecords(inputRecords, malformedJsonRecords = 0) {
+   const seen = new Set();
+   const entries = [];
++  const parsedEvents = [];
+   let candidateRecords = malformedJsonRecords;
+   let parsedRecords = 0;
+   let unsupportedCandidates = malformedJsonRecords;
+-  for (const record of records) {
++  for (const record of inputRecords) {
+     const usage = record?.usageMetadata ?? record?.usage ?? record?.tokenUsage ?? record?.tokens;
+     if (record?.type !== "gemini" && !hasGeminiUsageContainer(record)) continue;
+     candidateRecords += 1;
+@@ -81,6 +82,7 @@ function analyzeGeminiRecords(records, malformedJsonRecords = 0) {
+       continue;
+     }
+     parsedRecords += 1;
++    parsedEvents.push({ id, date: day, entry });
+     if (seen.has(id)) continue;
+     seen.add(id);
+     entries.push(entry);
+@@ -90,6 +92,7 @@ function analyzeGeminiRecords(records, malformedJsonRecords = 0) {
+     candidateRecords,
+     parsedRecords,
+     unsupportedCandidates,
++    parsedEvents,
+   );
+ }
+ 
+@@ -162,7 +165,7 @@ export const geminiAdapter = Object.freeze({
+       source,
+       parseGeminiLines,
+       (path) => basename(path).startsWith("session-"),
+-      stateCompatible ? state : {},
++      state,
+       range,
+       geminiEventKey,
+     );
+diff --git a/packages/connector/lib/adapters/kimi.mjs b/packages/connector/lib/adapters/kimi.mjs
+index 1b831a1164d975ccb27efd6e0c96d058f365bbc6..20659175ff05c38d95c0f7591bb5fa86e208fdd3 100644
+--- a/packages/connector/lib/adapters/kimi.mjs
++++ b/packages/connector/lib/adapters/kimi.mjs
+@@ -77,6 +77,7 @@ function legacyRecord(line) {
+ function parseRecords(lines, decoder, relevant) {
+   const seen = new Set();
+   const entries = [];
++  const records = [];
+   let candidateRecords = 0;
+   let parsedRecords = 0;
+   let unsupportedCandidates = 0;
+@@ -97,6 +98,7 @@ function parseRecords(lines, decoder, relevant) {
+       continue;
+     }
+     parsedRecords += 1;
++    records.push(record);
+     if (seen.has(record.id)) continue;
+     seen.add(record.id);
+     entries.push(record.entry);
+@@ -106,6 +108,7 @@ function parseRecords(lines, decoder, relevant) {
+     candidateRecords,
+     parsedRecords,
+     unsupportedCandidates,
++    records,
+   );
+ }
+ 
+@@ -214,7 +217,7 @@ export const kimiAdapter = Object.freeze({
+       source,
+       parser,
+       (path) => basename(path) === "wire.jsonl",
+-      stateCompatible ? state : {},
++      state,
+       range,
+       eventKey(decoder),
+     ).then((result) => {
+diff --git a/packages/connector/lib/adapters/opencode.mjs b/packages/connector/lib/adapters/opencode.mjs
+index 8c6bee94054ca931c5b7fbff3059b5cd61c61a6c..78abbf8993654cf1868d7714dc38acaab3c03d63 100644
+--- a/packages/connector/lib/adapters/opencode.mjs
++++ b/packages/connector/lib/adapters/opencode.mjs
+@@ -3,7 +3,16 @@ import { homedir } from "node:os";
+ import { readdir, stat } from "node:fs/promises";
+ import { isAbsolute, join, resolve } from "node:path";
+ import { diagnosticError } from "../diagnostics.mjs";
+-import { canonicalPathKey, componentEntry, diagnosePath, mergeEntries, utcDay } from "./shared.mjs";
++import {
++  acceptEventRecords,
++  canonicalPathKey,
++  componentEntry,
++  diagnosePath,
++  eventLedgerEntries,
++  eventLedgerState,
++  mergeEntries,
++  utcDay,
++} from "./shared.mjs";
+ 
+ export const openCodeDatabasePattern = /^opencode(?:-[A-Za-z0-9._-]+)?\.db$/;
+ const maximumCutoverAliases = 65_536;
+@@ -27,10 +36,6 @@ function analyzeOpenCodeMessages(rows) {
+     }
+     if (message?.role !== "assistant") continue;
+     candidateRecords += 1;
+-    if (seen.has(row.id)) {
+-      parsedRecords += 1;
+-      continue;
+-    }
+     const day = utcDay(message?.time?.created ?? row.time_created);
+     const usage = message?.tokens;
+     const entry =
+@@ -47,6 +52,11 @@ function analyzeOpenCodeMessages(rows) {
+             usage.total,
+           )
+         : null;
++    if (seen.has(row.id)) {
++      parsedRecords += 1;
++      if (entry !== null) records.push({ id: row.id, date: entry.date, entry });
++      continue;
++    }
+     if (entry === null) {
+       unsupportedCandidates += 1;
+       continue;
+@@ -54,7 +64,7 @@ function analyzeOpenCodeMessages(rows) {
+     parsedRecords += 1;
+     seen.add(row.id);
+     entries.push(entry);
+-    records.push({ id: row.id, date: entry.date });
++    records.push({ id: row.id, date: entry.date, entry });
+   }
+   return {
+     entries: mergeEntries(entries),
+@@ -82,6 +92,12 @@ async function collect(source, range, state = {}) {
+       );
+     const analysis = analyzeOpenCodeMessages(rows);
+     const unsupported = analysis.stats.unsupportedCandidates > 0;
++    const previousAliases = [state.cutover, state.cutoverPending]
++      .flatMap((cutover) => Object.keys(cutover?.aliases ?? {}));
++    const ledger = eventLedgerState(state, [], previousAliases);
++    const accepted = unsupported ? { conflict: false } : acceptEventRecords(ledger, analysis.records);
++    const conflict = accepted.conflict === true;
++    const ledgerBounded = accepted.bounded === true;
+     const aliases = Object.fromEntries(
+       analysis.records.map(({ id, date }) => [createHash("sha256").update(id).digest("hex"), date]),
+     );
+@@ -89,26 +105,33 @@ async function collect(source, range, state = {}) {
+       Object.keys(aliases).length <= maximumCutoverAliases &&
+       Buffer.byteLength(JSON.stringify(aliases)) <= maximumCutoverAliasBytes;
+     return {
+-      entries: analysis.entries,
+-      completeness: unsupported || !cutoverBounded ? "partial" : "complete",
++      entries: eventLedgerEntries(ledger, range),
++      completeness: unsupported || !cutoverBounded || conflict || ledgerBounded ? "partial" : "complete",
+       nextState:
+-        unsupported || !cutoverBounded
++        unsupported
+           ? state
+           : {
+               ...state,
+-              cutoverCandidate: {
+-                version: 1,
+-                confirmedRangeEnd: range.rangeEnd,
+-                aliases,
+-              },
++              eventLedger: ledger,
++              ...(!cutoverBounded || conflict
++                ? {}
++                : {
++                    cutoverCandidate: {
++                      version: 1,
++                      confirmedRangeEnd: range.rangeEnd,
++                      aliases,
++                    },
++                  }),
+             },
+       warnings: [
+         ...(unsupported ? ["unsupported_usage_records"] : []),
+         ...(!cutoverBounded ? ["collector_limits_or_unreadable_files"] : []),
++        ...(conflict ? ["conflicting_event_usage"] : []),
+       ],
+       diagnostics: [
+         ...(unsupported ? [{ code: "local_store_schema_unsupported", phase: "collect" }] : []),
+         ...(!cutoverBounded ? [{ code: "local_store_scan_limit", phase: "collect" }] : []),
++        ...(conflict ? [{ code: "event_usage_conflict", phase: "collect" }] : []),
+       ],
+     };
+   } catch (error) {
+diff --git a/packages/connector/lib/adapters/qwen.mjs b/packages/connector/lib/adapters/qwen.mjs
+index ec1d50d05c301b1956c867a50fce6b18bf543626..179d1db92b5fae1aeb70c1b7c459431c0c2013f1 100644
+--- a/packages/connector/lib/adapters/qwen.mjs
++++ b/packages/connector/lib/adapters/qwen.mjs
+@@ -19,6 +19,7 @@ const qwenParserVersion = 4;
+ function analyzeQwenLines(lines) {
+   const seen = new Set();
+   const entries = [];
++  const records = [];
+   let candidateRecords = 0;
+   let parsedRecords = 0;
+   let unsupportedCandidates = 0;
+@@ -80,6 +81,7 @@ function analyzeQwenLines(lines) {
+       continue;
+     }
+     parsedRecords += 1;
++    records.push({ id: record.id, date: day, entry });
+     if (seen.has(record.id)) continue;
+     seen.add(record.id);
+     entries.push(entry);
+@@ -89,6 +91,7 @@ function analyzeQwenLines(lines) {
+     candidateRecords,
+     parsedRecords,
+     unsupportedCandidates,
++    records,
+   );
+ }
+ 
+@@ -348,7 +351,7 @@ export const qwenAdapter = Object.freeze({
+       source,
+       analyzeQwenLines,
+       (path) => basename(path).startsWith("token-usage-"),
+-      state.parserVersion === qwenParserVersion ? state : {},
++      state,
+       range,
+       qwenEventKey,
+     );
+diff --git a/packages/connector/lib/adapters/shared.mjs b/packages/connector/lib/adapters/shared.mjs
+index b19a10bdd21d618d5fece37547288c278c60e788..4ab576f4e78a4df7512419480256fcff9a76952f 100644
+--- a/packages/connector/lib/adapters/shared.mjs
++++ b/packages/connector/lib/adapters/shared.mjs
+@@ -4,6 +4,18 @@ import { access, open, opendir, realpath, stat } from "node:fs/promises";
+ import { join, resolve } from "node:path";
+ 
+ export const dayPattern = /^\d{4}-\d{2}-\d{2}$/;
++export const eventLedgerVersion = 1;
++export const maximumEventLedgerEntries = 65_536;
++
++const eventTupleKeys = [
++  "date",
++  "totalTokens",
++  "inputTokens",
++  "outputTokens",
++  "cacheReadTokens",
++  "cacheWriteTokens",
++  "reasoningTokens",
++];
+ 
+ export function integer(value) {
+   if (typeof value === "bigint") return value >= 0n ? value : null;
+@@ -74,6 +86,91 @@ export function mergeEntries(entries) {
+     });
+ }
+ 
++function tuple(entry) {
++  if (!entry || typeof entry !== "object" || !dayPattern.test(entry.date ?? "")) return null;
++  const result = {};
++  for (const key of eventTupleKeys) {
++    if (entry[key] !== undefined) {
++      if (
++        typeof entry[key] !== "string" ||
++        (key === "date" ? !dayPattern.test(entry[key]) : !/^\d+$/.test(entry[key]))
++      )
++        return null;
++      result[key] = entry[key];
++    }
++  }
++  return result.totalTokens === undefined ? null : result;
++}
++
++function eventHash(id) {
++  return createHash("sha256").update(id).digest("hex");
++}
++
++export function eventLedgerState(state = {}, legacyEntries = [], legacyIds = []) {
++  const stored = state.eventLedger;
++  if (
++    stored?.version === eventLedgerVersion &&
++    stored.events &&
++    typeof stored.events === "object" &&
++    !Array.isArray(stored.events)
++  ) {
++    const events = Object.create(null);
++    for (const [key, value] of Object.entries(stored.events)) {
++      const entry = tuple(value);
++      if (/^[a-f0-9]{64}$/.test(key) && entry) events[key] = entry;
++    }
++    return {
++      version: eventLedgerVersion,
++      events,
++      legacy: mergeEntries(
++        (Array.isArray(stored.legacy) ? stored.legacy : []).map(tuple).filter(Boolean),
++      ),
++      legacyIds: Object.fromEntries(
++        Object.keys(stored.legacyIds ?? {}).filter((key) => /^[a-f0-9]{64}$/.test(key)).map((key) => [key, true]),
++      ),
++    };
++  }
++  const legacy = mergeEntries(legacyEntries);
++  const ids = Object.fromEntries(
++    [...legacyIds].filter((key) => /^[a-f0-9]{64}$/.test(key)).map((key) => [key, true]),
++  );
++  return { version: eventLedgerVersion, events: Object.create(null), legacy, legacyIds: ids };
++}
++
++export function acceptEventRecords(ledger, records) {
++  let conflict = false;
++  let bounded = false;
++  for (const record of records ?? []) {
++    if (typeof record?.id !== "string") continue;
++    const entry = tuple(record.entry);
++    if (!entry) continue;
++    const key = eventHash(record.id);
++    if (ledger.legacyIds[key]) continue;
++    const previous = ledger.events[key];
++    if (previous) {
++      if (JSON.stringify(previous) !== JSON.stringify(entry)) conflict = true;
++      continue;
++    }
++    ledger.events[key] = entry;
++    const keys = Object.keys(ledger.events);
++    if (keys.length > maximumEventLedgerEntries) {
++      delete ledger.events[keys[0]];
++      bounded = true;
++    }
++  }
++  return { conflict, bounded };
++}
++
++export function eventLedgerEntries(ledger, range) {
++  return mergeEntries([
++    ...(ledger?.legacy ?? []),
++    ...Object.values(ledger?.events ?? {}),
++  ]).filter(
++    (entry) =>
++      !range || (entry.date >= range.rangeStart && entry.date <= range.rangeEnd),
++  );
++}
++
+ export async function exists(path) {
+   try {
+     await access(path);
+@@ -265,10 +362,18 @@ export async function collectJsonl(
+   const discovered = await walk(source.dataPath, [".jsonl"]);
+   const files = discovered.files.filter((file) => filter(file.path));
+   const nextState = { files: {} };
++  const legacyEntries = Object.values(state.files ?? {}).flatMap((file) => file.entries ?? []);
++  const legacyIds = Object.values(state.files ?? {}).flatMap((file) =>
++    Object.keys(file.eventDays ?? {}),
++  );
++  const ledger = eventLedgerState(state, legacyEntries, legacyIds);
+   const entries = [];
++  const provisionalEntries = [];
+   let incomplete = discovered.incomplete;
+   let oversized = false;
+   let schemaUnsupported = false;
++  let eventConflict = false;
++  let ledgerBounded = false;
+   let unreadable = discovered.issues.some((issue) => issue.reason === "unreadable");
+   let limited = discovered.issues.some((issue) => ["limit", "oversized"].includes(issue.reason));
+   let bytes = 0;
+@@ -335,7 +440,6 @@ export async function collectJsonl(
+           continue;
+         }
+         const key = createHash("sha256").update(event.id).digest("hex");
+-        if (eventDays[key] !== undefined) continue;
+         eventDays[key] = event.date;
+         unseenLines.push(line);
+       }
+@@ -344,6 +448,7 @@ export async function collectJsonl(
+           if (date < range.rangeStart || date > range.rangeEnd) delete eventDays[key];
+       const parserOutput = parser(unseenLines);
+       const parsed = Array.isArray(parserOutput) ? parserOutput : parserOutput.entries;
++      const records = Array.isArray(parserOutput) ? [] : parserOutput.records;
+       const unsupportedRecords = Array.isArray(parserOutput)
+         ? 0
+         : parserOutput.stats.unsupportedCandidates;
+@@ -370,9 +475,12 @@ export async function collectJsonl(
+         : fileEntries;
+       if (hasUnterminatedTail) {
+         if (previous) nextState.files[file.path] = previous;
+-        entries.push(...(previous && !appended ? (previous.entries ?? []) : ranged));
++        if (!previous || appended) provisionalEntries.push(...parsed);
+         continue;
+       }
++      const accepted = acceptEventRecords(ledger, records);
++      eventConflict ||= accepted.conflict;
++      ledgerBounded ||= accepted.bounded;
+       nextState.files[file.path] = {
+         size: file.size,
+         modifiedAt: file.modifiedAt,
+@@ -402,22 +510,39 @@ export async function collectJsonl(
+   if (incomplete) warnings.push("collector_limits_or_unreadable_files");
+   if (oversized) warnings.push("oversized_jsonl_records");
+   if (schemaUnsupported) warnings.push("unsupported_usage_records");
++  if (eventConflict) {
++    incomplete = true;
++    warnings.push("conflicting_event_usage");
++  }
++  if (ledgerBounded) {
++    incomplete = true;
++    limited = true;
++    warnings.push("collector_limits_or_unreadable_files");
++  }
+   return {
+-    entries: mergeEntries(entries),
++    entries: mergeEntries([...eventLedgerEntries(ledger, range), ...provisionalEntries]),
+     completeness: incomplete ? "partial" : "complete",
+-    nextState,
++    nextState: { ...nextState, eventLedger: ledger },
+     warnings,
+     diagnostics: [
+       ...(unreadable ? [{ code: "local_store_unreadable", phase: "collect" }] : []),
+       ...(limited ? [{ code: "local_store_scan_limit", phase: "collect" }] : []),
+       ...(schemaUnsupported ? [{ code: "local_store_schema_unsupported", phase: "collect" }] : []),
++      ...(eventConflict ? [{ code: "event_usage_conflict", phase: "collect" }] : []),
+     ],
+   };
+ }
+ 
+-export function parserResult(entries, candidateRecords, parsedRecords, unsupportedCandidates) {
++export function parserResult(
++  entries,
++  candidateRecords,
++  parsedRecords,
++  unsupportedCandidates,
++  records = [],
++) {
+   return {
+     entries,
++    records,
+     stats: { candidateRecords, parsedRecords, unsupportedCandidates },
+   };
+ }
+diff --git a/packages/connector/test/claude-security.test.mjs b/packages/connector/test/claude-security.test.mjs
+index e9849b2f22b065b79829099440961a63ce2d6ab7..8654f90d45c4dcd501cf131f67fb612be3b4fcf4 100644
+--- a/packages/connector/test/claude-security.test.mjs
++++ b/packages/connector/test/claude-security.test.mjs
+@@ -1,5 +1,6 @@
+ import test from "node:test";
+ import assert from "node:assert/strict";
++import { createHash } from "node:crypto";
+ import { appendFile, mkdtemp, rm, writeFile } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+@@ -13,6 +14,10 @@ function message(id, inputTokens) {
+   });
+ }
+ 
++function identity(id) {
++  return createHash("sha256").update(id).digest("hex");
++}
++
+ test("Claude message ids cannot mutate collector prototypes", async (context) => {
+   const directory = await mkdtemp(join(tmpdir(), "viberacing-claude-prototype-"));
+   context.after(() => rm(directory, { recursive: true, force: true }));
+@@ -24,20 +29,18 @@ test("Claude message ids cannot mutate collector prototypes", async (context) =>
+   const range = { rangeStart: "2026-08-01", rangeEnd: "2026-08-31" };
+   const first = await collectClaude({ dataPath: directory }, range);
+   assert.equal(Object.getPrototypeOf(first.nextState.messages), null);
+-  assert.deepEqual(Object.keys(first.nextState.messages).sort(), [
+-    "__proto__",
+-    "constructor",
+-    "prototype",
+-  ]);
++  assert.deepEqual(
++    Object.keys(first.nextState.messages).sort(),
++    ["__proto__", "constructor", "prototype"].map(identity).sort(),
++  );
++  assert.doesNotMatch(JSON.stringify(first.nextState.messages), /__proto__|constructor|prototype/);
+   assert.doesNotThrow(() => JSON.parse(JSON.stringify(first.nextState)));
+   await appendFile(path, `${message("__proto__", 100)}\n${message("ordinary", 4)}\n`);
+   const second = await collectClaude({ dataPath: directory }, range, first.nextState);
+   assert.equal(Object.getPrototypeOf(second.nextState.messages), null);
+-  assert.deepEqual(Object.keys(second.nextState.messages).sort(), [
+-    "__proto__",
+-    "constructor",
+-    "ordinary",
+-    "prototype",
+-  ]);
++  assert.deepEqual(
++    Object.keys(second.nextState.messages).sort(),
++    ["__proto__", "constructor", "ordinary", "prototype"].map(identity).sort(),
++  );
+   assert.equal(second.entries[0].totalTokens, "14");
+ });
+diff --git a/packages/connector/test/readers.test.mjs b/packages/connector/test/readers.test.mjs
+index e388d09ca7243fa23f0429ca49fa35a8077efc17..2ad665e23d3cea570f321acd24378e9cade052f8 100644
+--- a/packages/connector/test/readers.test.mjs
++++ b/packages/connector/test/readers.test.mjs
+@@ -2914,6 +2914,46 @@ test("reads OpenCode assistant usage and avoids cache double-counting", async ()
+   ]);
+ });
+ 
++test("OpenCode event ledgers retain accepted rows after database history switches", async (context) => {
++  const directory = await mkdtemp(join(tmpdir(), "viberacing-opencode-event-ledger-"));
++  context.after(() => rm(directory, { force: true, recursive: true }));
++  const path = join(directory, "opencode.db");
++  const { DatabaseSync } = await import("node:sqlite");
++  const database = new DatabaseSync(path);
++  database.exec("CREATE TABLE message (id TEXT PRIMARY KEY, time_created INTEGER, data TEXT)");
++  const insert = database.prepare("INSERT INTO message (id, time_created, data) VALUES (?, ?, ?)");
++  const message = (id, date) => [
++    id,
++    Date.parse(`${date}T12:00:00Z`),
++    JSON.stringify({ role: "assistant", tokens: { input: 5, output: 4, total: 9 } }),
++  ];
++  insert.run(...message("opencode-event-a", "2026-08-10"));
++  database.close();
++  const range = { rangeStart: "2026-07-15", rangeEnd: "2026-08-14" };
++  const adapter = adapterFor("opencode");
++  const source = { dataPath: path };
++  const first = await adapter.collect(source, range, {});
++
++  const switchedDatabase = new DatabaseSync(path);
++  switchedDatabase.prepare("DELETE FROM message").run();
++  switchedDatabase
++    .prepare("INSERT INTO message (id, time_created, data) VALUES (?, ?, ?)")
++    .run(...message("opencode-event-a", "2026-08-10"));
++  switchedDatabase
++    .prepare("INSERT INTO message (id, time_created, data) VALUES (?, ?, ?)")
++    .run(...message("opencode-event-b", "2026-08-11"));
++  switchedDatabase.close();
++  const switched = await adapter.collect(source, range, first.nextState);
++  assert.equal(switched.entries.reduce((total, entry) => total + BigInt(entry.totalTokens), 0n), 18n);
++
++  const truncatedDatabase = new DatabaseSync(path);
++  truncatedDatabase.prepare("DELETE FROM message WHERE id = ?").run("opencode-event-a");
++  truncatedDatabase.close();
++  const truncated = await adapter.collect(source, range, switched.nextState);
++  assert.equal(truncated.entries.reduce((total, entry) => total + BigInt(entry.totalTokens), 0n), 18n);
++  assert.doesNotMatch(JSON.stringify(truncated.nextState), /opencode-event-[ab]/);
++});
++
+ test("reads current Kimi usage records with millisecond UTC timestamps", async () => {
+   const lines = (await fixture("kimi.jsonl")).trim().split("\n");
+   assert.deepEqual(parseKimiLines([...lines, lines[1]]), [
+@@ -3564,8 +3604,135 @@ test("JSONL collectors reuse unchanged state and resume at the last complete byt
+   const truncated = await adapter.collect({ dataPath: path }, range, duplicate.nextState);
+   assert.deepEqual(
+     truncated.entries.map((entry) => entry.date),
+-    ["2026-08-11"],
++    ["2026-08-10", "2026-08-11"],
++  );
++});
++
++test("event ledgers survive copied, moved, and truncated account histories", async (context) => {
++  const range = { rangeStart: "2026-07-15", rangeEnd: "2026-08-14" };
++  const claude = JSON.parse((await fixture("claude.jsonl")).trim());
++  const qwen = JSON.parse((await fixture("qwen.jsonl")).trim());
++  const gemini = JSON.parse(await fixture("gemini.json"))[0];
++  const antigravity = safeCaptureRecord(
++    "antigravity",
++    (await fixture("antigravity.jsonl")).trim(),
++  );
++  const kimiLines = (await fixture("kimi.jsonl")).trim().split("\n");
++  const cases = [
++    {
++      agentId: "claude_code",
++      name: "session.jsonl",
++      first: JSON.stringify(claude),
++      second: JSON.stringify({
++        ...claude,
++        timestamp: "2026-08-11T12:00:00Z",
++        message: { ...claude.message, id: "switch-claude" },
++      }),
++      source: {},
++    },
++    {
++      agentId: "qwen_code",
++      name: "token-usage-2026-08.jsonl",
++      first: JSON.stringify(qwen),
++      second: JSON.stringify({ ...qwen, id: "switch-qwen", timestamp: "2026-08-11T12:00:00Z" }),
++      source: {},
++    },
++    {
++      agentId: "gemini_cli",
++      name: "session-switch.jsonl",
++      first: JSON.stringify(gemini),
++      second: JSON.stringify({ ...gemini, id: "switch-gemini", timestamp: "2026-08-11T12:00:00Z" }),
++      source: {},
++    },
++    {
++      agentId: "antigravity",
++      name: "capture.jsonl",
++      first: JSON.stringify(antigravity),
++      second: JSON.stringify({
++        ...antigravity,
++        id: "switch-antigravity",
++        date: "2026-08-11",
++        usage: { ...antigravity.usage, date: "2026-08-11" },
++      }),
++      source: {},
++    },
++    {
++      agentId: "kimi_code",
++      name: "wire.jsonl",
++      first: kimiLines[1],
++      second: kimiLines[2],
++      source: { collectionMethod: "kimi_wire_jsonl" },
++    },
++  ];
++
++  for (const item of cases) {
++    const directory = await mkdtemp(join(tmpdir(), `viberacing-${item.agentId}-switch-ledger-`));
++    context.after(() => rm(directory, { force: true, recursive: true }));
++    const path = join(directory, item.name);
++    const source = { dataPath: directory, ...item.source };
++    const adapter = adapterFor(item.agentId);
++    await writeFile(path, `${item.first}\n`);
++    const first = await adapter.collect(source, range, {});
++    const firstTotal = BigInt(first.entries[0].totalTokens);
++
++    await writeFile(path, `${item.first}\n${item.second}\n`);
++    const switched = await adapter.collect(source, range, first.nextState);
++    const switchedTotal = switched.entries.reduce(
++      (total, entry) => total + BigInt(entry.totalTokens),
++      0n,
++    );
++    assert.ok(switchedTotal > firstTotal, item.agentId);
++
++    await writeFile(path, `${item.first}\n`);
++    const truncated = await adapter.collect(source, range, switched.nextState);
++    assert.equal(
++      truncated.entries.reduce((total, entry) => total + BigInt(entry.totalTokens), 0n),
++      switchedTotal,
++      `${item.agentId} retained accepted events`,
++    );
++  }
++});
++
++test("conflicting event tuples retain the first tuple and accept unrelated events", async (context) => {
++  const directory = await mkdtemp(join(tmpdir(), "viberacing-event-ledger-conflict-"));
++  context.after(() => rm(directory, { force: true, recursive: true }));
++  const path = join(directory, "token-usage-2026-08.jsonl");
++  const original = JSON.parse((await fixture("qwen.jsonl")).trim());
++  const conflict = { ...original, totalTokens: Number(original.totalTokens) + 1 };
++  const unrelated = { ...original, id: "unrelated-event", timestamp: "2026-08-11T12:00:00Z" };
++  const source = { dataPath: directory };
++  const range = { rangeStart: "2026-07-15", rangeEnd: "2026-08-14" };
++  await writeFile(path, `${JSON.stringify(original)}\n`);
++  const first = await adapterFor("qwen_code").collect(source, range, {});
++  await writeFile(path, `${JSON.stringify(conflict)}\n${JSON.stringify(unrelated)}\n`);
++  const result = await adapterFor("qwen_code").collect(source, range, first.nextState);
++  assert.equal(result.completeness, "partial");
++  assert.deepEqual(result.entries.map((entry) => entry.totalTokens), [
++    String(original.totalTokens),
++    String(original.totalTokens),
++  ]);
++  assert.deepEqual(result.diagnostics, [{ code: "event_usage_conflict", phase: "collect" }]);
++});
++
++test("event collectors migrate pre-ledger state without re-counting its known IDs", async (context) => {
++  const directory = await mkdtemp(join(tmpdir(), "viberacing-event-ledger-migration-"));
++  context.after(() => rm(directory, { force: true, recursive: true }));
++  const path = join(directory, "token-usage-2026-08.jsonl");
++  const original = JSON.parse((await fixture("qwen.jsonl")).trim());
++  const next = { ...original, id: "migrated-new-event", timestamp: "2026-08-11T12:00:00Z" };
++  const source = { dataPath: directory };
++  const range = { rangeStart: "2026-07-15", rangeEnd: "2026-08-14" };
++  await writeFile(path, `${JSON.stringify(original)}\n`);
++  const current = await adapterFor("qwen_code").collect(source, range, {});
++  const { eventLedger: _eventLedger, ...legacyState } = current.nextState;
++  await writeFile(path, `${JSON.stringify(original)}\n${JSON.stringify(next)}\n`);
++  const migrated = await adapterFor("qwen_code").collect(source, range, legacyState);
++  assert.equal(
++    migrated.entries.reduce((total, entry) => total + BigInt(entry.totalTokens), 0n),
++    70n,
+   );
++  assert.equal(migrated.nextState.eventLedger.version, 1);
++  assert.doesNotMatch(JSON.stringify(migrated.nextState), /migrated-new-event/);
+ });
+ 
+ test("collector limits are explicit partial results with diagnostics", async () => {

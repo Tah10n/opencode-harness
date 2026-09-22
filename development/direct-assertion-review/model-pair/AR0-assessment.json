@@ -1,0 +1,306 @@
+{
+  "arm": "AR0",
+  "Q": false,
+  "basis": "Original task and frozen whole-contract acceptance; not raw test count",
+  "rawE": {
+    "tests": 23,
+    "pass": 20,
+    "fail": 3,
+    "skipped": 0
+  },
+  "literalFailureInterpretation": {
+    "semanticFailuresInFrozenE": 2,
+    "exactDiagnosticNameMismatch": 1,
+    "exactNameAloneDeterminesQ": false,
+    "diagnosticIntegrationSeparatelyChecked": true
+  },
+  "findings": [
+    {
+      "id": "missing-cutover",
+      "contract": "OpenCode exact-ID cutover remains fail closed",
+      "expected": "Reject accepted server baseline without confirmed exact-ID cutover",
+      "actual": "Empty entries, completeness complete, no rejection",
+      "evidence": "E-migration-contract and E-diagnose",
+      "source": "packages/connector/lib/adapters/opencode.mjs:95"
+    },
+    {
+      "id": "confirmed-cutover",
+      "contract": "Retain accepted baseline and count new IDs once",
+      "expected": [
+        [
+          "2026-08-10",
+          "100"
+        ],
+        [
+          "2026-08-11",
+          "7"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-11",
+          "7"
+        ]
+      ],
+      "evidence": "E-migration-contract, first assertion of confirmed-cutover scenario",
+      "source": "packages/connector/lib/adapters/opencode.mjs:95; shared.mjs:148 skips legacy aliases but does not carry server baseline"
+    },
+    {
+      "id": "corrupt-state",
+      "contract": "Preserve fail-closed accounting state validation",
+      "expected": "Reject or explicitly report partial/unavailable after corrupting the actual reloaded ledger version",
+      "actual": "Empty entries, completeness complete",
+      "evidence": "E-diagnose; actual nextState.eventLedger.version was changed to -1",
+      "source": "packages/connector/lib/adapters/shared.mjs:109"
+    },
+    {
+      "id": "diagnostic-consumer",
+      "contract": "Preserve conflict diagnostics through actual CLI consumer",
+      "expected": "Keep first tuple plus unrelated event (22), partial, and a usable normalized conflict diagnostic",
+      "actual": "Totals 22 and partial; event_usage_conflict is dropped by normalizeAdapterDiagnostics",
+      "evidence": "E-diagnose invokes real normalizer; bin/viberacing.mjs:1385",
+      "source": "packages/connector/lib/diagnostics.mjs:66"
+    }
+  ],
+  "supplementalObservations": [
+    {
+      "receipt": {
+        "path": "local/direct-assertion-review-model-pair/evaluation-AR0/E-diagnose.json",
+        "bytes": 4679,
+        "sha256": "9734af7353c4c5d0bd538da02be3c2cc6fb628911bc0ea2a66e3cbddece70083"
+      },
+      "exitCode": 0,
+      "data": {
+        "observations": [
+          {
+            "case": "bound-source-legacy-migration",
+            "agentId": "claude_code",
+            "old": [
+              [
+                "2026-08-10",
+                "15"
+              ]
+            ],
+            "expected": [
+              [
+                "2026-08-10",
+                "15"
+              ],
+              [
+                "2026-08-11",
+                "15"
+              ]
+            ],
+            "actual": [
+              [
+                "2026-08-10",
+                "15"
+              ],
+              [
+                "2026-08-11",
+                "15"
+              ]
+            ],
+            "completeness": "complete"
+          },
+          {
+            "case": "bound-source-legacy-migration",
+            "agentId": "gemini_cli",
+            "old": [
+              [
+                "2026-08-10",
+                "15"
+              ]
+            ],
+            "expected": [
+              [
+                "2026-08-10",
+                "15"
+              ],
+              [
+                "2026-08-11",
+                "15"
+              ]
+            ],
+            "actual": [
+              [
+                "2026-08-10",
+                "15"
+              ],
+              [
+                "2026-08-11",
+                "15"
+              ]
+            ],
+            "completeness": "complete"
+          },
+          {
+            "case": "bound-source-legacy-migration",
+            "agentId": "qwen_code",
+            "old": [
+              [
+                "2026-08-10",
+                "15"
+              ]
+            ],
+            "expected": [
+              [
+                "2026-08-10",
+                "15"
+              ],
+              [
+                "2026-08-11",
+                "15"
+              ]
+            ],
+            "actual": [
+              [
+                "2026-08-10",
+                "15"
+              ],
+              [
+                "2026-08-11",
+                "15"
+              ]
+            ],
+            "completeness": "complete"
+          },
+          {
+            "case": "bound-source-legacy-migration",
+            "agentId": "antigravity",
+            "old": [
+              [
+                "2026-08-10",
+                "15"
+              ]
+            ],
+            "expected": [
+              [
+                "2026-08-10",
+                "15"
+              ],
+              [
+                "2026-08-11",
+                "15"
+              ]
+            ],
+            "actual": [
+              [
+                "2026-08-10",
+                "15"
+              ],
+              [
+                "2026-08-11",
+                "15"
+              ]
+            ],
+            "completeness": "complete"
+          },
+          {
+            "case": "same-observed-event-after-account-remap",
+            "expected": [
+              [
+                "2026-08-10",
+                "10"
+              ]
+            ],
+            "actual": [
+              [
+                "2026-08-10",
+                "10"
+              ]
+            ],
+            "completeness": "complete"
+          },
+          {
+            "case": "conflict-diagnostic-consumer",
+            "expectedTotals": [
+              [
+                "2026-08-10",
+                "22"
+              ]
+            ],
+            "actual": [
+              [
+                "2026-08-10",
+                "22"
+              ]
+            ],
+            "completeness": "partial",
+            "adapterDiagnostics": [
+              {
+                "code": "event_usage_conflict",
+                "phase": "collect"
+              }
+            ],
+            "normalizedDiagnostics": []
+          },
+          {
+            "case": "missing-exact-cutover",
+            "expected": "fail closed",
+            "actual": [],
+            "completeness": "complete",
+            "rejected": false
+          },
+          {
+            "case": "corrupt-reloaded-state",
+            "expected": "fail closed",
+            "actual": [],
+            "completeness": "complete",
+            "rejected": false
+          }
+        ]
+      }
+    },
+    {
+      "receipt": {
+        "path": "local/direct-assertion-review-model-pair/evaluation-AR0/E-privacy-observation.json",
+        "bytes": 1372,
+        "sha256": "19ed0b673274d7ab57878caa8a1693c06d93096fb301676c8ec8c11a203f746a"
+      },
+      "exitCode": 0,
+      "data": {
+        "case": "valid-64-hex-provider-id",
+        "total": "15",
+        "completeness": "complete",
+        "expectedRawIdPersisted": false,
+        "rawIdPersisted": false
+      }
+    }
+  ],
+  "originalPublicReplay": {
+    "receipt": {
+      "path": "local/direct-assertion-review-model-pair/evaluation-AR0/E-original-public-partial-rewrite.json",
+      "bytes": 1634,
+      "sha256": "ccea73383182a060b765d3d9d1e83e5236a9023cddc4e3e3dfe2d57109d30782"
+    },
+    "exitCode": 0,
+    "originalTestBodySha256": "1d1d304f8462171d59965740c87cfceda8faaf0c55c250735d6b062ec928f231",
+    "originalTestBodyUnchanged": true,
+    "fixtureAndImportPathRebindingOnly": true,
+    "notAddedToFrozen23": true
+  },
+  "localAssertionOutcome": {
+    "targetTruncationCorrect": true,
+    "sameSupportedDataPathCaller": true,
+    "optionalIdentityGate": false,
+    "adjacentTruncationTestAssertionsRetained": true,
+    "allOtherChangedAssertionsJustified": true,
+    "overallTechnique": "target corrected; no extra contract weakening observed in changed tests",
+    "newInstructionCausalAttribution": false
+  },
+  "sourceReview": {
+    "scope": "All changed files, public parser exports, independent Claude/OpenCode and shared JSONL paths, actual normalizer/CLI and serialized state consumers",
+    "boundedness": "Finite 65536-event insertion cap and existing scan caps; overflow evicts the oldest accepted tuple (shared.mjs:154-158), so finite storage alone does not prove retention. No restored-ledger cardinality/byte validation and corrupt state silently filters/resets. Overflow was source-reviewed, not newly load-tested.",
+    "privacy": "Both pass unchanged raw-64-hex-ID observation. Hashing and tuple-only ledger inspected; original prototype/negative cases remain and affected security test passes. Not an exhaustive privacy proof.",
+    "rangeAndCaller": "All five unchanged JSONL lifecycle chains, SQLite lifecycle, supported Antigravity inputs, Kimi migration and six real CLI persistence/source-isolation tests pass. Their later assertions were reached.",
+    "unreached": "Confirmed-cutover chain stops at its first total mismatch; later deletion/replay/privacy assertions are not tested by that execution.",
+    "sourceAccount": "Frozen CLI exercises separate configured source IDs with same event ID and disk reload. Same-event account-remap supplemental check stays 10 for both. No provider-account-discovery claim or exhaustive lifecycle race proof.",
+    "scopePreservation": "No product dependencies, server, Codex identity, release versions changed. Runtime/defaults of harness untouched."
+  },
+  "limits": [
+    "Full pnpm verify unavailable offline, not passed.",
+    "Raw provider SSE was not recorded; outgoing requests, terminal metadata, native reports and tool outputs remain available.",
+    "No additional model run or repair of M."
+  ]
+}

@@ -1,0 +1,196 @@
+{
+  "frozenAndAccountingAudit": "passed",
+  "schedulerScenarios": [
+    {
+      "mode": "unattributed-timeout",
+      "startedSlots": [
+        1
+      ],
+      "scriptedProviderRequests": 0,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 1
+    },
+    {
+      "mode": "managed-deadline",
+      "startedSlots": [
+        1
+      ],
+      "scriptedProviderRequests": 1,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 1
+    },
+    {
+      "mode": "late-response",
+      "startedSlots": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+      ],
+      "scriptedProviderRequests": 1,
+      "realProviderRequests": 0,
+      "status": "finished",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 1,
+      "closedSessions": 30
+    },
+    {
+      "mode": "foreign-abort-near-deadline",
+      "startedSlots": [
+        1
+      ],
+      "scriptedProviderRequests": 1,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 1
+    },
+    {
+      "mode": "unknown-execution",
+      "startedSlots": [
+        1
+      ],
+      "scriptedProviderRequests": 1,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 1
+    },
+    {
+      "mode": "unexplained-disconnect",
+      "startedSlots": [
+        1
+      ],
+      "scriptedProviderRequests": 1,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 1
+    },
+    {
+      "mode": "quota",
+      "startedSlots": [
+        1
+      ],
+      "scriptedProviderRequests": 1,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 1
+    },
+    {
+      "mode": "authorization",
+      "startedSlots": [
+        1
+      ],
+      "scriptedProviderRequests": 1,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 1
+    },
+    {
+      "mode": "capture-failure",
+      "startedSlots": [
+        1
+      ],
+      "scriptedProviderRequests": 0,
+      "realProviderRequests": 0,
+      "status": "paused",
+      "error": null,
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 1
+    },
+    {
+      "mode": "cleanup-failure",
+      "startedSlots": [
+        1
+      ],
+      "scriptedProviderRequests": 0,
+      "realProviderRequests": 0,
+      "status": "thrown-stop",
+      "error": "Container cleanup failed",
+      "lateResponsesForwarded": 0,
+      "latePacketsAttempted": 0,
+      "closedSessions": 1
+    }
+  ],
+  "syntax": "passed",
+  "patchApplications": "both passed unchanged; F/E inventories match",
+  "patchWhitespace": "both actual Git patches passed git diff --cached --check",
+  "cleanup": {
+    "checkedContainers": [
+      "template-dev-4522175d-a448-4e4f-8291-99e258ce453f",
+      "template-dev-07980f23-11aa-4fe9-886a-619a78c9b9cc",
+      "template-dev-a7bdfbda-e11d-4745-9638-2794df5db108",
+      "template-dev-8ef38e9e-4aec-4d10-a8b0-bea1ca8fe203",
+      "template-dev-fda35469-9a0a-425e-a8b9-3af86879c828",
+      "template-dev-893ca80c-96e3-4547-9903-d5a96fe2e67e"
+    ],
+    "allAbsent": true,
+    "unrelatedContainersUntouched": true
+  },
+  "review": "One final primary-agent scoped diff review; no independent model reviewer",
+  "realTaskRuns": 2,
+  "retries": 0,
+  "runtimeCollectorTransportEvaluatorChanges": false,
+  "parameterization": "Only new schedule kind, arm bundle paths and request recording in existing scheduler; campaign wiring and evidence export files. Raw response SSE omission retained and disclosed.",
+  "limitations": [
+    "No full platform/controller matrix rerun",
+    "Full pnpm verify unavailable offline",
+    "Remote CI separately checked after publication",
+    "Raw provider SSE not saved"
+  ],
+  "developingAgentSnapshot": {
+    "source": "Codex goal API",
+    "tokensUsed": 266879,
+    "timeUsedSeconds": 4238,
+    "note": "Intermediate pre-report snapshot, separate from Luna and not a billing figure; final usage is higher."
+  }
+}
