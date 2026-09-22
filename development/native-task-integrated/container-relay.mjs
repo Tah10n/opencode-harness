@@ -38,7 +38,7 @@ const server=http.createServer(async(req,res)=>{
 const input=readline.createInterface({input:process.stdin});
 input.on('line',line=>{
   try {
-    const frame=JSON.parse(line);if(frame.type==='task-budget'){if(taskDeadline!==null||!Number.isFinite(frame.milliseconds)||frame.milliseconds<=0||frame.milliseconds>1800000)throw Error('Invalid task budget');taskDeadline=Date.now()+frame.milliseconds;return;}const item=pending.get(frame.id);if(!item)return;
+    const frame=JSON.parse(line);if(frame.type==='task-budget'){if(taskDeadline!==null||!Number.isFinite(frame.milliseconds)||frame.milliseconds<=0||frame.milliseconds>3600000)throw Error('Invalid task budget');taskDeadline=Date.now()+frame.milliseconds;return;}const item=pending.get(frame.id);if(!item)return;
     if(frame.type==='headers')item.res.writeHead(frame.status,{'content-type':frame.contentType});
     else if(frame.type==='chunk'){
       const bytes=Buffer.from(frame.data,'base64');item.bytes+=bytes.length;

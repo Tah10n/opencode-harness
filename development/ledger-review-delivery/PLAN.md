@@ -63,3 +63,18 @@ transport stays unchanged and no real execution is admitted.
 
 This PLAN describes requirements, not a successful preflight or a real-execution
 freeze. Acceptance probes and F handoff have not been frozen for dispatch.
+
+
+## Explicit budget amendment and subsequent fixture stop
+
+The user approved changing only the two development budget ceiling guards from
+1800000 to 3600000 ms. This closes the original budget blocker without changing
+A/R maxima or resetting the common deadline. The original receipt stays historical.
+
+One scripted preflight was attempted and stopped in A's parent request because
+the fixture wrongly required the original task in parent context. No author tool,
+R, F or real request followed. Its closed admission remains preserved. The fixture
+is corrected and passes model-free request replay, but the installed chain and
+acceptance freeze remain unvalidated/not admitted. Do not rerun the saved root or
+start the real pilot without the explicitly authorized corrected preflight and
+its successful evidence. See REPORT.md for exact limits and accounting.

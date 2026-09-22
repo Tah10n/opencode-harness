@@ -1,13 +1,10 @@
 {
-  "status": "preflight_stopped",
-  "reason": "scripted_parent_input_assertion",
-  "budgetAmendment": "authorized_and_implemented",
+  "status": "preparation_blocked",
+  "reason": "existing_transport_budget_ceiling",
   "realProviderRequests": 0,
-  "scriptedProviderRequests": 2,
-  "scriptedNativeParentSessions": 1,
-  "scriptedNativeAuthorSessions": 0,
-  "realNativeSessions": 0,
-  "realDeadlineStarted": false,
+  "scriptedProviderRequests": 0,
+  "nativeSessions": 0,
+  "deadlineStarted": false,
   "stages": {
     "A": "not_started",
     "R": "not_started",

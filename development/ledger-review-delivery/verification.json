@@ -1,6 +1,6 @@
 {
   "passed": true,
-  "scope": "saved preparation only",
+  "scope": "historical budget-blocker preparation only",
   "budgetArithmetic": true,
   "sourceHashes": true,
   "bundleConfigHashes": true,

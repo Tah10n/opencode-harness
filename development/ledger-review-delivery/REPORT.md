@@ -1,83 +1,102 @@
-# Ledger review delivery: preparation blocked before model execution
+# Ledger review delivery: budget fixed; scripted preflight stopped
 
-**The requested A → R → F pilot has not run.** Preparation found a conflict
-between F's prescribed remaining budget and the existing development transport's
-30-minute per-native ceiling. No conclusion about Luna, review utility or complete
-delivery follows from this result.
+**The real A → R → F pilot remains not_started.** The explicitly authorized
+budget amendment is implemented. The single scripted preflight then stopped
+because of a fixture error in the parent-input assertion, before an author tool
+or author session began. No real provider request was sent. The stopped fixture
+has not been repeated, and its admission record remains closed.
 
-The existing `container-session.mjs` rejects `setTaskBudget(3150000)` with
-`Invalid relay task budget`; its relay independently imposes the same 1800000 ms
-maximum. By contrast, the native task plugin accepts up to 3600000 ms. A legal
-example with A=300 s, R=120 s and 30 s of transitions leaves 3150 s for F, so the
-transport cannot express the requested F budget for every admitted trajectory.
-Silently capping F, consuming time deliberately, restarting it or replacing the
-transport would change the prescribed experiment. The user prohibited changes
-to transport policy; no such change was made.
+## Authorized amendment and preparation
 
-[The boundary receipt](budget-boundary.json) records an actual call on the existing
-pinned, isolated container session. It is a preparation check, **not** the required
-three-stage scripted fixture. Only `opencode --version` ran; no native conversation
-was started. The temporary container was removed and its absence verified.
-A permission question proposed the narrow limit amendment; no approval had been
-received when this report was prepared. Further dispatch is not authorized by
-this saved preparation state.
+The user approved the narrow development ceiling change after the original
+[budget blocker](budget-blocker-REPORT.md). Only two shared guards changed:
+`container-session.mjs` and `container-relay.mjs` now accept up to 3600000 ms.
+The caller still assigns A at most 1800 s, R at most 600 s and F only the
+remaining shared budget. All local deadlines are capped by the same global
+3600-second deadline, started once immediately before the first native stage.
+No delay, new session or container resets it. The original 30-minute rejection
+receipt and the previous published result are preserved.
 
-| Required result | Actual state |
+Pilot-local wiring now prepares fresh baseline/D0 copies for the three operations,
+passes an unchanged independent review as untrusted diagnostics to F, and exports
+D0, a delta and a portable full patch on successful completion. The existing
+request/recording/cancellation/capture/cleanup lifecycle is reused in a scoped
+single-operation adapter; a source comparison verifies the request handler is
+byte-identical to the existing scheduler's handler. The shared scheduler itself,
+provider route, denial policy, recorder, collector, product controller, prompts,
+defaults and experimental status are unchanged. The two ceiling guards are the
+only changes outside this development pilot directory.
+
+This wiring is **not validated as a complete installed path**: its only installed
+scripted attempt failed in the first parent session. No real-execution acceptance
+freeze was committed; the real entry point requires one before any dispatch.
+The same prepared baseline, bundles, task and environment are retained. Reviewer
+permissions are configured, but the exact offered R inventory remains NOT RUN.
+
+## Actual scripted stop and correction
+
+The local scripted provider incorrectly asserted that every non-title request
+contained the original task. The recorded parent request actually contains the
+unchanged command `Invoke harness_task exactly once` and offers `harness_task`;
+the task belongs in the author's subsequent context, loaded from TASK.md.
+The assertion failed before the parent could call that tool. This was an error
+in this pilot's fixture, not a model error, missing task file or remote-provider
+failure.
+
+The reused lifecycle recorded `unknown_submission` for the throwing scripted
+fetch callback and closed admission. That status describes the local scripted
+operation; **there was no unknown real upstream submission**. R and F did not
+start. The collector independently saved all available patch/task/output evidence
+successfully, including an empty baseline diff. The later author-delivery assertion
+failed with `No delivered author worktree`, so scheduler `captureSaved` is false.
+The empty diff is not D0 or a successful author delivery. The container was removed
+only after the successful underlying collection; a subsequent Docker inspection
+confirmed its absence. No missing author result was reconstructed.
+
+The fixture assertion has been corrected to distinguish parent/title, author
+and reviewer roles. A local replay of the exact two saved request bodies accepts
+the valid parent/title requests; negative controls still reject an author lacking
+the original task and F lacking the unchanged review. This uses no native process
+or provider request. The full installed preflight was **not repeated**.
+
+[Safe failed-preflight receipt](preflight.json) retains stop, capture, accounting
+and private-evidence hashes. The original private requests, response, records,
+errors and cleanup receipts are preserved. This correction is not permission to
+clear the pause, resume the parent session or replace the attempt.
+
+## Results and accounting
+
+| Item | Current result |
 | --- | --- |
-| A / D0 | not_started / unavailable |
-| R / findings | not_started / unavailable |
-| F / final M / delta | not_started / unavailable |
-| Whole-chain scripted preflight | not_started |
-| False-review negative control | not_started |
-| Reviewer exact outgoing inventory | NOT RUN |
-| Independent D0/final assessment, raw 23 probes | NOT RUN |
-| delivery_apply / assessment_integrity / Q | unknown |
-| T / D | not evaluated: real path never started |
-| Overall real deadline | not started |
+| Real A / R / F | all not_started |
+| D0 / R response / delta / final M | unavailable |
+| Actual R inventory | NOT RUN |
+| Installed full-chain preflight | FAILED in A parent; R/F not_started |
+| Installed false-review negative control | NOT RUN |
+| State transfer / delivery patch application | NOT RUN |
+| Independent assessment / raw 23 probes / Q/T/D | NOT RUN / unknown |
+| Real common deadline | not started |
 
-## Preserved preparation
+One installed scripted attempt launched one parent session, zero author sessions
+and zero tools. Two local provider callback invocations occurred: one completed
+synthetic title response and one parent assertion failure. Synthetic known usage
+is 1 input + 1 output token; one scripted request has unknown usage. These numbers
+are **not Luna usage or monetary cost**. Elapsed time from the scripted deadline
+start to saved stop was 2795 ms, excluding earlier container/bootstrap preparation.
+Real provider calls, availability probes, real smokes and paid judges are zero.
+The earlier no-provider budget-check container remains separately accounted for.
+Developing-agent work is separate from these figures.
 
-The target branch was clean at f98a9612, matching its remote tracking branch.
-No ledger-review-delivery directory/state or matching active process was found;
-no existing pilot was resumed or duplicated. Origin and PR #25 were verified as
-Tah10n/opencode-harness, Draft, head `feat/native-task-workflow`, and base
-`feat/native-template-regression-workflow`. Docker and GitHub access worked after
-using the permitted execution context; initial sandbox denials were not treated
-as missing tools or authentication.
+Model-free checks pass for the exact two guard changes, host method acceptance
+of 3150000/3600000 ms and rejection beyond bounds, A/R/F/shared-deadline arithmetic,
+cancellation/unknown/capture-failure transition refusal, recorded-request replay
+and source identity of the reused transport. Syntax and final diff review are
+local evidence. Actual installed F greater than 30 minutes is NOT RUN; the relay's
+new limit is source-verified, not demonstrated by that failed fixture. No claim of
+CI, product quality, reviewer utility or whole-chain success is made.
 
-[Preparation hashes](preparation.json) bind the exact 1468-byte original task,
-saved environment and original baseline archive. The restored baseline matches
-the saved original tree. Separate author/reviewer bundles use the same f98a9612
-runtime, with only installation path mapping. Required `.gitignore` files exist
-before mounting. The reviewer per-run configuration denies everything except
-read/glob/grep and explicitly denies skill. This is prepared configuration,
-not evidence of the actual offered tool set. Author permissions remain separate.
-Private baseline, dependencies and bundles remain outside Git.
-
-An initial preparation command tried to exclusively create the author's existing
-`.gitignore` and stopped with EEXIST. The materializer already supplied the correct
-bytes. Preparation now verifies those bytes and creates the file only when absent;
-the same partial bundle and verified baseline were reused. [History](preparation-history.json)
-preserves this local error. No installed native preflight or provider attempt
-was repeated.
-
-The previous AR0/AR1 results, reviewer responses, control defects, skill caveat,
-costs and scores are unchanged. No implementation or reference was repaired.
-No change was made to lib/, prompts, collector, recorder, upstream evaluator,
-shared scheduler, relay, defaults or experimental status.
-
-## Accounting and limits
-
-Real requests: **0**. Scripted provider requests: **0**. Native conversations: **0**.
-Model input/output/cached/reasoning usage: no requests to account for; no monetary
-estimate. One neutral preparation container was created and removed. Development
-agent/tool work is separate from model-pilot accounting. There are no D0/final
-files to apply or assess; creating placeholder patches would misrepresent evidence.
-
-The saved-artifact verification checks source/bundle/config hashes, exact task and
-baseline custody, budget arithmetic, cleanup, absent stage starts and zero-request
-accounting. Syntax checks and one final scoped diff review cover the new preparation
-files. They do not establish state transfer, capture of an author delivery, patch
-application, exact reviewer inventory, negative-control behavior or product quality.
-The full controller/retention/platform matrices and product checks were not rerun.
-Local verification is not CI evidence. No next pilot or continuation is scheduled.
+Historical patches, the two completed reviewer runs, AR0 findings, missed defects,
+control flaws, scores and costs are unchanged. No runtime campaign or continuation
+is scheduled after the stop. Continuing requires explicit authorization for one
+corrected scripted preflight; only a successful preflight and committed exact
+freeze could admit the original single real A/R/F chain.

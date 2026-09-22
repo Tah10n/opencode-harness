@@ -79,6 +79,6 @@ export async function startContainer({source,toolchain,template,output,onRequest
   const inspected=spawnSync('docker',['inspect',name],{encoding:'utf8',timeout:5000});
   if(inspected.status!==0){close();throw Error('Container identity unavailable');}
   const identity=JSON.parse(inspected.stdout)[0];
-  session={name,relayPid,exec,close,output,preparedEnvironment,evidenceIdentity:Object.freeze({id:identity.Id,name,root:outputRoot,node:selectedNode}),setTaskBudget(milliseconds){if(!Number.isFinite(milliseconds)||milliseconds<=0||milliseconds>1800000)throw Error('Invalid relay task budget');send({type:'task-budget',milliseconds});}};
+  session={name,relayPid,exec,close,output,preparedEnvironment,evidenceIdentity:Object.freeze({id:identity.Id,name,root:outputRoot,node:selectedNode}),setTaskBudget(milliseconds){if(!Number.isFinite(milliseconds)||milliseconds<=0||milliseconds>3600000)throw Error('Invalid relay task budget');send({type:'task-budget',milliseconds});}};
   return session;
 }

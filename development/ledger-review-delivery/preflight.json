@@ -1,0 +1,51 @@
+{
+  "passed": false,
+  "phase": "scripted preflight A parent before harness_task",
+  "cause": "Fixture incorrectly required original task text in parent request. Native parent receives the harness command; the author gets original task via TASK.md.",
+  "admissionStop": {
+    "kind": "unknown_submission",
+    "slot": 1,
+    "error": "AssertionError"
+  },
+  "nativeParentSessions": 1,
+  "nativeAuthorSessions": 0,
+  "nativeTools": 0,
+  "scriptedRequests": 2,
+  "scriptedCompletedResponses": 1,
+  "scriptedRequestsWithoutUsage": 1,
+  "syntheticUsage": {
+    "input_tokens": 1,
+    "output_tokens": 1,
+    "total_tokens": 2
+  },
+  "realProviderRequests": 0,
+  "elapsedFromScriptedDeadlineMs": 2795,
+  "scriptedStages": {
+    "A": "incomplete",
+    "R": "not_started",
+    "F": "not_started"
+  },
+  "realStages": {
+    "A": "not_started",
+    "R": "not_started",
+    "F": "not_started"
+  },
+  "collectorEvidenceComplete": true,
+  "deliveryAssertion": "No delivered author worktree",
+  "schedulerCaptureSaved": false,
+  "capturedPatchBytes": 0,
+  "patchIsAuthorDelivery": false,
+  "containerRemoved": true,
+  "rawFailurePreserved": true,
+  "retryPerformed": false,
+  "postFailureCorrection": "Fixture distinguishes title/parent from author; recorded request replay passes; no native re-execution.",
+  "privateEvidenceHashes": {
+    "chain-result.json": "7287db9eefb2142eab67efa4edaf0d1166b4f2157639d27f434be40cafe2901b",
+    "attempt.json": "d3ffa1d7ef5011aadb26517ccb8d9d0dd833ab44747f610a082064a2c37ba2f5",
+    "A/runs/account-switch-ledger-A/provider-metadata.json": "f776707a646dc7c8775a7f52f349335871ff7c60de5f645f7c15058a1067950c",
+    "A/runs/account-switch-ledger-A/evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e",
+    "A/runs/account-switch-ledger-A/error.json": "8f377ba371958ed0c69995cdb16a72115851d37790d5e9ada0ac9ff91ec50d7d",
+    "A/runs/account-switch-ledger-A/native-evidence.json": "3e0e870cac50ba807ee9e15455ed28860908871903a9df205523c9ef99a03e1a",
+    "A/runs/account-switch-ledger-A/session/cleanup.json": "a1b289a69f5bd9c40924b5395e29df6870f9fab8b04e38f1cedc106eff144916"
+  }
+}
