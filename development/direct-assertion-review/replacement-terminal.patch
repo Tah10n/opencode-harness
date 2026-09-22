@@ -1,0 +1,52 @@
+diff --git a/draft.txt b/draft.txt
+index c922fa2103a28e319d3d27b01a2c4035be826857..f96cd797b8a2b9a3061840b11c4bdce185825f93 100644
+--- a/draft.txt
++++ b/draft.txt
+@@ -1 +1,2 @@
+-initial user draft
++staged user draft
++unstaged addition
+diff --git a/index.cjs b/index.cjs
+index 33100217256d108401f2490d4e882a154f7d911c..160e98ef07037b21aef41384c2905374e49e7050 100644
+--- a/index.cjs
++++ b/index.cjs
+@@ -1,5 +1,5 @@
+ exports.normalize = function (value) {
+   if (typeof value !== 'string') throw new TypeError('text required');
+   if (value.length > 32) throw new RangeError('text too long');
+-  return value.trim();
++  return value.trim().toLowerCase();
+ };
+diff --git a/mixed.test.cjs b/mixed.test.cjs
+index 696d6ee29ee2422eea9751322c31a3c22e8134f0..2425485a3faaa534ad64051f622fb10a0f24a59b 100644
+--- a/mixed.test.cjs
++++ b/mixed.test.cjs
+@@ -2,7 +2,7 @@ const {test} = require('node:test');
+ const assert = require('node:assert/strict');
+ const {normalize} = require('./index.cjs');
+ test('mixed public normalization contract', () => {
+-  assert.equal(normalize('  AbC  '), 'AbC');
++  assert.equal(normalize('  AbC  '), 'abc');
+   assert.equal(normalize('   '), '');
+   assert.equal(normalize('x'.repeat(32)), 'x'.repeat(32));
+   assert.throws(() => normalize(null), TypeError);
+diff --git a/notes.txt b/notes.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..8bb6f12bb436d9cdaf5d435b0a17206aabba1673
+--- /dev/null
++++ b/notes.txt
+@@ -0,0 +1 @@
++untracked user note
+diff --git a/policy.test.cjs b/policy.test.cjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..54b75860499ac20f62a1a05fadeeab61648d224a
+--- /dev/null
++++ b/policy.test.cjs
+@@ -0,0 +1,7 @@
++const {test} = require('node:test');
++const assert = require('node:assert/strict');
++const {normalize} = require('./index.cjs');
++test('changed policy through the existing one-argument caller', () => {
++  assert.equal(normalize('  MiXeD  '), 'mixed');
++  assert.equal(normalize('UPPER'), 'upper');
++});

@@ -44,6 +44,17 @@ expectations remain hypotheses derived from the task and existing contracts.
 This is an execution technique within normal project work, not a mandatory
 preparation phase. It is experimental and has not established a quality advantage.
 
+Direct's existing author instructions also require resolving a conflicting old
+assertion against the original task, preserved public API and actual input before
+adding a compatibility gate. Explicitly replaced expectations may be updated
+within existing write permissions; unaffected parts of mixed tests, negative
+cases and meaningful regressions must remain. The author checks disputed behavior
+through the same supported caller without invented metadata or flags, and leaves
+unsupported or ambiguous claims unresolved. The host does not classify assertions
+or grant repair authority from the author's explanation; failures and existing
+observation limits remain recorded. This adds no stage or tool. See the
+[installed scripted evidence and limits](../../development/direct-assertion-review/README.md).
+
 The author uses native repository-relative read/edit paths and an explicit
 `workdir: "."` for Bash at the project root. Native glob/grep may omit their
 directory. Native tools resolve the paths and enforce the existing permissions.

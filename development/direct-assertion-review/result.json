@@ -1,0 +1,569 @@
+{
+  "installed": "1.18.26",
+  "network": "none; loopback scripted provider",
+  "realProviderCalls": 0,
+  "scriptedAuthor": true,
+  "authorSessions": 2,
+  "results": [
+    {
+      "mode": "replacement",
+      "installed": {
+        "native-task-workflow.mjs": "e7acceec0c5716e713f29a6d2daf44f3d573d716bae7e2cb87446fce83603a18",
+        "native-task-plugin.mjs": "b36b42d827454ee8121eb08c075699107259b33836b8285374b5bef02ee57740",
+        "native-task-observations.mjs": "31c5338a74cb958fe2a0532dbc81a8822084aadb8068aca44405c6bc92a42eae"
+      },
+      "requests": 16,
+      "authorRequests": 13,
+      "requestEvidence": [
+        {
+          "request": 3,
+          "authorStep": 0,
+          "sha256": "90e069857173b2a9fe44d84437008b633ea8387e9b1b5f3fe478c2ec065739b9",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "oldFailureReceived": false,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        },
+        {
+          "request": 4,
+          "authorStep": 1,
+          "sha256": "fe8172287d8ac53874eb180b02bc0066123ef849bebd607aad976be6374fd359",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "d79a08c932ba8d03866dd3fd5dd55aecb2fbd84493fd21c621bcb3d57905437b",
+          "oldFailureReceived": false,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        },
+        {
+          "request": 5,
+          "authorStep": 2,
+          "sha256": "792a88196369dc63f988332cbbf9b14dc0e66f68fa609f58df3e10d5c6f75724",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "b36a9f4271febde304031ee74f0b4ea600e2b1189a48dc9dfd7b066306f9ecb1",
+          "oldFailureReceived": false,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        },
+        {
+          "request": 6,
+          "authorStep": 3,
+          "sha256": "75cc4fbf5fffcb1b6093549ba1893b1b2dae0a00e0522c178b9d5d0943ad957e",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "6175fa1ea98cad28b2548453a64b8f20beeec35068124fb22cd359e98c10dc0a",
+          "oldFailureReceived": true,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        },
+        {
+          "request": 7,
+          "authorStep": 4,
+          "sha256": "348071c56ff872044c0c1a945cda563a7364909e5820bc7fa1fdee2132a7df33",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "6f2abcaf1779563879dfe935fce006aefd56c3c22844a497442908327e9ae9bc",
+          "oldFailureReceived": false,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        },
+        {
+          "request": 8,
+          "authorStep": 5,
+          "sha256": "71a87f88c68725ceacba69e8c4018e20870a2b0b8815cbe1b1bc73b199ecfa22",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "4e2e2228923af186dfc3f98636378acee57dd541d43e56f26337967efbffb3cf",
+          "oldFailureReceived": false,
+          "gateDiffReceived": true,
+          "ungatedCallerFailureReceived": false
+        },
+        {
+          "request": 9,
+          "authorStep": 6,
+          "sha256": "0a78087b94798d2ef355a0e62ef200164cb4339416f5a35a9d5e799f51fce55f",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "987e23bd9ddd7a528eaff9cc59721518985ee91cb548255afc8faacfe975439b",
+          "oldFailureReceived": false,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": true
+        },
+        {
+          "request": 10,
+          "authorStep": 7,
+          "sha256": "b7c69be6332b2f62d7e0a058d89cbe850bc9bd6bb62ca4f6bf26ec5fa75d41eb",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "951e24670fa2400900c245773b32a47a620030dfa9681bce124ca65958fd98d9",
+          "oldFailureReceived": false,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        },
+        {
+          "request": 11,
+          "authorStep": 8,
+          "sha256": "be2750f479f370c71fdfe2891ddd8fc19f3031010858466e4bd4ec7122902bc6",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "0bdc6e88388511a7214346c680618a1f15a7272db29f6a793cd575f886a74b82",
+          "oldFailureReceived": false,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        },
+        {
+          "request": 12,
+          "authorStep": 9,
+          "sha256": "fe7b1ca1f27b235b7bbe1b7e23af19479c1053c41166539b8f1f24bbcec8c884",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "926f18ca591c4b01e3d61f0297b6130ddc950489fe3254e70ef2098fa12197d5",
+          "oldFailureReceived": false,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        },
+        {
+          "request": 13,
+          "authorStep": 10,
+          "sha256": "55b96255bc7ed696490988915490a76fbb4b358ecf150fe7b17ccf767b554e36",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "f3e62620f75ef00029550a598f1c30489eaf395a565a8c77969e2b61abde2d2e",
+          "oldFailureReceived": false,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        },
+        {
+          "request": 14,
+          "authorStep": 11,
+          "sha256": "6d08324b39b432cc83f5243a24c00317bbc1d562f7c1b6e7e55e1a42a212565d",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "73f73f54b668376661e8e6b914e1cc3d200cf36e4895035a246dfa0b6df7ca80",
+          "oldFailureReceived": false,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        },
+        {
+          "request": 15,
+          "authorStep": 12,
+          "sha256": "8540e296614a77c38b9e5cd26c9bf72a8d299fac39e4c65ed4b5fcb911358ef8",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "011919ca2694d14dcfbcc8e75e626226af682a51edf71f511c7367e567785619",
+          "oldFailureReceived": false,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        }
+      ],
+      "instruction": {
+        "words": 204,
+        "bytes": 1505,
+        "sha256": "652c7ca74dab68f5e8898b8eb0e1d7bb33704e58f36acbb412806fae87b1e3f3"
+      },
+      "status": "incomplete",
+      "remaining": [],
+      "limits": [
+        "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified.",
+        "Command execution observed: node --test policy.test.cjs; completed_exit_0; internal runner results not interpreted by a supported adapter."
+      ],
+      "stages": [
+        {
+          "label": "implementation",
+          "role": "author",
+          "elapsedMs": 6550,
+          "messageID": "msg_0c82845310014NkW6Zgeicj6kr"
+        }
+      ],
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "checks": [
+        {
+          "command": "node --test",
+          "exit": 1,
+          "durationMs": 356
+        },
+        {
+          "command": "git diff -- index.cjs mixed.test.cjs",
+          "exit": 0,
+          "durationMs": 183
+        },
+        {
+          "command": "node -e \"require('node:assert/strict').equal(require('./index.cjs').normalize('  AbC  '), 'abc')\"",
+          "exit": 1,
+          "durationMs": 159
+        },
+        {
+          "command": "node --test policy.test.cjs",
+          "exit": 0,
+          "durationMs": 156
+        },
+        {
+          "command": "node --test mixed.test.cjs",
+          "exit": 0,
+          "durationMs": 104
+        },
+        {
+          "command": "node --test",
+          "exit": 0,
+          "durationMs": 143
+        }
+      ],
+      "portable": {
+        "exit": 0,
+        "independentExit": 0,
+        "patchSha256": "a2e06d53fe19bb32f7a351822ecbd9bc708406e024790f10c0a6984b128155b4",
+        "inventory": [
+          {
+            "path": "check.sh",
+            "sha256": "ebe461f21540cdac25956e346af876b9cfe0eabfabcb870e5ae7b5a0f413d310",
+            "mode": 493
+          },
+          {
+            "path": "draft.txt",
+            "sha256": "f3d08f8a14da7d3dc89c2a494ac7d3b599818f6706538877ad8dff23c709c39f",
+            "mode": 420
+          },
+          {
+            "path": "index.cjs",
+            "sha256": "428ea83d010d2872e5bbdb02c9d8503e28746726131ed39b481cdfdcada3a600",
+            "mode": 420
+          },
+          {
+            "path": "mixed.test.cjs",
+            "sha256": "c6175d3e1ead8174aa4f882f8ba8aeb6b9b68b7041226df07eab37510d44f24c",
+            "mode": 420
+          },
+          {
+            "path": "notes.txt",
+            "sha256": "517b30227cd6c29d3aed4831656969624fa4724bdd4de1ab65d687821eac60a4",
+            "mode": 420
+          },
+          {
+            "path": "opencode.json",
+            "sha256": "66333f15863df1760ff0dbbe1eccf9162cbfd8f7c4a3d32d9abe4854e85060ba",
+            "mode": 420
+          },
+          {
+            "path": "package.json",
+            "sha256": "6ee1bd2de15c0bddea1afbd1b863556529ccb579762734ae4384af7672854598",
+            "mode": 420
+          },
+          {
+            "path": "policy.test.cjs",
+            "sha256": "dbe99165c328ef5c6aa2cb5d3c54ffe3c6cc1108b9725c38fea3a57440725ee3",
+            "mode": 420
+          }
+        ]
+      },
+      "originalCheckoutAndIndexUnchanged": true,
+      "durationMs": 13042,
+      "serverTerminated": true,
+      "nativeEvents": {
+        "count": 12,
+        "sha256": "bde3063ab9e91668934bad11aed12aa37d8f22d1ef6ebab15046f45db461a32a"
+      }
+    },
+    {
+      "mode": "preserved",
+      "installed": {
+        "native-task-workflow.mjs": "e7acceec0c5716e713f29a6d2daf44f3d573d716bae7e2cb87446fce83603a18",
+        "native-task-plugin.mjs": "b36b42d827454ee8121eb08c075699107259b33836b8285374b5bef02ee57740",
+        "native-task-observations.mjs": "31c5338a74cb958fe2a0532dbc81a8822084aadb8068aca44405c6bc92a42eae"
+      },
+      "requests": 10,
+      "authorRequests": 7,
+      "requestEvidence": [
+        {
+          "request": 3,
+          "authorStep": 0,
+          "sha256": "7167912f7d84283de1899e66d4e829240bd29c61964d7c43af597246b9aeb008",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "oldFailureReceived": false,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        },
+        {
+          "request": 4,
+          "authorStep": 1,
+          "sha256": "e632fc9e92581917df520bf76d1c78038060c27cf19ed10ac6971768e4665fd4",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "98a1b34abcc19194e893e05f838e23f1d59387785676ea73fc938d1e14e362cf",
+          "oldFailureReceived": false,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        },
+        {
+          "request": 5,
+          "authorStep": 2,
+          "sha256": "02d4b1842a92b82d99c32fa9ba3b4ca239fa85f3a4ed79603bcec0d7f4590d61",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "b36a9f4271febde304031ee74f0b4ea600e2b1189a48dc9dfd7b066306f9ecb1",
+          "oldFailureReceived": false,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        },
+        {
+          "request": 6,
+          "authorStep": 3,
+          "sha256": "14906e1862f810e905bc7e6ec555e9e2c490938c92a5352c3fbad369fb113c41",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "dd33aef4ed910d1eca8fe36c9288f14ee10255447aa16fbe44859988533f7c9f",
+          "oldFailureReceived": true,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        },
+        {
+          "request": 7,
+          "authorStep": 4,
+          "sha256": "3a33ded513a0789afc6d728606ecae8fdd9d3999008e8d11b3a33b0cfd638472",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "2940c2f5603dc9c8d62fa52b55ddb700806bed2904791fdd00cf0d63d44377fe",
+          "oldFailureReceived": false,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        },
+        {
+          "request": 8,
+          "authorStep": 5,
+          "sha256": "79d498e8a7134ac1f9126bf97f20e48dd5f4c7d3077343f0e4bca1e19b55e0e7",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "1dcb963cbd007e2d94e5af1a6fda97612fbf9368ee2a4a9b6363fa480722a7c7",
+          "oldFailureReceived": false,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        },
+        {
+          "request": 9,
+          "authorStep": 6,
+          "sha256": "6cf698ddc4f335cbd351b5801612d918ba2d989b07f9c4c7424eb2617d84e67b",
+          "fullTask": true,
+          "fullInstruction": true,
+          "lastToolSha256": "aed8bc94b46916774f0f7d27997daf3f6b99518d08b8011e71be52e4ccd09b01",
+          "oldFailureReceived": false,
+          "gateDiffReceived": false,
+          "ungatedCallerFailureReceived": false
+        }
+      ],
+      "instruction": {
+        "words": 204,
+        "bytes": 1505,
+        "sha256": "652c7ca74dab68f5e8898b8eb0e1d7bb33704e58f36acbb412806fae87b1e3f3"
+      },
+      "status": "checks_passed",
+      "remaining": [],
+      "limits": [],
+      "stages": [
+        {
+          "label": "implementation",
+          "role": "author",
+          "elapsedMs": 1668,
+          "messageID": "msg_0c8285f27001YL6H6vZKKeXSGL"
+        }
+      ],
+      "repairs": 0,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "queuedTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "checks": [
+        {
+          "command": "node --test",
+          "exit": 1,
+          "durationMs": 178
+        },
+        {
+          "command": "git diff -- index.cjs mixed.test.cjs",
+          "exit": 0,
+          "durationMs": 53
+        },
+        {
+          "command": "node --test",
+          "exit": 0,
+          "durationMs": 94
+        }
+      ],
+      "portable": {
+        "exit": 0,
+        "independentExit": 0,
+        "patchSha256": "ad3cde846f99e377976ac8f33a987f12a66959d6c252cdb337ce693f3ca02197",
+        "inventory": [
+          {
+            "path": "check.sh",
+            "sha256": "ebe461f21540cdac25956e346af876b9cfe0eabfabcb870e5ae7b5a0f413d310",
+            "mode": 493
+          },
+          {
+            "path": "draft.txt",
+            "sha256": "f3d08f8a14da7d3dc89c2a494ac7d3b599818f6706538877ad8dff23c709c39f",
+            "mode": 420
+          },
+          {
+            "path": "index.cjs",
+            "sha256": "c01db36d648ba5c7baa2e07eb4877165e1c60a4d1b0638c72158ceae35d723fe",
+            "mode": 420
+          },
+          {
+            "path": "mixed.test.cjs",
+            "sha256": "8dc18fb5c093b3562d862c75e5bccf600eb1d191f03dab5afe463397ac613396",
+            "mode": 420
+          },
+          {
+            "path": "notes.txt",
+            "sha256": "517b30227cd6c29d3aed4831656969624fa4724bdd4de1ab65d687821eac60a4",
+            "mode": 420
+          },
+          {
+            "path": "opencode.json",
+            "sha256": "66333f15863df1760ff0dbbe1eccf9162cbfd8f7c4a3d32d9abe4854e85060ba",
+            "mode": 420
+          },
+          {
+            "path": "package.json",
+            "sha256": "6ee1bd2de15c0bddea1afbd1b863556529ccb579762734ae4384af7672854598",
+            "mode": 420
+          }
+        ]
+      },
+      "originalCheckoutAndIndexUnchanged": true,
+      "durationMs": 6522,
+      "serverTerminated": true,
+      "nativeEvents": {
+        "count": 6,
+        "sha256": "bf890d7f67f2001afaee9aca871d508f7c6f031c3a6cd0c5345e206282044aaf"
+      }
+    }
+  ],
+  "retention": {
+    "version": 1,
+    "runID": "direct-assertion-1790064419875",
+    "containerID": "a7533559d71a0dcbb1691dcf561d1f4f6aaf82aa4e4c264609984eca4f977a9f",
+    "sourceRoot": "/work/data/opencode/tool-output",
+    "sourceKind": "native combined tool output",
+    "limits": {
+      "fileBytes": 67108864,
+      "totalBytes": 268435456,
+      "files": 128,
+      "exportMs": 30000
+    },
+    "files": [],
+    "errors": [],
+    "evidenceComplete": true,
+    "elapsedMs": 75,
+    "bytes": 0
+  },
+  "checks": [
+    {
+      "entry": "development/direct-assertion-review/verify.mjs",
+      "exit": 0,
+      "signal": null,
+      "durationMs": 187,
+      "log": "verify.mjs.log"
+    },
+    {
+      "entry": "scripts/verify-native-task.mjs",
+      "exit": 0,
+      "signal": null,
+      "durationMs": 42735,
+      "log": "verify-native-task.mjs.log"
+    },
+    {
+      "entry": "scripts/verify-native-template.mjs",
+      "exit": 0,
+      "signal": null,
+      "durationMs": 157,
+      "log": "verify-native-template.mjs.log"
+    },
+    {
+      "entry": "scripts/verify-native-review.mjs",
+      "exit": 0,
+      "signal": null,
+      "durationMs": 735,
+      "log": "verify-native-review.mjs.log"
+    }
+  ],
+  "durationMs": 19860,
+  "sourceRemoved": true,
+  "sourceBase": "ca72c444b06b3be096cfa22aa6a82968e807a994",
+  "scope": "Predetermined local scripted integration; no autonomous model-quality result.",
+  "preparationFailures": [
+    {
+      "container": "direct-assertion-1790064373630",
+      "exit": 125,
+      "cause": "Nested dependency mountpoint absent in read-only tracked source export; fixed only directory preparation.",
+      "openCodeStarted": false,
+      "scriptedRequests": 0,
+      "containerRemoved": true,
+      "exportRemoved": true
+    }
+  ],
+  "accounting": {
+    "scriptedRequests": 26,
+    "authorRequests": 20,
+    "parentRequests": 4,
+    "titleRequests": 2,
+    "lunaTaskRuns": 0,
+    "realProviderCalls": 0,
+    "availabilityProbes": 0,
+    "paidReviews": 0,
+    "benchmarks": 0,
+    "scriptedModelTokens": null,
+    "scriptedUsageNote": "No model inference; local scripted responder emits no token-usage claims.",
+    "developingAgentUsage": "Separate from scripted requests and historical Luna; token and billing totals unavailable."
+  },
+  "privateCaptureHashes": {
+    "preserved-events.json": "bf890d7f67f2001afaee9aca871d508f7c6f031c3a6cd0c5345e206282044aaf",
+    "preserved-portable.txt": "e2c38745d8d98f48e7d5a7d6dde5fb4bb0a729912c7cc5a3a8f673a93a742b67",
+    "preserved-request-1.json": "e115f4e99fea8b888c29cd32de414e1fb4df2f0949bb0ecb7e23847252c17379",
+    "preserved-request-10.json": "519482b1ed84621db7807a19bb63ed8d16b9901aa41f905abb84e1536874b07f",
+    "preserved-request-2.json": "f3ff093acf25a11b983bf637fc883198ce2893a77284185c8eb07e0cb6b89f59",
+    "preserved-request-3.json": "7167912f7d84283de1899e66d4e829240bd29c61964d7c43af597246b9aeb008",
+    "preserved-request-4.json": "e632fc9e92581917df520bf76d1c78038060c27cf19ed10ac6971768e4665fd4",
+    "preserved-request-5.json": "02d4b1842a92b82d99c32fa9ba3b4ca239fa85f3a4ed79603bcec0d7f4590d61",
+    "preserved-request-6.json": "14906e1862f810e905bc7e6ec555e9e2c490938c92a5352c3fbad369fb113c41",
+    "preserved-request-7.json": "3a33ded513a0789afc6d728606ecae8fdd9d3999008e8d11b3a33b0cfd638472",
+    "preserved-request-8.json": "79d498e8a7134ac1f9126bf97f20e48dd5f4c7d3077343f0e4bca1e19b55e0e7",
+    "preserved-request-9.json": "6cf698ddc4f335cbd351b5801612d918ba2d989b07f9c4c7424eb2617d84e67b",
+    "preserved-result.json": "225d65b11d8fb6be380c5c2dc6ce6e52376a3dd32ce27ea324e92cfb04fb5c55",
+    "replacement-events.json": "bde3063ab9e91668934bad11aed12aa37d8f22d1ef6ebab15046f45db461a32a",
+    "replacement-portable.txt": "c1dbe6cb9e1dc7820838516619878b2d767db28fa8d9d20e0ff0d435d8a81cf4",
+    "replacement-request-1.json": "e115f4e99fea8b888c29cd32de414e1fb4df2f0949bb0ecb7e23847252c17379",
+    "replacement-request-10.json": "b7c69be6332b2f62d7e0a058d89cbe850bc9bd6bb62ca4f6bf26ec5fa75d41eb",
+    "replacement-request-11.json": "be2750f479f370c71fdfe2891ddd8fc19f3031010858466e4bd4ec7122902bc6",
+    "replacement-request-12.json": "fe7b1ca1f27b235b7bbe1b7e23af19479c1053c41166539b8f1f24bbcec8c884",
+    "replacement-request-13.json": "55b96255bc7ed696490988915490a76fbb4b358ecf150fe7b17ccf767b554e36",
+    "replacement-request-14.json": "6d08324b39b432cc83f5243a24c00317bbc1d562f7c1b6e7e55e1a42a212565d",
+    "replacement-request-15.json": "8540e296614a77c38b9e5cd26c9bf72a8d299fac39e4c65ed4b5fcb911358ef8",
+    "replacement-request-16.json": "ee0c43fd6e93a782f93f9db4f1b84673a19e1da29264509f2dbdea04128c5ec4",
+    "replacement-request-2.json": "097d0628afa2535987ead945cfedbe738801191f9ec1f18a2503f1039a4931f0",
+    "replacement-request-3.json": "90e069857173b2a9fe44d84437008b633ea8387e9b1b5f3fe478c2ec065739b9",
+    "replacement-request-4.json": "fe8172287d8ac53874eb180b02bc0066123ef849bebd607aad976be6374fd359",
+    "replacement-request-5.json": "792a88196369dc63f988332cbbf9b14dc0e66f68fa609f58df3e10d5c6f75724",
+    "replacement-request-6.json": "75cc4fbf5fffcb1b6093549ba1893b1b2dae0a00e0522c178b9d5d0943ad957e",
+    "replacement-request-7.json": "348071c56ff872044c0c1a945cda563a7364909e5820bc7fa1fdee2132a7df33",
+    "replacement-request-8.json": "71a87f88c68725ceacba69e8c4018e20870a2b0b8815cbe1b1bc73b199ecfa22",
+    "replacement-request-9.json": "0a78087b94798d2ef355a0e62ef200164cb4339416f5a35a9d5e799f51fce55f",
+    "replacement-result.json": "ea189b88ece3533a42ebd0cdb633bdcefe5bfcc7bfc33e53df66fd2d4abd180f"
+  }
+}
