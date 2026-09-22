@@ -67,3 +67,15 @@ mount. Runtime and permissions were not changed. No second preflight was run.
 Both real slots remain not_started; a real-execution freeze was never admitted.
 The initial snapshot/capture failure and recovery are retained separately.
 This is a preparation blocker, not evidence about reviewer utility.
+
+## Authorized continuation after preparation failure
+
+The user subsequently requested the fix after the explicit continuation question.
+One corrected preflight is authorized, followed on success by the original two
+real slots and one additional publication. The failed preflight and its closure
+remain historical and are never resumed. A separate corrected bundle adds only
+OpenCode's initialization `.gitignore`; no prompt/runtime/permission changes.
+The corrected preflight passed with one native session, three scripted requests,
+one read, full task/base/tracked-untracked snapshot, complete raw recording and
+verified unchanged state/cleanup. Both real slots are still not_started at freeze.
+The original decision criteria, 600-second budgets and no-retry rule remain.

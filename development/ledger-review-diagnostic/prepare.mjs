@@ -33,6 +33,7 @@ const bundle=root+'/bundle';execFileSync(process.execPath,['scripts/profile-mate
 const c=get(bundle+'/opencode.json'),originalURL=Buffer.from('file://'+bundle+'/review-context.mjs').toString('base64');assert.ok(c.command['harness-review'].template.includes(originalURL));
 c.instructions=['/template/core.md'];c.command['harness-review'].template=c.command['harness-review'].template.replace(originalURL,Buffer.from('file:///template/review-context.mjs').toString('base64'));fs.writeFileSync(bundle+'/opencode.json',JSON.stringify(c,null,2)+'\n');
 for(const n of ['node_modules','package.json','package-lock.json','rg'])fs.cpSync(prior.dependencies+'/'+n,bundle+'/'+n,{recursive:true,verbatimSymlinks:true});
+fs.writeFileSync(bundle+'/.gitignore','node_modules\npackage.json\npackage-lock.json\n',{flag:'wx'});
 const config=structuredClone(prior.config);config.permission.webfetch='deny';
 const prepared={version:1,experimentKind:'ledger-review-diagnostic',runtimeSha:'ab7e6e1d153b996c577d96708c1e1fb84f57cbd3',image:prior.image,model:prior.model,variant:prior.variant,budgetMs:600000,strategy:'diagnostic-review',preflightPassed:false,streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,toolchain:prior.toolchain,template:bundle,config,attempts:assignments.map(({slot,task,arm,project,source})=>({slot,task,arm,project,source})),inputManifests,runtimeManifests:{[bundle]:manifest(bundle)},files:{}};
 save(root+'/prepared.json',prepared);

@@ -1,0 +1,7 @@
+// Explicitly authorized correction; preserve original inputs, bundle and failed preflight.
+import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {createHash} from 'node:crypto';import {manifest} from '../native-task-integrated/run.mjs';
+const root=path.resolve('local/ledger-review-diagnostic'),f=JSON.parse(fs.readFileSync(root+'/prepared.json'));const previous=f.template,next=root+'/bundle-corrected';
+assert.deepEqual(manifest(previous),f.runtimeManifests[previous]);assert.ok(!fs.existsSync(next));fs.cpSync(previous,next,{recursive:true,verbatimSymlinks:true});fs.writeFileSync(next+'/.gitignore','node_modules\npackage.json\npackage-lock.json\n',{flag:'wx'});
+const before=manifest(previous),after=manifest(next);assert.deepEqual(Object.keys(after).filter(k=>JSON.stringify(before[k])!==JSON.stringify(after[k])),['.gitignore']);
+f.template=next;f.runtimeManifests={[next]:after};fs.writeFileSync(root+'/prepared-corrected.json',JSON.stringify(f,null,2)+'\n',{flag:'wx',mode:0o600});
+fs.writeFileSync('development/ledger-review-diagnostic/preparation-correction.json',JSON.stringify({originalPreflightPreserved:true,correction:'Pre-create OpenCode initialization .gitignore before read-only mount',changedBundleFiles:['.gitignore'],originalBundleSha256:createHash('sha256').update(JSON.stringify(before)).digest('hex'),correctedBundleSha256:createHash('sha256').update(JSON.stringify(after)).digest('hex'),candidatesChanged:false,reviewerChanged:false,realProviderRequests:0},null,2)+'\n',{flag:'wx'});

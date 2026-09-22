@@ -1,12 +1,12 @@
 // One neutral scripted native session, using the identical review command adapter.
 import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {execFileSync,spawnSync} from 'node:child_process';import {createHash} from 'node:crypto';
 import {manifest} from '../native-task-integrated/run.mjs';import {run} from './run.mjs';
-const root=path.resolve('local/ledger-review-diagnostic/preflight'),get=p=>JSON.parse(fs.readFileSync(p)),hash=b=>createHash('sha256').update(b).digest('hex');fs.mkdirSync(root,{mode:0o700});
+const root=path.resolve('local/ledger-review-diagnostic/preflight-corrected'),get=p=>JSON.parse(fs.readFileSync(p)),hash=b=>createHash('sha256').update(b).digest('hex');fs.mkdirSync(root,{mode:0o700});
 const source=root+'/input';fs.mkdirSync(source);const git=(...args)=>execFileSync('git',args,{cwd:source});
 fs.writeFileSync(source+'/index.cjs','exports.double = value => value * 2;\n');git('init','-q');git('add','.');git('-c','user.name=Fixture','-c','user.email=fixture@localhost','commit','-qm','Baseline');git('reflog','expire','--expire=all','--all');
 fs.writeFileSync(source+'/index.cjs','exports.double = value => value * 3;\n');fs.writeFileSync(source+'/added.txt','NEUTRAL_UNTRACKED_SENTINEL\n');fs.appendFileSync(source+'/.git/info/exclude','\n/TASK.md\n');
 const task='Review the change to double(value): multiply all numeric inputs by three, retaining the public function name. NEUTRAL_ORIGINAL_TASK_SENTINEL';fs.writeFileSync(source+'/TASK.md',task);
-const f=get('local/ledger-review-diagnostic/prepared.json');Object.assign(f,{experimentKind:'ledger-review-diagnostic-preflight',preflightPassed:true,attempts:[{slot:1,task:'neutral-review',arm:'candidate-A',project:'local/neutral-review',source}],inputManifests:{'neutral-review-candidate-A':manifest(source)}});fs.writeFileSync(root+'/freeze.json',JSON.stringify(f,null,2));
+const f=get('local/ledger-review-diagnostic/prepared-corrected.json');Object.assign(f,{experimentKind:'ledger-review-diagnostic-preflight',preflightPassed:true,attempts:[{slot:1,task:'neutral-review',arm:'candidate-A',project:'local/neutral-review',source}],inputManifests:{'neutral-review-candidate-A':manifest(source)}});fs.writeFileSync(root+'/freeze.json',JSON.stringify(f,null,2));
 let seq=0,work=0;const sent=[],errors=[];const started=Date.now();
 try{
  const outcome=await run(root,{readAuth:()=>({access:'scripted-not-a-credential',accountId:'local'}),fetchImpl:async(url,options)=>{
