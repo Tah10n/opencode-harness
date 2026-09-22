@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "scope": "saved preparation only",
+  "budgetArithmetic": true,
+  "sourceHashes": true,
+  "bundleConfigHashes": true,
+  "taskAndBaselineCustody": true,
+  "savedCleanupVerified": true,
+  "realAndScriptedRequests": 0,
+  "stageStarts": 0,
+  "stateTransfer": "NOT RUN",
+  "patchApplication": "NOT RUN",
+  "actualReviewerInventory": "NOT RUN",
+  "fullChainPreflight": "NOT RUN",
+  "assessment": "NOT RUN"
+}

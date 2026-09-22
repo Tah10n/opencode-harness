@@ -1,0 +1,23 @@
+{
+  "status": "preparation_blocked",
+  "reason": "existing_transport_budget_ceiling",
+  "realProviderRequests": 0,
+  "scriptedProviderRequests": 0,
+  "nativeSessions": 0,
+  "deadlineStarted": false,
+  "stages": {
+    "A": "not_started",
+    "R": "not_started",
+    "F": "not_started"
+  },
+  "delivery_apply": null,
+  "assessment_integrity": null,
+  "contract_results": null,
+  "Q": null,
+  "T": null,
+  "D": null,
+  "assessmentStatus": "not_run",
+  "dispatchAdmitted": false,
+  "freezeCommit": null,
+  "continuationAuthorized": false
+}

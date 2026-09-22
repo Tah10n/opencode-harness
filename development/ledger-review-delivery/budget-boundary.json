@@ -1,0 +1,34 @@
+{
+  "kind": "pre-native-budget-boundary",
+  "realProviderRequests": 0,
+  "nativeSessions": 0,
+  "scriptedProviderRequests": 0,
+  "originalTaskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+  "sourceFiles": {
+    "development/native-task-integrated/container-session.mjs": "60b2d069bd284868da431e17c85852b2c1c8753951aedef7ad3a69f9f1c71e72",
+    "development/native-task-integrated/container-relay.mjs": "db186a20946348867504c48d7faca8f40a93fdfa122e1102f581e8cf5377f1b3",
+    "lib/native-task-plugin.mjs": "b36b42d827454ee8121eb08c075699107259b33836b8285374b5bef02ee57740"
+  },
+  "fullChainPreflight": "not_started",
+  "deadlineStarted": false,
+  "stages": {
+    "A": "not_started",
+    "R": "not_started",
+    "F": "not_started"
+  },
+  "openCodeVersion": "1.18.26",
+  "example": {
+    "totalMs": 3600000,
+    "elapsedMs": 450000,
+    "remainingFMs": 3150000
+  },
+  "error": {
+    "name": "Error",
+    "message": "Invalid relay task budget"
+  },
+  "result": "confirmed_budget_boundary",
+  "cleanupStatus": 0,
+  "containerAbsent": true,
+  "observedRelayRequests": 0,
+  "finishedAt": "2026-09-22T12:36:31.455Z"
+}
