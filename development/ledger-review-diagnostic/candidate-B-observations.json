@@ -1,0 +1,65 @@
+{
+  "arm": "candidate-B",
+  "observations": [
+    {
+      "finding": "B1",
+      "kind": "malformed",
+      "directPreflightRejected": false,
+      "entryPoint": "CLI source add --agent antigravity --name Review fixture",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Vibe Racing: A nonempty custom Vibe Racing state directory requires a valid marker\n",
+      "sourcesCreated": false
+    },
+    {
+      "finding": "B1",
+      "kind": "invalid-source-id",
+      "directPreflightRejected": false,
+      "entryPoint": "CLI source add --agent antigravity --name Review fixture",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Vibe Racing: A nonempty custom Vibe Racing state directory requires a valid marker\n",
+      "sourcesCreated": false
+    },
+    {
+      "finding": "B1",
+      "kind": "invalid-sequence",
+      "directPreflightRejected": false,
+      "entryPoint": "CLI source add --agent antigravity --name Review fixture",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Vibe Racing: A nonempty custom Vibe Racing state directory requires a valid marker\n",
+      "sourcesCreated": false
+    },
+    {
+      "finding": "B3",
+      "entryPoint": "baseline collect -> JSON reload -> current public antigravity collect",
+      "before": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-10",
+          "22"
+        ]
+      ],
+      "expectedTotals": [
+        [
+          "2026-08-10",
+          "22"
+        ]
+      ],
+      "expectedCompleteness": "partial",
+      "completeness": "complete",
+      "diagnostics": [],
+      "legacyStateShape": [
+        "files",
+        "parserVersion"
+      ],
+      "limits": "Historical state has per-day totals and ID/date index, not exact per-ID tuples; proposed retroactive tuple recovery is not established"
+    }
+  ]
+}
