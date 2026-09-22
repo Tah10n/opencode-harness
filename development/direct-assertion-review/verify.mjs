@@ -26,13 +26,12 @@ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'direct-assertion-'));
 try {
   const direct=await promptsFor(runWorkflow,'direct'), d=await promptsFor(runWorkflow,'D'), cf=await promptsFor(runWorkflow,'check-first');
   assert.equal(direct.prompts.length,1);assert.equal(d.prompts.length,1);assert.equal(cf.prompts.length,2);
-  const block=direct.prompts[0].slice(direct.prompts[0].indexOf('During self-review,'),direct.prompts[0].indexOf('\nOriginal task:'));
-  assert.ok(block.split(/\s+/).length<=220);
-  assert.equal(direct.prompts[0].replace('\n'+block,''),d.prompts[0]);
-  // Frozen pre-change prompt bytes: no accidental text changes to D/check-first.
+  assert.deepEqual(direct.prompts,d.prompts);
+  assert.ok(!direct.prompts[0].includes('During self-review,'));
+  // AR0 direct was byte-identical to D; preserve both original hashes and check-first.
   const expected=JSON.parse(fs.readFileSync(new URL('./prior-prompts.json',import.meta.url)));
+  assert.deepEqual([direct,cf].map(v=>v.prompts.map(hash)),expected);
   assert.deepEqual([d,cf].map(v=>v.prompts.map(hash)),expected);
-  for(const phrase of ['Preserved contract: fix implementation','Explicitly replaced behavior','Wrong setup','Ambiguous requirements','same supported public caller','without adding metadata or flags','Do not delete mixed tests','Respect test-write permissions'])assert.ok(block.includes(phrase));
   for(const stop of ['cancel','denial','deadline']) {
     const {prompts,result}=await promptsFor(runWorkflow,'direct',stop);
     assert.equal(prompts.length,1);assert.equal(result.stages.length,1);assert.equal(result.repairs,0);
@@ -45,7 +44,7 @@ try {
       assert.deepEqual(fs.readFileSync(bundle+'/native-task-workflow.mjs'),fs.readFileSync(root+'/lib/native-task-workflow.mjs'));
       const installed=await import(pathToFileURL(bundle+'/native-task-workflow.mjs'));
       assert.deepEqual((await promptsFor(installed.runWorkflow,'direct')).prompts,direct.prompts);
-    }else for(const f of fs.readdirSync(bundle))assert.ok(!fs.readFileSync(bundle+'/'+f,'utf8').includes(block));
+    }else for(const f of fs.readdirSync(bundle))assert.ok(!fs.readFileSync(bundle+'/'+f,'utf8').includes('During self-review,'));
   }
   const controls=[];
   for(const [name,source,replaced,want] of [
@@ -59,5 +58,5 @@ try {
     controls.push({name,acceptanceExit:r.status});
   }
   assert.equal(mixed.replace(oldAssertion,newAssertion).replace(newAssertion,oldAssertion),mixed);
-  console.log(JSON.stringify({passed:true,prompt:{words:block.split(/\s+/).length,bytes:Buffer.byteLength(block),sha256:hash(block)},stages:{direct:1,D:1,checkFirst:2},nonTargetBytesUnchanged:true,controls,realProviderCalls:0}));
+  console.log(JSON.stringify({passed:true,prompt:{matchesAR0:true,sha256:hash(direct.prompts[0])},stages:{direct:1,D:1,checkFirst:2},nonTargetBytesUnchanged:true,controls,realProviderCalls:0}));
 }finally{fs.rmSync(temp,{recursive:true,force:true});}

@@ -1,5 +1,9 @@
 # Direct author review of conflicting assertions
 
+The implementation and installed results below are historical AR1 evidence.
+The 204-word addition has been removed from the working direct prompt; see
+[follow-up decision](DECISION.md). Current `verify.mjs` checks AR0 prompt bytes.
+
 Direct's implementation prompt now asks the author to establish the original
 requirement, preserved public contract and actual input before preserving an old
 assertion through a gate, fallback or legacy branch. A preserved contract calls
