@@ -1,0 +1,259 @@
+{
+  "reproduction": {
+    "reproduced": true,
+    "source": "0a56d5393f390ed360fd420ee0e8e2ffcd05c8f8",
+    "experimentKind": "assertion-review-pair",
+    "localHTTPRequests": 2,
+    "requestSaved": true,
+    "responseSaved": false,
+    "clientBytes": 367,
+    "sha256": "eb45c54d829b7a43513514558f07cb7ba9051f3ba35ba23ef68d8e806ed6df37",
+    "realProviderCalls": 0
+  },
+  "controls": {
+    "passed": true,
+    "results": [
+      {
+        "kind": "assertion-review-pair",
+        "requests": 2,
+        "bytes": 734,
+        "passed": true
+      },
+      {
+        "kind": "sensitivity-usage",
+        "requests": 2,
+        "bytes": 734,
+        "passed": true
+      },
+      {
+        "mode": "read-error",
+        "requests": 1,
+        "state": "read_error",
+        "provider": "unknown",
+        "passed": true
+      },
+      {
+        "mode": "cancel",
+        "requests": 1,
+        "state": "interrupted",
+        "provider": "unknown",
+        "passed": true
+      },
+      {
+        "mode": "eof-only",
+        "requests": 1,
+        "state": "complete",
+        "provider": "unknown",
+        "passed": true
+      },
+      {
+        "mode": "prepare-error",
+        "requests": 0,
+        "state": "preparation_error",
+        "provider": "not_sent",
+        "passed": true
+      },
+      {
+        "mode": "dispatch-metadata-error",
+        "requests": 0,
+        "state": "not_started",
+        "provider": "not_sent",
+        "passed": true
+      },
+      {
+        "mode": "auth-error",
+        "requests": 0,
+        "state": "not_started",
+        "provider": "unknown",
+        "passed": true
+      },
+      {
+        "mode": "terminal-write-error",
+        "requests": 1,
+        "state": "write_error",
+        "provider": "completed",
+        "passed": true
+      },
+      {
+        "mode": "new-label",
+        "state": "complete",
+        "passed": true
+      },
+      {
+        "mode": "limit",
+        "state": "limit",
+        "passed": true
+      },
+      {
+        "mode": "corruption",
+        "state": "integrity_error",
+        "passed": true
+      },
+      {
+        "mode": "request-corruption",
+        "state": "integrity_error",
+        "passed": true
+      },
+      {
+        "mode": "unsafe",
+        "passed": true
+      },
+      {
+        "mode": "storage-time-limit",
+        "passed": true
+      },
+      {
+        "mode": "ordinary-template-uninstrumented",
+        "passed": true
+      },
+      {
+        "mode": "unknown-admission-rejected",
+        "passed": true
+      }
+    ],
+    "realProviderCalls": 0
+  },
+  "installedFinal": {
+    "passed": true,
+    "elapsedMs": 11279,
+    "scriptedRequests": 14,
+    "authorRequests": 8,
+    "results": [
+      {
+        "slot": 1,
+        "requests": 7,
+        "responseBytes": 9683,
+        "requestBytes": 385316,
+        "storageMs": 42.07275099999879,
+        "oneAuthorStage": true,
+        "patchApplies": true,
+        "testsPass": true,
+        "sourceRemoved": true
+      },
+      {
+        "slot": 2,
+        "requests": 7,
+        "responseBytes": 9724,
+        "requestBytes": 385344,
+        "storageMs": 44.492958999999246,
+        "oneAuthorStage": true,
+        "patchApplies": true,
+        "testsPass": true,
+        "sourceRemoved": true
+      }
+    ],
+    "realProviderCalls": 0
+  },
+  "attempts": [
+    {
+      "attempt": "controls-1",
+      "loopbackRequests": 7,
+      "failure": "Incorrect fixture expectation: EOF archive completeness was conflated with provider completion"
+    },
+    {
+      "attempt": "controls-2",
+      "loopbackRequests": 8,
+      "failure": "ENOSPC injection also hit provider metadata"
+    },
+    {
+      "attempt": "controls-3",
+      "loopbackRequests": 8,
+      "failure": "ENOSPC injection repeated on a reused fd"
+    },
+    {
+      "attempt": "controls-4",
+      "loopbackRequests": 8,
+      "failure": null
+    },
+    {
+      "attempt": "controls-final",
+      "loopbackRequests": 8,
+      "failure": "Ordinary-template string assertion matched the fixture directory name"
+    },
+    {
+      "attempt": "controls-final-2",
+      "loopbackRequests": 8,
+      "failure": null
+    },
+    {
+      "attempt": "controls-final-3",
+      "loopbackRequests": 8,
+      "failure": null
+    }
+  ],
+  "installedAttempts": [
+    {
+      "attempt": "installed-1",
+      "requests": 3,
+      "elapsedMs": 4037,
+      "failure": "Host materialization paths made harness_task unavailable"
+    },
+    {
+      "attempt": "installed-2",
+      "requests": 3,
+      "elapsedMs": 7958,
+      "failure": "Config-file wiring alone did not fix host materialization paths"
+    },
+    {
+      "attempt": "installed-3",
+      "requests": 14,
+      "elapsedMs": 32367,
+      "failure": "Docker absent-object diagnostic case differed; native capture had succeeded"
+    },
+    {
+      "attempt": "installed-4",
+      "requests": 14,
+      "elapsedMs": 10760,
+      "failure": null
+    },
+    {
+      "attempt": "installed-final",
+      "requests": 14,
+      "elapsedMs": 11279,
+      "failure": null
+    }
+  ],
+  "otherChecks": {
+    "scheduler": {
+      "runs": 3,
+      "scenariosPerRun": 16,
+      "mockDispatchesPerRun": 13
+    },
+    "transport": {
+      "runs": 1,
+      "scenarios": 7,
+      "loopbackRequests": 8
+    },
+    "continuation": {
+      "runs": 1,
+      "realRequests": 0
+    },
+    "prompt": "PASS",
+    "template": "PASS",
+    "separateReview": "PASS"
+  },
+  "totals": {
+    "loopbackHTTPRequests": 113,
+    "mockSchedulerDispatches": 39,
+    "installedScriptedRequests": 48,
+    "fixtureContainers": 8,
+    "realProviderCalls": 0,
+    "lunaTaskRuns": 0
+  },
+  "limitations": [
+    "No model-quality measurement",
+    "No billed cost estimate",
+    "Installed node --test exits 0; existing observer interpretation remains unsupported and workflow incomplete",
+    "storageMs measures data-file IO and hash verification, not all metadata serialization or full marginal overhead",
+    "No historical stream reconstruction"
+  ],
+  "finalReview": {
+    "observerBytesUnchanged": true,
+    "workflowMatchesAR0": true,
+    "historicalPairAndFixturesUnchanged": true,
+    "unknownAdmissionRejected": true,
+    "containersAbsent": 8,
+    "scopedWhitespace": "PASS",
+    "syntax": "PASS"
+  }
+}

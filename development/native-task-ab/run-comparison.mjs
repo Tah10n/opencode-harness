@@ -2,6 +2,8 @@
 // A/B do not add a phase or an intermediate model deadline.
 import fs from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';
 import {runTask} from './native-run.mjs';
+import {prepareRecording,recordingProfile} from './provider-recording.mjs';
+import {privateJSON} from '../native-output-retention/output-files.mjs';
 import {recheckSavedAvailability} from '../native-task-investigation/availability-probe.mjs';
 import {execFileSync} from 'node:child_process';
 // Per-request observer for the response lifecycle forms actually emitted by
@@ -80,6 +82,7 @@ if(amendment){
 }
 
 function verify(){
+ if(f.experimentKind!==undefined&&!['assertion-review-pair','assertion-review-pair-preflight','plain-ledger-native-high','plain-ledger-native-high-preflight','plain-mui-18141','plain-mui-18141-preflight','preservation-pair','preservation-pair-preflight','polybench-pilot','polybench-pilot-preflight','subscribe-offline','type-compat','command-hints','transfer','h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration','integrated-repeats'].includes(f.experimentKind))throw Error('Unknown development experiment');
  const assertionPair=['assertion-review-pair','assertion-review-pair-preflight'].includes(f.experimentKind);
  const plainLedger=['plain-ledger-native-high','plain-ledger-native-high-preflight'].includes(f.experimentKind);
  const plainMui=['plain-mui-18141','plain-mui-18141-preflight'].includes(f.experimentKind);
@@ -174,23 +177,28 @@ if(availabilityContinuation){
  if(probe?.success!==true){fs.writeFileSync(path.join(outputRoot,'scheduling-paused.json'),JSON.stringify({kind:'availability_not_confirmed',probe:probe??null},null,2),{flag:'wx'});return {status:'paused',pause:{kind:'availability_not_confirmed'}};}
 }
 let pause=null;
-function pauseScheduling(kind,slot,details={}){if(pause)return;pause={kind,slot,...details};fs.writeFileSync(path.join(outputRoot,'scheduling-paused.json'),JSON.stringify(pause,null,2),{flag:'wx'});}
+function pauseScheduling(kind,slot,details={}){if(pause)return;pause={kind,slot,...details};try{fs.writeFileSync(path.join(outputRoot,'scheduling-paused.json'),JSON.stringify(pause,null,2),{flag:'wx',mode:0o600});}catch(error){pause.persistenceError=error.message;}}
 for(const attempt of f.attempts.filter(a=>!amendment||(a.slot>=firstSlot&&a.slot<=lastSlot))){
  verify();if(pause)break;const out=path.join(outputRoot,'runs',attempt.task+(attempt.repetition?'-r'+attempt.repetition:'')+'-'+attempt.arm);
  if(fs.existsSync(out))throw Error('Previously created slot must never be retried: '+out);
  fs.mkdirSync(out,{recursive:true,mode:0o700});fs.writeFileSync(path.join(out,'started.json'),JSON.stringify({...attempt,at:new Date().toISOString()},null,2),{flag:'wx'});
- const requests=[],active=new Set(),abort=new AbortController();let session,deadline=null,timer,result,terminationVerified=false,forwardingOpen=true,deadlineTriggered=false,captureSaved=false,relayRemoved=false,captureAttempted=false;
+ const requests=[],active=new Set(),abort=new AbortController();let session,deadline=null,timer,result,terminationVerified=false,forwardingOpen=true,deadlineTriggered=false,captureSaved=false,relayRemoved=false,captureAttempted=false,recording,recordingPersistenceError=null;
  const deadlineReason=Object.assign(new Error('Own task deadline reached'),{name:'AbortError'});
  const settleHandlers=async()=>{let timeout;try{await Promise.race([Promise.allSettled([...active]),new Promise((_,reject)=>{timeout=setTimeout(()=>reject(Error('Provider handlers did not settle after cancellation')),5000);})]);}finally{clearTimeout(timeout);}};
- const save=()=>fs.writeFileSync(path.join(out,'provider-metadata.json'),JSON.stringify(requests,null,2));
+ const save=()=>{try{privateJSON(path.join(out,'provider-metadata.json'),requests);return true;}catch(error){recordingPersistenceError=error.message;forwardingOpen=false;pauseScheduling('evidence_incomplete',attempt.slot,{reason:'Provider metadata persistence: '+error.message});return false;}};
  try{
+  // One full profile for this research-only entry point, fixed before native requests.
+  // Admission above remains independent; ordinary native sessions never call here.
+  try{recording=prepareRecording(out,{run:path.basename(path.resolve(root)),slot:attempt.slot,profile:recordingProfile.name});}
+  catch(error){pauseScheduling('evidence_incomplete',attempt.slot,{phase:'recording_preparation',message:error.message});throw error;}
   session=await startContainer({source:attempt.source,toolchain:f.toolchain,template:['assertion-review-pair','assertion-review-pair-preflight'].includes(f.experimentKind)?f.templates[attempt.arm]:attempt.arm==='S0'?f.baselineTemplate:attempt.arm!=='P'?f.template:f.dependencies,output:path.join(out,'session'),onRequest:(frame,rawSend,signal)=>{
    const send=message=>{if(forwardingOpen)rawSend(message);};
    const pending=(async()=>{
     const requestKind=frame.body?.tools?.length?'work':'title';
     let requestSignal;
-    const record={requestIndex:requests.length+1,relayRequestId:frame.id??null,requestKind,at:new Date().toISOString(),path:frame.path,model:frame.body?.model,effort:frame.body?.reasoning?.effort??null,forwarded:false,usage:null};requests.push(record);save();
-    if(['assertion-review-pair','assertion-review-pair-preflight','plain-ledger-native-high','plain-ledger-native-high-preflight','plain-mui-18141','plain-mui-18141-preflight','preservation-pair','preservation-pair-preflight','polybench-pilot','polybench-pilot-preflight','subscribe-offline','type-compat','h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration','integrated-repeats'].includes(f.experimentKind))fs.writeFileSync(path.join(out,'request-'+requests.length+'.json'),JSON.stringify(frame.body),{mode:0o600,flag:'wx'});
+    const record={requestIndex:requests.length+1,relayRequestId:frame.id??null,requestKind,at:new Date().toISOString(),path:frame.path,model:frame.body?.model,effort:frame.body?.reasoning?.effort??null,forwarded:false,usage:null,recording:{profile:recordingProfile.name,status:'not_started',evidenceComplete:false}};requests.push(record);save();
+    let recorder,recordingEnd='not_started';
+    const recordingFailed=()=>{record.evidenceIncomplete=true;pauseScheduling('evidence_incomplete',attempt.slot,{requestIndex:record.requestIndex,reason:record.recording?.error??recordingPersistenceError??'Partial provider evidence'});};
     const blocked=()=>{
      if(!pause&&!abort.signal.aborted&&!signal.aborted&&forwardingOpen&&deadline&&Date.now()<deadline)return false;
      record.notForwardedReason=pause?'series-paused':signal.aborted?'client-cancelled':'closed-or-deadline';record.blockedBy=pause;record.finishedAt=new Date().toISOString();save();
@@ -199,15 +207,18 @@ for(const attempt of f.attempts.filter(a=>!amendment||(a.slot>=firstSlot&&a.slot
     if(blocked())return;
     if(frame.path!=='/v1/responses'||frame.body?.model!=='gpt-5.6-luna'||frame.body.stream!==true||frame.body?.reasoning?.effort!=='high'){pauseScheduling('boundary_refusal',attempt.slot);record.rejected=true;save();send({type:'headers',status:403,contentType:'text/plain'});send({type:'end'});return;}
     try{
-     const a=readAuth();const body=JSON.stringify({...frame.body,store:false});record.maxDurationMs=f.streamLimit==='remaining-task-budget'?Math.max(0,deadline-Date.now()):180000;record.connectionTimeoutMs=f.connectionTimeoutMs??null;save();
+     const body=JSON.stringify({...frame.body,store:false});
+     try{recorder=recording.begin(record,JSON.stringify(frame.body),body);if(!save())throw Error(recordingPersistenceError);}
+     catch(error){record.notForwardedReason='recording-preparation-failed';record.recordingPreparationError=error.message;recordingFailed();throw Object.assign(error,{recordingPreparation:true});}
+     const a=readAuth();record.maxDurationMs=f.streamLimit==='remaining-task-budget'?Math.max(0,deadline-Date.now()):180000;record.connectionTimeoutMs=f.connectionTimeoutMs??null;save();
      const connectionAbort=new AbortController();const connectionTimer=f.connectionTimeoutMs?setTimeout(()=>connectionAbort.abort(new Error('Connection timeout')),f.connectionTimeoutMs):null;
      requestSignal=AbortSignal.any([signal,abort.signal,...(f.streamLimit==='remaining-task-budget'?[connectionAbort.signal]:[AbortSignal.timeout(180000)])]);
      let response;try {
      // Last synchronous gate, after auth/body preparation and immediately before dispatch.
      if(blocked())return;
-     record.forwarded=true;record.forwardedAt=new Date().toISOString();save();
+     record.forwarded=true;record.forwardedAt=new Date().toISOString();if(!save()){record.forwarded=false;delete record.forwardedAt;record.notForwardedReason='recording-preparation-failed';recordingFailed();return;}
      response=await fetchImpl('https://chatgpt.com/backend-api/codex/responses',{method:'POST',redirect:'error',headers:{'content-type':'application/json',authorization:`Bearer ${a.access}`,'ChatGPT-Account-Id':a.accountId},body,signal:requestSignal});}finally{clearTimeout(connectionTimer);}
-     record.status=response.status;record.upstreamRequestId=response.headers.get('x-request-id');save();
+     record.status=response.status;record.upstreamRequestId=response.headers.get('x-request-id');record.contentType=response.headers.get('content-type');recordingEnd='interrupted';save();
      if(response.status!==200){
       const refusal=[401,403,429].includes(response.status);
       record.serverCompletion=refusal?'known_refusal':'unknown';
@@ -220,13 +231,14 @@ for(const attempt of f.attempts.filter(a=>!amendment||(a.slot>=firstSlot&&a.slot
        while(iterator){
         const next=await Promise.race([iterator.next(),expired]);
         if(next.boundedTimeout){record.errorBodyTimedOut=true;break;}
-        if(next.done)break;
+        if(next.done){recordingEnd='eof';break;}
         const b=Buffer.from(next.value),remaining=8192-bytes.length;
+        if(!recorder.append(b))recordingFailed();
         bytes=Buffer.concat([bytes,b.subarray(0,remaining)]);
         record.errorBody=bytes.toString('utf8');record.errorBodyBase64=bytes.toString('base64');save();
         if(b.length>=remaining){record.errorBodyTruncated=true;break;}
        }
-      }catch(error){record.errorBodyInterrupted=error.name;}
+      }catch(error){record.errorBodyInterrupted=error.name;recordingEnd=signal.aborted||abort.signal.aborted?'interrupted':'read_error';}
       finally{clearTimeout(bodyTimer);void iterator?.return?.().catch(()=>{});}
       record.errorBody=bytes.toString('utf8');record.errorBodyBase64=bytes.toString('base64');
       if(refusal){
@@ -239,28 +251,33 @@ for(const attempt of f.attempts.filter(a=>!amendment||(a.slot>=firstSlot&&a.slot
        }
       }
       save();
-      try{send({type:'headers',status:response.status,contentType:response.headers.get('content-type')??'text/plain'});if(bytes.length)send({type:'chunk',data:bytes.toString('base64')});send({type:'end'});}
+      try{send({type:'headers',status:response.status,contentType:response.headers.get('content-type')??'text/plain'});if(bytes.length){send({type:'chunk',data:bytes.toString('base64')});if(forwardingOpen)recorder.forwarded(bytes);}send({type:'end'});}
       finally{stopWorkload(session);abort.abort();}
       return;
      }
      send({type:'headers',status:response.status,contentType:response.headers.get('content-type')??'text/event-stream'});
      const observer=responseObserver(record,save,details=>pauseScheduling(details.kind,attempt.slot,{requestIndex:record.requestIndex,...details}));
      for await(const chunk of response.body){
-      if(['plain-ledger-native-high','plain-ledger-native-high-preflight','plain-mui-18141','plain-mui-18141-preflight','preservation-pair','preservation-pair-preflight','polybench-pilot','polybench-pilot-preflight','subscribe-offline','type-compat','h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration','integrated-repeats'].includes(f.experimentKind))fs.appendFileSync(path.join(out,'response-'+record.requestIndex+'.sse'),chunk,{mode:0o600});
+      const recorded=recorder.append(chunk);
+      if(!recorded)recordingFailed();
       // Observe/persist upstream facts before delivery can fail or be cancelled.
       observer.push(chunk);
+      // Disk failure must not hide terminal facts in the chunk already received.
+      if(!recorded||recordingPersistenceError){recordingFailed();stopWorkload(session);abort.abort();return;}
       // The observer persists response facts AND the pause synchronously, before
       // a retryable packet can reach any client (including title/helper clients).
-      send({type:'chunk',data:Buffer.from(chunk).toString('base64')});
+      send({type:'chunk',data:Buffer.from(chunk).toString('base64')});if(forwardingOpen)recorder.forwarded(chunk);
       if(record.admissionStop){
        send({type:'end'});record.clientDelivery='stop-event-forwarded';save();
        stopWorkload(session);abort.abort();return;
       }
      }
-     observer.end();record.streamEnded=true;if(record.admissionStop){send({type:'end'});stopWorkload(session);abort.abort();return;}
+     recordingEnd='eof';observer.end();record.streamEnded=true;if(record.admissionStop){send({type:'end'});stopWorkload(session);abort.abort();return;}
      if(!knownResponseTerminal(record)){record.serverCompletion='unknown';pauseScheduling('unknown_submission',attempt.slot,{reason:'Stream ended without a bound terminal provider response'});stopWorkload(session);abort.abort();return;}
      send({type:'end'});record.clientDelivery='stream-forwarded';save();
     }catch(error){
+     if(recorder&&record.status!==undefined&&recordingEnd!=='eof')recordingEnd=signal.aborted||abort.signal.aborted?'interrupted':'read_error';
+     if(error.recordingPreparation){forwardingOpen=false;if(session)stopWorkload(session);abort.abort();throw error;}
      if(record.admissionStop&&record.clientDelivery==='stop-event-forwarded'&&abort.signal.aborted){record.localStreamStop=error.name;return;}
      record.error=error.name;
      const ownDeadline=record.forwarded&&deadlineTriggered&&requestSignal?.reason===deadlineReason;
@@ -271,7 +288,7 @@ for(const attempt of f.attempts.filter(a=>!amendment||(a.slot>=firstSlot&&a.slot
      if([401,403,429].includes(record.status)){record.refusal??={status:record.status,bodyInterrupted:true};pauseScheduling('provider_refusal',attempt.slot,record.refusal);}
      else if(!record.forwarded||!knownResponseTerminal(record))pauseScheduling(record.forwarded?'unknown_submission':'authorization_unavailable',attempt.slot,{error:error.name});
      forwardingOpen=false;if(session)stopWorkload(session);if(!abort.signal.aborted)abort.abort();throw error;}
-    finally{record.finishedAt=new Date().toISOString();save();}
+    finally{if(recorder&&!recorder.finish(recordingEnd)&&['write_error','integrity_error','limit'].includes(recorder.state.status))recordingFailed();record.finishedAt=new Date().toISOString();save();}
    })();active.add(pending);return pending.finally(()=>active.delete(pending));
   }});
   const setup=session.exec(['node','-e',"const fs=require('fs');fs.mkdirSync('/work/bin');fs.copyFileSync('/template/rg','/work/bin/rg');fs.chmodSync('/work/bin/rg',0o755);fs.mkdirSync('/work/config/opencode',{recursive:true});for(const n of ['node_modules','package.json','package-lock.json'])fs.cpSync('/template/'+n,'/work/config/opencode/'+n,{recursive:true,verbatimSymlinks:true});"]);if(setup.status!==0)throw Error('Dependency preparation failed: '+setup.stderr);
@@ -304,6 +321,7 @@ for(const attempt of f.attempts.filter(a=>!amendment||(a.slot>=firstSlot&&a.slot
    save();
   }finally{
    if(session){
+    if(recordingPersistenceError){session.evidenceRequired=true;session.evidenceComplete=false;}
     const cleanup=session.close();relayRemoved=cleanup===0;
     if(cleanup!==0){pauseScheduling(cleanup===2?'evidence_incomplete':'cleanup_unverified',attempt.slot,{resource:session.retainedResource??null});if(cleanup!==2)throw Error('Container cleanup failed');}
    }
