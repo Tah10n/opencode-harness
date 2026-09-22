@@ -1,0 +1,189 @@
+{
+  "version": 1,
+  "stage": "frozen_before_model_requests",
+  "freezeSha256": "1345d34b8d2b5574adff2cc0a9024e997955c1025d45b2a9a2aa89a21726bf15",
+  "candidates": {
+    "AR0": "ca72c444b06b3be096cfa22aa6a82968e807a994",
+    "AR1": "8facea83bec3203ed500ee6884278d2df06b8c2b"
+  },
+  "baseline": "2b16b6a8ad75b6b852adc5e2189e6d4a8d93eabd",
+  "reference": "9e389a6dbc1b0c9813599fb61eceb6958d8c4de4",
+  "image": "sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6",
+  "resources": {
+    "cpus": 2,
+    "memoryMb": 3072,
+    "workMemoryMb": 1536,
+    "pids": 512
+  },
+  "opencode": "1.18.26",
+  "node": "24.19.0",
+  "git": "2.39.5",
+  "model": "openai/gpt-5.6-luna",
+  "reasoning": "high",
+  "budgetSeconds": 1800,
+  "config": {
+    "model": "openai/gpt-5.6-luna",
+    "small_model": "openai/gpt-5.6-luna",
+    "provider": {
+      "openai": {
+        "options": {
+          "baseURL": "http://127.0.0.1:4099/v1",
+          "apiKey": "development-no-credential"
+        },
+        "models": {
+          "gpt-5.6-luna": {
+            "options": {
+              "reasoningEffort": "high"
+            },
+            "variants": {
+              "high": {
+                "reasoningEffort": "high"
+              }
+            }
+          }
+        }
+      }
+    },
+    "permission": {
+      "external_directory": {
+        "*": "deny"
+      }
+    }
+  },
+  "offlineConfig": {
+    "permission": {
+      "webfetch": "deny"
+    },
+    "agent": {
+      "build": {
+        "permission": {
+          "webfetch": "deny"
+        }
+      }
+    }
+  },
+  "flags": {
+    "HARNESS_TASK_CONTEXT": 0,
+    "HARNESS_TASK_CHECKS": 0,
+    "HARNESS_TASK_TYPE_COMPAT": 0,
+    "HARNESS_TASK_SENSITIVITY": 0,
+    "HARNESS_TASK_INVESTIGATION": 0,
+    "HARNESS_TASK_COMMAND_HINTS": 0,
+    "HARNESS_TASK_PRESERVATION_NUDGE": 0,
+    "HARNESS_TASK_EXTRA_ATTENTION": 0
+  },
+  "slots": [
+    {
+      "slot": 1,
+      "task": "account-switch-ledger",
+      "arm": "AR0",
+      "project": "Tah10n/viberacing",
+      "status": "not_started"
+    },
+    {
+      "slot": 2,
+      "task": "account-switch-ledger",
+      "arm": "AR1",
+      "project": "Tah10n/viberacing",
+      "status": "not_started"
+    }
+  ],
+  "preparation": {
+    "candidates": {
+      "AR0": "ca72c444b06b3be096cfa22aa6a82968e807a994",
+      "AR1": "8facea83bec3203ed500ee6884278d2df06b8c2b"
+    },
+    "differences": [
+      "native-task-workflow.mjs"
+    ],
+    "block": {
+      "words": 204,
+      "bytes": 1505,
+      "withSeparatorBytes": 1506,
+      "sha256": "652c7ca74dab68f5e8898b8eb0e1d7bb33704e58f36acbb412806fae87b1e3f3"
+    },
+    "promptRemovalExact": true,
+    "promptHashes": {
+      "AR0": "c8727544756e72772d743142b50efee4aa2a48ba20f08e8fa303682778faf2fa",
+      "AR1": "35ac7beda7d099f176b03e6fbca4a2578472e3f02fba515ac79ba7827e5cbc4e"
+    },
+    "bundleManifests": {
+      "AR0": "81629492578a24379215e158bd8484dcd8a32b92911611856ecb9eb9ec5d53be",
+      "AR1": "319d7cbfc8057d0d5b36e9026323af0590617aebeb27f9e17e2cf5df6cf19c15"
+    },
+    "pathHandling": "Only installation-generated instructions/plugin paths mapped explicitly to identical /template mount; no prompt normalization. UUIDs and runtime paths retained separately.",
+    "inputSha256": "15f4f3ce26468bad1afe37617a7e43da80abcf8e26ec24a5f99bafd0317ce1ea",
+    "taskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+    "environmentSha256": "aa0afe37ca2ec1f3564642a02842d71472b72b88225069be22a4cbbe8fb114cc",
+    "fullPromptSha256": "1873295e7730dd9688759dbd93f98480bbe7a5f9d991f8f4f2b99f1a57f54082",
+    "realProviderRequests": 0
+  },
+  "preflightSha256": "604af263e6e226a825774456f4783434b09acac43ca88f17618891297b284e3c",
+  "files": {
+    "development/direct-assertion-review/model-pair/AR0-initial-fixture-prompt.txt": "c8727544756e72772d743142b50efee4aa2a48ba20f08e8fa303682778faf2fa",
+    "development/direct-assertion-review/model-pair/AR1-initial-fixture-prompt.txt": "35ac7beda7d099f176b03e6fbca4a2578472e3f02fba515ac79ba7827e5cbc4e",
+    "development/direct-assertion-review/model-pair/PLAN.md": "7453bd7cc58b99cfec89ab4aee0a3ca73be041b21432832cccb31443157ccf8c",
+    "development/direct-assertion-review/model-pair/TASK.md": "1873295e7730dd9688759dbd93f98480bbe7a5f9d991f8f4f2b99f1a57f54082",
+    "development/direct-assertion-review/model-pair/freeze.mjs": "7ae0fb6463ddf7d908d381220a5a4a00b52a838238a3e04165e313263b7860d5",
+    "development/direct-assertion-review/model-pair/preflight.json": "604af263e6e226a825774456f4783434b09acac43ca88f17618891297b284e3c",
+    "development/direct-assertion-review/model-pair/preflight.mjs": "9f3a375e39aa33b9103786c0d35032f8f07cb69696fde294375cd1c189242093",
+    "development/direct-assertion-review/model-pair/preparation.json": "6d64879fd8b643e9bc6fa5b60daad61b17b3faf2b3c2e1cfd710697452278354",
+    "development/direct-assertion-review/model-pair/prepare.mjs": "082818cdb417dc09d156c57cf59a1297841d181e4f8dd7add0c1a7e5fcf1d76b",
+    "development/direct-assertion-review/model-pair/run.mjs": "588dc8749ae83a9ab38c40fc32ef26b6f11c80f4140019da43e0932379fbbcb0",
+    "development/plain-ledger-native-high/PLAN.md": "ce7a712c0ceeeb0a93cfd144062511c85806e7791c5441c57080bec4df0e2be0",
+    "development/plain-ledger-native-high/PREPARATION-HISTORY.md": "cdf81199061e110de680f5b94e724dcf448e03533135533fcbfccb700818315b",
+    "development/plain-ledger-native-high/REFERENCE-COMPATIBILITY.md": "de19cf0c23cd00d5424dc9c190751f19615adf302d29a4d6ef34dd1cf2f99700",
+    "development/plain-ledger-native-high/REPORT.md": "a2c8ebb0d949a060a71c2cac8509f024a7b83704ac13597e1c604e49d177618b",
+    "development/plain-ledger-native-high/account-switch-ledger.test.mjs": "cac8e70672237ed629aea9198adf924751943f3b8b20d114c3b76c97c6d9002c",
+    "development/plain-ledger-native-high/assessment.json": "0814e453d194304ac58f723c5e492c0088bb6b56cdbfb027ffb4fb753f24c051",
+    "development/plain-ledger-native-high/calibration-receipts.json": "4cce3240a0f69a8d35d04c667c18181305298221c9edbc800bcd4afc3accfa05",
+    "development/plain-ledger-native-high/cli-persistence.test.mjs": "69d64508aedea998897ef9b539486cf6fae887d0269f999c0ff667c95b31a9d1",
+    "development/plain-ledger-native-high/diagnose.mjs": "19229830e3faea90f4515ebc88b5344a0e3b83c0a4ed6338e8fe5e5399dbc6c8",
+    "development/plain-ledger-native-high/environment.txt": "aa0afe37ca2ec1f3564642a02842d71472b72b88225069be22a4cbbe8fb114cc",
+    "development/plain-ledger-native-high/evaluate.py": "c9ce97281f011d61ba8b9372940f05a2aba5141af6109ff65f23a72c72473169",
+    "development/plain-ledger-native-high/evaluation.json": "b233b57dc98fb0f1f6a960e3c913088ef59ea10e3a38bae092a1d99896c7bf79",
+    "development/plain-ledger-native-high/freeze.mjs": "4bec2ec43e62c1372ba098c4a7cf0a73b838a7df5b5f790539458947e05ada76",
+    "development/plain-ledger-native-high/kimi-migration.test.mjs": "d48fdbd2e9593ce2575c6dcc8e8421af5f6da1c089463b25218a56b5a6335ca6",
+    "development/plain-ledger-native-high/ledger-lifecycle.test.mjs": "0f049d12080a488c159b26716f43275b0d66751102d71521dcf77fbe88411ceb",
+    "development/plain-ledger-native-high/legacy-input.test.mjs": "d0cdb9449b719b2bc16874b3e81777c380ddb40b6e5bd597e45a8c286ac5f324",
+    "development/plain-ledger-native-high/manifest.json": "1f4155d8ce80a892cefd47e4c65524f4f5d4932bbf479ac348f923eb43bff938",
+    "development/plain-ledger-native-high/migration-0.4.3.json": "7c0b0ef89805cd301173b07d611ffe1fa0c163e909ad142f21028b39ccdde4c7",
+    "development/plain-ledger-native-high/migration-contract.test.mjs": "d0f21acc82bfedf7e4ea72469f25259baed3b3fbb633dc87b2fa90093483febc",
+    "development/plain-ledger-native-high/model.patch": "203f503a88faaa37d0e1a3b4f884507355b9efef0c92bab1e6a1af9819b173b5",
+    "development/plain-ledger-native-high/original-PLAN.md": "29302c9d793743584fcf7c62ca6538aea35216734904ce85336fcc0e3a544758",
+    "development/plain-ledger-native-high/original-before.json": "efcd121d039f48b7ea4dee7129ae0383ba518915dccff15e320924492a0dd9b1",
+    "development/plain-ledger-native-high/original-task.txt": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+    "development/plain-ledger-native-high/preflight.json": "ca8da591abc0c4e0027ec3addbae40979a14ec41a8e1c4746690c00478e5f548",
+    "development/plain-ledger-native-high/preflight.mjs": "47bef979f826b7db6c0d759b5856177016849dd3ea64956d30d7c44ae979612a",
+    "development/plain-ledger-native-high/prepare-input.mjs": "770ec6823493b091c3b3d290108e5656f59b95ca1329131a5d436c251311e02c",
+    "development/plain-ledger-native-high/privacy-observation.mjs": "7b1c2ca4dfc986dc031016110e30fe4ed6e0a4ad9ad4eeeb2370c1c8074560d4",
+    "development/plain-ledger-native-high/provenance.json": "a944586455807a760575eec95b670627b9c0c3e3c66b987edf0cced4ea0f8d96",
+    "development/plain-ledger-native-high/reference-compatibility-receipts.json": "2388441f754a1a86f5d005074cb7eada7bfb3fc6d7b7dbe96a45e98ed61737fd",
+    "development/plain-ledger-native-high/reference-compatibility.patch": "05105df0eafad600895060197ce2343fead52e7fe6781d748ef4c5ec51591d13",
+    "development/plain-ledger-native-high/result.json": "02cc5ef798d74807dd31cdd172e5c9d9a20dbe046c1d582c37505391bcc0d164",
+    "development/plain-ledger-native-high/run.mjs": "0dc938f7c87205150e856ce3340e816d1c680ce29e5ef3d220d29cb69ecb8381",
+    "development/plain-ledger-native-high/summarize.py": "c50427310ca5b2d32c423a8a0744d922c3e66309e008fb022ad960c8262ef898",
+    "development/plain-ledger-native-high/trajectory.json": "aab12876e9230ced6090936c1f7ac522489e804cf44c831ac8a5e564bbaef2e6",
+    "development/plain-ledger-native-high/verification.json": "4296dc3f9ce9564fbaf693458272677df21b5746e1dc7a558940360a2ff81702",
+    "development/plain-ledger-native-high/verify-result.py": "8cc7bdb4d386c8f94b087e4f32c12caf73e335aa42fec585490013a2b98ac926",
+    "development/native-task-ab/run-comparison.mjs": "3a4a5407379983930f6a053704482b6f7bf4a635910e65eb5fa38dd163a9100b",
+    "development/native-task-abc/native-run.mjs": "5d691871022fcf4f2117212c33b463849e791d7ebe120adc68e7ca419ee0d293",
+    "development/native-task-integrated/container-session.mjs": "60b2d069bd284868da431e17c85852b2c1c8753951aedef7ad3a69f9f1c71e72",
+    "development/native-task-integrated/container-relay.mjs": "db186a20946348867504c48d7faca8f40a93fdfa122e1102f581e8cf5377f1b3",
+    "development/native-task-utility/container/stop-workload.mjs": "b21c23f5a334dc54af340e2773e3e56427aa27a946231769d36df249ea54a69e",
+    "development/polybench-pilot/capture.mjs": "8ce3f0344bf45f8e25ef0317c914c21a566db717357e2d490803bc4dc2e3c7bc",
+    "development/native-output-retention/output-files.mjs": "bcc90984aa4e3ddc4048fc674f7762c245d5c0fb25ad8d053aae17a598ce0477",
+    "development/native-task-ab/extract-candidate.py": "aa5244bd4a5cc394344b266f0107728d9b70e190bad55de47c46dd10f28603de",
+    "development/native-task-offline/build.json": "16c5621afb56082001998a0f17f385ac90e4bdd31a19eeb215926de2e748ee61",
+    "/Users/tahion/dev/opencode-harness/.worktrees/verified-change-harness/local/template-toolchain-20260908/package/bin/opencode": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe",
+    "local/polybench-pilot/batch/freeze.json": "30008a1e389c67a40c4bfee0969b119f7c76cf0ee24a44364af261def605d216",
+    "local/polybench-pilot/batch/freeze-commit.json": "09580a67c738a05a5f21f554f2c76fa351e7a835c54bb86e75a99d10934fac86",
+    "local/polybench-pilot/batch/scheduling-paused.json": "69385be23d2edc8776accef8cd2b91cdbdf496a026e37bff9698862e8d29c6bd",
+    "local/polybench-pilot/batch/outcome.json": "8c1f279fc4b3b2ee0c63d5cc88b9c84ee1cfefdcbd683ab55dfcb95e7ed80402",
+    "local/preservation-nudge-revision-2-model-pair/batch/freeze.json": "07a37c0d342e4e011a272a180112657eedb9ac111e26c40553b19cb48c99c844",
+    "local/preservation-nudge-revision-2-model-pair/batch/freeze-commit.json": "4e60140800e8ce437516dae37a12ed5b80613ee35edaa36d0c0845a7151c7cda",
+    "local/preservation-nudge-revision-2-model-pair/batch/scheduling-paused.json": "12dc97cc581de95af5d565163ab46fc84dbd4cef4b1964af3f41452692eb2811",
+    "local/preservation-nudge-revision-2-model-pair/batch/outcome.json": "9bc77dca3cab78f0cbcc1e8c139d6cbdccc2179a11aa387f1f2e5f306afbc26c"
+  },
+  "realProviderRequestsBeforeFreeze": 0
+}

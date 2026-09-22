@@ -1,0 +1,30 @@
+{
+  "candidates": {
+    "AR0": "ca72c444b06b3be096cfa22aa6a82968e807a994",
+    "AR1": "8facea83bec3203ed500ee6884278d2df06b8c2b"
+  },
+  "differences": [
+    "native-task-workflow.mjs"
+  ],
+  "block": {
+    "words": 204,
+    "bytes": 1505,
+    "withSeparatorBytes": 1506,
+    "sha256": "652c7ca74dab68f5e8898b8eb0e1d7bb33704e58f36acbb412806fae87b1e3f3"
+  },
+  "promptRemovalExact": true,
+  "promptHashes": {
+    "AR0": "c8727544756e72772d743142b50efee4aa2a48ba20f08e8fa303682778faf2fa",
+    "AR1": "35ac7beda7d099f176b03e6fbca4a2578472e3f02fba515ac79ba7827e5cbc4e"
+  },
+  "bundleManifests": {
+    "AR0": "81629492578a24379215e158bd8484dcd8a32b92911611856ecb9eb9ec5d53be",
+    "AR1": "319d7cbfc8057d0d5b36e9026323af0590617aebeb27f9e17e2cf5df6cf19c15"
+  },
+  "pathHandling": "Only installation-generated instructions/plugin paths mapped explicitly to identical /template mount; no prompt normalization. UUIDs and runtime paths retained separately.",
+  "inputSha256": "15f4f3ce26468bad1afe37617a7e43da80abcf8e26ec24a5f99bafd0317ce1ea",
+  "taskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+  "environmentSha256": "aa0afe37ca2ec1f3564642a02842d71472b72b88225069be22a4cbbe8fb114cc",
+  "fullPromptSha256": "1873295e7730dd9688759dbd93f98480bbe7a5f9d991f8f4f2b99f1a57f54082",
+  "realProviderRequests": 0
+}
