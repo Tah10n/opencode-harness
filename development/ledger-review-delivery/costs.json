@@ -1,0 +1,63 @@
+{
+  "real": {
+    "A": {
+      "requests": 76,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": 13568381,
+        "output_tokens": 33999,
+        "cached_tokens": 9631232,
+        "reasoning_tokens": 17410
+      },
+      "toolCalls": 122,
+      "tools": {
+        "harness_task": 1,
+        "todowrite": 4,
+        "glob": 2,
+        "grep": 11,
+        "read": 50,
+        "bash": 25,
+        "apply_patch": 29
+      },
+      "parentSessions": 1,
+      "authorSessions": 1,
+      "nativeElapsedMs": 980363,
+      "executionElapsedMs": 980304,
+      "cleanupElapsedMs": 59
+    },
+    "R": {
+      "status": "not_started",
+      "requests": 0
+    },
+    "F": {
+      "status": "not_started",
+      "requests": 0
+    },
+    "totalRequests": 76,
+    "usage": {
+      "input_tokens": 13568381,
+      "output_tokens": 33999,
+      "cached_tokens": 9631232,
+      "reasoning_tokens": 17410
+    }
+  },
+  "preparation": {
+    "scriptedAttempts": 3,
+    "scriptedRequests": 27,
+    "realModelRequests": 0,
+    "syntheticUsageKnownRequests": 26,
+    "syntheticInputTokens": 26,
+    "syntheticOutputTokens": 26,
+    "syntheticUsageUnknownRequests": 1
+  },
+  "evaluator": {
+    "modelRequests": 0,
+    "accounting": "separate command receipts"
+  },
+  "developingAgent": {
+    "excludedFromPilot": true,
+    "tokenUsage": "not measured by pilot recorder"
+  },
+  "money": null,
+  "note": "Cached input and reasoning output are included subsets; not added to totals. No billed-cost inference."
+}

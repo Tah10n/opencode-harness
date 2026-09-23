@@ -1,0 +1,10 @@
+{
+  "scope": "Post-chain parameter selection under frozen ACCEPTANCE.md section 5; no model feedback or new acceptance criterion",
+  "delivery": "D0.partial",
+  "patchSha256": "e2833390b036f9339a776cb58cf82379f3541d191a10f978fd8b40294c33f3a6",
+  "storage": {"source": "packages/connector/lib/adapters/shared.mjs:7-9,116-164", "exportedCountBound": "maximumEventLedgerEntries", "exportedByteBound": "maximumEventLedgerBytes", "observedCountBound": 65536, "observedByteBound": 16777216, "exercise": "Reach the actual byte bound with distinct valid Antigravity records containing decimal integer input_tokens strings of 250000 digits; each JSONL line stays below the existing 1000000-byte line limit. All state is collector-produced; no seeded ledger. Remove input, replay an early accepted event, then a new event.", "unexercised": "Separate 65536-entry boundary need not be reached to reach the implementation's actual storage bound; report separately."},
+  "corruption": {"source": "packages/connector/lib/adapters/shared.mjs:116-134 and adapters/antigravity.mjs:111-128", "selector": "/eventLedger/version", "before": 1, "after": -1, "provenance": "JSON roundtrip of a real successful collector result; assert actual field before mutation; delete source file then collect"},
+  "additionalTransitions": "Complete previously declared mixed-valid/unsupported case with a prior accepted state and a subsequent source deletion; preserve every accepted valid event. Same frozen clause, no new threshold.",
+  "limits": {"seconds":180,"fixtureBytes":268435456},
+  "modelRequests":0
+}

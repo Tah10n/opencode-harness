@@ -104,3 +104,13 @@ ACCEPTANCE.md and manifest.json now freeze the real pilot. Existing OAuth was
 refreshed using the existing project function with the same account and zero
 model requests. A local freeze commit precedes the one real execution root.
 No additional preparation or real retry is authorized after a new stop.
+
+## Terminal state of the authorized real pilot
+
+One real A completed natively, then the pilot-local capture assertion failed on
+OpenCode's compact large-report response. Admission closed; R/F are not_started.
+Existing read-only recovery verified the actual full patch/tree and removed the
+retained source. D0 is independently incomplete (Q=false); the interrupted full
+path has T=false and D=false. No continuation or another pilot is authorized.
+The preflight/freeze sections above describe historical admission, not current
+permission to run again. See REPORT.md and result.json for the terminal outcome.

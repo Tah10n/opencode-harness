@@ -1,0 +1,181 @@
+{
+  "scope": "unchanged historical 23 probes, new D0 observations only",
+  "summary": {
+    "tests": 23,
+    "pass": 15,
+    "fail": 8,
+    "skipped": 0
+  },
+  "suites": [
+    {
+      "file": "local/ledger-review-delivery/evaluation-D0/E-account-switch-ledger.json",
+      "sha256": "12cceee8e6b8723b54f98c52cfbbc9799605c549bce073c13866a11c9a89f927",
+      "exitCode": 0,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0
+      },
+      "cases": [
+        {
+          "status": "pass",
+          "name": "OpenCode retains accepted usage after database deletion and counts new events once"
+        }
+      ]
+    },
+    {
+      "file": "local/ledger-review-delivery/evaluation-D0/E-ledger-lifecycle.json",
+      "sha256": "8db8a82b58b515d124b9e6d2f3b913e4486e75b308e867660edc0bddd14b6bdb",
+      "exitCode": 1,
+      "counts": {
+        "tests": 5,
+        "pass": 4,
+        "fail": 1,
+        "skipped": 0
+      },
+      "cases": [
+        {
+          "status": "fail",
+          "name": "claude_code: move, truncate, reload, conflict and range preservation"
+        },
+        {
+          "status": "pass",
+          "name": "gemini_cli: move, truncate, reload, conflict and range preservation"
+        },
+        {
+          "status": "pass",
+          "name": "antigravity: move, truncate, reload, conflict and range preservation"
+        },
+        {
+          "status": "pass",
+          "name": "qwen_code: move, truncate, reload, conflict and range preservation"
+        },
+        {
+          "status": "pass",
+          "name": "kimi_code: move, truncate, reload, conflict and range preservation"
+        }
+      ]
+    },
+    {
+      "file": "local/ledger-review-delivery/evaluation-D0/E-legacy-input.json",
+      "sha256": "fcc453f7be7ef7129c1ccf21fcb6f895380f622662df19dd760e13b63238463e",
+      "exitCode": 0,
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0
+      },
+      "cases": [
+        {
+          "status": "pass",
+          "name": "Antigravity preserves supported legacy input id/timestamp/usage"
+        },
+        {
+          "status": "pass",
+          "name": "Antigravity preserves supported legacy input session_id/date/usage"
+        }
+      ]
+    },
+    {
+      "file": "local/ledger-review-delivery/evaluation-D0/E-kimi-migration.json",
+      "sha256": "6260fdadb036e5f4e9f9f43fc30f6ee0a0511022ce0d187e28a136320d028519",
+      "exitCode": 0,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0
+      },
+      "cases": [
+        {
+          "status": "pass",
+          "name": "historical Kimi 0.4.3 accepted state survives append, copy, move and truncation after JSON reload"
+        }
+      ]
+    },
+    {
+      "file": "local/ledger-review-delivery/evaluation-D0/E-migration-contract.json",
+      "sha256": "ede048f84c5d5b9e6ec0a652db4acba6b1ad54b731a6edb81871d4aaa97ffab4",
+      "exitCode": 1,
+      "counts": {
+        "tests": 8,
+        "pass": 2,
+        "fail": 6,
+        "skipped": 0
+      },
+      "cases": [
+        {
+          "status": "fail",
+          "name": "claude_code: accepted legacy state survives source replacement and JSON reload"
+        },
+        {
+          "status": "fail",
+          "name": "gemini_cli: accepted legacy state survives source replacement and JSON reload"
+        },
+        {
+          "status": "fail",
+          "name": "qwen_code: accepted legacy state survives source replacement and JSON reload"
+        },
+        {
+          "status": "fail",
+          "name": "antigravity: accepted legacy state survives source replacement and JSON reload"
+        },
+        {
+          "status": "pass",
+          "name": "Kimi legacy StatusUpdate keeps accepted usage through replacement and reload"
+        },
+        {
+          "status": "fail",
+          "name": "OpenCode legacy baseline without exact-ID cutover remains fail closed"
+        },
+        {
+          "status": "pass",
+          "name": "OpenCode confirmed cutover retains accepted baseline and counts race/new IDs once"
+        },
+        {
+          "status": "fail",
+          "name": "OpenCode conflicting tuple does not prevent unrelated new usage"
+        }
+      ]
+    },
+    {
+      "file": "local/ledger-review-delivery/evaluation-D0/E-cli-persistence.json",
+      "sha256": "2b121eb47f404fac8df0a8b39b559c8d1bea37ee73d73c577d7a905082265f71",
+      "exitCode": 1,
+      "counts": {
+        "tests": 6,
+        "pass": 5,
+        "fail": 1,
+        "skipped": 0
+      },
+      "cases": [
+        {
+          "status": "fail",
+          "name": "claude_code: CLI source isolation and persisted deletion retention"
+        },
+        {
+          "status": "pass",
+          "name": "gemini_cli: CLI source isolation and persisted deletion retention"
+        },
+        {
+          "status": "pass",
+          "name": "qwen_code: CLI source isolation and persisted deletion retention"
+        },
+        {
+          "status": "pass",
+          "name": "antigravity: CLI source isolation and persisted deletion retention"
+        },
+        {
+          "status": "pass",
+          "name": "kimi_code: CLI source isolation and persisted deletion retention"
+        },
+        {
+          "status": "pass",
+          "name": "opencode: CLI source isolation and persisted deletion retention"
+        }
+      ]
+    }
+  ]
+}
