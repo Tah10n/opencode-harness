@@ -1,27 +1,16 @@
 {
-  "status": "corrected_preflight_stopped",
-  "reason": "overstrict_patch_byte_equality",
-  "budgetAmendment": "authorized_and_implemented",
+  "status": "frozen_before_real_dispatch",
   "realProviderRequests": 0,
-  "scriptedProviderRequestsTotal": 9,
-  "scriptedAttempts": 2,
-  "scriptedNativeParentSessionsTotal": 2,
-  "scriptedNativeAuthorSessionsTotal": 1,
-  "realNativeSessions": 0,
-  "realDeadlineStarted": false,
+  "scriptedPreflightRequests": 27,
+  "scriptedPreflightAttempts": 3,
+  "lastPreflight": "passed",
   "stages": {
     "A": "not_started",
     "R": "not_started",
     "F": "not_started"
   },
-  "delivery_apply": null,
-  "assessment_integrity": null,
-  "contract_results": null,
+  "deadlineStarted": false,
   "Q": null,
   "T": null,
-  "D": null,
-  "assessmentStatus": "not_run",
-  "dispatchAdmitted": false,
-  "freezeCommit": null,
-  "continuationAuthorized": false
+  "D": null
 }

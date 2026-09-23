@@ -1,0 +1,9 @@
+{
+  "authorization": "User explicitly approved one more corrected scripted preflight and one additional final push after the saved patch-order stop.",
+  "previousHead": "2ad36375",
+  "attemptDirectory": "local/ledger-review-delivery/preflight-tree-verified",
+  "scriptedAttemptsAuthorized": 1,
+  "previousStopsPreserved": true,
+  "realPilotLimitUnchanged": true,
+  "continuationAfterNewStop": false
+}

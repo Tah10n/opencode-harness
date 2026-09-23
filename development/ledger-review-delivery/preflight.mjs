@@ -1,7 +1,7 @@
 import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {spawnSync} from 'node:child_process';
 import {chain,get,save,hash,budget,nextAllowed} from './chain.mjs';
 import {checkFixtureInput} from './fixture-input.mjs';
-const root=path.resolve('local/ledger-review-delivery/preflight-corrected'),baseline=path.resolve('local/ledger-review-delivery/neutral-baseline-corrected');
+const root=path.resolve('local/ledger-review-delivery/preflight-tree-verified'),baseline=path.resolve('local/ledger-review-delivery/neutral-baseline-tree-verified');
 assert.ok(!fs.existsSync(root));fs.mkdirSync(baseline,{mode:0o700});
 const original="exports.double = value => { if (typeof value !== 'number') throw new TypeError('number required'); return value * 2; };\n";
 fs.writeFileSync(baseline+'/index.cjs',original);
@@ -50,6 +50,6 @@ try {
  assert.equal(budget('A',100,1000),1000);assert.equal(budget('R',100,3600100),600100);assert.equal(budget('F',100,3600100),3600100);
  const good={pause:null,result:{nativeCompleted:true},stop:{terminationVerified:true,captureSaved:true,relayRemoved:true,forwardingClosed:true,activeProviderHandlers:0},recordings:[],now:1,deadline:2};assert.ok(nextAllowed(good));
  assert.equal(nextAllowed({...good,result:{...good.result,stopReason:{kind:'cancelled'}}}),false);assert.equal(nextAllowed({...good,stop:{...good.stop,captureSaved:false}}),false);assert.equal(nextAllowed({...good,pause:{kind:'unknown_submission'}}),false);
- save('development/ledger-review-delivery/preflight-corrected.json',{passed:true,scriptedNativeOperations:3,scriptedRequests:seq,realRequests:0,elapsedMs:Date.now()-start,exactReviewerInventory:true,unchangedReview:true,sharedDeadline:true,greaterThan30MinuteF:true,actualFailThenPass:true,falseSuggestionRejected:true,fullPortablePatch:true,executableModePreserved:true,cancellationAndCaptureTransitionControls:true,resourcesRemoved:true});
+ save('development/ledger-review-delivery/preflight-tree-verified.json',{passed:true,scriptedNativeOperations:3,scriptedRequests:seq,realRequests:0,elapsedMs:Date.now()-start,exactReviewerInventory:true,unchangedReview:true,sharedDeadline:true,greaterThan30MinuteF:true,actualFailThenPass:true,falseSuggestionRejected:true,fullPortablePatch:true,executableModePreserved:true,cancellationAndCaptureTransitionControls:true,resourcesRemoved:true});
  console.log('PASS: three-stage scripted preflight, exact reviewer inventory, real tests, portable patch and negative control');
 }finally{save(root+'/attempt.json',{requests:seq,elapsedMs:Date.now()-start,summary:summary??null});}

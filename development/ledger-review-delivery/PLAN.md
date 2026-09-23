@@ -89,3 +89,18 @@ file bytes and modes despite block ordering. The comparison is corrected locally
 and negative byte/mode controls pass; no installed rerun followed this stop.
 R/F and the entire real pilot remain not_started. Neither a new preparation root
 nor post-hoc equivalence reopens the closed attempt. See preflight-corrected.json.
+
+## Current admission: successful explicitly authorized third fixture
+
+The user approved one additional corrected fixture and one final push. The new
+root preflight-tree-verified completed A/R/F with 18 scripted requests, exact R
+inventory before and after read, actual failing/passing tests, live delivery tree
+comparison, full portable patch and retained executable mode. The false suggestion
+was rejected by the scripted F and independently checked against the public
+TypeError contract. Spill bytes and every raw response were verified. This is
+technical wiring evidence only. The earlier stopped attempts remain sealed.
+
+ACCEPTANCE.md and manifest.json now freeze the real pilot. Existing OAuth was
+refreshed using the existing project function with the same account and zero
+model requests. A local freeze commit precedes the one real execution root.
+No additional preparation or real retry is authorized after a new stop.

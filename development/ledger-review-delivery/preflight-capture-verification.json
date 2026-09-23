@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "spillFiles": 1,
+  "spillBytes": 375153,
+  "exactGeneratedOutputPresent": true,
+  "spillHashVerified": true,
+  "realRequests": 0
+}
