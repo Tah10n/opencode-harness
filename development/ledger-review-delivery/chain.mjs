@@ -2,6 +2,7 @@
 import fs from 'node:fs';import path from 'node:path';import os from 'node:os';
 import assert from 'node:assert/strict';import {execFileSync,spawn} from 'node:child_process';import {createHash} from 'node:crypto';
 import {runOperation} from './operation.mjs';
+import {resolveNativeResult} from './resolve-native-result.mjs';
 import {verifyPatches,projectManifest} from './patch-integrity.mjs';
 import {startContainer} from '../native-task-integrated/container-session.mjs';
 import {stopWorkload} from '../native-task-utility/container/stop-workload.mjs';
@@ -20,13 +21,15 @@ export function nextAllowed({pause,result,stop,recordings,now,deadline}){
  return !pause&&result?.nativeCompleted===true&&!result.timedOut&&!result.stopReason&&stop?.terminationVerified===true&&stop.captureSaved===true&&stop.relayRemoved===true&&stop.forwardingClosed===true&&stop.activeProviderHandlers===0&&!stop.providerServerStateMayRemainUnknown&&recordings.every(r=>!r.forwarded||(r.recording?.evidenceComplete&&r.serverCompletion==='completed'&&!r.admissionStop))&&now<deadline;
 }
 export function budget(stage,now,deadline){assert.ok(['A','R','F'].includes(stage));return Math.min(deadline,now+({A:1800000,R:600000,F:3600000}[stage]));}
-export async function chain({root,baseline,task,environment='',scriptedFetch=null,onStage=()=>{}}){
+export async function chain({root,baseline,task,environment='',scriptedFetch=null,onStage=()=>{},followup=null}){
  const prepared=get('local/ledger-review-delivery/prepared.json');
  assert.ok(!fs.existsSync(root),'Existing chain may not be rerun');
- if(!scriptedFetch){const frozen=get('development/ledger-review-delivery/manifest.json');assert.equal(frozen.admitted,true);const commit=get('local/ledger-review-delivery/freeze-commit.json').commit;assert.equal(hash(execFileSync('git',['show',commit+':development/ledger-review-delivery/manifest.json'])),hash(fs.readFileSync('development/ledger-review-delivery/manifest.json')));for(const [file,sha]of Object.entries(frozen.files))assert.equal(hash(fs.readFileSync(file)),sha);assert.equal(frozen.taskSha256,hash(task));assert.equal(frozen.environmentSha256,hash(environment));assert.equal(hash(JSON.stringify(manifest(baseline))),frozen.baselineTreeSha256);for(const role of ['author','reviewer'])assert.equal(hash(fs.readFileSync('local/ledger-review-delivery/'+role+'-config.json')),frozen.configHashes[role]);assert.equal(path.resolve(root),path.resolve('local/ledger-review-delivery/real'));}
+ if(followup){assert.equal(scriptedFetch,null);assert.deepEqual(followup.stages,['R','F']);assert.equal(followup.budgetMs,1800000);assert.ok(path.isAbsolute(followup.draftPatch));followup.verify({root,baseline,task,environment,prepared});}
+ if(!scriptedFetch&&!followup){const frozen=get('development/ledger-review-delivery/manifest.json');assert.equal(frozen.admitted,true);const commit=get('local/ledger-review-delivery/freeze-commit.json').commit;assert.equal(hash(execFileSync('git',['show',commit+':development/ledger-review-delivery/manifest.json'])),hash(fs.readFileSync('development/ledger-review-delivery/manifest.json')));for(const [file,sha]of Object.entries(frozen.files))assert.equal(hash(fs.readFileSync(file)),sha);assert.equal(frozen.taskSha256,hash(task));assert.equal(frozen.environmentSha256,hash(environment));assert.equal(hash(JSON.stringify(manifest(baseline))),frozen.baselineTreeSha256);for(const role of ['author','reviewer'])assert.equal(hash(fs.readFileSync('local/ledger-review-delivery/'+role+'-config.json')),frozen.configHashes[role]);assert.equal(path.resolve(root),path.resolve('local/ledger-review-delivery/real'));}
  fs.mkdirSync(root,{mode:0o700});save(root+'/started.json',{scripted:!!scriptedFetch,at:new Date().toISOString(),taskSha256:hash(task)});
- let globalDeadline=null,globalStart=null,previousPatch=null,review=null,pause=null;const results=[];
- try {for(const [index,stage]of ['A','R','F'].entries()){
+ const stages=followup?['R','F']:['A','R','F'];
+ let globalDeadline=null,globalStart=null,previousPatch=followup?.draftPatch??null,review=null,pause=null;const results=[];
+ try {for(const [index,stage]of stages.entries()){
   if(pause)break;if(globalDeadline&&Date.now()>=globalDeadline){pause={kind:'shared_deadline'};break;}
   const stageRoot=root+'/'+stage;fs.mkdirSync(stageRoot,{mode:0o700});
   const source=stageRoot+'/input';fs.cpSync(baseline,source,{recursive:true,verbatimSymlinks:true});assert.ok(!fs.existsSync(source+'/.git'));init(source);
@@ -46,8 +49,11 @@ export async function chain({root,baseline,task,environment='',scriptedFetch=nul
    const text=s.exec(['node','-e',"const {DatabaseSync}=require('node:sqlite');const db=new DatabaseSync('/work/data/opencode/opencode.db',{readOnly:true});console.log(JSON.stringify(db.prepare('SELECT session_id,message_id,data FROM part').all().map(x=>({...x,data:JSON.parse(x.data)})).filter(x=>x.data.type==='text')));db.close();"]);assert.equal(text.status,0);fs.writeFileSync(dir+'/native-text.json',text.stdout,{flag:'wx',mode:0o600});
    if(stage==='R') {assert.deepEqual(snapshot(s),s.before);assert.ok(native.tools.every(t=>['read','glob','grep'].includes(t.data.tool)));assert.ok(native.sessions.every(t=>!t.parent_id));}
    else {
-    const workflow=JSON.parse(native.tools.find(t=>t.data.tool==='harness_task')?.data.state?.output??'null');assert.ok(workflow?.executionDirectory,'No delivered author worktree');assert.deepEqual(workflow.stages.map(t=>t.role),['author']);assert.equal(workflow.repairs,0);
-    const terminal=s.exec(['node','-e',`const fs=require('fs'),path=require('path');process.stdout.write(fs.readFileSync(path.dirname(${JSON.stringify(workflow.executionDirectory)})+'/terminal.patch'));`]);assert.equal(terminal.status,0,terminal.stderr);fs.writeFileSync(dir+'/native-terminal.patch',terminal.stdout,{flag:'wx',mode:0o600});
+    const resolved=resolveNativeResult({native,artifactRoot:dir+'/task-artifacts',capture:get(dir+'/patch-capture.json')});
+    const {workflow}=resolved;assert.deepEqual(workflow.stages.map(t=>t.role),['author']);assert.equal(workflow.repairs,0);
+    save(dir+'/native-result-receipt.json',resolved.receipt);save(dir+'/native-result-resolution.json',resolved.proof);
+    if(resolved.fullBytes)fs.writeFileSync(dir+'/native-result-full.json',resolved.fullBytes,{flag:'wx',mode:0o600});
+    const terminal={stdout:resolved.patch};fs.writeFileSync(dir+'/native-terminal.patch',resolved.patch,{flag:'wx',mode:0o600});
     const actual=s.exec(['node','-e',`const fs=require('fs'),path=require('path'),{createHash}=require('crypto');const manifest=${manifest.toString()};console.log(JSON.stringify(manifest(${JSON.stringify(workflow.executionDirectory)})));`]);assert.equal(actual.status,0,actual.stderr);const actualTree=JSON.parse(actual.stdout);delete actualTree['TASK.md'];save(dir+'/delivery-tree.json',actualTree);
     const integrity=verifyPatches({baseline:source,patches:[terminal.stdout,fs.readFileSync(dir+'/model.patch')],evidenceDir:dir+'/patch-integrity',expectedTree:actualTree});
     save(dir+'/delivery-integrity.json',{executionDirectory:workflow.executionDirectory,terminalPatchTreeMatches:true,integrity,workflowStatus:workflow.status,stages:workflow.stages});
@@ -55,9 +61,10 @@ export async function chain({root,baseline,task,environment='',scriptedFetch=nul
    s.evidenceComplete=true;return r;
   },{requiresOutputRetention:true});
   const outcome=await runOperation({root:stageRoot,f,operation,verify:()=>{
+   if(followup)followup.verify({root,baseline,task,environment,prepared});
    assert.equal(hash(JSON.stringify(manifest(f.template))),prepared.bundles[role].sha256);assert.deepEqual(manifest(source),f.inputManifests['account-switch-ledger-'+stage]);
   },beforeNative:()=>{
-   if(globalDeadline===null){globalStart=Date.now();globalDeadline=globalStart+3600000;save(root+'/deadline.json',{startedAt:globalStart,deadline:globalDeadline,budgetMs:3600000,scripted:!!scriptedFetch});}
+   if(globalDeadline===null){globalStart=Date.now();globalDeadline=globalStart+(followup?.budgetMs??3600000);save(root+'/deadline.json',{startedAt:globalStart,deadline:globalDeadline,budgetMs:followup?.budgetMs??3600000,scripted:!!scriptedFetch});}
    const now=Date.now(),deadline=budget(stage,now,globalDeadline);assert.ok(deadline>now);save(stageRoot+'/deadline.json',{globalStart,globalDeadline,stageDeadline:deadline,remainingMs:deadline-now});return deadline;
   },startContainer:async options=>{
    const s=await startContainer({...options,workMemoryMb:1536,memoryMb:3072});try{

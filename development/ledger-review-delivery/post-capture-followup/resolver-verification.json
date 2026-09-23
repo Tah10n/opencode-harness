@@ -1,0 +1,76 @@
+{
+  "historicalFailureReproduced": true,
+  "realFullArtifactResolved": true,
+  "proof": {
+    "run": "4a203d29-50b9-4f5d-b6fe-aec459c342ec",
+    "parentSession": "ses_f320fe1faffemAsFhZylrt4Y6l",
+    "sessions": {
+      "author": "ses_f320fcfb8ffefd5Hj33nOW4DLe"
+    },
+    "compact": true,
+    "resultSha256": "3d246112c925b12f50f58af4a7210b69afee093ee2eed732dd0ee7a37332d051",
+    "snapshotSha256": "061f1ac2421b12b33623aea395d57e2703e1656f62c1d93865a1a746e7085e68",
+    "patchSha256": "e2833390b036f9339a776cb58cf82379f3541d191a10f978fd8b40294c33f3a6"
+  },
+  "stages": [
+    {
+      "label": "implementation",
+      "role": "author",
+      "elapsedMs": 970200,
+      "messageID": "msg_0cdfee57b001ZIW6RqKEN38q8y"
+    }
+  ],
+  "repairs": 0,
+  "controls": [
+    {
+      "name": "missing",
+      "evidenceIncomplete": true,
+      "nextDispatch": false,
+      "originalEvidencePreserved": true
+    },
+    {
+      "name": "foreign-run",
+      "evidenceIncomplete": true,
+      "nextDispatch": false,
+      "originalEvidencePreserved": true
+    },
+    {
+      "name": "corrupt-json",
+      "evidenceIncomplete": true,
+      "nextDispatch": false,
+      "originalEvidencePreserved": true
+    },
+    {
+      "name": "contradiction",
+      "evidenceIncomplete": true,
+      "nextDispatch": false,
+      "originalEvidencePreserved": true
+    },
+    {
+      "name": "cancelled",
+      "evidenceIncomplete": true,
+      "nextDispatch": false,
+      "originalEvidencePreserved": true
+    },
+    {
+      "name": "missing-repairs",
+      "evidenceIncomplete": true,
+      "nextDispatch": false,
+      "originalEvidencePreserved": true
+    },
+    {
+      "name": "wrong-snapshot",
+      "evidenceIncomplete": true,
+      "nextDispatch": false,
+      "originalEvidencePreserved": true
+    },
+    {
+      "name": "wrong-session",
+      "evidenceIncomplete": true,
+      "nextDispatch": false,
+      "originalEvidencePreserved": true
+    }
+  ],
+  "historicalCompletedResponses": 76,
+  "fullStructuredForm": true
+}

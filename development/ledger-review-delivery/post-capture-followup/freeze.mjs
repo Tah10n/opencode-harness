@@ -1,0 +1,12 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';
+import {get,save,hash,handoff} from '../chain.mjs';
+const dev='development/ledger-review-delivery/post-capture-followup',prepared=get('local/ledger-review-delivery/prepared.json');
+assert.equal(get(dev+'/scripted-verification.json').passed,true);
+assert.equal(get(dev+'/provenance.json').oldNativeCompleted,true);
+assert.equal(handoff('{{VERBATIM_REVIEW_RESPONSE}}'),fs.readFileSync('development/ledger-review-delivery/handoff-template.txt','utf8'));
+assert.equal(execFileSync('git',['branch','--show-current'],{encoding:'utf8'}).trim(),'feat/native-task-workflow');
+assert.equal(execFileSync('git',['remote','get-url','origin'],{encoding:'utf8'}).trim(),'https://github.com/Tah10n/opencode-harness.git');
+const original=get('development/ledger-review-delivery/manifest.json'),files={};
+for(const name of [...Object.keys(original.files),...fs.readdirSync(dev).filter(n=>/\.(mjs|md|json)$/.test(n)).map(n=>dev+'/'+n),'development/ledger-review-delivery/resolve-native-result.mjs','development/ledger-review-delivery/D0.patch','development/ledger-review-delivery/M.partial.patch','development/ledger-review-delivery/selected-probes.mjs','development/ledger-review-delivery/retention-probe.mjs'])files[name]=hash(fs.readFileSync(name));
+save(dev+'/manifest.json',{version:1,admitted:true,admission:'separate-post-capture-RF-only',operations:['R','F'],budgetMs:1800000,reviewerMaxMs:600000,authorBudget:'actual common remainder',sourceCommit:'51f10ba2d9c005a16231f72094fb5a9773bae687',runtime:prepared.runtime,baseline:prepared.baseline,image:prepared.image,model:prepared.model,variant:prepared.variant,taskSha256:prepared.taskSha256,environmentSha256:prepared.environmentSha256,baselineTreeSha256:prepared.baselineTreeSha256,configHashes:prepared.configHashes,bundleHashes:Object.fromEntries(Object.entries(prepared.bundles).map(([r,v])=>[r,v.sha256])),archiveSha256:get('local/ledger-review-delivery/private-evidence-index.json').archiveSha256,files,recording:'research-full-v1',forbidden:['A','availability probe','real smoke','retry','additional review','post-stop continuation'],historicalStateUnchanged:true});
+console.log('Prepared separate manifest; commit locally before dispatch and record its exact SHA.');
