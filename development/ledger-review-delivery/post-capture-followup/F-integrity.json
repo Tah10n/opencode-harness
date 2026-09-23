@@ -1,0 +1,31 @@
+{
+  "executionDirectory": "/work/repo/.git/harness-task/2ef7bc1c-a0c5-4fb8-8d68-14f0cf8cc9ff/worktree",
+  "terminalPatchTreeMatches": true,
+  "integrity": {
+    "equivalent": true,
+    "actualTreeVerified": true,
+    "patches": [
+      {
+        "sha256": "7c69f3dc093548780210270b07cca4173707300192223ae17e28dc7a0d4f7c03",
+        "bytes": 13866,
+        "applied": true,
+        "treeSha256": "053c31874d0673e981a908ebe82190c85f9d14eb6308a6d1adb4ab9257738c3f"
+      },
+      {
+        "sha256": "7c69f3dc093548780210270b07cca4173707300192223ae17e28dc7a0d4f7c03",
+        "bytes": 13866,
+        "applied": true,
+        "treeSha256": "053c31874d0673e981a908ebe82190c85f9d14eb6308a6d1adb4ab9257738c3f"
+      }
+    ]
+  },
+  "workflowStatus": "incomplete",
+  "stages": [
+    {
+      "label": "implementation",
+      "role": "author",
+      "elapsedMs": 660427,
+      "messageID": "msg_0ce446c1c001bqCkP4szTtemb5"
+    }
+  ]
+}

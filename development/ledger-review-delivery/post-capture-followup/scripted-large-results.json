@@ -1,0 +1,91 @@
+{
+  "stages": {
+    "A": {
+      "resolution": {
+        "run": "17eb92cd-a597-4ac6-9d36-94d41c3e62bf",
+        "parentSession": "ses_f31ccbb0effe2eGRqBj5pQN7cq",
+        "sessions": {
+          "author": "ses_f31ccb78cffepk24Rw9Q247zEq"
+        },
+        "compact": true,
+        "resultSha256": "bc05276c8222fd2f19516cd8efdedb3beeedf66f75ad119f068729f1d81c3b52",
+        "snapshotSha256": "989c1aafbf38d95fa24827ef0bb6438d43510000101fffcec1a14f3947b0dca9",
+        "patchSha256": "6622bf5ed73f236261d0361eee281774035d431f6a0c90fd0bedb4945e289772"
+      },
+      "receiptSha256": "6b61d0e51db4439cddeaa292d8fdb68856301ed6258692c0da33a43707d8ab71",
+      "fullBytes": 33399,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "integrity": {
+        "equivalent": true,
+        "actualTreeVerified": true,
+        "patches": [
+          {
+            "sha256": "6622bf5ed73f236261d0361eee281774035d431f6a0c90fd0bedb4945e289772",
+            "bytes": 1347,
+            "applied": true,
+            "treeSha256": "c8e92c13632cee5df3aa8e8511c152e6c402bc5d4e8ba36f345f5cc50bf3af54"
+          },
+          {
+            "sha256": "8c4db83c661cc7e55763ae4fd44b90d805bc1e8f1951d56a5906a60b174f530d",
+            "bytes": 1347,
+            "applied": true,
+            "treeSha256": "c8e92c13632cee5df3aa8e8511c152e6c402bc5d4e8ba36f345f5cc50bf3af54"
+          }
+        ]
+      }
+    },
+    "F": {
+      "resolution": {
+        "run": "879ed3bf-bf7e-40ce-a7c6-f42bf232befd",
+        "parentSession": "ses_f31cc8130ffeUAv0uppz8mwm2t",
+        "sessions": {
+          "author": "ses_f31cc7d8cffeCd6OgaEn7EX71S"
+        },
+        "compact": true,
+        "resultSha256": "4406cd91067cc7fc34e08f103866016faddf9b1144727409b8ec914f336afd83",
+        "snapshotSha256": "03f4c28a7be08fa2cf75b35a1c710c13b42c030a49098434a637e15ed4762313",
+        "patchSha256": "e3b06e2f20a96a5f1cb01f32d3cb43f1264f7e273b7b6f4f85959d18e34f1475"
+      },
+      "receiptSha256": "3712bb1f9926d76d50e65d50b2ade75e1a3dd5a7c10c4f3925517680a40cd6a6",
+      "fullBytes": 137815,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "integrity": {
+        "equivalent": true,
+        "actualTreeVerified": true,
+        "patches": [
+          {
+            "sha256": "e3b06e2f20a96a5f1cb01f32d3cb43f1264f7e273b7b6f4f85959d18e34f1475",
+            "bytes": 417,
+            "applied": true,
+            "treeSha256": "31e7af2a6784d47d347557e3d6d186fcf4f332f55fb47a0fe2bf6658cf4b36b9"
+          },
+          {
+            "sha256": "e3b06e2f20a96a5f1cb01f32d3cb43f1264f7e273b7b6f4f85959d18e34f1475",
+            "bytes": 417,
+            "applied": true,
+            "treeSha256": "31e7af2a6784d47d347557e3d6d186fcf4f332f55fb47a0fe2bf6658cf4b36b9"
+          }
+        ]
+      }
+    }
+  },
+  "productThresholdUnchanged": 16000,
+  "fullArtifactsPrivate": true,
+  "modelContextClaim": "Only original request recordings establish model input; full saved artifact is not automatically model context."
+}

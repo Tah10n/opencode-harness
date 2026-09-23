@@ -1,0 +1,100 @@
+{
+  "delivery": "full B-to-final patch; functionally incomplete",
+  "assessment_integrity": "verified",
+  "raw_probe_counts": {
+    "tests": 23,
+    "pass": 15,
+    "fail": 8
+  },
+  "raw_is_not_semantic_score": true,
+  "contract_results": [
+    {
+      "component": "delivery_apply",
+      "status": "pass",
+      "evidence": "Full B-to-final M and D0-to-final delta match actual F delivery files/modes. Ordinary Git application and independent F/E copies verified."
+    },
+    {
+      "component": "project_checks",
+      "status": "pass",
+      "evidence": "Final delivered readers 92/92, config 103/103, protocol 14/14 pass independently. Offline pnpm verify unavailable."
+    },
+    {
+      "component": "event_identity_lifecycle",
+      "status": "fail",
+      "evidence": "Four raw adapter lifecycle probes pass; Claude probe fails privacy assertion. Claude/Antigravity unfinished replay returns 30 instead of 15; completing line restores 15 plus new 7."
+    },
+    {
+      "component": "legacy_migration",
+      "status": "fail",
+      "evidence": "Actual 0.4.3 state from four collectors, including bound source/account IDs: prior day 15 disappears after source replacement; only new day 15 remains. Kimi legacy probes pass."
+    },
+    {
+      "component": "source_account_boundaries",
+      "status": "pass",
+      "evidence": "Public same-source account-remap observation retains 15 once. CLI tests use separate client/source IDs; five full cases pass and Claude passes first source isolation assertions before failing privacy. No broad reconnect claim."
+    },
+    {
+      "component": "opencode_cutover",
+      "status": "fail",
+      "evidence": "Historical missing-exact-cutover probe returns rather than rejects; adapter does not inspect supplied serverBaseline/cutover before presenting a complete result. Confirmed-cutover raw scenario and project server-acceptance test pass. These do not establish the missing-cutover fail-closed contract."
+    },
+    {
+      "component": "corrupt_state",
+      "status": "fail",
+      "evidence": "Mutating actual JSON-roundtripped eventLedger.version from 1 to -1 and deleting source yields complete empty usage with no diagnostics."
+    },
+    {
+      "component": "diagnostic_consumer",
+      "status": "fail",
+      "evidence": "OpenCode conflict retains first tuple and unrelated valid event (22, partial), but normalizeAdapterDiagnostics removes event_usage_conflict. The raw diagnostic-name assertion alone is not treated as a defect."
+    },
+    {
+      "component": "privacy",
+      "status": "fail",
+      "evidence": "Actual Claude state persists provider IDs in messages keys/files[].ids, including a valid 64-hex ID; persisted CLI state reproduces the leak."
+    },
+    {
+      "component": "ranges_components_parser_apis",
+      "status": "pass",
+      "evidence": "Independent 209 project tests plus four complete lifecycle/range probes pass; fifth lifecycle probe fails privacy before later coverage. No layout requirement or exhaustive-input claim."
+    },
+    {
+      "component": "cli_persistence",
+      "status": "fail",
+      "evidence": "Five raw source-isolation/deletion-retention cases pass. Claude is stopped by persisted raw-ID failure before later deletion assertions; later Claude CLI deletion is unproven, not passed."
+    },
+    {
+      "component": "valid_beside_unsupported",
+      "status": "fail",
+      "evidence": "Fresh inputs retain valid usage with partial in Antigravity/OpenCode. With prior accepted Antigravity 15, valid new 7 beside unsupported input is absent: reports 15 rather than 22 and stays 15 after deletion."
+    },
+    {
+      "component": "bounded_storage_retention",
+      "status": "pass",
+      "evidence": "Final actual 16 MiB bound exercised through public Antigravity collector with JSON-roundtripped real state. At event 34, 33 persisted tuples remain and the new tuple is rejected with partial diagnostics. Deletion preserves accepted total; old replay is counted once; a small new tuple is accepted. Separate entry-count boundary is covered only by the delivered synthetic unit test, not a collector saturation run."
+    },
+    {
+      "component": "bounded_scans",
+      "status": "unknown",
+      "evidence": "Inherited limits and parser APIs remain in the full patch; public suite coverage passes. No separate resource-boundary matrix repeated. Actual byte-bound collector check passed; broader scan-boundary behavior remains unproven."
+    }
+  ],
+  "Q_followup": false,
+  "T_followup": true,
+  "D_followup": false,
+  "historical": {
+    "D0_Q": false,
+    "A_native_completed": true,
+    "pilot_T": false,
+    "pilot_D": false,
+    "R": "not_started",
+    "F": "not_started"
+  },
+  "reviewer_help": {
+    "complete_records_before_tail": "F changed shared/Claude parsing and added two public collector regressions; both pass. This does not fix relocated unterminated replay, which still doubles usage.",
+    "duplicate_conflict": "F removed the pre-parser known-ID skip and added a public conflict regression. It checks file replacement rather than the exact append trigger; source trace supports the intended repair, but the delivered regression is narrower than the review wording. Diagnostic consumer loss remains.",
+    "capacity": "Independently confirmed improvement at actual byte bound; no unpersisted usage is emitted.",
+    "review_test_omission_claim": "Snapshot Checks NOT RUN is review evidence availability, not proof A failed to execute tests. Historical native A did run tests. This statement is not scored as an implementation defect."
+  },
+  "decision": "Partial help and verified completed separate R/F delivery; entire original ledger task remains incomplete. No further repair/review/run. No claim of continuous old-chain success, causal reviewer benefit or equal-time superiority."
+}

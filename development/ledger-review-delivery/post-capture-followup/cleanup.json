@@ -1,0 +1,31 @@
+{
+  "completed": true,
+  "containersVerifiedAbsent": [
+    "template-dev-3e61c31a-3c0a-4d5f-a6a2-13dcba6566c9",
+    "template-dev-fe1ffcf3-522c-4699-9349-32e801215e9a",
+    "template-dev-46c1e819-8705-41a4-a432-654dea2b1750",
+    "template-dev-8158201f-7ef7-4b7d-a2cb-2323819f1412",
+    "template-dev-bfb76205-b4f6-49a3-8ec8-a4a8599897c0",
+    "template-dev-ac8a53fc-b09d-424f-a974-de3426ef96a9",
+    "template-dev-92222256-95b3-4137-a74d-5ff50e9e9287",
+    "template-dev-6a74d125-636b-47b8-b19f-7126baaff00c"
+  ],
+  "archive": {
+    "path": "local/ledger-review-delivery/post-capture-followup-evidence.tar.gz",
+    "sha256": "1987bd43e4d9bc63f7b9c3b9e96142d130f26d7a8fe116640fe1117993257e62",
+    "bytes": 23644257,
+    "entriesVerified": 1265
+  },
+  "historicalArchiveUnchanged": "54b66700f95a3adf210e9d660f031671aba255901fcc52705eb05154cb59c391",
+  "allocatedBytesRemoved": 515751936,
+  "netAllocatedBytesReleased": 491433984,
+  "removed": [
+    "local/ledger-review-delivery/post-capture-followup",
+    "local/ledger-review-delivery/author-bundle",
+    "local/ledger-review-delivery/reviewer-bundle",
+    "local/ledger-review-delivery/baseline"
+  ],
+  "preserved": "two verified private archives and indexes; public patches and receipts; shared runtime/image/dependencies untouched",
+  "globalPrune": false,
+  "accountingScope": "Allocated regular-file blocks in removed task copies, less the new retained archive and index; excludes directory metadata and shared resources."
+}

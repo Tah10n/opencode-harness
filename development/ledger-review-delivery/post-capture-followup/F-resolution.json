@@ -1,0 +1,11 @@
+{
+  "run": "2ef7bc1c-a0c5-4fb8-8d68-14f0cf8cc9ff",
+  "parentSession": "ses_f31c59530ffe0gosuQuwmgYmL9",
+  "sessions": {
+    "author": "ses_f31c58705ffe0CbJbovNhZA3pq"
+  },
+  "compact": true,
+  "resultSha256": "b00a35fe8102d01df501b902b39e2fc830a0aa23cc582cdee4be74cd8295f1b2",
+  "snapshotSha256": "89381d11b73c69de37d2a96c4f5e3c2d43da239d9c12f00a4fbf8f967866d03c",
+  "patchSha256": "7c69f3dc093548780210270b07cca4173707300192223ae17e28dc7a0d4f7c03"
+}

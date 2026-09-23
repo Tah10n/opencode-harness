@@ -1,0 +1,148 @@
+{
+  "requests": [
+    {
+      "index": 1,
+      "names": [],
+      "afterToolResult": false
+    },
+    {
+      "index": 2,
+      "names": [
+        "glob",
+        "grep",
+        "read"
+      ],
+      "afterToolResult": false
+    },
+    {
+      "index": 3,
+      "names": [
+        "glob",
+        "grep",
+        "read"
+      ],
+      "afterToolResult": true
+    },
+    {
+      "index": 4,
+      "names": [
+        "glob",
+        "grep",
+        "read"
+      ],
+      "afterToolResult": true
+    },
+    {
+      "index": 5,
+      "names": [
+        "glob",
+        "grep",
+        "read"
+      ],
+      "afterToolResult": true
+    },
+    {
+      "index": 6,
+      "names": [
+        "glob",
+        "grep",
+        "read"
+      ],
+      "afterToolResult": true
+    },
+    {
+      "index": 7,
+      "names": [
+        "glob",
+        "grep",
+        "read"
+      ],
+      "afterToolResult": true
+    },
+    {
+      "index": 8,
+      "names": [
+        "glob",
+        "grep",
+        "read"
+      ],
+      "afterToolResult": true
+    },
+    {
+      "index": 9,
+      "names": [
+        "glob",
+        "grep",
+        "read"
+      ],
+      "afterToolResult": true
+    },
+    {
+      "index": 10,
+      "names": [
+        "glob",
+        "grep",
+        "read"
+      ],
+      "afterToolResult": true
+    },
+    {
+      "index": 11,
+      "names": [
+        "glob",
+        "grep",
+        "read"
+      ],
+      "afterToolResult": true
+    },
+    {
+      "index": 12,
+      "names": [
+        "glob",
+        "grep",
+        "read"
+      ],
+      "afterToolResult": true
+    },
+    {
+      "index": 13,
+      "names": [
+        "glob",
+        "grep",
+        "read"
+      ],
+      "afterToolResult": true
+    },
+    {
+      "index": 14,
+      "names": [
+        "glob",
+        "grep",
+        "read"
+      ],
+      "afterToolResult": true
+    },
+    {
+      "index": 15,
+      "names": [
+        "glob",
+        "grep",
+        "read"
+      ],
+      "afterToolResult": true
+    },
+    {
+      "index": 16,
+      "names": [
+        "glob",
+        "grep",
+        "read"
+      ],
+      "afterToolResult": true
+    }
+  ],
+  "exactInventory": true,
+  "postToolResultChecked": true,
+  "nativeToolsOnlyAllowed": true,
+  "unchangedSnapshotCapture": true
+}

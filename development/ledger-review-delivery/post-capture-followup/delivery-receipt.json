@@ -1,0 +1,186 @@
+{
+  "freezeCommit": "69a66199ffa727f4f9664c64ada8aa7089b5852d",
+  "summary": {
+    "status": "finished",
+    "pause": null,
+    "globalStart": 1790166003871,
+    "globalDeadline": 1790167803871,
+    "finishedAt": 1790167001908,
+    "results": [
+      {
+        "stage": "R",
+        "outcome": {
+          "status": "finished",
+          "pause": null
+        },
+        "result": {
+          "slot": 1,
+          "task": "account-switch-ledger",
+          "arm": "R",
+          "source": "local/ledger-review-delivery/post-capture-followup/real/R/input",
+          "exitCode": 0,
+          "signal": null,
+          "termination": {
+            "terminationVerified": true,
+            "killed": []
+          },
+          "timedOut": false,
+          "stopReason": null,
+          "researchBoundary": "not-reached",
+          "completedAt": 1790166325577,
+          "executionElapsedMs": 320032,
+          "cleanupElapsedMs": 52,
+          "elapsedMs": 320084,
+          "parseErrors": 0,
+          "nativeCompleted": true,
+          "requests": 16,
+          "requestsWithoutUsage": 0,
+          "workflowStatus": null,
+          "repairs": null,
+          "toolCalls": 31,
+          "sessions": 1,
+          "delivery": null,
+          "ownTaskDeadlineTriggered": false
+        },
+        "stop": {
+          "ownTaskDeadlineTriggered": false,
+          "terminationVerified": true,
+          "captureSaved": true,
+          "forwardingClosed": true,
+          "relayRemoved": true,
+          "activeProviderHandlers": 0,
+          "providerServerStateMayRemainUnknown": false
+        },
+        "requests": 16
+      },
+      {
+        "stage": "F",
+        "outcome": {
+          "status": "finished",
+          "pause": null
+        },
+        "result": {
+          "slot": 2,
+          "task": "account-switch-ledger",
+          "arm": "F",
+          "source": "local/ledger-review-delivery/post-capture-followup/real/F/input",
+          "exitCode": 0,
+          "signal": null,
+          "termination": {
+            "terminationVerified": true,
+            "killed": []
+          },
+          "timedOut": false,
+          "stopReason": null,
+          "researchBoundary": "not-reached",
+          "completedAt": 1790166999815,
+          "executionElapsedMs": 670486,
+          "cleanupElapsedMs": 66,
+          "elapsedMs": 670552,
+          "parseErrors": 0,
+          "phaseCount": 1,
+          "continuationApplied": false,
+          "nativeCompleted": true,
+          "requests": 49,
+          "requestsWithoutUsage": 0,
+          "workflowStatus": "incomplete",
+          "repairs": 0,
+          "toolCalls": 79,
+          "sessions": 2,
+          "delivery": "/work/repo/.git/harness-task/2ef7bc1c-a0c5-4fb8-8d68-14f0cf8cc9ff/worktree",
+          "ownTaskDeadlineTriggered": false
+        },
+        "stop": {
+          "ownTaskDeadlineTriggered": false,
+          "terminationVerified": true,
+          "captureSaved": true,
+          "forwardingClosed": true,
+          "relayRemoved": true,
+          "activeProviderHandlers": 0,
+          "providerServerStateMayRemainUnknown": false
+        },
+        "requests": 49
+      }
+    ],
+    "stages": {
+      "A": "not_started",
+      "R": "native_completed",
+      "F": "native_completed"
+    }
+  },
+  "stages": {
+    "R": {
+      "status": "native_completed",
+      "requests": 16,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": 819319,
+        "output_tokens": 14774,
+        "cached_tokens": 219136,
+        "reasoning_tokens": 12564
+      },
+      "toolCalls": 31,
+      "tools": {
+        "grep": 10,
+        "read": 20,
+        "glob": 1
+      },
+      "sessions": 1,
+      "nativeElapsedMs": 320084,
+      "executionElapsedMs": 320032,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "nativeCompleted": true
+    },
+    "F": {
+      "status": "native_completed",
+      "requests": 49,
+      "requestsWithoutUsage": 0,
+      "usage": {
+        "input_tokens": 4191917,
+        "output_tokens": 22999,
+        "cached_tokens": 2643968,
+        "reasoning_tokens": 14156
+      },
+      "toolCalls": 79,
+      "tools": {
+        "harness_task": 1,
+        "todowrite": 3,
+        "bash": 27,
+        "glob": 2,
+        "grep": 10,
+        "read": 27,
+        "apply_patch": 9
+      },
+      "sessions": 2,
+      "nativeElapsedMs": 670552,
+      "executionElapsedMs": 670486,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "nativeCompleted": true
+    }
+  },
+  "finalPatch": {
+    "sha256": "225094f080a304fe598200d5c4f8252ad20af2ef2c08b5d35ab9967509f7b8b7",
+    "deltaSha256": "7c69f3dc093548780210270b07cca4173707300192223ae17e28dc7a0d4f7c03",
+    "fullTreeMatchesActual": true
+  },
+  "deliveryApply": true,
+  "Q_followup": false,
+  "T_followup": true,
+  "D_followup": false
+}
