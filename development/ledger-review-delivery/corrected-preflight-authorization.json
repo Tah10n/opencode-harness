@@ -1,0 +1,10 @@
+{
+  "authorization": "User explicitly approved one corrected scripted preflight and one additional final push to existing PR #25.",
+  "previousHead": "4cd33479",
+  "previousFailedAttemptPreserved": true,
+  "correctedAttemptDirectory": "local/ledger-review-delivery/preflight-corrected",
+  "correctedScriptedAttempts": 1,
+  "realPilotLimitUnchanged": true,
+  "realAdmissionRequiresSuccessfulPreflightAndCommittedFreeze": true,
+  "continuationAfterNewStop": false
+}

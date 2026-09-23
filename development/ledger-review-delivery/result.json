@@ -1,11 +1,12 @@
 {
-  "status": "preflight_stopped",
-  "reason": "scripted_parent_input_assertion",
+  "status": "corrected_preflight_stopped",
+  "reason": "overstrict_patch_byte_equality",
   "budgetAmendment": "authorized_and_implemented",
   "realProviderRequests": 0,
-  "scriptedProviderRequests": 2,
-  "scriptedNativeParentSessions": 1,
-  "scriptedNativeAuthorSessions": 0,
+  "scriptedProviderRequestsTotal": 9,
+  "scriptedAttempts": 2,
+  "scriptedNativeParentSessionsTotal": 2,
+  "scriptedNativeAuthorSessionsTotal": 1,
   "realNativeSessions": 0,
   "realDeadlineStarted": false,
   "stages": {

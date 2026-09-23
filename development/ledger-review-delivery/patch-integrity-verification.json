@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "scope": "saved corrected-preflight patches only; no native rerun",
+  "differentPatchBytes": true,
+  "equivalent": true,
+  "actualTreeVerified": false,
+  "patches": [
+    {
+      "sha256": "6622bf5ed73f236261d0361eee281774035d431f6a0c90fd0bedb4945e289772",
+      "bytes": 1347,
+      "applied": true,
+      "treeSha256": "c8e92c13632cee5df3aa8e8511c152e6c402bc5d4e8ba36f345f5cc50bf3af54"
+    },
+    {
+      "sha256": "8c4db83c661cc7e55763ae4fd44b90d805bc1e8f1951d56a5906a60b174f530d",
+      "bytes": 1347,
+      "applied": true,
+      "treeSha256": "c8e92c13632cee5df3aa8e8511c152e6c402bc5d4e8ba36f345f5cc50bf3af54"
+    }
+  ],
+  "untrackedFilesPreserved": true,
+  "executableModePreserved": true,
+  "changedContentRejected": true,
+  "changedModeRejected": true,
+  "deliberateDraftTestFailurePreserved": true,
+  "realProviderRequests": 0,
+  "nativeLaunches": 0
+}

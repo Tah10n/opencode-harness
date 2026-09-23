@@ -78,3 +78,14 @@ is corrected and passes model-free request replay, but the installed chain and
 acceptance freeze remain unvalidated/not admitted. Do not rerun the saved root or
 start the real pilot without the explicitly authorized corrected preflight and
 its successful evidence. See REPORT.md for exact limits and accounting.
+
+
+## Authorized corrected preflight: preserved second stop
+
+The user approved one corrected scripted preflight and one additional final push.
+The corrected attempt completed scripted A but closed admission at an overly strict
+terminal/external diff byte comparison. Saved patch applications confirm equal
+file bytes and modes despite block ordering. The comparison is corrected locally
+and negative byte/mode controls pass; no installed rerun followed this stop.
+R/F and the entire real pilot remain not_started. Neither a new preparation root
+nor post-hoc equivalence reopens the closed attempt. See preflight-corrected.json.

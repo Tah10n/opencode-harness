@@ -2,6 +2,7 @@
 import fs from 'node:fs';import path from 'node:path';import os from 'node:os';
 import assert from 'node:assert/strict';import {execFileSync,spawn} from 'node:child_process';import {createHash} from 'node:crypto';
 import {runOperation} from './operation.mjs';
+import {verifyPatches,projectManifest} from './patch-integrity.mjs';
 import {startContainer} from '../native-task-integrated/container-session.mjs';
 import {stopWorkload} from '../native-task-utility/container/stop-workload.mjs';
 import {captureCandidate} from '../polybench-pilot/capture.mjs';
@@ -40,16 +41,18 @@ export async function chain({root,baseline,task,environment='',scriptedFetch=nul
   const env=s=>['OPENCODE_CONFIG_DIR=/template','OPENCODE_BIN=/opt/opencode','OPENCODE_CONFIG_CONTENT='+JSON.stringify(config),'HARNESS_REVIEW_BASE='+s.baseline,'HARNESS_REVIEW_TASK_FILE=/work/repo/TASK.md','PATH=/work/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'];
   const snapshot=s=>{const r=s.exec(['env',...env(s),'node','/template/review-context.mjs']);assert.equal(r.status,0,r.stderr);const v=JSON.parse(r.stdout);assert.equal(v.status,'captured');return v;};
   const capture=Object.assign((s,dir)=>{
-   const r=captureCandidate(s,dir);if(r.status!==0)return r;
+   const r=captureCandidate(s,dir);if(r.status!==0)return r;s.evidenceComplete=false;
    const native=get(dir+'/native-evidence.json');
    const text=s.exec(['node','-e',"const {DatabaseSync}=require('node:sqlite');const db=new DatabaseSync('/work/data/opencode/opencode.db',{readOnly:true});console.log(JSON.stringify(db.prepare('SELECT session_id,message_id,data FROM part').all().map(x=>({...x,data:JSON.parse(x.data)})).filter(x=>x.data.type==='text')));db.close();"]);assert.equal(text.status,0);fs.writeFileSync(dir+'/native-text.json',text.stdout,{flag:'wx',mode:0o600});
    if(stage==='R') {assert.deepEqual(snapshot(s),s.before);assert.ok(native.tools.every(t=>['read','glob','grep'].includes(t.data.tool)));assert.ok(native.sessions.every(t=>!t.parent_id));}
    else {
     const workflow=JSON.parse(native.tools.find(t=>t.data.tool==='harness_task')?.data.state?.output??'null');assert.ok(workflow?.executionDirectory,'No delivered author worktree');assert.deepEqual(workflow.stages.map(t=>t.role),['author']);assert.equal(workflow.repairs,0);
-    const terminal=s.exec(['node','-e',`const fs=require('fs'),path=require('path');process.stdout.write(fs.readFileSync(path.dirname(${JSON.stringify(workflow.executionDirectory)})+'/terminal.patch'));`]);assert.equal(terminal.status,0,terminal.stderr);assert.equal(terminal.stdout,fs.readFileSync(dir+'/model.patch','utf8'),'Terminal/external full diff mismatch');
-    save(dir+'/delivery-integrity.json',{executionDirectory:workflow.executionDirectory,terminalPatchMatches:true,workflowStatus:workflow.status,stages:workflow.stages});
+    const terminal=s.exec(['node','-e',`const fs=require('fs'),path=require('path');process.stdout.write(fs.readFileSync(path.dirname(${JSON.stringify(workflow.executionDirectory)})+'/terminal.patch'));`]);assert.equal(terminal.status,0,terminal.stderr);fs.writeFileSync(dir+'/native-terminal.patch',terminal.stdout,{flag:'wx',mode:0o600});
+    const actual=s.exec(['node','-e',`const fs=require('fs'),path=require('path'),{createHash}=require('crypto');const manifest=${manifest.toString()};console.log(JSON.stringify(manifest(${JSON.stringify(workflow.executionDirectory)})));`]);assert.equal(actual.status,0,actual.stderr);const actualTree=JSON.parse(actual.stdout);delete actualTree['TASK.md'];save(dir+'/delivery-tree.json',actualTree);
+    const integrity=verifyPatches({baseline:source,patches:[terminal.stdout,fs.readFileSync(dir+'/model.patch')],evidenceDir:dir+'/patch-integrity',expectedTree:actualTree});
+    save(dir+'/delivery-integrity.json',{executionDirectory:workflow.executionDirectory,terminalPatchTreeMatches:true,integrity,workflowStatus:workflow.status,stages:workflow.stages});
    }
-   return r;
+   s.evidenceComplete=true;return r;
   },{requiresOutputRetention:true});
   const outcome=await runOperation({root:stageRoot,f,operation,verify:()=>{
    assert.equal(hash(JSON.stringify(manifest(f.template))),prepared.bundles[role].sha256);assert.deepEqual(manifest(source),f.inputManifests['account-switch-ledger-'+stage]);
@@ -65,7 +68,7 @@ export async function chain({root,baseline,task,environment='',scriptedFetch=nul
    }catch(e){s.close();throw e;}
   },runTaskImplementation:async(s,o)=>{
    if(stage!=='R')return authorTask(s,{...o,arm:'AR0'});
-   s.before=snapshot(s);assert.equal(s.before.task,input);assert.equal(hash(s.before.diff),hash(fs.readFileSync(previousPatch)));save(out+'/snapshot-before.json',s.before);
+   s.before=snapshot(s);assert.equal(s.before.task,input);verifyPatches({baseline,patches:[fs.readFileSync(previousPatch),s.before.diff],evidenceDir:out+'/review-input-integrity',expectedTree:projectManifest(source)});save(out+'/snapshot-before.json',s.before);
    const r=await runNativePhase(s,o,{spawnProcess:(cmd,args,settings)=>{const at=args.indexOf(s.name),after=args.slice(at);after[after.indexOf('harness-task')]='harness-review';after[after.indexOf('--agent')+1]='harness-reviewer';return spawn(cmd,['exec','--workdir','/work/repo',...env(s).flatMap(v=>['--env',v]),...after],settings);}});
    const response=r.events.filter(e=>e.type==='text').map(e=>e.part?.text??'').join('');fs.writeFileSync(out+'/response.md',response,{flag:'wx',mode:0o600});
    const {events,stderr,...rest}=r;return {...rest,nativeCompleted:r.exitCode===0&&!r.timedOut&&!r.parseErrors&&!events.some(e=>e.type==='error')&&events.some(e=>e.type==='step_finish'&&e.part?.reason==='stop')};
