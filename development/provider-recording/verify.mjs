@@ -41,6 +41,33 @@ for(const mode of ['new-label','limit','corruption','request-corruption','unsafe
  if(mode==='corruption')fs.writeFileSync(dir+'/response-1.sse','corrupt');
  assert.equal(recording.finish('eof'),mode==='new-label');results.push({mode,state:rec.recording.status,passed:true});
 }
+for(const [mode,bounds,expectedScopes] of [
+ ['response-bound',{responseBytes:5,totalBytes:100},['response']],
+ ['slot-bound',{responseBytes:100,totalBytes:9},['slot']],
+ ['both-bounds',{responseBytes:5,totalBytes:9},['response','slot']],
+]){
+ const dir=root+'/'+mode;fs.mkdirSync(dir,{mode:0o700});
+ const record={requestIndex:1,requestKind:'work',relayRequestId:'local'};
+ const recorder=prepareRecording(dir,{run:'local'},{bounds:{...recordingProfile,...bounds}}).begin(record,'{}','{}');
+ assert.equal(recorder.append(Buffer.alloc(6,0x61)),false);
+ assert.deepEqual(record.recording.limit,{requestIndex:1,exceeded:expectedScopes.map(scope=>({
+  scope,boundBytes:scope==='response'?bounds.responseBytes:bounds.totalBytes,
+  usedBytes:scope==='response'?0:4,operationBytes:6,
+ }))});
+ assert.equal(record.recording.status,'limit');
+ const firstError=record.recording.error;
+ let restore=()=>{};
+ if(mode==='both-bounds'){
+  const m=mock.method(fs,'fsyncSync',function(){throw Error('scripted later fsync failure');});
+  restore=()=>m.mock.restore();
+ }
+ try{assert.equal(recorder.finish('eof'),false);}finally{restore();}
+ assert.equal(record.recording.error,firstError);
+ assert.equal(record.recording.status,'limit');
+ assert.equal(record.recording.evidenceComplete,false);
+ assert.equal(record.recording.terminalResponse,undefined);
+ results.push({mode,scopes:expectedScopes,passed:true});
+}
 {
  const dir=root+'/storage-time';fs.mkdirSync(dir,{mode:0o700});let now=0;const clock=mock.method(performance,'now',()=>now);let write;
  try{const rec={requestIndex:1};const recording=prepareRecording(dir,{run:'local'}).begin(rec,'{}','{}');const original=fs.writeSync;write=mock.method(fs,'writeSync',function(...args){const n=original.apply(this,args);now=30001;return n;});assert.equal(recording.append(stream),false);assert.equal(recording.finish('eof'),false);assert.match(rec.recording.error,/time limit/);results.push({mode:'storage-time-limit',passed:true});}finally{write?.mock.restore();clock.mock.restore();}

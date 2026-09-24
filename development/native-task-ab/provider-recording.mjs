@@ -21,7 +21,11 @@ export function prepareRecording(directory,identity,{bounds=recordingProfile}={}
   record.recording=state;
   const statusFile=path.join(target,`recording-${index}.json`),responseFile=path.join(target,state.response.file);
   let fd,closed=false,hash=createHash('sha256'),forwardHash=createHash('sha256');
-  const fail=(error,status='write_error')=>{state.evidenceComplete=false;state.status=status;state.error=error.message;state.response.status=status;return false;};
+  const fail=(error,status='write_error')=>{
+   state.evidenceComplete=false;
+   if(state.error){(state.additionalErrors??=[]).push(error.message);return false;}
+   state.status=status;state.error=error.message;state.response.status=status;return false;
+  };
   const persist=()=>{try{privateJSON(statusFile,{...state,responseId:record.responseId??null,upstreamRequestId:record.upstreamRequestId??null,httpStatus:record.status??null,contentType:record.contentType??null,terminalResponse:record.terminalResponse??null,serverCompletion:record.serverCompletion??null,storageMs});return true;}catch(e){return fail(e);}};
   const writeRequest=(name,body)=>{
    const bytes=Buffer.from(body);if(bytes.length>bounds.requestBytes||total+bytes.length>bounds.totalBytes)throw Error('Recording request byte limit');
@@ -33,7 +37,14 @@ export function prepareRecording(directory,identity,{bounds=recordingProfile}={}
     if(closed||state.status!=='recording')return false;
     const bytes=Buffer.from(chunk),started=performance.now();
     // A limit leaves an explicit partial prefix; never silently truncates as complete.
-    if(state.response.size+bytes.length>bounds.responseBytes||total+bytes.length>bounds.totalBytes)return fail(Error('Recording response byte limit'),'limit');
+    const exceeded=[
+     {scope:'response',boundBytes:bounds.responseBytes,usedBytes:state.response.size,operationBytes:bytes.length},
+     {scope:'slot',boundBytes:bounds.totalBytes,usedBytes:total,operationBytes:bytes.length},
+    ].filter(limit=>limit.usedBytes+limit.operationBytes>limit.boundBytes);
+    if(exceeded.length){
+     state.limit={requestIndex:index,exceeded};
+     return fail(Error('Recording response byte limit: '+exceeded.map(limit=>limit.scope).join('+')),'limit');
+    }
     try{timed(()=>{let at=0;while(at<bytes.length){const n=fs.writeSync(fd,bytes,at,Math.min(65536,bytes.length-at));if(n<=0)throw Error('Recording write made no progress');hash.update(bytes.subarray(at,at+n));at+=n;state.response.size+=n;total+=n;if(storageMs+performance.now()-started>=bounds.storageMs)throw Error('Recording storage time limit');}});state.response.status='partial';return true;}catch(e){return fail(e);}
    },
    forwarded(chunk){const b=Buffer.from(chunk);state.forwarded.size+=b.length;forwardHash.update(b);},

@@ -43,6 +43,11 @@ Paths come only from host-selected run directories and numeric request indices.
 Exclusive creation prevents request overwrite. Directory/file type, link count,
 permissions, size and hashes are checked; corruption or limits cannot certify
 complete evidence. Authorization, cookies and full headers are not recorded.
+When an append exceeds a bound, `recording-N.json` now names every exceeded
+scope (`response`, `slot`, or both) and records its bound, bytes already used,
+rejected chunk size and request index. The first recording failure remains the
+primary error if finalization or persistence then fails; later errors are listed
+separately. Bounds, slot accounting and the pause policy are unchanged.
 The existing private JSON/hash helpers are reused; there is no second native
 output collector or general telemetry service.
 

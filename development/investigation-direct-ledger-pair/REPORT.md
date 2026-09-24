@@ -128,6 +128,13 @@ against their recorded sizes and SHA-256 values. Both patch captures and native
 output exports succeeded. This proves the *local* stop and retained partial
 evidence; it cannot establish the upstream completion of response 148.
 
+**Later diagnostic clarification (2026-09-24):** the earlier generic
+“response byte limit” label conflated two predicates. Summed saved bytes prove
+the whole-slot limit was reached at request 148; the rejected chunk length was
+not saved, so simultaneous response-bound exceedance is unknown. The original
+record and I1 unknown completion remain unchanged. See
+[the bounded delivery and recorder follow-up](DELIVERY-FOLLOWUP.md).
+
 ## Resources and interpretation
 
 | Provider role | Requests | Known input | Known output | Cached input subset | Reasoning output subset |
