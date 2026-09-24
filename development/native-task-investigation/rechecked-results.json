@@ -1,0 +1,951 @@
+{
+  "version": 1,
+  "status": "all-seven-original-slots-attempted-last-slot-stopped",
+  "productCandidate": "9cd8ffb4dfcfd32f1a7a65ac9c3eaca44728d2e7",
+  "launcherCommit": "f745a4092bb955595bf902353bde6ae5e037c31b",
+  "originalFreezeSha256": "198d694521294c5f1eb0255a67f92ad61b8595f4a1b89d74cc4f94911afdd384",
+  "amendment": {
+    "sha256": "f31419cf01eb8361975ce25d845375b666ae8c9466e0e0a23d463f2d11c5ee0c",
+    "firstSlot": 3,
+    "lastSlot": 9,
+    "newAvailabilityRequests": 0,
+    "savedProbeReportSha256": "5d19b20c3f1ad0569044d32fb4d687544aa11d3d264bd7d4253da5fc350be409",
+    "savedProbePauseSha256": "0e32eb5556f164360af74331459a8b243bd152b03e3bac7899cb31d38691beb6",
+    "policy": "Explicit exception only for the false availability_not_confirmed text-extraction pause. Recheck the preserved completed probe offline; zero new availability requests. Run only original slots 3–9 once, stop on any new external failure or unverified execution. Preserve all three old pauses; historical remote outcomes remain unknown.",
+    "historicalEvidenceFilesPreserved": 45
+  },
+  "savedProbeRecheck": {
+    "kind": "offline-saved-availability-recheck",
+    "status": 200,
+    "usage": {
+      "input_tokens": 18,
+      "output_tokens": 29,
+      "total_tokens": 47,
+      "cached_tokens": 0,
+      "reasoning_tokens": 22
+    },
+    "streamEnded": true,
+    "handlerFinished": true,
+    "connectionClosed": true,
+    "activeProviderHandlers": 0,
+    "responseId": "resp_07804ed9bb5d4d50016aa90b2ddebc87d2bfdd1a5709b2b079",
+    "responseStatus": "completed",
+    "terminalResponse": {
+      "id": "resp_07804ed9bb5d4d50016aa90b2ddebc87d2bfdd1a5709b2b079",
+      "status": "completed",
+      "eventType": "response.completed",
+      "usage": {
+        "input_tokens": 18,
+        "output_tokens": 29,
+        "total_tokens": 47,
+        "cached_tokens": 0,
+        "reasoning_tokens": 22
+      }
+    },
+    "terminalEvents": 1,
+    "serverCompletion": "completed",
+    "text": "Okay",
+    "success": true,
+    "previousAdmissionSuccess": false,
+    "newProviderRequests": 0,
+    "usageAlreadyCounted": true,
+    "sourceHashes": {
+      "sse": "f0fdabbcfe69a4c4113a61dd43bb736274482f223c5a9def40f0971e3c2d2c2a",
+      "metadata": "c7432b7efda9e12feea85647e1066fd6ea27a757c9fc5f6c81e8f4c88b731c84",
+      "pause": "0e32eb5556f164360af74331459a8b243bd152b03e3bac7899cb31d38691beb6",
+      "report": "5d19b20c3f1ad0569044d32fb4d687544aa11d3d264bd7d4253da5fc350be409"
+    }
+  },
+  "slots": [
+    {
+      "slot": 1,
+      "task": "quick-lru-take",
+      "arm": "P",
+      "period": "original",
+      "status": "interrupted-before-implementation",
+      "Q": false,
+      "T": false,
+      "D": false,
+      "patch": "patches/quick-lru-take-P.patch",
+      "patchBytes": 0,
+      "reason": "Provider/transport interruption; required take API absent; no normal native stop."
+    },
+    {
+      "slot": 2,
+      "task": "quick-lru-take",
+      "arm": "R",
+      "period": "continuation-2-9",
+      "status": "interrupted-before-implementation",
+      "Q": false,
+      "T": false,
+      "D": false,
+      "patch": "patches/quick-lru-take-R.patch",
+      "patchBytes": 0,
+      "reason": "Provider/transport interruption; required take API absent; no normal native stop."
+    },
+    {
+      "slot": 3,
+      "task": "quick-lru-take",
+      "project": "quick-lru",
+      "arm": "H",
+      "period": "continuation-3-9-rechecked",
+      "status": "completed",
+      "Q": true,
+      "T": true,
+      "D": true,
+      "internalStatus": "incomplete",
+      "patch": "patches/quick-lru-take-H.patch",
+      "patchBytes": 4458,
+      "patchSha256": "8a91f1580df340cea7b51cb7984f10cf8d16a8ddd8b1fc86a9fd17b668b978f1",
+      "nativeCompleted": true,
+      "nativeExitCode": 0,
+      "nativeExecutionMs": 363437,
+      "nativeCleanupMs": 58,
+      "forwardedRequests": 23,
+      "titleRequests": 1,
+      "knownUsage": {
+        "input_tokens": 836898,
+        "output_tokens": 8043,
+        "total_tokens": 844941,
+        "cached_tokens": 73216,
+        "reasoning_tokens": 4274
+      },
+      "unknownUsageRequests": 0,
+      "totalTokens": 844941,
+      "summedRequestElapsedMs": 220783,
+      "overlappingRequestsPossible": true,
+      "sensitivityCalls": 2,
+      "sensitivityReportedElapsedMs": 127554,
+      "investigatorInvocations": 0,
+      "extraAttentionStages": [],
+      "checks": [
+        {
+          "name": "patch-application",
+          "exit": 0
+        },
+        {
+          "name": "npm test",
+          "exit": 0
+        },
+        {
+          "name": "independent-contract",
+          "exit": 0
+        }
+      ],
+      "review": {
+        "slot": 3,
+        "alias": "83d6154e6df7-3",
+        "Q": true,
+        "T": true,
+        "D": true,
+        "internalStatus": "incomplete",
+        "fullPatchReview": {
+          "behavior": "Uses existing expiry/delete semantics without promotion, preserves stored undefined via wrapper, removes from either generation; no changes to existing methods. Independent identity, expiry/callback and retained-order checks pass.",
+          "tests": "Adds live/missing/stored-undefined, both generations, expiry callback and retained-entry regressions; existing tests retained. Type-use regression added and ordinary suite including tsd passes.",
+          "docs": "Public take signature and README example delivered.",
+          "coverageLimit": "Runtime regression uses deep equality for object value inside wrapper rather than strict identity after the final edit; independent contract checks verify actual identity. This is reported as test-strength detail, not a new post-hoc rubric requirement.",
+          "authorChecks": "Actual host tool records include focused AVA+tsd and npm test after the final patch edit, with exit 0. Offline checks are separate.",
+          "internalStatusReason": "Observer did not classify npm test as required check even though completedCommands/tool evidence contains it. No product repair made."
+        },
+        "investigator": {
+          "invocations": 0,
+          "question": null,
+          "returnedPatch": null,
+          "integration": null,
+          "contribution": "Not invoked; no investigator credit."
+        },
+        "evaluationProviderRequests": 0
+      },
+      "stopVerification": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "evidenceHashes": {
+        "result.json": "556a5594567805d4c218f42df2b6eef4573040c3150e0a3a700073f815813caf",
+        "provider-metadata.json": "e94f7deb5667eefcd9ddaa46061be6e40b6c522d34c208e5b9f21ad77e1148d7",
+        "stop-verification.json": "52fe5323a7721048db9c6f77a774173b862430ddd3637f53737e02cb3d350d1d",
+        "native-evidence.json": "6fc4f665aca59e721b1b972c78de2d8a2342924a97d211c0c0877fb4095408e1"
+      }
+    },
+    {
+      "slot": 4,
+      "task": "denque-drain",
+      "project": "denque",
+      "arm": "R",
+      "period": "continuation-3-9-rechecked",
+      "status": "completed",
+      "Q": true,
+      "T": true,
+      "D": true,
+      "internalStatus": "incomplete",
+      "patch": "patches/denque-drain-R.patch",
+      "patchBytes": 6342,
+      "patchSha256": "3db5a00bc4ec2eef622587efd02707955b26814668034fa0f96a7f2ce1136ce3",
+      "nativeCompleted": true,
+      "nativeExitCode": 0,
+      "nativeExecutionMs": 333693,
+      "nativeCleanupMs": 59,
+      "forwardedRequests": 33,
+      "titleRequests": 1,
+      "knownUsage": {
+        "input_tokens": 1417528,
+        "output_tokens": 12504,
+        "total_tokens": 1430032,
+        "cached_tokens": 963072,
+        "reasoning_tokens": 6724
+      },
+      "unknownUsageRequests": 0,
+      "totalTokens": 1430032,
+      "summedRequestElapsedMs": 295978,
+      "overlappingRequestsPossible": true,
+      "sensitivityCalls": 3,
+      "sensitivityReportedElapsedMs": 32549,
+      "investigatorInvocations": 0,
+      "extraAttentionStages": [
+        {
+          "label": "attention",
+          "role": "author",
+          "elapsedMs": 57807
+        }
+      ],
+      "checks": [
+        {
+          "name": "patch-application",
+          "exit": 0
+        },
+        {
+          "name": "npm test",
+          "exit": 0
+        },
+        {
+          "name": "independent-contract",
+          "exit": 0
+        }
+      ],
+      "review": {
+        "slot": 4,
+        "alias": "f8c28140c069-4",
+        "Q": true,
+        "T": true,
+        "D": true,
+        "internalStatus": "incomplete",
+        "fullPatchReview": {
+          "behavior": "Validates type, finiteness and integer/nonnegative bounds before mutation; loops by count using existing shift, retaining undefined/NaN/object identity and capacity semantics. Independent wrap/growth/reuse checks pass.",
+          "tests": "Adds bounded/full, no-mutation validation, special identities, zero freshness, explicit undefined, wrap/growth and capacity reuse regressions. Existing tests preserved. Generic declaration and compilable type-use regression supplied.",
+          "docs": "Public docs/api.mdx describes omission, count bounds and example.",
+          "authorChecks": "Actual author npm test passed after edits. The ordinary extra attention stage ran for 57.807s, reran npm test and an additional runtime assertion command. No evaluator checks attributed to author.",
+          "internalStatusReason": "Required-check classifier reported npm test unobserved despite successful completed command records; kept separate without product repair."
+        },
+        "extraAttention": {
+          "ran": true,
+          "elapsedMs": 57807,
+          "finalPatchChanged": false
+        },
+        "evaluationProviderRequests": 0
+      },
+      "stopVerification": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "evidenceHashes": {
+        "result.json": "99dee504c387d269fba2c6c5aa49410b4856d00bae8271e7e4c1bf66ee4118bd",
+        "provider-metadata.json": "fcda3635f2319c7eac3b28f0f7036c0e82b2e887b00bea2316c1d26b484bb449",
+        "stop-verification.json": "52fe5323a7721048db9c6f77a774173b862430ddd3637f53737e02cb3d350d1d",
+        "native-evidence.json": "4fd3d7ad90d5c9b04973d4a1d1eafc3380f4dc3894be75b68ebaaf718a7ec6ae"
+      }
+    },
+    {
+      "slot": 5,
+      "task": "denque-drain",
+      "project": "denque",
+      "arm": "H",
+      "period": "continuation-3-9-rechecked",
+      "status": "completed",
+      "Q": true,
+      "T": true,
+      "D": true,
+      "internalStatus": "incomplete",
+      "patch": "patches/denque-drain-H.patch",
+      "patchBytes": 6903,
+      "patchSha256": "bdc870522706d0003a6841025e21ff3f45ec76c1cbd02188302f31bc9f305438",
+      "nativeCompleted": true,
+      "nativeExitCode": 0,
+      "nativeExecutionMs": 308440,
+      "nativeCleanupMs": 58,
+      "forwardedRequests": 26,
+      "titleRequests": 1,
+      "knownUsage": {
+        "input_tokens": 950058,
+        "output_tokens": 12429,
+        "total_tokens": 962487,
+        "cached_tokens": 92160,
+        "reasoning_tokens": 5704
+      },
+      "unknownUsageRequests": 0,
+      "totalTokens": 962487,
+      "summedRequestElapsedMs": 292221,
+      "overlappingRequestsPossible": true,
+      "sensitivityCalls": 1,
+      "sensitivityReportedElapsedMs": 10749,
+      "investigatorInvocations": 0,
+      "extraAttentionStages": [],
+      "checks": [
+        {
+          "name": "patch-application",
+          "exit": 0
+        },
+        {
+          "name": "npm test",
+          "exit": 0
+        },
+        {
+          "name": "independent-contract",
+          "exit": 0
+        }
+      ],
+      "review": {
+        "slot": 5,
+        "alias": "26f4401caefe-5",
+        "Q": true,
+        "T": true,
+        "D": true,
+        "internalStatus": "incomplete",
+        "fullPatchReview": {
+          "behavior": "Validates count before mutation, copies by bounded index and advances head with capacity mask; clears removed references while preserving FIFO values and remaining ring state. Independent contract passes.",
+          "tests": "Runtime tests cover bounded/full drain, undefined counts, no-mutation validation, fresh zero arrays, identities, grown/wrapped storage and capacity reuse. Existing tests preserved. Generic declaration and type-use cases compile in npm test.",
+          "docs": "README example plus public API documentation and example supplied.",
+          "authorChecks": "Host records confirm TypeScript and npm test after edits; evaluator rerun is separate.",
+          "internalStatusReason": "Check classifier reports missing npm test despite completed author command evidence; preserved as internal incomplete."
+        },
+        "investigator": {
+          "invocations": 0,
+          "question": null,
+          "returnedPatch": null,
+          "integration": null,
+          "contribution": "Not invoked; no investigator credit."
+        },
+        "evaluationProviderRequests": 0
+      },
+      "stopVerification": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "evidenceHashes": {
+        "result.json": "22b950aa4b2cfd30bff332669cbe9237a929db7c79c45779ede09ceea83efb1d",
+        "provider-metadata.json": "6a053c9fac804a049813392ee4a29ff59e078fc8a8c8b124830d73a17e65e2e9",
+        "stop-verification.json": "52fe5323a7721048db9c6f77a774173b862430ddd3637f53737e02cb3d350d1d",
+        "native-evidence.json": "720b0239864512a95bb34ef76a2475cee4828236ac98772cf412a0896807e53f"
+      }
+    },
+    {
+      "slot": 6,
+      "task": "denque-drain",
+      "project": "denque",
+      "arm": "P",
+      "period": "continuation-3-9-rechecked",
+      "status": "completed",
+      "Q": true,
+      "T": true,
+      "D": true,
+      "internalStatus": null,
+      "patch": "patches/denque-drain-P.patch",
+      "patchBytes": 5958,
+      "patchSha256": "148f369c32be6e9825cf21085a14165d861dc64638d56c22ff3a8e336f946c55",
+      "nativeCompleted": true,
+      "nativeExitCode": 0,
+      "nativeExecutionMs": 191866,
+      "nativeCleanupMs": 57,
+      "forwardedRequests": 16,
+      "titleRequests": 1,
+      "knownUsage": {
+        "input_tokens": 443549,
+        "output_tokens": 8047,
+        "total_tokens": 451596,
+        "cached_tokens": 175104,
+        "reasoning_tokens": 4138
+      },
+      "unknownUsageRequests": 0,
+      "totalTokens": 451596,
+      "summedRequestElapsedMs": 190991,
+      "overlappingRequestsPossible": true,
+      "sensitivityCalls": 0,
+      "sensitivityReportedElapsedMs": 0,
+      "investigatorInvocations": 0,
+      "extraAttentionStages": [],
+      "checks": [
+        {
+          "name": "patch-application",
+          "exit": 0
+        },
+        {
+          "name": "npm test",
+          "exit": 0
+        },
+        {
+          "name": "independent-contract",
+          "exit": 0
+        }
+      ],
+      "review": {
+        "slot": 6,
+        "alias": "5228980ed2af-6",
+        "Q": true,
+        "T": true,
+        "D": true,
+        "internalStatus": null,
+        "fullPatchReview": {
+          "behavior": "Validated finite nonnegative integer count, omission/undefined support, size-bounded shift loop; independent contract passes, preserving special values and ring/capacity behavior.",
+          "tests": "Runtime coverage includes all announced categories, verifies wrapped state, capacity reuse and identities; old tests preserved. Generic declaration and three compilable type-use cases supplied.",
+          "docs": "README explains public drain with usage example.",
+          "authorChecks": "Actual native tool evidence confirms npm test including TypeScript after edits, exit 0; independent offline run is separate."
+        },
+        "evaluationProviderRequests": 0
+      },
+      "stopVerification": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "evidenceHashes": {
+        "result.json": "93a68a3652f7eb3656601f82f920d602ec0c8c958aed96691c9b68dfaa0b5537",
+        "provider-metadata.json": "9c6eedea950531e159a2ebf3d513e129a155cbc0d5a47a40bbbd201953417bd6",
+        "stop-verification.json": "52fe5323a7721048db9c6f77a774173b862430ddd3637f53737e02cb3d350d1d",
+        "native-evidence.json": "8987d7b9a91ae1ea4c5927aadffdf4415aa2927524194ab585012a0452740dbd"
+      }
+    },
+    {
+      "slot": 7,
+      "task": "eventemitter-collect",
+      "project": "eventemitter3",
+      "arm": "H",
+      "period": "continuation-3-9-rechecked",
+      "status": "completed",
+      "Q": true,
+      "T": true,
+      "D": true,
+      "internalStatus": "incomplete",
+      "patch": "patches/eventemitter-collect-H.patch",
+      "patchBytes": 11214,
+      "patchSha256": "07649d4059440d1cd4080e3faf8a5f9d742e307419d69b2411e3c62b17341e38",
+      "nativeCompleted": true,
+      "nativeExitCode": 0,
+      "nativeExecutionMs": 551421,
+      "nativeCleanupMs": 58,
+      "forwardedRequests": 39,
+      "titleRequests": 1,
+      "knownUsage": {
+        "input_tokens": 1466249,
+        "output_tokens": 17528,
+        "total_tokens": 1483777,
+        "cached_tokens": 111616,
+        "reasoning_tokens": 10052
+      },
+      "unknownUsageRequests": 0,
+      "totalTokens": 1483777,
+      "summedRequestElapsedMs": 455804,
+      "overlappingRequestsPossible": true,
+      "sensitivityCalls": 3,
+      "sensitivityReportedElapsedMs": 21345,
+      "investigatorInvocations": 0,
+      "extraAttentionStages": [],
+      "checks": [
+        {
+          "name": "patch-application",
+          "exit": 0
+        },
+        {
+          "name": "npm test",
+          "exit": 0
+        },
+        {
+          "name": "npm run test-esm",
+          "exit": 0
+        },
+        {
+          "name": "independent-contract",
+          "exit": 0
+        },
+        {
+          "name": "independent-types",
+          "exit": 0
+        }
+      ],
+      "review": {
+        "slot": 7,
+        "alias": "06c6e3ff942e-7",
+        "Q": true,
+        "T": true,
+        "D": true,
+        "internalStatus": "incomplete",
+        "fullPatchReview": {
+          "behavior": "Snapshots listener registration objects, removes only the exact once registration before invoking it, forwards context/arguments synchronously and retains result identity. Throws propagate without invoking later callbacks. Existing emit/removeListener behavior unchanged.",
+          "tests": "Runtime regressions cover order/context/large and zero argument lists, symbols, object/promise/undefined identity, fresh empty results, once recursive cases, removal/addition during dispatch and thrown-value subsequent state. Existing tests retained.",
+          "typesAndModules": "Generic declaration uses existing event-name/argument types and unknown[] return. Added type regression was compiled by author; independent types pass. CJS suite and ESM suite pass.",
+          "docs": "README API description and working instance example supplied.",
+          "authorChecks": "Host tool records confirm targeted Mocha, npm test, test-esm and local TypeScript 6.0.3 compilation after edits. Offline evaluator checks are separate.",
+          "internalStatusReason": "Internal required-check classifier did not recognize npm test despite successful completed commands; status retained without repair."
+        },
+        "investigator": {
+          "invocations": 0,
+          "question": null,
+          "returnedPatch": null,
+          "integration": null,
+          "contribution": "Not invoked; all test changes belong to the main author."
+        },
+        "evaluationProviderRequests": 0
+      },
+      "stopVerification": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "evidenceHashes": {
+        "result.json": "61ac23985c83f0d7b8a1c42fdb92c6e5d4277d835b8fad9cd7aa5f84e146c332",
+        "provider-metadata.json": "563b02a9bd283ac0b854b0b5e469cb8ab9f34f8bcd66c7578b820a5bee5de921",
+        "stop-verification.json": "52fe5323a7721048db9c6f77a774173b862430ddd3637f53737e02cb3d350d1d",
+        "native-evidence.json": "1601f02b07914a94bf75c214138444d9757aadb84c5d7115c4ea9c4ee6f50c6d"
+      }
+    },
+    {
+      "slot": 8,
+      "task": "eventemitter-collect",
+      "project": "eventemitter3",
+      "arm": "P",
+      "period": "continuation-3-9-rechecked",
+      "status": "completed",
+      "Q": true,
+      "T": true,
+      "D": true,
+      "internalStatus": null,
+      "patch": "patches/eventemitter-collect-P.patch",
+      "patchBytes": 9628,
+      "patchSha256": "cbe5c70e25a2def7390d6cf8023fa1e1dfaeffa47cf5605dd7fd6caeea40e982",
+      "nativeCompleted": true,
+      "nativeExitCode": 0,
+      "nativeExecutionMs": 259538,
+      "nativeCleanupMs": 53,
+      "forwardedRequests": 20,
+      "titleRequests": 1,
+      "knownUsage": {
+        "input_tokens": 530191,
+        "output_tokens": 11151,
+        "total_tokens": 541342,
+        "cached_tokens": 315904,
+        "reasoning_tokens": 6158
+      },
+      "unknownUsageRequests": 0,
+      "totalTokens": 541342,
+      "summedRequestElapsedMs": 258958,
+      "overlappingRequestsPossible": true,
+      "sensitivityCalls": 0,
+      "sensitivityReportedElapsedMs": 0,
+      "investigatorInvocations": 0,
+      "extraAttentionStages": [],
+      "checks": [
+        {
+          "name": "patch-application",
+          "exit": 0
+        },
+        {
+          "name": "npm test",
+          "exit": 0
+        },
+        {
+          "name": "npm run test-esm",
+          "exit": 0
+        },
+        {
+          "name": "independent-contract",
+          "exit": 0
+        },
+        {
+          "name": "independent-types",
+          "exit": 0
+        }
+      ],
+      "review": {
+        "slot": 8,
+        "alias": "4448c63fa9c3-8",
+        "Q": true,
+        "T": true,
+        "D": true,
+        "internalStatus": null,
+        "fullPatchReview": {
+          "behavior": "Snapshot of registrations and exact once-instance removal preserve recursive/snapshot behavior; synchronous apply preserves arguments, contexts, identities and thrown value. Existing emit unchanged.",
+          "tests": "Runtime categories, ESM exports and compilable typed event regression supplied; prior tests retained. Ordinary suites and independent contracts/types pass.",
+          "coverageLimit": "Thrown-value regression lacks an explicit caught flag, so swallowing the error while stopping callbacks could escape it. The actual patch propagates the exact throw and independent contract verifies it; reported as test-strength limitation rather than a new mutation threshold.",
+          "docs": "README public API description and example supplied."
+        },
+        "evaluationProviderRequests": 0
+      },
+      "stopVerification": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "evidenceHashes": {
+        "result.json": "d04a524055d4e7c581a8b995790821ce0b650ee1b2b048a893cb23bc93d5a312",
+        "provider-metadata.json": "c885c4e324c658079ba660b7403ce133dabcda81b5aa1b824738889d22dfce45",
+        "stop-verification.json": "52fe5323a7721048db9c6f77a774173b862430ddd3637f53737e02cb3d350d1d",
+        "native-evidence.json": "3d172afdca7af7ea10b1dfbde639c2632a5d1d261d1a086ffa9ea349d42c731f"
+      }
+    },
+    {
+      "slot": 9,
+      "task": "eventemitter-collect",
+      "project": "eventemitter3",
+      "arm": "R",
+      "period": "continuation-3-9-rechecked",
+      "status": "stopped-unconfirmed-execution",
+      "Q": false,
+      "T": false,
+      "D": false,
+      "internalStatus": "incomplete",
+      "patch": "patches/eventemitter-collect-R.patch",
+      "patchBytes": 0,
+      "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeCompleted": false,
+      "nativeExitCode": 137,
+      "nativeExecutionMs": 17317,
+      "nativeCleanupMs": 55,
+      "forwardedRequests": 4,
+      "titleRequests": 1,
+      "knownUsage": {
+        "input_tokens": 14279,
+        "output_tokens": 347,
+        "total_tokens": 14626,
+        "cached_tokens": 5632,
+        "reasoning_tokens": 128
+      },
+      "unknownUsageRequests": 1,
+      "totalTokens": null,
+      "summedRequestElapsedMs": 18871,
+      "overlappingRequestsPossible": true,
+      "sensitivityCalls": 0,
+      "sensitivityReportedElapsedMs": 0,
+      "investigatorInvocations": 0,
+      "extraAttentionStages": [],
+      "checks": [
+        {
+          "name": "patch-application",
+          "exit": 0
+        },
+        {
+          "name": "npm test",
+          "exit": 0
+        },
+        {
+          "name": "npm run test-esm",
+          "exit": 0
+        },
+        {
+          "name": "independent-contract",
+          "exit": 1
+        },
+        {
+          "name": "independent-types",
+          "exit": 2
+        }
+      ],
+      "review": {
+        "slot": 9,
+        "alias": "bc32d703af1a-9",
+        "Q": false,
+        "T": false,
+        "D": false,
+        "internalStatus": "incomplete",
+        "fullPatchReview": {
+          "behavior": "No implementation: captured public worktree matches all 28 original files. emitCollect and types absent; no terminal patch.",
+          "tests": "Original CJS/ESM suites pass; independent API and types checks fail. No model verification of a new implementation occurred."
+        },
+        "stopCause": {
+          "kind": "tool_error",
+          "tool": "glob",
+          "path": "src",
+          "message": "ripgrep execution failed",
+          "subsequentTransport": "Fourth forwarded request aborted after client/relay cancellation; bound only in_progress, server completion and usage unknown. Not an observed provider refusal or overload.",
+          "ownTaskDeadline": false
+        },
+        "extraAttention": {
+          "ran": false
+        },
+        "evaluationProviderRequests": 0
+      },
+      "stopVerification": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": true
+      },
+      "evidenceHashes": {
+        "result.json": "264d7e9683813363dcae964490069bb51ee2ae654b28ecb3f78bae32b58932e7",
+        "provider-metadata.json": "d042ff5797d0234788735499712494dc46ee46d7be7573eeb030304f0c7b3f1e",
+        "stop-verification.json": "3fe623efca54994d79b8ab2ec2ad1b7e56d93caf3ca4310d2fb82472c953bbcd",
+        "native-evidence.json": "eda7f3908bd53770ffa0d00bb752723f643917dc96408e4d777fa63f75f06c01"
+      }
+    }
+  ],
+  "periods": [
+    {
+      "name": "original",
+      "admittedSlots": [
+        1
+      ],
+      "forwardedRequests": 4,
+      "knownTokens": 6418,
+      "unknownUsageRequests": 3,
+      "auxiliaryRetries": 1
+    },
+    {
+      "name": "amended",
+      "admittedSlots": [
+        2
+      ],
+      "forwardedRequests": 2,
+      "knownTokens": null,
+      "unknownUsageRequests": 2,
+      "auxiliaryRetries": 0,
+      "taskRetries": 0,
+      "realSmokes": 0,
+      "nativeExecutionMs": 2491,
+      "nativeCleanupMs": 57,
+      "preNativePreparationMs": 4803,
+      "summedRequestElapsedMs": 2038,
+      "overlappingRequestIntervals": true
+    },
+    {
+      "name": "availability-only",
+      "taskRuns": 0,
+      "forwardedRequests": 1,
+      "knownTokens": 47,
+      "unknownUsageRequests": 0,
+      "note": "Counted once; offline recheck adds no requests or usage."
+    },
+    {
+      "name": "continuation-3-9-rechecked",
+      "assignedAndStartedSlots": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "normalNativeCompletions": 6,
+      "autonomousDeliveries": 6,
+      "forwardedRequests": 161,
+      "knownTokenSubtotal": 5728801,
+      "unknownUsageRequests": 1,
+      "totalTokens": null,
+      "nativeExecutionMs": 2025712,
+      "nativeCleanupMs": 398,
+      "newAvailabilityRequests": 0,
+      "taskRetries": 0,
+      "realSmokes": 0
+    }
+  ],
+  "combined": {
+    "assignedSlots": 9,
+    "startedSlots": 9,
+    "Q": 6,
+    "T": 6,
+    "D": 6,
+    "forwardedRequests": 168,
+    "knownTokenSubtotal": 5735266,
+    "unknownUsageRequests": 6,
+    "totalTokens": null,
+    "monetaryCost": null
+  },
+  "lastStop": {
+    "schedulingPause": {
+      "kind": "unknown_submission",
+      "slot": 9,
+      "error": "AbortError"
+    },
+    "cause": {
+      "kind": "tool_error",
+      "tool": "glob",
+      "path": "src",
+      "message": "ripgrep execution failed",
+      "subsequentTransport": "Fourth forwarded request aborted after client/relay cancellation; bound only in_progress, server completion and usage unknown. Not an observed provider refusal or overload.",
+      "ownTaskDeadline": false
+    },
+    "knownRequests": 3,
+    "unknownRequests": 1,
+    "knownTokens": 14626,
+    "finalRequest": {
+      "requestIndex": 4,
+      "requestKind": "work",
+      "usage": null,
+      "status": 200,
+      "responseStatus": "in_progress",
+      "error": "AbortError",
+      "transportError": {
+        "name": "AbortError",
+        "clientOrRelayCancelled": true,
+        "ownTaskDeadline": false
+      },
+      "clientDelivery": "unconfirmed-after-transport-error",
+      "serverCompletion": "unknown",
+      "finishedAt": "2026-09-15T10:02:07.759Z"
+    },
+    "extraAttentionStarted": false
+  },
+  "investigator": {
+    "HSlots": 3,
+    "invokedSlots": 0,
+    "questions": [],
+    "childTestPatches": [],
+    "acceptedOrDeclinedPatches": [],
+    "integrationEffect": "No investigator action occurred. All H edits and tests belong to the main author; no contribution or causal benefit established."
+  },
+  "comparison": {
+    "denque": {
+      "P": true,
+      "R": true,
+      "H": true,
+      "note": "Complete matched triple: all deliver; H did not invoke investigator."
+    },
+    "eventemitter": {
+      "P": true,
+      "R": false,
+      "H": true,
+      "note": "All assigned outcomes retained; R stopped before implementation after a native tool error and unconfirmed in-flight request. Not a completed quality triple or researcher benefit."
+    },
+    "quicklru": {
+      "P": false,
+      "R": false,
+      "H": true,
+      "note": "Historical P/R infrastructure interruption prevents a causal quality comparison."
+    },
+    "practicalDecision": "No observed full-delivery improvement over plain OpenCode on the two tasks with completed P/H pairs. Investigator never used; benefit unproven. Preserve experimental/default-off status and existing defaults. No statistical lift claim or follow-on campaign."
+  },
+  "validation": {
+    "targeted": "probe-recheck-validation.json",
+    "patchEvaluation": "Original frozen behavioral evaluator and ordinary suites in independent copies; automated grading ordered by hash alias, manual reviewer knew arm labels. Complete patch contracts/tests/types/docs assessed separately.",
+    "newPatchEvaluationProviderRequests": 0,
+    "fullVerifier": "PROCESS_CONTAINMENT_UNAVAILABLE remains separate; not rerun and not a CI pass."
+  },
+  "preparationDeveloperEvaluatorAccounting": {
+    "separateFromModelSeries": true,
+    "realProviderRequestsForLocalChecksAndGrading": 0,
+    "cumulativeDeveloperTokens": null,
+    "cumulativePreparationAndEvaluationWallMs": null,
+    "note": "No reliable aggregate meter for developer/preparation/evaluation work; unknown is not zero."
+  },
+  "integrity": {
+    "historicalFilesUnchanged": 45,
+    "freezeUnchanged": true,
+    "frozenNonLauncherFilesUnchanged": true,
+    "allSevenStopsVerified": true,
+    "taskAndGradingContainersAbsent": 14,
+    "activeLauncherProcesses": 0,
+    "newAvailabilityRequests": 0,
+    "stops": [
+      {
+        "run": "eventemitter-collect-R",
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": true
+      },
+      {
+        "run": "eventemitter-collect-H",
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      {
+        "run": "denque-drain-R",
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      {
+        "run": "denque-drain-H",
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      {
+        "run": "quick-lru-take-H",
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      {
+        "run": "eventemitter-collect-P",
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      {
+        "run": "denque-drain-P",
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      }
+    ],
+    "inputManifestFilesVerified": 22712,
+    "bundleManifestFilesVerified": 6250,
+    "oldAvailabilityReportUnchanged": true
+  }
+}

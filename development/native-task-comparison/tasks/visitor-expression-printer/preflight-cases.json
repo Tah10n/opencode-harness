@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/visitor.mjs": "export function visitExpression(root,visitor){\n const jobs=[{node:root,ready:false}],values=[];\n while(jobs.length){const {node,ready}=jobs.pop();if(node.type==='literal'){values.push(visitor.literal(node.value));continue;}if(!ready){jobs.push({node,ready:true},{node:node.right,ready:false},{node:node.left,ready:false});}else{const right=values.pop(),left=values.pop();values.push(visitor.binary(node.op,left,right));}}\n return values[0];\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "drops-equal-right-parentheses",
+      "file": "src/printer.mjs",
+      "replacement": "import {visitExpression} from './visitor.mjs';\nexport function printExpression(node){\n return visitExpression(node,{\n literal(value){return{text:JSON.stringify(value),precedence:3};},\n binary(op,left,right){const precedence=op==='+'||op==='-'?1:2;const l=left.precedence<precedence?'('+left.text+')':left.text,r=right.precedence<precedence?'('+right.text+')':right.text;return{text:l+' '+op+' '+r,precedence};}\n }).text;\n}\n"
+    },
+    {
+      "name": "visits-right-first",
+      "file": "src/visitor.mjs",
+      "replacement": "export function visitExpression(node,visitor){\n if(node.type==='literal')return visitor.literal(node.value);\n const right=visitExpression(node.right,visitor),left=visitExpression(node.left,visitor);return visitor.binary(node.op,left,right);\n}\n"
+    }
+  ]
+}

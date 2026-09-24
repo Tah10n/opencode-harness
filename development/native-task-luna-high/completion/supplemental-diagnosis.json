@@ -1,0 +1,13 @@
+[
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "H",
+    "phase": "final",
+    "code": 1,
+    "scope": "Same post-P supplemental test, not a frozen score; model patch unchanged",
+    "observed": "Migration rejected the full layout as unrelated entry lib before installed-launcher assertion.",
+    "testSha256": "fb280a64559ebb099fa1834b2b2301247a1e0a1c76534952ec1ad6b254eb361e",
+    "originalRuntimePResult": "../results/supplemental-diagnosis.json",
+    "scoredFrozenCheck": false
+  }
+]

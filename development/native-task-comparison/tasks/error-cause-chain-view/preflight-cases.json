@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/error-view.mjs": "export function formatError(error){\n if(!(error instanceof Error))throw new TypeError('error root');\n function describe(value,ancestors){\n  if(!(value instanceof Error))return String(value);\n  if(ancestors.includes(value))return '[Circular cause]';\n  let text=value.name+': '+value.message;\n  if(Object.hasOwn(value,'cause')&&value.cause!==undefined)text+='\\nCaused by: '+describe(value.cause,[...ancestors,value]);\n  return text;\n }\n return describe(error,[]);\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "drops-falsy-cause",
+      "file": "src/error-view.mjs",
+      "replacement": "export function formatError(error){\n if(!(error instanceof Error))throw new TypeError('error root');\n const seen=new Set(),lines=[];let current=error;\n while(current!==undefined){\n  if(current instanceof Error){\n   if(seen.has(current)){lines.push('[Circular cause]');break;}\n   seen.add(current);lines.push(current.name+': '+current.message);\n   current=Object.hasOwn(current,'cause')&&current.cause?current.cause:undefined;\n  }else{lines.push(String(current));break;}\n }\n return lines.map((line,i)=>i===0?line:'Caused by: '+line).join('\\n');\n}\n"
+    },
+    {
+      "name": "cycles-by-message",
+      "file": "src/error-view.mjs",
+      "replacement": "export function formatError(error){\n if(!(error instanceof Error))throw new TypeError('error root');\n const seen=new Set(),lines=[];let current=error;\n while(current!==undefined){\n  if(current instanceof Error){\n   if(seen.has(current.message)){lines.push('[Circular cause]');break;}\n   seen.add(current.message);lines.push(current.name+': '+current.message);\n   current=Object.hasOwn(current,'cause')?current.cause:undefined;\n  }else{lines.push(String(current));break;}\n }\n return lines.map((line,i)=>i===0?line:'Caused by: '+line).join('\\n');\n}\n"
+    }
+  ]
+}

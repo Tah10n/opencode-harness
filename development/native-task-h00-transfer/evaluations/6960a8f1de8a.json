@@ -1,0 +1,113 @@
+{
+  "id": "6960a8f1de8a",
+  "task": "eventemitter-remove-context",
+  "project": "eventemitter3",
+  "Q": 0,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "patchApplicable": true,
+  "sourcePatchSha256": "c056666eb18ade814a16c13bb7ea57ec80443d2d2a26f15508701d5b02e04f55",
+  "decision": "Full delivery does not satisfy the frozen rubric.",
+  "findings": [
+    {
+      "category": "required-type-test-loss",
+      "reason": "Public declaration supplied, but no required TypeScript consumer/type regression is delivered."
+    }
+  ],
+  "contentReview": {
+    "id": "6960a8f1de8a",
+    "task": "eventemitter-remove-context",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete",
+    "typesReview": "Public declaration is added, but no TypeScript consumer or type regression is supplied. The frozen task explicitly requires applicable type tests.",
+    "retainedTestsReview": "Existing regression cases are retained.",
+    "contentFindings": [
+      {
+        "category": "required-coverage-loss",
+        "requirement": "Deliver applicable public TypeScript declarations/type tests.",
+        "evidence": "Changed files contain only README, declaration, runtime, CJS and ESM runtime tests. No type-use fixture is supplied.",
+        "impact": "The new public method has no delivered type regression."
+      }
+    ],
+    "behaviorReview": "Snapshots string and symbol event keys, filters by strict stored context, updates clearEvent counts and singleton representation; no existing emit or registration path changes. Runtime confirmation pending.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Same callback registered under two contexts on string and symbol events, including once/duplicate cases; counts and surviving registrations asserted."
+      },
+      {
+        "scenario": 2,
+        "covered": "partial",
+        "evidence": "Empty names, repeated removal and reuse are tested. Distinguishable survivor ordering within one event is not tested: surviving lists contain a single callback or repeated identical shared function."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Omitted/undefined/null/false/zero/empty/explicit emitter contexts are removed by emitter, with exact count and repeated zero."
+      }
+    ],
+    "docsReview": "README documents counts, duplicates/once, strict context identity and removal of normalized contexts by emitter.",
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "6960a8f1de8a",
+    "task": "eventemitter-remove-context",
+    "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "c056666eb18ade814a16c13bb7ea57ec80443d2d2a26f15508701d5b02e04f55",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 8,
+  "arm": "P",
+  "D": 0,
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "normalHandoff": true,
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "finalResponseSha256": "7bcfc6ddb8218232b713d83f6a690c523db953eea950729d7ea98051345aa595",
+    "finalResponseExcerpt": "Implemented `removeListenersByContext(context): number`.\n\n- Strictly matches stored contexts across string and symbol events.\n- Counts duplicates and `once` registrations.\n- Preserves unrelated listener order and emitter bookkeeping.\n- Added CommonJS, ESM, declaration, regression tests, and README documentation.\n- No dependencies or commits changed.\n\nChecks passed:\n- `npm test`: 43 passing\n- `npm run test-esm`: 3 passing\n- `npm run rollup`\n- `git diff --check`\n\nNo TypeScript test harness exists in the project; `index.d.ts` was updated directly.",
+    "reportFindings": []
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 1182,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 0,
+      "elapsedMs": 517,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    }
+  ]
+}

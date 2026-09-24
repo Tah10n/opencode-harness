@@ -1,0 +1,108 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "arm": "P",
+      "nativeStop": true,
+      "dependenciesAvailable": true,
+      "compatibility": null
+    }
+  ],
+  "realProviderRequests": 0,
+  "opencodeVersion": "1.18.26",
+  "runtimeVersionVerifiedInPinnedLinuxImage": true,
+  "exactOriginalPromptBytesPresentInAllRequests": true,
+  "inventory": [
+    "apply_patch",
+    "bash",
+    "glob",
+    "grep",
+    "read",
+    "skill",
+    "task",
+    "todowrite"
+  ],
+  "syntheticRequests": 7,
+  "syntheticTools": 5,
+  "execution": {
+    "slot": 1,
+    "task": "mui__material-ui-18141",
+    "arm": "P",
+    "project": "mui/material-ui",
+    "exitCode": 0,
+    "signal": null,
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "timedOut": false,
+    "stopReason": null,
+    "researchBoundary": "not-reached",
+    "completedAt": 1790008527024,
+    "executionElapsedMs": 23358,
+    "cleanupElapsedMs": 54,
+    "elapsedMs": 23412,
+    "parseErrors": 0,
+    "phaseCount": 1,
+    "continuationApplied": false,
+    "nativeCompleted": true,
+    "requests": 7,
+    "requestsWithoutUsage": 0,
+    "workflowStatus": null,
+    "repairs": null,
+    "toolCalls": 5,
+    "sessions": 1,
+    "delivery": "/work/repo",
+    "ownTaskDeadlineTriggered": false
+  },
+  "spill": {
+    "version": 1,
+    "runID": "template-dev-25e6093b-dbbb-4725-a1c3-ef12792a7ffd",
+    "containerID": "b3747668aa2dfa84a426306e538921443157757e5da13491c93ede30c6185e22",
+    "sourceRoot": "/work/data/opencode/tool-output",
+    "sourceKind": "native combined tool output",
+    "limits": {
+      "fileBytes": 67108864,
+      "totalBytes": 268435456,
+      "files": 128,
+      "exportMs": 30000
+    },
+    "files": [
+      {
+        "sourceReference": "/work/data/opencode/tool-output/tool_0c4d283b6001n3ce28VOHHvHIf",
+        "links": [
+          {
+            "sessionID": "ses_f3b2dcec1ffeF2t2R9Bo1RMfhx",
+            "callID": "call_6",
+            "partID": "prt_0c4d27a39001Z71HjT2eTgYftw",
+            "status": "completed",
+            "exit": 0
+          }
+        ],
+        "destination": "native-output/74877994462bd9dc38150aa0290a421eb202a284520762b924dc16d423d8360a.bin",
+        "status": "copied",
+        "archiveComplete": true,
+        "sourceCompleteness": "unknown",
+        "sourceCompletenessReason": "Native file bytes verified separately; command completion alone does not exclude internal output limits",
+        "linkStatus": "linked",
+        "size": 39690,
+        "sha256": "0c3d1f22db2ae885f2cc2de7a406fc9a7ecf7c29953faab82f0ae8b57326315a",
+        "savedAt": "2026-09-21T16:35:27.893Z"
+      }
+    ],
+    "errors": [],
+    "evidenceComplete": true,
+    "elapsedMs": 132,
+    "bytes": 39690
+  },
+  "stop": {
+    "ownTaskDeadlineTriggered": false,
+    "terminationVerified": true,
+    "captureSaved": true,
+    "forwardingClosed": true,
+    "relayRemoved": true,
+    "activeProviderHandlers": 0,
+    "providerServerStateMayRemainUnknown": false
+  },
+  "spillExpectedBytesVerified": true
+}

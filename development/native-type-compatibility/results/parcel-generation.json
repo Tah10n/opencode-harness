@@ -1,0 +1,84 @@
+{
+  "limits": {
+    "genericParameters": 2,
+    "rootSeeds": 18,
+    "methods": 60,
+    "depth": 3,
+    "nodes": 160,
+    "consumers": 24
+  },
+  "specimens": [
+    "string",
+    "{ sample: [string] }",
+    "{ marker: string }"
+  ],
+  "exports": [
+    "default"
+  ],
+  "roots": [
+    {
+      "id": 0,
+      "export": "default",
+      "typeArguments": "<string>",
+      "import": "import { default as API0 } from './index';",
+      "declaration": "declare const subject0: API0<string>;",
+      "accepted": true
+    },
+    {
+      "id": 1,
+      "export": "default",
+      "typeArguments": "<{ sample: [string] }>",
+      "import": "import { default as API1 } from './index';",
+      "declaration": "declare const subject1: API1<{ sample: [string] }>;",
+      "accepted": true
+    },
+    {
+      "id": 2,
+      "export": "default",
+      "typeArguments": "<{ marker: string }>",
+      "import": "import { default as API2 } from './index';",
+      "declaration": "declare const subject2: API2<{ marker: string }>;",
+      "accepted": true
+    }
+  ],
+  "consumers": [
+    {
+      "id": 0,
+      "provenance": "generated from baseline only",
+      "export": "default",
+      "typeArguments": "<string>",
+      "method": "lookup",
+      "route": "default<string>.lookup() -> returned[\"action\"]",
+      "arguments": "1",
+      "callbackArguments": "\"sample\"",
+      "baselineThis": null,
+      "text": "import { default as API0 } from './index';\ndeclare const subject0: API0<string>;\nconst returned = subject0[\"lookup\"](1);\nconst callable = returned[\"action\"];\ncallable(\"sample\");\n"
+    },
+    {
+      "id": 1,
+      "provenance": "generated from baseline only",
+      "export": "default",
+      "typeArguments": "<{ sample: [string] }>",
+      "method": "lookup",
+      "route": "default<{ sample: [string] }>.lookup() -> returned[\"action\"]",
+      "arguments": "1",
+      "callbackArguments": "\"sample\"",
+      "baselineThis": null,
+      "text": "import { default as API1 } from './index';\ndeclare const subject1: API1<{ sample: [string] }>;\nconst returned = subject1[\"lookup\"](1);\nconst callable = returned[\"action\"];\ncallable(\"sample\");\n"
+    },
+    {
+      "id": 2,
+      "provenance": "generated from baseline only",
+      "export": "default",
+      "typeArguments": "<{ marker: string }>",
+      "method": "lookup",
+      "route": "default<{ marker: string }>.lookup() -> returned[\"action\"]",
+      "arguments": "1",
+      "callbackArguments": "\"sample\"",
+      "baselineThis": null,
+      "text": "import { default as API2 } from './index';\ndeclare const subject2: API2<{ marker: string }>;\nconst returned = subject2[\"lookup\"](1);\nconst callable = returned[\"action\"];\ncallable(\"sample\");\n"
+    }
+  ],
+  "skipped": [],
+  "nodes": 6
+}

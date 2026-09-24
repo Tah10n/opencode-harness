@@ -1,0 +1,1 @@
+export function decodeText(chunks){const length=chunks.reduce((n,c)=>n+c.length,0),all=new Uint8Array(length);let at=0;for(const c of chunks){all.set(c,at);at+=c.length;}try{return new TextDecoder('utf-8',{fatal:true,ignoreBOM:true}).decode(all);}catch{throw new RangeError('invalid utf8');}}

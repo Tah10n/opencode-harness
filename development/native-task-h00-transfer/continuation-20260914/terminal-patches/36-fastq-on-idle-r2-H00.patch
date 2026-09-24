@@ -1,0 +1,554 @@
+diff --git a/README.md b/README.md
+index b44cce36ef1e06da8b5987fd9c6dc508afdff166..9f288416b5b9bbc1e3c0e9520f749027450f9fcb 100644
+--- a/README.md
++++ b/README.md
+@@ -133,6 +133,7 @@ async function asyncWorker (arg: Task): Promise<void> {
+ * <a href="#pause"><code>queue#<b>pause()</b></code></a>
+ * <a href="#resume"><code>queue#<b>resume()</b></code></a>
+ * <a href="#idle"><code>queue#<b>idle()</b></code></a>
++* <a href="#onIdle"><code>queue#<b>onIdle()</b></code></a>
+ * <a href="#length"><code>queue#<b>length()</b></code></a>
+ * <a href="#getQueue"><code>queue#<b>getQueue()</b></code></a>
+ * <a href="#kill"><code>queue#<b>kill()</b></code></a>
+@@ -192,6 +193,16 @@ Resume the processing of tasks.
+ Returns `false` if there are tasks being processed or waiting to be processed.
+ `true` otherwise.
+ 
++-------------------------------------------------------
++<a name="onIdle"></a>
++### queue.onIdle() => Promise
++
++Returns a promise that resolves when the queue has no running or queued tasks.
++Each call creates an independent wait, and an already idle queue returns a
++resolved promise. A paused queue with pending tasks is not idle.
++
++`onIdle()` does not change the queue's `drain` callback.
++
+ -------------------------------------------------------
+ <a name="length"></a>
+ ### queue.length()
+diff --git a/index.d.ts b/index.d.ts
+index 262dd0482b2250546479f07e3f0345486d915b36..9959c99bc09142bbb706ac5b0d6cac2cfcd7ce74 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -19,6 +19,8 @@ declare namespace fastq {
+     running(): number
+     /** Returns `false` if there are tasks being processed or waiting to be processed. `true` otherwise. */
+     idle(): boolean
++    /** Returns a promise that resolves when there are no running or queued tasks. */
++    onIdle(): Promise<void>
+     /** Returns the number of tasks waiting to be processed (in the queue). */
+     length(): number
+     /** Returns all the tasks be processed (in the queue). Returns empty array when there are no tasks */
+diff --git a/queue.js b/queue.js
+index e1d56c540765991e31a5f5326baa806702dfb85d..d4ad45c881ce58f490bf69aab37cea231f905983 100644
+--- a/queue.js
++++ b/queue.js
+@@ -20,6 +20,8 @@ function fastqueue (context, worker, _concurrency) {
+   var queueTail = null
+   var _running = 0
+   var errorHandler = null
++  var idleResolvers = []
++  var idleNotificationSuppressed = 0
+ 
+   var self = {
+     push: push,
+@@ -47,6 +49,7 @@ function fastqueue (context, worker, _concurrency) {
+     running: running,
+     resume: resume,
+     idle: idle,
++    onIdle: onIdle,
+     length: length,
+     getQueue: getQueue,
+     unshift: unshift,
+@@ -109,6 +112,25 @@ function fastqueue (context, worker, _concurrency) {
+     return _running === 0 && self.length() === 0
+   }
+ 
++  function onIdle () {
++    return new Promise(function (resolve) {
++      if (idle()) {
++        resolve()
++      } else {
++        idleResolvers.push(resolve)
++      }
++    })
++  }
++
++  function notifyIdle () {
++    if (idleNotificationSuppressed > 0 || !idle()) return
++    var resolvers = idleResolvers
++    idleResolvers = []
++    for (var i = 0; i < resolvers.length; i++) {
++      resolvers[i]()
++    }
++  }
++
+   function push (value, done) {
+     var current = cache.get()
+ 
+@@ -177,7 +199,17 @@ function fastqueue (context, worker, _concurrency) {
+         _running--
+       }
+     } else if (--_running === 0) {
++      callDrain()
++      notifyIdle()
++    }
++  }
++
++  function callDrain () {
++    idleNotificationSuppressed++
++    try {
+       self.drain()
++    } finally {
++      idleNotificationSuppressed--
+     }
+   }
+ 
+@@ -185,13 +217,15 @@ function fastqueue (context, worker, _concurrency) {
+     queueHead = null
+     queueTail = null
+     self.drain = noop
++    notifyIdle()
+   }
+ 
+   function killAndDrain () {
+     queueHead = null
+     queueTail = null
+-    self.drain()
++    callDrain()
+     self.drain = noop
++    notifyIdle()
+   }
+ 
+   function abort () {
+@@ -199,35 +233,42 @@ function fastqueue (context, worker, _concurrency) {
+     queueHead = null
+     queueTail = null
+ 
+-    while (current) {
+-      var next = current.next
+-      var callback = current.callback
+-      var errorHandler = current.errorHandler
+-      var val = current.value
+-      var context = current.context
+-
+-      // Reset the task state
+-      current.value = null
+-      current.callback = noop
+-      current.errorHandler = null
+-      current.next = null
+-
+-      // Call error handler if present
+-      if (errorHandler) {
+-        errorHandler(new Error('abort'), val)
+-      }
++    idleNotificationSuppressed++
++    try {
++      while (current) {
++        var next = current.next
++        var callback = current.callback
++        var errorHandler = current.errorHandler
++        var val = current.value
++        var context = current.context
++
++        // Reset the task state
++        current.value = null
++        current.callback = noop
++        current.errorHandler = null
++        current.next = null
++
++        // Call error handler if present
++        if (errorHandler) {
++          errorHandler(new Error('abort'), val)
++        }
++
++        // Call callback with error
++        callback.call(context, new Error('abort'))
+ 
+-      // Call callback with error
+-      callback.call(context, new Error('abort'))
++        // This task was queued, so return it to the pool without updating
++        // the running worker count.
++        cache.release(current)
+ 
+-      // This task was queued, so return it to the pool without updating
+-      // the running worker count.
+-      cache.release(current)
++        current = next
++      }
+ 
+-      current = next
++      self.drain = noop
++    } finally {
++      idleNotificationSuppressed--
+     }
+ 
+-    self.drain = noop
++    notifyIdle()
+   }
+ 
+   function error (handler) {
+diff --git a/test/example.ts b/test/example.ts
+index a47d4419cdc04144771c747d4c0a66da990e4eaa..5cdeb1494a98f300cbbe4a00016caa2c543bdde3 100644
+--- a/test/example.ts
++++ b/test/example.ts
+@@ -21,6 +21,7 @@ queue.empty = () => undefined
+ console.log('the queue tasks are', queue.getQueue())
+ 
+ queue.idle()
++queue.onIdle().then(() => undefined)
+ 
+ queue.kill()
+ 
+@@ -78,6 +79,7 @@ async function asyncWorker(task: any) {
+ async function run () {
+   await queue.push(42)
+   await queue.unshift(42)
++  await queue2.onIdle()
+ }
+ 
+ run()
+diff --git a/test/promise.js b/test/promise.js
+index de9e856caf7f5807ec0ebf3e1d58c50f5a07f91d..76afb6350317516e16c961a5980dd798e53a9a1b 100644
+--- a/test/promise.js
++++ b/test/promise.js
+@@ -156,6 +156,145 @@ test('drained while idle should not call the drain function', async function (t)
+   t.equal(drainCalled, false)
+ })
+ 
++test('onIdle waits for active and queued work', async function (t) {
++  const queue = buildQueue(worker, 2)
++  const finish = []
++  let resolved = 0
++
++  queue.push(1)
++  queue.push(2)
++  queue.push(3)
++
++  const first = queue.onIdle().then(function () {
++    resolved++
++  })
++  const second = queue.onIdle().then(function () {
++    resolved++
++  })
++
++  t.equal(queue.running(), 2, 'two tasks are running')
++  t.equal(queue.length(), 1, 'one task is waiting')
++  await immediate()
++  t.equal(resolved, 0, 'subscribers are pending')
++
++  finish.shift()()
++  await immediate()
++  finish.shift()()
++  await immediate()
++  t.equal(queue.running(), 1, 'the queued task starts')
++  t.equal(resolved, 0, 'subscribers still wait for the queued task')
++  finish.shift()()
++
++  await Promise.all([first, second])
++  t.equal(resolved, 2, 'all subscribers resolve')
++  t.ok(queue.idle(), 'queue is idle')
++  t.ok(queue.onIdle() instanceof Promise, 'idle calls return promises')
++
++  async function worker (arg) {
++    return new Promise(function (resolve) {
++      finish.push(resolve)
++    })
++  }
++})
++
++test('onIdle waits for paused and rejected work', async function (t) {
++  let finish
++  let resolved = false
++
++  const queue = buildQueue(async function (task) {
++    if (task === 'reject') throw new Error('rejected')
++    return new Promise(function (resolve) {
++      finish = resolve
++    })
++  }, 1)
++
++  queue.pause()
++  const rejected = queue.push('reject')
++  const running = queue.push('running')
++  t.equal(queue.running(), 0, 'paused work has no running workers')
++  t.equal(queue.length(), 2, 'paused work is queued')
++  const idle = queue.onIdle().then(function () {
++    resolved = true
++  })
++
++  queue.resume()
++  await immediate()
++  t.equal(queue.running(), 1, 'the replacement task is running')
++  t.equal(queue.length(), 0, 'no tasks remain queued')
++  t.notOk(resolved, 'rejection does not resolve while work runs')
++
++  await rejected.catch(function (err) {
++    t.equal(err.message, 'rejected', 'rejected work remains observable')
++  })
++  t.notOk(resolved, 'subscriber still waits for the running task')
++
++  finish()
++  await running
++  await idle
++  t.ok(resolved && queue.idle(), 'subscriber resolves after rejected work reaches idle')
++})
++
++test('onIdle resolves after queued work is removed', async function (t) {
++  let finish
++  const killQueue = buildQueue(worker, 1)
++  killQueue.pause()
++  killQueue.push(1)
++  t.equal(killQueue.running(), 0, 'kill starts with no worker')
++  t.equal(killQueue.length(), 1, 'kill starts with queued work')
++  const killIdle = killQueue.onIdle()
++  killQueue.kill()
++  await killIdle
++  t.ok(killQueue.idle(), 'kill subscriber resolves an idle queue')
++
++  const activeQueue = buildQueue(async function () {
++    return new Promise(function (resolve) {
++      finish = resolve
++    })
++  }, 1)
++
++  activeQueue.push(1)
++  activeQueue.push(2)
++  const activeIdle = activeQueue.onIdle()
++  t.equal(activeQueue.running(), 1, 'a worker is running before kill')
++  t.equal(activeQueue.length(), 1, 'a task is queued before kill')
++  activeQueue.kill()
++  t.equal(activeQueue.length(), 0, 'kill removes queued work')
++  await immediate()
++  t.notOk(activeQueue.idle(), 'kill does not remove the running worker')
++  finish()
++  await activeIdle
++  t.ok(activeQueue.idle(), 'kill subscriber resolves after the worker finishes')
++
++  const killAndDrainQueue = buildQueue(worker, 1)
++  let drainCalled = false
++  killAndDrainQueue.drain = function () {
++    drainCalled = true
++  }
++  killAndDrainQueue.pause()
++  killAndDrainQueue.push(1)
++  t.equal(killAndDrainQueue.running(), 0, 'killAndDrain starts with no worker')
++  t.equal(killAndDrainQueue.length(), 1, 'killAndDrain starts with queued work')
++  const killAndDrainIdle = killAndDrainQueue.onIdle()
++  killAndDrainQueue.killAndDrain()
++  await killAndDrainIdle
++  t.ok(drainCalled && killAndDrainQueue.idle(), 'killAndDrain resolves an idle queue')
++
++  const abortQueue = buildQueue(worker, 1)
++  abortQueue.pause()
++  const aborted = abortQueue.push(1)
++  t.equal(abortQueue.running(), 0, 'abort starts with no worker')
++  t.equal(abortQueue.length(), 1, 'abort starts with queued work')
++  const abortIdle = abortQueue.onIdle()
++  abortQueue.abort()
++  await aborted.catch(function (err) {
++    t.equal(err.message, 'abort', 'abort rejects queued work')
++  })
++  await abortIdle
++  t.ok(abortQueue.idle(), 'abort subscriber resolves when the queue is idle')
++
++  async function worker () {}
++})
++
+ test('set this', async function (t) {
+   t.plan(1)
+   const that = {}
+diff --git a/test/test.js b/test/test.js
+index c59e8c3403c113279d8fde260bdb1455716358b7..ffa111cff2fbcd0b954095992a7974680c187656 100644
+--- a/test/test.js
++++ b/test/test.js
+@@ -301,6 +301,188 @@ test('idle()', function (t) {
+   }
+ })
+ 
++test('onIdle waits for active and queued work', function (t) {
++  t.plan(9)
++
++  var queue = buildQueue(worker, 2)
++  var finish = []
++  var resolved = 0
++
++  queue.push(1)
++  queue.push(2)
++  queue.push(3)
++
++  var first = queue.onIdle().then(function () {
++    resolved++
++  })
++  var second = queue.onIdle().then(function () {
++    resolved++
++  })
++
++  t.equal(queue.running(), 2, 'two tasks are running')
++  t.equal(queue.length(), 1, 'one task is waiting')
++  t.equal(resolved, 0, 'subscribers are pending')
++
++  finish.shift()()
++  t.equal(resolved, 0, 'subscribers wait for all workers')
++  finish.shift()()
++  t.equal(queue.running(), 1, 'the queued task starts')
++  t.equal(resolved, 0, 'subscribers still wait for the queued task')
++  finish.shift()()
++
++  Promise.all([first, second]).then(function () {
++    t.equal(resolved, 2, 'all subscribers resolve')
++    t.ok(queue.idle(), 'queue is idle')
++    t.ok(queue.onIdle() instanceof Promise, 'idle calls return promises')
++  })
++
++  function worker (arg, cb) {
++    finish.push(cb)
++  }
++})
++
++test('onIdle waits for paused work', function (t) {
++  t.plan(5)
++
++  var queue = buildQueue(worker, 1)
++  var finish
++  var resolved = false
++
++  queue.pause()
++  queue.push(42)
++  var idle = queue.onIdle().then(function () {
++    resolved = true
++  })
++
++  t.notOk(queue.idle(), 'paused queued work is not idle')
++  queue.resume()
++  t.equal(queue.running(), 1, 'resuming starts the task')
++  t.notOk(resolved, 'subscriber remains pending while the task runs')
++
++  finish()
++  t.notOk(resolved, 'promise callbacks run after the task completes')
++
++  idle.then(function () {
++    t.ok(resolved && queue.idle(), 'subscriber resolves after the queue is idle')
++  })
++
++  function worker (arg, cb) {
++    finish = cb
++  }
++})
++
++test('onIdle preserves drain and waits for reentrant work', function (t) {
++  t.plan(7)
++
++  var queue = buildQueue(worker, 1)
++  var finish = []
++  var drainCalls = 0
++
++  function drain () {
++    drainCalls++
++    if (drainCalls === 1) queue.push(2)
++  }
++
++  queue.drain = drain
++  queue.push(1)
++  var idle = queue.onIdle()
++
++  t.equal(queue.drain, drain, 'onIdle preserves drain identity')
++  t.equal(queue.running(), 1, 'the first task is running')
++
++  finish.shift()()
++  t.equal(drainCalls, 1, 'drain is called')
++  t.equal(queue.running(), 1, 'reentrant work keeps the queue busy')
++  t.equal(queue.drain, drain, 'drain remains unchanged')
++
++  finish.shift()()
++
++  idle.then(function () {
++    t.equal(drainCalls, 2, 'drain is called for reentrant work')
++    t.ok(queue.idle(), 'idle resolves after drain callbacks finish')
++  })
++
++  function worker (arg, cb) {
++    finish.push(cb)
++  }
++})
++
++test('onIdle waits for synchronous drain callbacks to finish', function (t) {
++  t.plan(6)
++
++  var queue = buildQueue(worker, 1)
++  var firstFinish
++  var finish
++  var drainCalls = 0
++  var resolved = false
++
++  queue.drain = function () {
++    drainCalls++
++    if (drainCalls === 1) {
++      queue.push(2)
++      queue.push(3)
++    }
++  }
++
++  queue.push(1)
++  var idle = queue.onIdle().then(function () {
++    resolved = true
++  })
++
++  firstFinish()
++  t.equal(drainCalls, 2, 'nested synchronous completion calls drain')
++  t.equal(queue.running(), 1, 'later work in drain remains running')
++  t.equal(queue.length(), 0, 'later work was assigned')
++  t.notOk(resolved, 'idle does not resolve inside drain')
++
++  finish()
++  idle.then(function () {
++    t.equal(drainCalls, 3, 'drain completes before idle resolves')
++    t.ok(resolved && queue.idle(), 'queue is idle after the callback')
++  })
++
++  function worker (arg, cb) {
++    if (arg === 1) {
++      firstFinish = cb
++    } else if (arg === 2) {
++      cb()
++    } else {
++      finish = cb
++    }
++  }
++})
++
++test('onIdle waits for running work after kill', function (t) {
++  t.plan(5)
++
++  var queue = buildQueue(worker, 1)
++  var finish
++  var resolved = false
++
++  queue.push(1)
++  queue.push(2)
++  var idle = queue.onIdle().then(function () {
++    resolved = true
++  })
++
++  queue.kill()
++  t.equal(queue.length(), 0, 'kill removes queued work')
++  t.equal(queue.running(), 1, 'the running task remains')
++
++  setImmediate(function () {
++    t.notOk(resolved, 'subscriber waits for the running task')
++    finish()
++    idle.then(function () {
++      t.ok(resolved, 'subscriber resolves after the worker finishes')
++      t.ok(queue.idle(), 'queue is idle')
++    })
++  })
++
++  function worker (arg, cb) {
++    finish = cb
++  }
++})
++
+ test('saturated', function (t) {
+   t.plan(9)
+ 

@@ -1,0 +1,53 @@
+{
+  "attempts": [
+    {
+      "slot": 1,
+      "requests": 20,
+      "duplicateRequestBodies": 0,
+      "transportErrors": 0,
+      "statuses": [
+        200
+      ],
+      "terminationVerified": true,
+      "containerRemoved": true
+    },
+    {
+      "slot": 2,
+      "requests": 13,
+      "duplicateRequestBodies": 0,
+      "transportErrors": 0,
+      "statuses": [
+        200
+      ],
+      "terminationVerified": true,
+      "containerRemoved": true
+    },
+    {
+      "slot": 3,
+      "requests": 19,
+      "duplicateRequestBodies": 0,
+      "transportErrors": 0,
+      "statuses": [
+        200
+      ],
+      "terminationVerified": true,
+      "containerRemoved": true
+    },
+    {
+      "slot": 4,
+      "requests": 17,
+      "duplicateRequestBodies": 0,
+      "transportErrors": 0,
+      "statuses": [
+        200
+      ],
+      "terminationVerified": true,
+      "containerRemoved": true
+    }
+  ],
+  "frozenFilesUnchanged": true,
+  "historicalPauseUnchanged": true,
+  "replacements": 0,
+  "realSmokes": 0,
+  "initialApprovalRejectionOccurredBeforeAnyTaskRun": true
+}

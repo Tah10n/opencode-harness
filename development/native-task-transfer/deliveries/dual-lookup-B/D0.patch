@@ -1,0 +1,122 @@
+diff --git a/README.md b/README.md
+index 40d5afdbe3fb63001cdb3256b1e1cfd3614623fa..022f1cc2baeeadd73a38ba27aef00853a3299658 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,13 @@
+ # dual-lookup
+ 
+-Small local library. Run `npm test`.
++`createLookup(transport)` supports both callback and Promise consumers. Pass a
++function callback to receive `(error, value)` and get `undefined` back; omit it
++to receive a Promise. The first transport completion wins, including when the
++transport calls back more than once or throws after completing.
++
++`listNames(lookup, ids, callback)` remains the callback-based API.
++`listNamesAsync(lookup, ids)` uses Promise lookups and returns names in input
++order, including duplicate IDs. It returns an empty array for empty input and
++propagates lookup rejections.
++
++Run `npm test`.
+diff --git a/src/lookup.mjs b/src/lookup.mjs
+index 2e1cb037b6fd1dc8e289ff1c10141e3fb1131c92..83df55a20743c6c83dd4e093a5668fe94b6c98c8 100644
+--- a/src/lookup.mjs
++++ b/src/lookup.mjs
+@@ -1 +1,30 @@
+-export function createLookup(transport){return function lookup(id,callback){transport.get(id,callback);};}
++export function createLookup(transport) {
++  return function lookup(id, callback) {
++    const promiseMode = typeof callback !== 'function';
++    let settled = false;
++    let resolvePromise;
++    let rejectPromise;
++    const promise = promiseMode ? new Promise((resolve, reject) => {
++      resolvePromise = resolve;
++      rejectPromise = reject;
++    }) : undefined;
++
++    function complete(error, value) {
++      if (settled) return;
++      settled = true;
++      if (promiseMode) {
++        if (error) rejectPromise(error);
++        else resolvePromise(value);
++      } else {
++        callback(error, value);
++      }
++    }
++
++    try {
++      transport.get.call(transport, id, complete);
++    } catch (error) {
++      if (!settled) complete(error);
++    }
++    return promise;
++  };
++}
+diff --git a/src/names.mjs b/src/names.mjs
+index 80e5a7cfd93a04c9bf55f58e383313086a234b16..e42e9c63b085707696f541165f993f5374ce1ae7 100644
+--- a/src/names.mjs
++++ b/src/names.mjs
+@@ -1 +1,6 @@
+ export function listNames(lookup,ids,callback){const names=[];let index=0;function next(){if(index===ids.length)return callback(null,names);lookup(ids[index++],(err,user)=>{if(err)return callback(err);names.push(user.name);next();});}next();}
++
++export async function listNamesAsync(lookup, ids) {
++  const users = await Promise.all(ids.map((id) => lookup(id)));
++  return users.map((user) => user.name);
++}
+diff --git a/test/lookup.test.mjs b/test/lookup.test.mjs
+index e5da153f82668a1d1f9803a3ce5dcc219fd0a611..79061c41aab011b4f5850912f2f5ff1ed4cf7b56 100644
+--- a/test/lookup.test.mjs
++++ b/test/lookup.test.mjs
+@@ -1,2 +1,50 @@
+ import {test} from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';
+-import {createLookup} from '../src/lookup.mjs';import {listNames} from '../src/names.mjs';test('legacy callback consumer',async()=>{const lookup=createLookup({get(id,cb){cb(null,{name:id.toUpperCase()});}});assert.deepEqual(await new Promise((resolve,reject)=>listNames(lookup,['a','b'],(e,x)=>e?reject(e):resolve(x))),['A','B']);});
++import {createLookup} from '../src/lookup.mjs';import {listNames,listNamesAsync} from '../src/names.mjs';
++
++test('legacy callback consumer',async()=>{const lookup=createLookup({get(id,cb){cb(null,{name:id.toUpperCase()});}});assert.deepEqual(await new Promise((resolve,reject)=>listNames(lookup,['a','b'],(e,x)=>e?reject(e):resolve(x))),['A','B']);});
++
++test('callback lookup preserves transport context and first completion', () => {
++  const id = {key: 'id'};
++  const error = new Error('late');
++  const transport = {value: 7, get(receivedId, callback) {
++    assert.equal(this, transport);
++    assert.equal(receivedId, id);
++    callback(null, {name: this.value});
++    callback(error, {name: 8});
++    throw error;
++  }};
++  const lookup = createLookup(transport);
++  const results = [];
++  assert.equal(lookup(id, (err, value) => results.push([err, value])), undefined);
++  assert.deepEqual(results, [[null, {name: 7}]]);
++});
++
++test('promise lookup resolves first callback and ignores later completion', async () => {
++  const error = new Error('late');
++  const lookup = createLookup({get(id, callback) {
++    callback(null, {name: id});
++    callback(error, null);
++    throw error;
++  }});
++  assert.deepEqual(await lookup('name'), {name: 'name'});
++});
++
++test('promise lookup rejects the original synchronous transport error', async () => {
++  const error = new Error('transport');
++  const lookup = createLookup({get() { throw error; }});
++  await assert.rejects(lookup('name'), (received) => received === error);
++});
++
++test('listNamesAsync preserves order and duplicates', async () => {
++  const lookup = createLookup({get(id, callback) {
++    setTimeout(() => callback(null, {name: id.toUpperCase()}), id === 'a' ? 10 : 0);
++  }});
++  assert.deepEqual(await listNamesAsync(lookup, ['a', 'b', 'a']), ['A', 'B', 'A']);
++  assert.deepEqual(await listNamesAsync(lookup, []), []);
++});
++
++test('listNamesAsync propagates lookup rejection identity', async () => {
++  const error = new Error('missing');
++  const lookup = createLookup({get(id, callback) { callback(error); }});
++  await assert.rejects(listNamesAsync(lookup, ['x']), (received) => received === error);
++});

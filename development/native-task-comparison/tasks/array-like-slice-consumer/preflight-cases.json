@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/batches.mjs": "export function batches(input,size){\n if(!Number.isInteger(size)||size<1||size>10000)throw new RangeError('size');\n if(input===null||(typeof input!=='object'&&typeof input!=='string'))throw new TypeError('input');\n const source=Object(input),length=source.length;\n if(!Number.isInteger(length)||length<0||length>10000)throw new RangeError('length');\n const snapshot=new Array(length);for(let i=0;i<length;i++)if(Reflect.has(source,String(i)))snapshot[i]=Reflect.get(source,String(i));\n const result=[];for(let i=0;i<length;i+=size)result.push(snapshot.slice(i,i+size));return result;\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "fills-absent-indices",
+      "file": "src/batches.mjs",
+      "replacement": "export function batches(input,size){\n if(!Number.isInteger(size)||size<1||size>10000)throw new RangeError('size');\n if(input===null||(typeof input!=='object'&&typeof input!=='string'))throw new TypeError('input');\n const source=Object(input),length=source.length;\n if(!Number.isInteger(length)||length<0||length>10000)throw new RangeError('length');\n const output=[];for(let start=0;start<length;start+=size){\n  const chunk=new Array(Math.min(size,length-start));\n  for(let j=0;j<chunk.length;j++){const index=start+j;chunk[j]=source[index];}\n  output.push(chunk);\n }\n return output;\n}\n"
+    },
+    {
+      "name": "ignores-inherited-indices",
+      "file": "src/batches.mjs",
+      "replacement": "export function batches(input,size){\n if(!Number.isInteger(size)||size<1||size>10000)throw new RangeError('size');\n if(input===null||(typeof input!=='object'&&typeof input!=='string'))throw new TypeError('input');\n const source=Object(input),length=source.length;\n if(!Number.isInteger(length)||length<0||length>10000)throw new RangeError('length');\n const output=[];for(let start=0;start<length;start+=size){\n  const chunk=new Array(Math.min(size,length-start));\n  for(let j=0;j<chunk.length;j++){const index=start+j;if(Object.hasOwn(source,index))chunk[j]=source[index];}\n  output.push(chunk);\n }\n return output;\n}\n"
+    }
+  ]
+}

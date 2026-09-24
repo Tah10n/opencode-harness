@@ -1,0 +1,129 @@
+{
+  "slot": 6,
+  "task": "legacy-runtime-reload",
+  "arm": "A",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 146546,
+  "phaseCount": 1,
+  "continuationApplied": false,
+  "requests": 16,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": null,
+  "repairs": null,
+  "toolCalls": 29,
+  "sessions": 1,
+  "usage": {
+    "input_tokens": 541284,
+    "cached_tokens": 178688,
+    "output_tokens": 4173,
+    "reasoning_tokens": 837,
+    "total_tokens": 545457
+  },
+  "requestEfforts": {
+    "none": 1,
+    "low": 15
+  },
+  "httpStatuses": {
+    "200": 16
+  },
+  "terminationVerified": true,
+  "packet": "P3",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/lib/config.mjs",
+      "packages/connector/test/state-security.test.mjs"
+    ],
+    "patchSha256": "6c6df593aa13f7841af9c904886e6839de7d93fcfe330bd873acccc575780d7d"
+  },
+  "sourceReview": {
+    "packet": "P3",
+    "sourceReview": {
+      "implementation": "Small per-path ownership extension for known legacy libraries and adapters. Existing filesystem, identity, executable and versioned runtime checks are preserved; no whole-set assumption or separator regression added.",
+      "tests": "Adds an unmarked full legacy-layout fixture and repeats initialization in two fresh child processes, retaining bytes and verifying marker creation. It does not itself call prepareRuntime; existing runtime tests and the independent fresh-process preparation/CLI test will cover that integration. Existing assertions are retained.",
+      "documentation": "README explains preserved legacy bytes and current runtime installation, with unknown/foreign entries rejected.",
+      "staticDefects": []
+    },
+    "behaviorVerdict": "All executed independent checks passed",
+    "completenessVerdict": "requirements delivered within targeted scope"
+  },
+  "grading": {
+    "final": {
+      "packet": "P3",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 2,
+            "pass": 2,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 2,
+            "pass": 2,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "legacy-acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 9,
+            "pass": 9,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    }
+  },
+  "evidenceSelections": []
+}

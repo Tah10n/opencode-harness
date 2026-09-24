@@ -1,0 +1,32 @@
+{
+  "status": "invalid_input_preparation",
+  "runsCompleted": 4,
+  "reruns": 0,
+  "cause": "git apply was invoked in a nested directory without its own Git repository; Git discovered the enclosing harness repository and skipped paths outside the current prefix with exit 0. Public D-final patches were not applied.",
+  "impact": "All four runs began at original task baselines, not the requested preserved incomplete D-final. They cannot answer the requested continuation P/H comparison.",
+  "rows": [
+    {
+      "task": "legacy-runtime-reload",
+      "invalidInputsWereOriginalBaseline": true,
+      "preservedDfinalPatchSha256": "89c7c137cb1e27ed175c10af24d89492b891eda2a07463cfa839a72d01f08748",
+      "correctedFilesMatchedHistoricalDfinal": [
+        "packages/connector/README.md",
+        "packages/connector/lib/config.mjs"
+      ],
+      "correctedGitRootVerified": true,
+      "newProviderRuns": 0
+    },
+    {
+      "task": "reconnect-revoked",
+      "invalidInputsWereOriginalBaseline": true,
+      "preservedDfinalPatchSha256": "5578826a04112f1c92d826d171bd365f6c09d99f40f14f4a1140a62d09a5e01e",
+      "correctedFilesMatchedHistoricalDfinal": [
+        "packages/connector/README.md",
+        "packages/connector/bin/viberacing.mjs",
+        "packages/connector/test/config.test.mjs"
+      ],
+      "correctedGitRootVerified": true,
+      "newProviderRuns": 0
+    }
+  ]
+}

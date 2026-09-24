@@ -1,0 +1,1978 @@
+{
+  "status": "incomplete-stopped",
+  "measuredSourceCommit": "1cebebb082163250a0f78269acc164edfc3c6268",
+  "preOutcomePublicationCommit": "237c98e36d4e30b4c158a3d3450902c1cdd644bf",
+  "freezeSha256": "240802e6d4deecca8b7e22096c6f4bccdd41b8c161e380eb32a56b9a42dbd1d6",
+  "plannedSlots": 48,
+  "startedSlots": 18,
+  "notStartedSlots": 30,
+  "activeSlots": 0,
+  "primaryEstimate": null,
+  "primary95Interval": null,
+  "reasonPrimaryUnavailable": "No task has both repetitions. The frozen project-block analysis requires all planned paired task means; no replacement partial-series CI or p-value is computed.",
+  "descriptiveStartedOnly": {
+    "arms": {
+      "P": {
+        "started": 9,
+        "notStarted": 15,
+        "Q": 3,
+        "D": 3,
+        "QRateAmongStarted": 0.3333333333333333,
+        "DRateAmongStarted": 0.3333333333333333,
+        "normalNativeCompletion": 8,
+        "summedSlotElapsedMs": 3309967,
+        "medianSlotElapsedMs": 295276
+      },
+      "H00": {
+        "started": 9,
+        "notStarted": 15,
+        "Q": 4,
+        "D": 4,
+        "QRateAmongStarted": 0.4444444444444444,
+        "DRateAmongStarted": 0.4444444444444444,
+        "normalNativeCompletion": 8,
+        "summedSlotElapsedMs": 2947547,
+        "medianSlotElapsedMs": 312546
+      }
+    },
+    "QDifference": 0.1111111111111111,
+    "DDifference": 0.1111111111111111,
+    "repetition1WinsLossesTiesH00vsP": {
+      "wins": 3,
+      "losses": 2,
+      "ties": 4
+    },
+    "notConfirmatory": true
+  },
+  "tasks": [
+    {
+      "task": "denque-rotate",
+      "project": "denque",
+      "repetitions": [
+        {
+          "repetition": 1,
+          "P": {
+            "state": "stopped",
+            "Q": 0,
+            "D": 0
+          },
+          "H00": {
+            "state": "stopped",
+            "Q": 1,
+            "D": 1
+          },
+          "QDifference": 1,
+          "DDifference": 1
+        },
+        {
+          "repetition": 2,
+          "P": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "H00": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "QDifference": null,
+          "DDifference": null
+        }
+      ],
+      "twoRepetitionMeans": null,
+      "changeBetweenRepetitions": null
+    },
+    {
+      "task": "denque-remove-where",
+      "project": "denque",
+      "repetitions": [
+        {
+          "repetition": 1,
+          "P": {
+            "state": "stopped",
+            "Q": 0,
+            "D": 0
+          },
+          "H00": {
+            "state": "stopped",
+            "Q": 0,
+            "D": 0
+          },
+          "QDifference": 0,
+          "DDifference": 0
+        },
+        {
+          "repetition": 2,
+          "P": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "H00": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "QDifference": null,
+          "DDifference": null
+        }
+      ],
+      "twoRepetitionMeans": null,
+      "changeBetweenRepetitions": null
+    },
+    {
+      "task": "eventemitter-prepend",
+      "project": "eventemitter3",
+      "repetitions": [
+        {
+          "repetition": 1,
+          "P": {
+            "state": "stopped",
+            "Q": 1,
+            "D": 1
+          },
+          "H00": {
+            "state": "stopped",
+            "Q": 0,
+            "D": 0
+          },
+          "QDifference": -1,
+          "DDifference": -1
+        },
+        {
+          "repetition": 2,
+          "P": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "H00": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "QDifference": null,
+          "DDifference": null
+        }
+      ],
+      "twoRepetitionMeans": null,
+      "changeBetweenRepetitions": null
+    },
+    {
+      "task": "eventemitter-remove-context",
+      "project": "eventemitter3",
+      "repetitions": [
+        {
+          "repetition": 1,
+          "P": {
+            "state": "stopped",
+            "Q": 0,
+            "D": 0
+          },
+          "H00": {
+            "state": "stopped",
+            "Q": 0,
+            "D": 0
+          },
+          "QDifference": 0,
+          "DDifference": 0
+        },
+        {
+          "repetition": 2,
+          "P": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "H00": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "QDifference": null,
+          "DDifference": null
+        }
+      ],
+      "twoRepetitionMeans": null,
+      "changeBetweenRepetitions": null
+    },
+    {
+      "task": "fastq-running-tasks",
+      "project": "fastq",
+      "repetitions": [
+        {
+          "repetition": 1,
+          "P": {
+            "state": "stopped",
+            "Q": 0,
+            "D": 0
+          },
+          "H00": {
+            "state": "stopped",
+            "Q": 1,
+            "D": 1
+          },
+          "QDifference": 1,
+          "DDifference": 1
+        },
+        {
+          "repetition": 2,
+          "P": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "H00": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "QDifference": null,
+          "DDifference": null
+        }
+      ],
+      "twoRepetitionMeans": null,
+      "changeBetweenRepetitions": null
+    },
+    {
+      "task": "fastq-on-idle",
+      "project": "fastq",
+      "repetitions": [
+        {
+          "repetition": 1,
+          "P": {
+            "state": "stopped",
+            "Q": 0,
+            "D": 0
+          },
+          "H00": {
+            "state": "stopped",
+            "Q": 0,
+            "D": 0
+          },
+          "QDifference": 0,
+          "DDifference": 0
+        },
+        {
+          "repetition": 2,
+          "P": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "H00": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "QDifference": null,
+          "DDifference": null
+        }
+      ],
+      "twoRepetitionMeans": null,
+      "changeBetweenRepetitions": null
+    },
+    {
+      "task": "quick-lru-computed",
+      "project": "quick-lru",
+      "repetitions": [
+        {
+          "repetition": 1,
+          "P": {
+            "state": "stopped",
+            "Q": 1,
+            "D": 1
+          },
+          "H00": {
+            "state": "stopped",
+            "Q": 1,
+            "D": 1
+          },
+          "QDifference": 0,
+          "DDifference": 0
+        },
+        {
+          "repetition": 2,
+          "P": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "H00": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "QDifference": null,
+          "DDifference": null
+        }
+      ],
+      "twoRepetitionMeans": null,
+      "changeBetweenRepetitions": null
+    },
+    {
+      "task": "quick-lru-prune",
+      "project": "quick-lru",
+      "repetitions": [
+        {
+          "repetition": 1,
+          "P": {
+            "state": "stopped",
+            "Q": 0,
+            "D": 0
+          },
+          "H00": {
+            "state": "stopped",
+            "Q": 1,
+            "D": 1
+          },
+          "QDifference": 1,
+          "DDifference": 1
+        },
+        {
+          "repetition": 2,
+          "P": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "H00": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "QDifference": null,
+          "DDifference": null
+        }
+      ],
+      "twoRepetitionMeans": null,
+      "changeBetweenRepetitions": null
+    },
+    {
+      "task": "ufo-query-sort",
+      "project": "ufo",
+      "repetitions": [
+        {
+          "repetition": 1,
+          "P": {
+            "state": "stopped",
+            "Q": 1,
+            "D": 1
+          },
+          "H00": {
+            "state": "stopped",
+            "Q": 0,
+            "D": 0
+          },
+          "QDifference": -1,
+          "DDifference": -1
+        },
+        {
+          "repetition": 2,
+          "P": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "H00": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "QDifference": null,
+          "DDifference": null
+        }
+      ],
+      "twoRepetitionMeans": null,
+      "changeBetweenRepetitions": null
+    },
+    {
+      "task": "ufo-append-query",
+      "project": "ufo",
+      "repetitions": [
+        {
+          "repetition": 1,
+          "P": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "H00": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "QDifference": null,
+          "DDifference": null
+        },
+        {
+          "repetition": 2,
+          "P": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "H00": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "QDifference": null,
+          "DDifference": null
+        }
+      ],
+      "twoRepetitionMeans": null,
+      "changeBetweenRepetitions": null
+    },
+    {
+      "task": "ms-format-unit",
+      "project": "ms",
+      "repetitions": [
+        {
+          "repetition": 1,
+          "P": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "H00": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "QDifference": null,
+          "DDifference": null
+        },
+        {
+          "repetition": 2,
+          "P": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "H00": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "QDifference": null,
+          "DDifference": null
+        }
+      ],
+      "twoRepetitionMeans": null,
+      "changeBetweenRepetitions": null
+    },
+    {
+      "task": "ms-parse-compound",
+      "project": "ms",
+      "repetitions": [
+        {
+          "repetition": 1,
+          "P": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "H00": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "QDifference": null,
+          "DDifference": null
+        },
+        {
+          "repetition": 2,
+          "P": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "H00": {
+            "state": "not_started",
+            "Q": null,
+            "D": null
+          },
+          "QDifference": null,
+          "DDifference": null
+        }
+      ],
+      "twoRepetitionMeans": null,
+      "changeBetweenRepetitions": null
+    }
+  ],
+  "slots": [
+    {
+      "slot": 1,
+      "task": "denque-rotate",
+      "project": "denque",
+      "repetition": 1,
+      "arm": "P",
+      "state": "stopped",
+      "startedAt": "2026-09-13T19:42:14.528Z",
+      "completedAt": "2026-09-13T19:48:00.294Z",
+      "elapsedMs": 342877,
+      "nativeCompleted": true,
+      "timedOut": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "error": null,
+      "forwarded": 23,
+      "Q": 0,
+      "D": 0,
+      "neutralId": "8fb8b5e52a97",
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "Delivered suite passes with object cloning on nontrivial rotations; object assertions concern invalid/no-op rotations. The paired neutral alternative detects identity loss. Original reference and alternative controls also miss this case, a disclosed pre-start calibration gap."
+        }
+      ],
+      "nativeFinishReason": "stop",
+      "normalHandoff": true,
+      "nativeExitCode": 0,
+      "signal": null,
+      "workflowStatus": null,
+      "patch": "patches/01-denque-rotate-r1-P.patch",
+      "patchSha256": "6952239353c00a3be16c77d3caa555a46578e4e5a013b88b3ddb1e8e0297cde0",
+      "patchBytes": 7307,
+      "evaluation": "evaluations/8fb8b5e52a97.json",
+      "reportFindings": []
+    },
+    {
+      "slot": 2,
+      "task": "denque-rotate",
+      "project": "denque",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "stopped",
+      "startedAt": "2026-09-13T19:48:01.028Z",
+      "completedAt": "2026-09-13T19:54:26.947Z",
+      "elapsedMs": 383399,
+      "nativeCompleted": true,
+      "timedOut": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "error": null,
+      "forwarded": 32,
+      "Q": 1,
+      "D": 1,
+      "neutralId": "e01efb782e8c",
+      "findings": [],
+      "nativeFinishReason": "stop",
+      "normalHandoff": true,
+      "nativeExitCode": 0,
+      "signal": null,
+      "workflowStatus": "incomplete",
+      "patch": "patches/02-denque-rotate-r1-H00.patch",
+      "patchSha256": "ef746782f725c4977bdaf00a0de93d059a9849d1486f7b2526ece5f281d015a2",
+      "patchBytes": 7244,
+      "evaluation": "evaluations/e01efb782e8c.json",
+      "reportFindings": [
+        {
+          "category": "misleading-workflow-report",
+          "evidence": "Normal final response lists successful project commands but says No observed relevant project test/check and Executable project verification unavailable or not observed. Delivery worktree and terminal patch are correctly named and usable; this contradiction does not alone remove D."
+        }
+      ],
+      "nativeTerminalPatch": "terminal-patches/02-denque-rotate-r1-H00.patch"
+    },
+    {
+      "slot": 3,
+      "task": "denque-remove-where",
+      "project": "denque",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "stopped",
+      "startedAt": "2026-09-13T19:54:27.687Z",
+      "completedAt": "2026-09-13T19:59:19.439Z",
+      "elapsedMs": 289242,
+      "nativeCompleted": true,
+      "timedOut": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "error": null,
+      "forwarded": 21,
+      "Q": 0,
+      "D": 0,
+      "neutralId": "b60c3368673e",
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "Delivered suite passes with configured capacity removed after filtering. Both control suites detect this specified error."
+        }
+      ],
+      "nativeFinishReason": "stop",
+      "normalHandoff": true,
+      "nativeExitCode": 0,
+      "signal": null,
+      "workflowStatus": "incomplete",
+      "patch": "patches/03-denque-remove-where-r1-H00.patch",
+      "patchSha256": "0f1165236f206a77143b9592e84fd3131285139b29b17cf22f4222ce47cf0832",
+      "patchBytes": 6376,
+      "evaluation": "evaluations/b60c3368673e.json",
+      "reportFindings": [
+        {
+          "category": "misleading-workflow-report",
+          "evidence": "Normal final response lists successful project commands but says No observed relevant project test/check and Executable project verification unavailable or not observed. Delivery worktree and terminal patch are correctly named and usable; this contradiction does not alone remove D."
+        }
+      ],
+      "nativeTerminalPatch": "terminal-patches/03-denque-remove-where-r1-H00.patch"
+    },
+    {
+      "slot": 4,
+      "task": "denque-remove-where",
+      "project": "denque",
+      "repetition": 1,
+      "arm": "P",
+      "state": "stopped",
+      "startedAt": "2026-09-13T19:59:20.175Z",
+      "completedAt": "2026-09-13T20:02:42.449Z",
+      "elapsedMs": 199915,
+      "nativeCompleted": true,
+      "timedOut": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "error": null,
+      "forwarded": 17,
+      "Q": 0,
+      "D": 0,
+      "neutralId": "8113f808eacc",
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "Delivered suite passes with configured capacity removed after filtering; only backing length/mask and below-capacity reuse are tested. Both control suites detect the capacity-loss mutation."
+        }
+      ],
+      "nativeFinishReason": "stop",
+      "normalHandoff": true,
+      "nativeExitCode": 0,
+      "signal": null,
+      "workflowStatus": null,
+      "patch": "patches/04-denque-remove-where-r1-P.patch",
+      "patchSha256": "4a8b5239943fae318fb44ed4bdbe6bd84ac9dafc7fac404bbbedc9a5735c309e",
+      "patchBytes": 6936,
+      "evaluation": "evaluations/8113f808eacc.json",
+      "reportFindings": []
+    },
+    {
+      "slot": 5,
+      "task": "eventemitter-prepend",
+      "project": "eventemitter3",
+      "repetition": 1,
+      "arm": "P",
+      "state": "stopped",
+      "startedAt": "2026-09-13T20:02:43.105Z",
+      "completedAt": "2026-09-13T20:09:18.969Z",
+      "elapsedMs": 393714,
+      "nativeCompleted": true,
+      "timedOut": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "error": null,
+      "forwarded": 31,
+      "Q": 1,
+      "D": 1,
+      "neutralId": "2c3146b61f69",
+      "findings": [],
+      "nativeFinishReason": "stop",
+      "normalHandoff": true,
+      "nativeExitCode": 0,
+      "signal": null,
+      "workflowStatus": null,
+      "patch": "patches/05-eventemitter-prepend-r1-P.patch",
+      "patchSha256": "4883a10142af5078d4d250afcf58d73de6dd1dfeb6d215f38ce3b9f4626e7206",
+      "patchBytes": 9893,
+      "evaluation": "evaluations/2c3146b61f69.json",
+      "reportFindings": []
+    },
+    {
+      "slot": 6,
+      "task": "eventemitter-prepend",
+      "project": "eventemitter3",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "stopped",
+      "startedAt": "2026-09-13T20:09:19.619Z",
+      "completedAt": "2026-09-13T20:13:01.646Z",
+      "elapsedMs": 219922,
+      "nativeCompleted": true,
+      "timedOut": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "error": null,
+      "forwarded": 23,
+      "Q": 0,
+      "D": 0,
+      "neutralId": "65f9ded470ca",
+      "findings": [
+        {
+          "category": "required-type-test-loss",
+          "reason": "Public declarations supplied, but no required event-specific TypeScript consumer/type regression is delivered."
+        }
+      ],
+      "nativeFinishReason": "stop",
+      "normalHandoff": true,
+      "nativeExitCode": 0,
+      "signal": null,
+      "workflowStatus": "incomplete",
+      "patch": "patches/06-eventemitter-prepend-r1-H00.patch",
+      "patchSha256": "8f79f0c9ddf49d9fd516f024344e34bf10ec5c5bc03ceeed3e13a4a5b6ece0f5",
+      "patchBytes": 8940,
+      "evaluation": "evaluations/65f9ded470ca.json",
+      "reportFindings": [
+        {
+          "category": "misleading-workflow-report",
+          "evidence": "Normal final response lists successful project commands but says No observed relevant project test/check and Executable project verification unavailable or not observed. Delivery worktree and terminal patch are correctly named and usable; this contradiction does not alone remove D."
+        }
+      ],
+      "nativeTerminalPatch": "terminal-patches/06-eventemitter-prepend-r1-H00.patch"
+    },
+    {
+      "slot": 7,
+      "task": "eventemitter-remove-context",
+      "project": "eventemitter3",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "stopped",
+      "startedAt": "2026-09-13T20:13:02.261Z",
+      "completedAt": "2026-09-13T20:18:41.526Z",
+      "elapsedMs": 337247,
+      "nativeCompleted": true,
+      "timedOut": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "error": null,
+      "forwarded": 29,
+      "Q": 0,
+      "D": 0,
+      "neutralId": "53a657cf6ab8",
+      "findings": [
+        {
+          "category": "required-type-test-loss",
+          "reason": "Public declaration supplied, but the explicitly required TypeScript consumer/type regression is absent."
+        }
+      ],
+      "nativeFinishReason": "stop",
+      "normalHandoff": true,
+      "nativeExitCode": 0,
+      "signal": null,
+      "workflowStatus": "incomplete",
+      "patch": "patches/07-eventemitter-remove-context-r1-H00.patch",
+      "patchSha256": "c2fffc456d3318a863f36425539aead7b054788f890600c15c920633c5690dfc",
+      "patchBytes": 7538,
+      "evaluation": "evaluations/53a657cf6ab8.json",
+      "reportFindings": [
+        {
+          "category": "misleading-workflow-report",
+          "evidence": "Normal final response lists successful project commands but says No observed relevant project test/check and Executable project verification unavailable or not observed. Delivery worktree and terminal patch are correctly named and usable; this contradiction does not alone remove D."
+        }
+      ],
+      "nativeTerminalPatch": "terminal-patches/07-eventemitter-remove-context-r1-H00.patch"
+    },
+    {
+      "slot": 8,
+      "task": "eventemitter-remove-context",
+      "project": "eventemitter3",
+      "repetition": 1,
+      "arm": "P",
+      "state": "stopped",
+      "startedAt": "2026-09-13T20:18:42.148Z",
+      "completedAt": "2026-09-13T20:23:22.545Z",
+      "elapsedMs": 278369,
+      "nativeCompleted": true,
+      "timedOut": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "error": null,
+      "forwarded": 23,
+      "Q": 0,
+      "D": 0,
+      "neutralId": "6960a8f1de8a",
+      "findings": [
+        {
+          "category": "required-type-test-loss",
+          "reason": "Public declaration supplied, but no required TypeScript consumer/type regression is delivered."
+        }
+      ],
+      "nativeFinishReason": "stop",
+      "normalHandoff": true,
+      "nativeExitCode": 0,
+      "signal": null,
+      "workflowStatus": null,
+      "patch": "patches/08-eventemitter-remove-context-r1-P.patch",
+      "patchSha256": "c056666eb18ade814a16c13bb7ea57ec80443d2d2a26f15508701d5b02e04f55",
+      "patchBytes": 6816,
+      "evaluation": "evaluations/6960a8f1de8a.json",
+      "reportFindings": []
+    },
+    {
+      "slot": 9,
+      "task": "fastq-running-tasks",
+      "project": "fastq",
+      "repetition": 1,
+      "arm": "P",
+      "state": "stopped",
+      "startedAt": "2026-09-13T20:23:23.223Z",
+      "completedAt": "2026-09-13T20:38:27.955Z",
+      "elapsedMs": 900230,
+      "nativeCompleted": false,
+      "timedOut": true,
+      "stop": {
+        "ownTaskDeadlineTriggered": true,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": true
+      },
+      "error": null,
+      "forwarded": 5,
+      "Q": 0,
+      "D": 0,
+      "neutralId": "3375af3c39c5",
+      "findings": [
+        {
+          "category": "missing-delivery",
+          "reason": "Empty source patch; requested runningTasks API and full delivery are absent."
+        }
+      ],
+      "nativeFinishReason": "tool-calls",
+      "normalHandoff": false,
+      "nativeExitCode": null,
+      "signal": "SIGKILL",
+      "workflowStatus": null,
+      "patch": "patches/09-fastq-running-tasks-r1-P.patch",
+      "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "patchBytes": 0,
+      "evaluation": "evaluations/3375af3c39c5.json",
+      "reportFindings": []
+    },
+    {
+      "slot": 10,
+      "task": "fastq-running-tasks",
+      "project": "fastq",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "stopped",
+      "startedAt": "2026-09-13T20:38:28.675Z",
+      "completedAt": "2026-09-13T20:49:54.377Z",
+      "elapsedMs": 682056,
+      "nativeCompleted": true,
+      "timedOut": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "error": null,
+      "forwarded": 28,
+      "Q": 1,
+      "D": 1,
+      "neutralId": "cf57afd4f2c6",
+      "findings": [],
+      "nativeFinishReason": "stop",
+      "normalHandoff": true,
+      "nativeExitCode": 0,
+      "signal": null,
+      "workflowStatus": "incomplete",
+      "patch": "patches/10-fastq-running-tasks-r1-H00.patch",
+      "patchSha256": "8a5b5d8984c03d40cb4d7d91f96ac92aec5366878385450d82b19092cbc20491",
+      "patchBytes": 11617,
+      "evaluation": "evaluations/cf57afd4f2c6.json",
+      "reportFindings": [
+        {
+          "category": "misleading-workflow-report",
+          "evidence": "Normal final response lists successful project commands but says No observed relevant project test/check and Executable project verification unavailable or not observed. Delivery worktree and terminal patch are correctly named and usable; this contradiction does not alone remove D."
+        }
+      ],
+      "nativeTerminalPatch": "terminal-patches/10-fastq-running-tasks-r1-H00.patch"
+    },
+    {
+      "slot": 11,
+      "task": "fastq-on-idle",
+      "project": "fastq",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "stopped",
+      "startedAt": "2026-09-13T20:49:55.118Z",
+      "completedAt": "2026-09-13T20:57:34.019Z",
+      "elapsedMs": 454585,
+      "nativeCompleted": true,
+      "timedOut": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "error": null,
+      "forwarded": 27,
+      "Q": 0,
+      "D": 0,
+      "neutralId": "4b726527599f",
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "Delivered tests pass when kill/killAndDrain prematurely resolve onIdle while workers remain active. Both control suites detect the same specified error."
+        }
+      ],
+      "nativeFinishReason": "stop",
+      "normalHandoff": true,
+      "nativeExitCode": 0,
+      "signal": null,
+      "workflowStatus": "incomplete",
+      "patch": "patches/11-fastq-on-idle-r1-H00.patch",
+      "patchSha256": "c434634eba396336d39829dbb67acebee865d145f169c4ae67798766bee561f9",
+      "patchBytes": 14441,
+      "evaluation": "evaluations/4b726527599f.json",
+      "reportFindings": [
+        {
+          "category": "misleading-workflow-report",
+          "evidence": "Normal final response lists successful project commands but says No observed relevant project test/check and Executable project verification unavailable or not observed. Delivery worktree and terminal patch are correctly named and usable; this contradiction does not alone remove D."
+        }
+      ],
+      "nativeTerminalPatch": "terminal-patches/11-fastq-on-idle-r1-H00.patch"
+    },
+    {
+      "slot": 12,
+      "task": "fastq-on-idle",
+      "project": "fastq",
+      "repetition": 1,
+      "arm": "P",
+      "state": "stopped",
+      "startedAt": "2026-09-13T20:57:34.693Z",
+      "completedAt": "2026-09-13T21:05:19.148Z",
+      "elapsedMs": 461114,
+      "nativeCompleted": true,
+      "timedOut": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "error": null,
+      "forwarded": 24,
+      "Q": 0,
+      "D": 0,
+      "neutralId": "26ece8019a92",
+      "findings": [
+        {
+          "category": "behavior-defect",
+          "reason": "A subscribed waiter misses the real idle transition caused by kill if unrelated work starts before nextTick; the public-path probe fails while alternative and both controls pass."
+        },
+        {
+          "category": "required-coverage-loss",
+          "reason": "Underlying delivered runtime tests pass with early resolution after kill/killAndDrain while workers remain active. Both control suites fail the same mutation."
+        }
+      ],
+      "nativeFinishReason": "stop",
+      "normalHandoff": true,
+      "nativeExitCode": 0,
+      "signal": null,
+      "workflowStatus": null,
+      "patch": "patches/12-fastq-on-idle-r1-P.patch",
+      "patchSha256": "b520cc5bde2ef64720361891538272ae95861d9a4e3d1160713768435cdcc588",
+      "patchBytes": 9654,
+      "evaluation": "evaluations/26ece8019a92.json",
+      "reportFindings": [
+        {
+          "category": "overstated-author-behavior",
+          "evidence": "Author says independent subscriptions handle kill and idle transitions; the post-start public API probe proves a reached idle state can be missed before later independent work starts."
+        }
+      ]
+    },
+    {
+      "slot": 13,
+      "task": "quick-lru-computed",
+      "project": "quick-lru",
+      "repetition": 1,
+      "arm": "P",
+      "state": "stopped",
+      "startedAt": "2026-09-13T21:05:19.791Z",
+      "completedAt": "2026-09-13T21:08:23.144Z",
+      "elapsedMs": 178494,
+      "nativeCompleted": true,
+      "timedOut": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "error": null,
+      "forwarded": 18,
+      "Q": 1,
+      "D": 1,
+      "neutralId": "0d6ee00e6ab4",
+      "findings": [],
+      "nativeFinishReason": "stop",
+      "normalHandoff": true,
+      "nativeExitCode": 0,
+      "signal": null,
+      "workflowStatus": null,
+      "patch": "patches/13-quick-lru-computed-r1-P.patch",
+      "patchSha256": "7ce01ea9f0bfdfc98a11d7cf031d0273a4fc2957820dc7b4e95a1575a2cfd784",
+      "patchBytes": 5021,
+      "evaluation": "evaluations/0d6ee00e6ab4.json",
+      "reportFindings": []
+    },
+    {
+      "slot": 14,
+      "task": "quick-lru-computed",
+      "project": "quick-lru",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "stopped",
+      "startedAt": "2026-09-13T21:08:23.779Z",
+      "completedAt": "2026-09-13T21:13:40.962Z",
+      "elapsedMs": 312546,
+      "nativeCompleted": true,
+      "timedOut": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "error": null,
+      "forwarded": 19,
+      "Q": 1,
+      "D": 1,
+      "neutralId": "f4d825ced509",
+      "findings": [],
+      "nativeFinishReason": "stop",
+      "normalHandoff": true,
+      "nativeExitCode": 0,
+      "signal": null,
+      "workflowStatus": "incomplete",
+      "patch": "patches/14-quick-lru-computed-r1-H00.patch",
+      "patchSha256": "bb4805eb1ff89ae2e1fa0a0ab2bdd9d24c34b92df122513d530f00fd5958914d",
+      "patchBytes": 5322,
+      "evaluation": "evaluations/f4d825ced509.json",
+      "reportFindings": [
+        {
+          "category": "misleading-workflow-report",
+          "evidence": "Normal final response lists successful project commands but says No observed relevant project test/check and Executable project verification unavailable or not observed. Delivery worktree and terminal patch are correctly named and usable; this contradiction does not alone remove D."
+        }
+      ],
+      "nativeTerminalPatch": "terminal-patches/14-quick-lru-computed-r1-H00.patch"
+    },
+    {
+      "slot": 15,
+      "task": "quick-lru-prune",
+      "project": "quick-lru",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "stopped",
+      "startedAt": "2026-09-13T21:13:41.649Z",
+      "completedAt": "2026-09-13T21:17:25.617Z",
+      "elapsedMs": 219603,
+      "nativeCompleted": true,
+      "timedOut": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "error": null,
+      "forwarded": 15,
+      "Q": 1,
+      "D": 1,
+      "neutralId": "3ef12ae73600",
+      "findings": [],
+      "nativeFinishReason": "stop",
+      "normalHandoff": true,
+      "nativeExitCode": 0,
+      "signal": null,
+      "workflowStatus": "incomplete",
+      "patch": "patches/15-quick-lru-prune-r1-H00.patch",
+      "patchSha256": "1921707c4a0839e865a41513187f07dbedc9937a9645bbb6790f65e6fb423206",
+      "patchBytes": 6616,
+      "evaluation": "evaluations/3ef12ae73600.json",
+      "reportFindings": [
+        {
+          "category": "misleading-workflow-report",
+          "evidence": "Normal final response lists successful project commands but says No observed relevant project test/check and Executable project verification unavailable or not observed. Delivery worktree and terminal patch are correctly named and usable; this contradiction does not alone remove D."
+        }
+      ],
+      "nativeTerminalPatch": "terminal-patches/15-quick-lru-prune-r1-H00.patch"
+    },
+    {
+      "slot": 16,
+      "task": "quick-lru-prune",
+      "project": "quick-lru",
+      "repetition": 1,
+      "arm": "P",
+      "state": "stopped",
+      "startedAt": "2026-09-13T21:17:26.270Z",
+      "completedAt": "2026-09-13T21:21:51.522Z",
+      "elapsedMs": 259978,
+      "nativeCompleted": true,
+      "timedOut": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "error": null,
+      "forwarded": 25,
+      "Q": 0,
+      "D": 0,
+      "neutralId": "80e5601c914d",
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "Delivered prune tests retain a live key in every exercised cache and never exercise the required reuse after an emptied cache. The expired-current test also starts with an old value that expires at the same time, leaving live-old resurrection untested. Callback ordering is NOT counted as a behavior failure."
+        }
+      ],
+      "nativeFinishReason": "stop",
+      "normalHandoff": true,
+      "nativeExitCode": 0,
+      "signal": null,
+      "workflowStatus": null,
+      "patch": "patches/16-quick-lru-prune-r1-P.patch",
+      "patchSha256": "a3aeda324e57f1a9d191ea72343e30eb1ac196e4abdd328bae0b44ab6db6a9c6",
+      "patchBytes": 5682,
+      "evaluation": "evaluations/80e5601c914d.json",
+      "reportFindings": []
+    },
+    {
+      "slot": 17,
+      "task": "ufo-query-sort",
+      "project": "ufo",
+      "repetition": 1,
+      "arm": "P",
+      "state": "stopped",
+      "startedAt": "2026-09-13T21:21:52.145Z",
+      "completedAt": "2026-09-13T21:26:50.914Z",
+      "elapsedMs": 295276,
+      "nativeCompleted": true,
+      "timedOut": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "error": null,
+      "forwarded": 35,
+      "Q": 1,
+      "D": 1,
+      "neutralId": "7379be605902",
+      "findings": [],
+      "nativeFinishReason": "stop",
+      "normalHandoff": true,
+      "nativeExitCode": 0,
+      "signal": null,
+      "workflowStatus": null,
+      "patch": "patches/17-ufo-query-sort-r1-P.patch",
+      "patchSha256": "737e3fa241641e6d3d9f3dd75bd73227c3d326176cb1096886e0c0e24a26235b",
+      "patchBytes": 8723,
+      "evaluation": "evaluations/7379be605902.json",
+      "reportFindings": []
+    },
+    {
+      "slot": 18,
+      "task": "ufo-query-sort",
+      "project": "ufo",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "stopped",
+      "startedAt": "2026-09-13T21:26:51.531Z",
+      "completedAt": "2026-09-13T21:27:44.377Z",
+      "elapsedMs": 48947,
+      "nativeCompleted": false,
+      "timedOut": false,
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": true
+      },
+      "error": null,
+      "forwarded": 10,
+      "Q": 0,
+      "D": 0,
+      "neutralId": "9e4f9df7cdda",
+      "findings": [
+        {
+          "category": "missing-delivery",
+          "reason": "Empty source patch; requested query sorting options and associated delivery are absent."
+        }
+      ],
+      "nativeFinishReason": null,
+      "normalHandoff": false,
+      "nativeExitCode": 137,
+      "signal": null,
+      "workflowStatus": null,
+      "patch": "patches/18-ufo-query-sort-r1-H00.patch",
+      "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "patchBytes": 0,
+      "evaluation": "evaluations/9e4f9df7cdda.json",
+      "reportFindings": [
+        {
+          "category": "no-final-handoff",
+          "evidence": "No final response or terminal patch. Retained workflow records webfetch transport error as unconfirmed tool state; runner subsequently pauses on AbortError despite a known completed provider response. The initial transport-cancellation cause is not established."
+        }
+      ]
+    },
+    {
+      "slot": 19,
+      "task": "ufo-append-query",
+      "project": "ufo",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 20,
+      "task": "ufo-append-query",
+      "project": "ufo",
+      "repetition": 1,
+      "arm": "P",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 21,
+      "task": "ms-format-unit",
+      "project": "ms",
+      "repetition": 1,
+      "arm": "P",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 22,
+      "task": "ms-format-unit",
+      "project": "ms",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 23,
+      "task": "ms-parse-compound",
+      "project": "ms",
+      "repetition": 1,
+      "arm": "H00",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 24,
+      "task": "ms-parse-compound",
+      "project": "ms",
+      "repetition": 1,
+      "arm": "P",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 25,
+      "task": "denque-rotate",
+      "project": "denque",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 26,
+      "task": "denque-rotate",
+      "project": "denque",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 27,
+      "task": "denque-remove-where",
+      "project": "denque",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 28,
+      "task": "denque-remove-where",
+      "project": "denque",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 29,
+      "task": "eventemitter-prepend",
+      "project": "eventemitter3",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 30,
+      "task": "eventemitter-prepend",
+      "project": "eventemitter3",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 31,
+      "task": "eventemitter-remove-context",
+      "project": "eventemitter3",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 32,
+      "task": "eventemitter-remove-context",
+      "project": "eventemitter3",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 33,
+      "task": "fastq-running-tasks",
+      "project": "fastq",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 34,
+      "task": "fastq-running-tasks",
+      "project": "fastq",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 35,
+      "task": "fastq-on-idle",
+      "project": "fastq",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 36,
+      "task": "fastq-on-idle",
+      "project": "fastq",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 37,
+      "task": "quick-lru-computed",
+      "project": "quick-lru",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 38,
+      "task": "quick-lru-computed",
+      "project": "quick-lru",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 39,
+      "task": "quick-lru-prune",
+      "project": "quick-lru",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 40,
+      "task": "quick-lru-prune",
+      "project": "quick-lru",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 41,
+      "task": "ufo-query-sort",
+      "project": "ufo",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 42,
+      "task": "ufo-query-sort",
+      "project": "ufo",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 43,
+      "task": "ufo-append-query",
+      "project": "ufo",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 44,
+      "task": "ufo-append-query",
+      "project": "ufo",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 45,
+      "task": "ms-format-unit",
+      "project": "ms",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 46,
+      "task": "ms-format-unit",
+      "project": "ms",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 47,
+      "task": "ms-parse-compound",
+      "project": "ms",
+      "repetition": 2,
+      "arm": "P",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    },
+    {
+      "slot": 48,
+      "task": "ms-parse-compound",
+      "project": "ms",
+      "repetition": 2,
+      "arm": "H00",
+      "state": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "elapsedMs": null,
+      "nativeCompleted": null,
+      "timedOut": null,
+      "stop": null,
+      "error": null,
+      "forwarded": 0,
+      "Q": null,
+      "D": null,
+      "neutralId": null,
+      "findings": [],
+      "nativeFinishReason": null,
+      "normalHandoff": null
+    }
+  ],
+  "originalRunnerOutcome": {
+    "status": "paused",
+    "pause": {
+      "kind": "unknown_submission",
+      "slot": 18,
+      "error": "AbortError"
+    }
+  },
+  "interpretedStop": "Completed server response was misclassified as unknown submission after stream AbortError. Frozen launcher stopped scheduling; no runtime correction/resume/retry was performed.",
+  "conclusion": "Insufficient evidence to establish transfer, stable quality advantage, autonomous-delivery advantage or equality. No repetition-two observations exist."
+}

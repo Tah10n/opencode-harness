@@ -1,0 +1,1385 @@
+{
+  "archive": {
+    "path": "local/ledger-review-delivery/post-capture-followup-evidence.tar.gz",
+    "sha256": "1987bd43e4d9bc63f7b9c3b9e96142d130f26d7a8fe116640fe1117993257e62",
+    "indexSha256": "04b8d6190075c77e0209f3be942e9565d116b4031d238ba87c10a65155b9db51",
+    "verifiedEntries": 1265
+  },
+  "inputVerification": {
+    "firstAuthorRequest": 3,
+    "lastAuthorRequest": 48,
+    "all46AuthorRequests": {
+      "originalTask": true,
+      "environment": true,
+      "verbatimReview": true,
+      "handoff": true
+    },
+    "all46ExactMatchesAsserted": true,
+    "taskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+    "reviewSha256": "7cb1c20598f903e40bbf7b90714dbb89f8278055ce71f6e050a1247fe1996fba"
+  },
+  "authorSession": "ses_f31c58705ffe0CbJbovNhZA3pq",
+  "authorStart": 1790166333696,
+  "initialSnapshot": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+  "terminalSnapshot": "89381d11b73c69de37d2a96c4f5e3c2d43da239d9c12f00a4fbf8f967866d03c",
+  "deadline": {
+    "globalStart": 1790166003871,
+    "globalDeadline": 1790167803871,
+    "stageDeadline": 1790167803871,
+    "remainingMs": 1474597
+  },
+  "chain": {
+    "status": "finished",
+    "pause": null,
+    "globalStart": 1790166003871,
+    "globalDeadline": 1790167803871,
+    "finishedAt": 1790167001908,
+    "results": [
+      {
+        "stage": "R",
+        "outcome": {
+          "status": "finished",
+          "pause": null
+        },
+        "result": {
+          "slot": 1,
+          "task": "account-switch-ledger",
+          "arm": "R",
+          "source": "/Users/tahion/dev/opencode-harness/.worktrees/native-task-workflow/local/ledger-review-delivery/post-capture-followup/real/R/input",
+          "exitCode": 0,
+          "signal": null,
+          "termination": {
+            "terminationVerified": true,
+            "killed": []
+          },
+          "timedOut": false,
+          "stopReason": null,
+          "researchBoundary": "not-reached",
+          "completedAt": 1790166325577,
+          "executionElapsedMs": 320032,
+          "cleanupElapsedMs": 52,
+          "elapsedMs": 320084,
+          "parseErrors": 0,
+          "nativeCompleted": true,
+          "requests": 16,
+          "requestsWithoutUsage": 0,
+          "workflowStatus": null,
+          "repairs": null,
+          "toolCalls": 31,
+          "sessions": 1,
+          "delivery": null,
+          "ownTaskDeadlineTriggered": false
+        },
+        "stop": {
+          "ownTaskDeadlineTriggered": false,
+          "terminationVerified": true,
+          "captureSaved": true,
+          "forwardingClosed": true,
+          "relayRemoved": true,
+          "activeProviderHandlers": 0,
+          "providerServerStateMayRemainUnknown": false
+        },
+        "requests": 16
+      },
+      {
+        "stage": "F",
+        "outcome": {
+          "status": "finished",
+          "pause": null
+        },
+        "result": {
+          "slot": 2,
+          "task": "account-switch-ledger",
+          "arm": "F",
+          "source": "/Users/tahion/dev/opencode-harness/.worktrees/native-task-workflow/local/ledger-review-delivery/post-capture-followup/real/F/input",
+          "exitCode": 0,
+          "signal": null,
+          "termination": {
+            "terminationVerified": true,
+            "killed": []
+          },
+          "timedOut": false,
+          "stopReason": null,
+          "researchBoundary": "not-reached",
+          "completedAt": 1790166999815,
+          "executionElapsedMs": 670486,
+          "cleanupElapsedMs": 66,
+          "elapsedMs": 670552,
+          "parseErrors": 0,
+          "phaseCount": 1,
+          "continuationApplied": false,
+          "nativeCompleted": true,
+          "requests": 49,
+          "requestsWithoutUsage": 0,
+          "workflowStatus": "incomplete",
+          "repairs": 0,
+          "toolCalls": 79,
+          "sessions": 2,
+          "delivery": "/work/repo/.git/harness-task/2ef7bc1c-a0c5-4fb8-8d68-14f0cf8cc9ff/worktree",
+          "ownTaskDeadlineTriggered": false
+        },
+        "stop": {
+          "ownTaskDeadlineTriggered": false,
+          "terminationVerified": true,
+          "captureSaved": true,
+          "forwardingClosed": true,
+          "relayRemoved": true,
+          "activeProviderHandlers": 0,
+          "providerServerStateMayRemainUnknown": false
+        },
+        "requests": 49
+      }
+    ],
+    "stages": {
+      "A": "not_started",
+      "R": "native_completed",
+      "F": "native_completed"
+    }
+  },
+  "toolEventCount": 78,
+  "chronology": [
+    {
+      "event": 0,
+      "tool": "todowrite",
+      "callID": "call_SshLJ2HudGSeHNVNRLEKPsVx",
+      "relativeSeconds": 7.148,
+      "startedAt": 1790166340844,
+      "completedAt": 1790166340999,
+      "before": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "after": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "args": {
+        "todos": [
+          {
+            "content": "Inspect worktree, connector ledger implementation, persistence, and existing tests",
+            "status": "in_progress",
+            "priority": "high"
+          },
+          {
+            "content": "Reproduce and fix confirmed ledger tail, conflict, and bounded-capacity issues",
+            "status": "pending",
+            "priority": "high"
+          },
+          {
+            "content": "Add focused regressions preserving parser, range, partial, and privacy behavior",
+            "status": "pending",
+            "priority": "high"
+          },
+          {
+            "content": "Run focused new-behavior checks and required connector test commands separately",
+            "status": "pending",
+            "priority": "high"
+          },
+          {
+            "content": "Review final diff and report checks and limitations",
+            "status": "pending",
+            "priority": "medium"
+          }
+        ]
+      },
+      "nativeOutputSha256": "797e35aeb870d5ab676feb7fdba188b03a32292a9aa3dff14afbdcc1de02936e",
+      "firstActualDelivery": {
+        "request": 4,
+        "sha256": "797e35aeb870d5ab676feb7fdba188b03a32292a9aa3dff14afbdcc1de02936e",
+        "equalsNativeOutput": true
+      },
+      "exit": null
+    },
+    {
+      "event": 7,
+      "tool": "read",
+      "callID": "call_DYH7AWOjDnFePwjgD9GKOmAr",
+      "relativeSeconds": 17.638,
+      "startedAt": 1790166351334,
+      "completedAt": 1790166351453,
+      "before": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "after": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "args": {
+        "filePath": "packages/connector/lib/adapters/claude.mjs",
+        "offset": 1,
+        "limit": 250
+      },
+      "nativeOutputSha256": "48a6abab87a5b5889280097e833fe134358d7e0fa4060b10bde9f504f72b2e38",
+      "firstActualDelivery": {
+        "request": 6,
+        "sha256": "48a6abab87a5b5889280097e833fe134358d7e0fa4060b10bde9f504f72b2e38",
+        "equalsNativeOutput": true
+      },
+      "exit": null
+    },
+    {
+      "event": 8,
+      "tool": "read",
+      "callID": "call_ruwZBslCYLgJIxbGDRI0YPkb",
+      "relativeSeconds": 17.493,
+      "startedAt": 1790166351189,
+      "completedAt": 1790166351487,
+      "before": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "after": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "args": {
+        "filePath": "packages/connector/lib/adapters/shared.mjs",
+        "offset": 1,
+        "limit": 240
+      },
+      "nativeOutputSha256": "ecff1d48bb75b52850eb3085a4c4828f302ea631086c5d96a0270885d509dbdc",
+      "firstActualDelivery": {
+        "request": 6,
+        "sha256": "ecff1d48bb75b52850eb3085a4c4828f302ea631086c5d96a0270885d509dbdc",
+        "equalsNativeOutput": true
+      },
+      "exit": null
+    },
+    {
+      "event": 10,
+      "tool": "read",
+      "callID": "call_a6EVvyOpTt5Bog23pITsol4b",
+      "relativeSeconds": 27.871,
+      "startedAt": 1790166361567,
+      "completedAt": 1790166361618,
+      "before": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "after": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "args": {
+        "filePath": "packages/connector/lib/adapters/qwen.mjs",
+        "offset": 1,
+        "limit": 430
+      },
+      "nativeOutputSha256": "06ac4377f538438f8791ad92401876b617ab2c8763fecf2d3ff578afcf977cf7",
+      "firstActualDelivery": {
+        "request": 7,
+        "sha256": "06ac4377f538438f8791ad92401876b617ab2c8763fecf2d3ff578afcf977cf7",
+        "equalsNativeOutput": true
+      },
+      "exit": null
+    },
+    {
+      "event": 11,
+      "tool": "read",
+      "callID": "call_qDup2AGJ9gA56CcU68T4XJr7",
+      "relativeSeconds": 28.039,
+      "startedAt": 1790166361735,
+      "completedAt": 1790166361868,
+      "before": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "after": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "args": {
+        "filePath": "packages/connector/lib/adapters/kimi.mjs",
+        "offset": 1,
+        "limit": 250
+      },
+      "nativeOutputSha256": "a707486fa0398244516a4d77efc079a21faccfccf88d4acfa7a444c66edef729",
+      "firstActualDelivery": {
+        "request": 7,
+        "sha256": "a707486fa0398244516a4d77efc079a21faccfccf88d4acfa7a444c66edef729",
+        "equalsNativeOutput": true
+      },
+      "exit": null
+    },
+    {
+      "event": 12,
+      "tool": "read",
+      "callID": "call_WUcOIov44SLt0mBzx5jtUjXR",
+      "relativeSeconds": 28.001,
+      "startedAt": 1790166361697,
+      "completedAt": 1790166361907,
+      "before": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "after": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "args": {
+        "filePath": "packages/connector/lib/adapters/gemini.mjs",
+        "offset": 130,
+        "limit": 90
+      },
+      "nativeOutputSha256": "63ec7a0a44e7a5465050ae407437152a55d1336d103df6d67873e519101b6890",
+      "firstActualDelivery": {
+        "request": 7,
+        "sha256": "63ec7a0a44e7a5465050ae407437152a55d1336d103df6d67873e519101b6890",
+        "equalsNativeOutput": true
+      },
+      "exit": null
+    },
+    {
+      "event": 13,
+      "tool": "read",
+      "callID": "call_3AJi6xnkcCq4WCe3TMZjyqwD",
+      "relativeSeconds": 27.961,
+      "startedAt": 1790166361657,
+      "completedAt": 1790166361945,
+      "before": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "after": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "args": {
+        "filePath": "packages/connector/lib/adapters/antigravity.mjs",
+        "offset": 1,
+        "limit": 180
+      },
+      "nativeOutputSha256": "33965f5cb2069ee774fa1b7727037c2bff6b7ad57cead781acd8fbb3ebda021d",
+      "firstActualDelivery": {
+        "request": 7,
+        "sha256": "33965f5cb2069ee774fa1b7727037c2bff6b7ad57cead781acd8fbb3ebda021d",
+        "equalsNativeOutput": true
+      },
+      "exit": null
+    },
+    {
+      "event": 19,
+      "tool": "grep",
+      "callID": "call_FqWqFB1jK3iQbnQf1wO0a7SM",
+      "relativeSeconds": 34.204,
+      "startedAt": 1790166367900,
+      "completedAt": 1790166368087,
+      "before": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "after": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "args": {
+        "pattern": "collectJsonl\\(|eventLedger|parserVersion",
+        "path": "packages/connector/test",
+        "include": "*.mjs"
+      },
+      "nativeOutputSha256": "fed7caab42a0f3868db5bb82487791be4ae9cb40257e4a526a4c73a11598fe5b",
+      "firstActualDelivery": {
+        "request": 8,
+        "sha256": "fed7caab42a0f3868db5bb82487791be4ae9cb40257e4a526a4c73a11598fe5b",
+        "equalsNativeOutput": true
+      },
+      "exit": null
+    },
+    {
+      "event": 26,
+      "tool": "grep",
+      "callID": "call_Sgd6OtxjB9fktAu3atF4Z23m",
+      "relativeSeconds": 91.06,
+      "startedAt": 1790166424756,
+      "completedAt": 1790166424871,
+      "before": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "after": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "args": {
+        "pattern": "collect\\(|nextState|collectionState|state:",
+        "path": "packages/connector/bin/viberacing.mjs",
+        "include": "*.mjs"
+      },
+      "nativeOutputSha256": "776d3ec7201a916d7f740ef6882c28e2ce109ce1674c4c4eb769fea0f7272cd5",
+      "firstActualDelivery": {
+        "request": 10,
+        "sha256": "776d3ec7201a916d7f740ef6882c28e2ce109ce1674c4c4eb769fea0f7272cd5",
+        "equalsNativeOutput": true
+      },
+      "exit": null
+    },
+    {
+      "event": 27,
+      "tool": "grep",
+      "callID": "call_Nn5eciZbTcp0ivnexnrn0A6I",
+      "relativeSeconds": 91.141,
+      "startedAt": 1790166424837,
+      "completedAt": 1790166424995,
+      "before": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "after": "b391aa3862f55261c77c0008742369ce0051888fce92fb8a5d72ee7281fc1163",
+      "args": {
+        "pattern": "sourceState|readerState|nextState|eventLedger",
+        "path": "packages/connector",
+        "include": "*.mjs"
+      },
+      "nativeOutputSha256": "b10f93bbe0112a592f53b61a763fc78bbfe96aee2a5749970f5330c9540d48b2",
+      "firstActualDelivery": {
+        "request": 10,
+        "sha256": "b10f93bbe0112a592f53b61a763fc78bbfe96aee2a5749970f5330c9540d48b2",
+        "equalsNativeOutput": true
+      },
+      "exit": null
+    },
+    {
+      "event": 47,
+      "tool": "grep",
+      "callID": "call_KWJmusxBXw35KdNJGS2VkWVr",
+      "relativeSeconds": 300.651,
+      "startedAt": 1790166634347,
+      "completedAt": 1790166634392,
+      "before": "bebcf1723d0e8ea8ce6034456cb9691904d9f191d9acf193e87d3ad083b3425d",
+      "after": "bebcf1723d0e8ea8ce6034456cb9691904d9f191d9acf193e87d3ad083b3425d",
+      "args": {
+        "pattern": "raw|eventLedger|provider ID|sensitive|session",
+        "path": "packages/connector/test",
+        "include": "*.mjs"
+      },
+      "nativeOutputSha256": "ad8865925bcac8b3419f0a2e5e637d2e1530b0dfaaa91a4101ba8aff778ec48e",
+      "firstActualDelivery": {
+        "request": 22,
+        "sha256": "ad8865925bcac8b3419f0a2e5e637d2e1530b0dfaaa91a4101ba8aff778ec48e",
+        "equalsNativeOutput": true
+      },
+      "exit": null
+    },
+    {
+      "event": 53,
+      "tool": "read",
+      "callID": "call_d6eC9gMqfErbByA48yqZDELs",
+      "relativeSeconds": 397.702,
+      "startedAt": 1790166731398,
+      "completedAt": 1790166731462,
+      "before": "d076678b3d1a75c769bcdadd21126bdf566bef9d2cb9b2d1253a925452d9a339",
+      "after": "d076678b3d1a75c769bcdadd21126bdf566bef9d2cb9b2d1253a925452d9a339",
+      "args": {
+        "filePath": "packages/connector/test/claude-security.test.mjs",
+        "offset": 1,
+        "limit": 90
+      },
+      "nativeOutputSha256": "18c61bba14379e9e07f6b3d8e52cd838c5610789955f8f705beb755083ea77b5",
+      "firstActualDelivery": {
+        "request": 28,
+        "sha256": "18c61bba14379e9e07f6b3d8e52cd838c5610789955f8f705beb755083ea77b5",
+        "equalsNativeOutput": true
+      },
+      "exit": null
+    },
+    {
+      "event": 54,
+      "tool": "bash",
+      "callID": "call_BENXD5AiKMj0hpqy2JuKJigo",
+      "relativeSeconds": 406.852,
+      "startedAt": 1790166740548,
+      "completedAt": 1790166740602,
+      "before": "d076678b3d1a75c769bcdadd21126bdf566bef9d2cb9b2d1253a925452d9a339",
+      "after": "d076678b3d1a75c769bcdadd21126bdf566bef9d2cb9b2d1253a925452d9a339",
+      "args": {
+        "command": "git show --format= HEAD -- packages/connector/test/claude-security.test.mjs",
+        "workdir": "."
+      },
+      "nativeOutputSha256": "00c4390d7e1cc04eaf539838fb4e237ce0f75df3121664d323a71e1d84a2648c",
+      "firstActualDelivery": {
+        "request": 29,
+        "sha256": "00c4390d7e1cc04eaf539838fb4e237ce0f75df3121664d323a71e1d84a2648c",
+        "equalsNativeOutput": true
+      },
+      "exit": 0
+    },
+    {
+      "event": 55,
+      "tool": "todowrite",
+      "callID": "call_EFT8Rn7E6AL8gU7vuyKjmkgj",
+      "relativeSeconds": 423.625,
+      "startedAt": 1790166757321,
+      "completedAt": 1790166757363,
+      "before": "d076678b3d1a75c769bcdadd21126bdf566bef9d2cb9b2d1253a925452d9a339",
+      "after": "d076678b3d1a75c769bcdadd21126bdf566bef9d2cb9b2d1253a925452d9a339",
+      "args": {
+        "todos": [
+          {
+            "content": "Inspect worktree, connector ledger implementation, persistence, and existing tests",
+            "status": "completed",
+            "priority": "high"
+          },
+          {
+            "content": "Reproduce and fix confirmed ledger tail, conflict, and bounded-capacity issues",
+            "status": "completed",
+            "priority": "high"
+          },
+          {
+            "content": "Add focused regressions preserving parser, range, partial, and privacy behavior",
+            "status": "completed",
+            "priority": "high"
+          },
+          {
+            "content": "Run focused new-behavior checks and required connector test commands separately",
+            "status": "in_progress",
+            "priority": "high"
+          },
+          {
+            "content": "Review final diff and report checks and limitations",
+            "status": "pending",
+            "priority": "medium"
+          }
+        ]
+      },
+      "nativeOutputSha256": "5698ff1233ae9fc901dee2f5c542eb118d232e66c9ec928279c00d6240300afe",
+      "firstActualDelivery": {
+        "request": 30,
+        "sha256": "5698ff1233ae9fc901dee2f5c542eb118d232e66c9ec928279c00d6240300afe",
+        "equalsNativeOutput": true
+      },
+      "exit": null
+    },
+    {
+      "event": 58,
+      "tool": "apply_patch",
+      "callID": "call_CniMdHuWnOq38gmh1OAUfIq6",
+      "relativeSeconds": 460.986,
+      "startedAt": 1790166794682,
+      "completedAt": 1790166794731,
+      "before": "d076678b3d1a75c769bcdadd21126bdf566bef9d2cb9b2d1253a925452d9a339",
+      "after": "13a15ebe270fd22a40de06a9a4add96873f0e42b238c031fe2a0f5ccdebf69e8",
+      "args": {
+        "patchSha256": "b635f1d9a02a5f7f85c9c14d5ab6eb6ca6219b0cdd4dd12e0ba1d02b6673f405"
+      },
+      "nativeOutputSha256": "6cbadba139b1ddc0c6c6547cd34bd952910bba376eb8ffc3c9f0e84004ce3ccb",
+      "firstActualDelivery": {
+        "request": 32,
+        "sha256": "6cbadba139b1ddc0c6c6547cd34bd952910bba376eb8ffc3c9f0e84004ce3ccb",
+        "equalsNativeOutput": true
+      },
+      "exit": null
+    },
+    {
+      "event": 60,
+      "tool": "apply_patch",
+      "callID": "call_1Z2CNd3POmDw6md5v4ao6xQp",
+      "relativeSeconds": 481.666,
+      "startedAt": 1790166815362,
+      "completedAt": 1790166815407,
+      "before": "13a15ebe270fd22a40de06a9a4add96873f0e42b238c031fe2a0f5ccdebf69e8",
+      "after": "33dfc0474380c3e4b61a72a98e5ad31d41fea5b60234dbf3e3f71715f5336e11",
+      "args": {
+        "patchSha256": "a64f28be4cf494b5db4583df8d2f84b141391c8a3e57062a3b01e9bfeb596eb8"
+      },
+      "nativeOutputSha256": "6cbadba139b1ddc0c6c6547cd34bd952910bba376eb8ffc3c9f0e84004ce3ccb",
+      "firstActualDelivery": {
+        "request": 34,
+        "sha256": "6cbadba139b1ddc0c6c6547cd34bd952910bba376eb8ffc3c9f0e84004ce3ccb",
+        "equalsNativeOutput": true
+      },
+      "exit": null
+    },
+    {
+      "event": 64,
+      "tool": "bash",
+      "callID": "call_dm2Bzzeq4vvXJEqUIMXmT7eh",
+      "relativeSeconds": 535.308,
+      "startedAt": 1790166869004,
+      "completedAt": 1790166869117,
+      "before": "33dfc0474380c3e4b61a72a98e5ad31d41fea5b60234dbf3e3f71715f5336e11",
+      "after": "33dfc0474380c3e4b61a72a98e5ad31d41fea5b60234dbf3e3f71715f5336e11",
+      "args": {
+        "command": "corepack pnpm verify",
+        "workdir": ".",
+        "timeout": 120000
+      },
+      "nativeOutputSha256": "857861be9c0e598773b7c4a5ae0adff90b131ba670c00941fe670b5e77c23ce8",
+      "firstActualDelivery": {
+        "request": 38,
+        "sha256": "857861be9c0e598773b7c4a5ae0adff90b131ba670c00941fe670b5e77c23ce8",
+        "equalsNativeOutput": true
+      },
+      "exit": 1
+    },
+    {
+      "event": 69,
+      "tool": "bash",
+      "callID": "call_ASBseoK9ohV2OQdAmts1FpRt",
+      "relativeSeconds": 569.191,
+      "startedAt": 1790166902887,
+      "completedAt": 1790166902998,
+      "before": "33dfc0474380c3e4b61a72a98e5ad31d41fea5b60234dbf3e3f71715f5336e11",
+      "after": "33dfc0474380c3e4b61a72a98e5ad31d41fea5b60234dbf3e3f71715f5336e11",
+      "args": {
+        "command": "node --test packages/connector/test/claude-security.test.mjs",
+        "workdir": ".",
+        "timeout": 120000
+      },
+      "nativeOutputSha256": "b6b1088f13177f6a302c4c5a77ad7807c43da5904b75e2e404dfdd53d26b1ab9",
+      "firstActualDelivery": {
+        "request": 41,
+        "sha256": "b6b1088f13177f6a302c4c5a77ad7807c43da5904b75e2e404dfdd53d26b1ab9",
+        "equalsNativeOutput": true
+      },
+      "exit": 0,
+      "completeNativeOutput": "✔ Claude message ids cannot mutate collector prototypes (7.814625ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 40.779375\n"
+    },
+    {
+      "event": 70,
+      "tool": "apply_patch",
+      "callID": "call_HCVgLGi8gWeam3UJLpZz7QOh",
+      "relativeSeconds": 584.803,
+      "startedAt": 1790166918499,
+      "completedAt": 1790166918545,
+      "before": "33dfc0474380c3e4b61a72a98e5ad31d41fea5b60234dbf3e3f71715f5336e11",
+      "after": "89381d11b73c69de37d2a96c4f5e3c2d43da239d9c12f00a4fbf8f967866d03c",
+      "args": {
+        "patchSha256": "18792682379bcaafc92b77185a43eccae8ab4bd441c3624bb214eb9ff14d06eb"
+      },
+      "nativeOutputSha256": "10f850144224a2d56a6c1128964e4727d8f7faa46e350193df025f9825d38acd",
+      "firstActualDelivery": {
+        "request": 42,
+        "sha256": "10f850144224a2d56a6c1128964e4727d8f7faa46e350193df025f9825d38acd",
+        "equalsNativeOutput": true
+      },
+      "exit": null
+    },
+    {
+      "event": 71,
+      "tool": "bash",
+      "callID": "call_JPHqzHDoGnXMls9Kv3gfzTv2",
+      "relativeSeconds": 591.004,
+      "startedAt": 1790166924700,
+      "completedAt": 1790166925090,
+      "before": "89381d11b73c69de37d2a96c4f5e3c2d43da239d9c12f00a4fbf8f967866d03c",
+      "after": "89381d11b73c69de37d2a96c4f5e3c2d43da239d9c12f00a4fbf8f967866d03c",
+      "args": {
+        "command": "node --test --test-name-pattern='complete records before an unterminated tail|compares duplicate IDs|full event ledger' packages/connector/test/readers.test.mjs",
+        "workdir": ".",
+        "timeout": 120000
+      },
+      "nativeOutputSha256": "52c524536517e2f988bdd3cdddbbaa815d7c147ebabc188a6d870cfb844f1b10",
+      "firstActualDelivery": {
+        "request": 43,
+        "sha256": "52c524536517e2f988bdd3cdddbbaa815d7c147ebabc188a6d870cfb844f1b10",
+        "equalsNativeOutput": true
+      },
+      "exit": 0
+    },
+    {
+      "event": 72,
+      "tool": "bash",
+      "callID": "call_Rf5fupmyhtDsCsAnaM4iZhzl",
+      "relativeSeconds": 597.447,
+      "startedAt": 1790166931143,
+      "completedAt": 1790166931797,
+      "before": "89381d11b73c69de37d2a96c4f5e3c2d43da239d9c12f00a4fbf8f967866d03c",
+      "after": "89381d11b73c69de37d2a96c4f5e3c2d43da239d9c12f00a4fbf8f967866d03c",
+      "args": {
+        "command": "node --test packages/connector/test/readers.test.mjs",
+        "workdir": ".",
+        "timeout": 120000
+      },
+      "nativeOutputSha256": "b01dfa4daaadd814746475036bc622465b7fb8b94e51c3c992ac267a56f95fdf",
+      "firstActualDelivery": {
+        "request": 44,
+        "sha256": "b01dfa4daaadd814746475036bc622465b7fb8b94e51c3c992ac267a56f95fdf",
+        "equalsNativeOutput": true
+      },
+      "exit": 0
+    },
+    {
+      "event": 73,
+      "tool": "bash",
+      "callID": "call_iAl7sttGzaNjhghVMdUMQef9",
+      "relativeSeconds": 600.706,
+      "startedAt": 1790166934402,
+      "completedAt": 1790166969705,
+      "before": "89381d11b73c69de37d2a96c4f5e3c2d43da239d9c12f00a4fbf8f967866d03c",
+      "after": "89381d11b73c69de37d2a96c4f5e3c2d43da239d9c12f00a4fbf8f967866d03c",
+      "args": {
+        "command": "node --test packages/connector/test/config.test.mjs",
+        "workdir": ".",
+        "timeout": 120000
+      },
+      "nativeOutputSha256": "d7f4f6f87438ed90c2f61dc6ac0d47289cfe01d11b566f0343cbd00ec0d47fd7",
+      "firstActualDelivery": {
+        "request": 45,
+        "sha256": "d7f4f6f87438ed90c2f61dc6ac0d47289cfe01d11b566f0343cbd00ec0d47fd7",
+        "equalsNativeOutput": true
+      },
+      "exit": 0
+    },
+    {
+      "event": 74,
+      "tool": "bash",
+      "callID": "call_NidX2grXC8EZobdX0F5fX6Jl",
+      "relativeSeconds": 638.761,
+      "startedAt": 1790166972457,
+      "completedAt": 1790166972576,
+      "before": "89381d11b73c69de37d2a96c4f5e3c2d43da239d9c12f00a4fbf8f967866d03c",
+      "after": "89381d11b73c69de37d2a96c4f5e3c2d43da239d9c12f00a4fbf8f967866d03c",
+      "args": {
+        "command": "node --test packages/connector/test/protocol.test.mjs",
+        "workdir": ".",
+        "timeout": 120000
+      },
+      "nativeOutputSha256": "dd0b5b5abbad743f34f6d68afb3b3480ef145061242f1c9f4f086f50120c58c6",
+      "firstActualDelivery": {
+        "request": 46,
+        "sha256": "dd0b5b5abbad743f34f6d68afb3b3480ef145061242f1c9f4f086f50120c58c6",
+        "equalsNativeOutput": true
+      },
+      "exit": 0
+    },
+    {
+      "event": 75,
+      "tool": "bash",
+      "callID": "call_WMNRFj5d8xHGDDbLjv1m24G4",
+      "relativeSeconds": 644.243,
+      "startedAt": 1790166977939,
+      "completedAt": 1790166978003,
+      "before": "89381d11b73c69de37d2a96c4f5e3c2d43da239d9c12f00a4fbf8f967866d03c",
+      "after": "89381d11b73c69de37d2a96c4f5e3c2d43da239d9c12f00a4fbf8f967866d03c",
+      "args": {
+        "command": "git status --short && git diff --check && git diff --stat",
+        "workdir": "."
+      },
+      "nativeOutputSha256": "d95d49824aeded44e43e7bb936d2ed043c7db6c53fa9de192cb70eeb3213b09b",
+      "firstActualDelivery": {
+        "request": 47,
+        "sha256": "d95d49824aeded44e43e7bb936d2ed043c7db6c53fa9de192cb70eeb3213b09b",
+        "equalsNativeOutput": true
+      },
+      "exit": 0
+    },
+    {
+      "event": 77,
+      "tool": "todowrite",
+      "callID": "call_FsCmXEGUZO9U9PSWx4EOi3yE",
+      "relativeSeconds": 651.93,
+      "startedAt": 1790166985626,
+      "completedAt": 1790166985668,
+      "before": "89381d11b73c69de37d2a96c4f5e3c2d43da239d9c12f00a4fbf8f967866d03c",
+      "after": "89381d11b73c69de37d2a96c4f5e3c2d43da239d9c12f00a4fbf8f967866d03c",
+      "args": {
+        "todos": [
+          {
+            "content": "Inspect worktree, connector ledger implementation, persistence, and existing tests",
+            "status": "completed",
+            "priority": "high"
+          },
+          {
+            "content": "Reproduce and fix confirmed ledger tail, conflict, and bounded-capacity issues",
+            "status": "completed",
+            "priority": "high"
+          },
+          {
+            "content": "Add focused regressions preserving parser, range, partial, and privacy behavior",
+            "status": "completed",
+            "priority": "high"
+          },
+          {
+            "content": "Run focused new-behavior checks and required connector test commands separately",
+            "status": "completed",
+            "priority": "high"
+          },
+          {
+            "content": "Review final diff and report checks and limitations",
+            "status": "completed",
+            "priority": "medium"
+          }
+        ]
+      },
+      "nativeOutputSha256": "97c30d9de0fa4a357966dd8809101bf4c04ead4fa704effcdc84f4a2a5eb55ac",
+      "firstActualDelivery": {
+        "request": 48,
+        "sha256": "97c30d9de0fa4a357966dd8809101bf4c04ead4fa704effcdc84f4a2a5eb55ac",
+        "equalsNativeOutput": true
+      },
+      "exit": null
+    }
+  ],
+  "allBashCommands": [
+    {
+      "event": 1,
+      "callID": "call_ab9QxtFzrkZpsCzr0AnFZecj",
+      "command": "git status --short && git log -1 --oneline",
+      "exit": 0
+    },
+    {
+      "event": 21,
+      "callID": "call_T9OmsB4iZUoYRU4DynnD2Vdp",
+      "command": "git show --stat --oneline HEAD && git show --format= -- packages/connector/lib/adapters/shared.mjs | diff -u /dev/null -",
+      "exit": 1
+    },
+    {
+      "event": 33,
+      "callID": "call_eqkI5xkiPxbZKNXLWfCrWfKM",
+      "command": "node --test packages/connector/test/readers.test.mjs --test-name-pattern 'JSONL ledgers accept complete|event ledger compares duplicate|full event ledger'",
+      "exit": 1
+    },
+    {
+      "event": 38,
+      "callID": "call_3gbTJTMsDjKpPBpJAS87j4JV",
+      "command": "node --test packages/connector/test/readers.test.mjs --test-name-pattern 'JSONL ledgers accept complete|event ledger compares duplicate|full event ledger'",
+      "exit": 1
+    },
+    {
+      "event": 40,
+      "callID": "call_wX37SQk4X2jGPP9VjuiOGaiO",
+      "command": "node --test --test-name-pattern='JSONL ledgers accept complete|event ledger compares duplicate|full event ledger|complete JSON record without a final newline' packages/connector/test/readers.test.mjs",
+      "exit": 0
+    },
+    {
+      "event": 48,
+      "callID": "call_ezE2h98ehHsnS3nYFZemWffo",
+      "command": "git show HEAD~1:packages/connector/lib/version.mjs && git show HEAD:packages/connector/lib/version.mjs && git diff HEAD~1 HEAD -- packages/connector/lib/version.mjs package.json packages/connector/package.json",
+      "exit": 0
+    },
+    {
+      "event": 51,
+      "callID": "call_1HZXm31HcqSnXChIiKh3NT6f",
+      "command": "node --test --test-name-pattern='complete records before an unterminated tail|complete JSON record without a final newline|compares duplicate IDs|full event ledger' packages/connector/test/readers.test.mjs",
+      "exit": 0
+    },
+    {
+      "event": 52,
+      "callID": "call_dGVX2ND9SRKCXHW4bEmH9Jmr",
+      "command": "git show HEAD~1:packages/connector/lib/adapters/claude.mjs | sed -n '70,190p'; git show HEAD~1:packages/connector/lib/adapters/shared.mjs | sed -n '300,500p'",
+      "exit": 0
+    },
+    {
+      "event": 54,
+      "callID": "call_BENXD5AiKMj0hpqy2JuKJigo",
+      "command": "git show --format= HEAD -- packages/connector/test/claude-security.test.mjs",
+      "exit": 0
+    },
+    {
+      "event": 56,
+      "callID": "call_3P1IyzO3wa5GTofrAbSfC0xy",
+      "command": "git diff --check && git diff --stat",
+      "exit": 0
+    },
+    {
+      "event": 57,
+      "callID": "call_wSpKZiJBuzo2bXyoNUIEWJ2A",
+      "command": "git diff -- packages/connector/lib/adapters/shared.mjs packages/connector/lib/adapters/claude.mjs packages/connector/test/readers.test.mjs",
+      "exit": 0
+    },
+    {
+      "event": 59,
+      "callID": "call_gO6kTGUATwjy40PYWCQDtqvU",
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "exit": 1
+    },
+    {
+      "event": 61,
+      "callID": "call_xZuvUo5A7B28GG7ErnYhJgG5",
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "exit": 0
+    },
+    {
+      "event": 62,
+      "callID": "call_F4WGuov1OoBbYTdmD97GX6mZ",
+      "command": "node --test packages/connector/test/config.test.mjs",
+      "exit": 0
+    },
+    {
+      "event": 63,
+      "callID": "call_LEaZoaiyre7gjvVIrXVaMegf",
+      "command": "node --test packages/connector/test/protocol.test.mjs",
+      "exit": 0
+    },
+    {
+      "event": 64,
+      "callID": "call_dm2Bzzeq4vvXJEqUIMXmT7eh",
+      "command": "corepack pnpm verify",
+      "exit": 1
+    },
+    {
+      "event": 65,
+      "callID": "call_E0FwpYcB6VFOaMIh6lPraNOt",
+      "command": "node --test --test-name-pattern='complete records before an unterminated tail|compares duplicate IDs|full event ledger' packages/connector/test/readers.test.mjs",
+      "exit": 0
+    },
+    {
+      "event": 66,
+      "callID": "call_h1syRSz4DI5LYlWUwW8Yd4P4",
+      "command": "git status --short && git diff --check && git diff --stat",
+      "exit": 0
+    },
+    {
+      "event": 67,
+      "callID": "call_CBBvoqmZlCnrWK5rAr2MnBTo",
+      "command": "git diff -- packages/connector/lib/adapters/claude.mjs packages/connector/lib/adapters/shared.mjs packages/connector/test/readers.test.mjs",
+      "exit": 0
+    },
+    {
+      "event": 68,
+      "callID": "call_XMMS9JTj4NVC4WnEOtOkB01E",
+      "command": "git diff --name-only HEAD~1 HEAD && git status --porcelain=v1",
+      "exit": 0
+    },
+    {
+      "event": 69,
+      "callID": "call_ASBseoK9ohV2OQdAmts1FpRt",
+      "command": "node --test packages/connector/test/claude-security.test.mjs",
+      "exit": 0
+    },
+    {
+      "event": 71,
+      "callID": "call_JPHqzHDoGnXMls9Kv3gfzTv2",
+      "command": "node --test --test-name-pattern='complete records before an unterminated tail|compares duplicate IDs|full event ledger' packages/connector/test/readers.test.mjs",
+      "exit": 0
+    },
+    {
+      "event": 72,
+      "callID": "call_Rf5fupmyhtDsCsAnaM4iZhzl",
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "exit": 0
+    },
+    {
+      "event": 73,
+      "callID": "call_iAl7sttGzaNjhghVMdUMQef9",
+      "command": "node --test packages/connector/test/config.test.mjs",
+      "exit": 0
+    },
+    {
+      "event": 74,
+      "callID": "call_NidX2grXC8EZobdX0F5fX6Jl",
+      "command": "node --test packages/connector/test/protocol.test.mjs",
+      "exit": 0
+    },
+    {
+      "event": 75,
+      "callID": "call_WMNRFj5d8xHGDDbLjv1m24G4",
+      "command": "git status --short && git diff --check && git diff --stat",
+      "exit": 0
+    },
+    {
+      "event": 76,
+      "callID": "call_U6JHXA9AC1rS3Bu3bUsYTlkJ",
+      "command": "git diff --numstat && git diff --name-only",
+      "exit": 0
+    }
+  ],
+  "observableAssistantMessages": [
+    {
+      "message": "msg_0ce3a79a2001BxgP3ZdtPc3Z8t",
+      "time": {
+        "start": 1790166337071,
+        "end": 1790166338542
+      },
+      "text": "I’ll inspect the current connector implementation and worktree, then verify the reported ledger edge cases against the task contract before making the smallest fixes. I’ll add focused regressions, run each required Node 24 test command in separate checks after the final edit, and report any unavailable repository-wide verification."
+    },
+    {
+      "message": "msg_0ce3abee0001t4FVSlIyWQDY2Y",
+      "time": {
+        "start": 1790166356061,
+        "end": 1790166361443
+      },
+      "text": "The worktree is clean at the prepared draft. The shared collector currently skips known IDs before ledger comparison, discards completed records when an unterminated tail is present, and emits overflow observations without persisting or range-filtering them. These are directly within the requested first-tuple, no-double-counting, bounded-storage contract, so I’m tracing adapter call paths and existing state compatibility before changing them."
+    },
+    {
+      "message": "msg_0ce3c0902001oZNbpBRUU8QKeX",
+      "time": {
+        "start": 1790166449345,
+        "end": 1790166451671
+      },
+      "text": "The adapter state is persisted by `viberacing run` under each source’s `state.adapters[sourceId]`, so the ledger returned by each collector is the durable account-switch boundary; no separate persistence layer is missing. I’ll first add regressions that exercise real Qwen collection for tail/conflict behavior and the ledger entry point for the full-capacity boundary, then run them against this draft to confirm the failures before production edits."
+    },
+    {
+      "message": "msg_0ce3e6318001J3CfCD7bWv7Tip",
+      "time": {
+        "start": 1790166594984,
+        "end": 1790166595663
+      },
+      "text": "The regression run reproduced all three defects. The fix now keeps complete JSONL lines observable even when a tail remains provisional, lets known IDs reach tuple comparison, and drops observations that cannot fit the bounded ledger instead of returning non-durable usage. I also preserved provisional-tail output and filtered it by range, while making a valid ledger authoritative even when its current range is empty so overflow cannot leak through the old fallback."
+    },
+    {
+      "message": "msg_0ce3f257d001D5Lvt3452Cj7Jh",
+      "time": {
+        "start": 1790166664190,
+        "end": 1790166665126
+      },
+      "text": "A cross-adapter check found the same tail persistence gap in Claude’s specialized collector, which does not use `collectJsonl`: it treated complete lines and the tail as one provisional batch. I’m correcting that path too, so the requirement remains true for all event-based adapters rather than only the shared JSONL adapters."
+    },
+    {
+      "message": "msg_0ce40ae9d001sVgWVWVjzMvaoB",
+      "time": {
+        "start": 1790166750616,
+        "end": 1790166753295
+      },
+      "text": "The focused regressions now pass for Qwen, Claude, duplicate conflicts, and ledger saturation. The required preservation checks are the three connector suites named in the task; `readers` covers the changed accounting paths, while `config` and `protocol` cover state/config persistence and upload validation. I’ll run them separately after reviewing the final implementation diff, then attempt the project verification only if the environment supports the pinned dependencies."
+    },
+    {
+      "message": "msg_0ce428b2e001zo65umjjSx9gcq",
+      "time": {
+        "start": 1790166866604,
+        "end": 1790166868187
+      },
+      "text": "All three required Node 24 connector suites pass separately: readers `92/92`, config `103/103`, and protocol `14/14`. I’m running the repository-mandated `corepack pnpm verify` as a diagnostic now; the task environment warns its pinned pnpm/workspace dependencies may be unavailable, so a failure there will be reported as an environment limitation rather than worked around by changing dependencies."
+    },
+    {
+      "message": "msg_0ce42e50e0018hPcBkWvG7rivM",
+      "time": {
+        "start": 1790166901323,
+        "end": 1790166902327
+      },
+      "text": "The final diff is limited to the shared event collector, Claude’s equivalent collector, and reader regressions; no package versions or unrelated files changed. The required suites and focused regressions pass, and `git diff --check` is clean. Because Claude’s specialized path was also changed, I’m running its dedicated security regression as an additional preservation check before closing."
+    },
+    {
+      "message": "msg_0ce446c1c001bqCkP4szTtemb5",
+      "time": {
+        "start": 1790166991162,
+        "end": 1790166993736
+      },
+      "text": "Implemented ledger fixes across shared JSONL and Claude collectors:\n\n- Preserve complete records before unterminated tails.\n- Detect conflicting duplicate IDs while retaining the first tuple.\n- Prevent bounded-ledger overflow from emitting non-persisted usage.\n- Preserve range filtering, partial diagnostics, and provisional-tail behavior.\n- Added focused regressions.\n\nChecks passed:\n- Readers: 92/92\n- Config: 103/103\n- Protocol: 14/14\n- Focused ledger tests and Claude security test\n- `git diff --check`\n\n`corepack pnpm verify` was unavailable because pnpm 11.7.0 could not be downloaded with network access disabled. No commit or package version changes made."
+    }
+  ],
+  "compactionParts": [],
+  "independentEvidence": {
+    "cliExit": 1,
+    "cliKnownInputInPersistedMessages": true,
+    "cliKnownInputInPersistedIds": true,
+    "privacyHex": {
+      "name": "privacy-hex-id",
+      "actual": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "rawIdPersisted": true,
+      "expectedRawIdPersisted": false
+    },
+    "cliFailureStack": [
+      "at snapshots (file:///probes/cli-persistence.test.mjs:149:78)"
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "evaluation-final/E-cli-persistence.json",
+      "size": 10666,
+      "sha256": "1c924767ae7ed3231eed92d2bbfaf7914177ba686bb32908161dfd63e22395dc",
+      "mode": 420
+    },
+    {
+      "path": "evaluation-final/E-supplemental.json",
+      "size": 7113,
+      "sha256": "b390887ced62eb2ad5d0302c026ceec9cfb1a8a9e7367f5af36e96d4c357e6c8",
+      "mode": 420
+    },
+    {
+      "path": "real/F/deadline.json",
+      "size": 130,
+      "sha256": "3cab21b81e2697e212ad0e1a9b846ba7889a5bb0b02c92c30616d569bfb70003",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/task-artifacts/2ef7bc1c-a0c5-4fb8-8d68-14f0cf8cc9ff/implementation-messages.json",
+      "size": 1320234,
+      "sha256": "25b3bcc8635902c4bc31c35d74ef73ac4556da545e8b11f0417a865a9304d2ee",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/task-artifacts/2ef7bc1c-a0c5-4fb8-8d68-14f0cf8cc9ff/initial.json",
+      "size": 7620,
+      "sha256": "ab30c72df483d0ea737749dc4b5a054f3fa64d9aa918526ee67a828e32ce3e76",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/task-artifacts/2ef7bc1c-a0c5-4fb8-8d68-14f0cf8cc9ff/terminal.json",
+      "size": 22031,
+      "sha256": "906182e67edd93efddf852b7fdc0fb5a49cbc1fb4df27f0bc58df84682e99ef0",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/task-artifacts/2ef7bc1c-a0c5-4fb8-8d68-14f0cf8cc9ff/tool-events.json",
+      "size": 455775,
+      "sha256": "b6091a875569fa722aeb064a73c40a01d711880f53488b94ef25161a46eb1748",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-10.json",
+      "size": 294418,
+      "sha256": "f3e9d9217fde8d32666d4977ea8fc0a7a631f15d9f65bdd70e4c304d6926ac5d",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-11.json",
+      "size": 300942,
+      "sha256": "ea87f1d5e77b7595e58d28e24edb1ce8d3b3fd1a5bd9cb2a3be7e6b098449120",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-12.json",
+      "size": 311184,
+      "sha256": "4db6e3e0608cbc4074b0c96442050778eaa8bd2900514da608fdf4d9643d2f85",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-13.json",
+      "size": 324174,
+      "sha256": "f3e6edd815cb671919da0dea008960b1ad27833e62322ee0f8ddd5131f1f0d0d",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-14.json",
+      "size": 347687,
+      "sha256": "4de98355be0971f70d0c0cb04c8b85df036b72a8ec424b3f401f87003bbab9a3",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-15.json",
+      "size": 353739,
+      "sha256": "2b285c2f04bdf5275ac7aab1a9118cd880492f91548aed7bced3618df49abbf5",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-16.json",
+      "size": 368322,
+      "sha256": "d5e524c93d8e5f774c960188b462920458c47670870897881d9831a2352fd6bb",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-17.json",
+      "size": 373682,
+      "sha256": "34331f04f4a5ef7a25494d1c22f7134b0901d812abceea3fb83449be8a4ea3ab",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-18.json",
+      "size": 385540,
+      "sha256": "ae3cc77dffabcc88e628b80b78793a60966e42efb0e651936ed011cc954b6f93",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-19.json",
+      "size": 388744,
+      "sha256": "ab8e0b6964473057383b04a8a37375dc1e9f0251ae21dbee806df417f6dc5aee",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-20.json",
+      "size": 392601,
+      "sha256": "3e8650a752737cd779c1d261e102a5e66a948f32ca03ce63ee1c18c5ac5d8eb2",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-21.json",
+      "size": 415739,
+      "sha256": "3ab53c30eb61a3e62f5759fa73995befa31549e33423aded27ce19b4631805fa",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-22.json",
+      "size": 429550,
+      "sha256": "dd73f733aee46d64cad61b33b72333f8b7fc6f25144025b0d02a0c41314565ef",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-23.json",
+      "size": 432466,
+      "sha256": "034dca9c5655076bbbd5250fcae0506799077d6cbd1bbc9476ea16089d69fdc8",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-24.json",
+      "size": 446566,
+      "sha256": "56af92155ab0fba565b5203133dc5b7ddd33a053f89292ea6aa9001fca33e9ad",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-25.json",
+      "size": 451880,
+      "sha256": "bfa3c19c33295fb848e53b19ccf107276ca56fe283ab9288e95ed7ade15eba6d",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-26.json",
+      "size": 454315,
+      "sha256": "4b04327b60ad302b1d26884bc84aa7ea07e8af65595c4ff65cee1b12ec9e52bb",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-27.json",
+      "size": 474502,
+      "sha256": "fea3cfbd54298ae35cb12a03049c2a841f816fe3ab6e9dcfdacb9b0584bd3686",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-28.json",
+      "size": 481278,
+      "sha256": "2bee5ccdb20c57972622cfcc45a25122f0fc83952c3274fd2c77d97e7ec0e236",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-29.json",
+      "size": 485142,
+      "sha256": "016530ea93951a2f43318421fd9d8f216fb4deb0ea18c6c2932f25c2066ee77e",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-3.json",
+      "size": 37975,
+      "sha256": "9db3078b181fcb72a7fef14b6b68055026ba92bc3383db08ce6887fc8f567c44",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-30.json",
+      "size": 491166,
+      "sha256": "4675beab64a109536dca2ea90357919d62d5e0b02fe4efb18a12e633b2fdb594",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-31.json",
+      "size": 504946,
+      "sha256": "07a1b70d0a1bde66e075890fca29e13009a0b217a176dfa9919f073fd2450cc9",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-32.json",
+      "size": 510955,
+      "sha256": "bf5db24dffc4732a244dbf547703595f9c9b76a02cf9a9adc0784006e4dc5ecf",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-33.json",
+      "size": 521861,
+      "sha256": "81993b97b726637fb7f129b63a0609532292ab3b7c7a045cc5f6a13887ddb056",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-34.json",
+      "size": 526906,
+      "sha256": "a4673373dd191051d8706ba908bb49d3d26da35938669efd9b3ff22b849ddd92",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-35.json",
+      "size": 536886,
+      "sha256": "9e17ea918e5c73055c5d7cdce82dc8d32260039e74927859ec0c1a84a59df313",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-36.json",
+      "size": 548192,
+      "sha256": "ba50e513bb328acc3bf71c15894ab7236fdda7c6771775054695c651ac8893e1",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-37.json",
+      "size": 551241,
+      "sha256": "bedfea0faad4020f3dfff45cb4f25cc58af8882380db3ed6105db66a5f0aa5c7",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-38.json",
+      "size": 555111,
+      "sha256": "2a050d9b7eef682420d11569de8e4a672066ea79976faab968bb2d41e7706a9f",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-39.json",
+      "size": 558926,
+      "sha256": "1132d913002ffa81d4fb75c64e7900b1635c57b38a53285ec47f4151e81e0fe4",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-4.json",
+      "size": 42077,
+      "sha256": "230fa5a951ce7c925caa9b4e7353a4dac66314f00831cfb8b0f5f34180292ae2",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-40.json",
+      "size": 577272,
+      "sha256": "2647e8769dddfc8d318fc82af7ba4bd4ae1feb7a566bea37e419fe36fe8feab3",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-41.json",
+      "size": 585138,
+      "sha256": "075a64258b3d78bb6f5bd41756a92b0ab42cdbb66e5ee060188d7ee594d0332c",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-42.json",
+      "size": 590432,
+      "sha256": "9aac57c3805cd70c0b367b4cec4cad338c28415e98098774efcf4084c002ee8e",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-43.json",
+      "size": 592927,
+      "sha256": "0acdedb2ea8af2a5b9063153fb47a023dd5a0ad87ed225cc0c8bf26d47aa72c3",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-44.json",
+      "size": 602733,
+      "sha256": "f5bdd90e15b3affe77174fb99f38ed91f71c35ebea5ad5fd1b8f3cc18f7b94cb",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-45.json",
+      "size": 613984,
+      "sha256": "473bf2200c77734495d01ebe7ece5dd17f4f4cf7127f756e705c81274334d382",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-46.json",
+      "size": 615663,
+      "sha256": "e0eaf81590de24ecd4ea59c9bab6d4958e3a948ccc78592d542593779eb6150d",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-47.json",
+      "size": 618355,
+      "sha256": "5fd0898f16988c63e93ab481f83e4a387d3663ed55b5913cb3ec0b59eb9178c8",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-48.json",
+      "size": 621852,
+      "sha256": "21d09a9948ac319cbae5f3255a367a8d21c2342185cb0d3b7c456faeee45936b",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-5.json",
+      "size": 53798,
+      "sha256": "0f7835f3d09299daaf09ad93190efcd8a9fc85405e4c06544410b42353299ba9",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-6.json",
+      "size": 104072,
+      "sha256": "85b1824baca82f971bc166d058fe04274a9994a44436d23fea9572a8f82b72f7",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-7.json",
+      "size": 147871,
+      "sha256": "4e28d0350b8b32161115ba9c39b4e1a884b0d0642b56827127468e7cf77b368a",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-8.json",
+      "size": 171314,
+      "sha256": "7fc279e8ccf5918ee0dbc53b9a6d46f5c99c471bd1c7f0a6372a02f5dfd88eba",
+      "mode": 384
+    },
+    {
+      "path": "real/F/runs/account-switch-ledger-F/upstream-request-9.json",
+      "size": 256806,
+      "sha256": "3e7ac0b3f15612f989e65b355521218e11ecc8217fd48a53347e3c3fe978c44b",
+      "mode": 384
+    },
+    {
+      "path": "real/chain-result.json",
+      "size": 3107,
+      "sha256": "5caa75b6c178f7bdc0b8255b5167785003e588a1d35c6cc29c31ccede30e8d49",
+      "mode": 384
+    }
+  ],
+  "accounting": {
+    "newProviderCalls": 0,
+    "newModelRuns": 0,
+    "newBehaviorExecutions": 0
+  },
+  "publicSourceHashes": {
+    "development/plain-ledger-native-high/original-task.txt": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+    "development/plain-ledger-native-high/environment.txt": "aa0afe37ca2ec1f3564642a02842d71472b72b88225069be22a4cbbe8fb114cc",
+    "development/plain-ledger-native-high/cli-persistence.test.mjs": "69d64508aedea998897ef9b539486cf6fae887d0269f999c0ff667c95b31a9d1",
+    "development/ledger-review-delivery/D0.patch": "e2833390b036f9339a776cb58cf82379f3541d191a10f978fd8b40294c33f3a6",
+    "development/ledger-review-delivery/handoff-template.txt": "07556dbc091bb14a5146f4e9f34b25d37f4bb26969d6f92d3df14a1082d35609",
+    "development/ledger-review-delivery/supplemental.mjs": "fef6e323d6195e806ccff14ef900b4dd19a662d82d9ecab9f6e41c111216d831",
+    "development/ledger-review-delivery/post-capture-followup/R.md": "7cb1c20598f903e40bbf7b90714dbb89f8278055ce71f6e050a1247fe1996fba",
+    "development/ledger-review-delivery/post-capture-followup/F-response.md": "f3c057398bed93eabd316f6e2cf16cf44d930b20d0752306876f4f327364e9f5",
+    "development/ledger-review-delivery/post-capture-followup/M.patch": "225094f080a304fe598200d5c4f8252ad20af2ef2c08b5d35ab9967509f7b8b7",
+    "development/ledger-review-delivery/post-capture-followup/D0-to-final.patch": "7c69f3dc093548780210270b07cca4173707300192223ae17e28dc7a0d4f7c03",
+    "development/ledger-review-delivery/post-capture-followup/assessment.json": "16ec7b3ab9b3276ae807cb2b3133377f5349d2fae210560c0d18a563df095235",
+    "development/ledger-review-delivery/post-capture-followup/model-input-verification.json": "57cc41250c04690117a46097b09feaf446df37ccd2219d7e15022d4efa953c4d",
+    "development/ledger-review-delivery/post-capture-followup/selected-state.mjs": "b7e8e85b2c897bb8372c913dad5ba7c8796fac0fa4385760dfbb530367a1b7ba",
+    "development/ledger-review-delivery/post-capture-followup/selected-observations.json": "6167eb5d5a7fe3d0fef9a935bf94d5c0683c59461f3d54ae81ff772f231448ba"
+  },
+  "historicalD0Privacy": {
+    "archiveSha256": "54b66700f95a3adf210e9d660f031671aba255901fcc52705eb05154cb59c391",
+    "verifiedArtifacts": [
+      {
+        "path": "evaluation-D0/E-cli-persistence.json",
+        "size": 10641,
+        "sha256": "2b121eb47f404fac8df0a8b39b559c8d1bea37ee73d73c577d7a905082265f71",
+        "mode": 420
+      },
+      {
+        "path": "evaluation-D0/E-supplemental.json",
+        "size": 7088,
+        "sha256": "611e50e440aef2cbcb50c7114052f6f45a86e397489de5daeaada484e05b92ae",
+        "mode": 420
+      }
+    ]
+  }
+}

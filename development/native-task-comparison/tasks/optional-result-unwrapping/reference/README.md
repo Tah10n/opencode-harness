@@ -1,0 +1,3 @@
+# optional-result-unwrapping
+
+unwrap defaults to direct-value mode: undefined selects fallback; all other values, even packet lookalikes, remain unchanged. Opt in with {tagged:true}. Own kind='some' requires own value and returns it, including undefined. 'none' returns fallback. 'error' requires own error and throws it unchanged, including falsy values. Malformed/unknown packets throw TypeError, never count as none; inherited protocol fields do not count. Extra fields are ignored. No mutation, promise awaiting, recursive unwrap or fallback function invocation. Frozen/null-prototype stable data packets work. Run npm test.

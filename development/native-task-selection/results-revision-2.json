@@ -1,0 +1,690 @@
+{
+  "classification": "known development pairs; not independent validation or general lift",
+  "revision": "088393068e0b26894d5a00fd2362938b0addfb7d",
+  "promptSha256": "0f33f8e464059ef54af2169b6764a26fae7f3fb0cf679a8dba7b6abfebd2bf32",
+  "mappingSha256": "007c3c4fc0543a12c5c199813cc1d3bd382adf31fcf703ccbafda8e0e4a00471",
+  "freezeSha256": "650a1f654989cde4327591eaca4c074c9f7ee847e924c80153a66cacead13a09",
+  "frozenAt": "2026-09-12T14:57:00.817Z",
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "openCode": "1.18.26",
+  "researchMs": 240000,
+  "budgetMs": 300000,
+  "outcome": {
+    "status": "finished",
+    "pause": null
+  },
+  "operatorResumptions": [
+    {
+      "reason": "Confirmed ordinary research timeout, no unknown live execution; user explicitly requires remaining pairs after ordinary choice errors.",
+      "completedSlotsPreserved": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "admittedSlots": [
+        5,
+        6
+      ],
+      "selectorRevision": "088393068e0b26894d5a00fd2362938b0addfb7d",
+      "selectorPromptChanged": false,
+      "frozenRunnerSha256": "0437f2aa2ee616953fad87a460550f6cc5811bee4a1c99ba51be7e565857d28c",
+      "operatorRunnerSha256": "2f8a619b0970601fe64d738225de2ebfde61b45c238bcff8963f4f1c674e42e1",
+      "at": "2026-09-12T15:15:54.065Z"
+    },
+    {
+      "reason": "Confirmed ordinary research timeout, no unknown live execution; user explicitly requires remaining pairs after ordinary choice errors.",
+      "completedSlotsPreserved": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "admittedSlots": [
+        6
+      ],
+      "selectorRevision": "088393068e0b26894d5a00fd2362938b0addfb7d",
+      "selectorPromptChanged": false,
+      "frozenRunnerSha256": "0437f2aa2ee616953fad87a460550f6cc5811bee4a1c99ba51be7e565857d28c",
+      "operatorRunnerSha256": "66d4280d34386ffc079fc5ee793d0e5e33baa1d2e348ff71df403d25593ded70",
+      "at": "2026-09-12T15:21:34.029Z"
+    }
+  ],
+  "originalPauses": [
+    {
+      "status": "paused",
+      "pause": {
+        "kind": "unattributed_timeout",
+        "slot": 4
+      }
+    },
+    {
+      "status": "paused",
+      "pause": {
+        "kind": "unattributed_timeout",
+        "slot": 5
+      }
+    }
+  ],
+  "rows": [
+    {
+      "slot": 1,
+      "task": "protocol-error-api",
+      "candidates": {
+        "X": {
+          "arm": "P",
+          "patch": "development/native-task-utility/patches/v3/protocol-error-api-P-final.patch",
+          "patchSha256": "402ae70699edac9b32cebd746e5594caa6a00577ce4fc09873b005bb53274fe1",
+          "treeSha256": "36400f8bf254ab228b321a554291db1d0d96d511e432806e4fe82dd8b8131148",
+          "fullPatchAccepted": true,
+          "reasons": []
+        },
+        "Y": {
+          "arm": "H",
+          "patch": "development/native-task-utility/patches/v3/protocol-error-api-H-final.patch",
+          "patchSha256": "200d0fe5c4001550aaba1ff556758a0e36c25f15cb7a2b119ca34178523904e2",
+          "treeSha256": "6e47b07ce432818803998e92897986cca2bb786d9494424f397b2f4c3263c916",
+          "fullPatchAccepted": true,
+          "reasons": []
+        }
+      },
+      "decision": null,
+      "selectionCompleted": false,
+      "selectedArm": null,
+      "selectedPatchSha256": null,
+      "usablePatchDelivered": false,
+      "pairHasAcceptable": true,
+      "correctNeither": false,
+      "incorrectIncompleteSelection": false,
+      "elapsedMs": 229235,
+      "requests": 10,
+      "requestsWithoutUsage": 0,
+      "tools": 47,
+      "sessions": 1,
+      "usage": {
+        "input_tokens": {
+          "observed": 567948,
+          "missingRequests": 0
+        },
+        "output_tokens": {
+          "observed": 9758,
+          "missingRequests": 0
+        },
+        "total_tokens": {
+          "observed": 577706,
+          "missingRequests": 0
+        },
+        "cached_tokens": {
+          "observed": 80384,
+          "missingRequests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 7013,
+          "missingRequests": 0
+        }
+      },
+      "phaseCount": 1,
+      "researchTimedOut": false,
+      "reportedAcceptance": {
+        "X": "uncertain",
+        "Y": "uncertain"
+      },
+      "recordConsistency": false,
+      "nativeCompletedBeforeDeadline": true,
+      "emittedDecisionUncertified": "X",
+      "recordSemanticValidity": "unverified by program",
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "inputsVerified": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "previous": {
+        "decision": "X",
+        "usablePatchDelivered": true,
+        "elapsedMs": 246572,
+        "requests": 13,
+        "tools": 59
+      }
+    },
+    {
+      "slot": 2,
+      "task": "catalog-cache",
+      "candidates": {
+        "X": {
+          "arm": "H",
+          "patch": "development/native-task-utility/patches/v3/catalog-cache-H-final.patch",
+          "patchSha256": "82c11e80076389719d55cec19e77f74a33d2e2f218c054dc55276561c1a3f269",
+          "treeSha256": "f30b07df92975140b68cc5e759b153d710857cb1d48fb8e0b9f73b0564ea9ad4",
+          "fullPatchAccepted": false,
+          "reasons": [
+            "The existing exported selectCatalog(catalog) call filters out region-bearing items when its optional argument is omitted. Initial, reference, alternative and P preserve the all-items copy; both H endpoints fail the same preservation check."
+          ]
+        },
+        "Y": {
+          "arm": "P",
+          "patch": "development/native-task-utility/patches/v3/catalog-cache-P-final.patch",
+          "patchSha256": "9b5b2a7395d0dfe68a3446c98e4f2589ba1e2d4fa7d0e9cd935f48ed2be703f1",
+          "treeSha256": "e8055d6bdc9461c889371213bb1f5e1e7890f68153398a7660ee9b905c3e95b8",
+          "fullPatchAccepted": true,
+          "reasons": []
+        }
+      },
+      "decision": "Y",
+      "selectionCompleted": true,
+      "selectedArm": "P",
+      "selectedPatchSha256": "9b5b2a7395d0dfe68a3446c98e4f2589ba1e2d4fa7d0e9cd935f48ed2be703f1",
+      "usablePatchDelivered": true,
+      "pairHasAcceptable": true,
+      "correctNeither": false,
+      "incorrectIncompleteSelection": false,
+      "elapsedMs": 203083,
+      "requests": 10,
+      "requestsWithoutUsage": 0,
+      "tools": 31,
+      "sessions": 1,
+      "usage": {
+        "input_tokens": {
+          "observed": 155667,
+          "missingRequests": 0
+        },
+        "output_tokens": {
+          "observed": 9662,
+          "missingRequests": 0
+        },
+        "total_tokens": {
+          "observed": 165329,
+          "missingRequests": 0
+        },
+        "cached_tokens": {
+          "observed": 47616,
+          "missingRequests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 6074,
+          "missingRequests": 0
+        }
+      },
+      "phaseCount": 1,
+      "researchTimedOut": false,
+      "reportedAcceptance": {
+        "X": "incomplete",
+        "Y": "acceptable"
+      },
+      "recordConsistency": true,
+      "nativeCompletedBeforeDeadline": true,
+      "emittedDecisionUncertified": "Y",
+      "recordSemanticValidity": "unverified by program",
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "inputsVerified": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "previous": {
+        "decision": "Y",
+        "usablePatchDelivered": true,
+        "elapsedMs": 213204,
+        "requests": 11,
+        "tools": 41
+      }
+    },
+    {
+      "slot": 3,
+      "task": "legacy-runtime-reload",
+      "candidates": {
+        "X": {
+          "arm": "P",
+          "patch": "development/native-task-utility/patches/v3/legacy-runtime-reload-P-final.patch",
+          "patchSha256": "ffd899cc9fc9e2ae6344947916d58e91ca21400b02539bac15a1ff7b273b7ebf",
+          "treeSha256": "5d782b40ad1b99cdba373fd04c9fbac4bad49b9967724596f607abb31b4a8416",
+          "fullPatchAccepted": false,
+          "reasons": [
+            "prepareRuntime(retainedLegacyLauncherURL) still sources current libraries from the old tree and fails on absent connection-lifecycle.mjs.",
+            "Delivered migration tests use the current launcher URL; malformed-layout tests can fail at the unrelated custom-directory gate."
+          ]
+        },
+        "Y": {
+          "arm": "H",
+          "patch": "development/native-task-utility/patches/v3/legacy-runtime-reload-H-final.patch",
+          "patchSha256": "e5b549e4a8c1be00a8c77d51042f7648808e1570493e7431ff14da5a5c615fb1",
+          "treeSha256": "14ea423a3792274798a3271c53c38807608c7db1e75941c2782f7f518c35a6fd",
+          "fullPatchAccepted": true,
+          "reasons": []
+        }
+      },
+      "decision": null,
+      "selectionCompleted": false,
+      "selectedArm": null,
+      "selectedPatchSha256": null,
+      "usablePatchDelivered": false,
+      "pairHasAcceptable": true,
+      "correctNeither": false,
+      "incorrectIncompleteSelection": false,
+      "elapsedMs": 300129,
+      "requests": 18,
+      "requestsWithoutUsage": 1,
+      "tools": 50,
+      "sessions": 1,
+      "usage": {
+        "input_tokens": {
+          "observed": 976074,
+          "missingRequests": 1
+        },
+        "output_tokens": {
+          "observed": 10423,
+          "missingRequests": 1
+        },
+        "total_tokens": {
+          "observed": 986497,
+          "missingRequests": 1
+        },
+        "cached_tokens": {
+          "observed": 192000,
+          "missingRequests": 1
+        },
+        "reasoning_tokens": {
+          "observed": 6511,
+          "missingRequests": 1
+        }
+      },
+      "phaseCount": 2,
+      "researchTimedOut": true,
+      "reportedAcceptance": null,
+      "recordConsistency": false,
+      "nativeCompletedBeforeDeadline": false,
+      "emittedDecisionUncertified": null,
+      "recordSemanticValidity": "unverified by program",
+      "stop": {
+        "ownTaskDeadlineTriggered": true,
+        "terminationVerified": true,
+        "inputsVerified": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": true
+      },
+      "previous": {
+        "decision": null,
+        "usablePatchDelivered": false,
+        "elapsedMs": 300155,
+        "requests": 15,
+        "tools": 51
+      }
+    },
+    {
+      "slot": 4,
+      "task": "reconnect-revoked",
+      "candidates": {
+        "X": {
+          "arm": "H",
+          "patch": "development/native-task-utility/patches/v3/reconnect-revoked-H-final.patch",
+          "patchSha256": "629d47a8d089934e26128a2466875ac530b7373dda2af50b3eaadb65fdb22b02",
+          "treeSha256": "3f8f4ab34f52f1e26db002d44ff66eba857d6997d803a22065fc7280c3d87a70",
+          "fullPatchAccepted": true,
+          "reasons": []
+        },
+        "Y": {
+          "arm": "P",
+          "patch": "development/native-task-utility/patches/v3/reconnect-revoked-P-final.patch",
+          "patchSha256": "c4381e6c20fe0cf3aac8c19d24e8874a907da24972ff8bc7cfb1998705b9f58a",
+          "treeSha256": "0e8e52d47c68efac81b1f8a5adfcc142988f45a41e9d2d2feb434e970cdf3923",
+          "fullPatchAccepted": true,
+          "reasons": []
+        }
+      },
+      "decision": null,
+      "selectionCompleted": false,
+      "selectedArm": null,
+      "selectedPatchSha256": null,
+      "usablePatchDelivered": false,
+      "pairHasAcceptable": true,
+      "correctNeither": false,
+      "incorrectIncompleteSelection": false,
+      "elapsedMs": 252956,
+      "requests": 13,
+      "requestsWithoutUsage": 0,
+      "tools": 48,
+      "sessions": 1,
+      "usage": {
+        "input_tokens": {
+          "observed": 1431593,
+          "missingRequests": 0
+        },
+        "output_tokens": {
+          "observed": 9124,
+          "missingRequests": 0
+        },
+        "total_tokens": {
+          "observed": 1440717,
+          "missingRequests": 0
+        },
+        "cached_tokens": {
+          "observed": 33280,
+          "missingRequests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 6132,
+          "missingRequests": 0
+        }
+      },
+      "phaseCount": 1,
+      "researchTimedOut": true,
+      "reportedAcceptance": {
+        "X": "acceptable",
+        "Y": "incomplete"
+      },
+      "recordConsistency": true,
+      "nativeCompletedBeforeDeadline": false,
+      "emittedDecisionUncertified": "X",
+      "recordSemanticValidity": "unverified by program",
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "inputsVerified": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "previous": {
+        "decision": "X",
+        "usablePatchDelivered": true,
+        "elapsedMs": 233892,
+        "requests": 18,
+        "tools": 57
+      }
+    },
+    {
+      "slot": 5,
+      "task": "request-module-extraction",
+      "candidates": {
+        "X": {
+          "arm": "P",
+          "patch": "development/native-task-utility/patches/v3/request-module-extraction-P-final.patch",
+          "patchSha256": "689a8842914942e92b478be31e8d4c6e687523ddf767a0f1317013eb7cfac0f2",
+          "treeSha256": "f005edc66f6fe91f71cb06af081d0d29c1d93dd630ff5d7f78d985ace54e633d",
+          "fullPatchAccepted": true,
+          "reasons": []
+        },
+        "Y": {
+          "arm": "H",
+          "patch": "development/native-task-utility/patches/v3/request-module-extraction-H-final.patch",
+          "patchSha256": "a603de216742b906fa5337077453baeafe7f9f1088e4925e8227500780104779",
+          "treeSha256": "ba6975a986d1ff1f66ff9c7a57758e8e7dbe61f4875b303a81342a4d25fc265c",
+          "fullPatchAccepted": true,
+          "reasons": []
+        }
+      },
+      "decision": null,
+      "selectionCompleted": false,
+      "selectedArm": null,
+      "selectedPatchSha256": null,
+      "usablePatchDelivered": false,
+      "pairHasAcceptable": true,
+      "correctNeither": false,
+      "incorrectIncompleteSelection": false,
+      "elapsedMs": 256971,
+      "requests": 11,
+      "requestsWithoutUsage": 0,
+      "tools": 39,
+      "sessions": 1,
+      "usage": {
+        "input_tokens": {
+          "observed": 424123,
+          "missingRequests": 0
+        },
+        "output_tokens": {
+          "observed": 10726,
+          "missingRequests": 0
+        },
+        "total_tokens": {
+          "observed": 434849,
+          "missingRequests": 0
+        },
+        "cached_tokens": {
+          "observed": 82944,
+          "missingRequests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 8170,
+          "missingRequests": 0
+        }
+      },
+      "phaseCount": 1,
+      "researchTimedOut": true,
+      "reportedAcceptance": {
+        "X": "uncertain",
+        "Y": "uncertain"
+      },
+      "recordConsistency": false,
+      "nativeCompletedBeforeDeadline": false,
+      "emittedDecisionUncertified": "X",
+      "recordSemanticValidity": "unverified by program",
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "inputsVerified": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "previous": {
+        "decision": "X",
+        "usablePatchDelivered": true,
+        "elapsedMs": 295384,
+        "requests": 18,
+        "tools": 54
+      }
+    },
+    {
+      "slot": 6,
+      "task": "dual-config",
+      "candidates": {
+        "X": {
+          "arm": "H",
+          "patch": "development/native-task-utility/patches/v3/dual-config-H-final.patch",
+          "patchSha256": "817603704265e5c23c143d574002ce1b19bd5a3c76c15f7524a78e1a078285a9",
+          "treeSha256": "b45c372e069a49f67c5539b39918135251959148a77b4d241a40e255e6739747",
+          "fullPatchAccepted": false,
+          "reasons": [
+            "The actual ESM consumer lacks the explicitly required pretty+indent:0 regression.",
+            "The previous ESM render compact-string assertion was removed despite the explicit requirement to keep old tests."
+          ]
+        },
+        "Y": {
+          "arm": "P",
+          "patch": "development/native-task-utility/patches/v3/dual-config-P-final.patch",
+          "patchSha256": "d9ac74b6cd8980c8dcd4477e154331c649d1aa3048418ed1dfeff288d62033d6",
+          "treeSha256": "b8c7f66c36f7e79651ffaa13bf1c2fa0abb4f182d097c77def6bfd754736d84b",
+          "fullPatchAccepted": false,
+          "reasons": [
+            "Negative tests exercise configure only, not both real render consumers as explicitly required."
+          ]
+        }
+      },
+      "decision": "X",
+      "selectionCompleted": true,
+      "selectedArm": "H",
+      "selectedPatchSha256": "817603704265e5c23c143d574002ce1b19bd5a3c76c15f7524a78e1a078285a9",
+      "usablePatchDelivered": false,
+      "pairHasAcceptable": false,
+      "correctNeither": false,
+      "incorrectIncompleteSelection": true,
+      "elapsedMs": 128610,
+      "requests": 8,
+      "requestsWithoutUsage": 0,
+      "tools": 33,
+      "sessions": 1,
+      "usage": {
+        "input_tokens": {
+          "observed": 98246,
+          "missingRequests": 0
+        },
+        "output_tokens": {
+          "observed": 5880,
+          "missingRequests": 0
+        },
+        "total_tokens": {
+          "observed": 104126,
+          "missingRequests": 0
+        },
+        "cached_tokens": {
+          "observed": 25088,
+          "missingRequests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 3362,
+          "missingRequests": 0
+        }
+      },
+      "phaseCount": 1,
+      "researchTimedOut": false,
+      "reportedAcceptance": {
+        "X": "acceptable",
+        "Y": "incomplete"
+      },
+      "recordConsistency": true,
+      "nativeCompletedBeforeDeadline": true,
+      "emittedDecisionUncertified": "X",
+      "recordSemanticValidity": "unverified by program",
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "inputsVerified": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "previous": {
+        "decision": "X",
+        "usablePatchDelivered": false,
+        "elapsedMs": 196733,
+        "requests": 10,
+        "tools": 35
+      }
+    }
+  ],
+  "aggregate": {
+    "available": 6,
+    "decisions": 2,
+    "acceptedSelections": 1,
+    "pairsWithAcceptable": 5,
+    "elapsedMs": 1370984,
+    "requests": 70,
+    "tools": 248,
+    "correctNeither": 0,
+    "incorrectIncompleteSelections": 1,
+    "nativeCompletedBeforeDeadline": 3,
+    "selectorExportSensitivity": {
+      "acceptedSelections": 1,
+      "pairsWithAcceptable": 5,
+      "historicalCandidateInventory": {
+        "P": 4,
+        "H": 5
+      },
+      "interpretation": "Catalog becomes an acceptable tie; no unique selection advantage. Main historical P4/H4 and dual-config contract unchanged."
+    },
+    "usage": {
+      "input_tokens": {
+        "observed": 3653651,
+        "missingRequests": 1
+      },
+      "output_tokens": {
+        "observed": 55573,
+        "missingRequests": 1
+      },
+      "total_tokens": {
+        "observed": 3709224,
+        "missingRequests": 1
+      },
+      "cached_tokens": {
+        "observed": 461312,
+        "missingRequests": 1
+      },
+      "reasoning_tokens": {
+        "observed": 37262,
+        "missingRequests": 1
+      }
+    }
+  },
+  "candidateGenerationCost": {
+    "requests": 322,
+    "tools": 588,
+    "elapsedSeconds": 4622.13,
+    "inputTokens": 22402676,
+    "outputTokens": 177985,
+    "separateFromSelection": true
+  },
+  "prices": "unknown; OAuth token usage is not a monetary price",
+  "localValidation": {
+    "revision": "088393068e0b26894d5a00fd2362938b0addfb7d",
+    "localBranches": {
+      "passed": true,
+      "cases": 7,
+      "greenSuiteMissingConsumer": true,
+      "deadline": true,
+      "lateCancellation": true,
+      "semanticEvidence": false
+    },
+    "selectionNativePreflight": {
+      "status": "passed",
+      "requests": 6,
+      "realProviderCalls": 0,
+      "elapsedMs": 23860,
+      "phaseCount": 2,
+      "sameSession": true,
+      "nativeScratchWrite": true,
+      "isolatedRuntimeState": true,
+      "realOutputsReachedFinal": true,
+      "readOnlyInputs": true,
+      "cappedToolTimeout": true,
+      "researchBoundary": true,
+      "terminationVerified": true
+    },
+    "unchangedTaskNativePreflight": {
+      "status": "passed",
+      "requests": 8,
+      "realProviderCalls": 0,
+      "elapsedMs": 3805,
+      "terminationVerified": true
+    },
+    "readOnlyReview": {
+      "count": 1,
+      "findings": 1,
+      "fixedBeforeFreeze": true,
+      "subject": "Research must settle provider request before reserved final; unknown live provider state must not permit continuation"
+    },
+    "preparationAttempts": {
+      "selectionFixture": 6,
+      "realOpenAICalls": 0,
+      "invalidAttemptsRetained": true
+    },
+    "scope": {
+      "authorRuns": 0,
+      "repairs": 0,
+      "manualActions": 0,
+      "platformMatrices": 0,
+      "merge": 0,
+      "release": 0,
+      "defaultChanges": 0
+    }
+  },
+  "limitations": [
+    "Same six known development pairs and unchanged final patches.",
+    "Model-filled records are not semantic certificates.",
+    "Mixed or invalid diagnostics must be excluded from comparative evidence; their cost remains counted.",
+    "Rejection is not delivered user work; choice between two acceptable patches is not an additional win.",
+    "Historical acceptance and selector-export sensitivity remain unchanged."
+  ]
+}

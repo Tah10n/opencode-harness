@@ -1,0 +1,149 @@
+diff --git a/README.md b/README.md
+index 4a26073..aba17fa 100644
+--- a/README.md
++++ b/README.md
+@@ -196,20 +196,6 @@ parseQuery("tags=javascript&tags=web&tags=dev");
+ // { tags: ["javascript", "web", "dev"] }
+ ```
+ 
+-### `stringifyQuery(query)`
+-
+-Stringfies and encodes a query object into a query string.
+-
+-**Example:**
+-
+-```js
+-stringifyQuery({ foo: 'bar', baz: 'qux' })
+-// 'foo=bar&baz=qux'
+-
+-stringifyQuery({ foo: 'bar', baz: undefined })
+-// 'foo=bar'
+-```
+-
+ ## Utils
+ 
+ ### `$URL()`
+@@ -404,6 +390,8 @@ resolveURL("http://foo.com/foo?test=123#token", "bar", "baz");
+ // Returns "http://foo.com/foo/bar/baz?test=123#token"
+ ```
+ 
++### `stringifyQuery(query, options)`
++
+ ### `withBase(input, base)`
+ 
+ Ensures the URL or pathname starts with base.
+@@ -538,7 +526,7 @@ Adds or replaces protocol of the input URL.
+ withProtocol("http://example.com", "ftp://"); // "ftp://example.com"
+ ```
+ 
+-### `withQuery(input, query)`
++### `withQuery(input, query, options?)`
+ 
+ Add/Replace the query section of the URL.
+ 
+@@ -580,3 +568,8 @@ Special thanks to Eduardo San Martin Morote ([posva](https://github.com/posva))
+ [codecov-href]: https://codecov.io/gh/unjs/ufo
+ [bundle-src]: https://img.shields.io/bundlephobia/minzip/ufo?style=flat&colorA=18181B&colorB=F0DB4F
+ [bundle-href]: https://bundlephobia.com/result?p=ufo
++
++
++## ufo-query-sort
++
++The API provides an optional {sort?: boolean} options argument to stringifyQuery and a third options argument to withQuery. With sort:true, serialize query keys in ascending JavaScript string order; preserve the order of repeated array values. Without it or with false, retain existing key enumeration and all current encoding/filtering behavior. withQuery must apply sorting after merging existing URL query with the supplied object, while preserving path, protocol/host and fragment. Do not mutate the caller's object or arrays. Export the public options type and thread it through public exports and generated declarations. Cover ordinary values including zero/false/empty/null/undefined and escaped/unicode keys. Preserve parsing pollution defenses.
+diff --git a/src/query.ts b/src/query.ts
+index 6fbcaaa..39bd9fc 100644
+--- a/src/query.ts
++++ b/src/query.ts
+@@ -129,8 +129,21 @@ export function encodeQueryItem(
+  *
+  * @group Query_utils
+  */
+-export function stringifyQuery(query: QueryObject): string {
+-  return Object.keys(query)
++export interface StringifyQueryOptions {
++  sort?: boolean;
++}
++
++export function stringifyQuery(
++  query: QueryObject,
++  options: StringifyQueryOptions = {},
++): string {
++  const keys = Object.keys(query);
++  if (options.sort)
++    keys.sort((a, b) => {
++      if (a === b) return 0;
++      return a < b ? -1 : 1;
++    });
++  return keys
+     .filter((k) => query[k] !== undefined)
+     .map((k) => encodeQueryItem(k, query[k]))
+     .filter(Boolean)
+diff --git a/src/utils.ts b/src/utils.ts
+index ea98aba..394c013 100644
+--- a/src/utils.ts
++++ b/src/utils.ts
+@@ -345,10 +345,14 @@ export function withoutBase(input: string, base: string) {
+  *
+  * @group utils
+  */
+-export function withQuery(input: string, query: QueryObject): string {
++export function withQuery(
++  input: string,
++  query: QueryObject,
++  options?: import("./query").StringifyQueryOptions,
++): string {
+   const parsed = parseURL(input);
+   const mergedQuery = { ...parseQuery(parsed.search), ...query };
+-  parsed.search = stringifyQuery(mergedQuery);
++  parsed.search = stringifyQuery(mergedQuery, options);
+   return stringifyParsedURL(parsed);
+ }
+ 
+diff --git a/test/h00-contract.test.ts b/test/h00-contract.test.ts
+new file mode 100644
+index 0000000..603f469
+--- /dev/null
++++ b/test/h00-contract.test.ts
+@@ -0,0 +1,27 @@
++// @ts-nocheck -- invalid runtime inputs are intentional; public types are tested separately.
++import * as A from "node:assert/strict";
++import { test } from "vitest";
++import * as api from "../src";
++test("new public contract", async () => {
++  const q = { z: [2, 1], a: 0, b: false, c: "", d: null, e: undefined };
++  const before = JSON.stringify(q);
++  A.equal(api.stringifyQuery(q), "z=2&z=1&a=0&b=false&c&d");
++  A.equal(api.stringifyQuery(q, { sort: false }), api.stringifyQuery(q));
++  A.equal(api.stringifyQuery(q, { sort: true }), "a=0&b=false&c&d&z=2&z=1");
++  A.equal(JSON.stringify(q), before);
++  A.equal(
++    api.withQuery(
++      "https://x.test/p?z=3&c=4#frag",
++      { a: [2, 1] },
++      { sort: true },
++    ),
++    "https://x.test/p?a=2&a=1&c=4&z=3#frag",
++  );
++  A.equal(api.withQuery("/p?z=3#f", { a: 1 }), "/p?z=3&a=1#f");
++  A.equal(
++    api.stringifyQuery({ é: 1, "a b": 2, "&": 3 }, { sort: true }),
++    "%26=3&a+b=2&%C3%A9=1",
++  );
++  A.equal(Object.getPrototypeOf(api.parseQuery("__proto__=bad")), null);
++  A.equal(api.parseQuery("constructor=bad").constructor, undefined);
++});
+diff --git a/test/types.test-d.ts b/test/types.test-d.ts
+index e28c503..1cab5c3 100644
+--- a/test/types.test-d.ts
++++ b/test/types.test-d.ts
+@@ -12,3 +12,10 @@ describe("query", () => {
+     expectTypeOf(result).toEqualTypeOf<{ foo: string }>();
+   });
+ });
++
++import * as addedApi from "../src";
++const opts: addedApi.StringifyQueryOptions = { sort: true };
++expectTypeOf(addedApi.stringifyQuery({ x: 1 }, opts)).toEqualTypeOf<string>();
++expectTypeOf(addedApi.withQuery("/", {}, opts)).toEqualTypeOf<string>();
++// @ts-expect-error sort must be boolean
++addedApi.stringifyQuery({}, { sort: 1 });

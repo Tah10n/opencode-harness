@@ -1,0 +1,26 @@
+{
+  "Q": false,
+  "reviewed": "Unchanged portable patch, static integration/tests/types/docs, project checks, independent behavior and delivered-regression sensitivity",
+  "delivery": "Three consumers, runtime/type regressions and README examples present",
+  "checks": {
+    "id": "n05",
+    "task": "url-search-params",
+    "apply": 0,
+    "projectStatus": 1,
+    "independentProjectTestsStatus": 0,
+    "independentProjectBuildStatus": 0,
+    "behaviorStatus": 0,
+    "cleanupStatus": 0
+  },
+  "regressionSensitivity": {
+    "detected": true,
+    "status": 1,
+    "property": "URLSearchParams public serialization retains entries"
+  },
+  "issues": [
+    "Params-backed append retains an old key when incoming query owns that key with undefined: expected /base/child?keep=ok#new, observed /base/child?drop=old&keep=ok#new.",
+    "Required project npm test fails on new unicorn/prefer-spread ESLint errors. Independent runtime/type tests and build pass."
+  ],
+  "finalClaims": "Accurately disclosed checks blocked; broad append support claim is incomplete. Trace shows successful local pnpm discovery followed by author-initiated dependency recreation and offline failure.",
+  "calibrationCaveat": "Frozen reference and alternative also miss undefined append removal. Follow-up checks enforce the task existing overlay contract, not a new requirement; artifacts are preserved unchanged."
+}

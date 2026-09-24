@@ -1,0 +1,16 @@
+{
+  "category": "compatibility",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert exact canonical precedence over alias and ASCII-insensitive alias lookup.",
+    "Assert collision refusal and preserved help/input ownership and order."
+  ],
+  "docDelivery": [
+    "Explain exact names versus folded aliases and collision rules.",
+    "Document handler forwarding, errors and help snapshot/order semantics."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "ASCII identifiers and static ordinary command entries; canonical exact lookup then folded alias; explicit collision and snapshot rules.",
+  "independence": "Add ASCII-insensitive aliases while preserving exact command precedence, help ordering and collision refusal."
+}

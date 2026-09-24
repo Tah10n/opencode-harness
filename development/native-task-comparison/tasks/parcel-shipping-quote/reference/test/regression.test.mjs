@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {quote} from '../src/quote.mjs';test('dimensional rounding and per-parcel oversize',()=>assert.deepEqual(quote([{id:'a',length:10,width:10,height:11,grams:5},{id:'b',length:21,width:1,height:1,grams:5}],{divisor:100,maxSide:20,base:3,stepGrams:10,stepCents:4}),[{id:'a',status:'quoted',grams:11,cents:11},{id:'b',status:'rejected',reason:'oversize'}]));

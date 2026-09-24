@@ -1,0 +1,144 @@
+diff --git a/index.d.ts b/index.d.ts
+index 1a20857..28a9493 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -133,4 +133,4 @@ await Promise.all(input);
+ export function limitFunction<Arguments extends unknown[], ReturnType>(
+ 	function_: (...arguments_: Arguments) => PromiseLike<ReturnType>,
+ 	options: Options
+-): ((...arguments_: Arguments) => Promise<ReturnType>) & Pick<LimitFunction, 'clearQueue'>;
++): ((...arguments_: Arguments) => Promise<ReturnType>) & Pick<LimitFunction, 'activeCount' | 'pendingCount' | 'concurrency' | 'clearQueue'>;
+diff --git a/index.js b/index.js
+index b74d48a..fca10a2 100644
+--- a/index.js
++++ b/index.js
+@@ -118,8 +118,22 @@ export function limitFunction(function_, options) {
+ 	const limit = pLimit(options);
+ 
+ 	const limitedFunction = (...arguments_) => limit(() => function_(...arguments_));
+-	Object.defineProperty(limitedFunction, 'clearQueue', {
+-		value: limit.clearQueue,
++	Object.defineProperties(limitedFunction, {
++		activeCount: {
++			get: () => limit.activeCount,
++		},
++		pendingCount: {
++			get: () => limit.pendingCount,
++		},
++		concurrency: {
++			get: () => limit.concurrency,
++			set(newConcurrency) {
++				limit.concurrency = newConcurrency;
++			},
++		},
++		clearQueue: {
++			value: limit.clearQueue,
++		},
+ 	});
+ 
+ 	return limitedFunction;
+diff --git a/index.test-d.ts b/index.test-d.ts
+index 457778a..bd443f4 100644
+--- a/index.test-d.ts
++++ b/index.test-d.ts
+@@ -24,7 +24,13 @@ expectType<void>(limitWithRejectOnClear.clearQueue());
+ // LimitFunction should require a Promise-returning function
+ const lf = limitFunction(async (_a: string) => 'ok', {concurrency: 1});
+ expectType<Promise<string>>(lf('input'));
++expectType<number>(lf.activeCount);
++expectType<number>(lf.pendingCount);
++expectType<number>(lf.concurrency);
++lf.concurrency = 2;
+ expectType<void>(lf.clearQueue());
++expectError(lf.activeCount = 1);
++expectError(lf.pendingCount = 1);
+ 
+ expectError(limitFunction((_a: string) => 'x', {concurrency: 1}));
+ expectError(pLimit({concurrency: 1, rejectOnClear: 'nope'}));
+diff --git a/readme.md b/readme.md
+index 6434792..eed0eb4 100644
+--- a/readme.md
++++ b/readme.md
+@@ -154,6 +154,18 @@ Default: `false`
+ Reject pending promises with an `AbortError` when `clearQueue()` is called.
+ This is recommended if you await the returned promises, for example with `Promise.all`, so pending tasks do not remain unresolved after `clearQueue()`.
+ 
++### limitedFunction.activeCount
++
++The number of promises currently running for this function.
++
++### limitedFunction.pendingCount
++
++The number of calls waiting to run for this function.
++
++### limitedFunction.concurrency
++
++Get or set the concurrency limit for this function. Increasing the limit immediately allows queued calls to run.
++
+ ### limitedFunction.clearQueue()
+ 
+ Discard pending calls that have not started yet.
+diff --git a/test.js b/test.js
+index 356c4d8..1bc01bd 100644
+--- a/test.js
++++ b/test.js
+@@ -226,6 +226,59 @@ testClearQueueRejects('limitFunction exposes clearQueue', async t => {
+ 	await t.throwsAsync(pendingPromise, {name: 'AbortError'});
+ });
+ 
++test('limitFunction exposes live limiter controls', async t => {
++	const resolvers = new Map();
++	const started = [];
++	const limitedFunction = limitFunction(async value => {
++		started.push(value);
++		return new Promise(resolve => {
++			resolvers.set(value, () => resolve(value));
++		});
++	}, {concurrency: 1});
++
++	const independentResolvers = new Map();
++	const independentFunction = limitFunction(async value => new Promise(resolve => {
++		independentResolvers.set(value, () => resolve(value));
++	}), {concurrency: 1});
++
++	const runningPromise = limitedFunction('running');
++	const queuedPromiseOne = limitedFunction('queued-one');
++	const queuedPromiseTwo = limitedFunction('queued-two');
++	const independentPromise = independentFunction('independent');
++
++	await delay(0);
++	// Check the actual limiter state before changing the setting.
++	t.is(limitedFunction.activeCount, 1);
++	t.is(limitedFunction.pendingCount, 2);
++	t.deepEqual(started, ['running']);
++	t.is(independentFunction.activeCount, 1);
++	t.is(independentFunction.pendingCount, 0);
++
++	t.throws(() => {
++		limitedFunction.concurrency = 0;
++	}, {instanceOf: TypeError});
++	t.is(limitedFunction.concurrency, 1);
++
++	limitedFunction.concurrency = 2;
++	await delay(0);
++	t.is(limitedFunction.activeCount, 2);
++	t.is(limitedFunction.pendingCount, 1);
++	t.deepEqual(started, ['running', 'queued-one']);
++	t.is(independentFunction.activeCount, 1);
++
++	resolvers.get('running')();
++	await delay(0);
++	t.deepEqual(started, ['running', 'queued-one', 'queued-two']);
++
++	resolvers.get('queued-one')();
++	resolvers.get('queued-two')();
++	independentResolvers.get('independent')();
++	t.deepEqual(await Promise.all([runningPromise, queuedPromiseOne, queuedPromiseTwo, independentPromise]), ['running', 'queued-one', 'queued-two', 'independent']);
++	t.is(limitedFunction.activeCount, 0);
++	t.is(limitedFunction.pendingCount, 0);
++	t.is(independentFunction.activeCount, 0);
++});
++
+ test('map', async t => {
+ 	const limit = pLimit(1);
+ 	const results = await limit.map([1, 2, 3, 4, 5, 6, 7], input => input + 1);

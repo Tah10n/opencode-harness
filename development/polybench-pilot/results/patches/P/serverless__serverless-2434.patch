@@ -1,0 +1,148 @@
+diff --git a/lib/classes/Service.js b/lib/classes/Service.js
+index 9cff995f22be1e4be2b94b3f3c182bc07f04685b..2e1682e5e4a7947431267ab5ff63147e7ead9299 100644
+--- a/lib/classes/Service.js
++++ b/lib/classes/Service.js
+@@ -152,7 +152,10 @@ class Service {
+           if (!functionObj.events) {
+             that.functions[functionName].events = [];
+           }
+-          if (!_.isArray(functionObj.events)) {
++          // Event variables are populated after the service is loaded.
++          const isEventVariable = typeof functionObj.events === 'string' &&
++            new RegExp(that.defaults.variableSyntax).test(functionObj.events);
++          if (!_.isArray(functionObj.events) && !isEventVariable) {
+             throw new SError(`Events for "${functionName}" must be an array,` +
+                              ` not an ${typeof functionObj.events}`);
+           }
+@@ -171,6 +174,15 @@ class Service {
+     return _.merge(this, data);
+   }
+ 
++  validateFunctionEvents() {
++    _.forEach(this.functions, (functionObj, functionName) => {
++      if (!_.isArray(functionObj.events)) {
++        throw new SError(`Events for "${functionName}" must be an array,` +
++                         ` not an ${typeof functionObj.events}`);
++      }
++    });
++  }
++
+   getAllFunctions() {
+     return Object.keys(this.functions);
+   }
+diff --git a/lib/classes/Service.test.js b/lib/classes/Service.test.js
+index 2a9ce568d60519b812bb3a5d3808e4d0d36b5a7c..f9d119df36c23edf57e9fec3dcb74deec7151f19 100644
+--- a/lib/classes/Service.test.js
++++ b/lib/classes/Service.test.js
+@@ -162,6 +162,43 @@ describe('Service', () => {
+       });
+     });
+ 
++    it('should populate function events from a variable file', () => {
++      const SUtils = new Utils();
++      const serverlessYml = {
++        service: 'new-service',
++        provider: 'aws',
++        functions: {
++          functionA: {
++            handler: 'handlers/functionA.handler',
++            events: '${file(./config.yml):events}',
++          },
++        },
++      };
++      const configYml = {
++        events: [
++          {
++            http: {
++              path: 'users',
++              method: 'get',
++            },
++          },
++        ],
++      };
++
++      SUtils.writeFileSync(path.join(tmpDirPath, 'serverless.yml'),
++        YAML.dump(serverlessYml));
++      SUtils.writeFileSync(path.join(tmpDirPath, 'config.yml'),
++        YAML.dump(configYml));
++
++      const serverless = new Serverless({ servicePath: tmpDirPath });
++
++      return serverless.service.load().then(() => {
++        serverless.variables.populateService();
++        expect(serverless.service.functions.functionA.events)
++          .to.deep.equal(configYml.events);
++      });
++    });
++
+     it('should make sure function name contains the default stage', () => {
+       const SUtils = new Utils();
+       const serverlessYml = {
+@@ -425,6 +462,55 @@ describe('Service', () => {
+       });
+     });
+ 
++    it("should throw error if a function's event is a string", () => {
++      const SUtils = new Utils();
++      const serverlessYml = {
++        service: 'service-name',
++        provider: 'aws',
++        functions: {
++          functionA: {
++            events: 'not-an-event-variable',
++          },
++        },
++      };
++      SUtils.writeFileSync(path.join(tmpDirPath, 'serverless.yml'),
++        YAML.dump(serverlessYml));
++
++      const serverless = new Serverless({ servicePath: tmpDirPath });
++      serviceInstance = new Service(serverless);
++
++      return serviceInstance.load().then(() => {
++        expect(1).to.equal(2);
++      }).catch(e => {
++        expect(e.name).to.be.equal('ServerlessError');
++      });
++    });
++
++    it("should throw error if a variable resolves a function's events to a non-array", () => {
++      const SUtils = new Utils();
++      const serverlessYml = {
++        service: 'service-name',
++        provider: 'aws',
++        functions: {
++          functionA: {
++            events: '${file(./config.yml):events}',
++          },
++        },
++      };
++
++      SUtils.writeFileSync(path.join(tmpDirPath, 'serverless.yml'),
++        YAML.dump(serverlessYml));
++      SUtils.writeFileSync(path.join(tmpDirPath, 'config.yml'),
++        YAML.dump({ events: {} }));
++
++      const serverless = new Serverless({ servicePath: tmpDirPath });
++
++      return serverless.service.load().then(() => {
++        expect(() => serverless.variables.populateService())
++          .to.throw(Error, /Events for "functionA" must be an array/);
++      });
++    });
++
+     it('should throw error if provider property is invalid', () => {
+       const SUtils = new Utils();
+       const serverlessYml = {
+diff --git a/lib/classes/Variables.js b/lib/classes/Variables.js
+index deb7d0a55ac0a33db3dc53b74f69f06e13d97480..238e6356d2a52de15e999cc141c370526a00002d 100644
+--- a/lib/classes/Variables.js
++++ b/lib/classes/Variables.js
+@@ -48,6 +48,7 @@ class Variables {
+     });
+ 
+     this.service.defaults.variableSyntax = variableSyntaxProperty;
++    this.service.validateFunctionEvents();
+     return this.service;
+   }
+ 

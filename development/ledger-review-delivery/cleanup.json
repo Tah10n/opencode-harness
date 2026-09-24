@@ -1,0 +1,30 @@
+{
+  "completed": true,
+  "scope": "local/ledger-review-delivery only",
+  "containersVerifiedAbsent": [
+    "ledger-delivery-retention-d0",
+    "ledger-delivery-selected-d0",
+    "template-dev-1f04bc08-9bc7-4ee3-9f80-af8eb18cd94f",
+    "template-dev-6db3be10-2673-4b61-8e96-9943eb76878b",
+    "template-dev-7937b9e1-e89a-48f7-b2fa-c8639fc2d843",
+    "template-dev-7f9ac676-9233-4350-99d6-3084e90eebad",
+    "template-dev-8002f9fe-37f2-47fb-97e4-ffe28e860b3b",
+    "template-dev-a78c96e2-0475-4bfe-b381-260bcdab86b9",
+    "template-dev-e9061724-2d5d-4dce-8161-ca1657435a81"
+  ],
+  "sourceContainerRecoveryBeforeRemoval": true,
+  "archive": {
+    "path": "local/ledger-review-delivery/private-evidence.tar.gz",
+    "sha256": "54b66700f95a3adf210e9d660f031671aba255901fcc52705eb05154cb59c391",
+    "bytes": 45025245,
+    "entriesVerified": 1321,
+    "allEntryBytesAndModesVerified": true
+  },
+  "logicalBytesBefore": 362592296,
+  "allocatedBytesBefore": 397561856,
+  "allocatedBytesAfter": 45342720,
+  "allocatedBytesReleased": 352219136,
+  "removed": "two task bundles/dependency copies, neutral fixtures, scratch patch/handoff copies, baseline/delivery/evaluator copies and loose evidence after verified archival",
+  "preserved": "compact exact patches/receipts in development; all unique native/provider/private evidence in verified private archive; shared image/toolchain/cache and unrelated containers untouched",
+  "globalPrune": false
+}

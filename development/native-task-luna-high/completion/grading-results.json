@@ -1,0 +1,417 @@
+[
+  {
+    "label": "J3",
+    "slot": 2,
+    "task": "legacy-runtime-reload",
+    "arm": "H",
+    "phase": "final",
+    "sourceDigest": "legacy-runtime-reload:5c747334fea0006c049e639d53fb8392cf782d8d87cf98fa8c700082d7f8af11",
+    "passed": false,
+    "checks": {
+      "ordinary": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 24,
+          "pass": 23,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        }
+      },
+      "consumers": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "preservation": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 24,
+          "pass": 23,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        }
+      },
+      "preserved-consumers": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "fresh-process-migration": {
+        "code": 1,
+        "timedOut": false,
+        "counts": {
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "legacy-preservation": {
+        "code": 1,
+        "timedOut": false,
+        "counts": {
+          "tests": 9,
+          "pass": 8,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "cleanup": 0
+    }
+  },
+  {
+    "label": "N8",
+    "slot": 3,
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "phase": "final",
+    "sourceDigest": "reconnect-revoked:774b8544a59fae62c823b9db97989939ad1dc0b93f1f640e766382fd7770d360",
+    "passed": true,
+    "checks": {
+      "ordinary": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 25,
+          "pass": 24,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        }
+      },
+      "consumers": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "preservation": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 25,
+          "pass": 24,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        }
+      },
+      "independent-reconnect": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "lifecycle-preservation": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "cleanup": 0
+    }
+  },
+  {
+    "label": "N8",
+    "slot": 3,
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "phase": "D0",
+    "sourceDigest": "reconnect-revoked:40b943758f928b26571d64cf2104f428ef4da7e1fe016f669c38f5f7cba9f04f",
+    "passed": true,
+    "checks": {
+      "ordinary": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 25,
+          "pass": 24,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        }
+      },
+      "consumers": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "preservation": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 25,
+          "pass": 24,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        }
+      },
+      "independent-reconnect": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "lifecycle-preservation": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "cleanup": 0
+    }
+  },
+  {
+    "label": "N8",
+    "slot": 3,
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "phase": "D1",
+    "sourceDigest": "reconnect-revoked:56a9414b4034619577194b647144441e19895c1f52b8898f4a794bfbc1364cb2",
+    "passed": true,
+    "checks": {
+      "ordinary": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 25,
+          "pass": 24,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        }
+      },
+      "consumers": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "preservation": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 25,
+          "pass": 24,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        }
+      },
+      "independent-reconnect": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "lifecycle-preservation": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "cleanup": 0
+    }
+  },
+  {
+    "label": "N8",
+    "slot": 3,
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "phase": "D2",
+    "sourceDigest": "reconnect-revoked:56a9414b4034619577194b647144441e19895c1f52b8898f4a794bfbc1364cb2",
+    "passed": true,
+    "checks": {
+      "ordinary": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 25,
+          "pass": 24,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        }
+      },
+      "consumers": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "preservation": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 25,
+          "pass": 24,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        }
+      },
+      "independent-reconnect": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "lifecycle-preservation": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "cleanup": 0
+    },
+    "reusedFromPhase": "D1",
+    "identicalSourceBytesAndModes": true
+  },
+  {
+    "label": "T2",
+    "slot": 4,
+    "task": "reconnect-revoked",
+    "arm": "P",
+    "phase": "final",
+    "sourceDigest": "reconnect-revoked:3f27c69c0d220d9749a2c17d61f2334995bb6562e61466d66507c5f1d4a13cb9",
+    "passed": true,
+    "checks": {
+      "ordinary": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 25,
+          "pass": 24,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        }
+      },
+      "consumers": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "preservation": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 25,
+          "pass": 24,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        }
+      },
+      "independent-reconnect": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "lifecycle-preservation": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "cleanup": 0
+    }
+  }
+]

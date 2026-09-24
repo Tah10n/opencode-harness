@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "First-reference ordering with duplicate references and a byte subview.",
+    "Conflicting duplicate CID rejection."
+  ],
+  "docDelivery": [
+    "Ordered unique referenced parts; unused attachments omitted but validated.",
+    "Byte-view boundaries and duplicate/missing CID TypeError behavior."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "HTML is opaque string scanned for literal cid: followed by [A-Za-z0-9_.-]+. Attachments {cid,type,bytes}; nonempty CID matches same identifier grammar, type nonempty ASCII with no CR/LF, bytes Uint8Array including subviews. No mutation.",
+  "independence": "Integrate multipart body construction with inline content IDs, ordered attachment deduplication and safe headers."
+}

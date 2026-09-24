@@ -1,0 +1,12 @@
+{
+  "alternative": {
+    "src/follow.mjs": "export function follow(start,links){const chain=[start];let terminal=start;while(Object.hasOwn(links,terminal)){terminal=links[terminal];if(chain.includes(terminal))return {chain,terminal,cycle:true};chain.push(terminal);}return {chain,terminal,cycle:false};}"
+  },
+  "mutants": [
+    {
+      "name": "empty-target-dropped",
+      "file": "src/follow.mjs",
+      "replacement": "export function follow(start,links){const chain=[],seen=new Set();let x=start;while(true){if(seen.has(x))return {chain,terminal:x,cycle:true};seen.add(x);chain.push(x);if(!links[x])return {chain,terminal:x,cycle:false};x=links[x];}}"
+    }
+  ]
+}

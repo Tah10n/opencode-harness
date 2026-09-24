@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "frozenManifestUnchanged": true,
+  "frozenFilesVerified": 31,
+  "syntax": true,
+  "safePublicationScan": true,
+  "rawProbeArithmetic": true,
+  "usageArithmetic": true,
+  "patchHashes": true,
+  "actualDeliveryRecovery": true,
+  "sharedSchedulerAndRequestPolicyUnchanged": true,
+  "modelRequests": 0,
+  "ciClaim": false
+}

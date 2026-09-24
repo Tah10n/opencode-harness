@@ -1,0 +1,12 @@
+{
+  "alternative": {
+    "src/roman.mjs": "export function roman(n){if(!Number.isInteger(n)||n<1||n>3999)throw new RangeError('roman');const t=[['','I','II','III','IV','V','VI','VII','VIII','IX'],['','X','XX','XXX','XL','L','LX','LXX','LXXX','XC'],['','C','CC','CCC','CD','D','DC','DCC','DCCC','CM'],['','M','MM','MMM']];return String(n).split('').reverse().map((x,i)=>t[i][Number(x)]).reverse().join('');}"
+  },
+  "mutants": [
+    {
+      "name": "subtractives-missing",
+      "file": "src/roman.mjs",
+      "replacement": "export function roman(n){if(!Number.isInteger(n)||n<1||n>3999)throw new RangeError('roman');let out='';for(const [v,s]of [[1000,'M'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[1,'I']])while(n>=v){out+=s;n-=v;}return out;}"
+    }
+  ]
+}

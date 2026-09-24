@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';const root=process.env.PILOT_SOURCE;
+const m0=await import(path.join(root,"src/delta.mjs"));
+test("sorted delta round trip with removal",()=>{const b={b:2,a:4},e={b:5,c:1};const d=m0.diffCounts(b,e);assert.deepEqual(d,[{key:'a',delta:-4},{key:'b',delta:3},{key:'c',delta:1}]);assert.deepEqual(m0.applyCounts(b,d),e);assert.deepEqual(b,{b:2,a:4});});
+test("negative transition is atomic to input",()=>{const b=Object.freeze({x:1});assert.throws(()=>m0.applyCounts(b,[{key:'x',delta:-2},{key:'x',delta:4}]),{name:'RangeError',message:'negative'});assert.deepEqual(b,{x:1});assert.deepEqual(m0.applyCounts(b,[{key:'x',delta:-1}]),{});});
+test("own special keys",()=>{const out=m0.applyCounts({},[{key:'__proto__',delta:2},{key:'constructor',delta:1}]);assert.equal(Object.getPrototypeOf(out),Object.prototype);assert.equal(out.__proto__,2);assert.deepEqual(m0.diffCounts({},out),[{key:'__proto__',delta:2},{key:'constructor',delta:1}]);});

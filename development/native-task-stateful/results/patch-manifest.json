@@ -1,0 +1,110 @@
+[
+  {
+    "slot": 1,
+    "task": "queue-batch",
+    "arm": "P",
+    "patchSha256": "e65924df4864ec0964451b88ab420adb66c3884e2215a6304254bf6200c2d731",
+    "changedFiles": [
+      "README.md",
+      "src/worker.mjs",
+      "test/worker.test.mjs"
+    ],
+    "reappliedBytesAndModesMatch": true
+  },
+  {
+    "slot": 2,
+    "task": "queue-batch",
+    "arm": "H0",
+    "patchSha256": "e31a45959e27d908f2b45033b7190ac458f241c3db2a52f65dabf610fe34bd65",
+    "changedFiles": [
+      "README.md",
+      "src/worker.mjs",
+      "test/worker.test.mjs"
+    ],
+    "reappliedBytesAndModesMatch": true
+  },
+  {
+    "slot": 3,
+    "task": "queue-batch",
+    "arm": "H1",
+    "patchSha256": "76739114dcb361f0617900e88e1d5caeba80505d17aeffe5929723e8c3423083",
+    "changedFiles": [
+      "README.md",
+      "src/worker.mjs",
+      "test/worker.test.mjs"
+    ],
+    "reappliedBytesAndModesMatch": true
+  },
+  {
+    "slot": 4,
+    "task": "editor-cancel",
+    "arm": "H0",
+    "patchSha256": "fa7f93fc4269e724975f5c47dd1d8ff369e8c49fc19bf6fe2a4a31e0095957e7",
+    "changedFiles": [
+      "README.md",
+      "src/editor.mjs",
+      "test/editor.test.mjs"
+    ],
+    "reappliedBytesAndModesMatch": true
+  },
+  {
+    "slot": 5,
+    "task": "editor-cancel",
+    "arm": "H1",
+    "patchSha256": "0414cf039203d0cc860edb90d275a99a760f70dd5d3f10c200d5b662598a4d6a",
+    "changedFiles": [
+      "README.md",
+      "src/editor.mjs",
+      "test/editor.test.mjs"
+    ],
+    "reappliedBytesAndModesMatch": true
+  },
+  {
+    "slot": 6,
+    "task": "editor-cancel",
+    "arm": "P",
+    "patchSha256": "53876f4edee6399bb5a36b2505e3ada195f516793640cc338a91fcf91256212c",
+    "changedFiles": [
+      "README.md",
+      "src/editor.mjs",
+      "test/editor.test.mjs"
+    ],
+    "reappliedBytesAndModesMatch": true
+  },
+  {
+    "slot": 7,
+    "task": "invite-single-use",
+    "arm": "H1",
+    "patchSha256": "cc7644d657fc4d58c9799107c34635cfd3c2ac9306245d35b2fb8c13315c3329",
+    "changedFiles": [
+      "README.md",
+      "src/redeem.mjs",
+      "test/invite.test.mjs"
+    ],
+    "reappliedBytesAndModesMatch": true
+  },
+  {
+    "slot": 8,
+    "task": "invite-single-use",
+    "arm": "P",
+    "patchSha256": "d22b1978d6d2c8fcecb1bafc0a53c200bcaa1c1e2a545cec1586bd52e947487f",
+    "changedFiles": [
+      "README.md",
+      "src/redeem.mjs",
+      "test/invite.test.mjs"
+    ],
+    "reappliedBytesAndModesMatch": true
+  },
+  {
+    "slot": 9,
+    "task": "invite-single-use",
+    "arm": "H0",
+    "patchSha256": "eac7051370162d204c67e667f6b6f4f23e33805b4880107a938ca4cafe5831a3",
+    "changedFiles": [
+      "README.md",
+      "src/redeem.mjs",
+      "test/invite.test.mjs"
+    ],
+    "reappliedBytesAndModesMatch": true
+  }
+]

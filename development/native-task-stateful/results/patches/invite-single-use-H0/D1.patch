@@ -1,0 +1,41 @@
+diff --git a/README.md b/README.md
+index a532daad382712d98a6a341870608f74d70bc7f7..3dffd385a7983fdb91a907a0f5161d1096085386 100644
+--- a/README.md
++++ b/README.md
+@@ -1,2 +1,13 @@
+ # invite-single-use
+-A small Node library. Run npm test.
++
++A small Node library for accepting pending invitations.
++
++`accept(book, request, clock)` evaluates `clock` once per request. A valid
++invitation is removed from pending and returns `{status: 'joined', team}` while
++adding its team and email as a member. It is single-use: replaying the token
++returns `{status: 'missing'}`. An invitation whose `expiresAt` is equal to or
++earlier than the clock value returns `{status: 'expired'}`, remains pending,
++and does not add a member. Unknown tokens return `{status: 'missing'}` without
++changing the book.
++
++Run `npm test` to execute the tests.
+diff --git a/src/redeem.mjs b/src/redeem.mjs
+index 56534c7c155099ea61e3d372081f3e8951a3439c..c63e3a946e500664f417ba0525acfb6251e0834d 100644
+--- a/src/redeem.mjs
++++ b/src/redeem.mjs
+@@ -1 +1 @@
+-export function redeem(book,token,now){const invite=book.peek(token);if(!invite)return {status:'missing'};book.join(invite.team,invite.email);return {status:'joined',team:invite.team};}
++export function redeem(book,token,now){const invite=book.peek(token);if(!invite)return {status:'missing'};if(invite.expiresAt<=now)return {status:'expired'};book.remove(token);book.join(invite.team,invite.email);return {status:'joined',team:invite.team};}
+diff --git a/test/invite.test.mjs b/test/invite.test.mjs
+index 8d641a2355d6b14155ca6ef4dc75392ad68634b8..a3045800f23c77fcfe0eef7a6ff38129c308da66 100644
+--- a/test/invite.test.mjs
++++ b/test/invite.test.mjs
+@@ -1,2 +1,10 @@
+ import {test} from 'node:test';import assert from 'node:assert/strict';import {ledger} from '../src/ledger.mjs';import {accept} from '../src/route.mjs';
+ test('join, remove pending invitation, missing token',()=>{const b=ledger([{token:'t',team:'red',email:'a@b',expiresAt:50}]);assert.deepEqual(accept(b,{token:'t'},()=>1),{status:'joined',team:'red'});assert.deepEqual(b.members(),[{team:'red',email:'a@b'}]);const selected=b.list().filter(x=>x.token==='t');for(const x of selected)b.remove(x.token);assert.equal(b.peek('t'),undefined);assert.deepEqual(accept(b,{token:'unknown'},()=>1),{status:'missing'});});
++
++test('a valid invitation is consumed and replay is missing',()=>{const b=ledger([{token:'one',team:'red',email:'one@example.test',expiresAt:20},{token:'two',team:'blue',email:'two@example.test',expiresAt:20}]);let calls=0;const clock=()=>{calls+=1;return 10;};assert.deepEqual(accept(b,{token:'one'},clock),{status:'joined',team:'red'});assert.equal(calls,1);assert.deepEqual(b.members(),[{team:'red',email:'one@example.test'}]);assert.equal(b.peek('one'),undefined);assert.deepEqual(b.peek('two'),{token:'two',team:'blue',email:'two@example.test',expiresAt:20});assert.deepEqual(accept(b,{token:'one'},clock),{status:'missing'});assert.equal(calls,2);assert.deepEqual(b.members(),[{team:'red',email:'one@example.test'}]);assert.deepEqual(b.peek('two'),{token:'two',team:'blue',email:'two@example.test',expiresAt:20});});
++
++test('an invitation at its expiration time remains pending and does not join',()=>{const b=ledger([{token:'equal',team:'red',email:'equal@example.test',expiresAt:10}]);let calls=0;assert.deepEqual(accept(b,{token:'equal'},()=>{calls+=1;return 10;}),{status:'expired'});assert.equal(calls,1);assert.deepEqual(b.peek('equal'),{token:'equal',team:'red',email:'equal@example.test',expiresAt:10});assert.deepEqual(b.members(),[]);});
++
++test('an invitation past its expiration remains pending and does not join',()=>{const b=ledger([{token:'past',team:'red',email:'past@example.test',expiresAt:9}]);assert.deepEqual(accept(b,{token:'past'},()=>10),{status:'expired'});assert.deepEqual(b.peek('past'),{token:'past',team:'red',email:'past@example.test',expiresAt:9});assert.deepEqual(b.members(),[]);});
++
++test('a missing invitation is a no-op and evaluates the clock once',()=>{const b=ledger([]);let calls=0;assert.deepEqual(accept(b,{token:'missing'},()=>{calls+=1;return 10;}),{status:'missing'});assert.equal(calls,1);assert.deepEqual(b.list(),[]);assert.deepEqual(b.members(),[]);});

@@ -1,0 +1,708 @@
+{
+  "slot": 1,
+  "instance_id": "mui__material-ui-18141",
+  "arm": "P",
+  "status": "finished",
+  "outcome": {
+    "status": "finished",
+    "pause": null
+  },
+  "delivery_apply": true,
+  "F_checks": "passed",
+  "assessment_integrity": "verified",
+  "acceptance_diag": true,
+  "Q": true,
+  "T": true,
+  "D": true,
+  "F_counts": {
+    "passed": 19,
+    "failed": 0,
+    "failed_tests": [],
+    "error": null
+  },
+  "E_counts": {
+    "passed": 20,
+    "failed": 0,
+    "failed_tests": [],
+    "missing_required_tests": [],
+    "error": null
+  },
+  "literal_id_observation": [
+    {
+      "suppliedId": "labelled-select",
+      "selectId": "labelled-select",
+      "labelHtmlFor": "labelled-select"
+    }
+  ],
+  "patch": {
+    "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/model.patch",
+    "bytes": 1703,
+    "sha256": "eb850fc680f60bf4b7b55ff490edd232f53bd8fc324e93c3123003bd7b0a33a2"
+  },
+  "usage": {
+    "requests": 15,
+    "requests_without_usage": 0,
+    "input_tokens": {
+      "observed": 472182,
+      "unknown_requests": 0
+    },
+    "output_tokens": {
+      "observed": 5002,
+      "unknown_requests": 0
+    },
+    "cached_tokens": {
+      "observed": 146432,
+      "unknown_requests": 0
+    },
+    "reasoning_tokens": {
+      "observed": 2525,
+      "unknown_requests": 0
+    },
+    "money": null
+  },
+  "requests_by_kind": {
+    "title": 1,
+    "work": 14
+  },
+  "provider_requests": [
+    {
+      "requestIndex": 1,
+      "requestKind": "title",
+      "forwarded": true,
+      "status": 200,
+      "serverCompletion": "completed",
+      "responseStatus": "completed",
+      "terminalEvents": 1,
+      "usage": {
+        "input_tokens": 938,
+        "output_tokens": 111,
+        "total_tokens": 1049,
+        "cached_tokens": 0,
+        "reasoning_tokens": 98
+      },
+      "at": "2026-09-21T19:06:35.513Z",
+      "forwardedAt": "2026-09-21T19:06:35.516Z",
+      "finishedAt": "2026-09-21T19:06:39.571Z"
+    },
+    {
+      "requestIndex": 2,
+      "requestKind": "work",
+      "forwarded": true,
+      "status": 200,
+      "serverCompletion": "completed",
+      "responseStatus": "completed",
+      "terminalEvents": 1,
+      "usage": {
+        "input_tokens": 6080,
+        "output_tokens": 144,
+        "total_tokens": 6224,
+        "cached_tokens": 0,
+        "reasoning_tokens": 31
+      },
+      "at": "2026-09-21T19:06:36.468Z",
+      "forwardedAt": "2026-09-21T19:06:36.470Z",
+      "finishedAt": "2026-09-21T19:06:42.302Z"
+    },
+    {
+      "requestIndex": 3,
+      "requestKind": "work",
+      "forwarded": true,
+      "status": 200,
+      "serverCompletion": "completed",
+      "responseStatus": "completed",
+      "terminalEvents": 1,
+      "usage": {
+        "input_tokens": 6333,
+        "output_tokens": 100,
+        "total_tokens": 6433,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "at": "2026-09-21T19:06:42.847Z",
+      "forwardedAt": "2026-09-21T19:06:42.850Z",
+      "finishedAt": "2026-09-21T19:06:46.385Z"
+    },
+    {
+      "requestIndex": 4,
+      "requestKind": "work",
+      "forwarded": true,
+      "status": 200,
+      "serverCompletion": "completed",
+      "responseStatus": "completed",
+      "terminalEvents": 1,
+      "usage": {
+        "input_tokens": 9968,
+        "output_tokens": 164,
+        "total_tokens": 10132,
+        "cached_tokens": 0,
+        "reasoning_tokens": 8
+      },
+      "at": "2026-09-21T19:06:46.971Z",
+      "forwardedAt": "2026-09-21T19:06:46.972Z",
+      "finishedAt": "2026-09-21T19:06:52.506Z"
+    },
+    {
+      "requestIndex": 5,
+      "requestKind": "work",
+      "forwarded": true,
+      "status": 200,
+      "serverCompletion": "completed",
+      "responseStatus": "completed",
+      "terminalEvents": 1,
+      "usage": {
+        "input_tokens": 23810,
+        "output_tokens": 439,
+        "total_tokens": 24249,
+        "cached_tokens": 5632,
+        "reasoning_tokens": 175
+      },
+      "at": "2026-09-21T19:06:53.061Z",
+      "forwardedAt": "2026-09-21T19:06:53.064Z",
+      "finishedAt": "2026-09-21T19:07:02.653Z"
+    },
+    {
+      "requestIndex": 6,
+      "requestKind": "work",
+      "forwarded": true,
+      "status": 200,
+      "serverCompletion": "completed",
+      "responseStatus": "completed",
+      "terminalEvents": 1,
+      "usage": {
+        "input_tokens": 35390,
+        "output_tokens": 184,
+        "total_tokens": 35574,
+        "cached_tokens": 0,
+        "reasoning_tokens": 18
+      },
+      "at": "2026-09-21T19:07:03.202Z",
+      "forwardedAt": "2026-09-21T19:07:03.206Z",
+      "finishedAt": "2026-09-21T19:07:08.033Z"
+    },
+    {
+      "requestIndex": 7,
+      "requestKind": "work",
+      "forwarded": true,
+      "status": 200,
+      "serverCompletion": "completed",
+      "responseStatus": "completed",
+      "terminalEvents": 1,
+      "usage": {
+        "input_tokens": 35847,
+        "output_tokens": 1194,
+        "total_tokens": 37041,
+        "cached_tokens": 0,
+        "reasoning_tokens": 853
+      },
+      "at": "2026-09-21T19:07:11.229Z",
+      "forwardedAt": "2026-09-21T19:07:11.232Z",
+      "finishedAt": "2026-09-21T19:07:34.412Z"
+    },
+    {
+      "requestIndex": 8,
+      "requestKind": "work",
+      "forwarded": true,
+      "status": 200,
+      "serverCompletion": "completed",
+      "responseStatus": "completed",
+      "terminalEvents": 1,
+      "usage": {
+        "input_tokens": 37081,
+        "output_tokens": 120,
+        "total_tokens": 37201,
+        "cached_tokens": 34304,
+        "reasoning_tokens": 22
+      },
+      "at": "2026-09-21T19:07:35.216Z",
+      "forwardedAt": "2026-09-21T19:07:35.221Z",
+      "finishedAt": "2026-09-21T19:07:40.800Z"
+    },
+    {
+      "requestIndex": 9,
+      "requestKind": "work",
+      "forwarded": true,
+      "status": 200,
+      "serverCompletion": "completed",
+      "responseStatus": "completed",
+      "terminalEvents": 1,
+      "usage": {
+        "input_tokens": 41787,
+        "output_tokens": 163,
+        "total_tokens": 41950,
+        "cached_tokens": 0,
+        "reasoning_tokens": 86
+      },
+      "at": "2026-09-21T19:07:41.417Z",
+      "forwardedAt": "2026-09-21T19:07:41.419Z",
+      "finishedAt": "2026-09-21T19:07:45.902Z"
+    },
+    {
+      "requestIndex": 10,
+      "requestKind": "work",
+      "forwarded": true,
+      "status": 200,
+      "serverCompletion": "completed",
+      "responseStatus": "completed",
+      "terminalEvents": 1,
+      "usage": {
+        "input_tokens": 42059,
+        "output_tokens": 204,
+        "total_tokens": 42263,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "at": "2026-09-21T19:07:46.486Z",
+      "forwardedAt": "2026-09-21T19:07:46.490Z",
+      "finishedAt": "2026-09-21T19:07:51.790Z"
+    },
+    {
+      "requestIndex": 11,
+      "requestKind": "work",
+      "forwarded": true,
+      "status": 200,
+      "serverCompletion": "completed",
+      "responseStatus": "completed",
+      "terminalEvents": 1,
+      "usage": {
+        "input_tokens": 45056,
+        "output_tokens": 623,
+        "total_tokens": 45679,
+        "cached_tokens": 9728,
+        "reasoning_tokens": 324
+      },
+      "at": "2026-09-21T19:09:52.472Z",
+      "forwardedAt": "2026-09-21T19:09:52.476Z",
+      "finishedAt": "2026-09-21T19:10:15.625Z"
+    },
+    {
+      "requestIndex": 12,
+      "requestKind": "work",
+      "forwarded": true,
+      "status": 200,
+      "serverCompletion": "completed",
+      "responseStatus": "completed",
+      "terminalEvents": 1,
+      "usage": {
+        "input_tokens": 45708,
+        "output_tokens": 232,
+        "total_tokens": 45940,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "at": "2026-09-21T19:10:16.380Z",
+      "forwardedAt": "2026-09-21T19:10:16.385Z",
+      "finishedAt": "2026-09-21T19:10:22.075Z"
+    },
+    {
+      "requestIndex": 13,
+      "requestKind": "work",
+      "forwarded": true,
+      "status": 200,
+      "serverCompletion": "completed",
+      "responseStatus": "completed",
+      "terminalEvents": 1,
+      "usage": {
+        "input_tokens": 46594,
+        "output_tokens": 649,
+        "total_tokens": 47243,
+        "cached_tokens": 44544,
+        "reasoning_tokens": 395
+      },
+      "at": "2026-09-21T19:13:22.700Z",
+      "forwardedAt": "2026-09-21T19:13:22.705Z",
+      "finishedAt": "2026-09-21T19:13:47.236Z"
+    },
+    {
+      "requestIndex": 14,
+      "requestKind": "work",
+      "forwarded": true,
+      "status": 200,
+      "serverCompletion": "completed",
+      "responseStatus": "completed",
+      "terminalEvents": 1,
+      "usage": {
+        "input_tokens": 47440,
+        "output_tokens": 543,
+        "total_tokens": 47983,
+        "cached_tokens": 5632,
+        "reasoning_tokens": 467
+      },
+      "at": "2026-09-21T19:13:58.991Z",
+      "forwardedAt": "2026-09-21T19:13:58.996Z",
+      "finishedAt": "2026-09-21T19:14:18.853Z"
+    },
+    {
+      "requestIndex": 15,
+      "requestKind": "work",
+      "forwarded": true,
+      "status": 200,
+      "serverCompletion": "completed",
+      "responseStatus": "completed",
+      "terminalEvents": 1,
+      "usage": {
+        "input_tokens": 48091,
+        "output_tokens": 132,
+        "total_tokens": 48223,
+        "cached_tokens": 46592,
+        "reasoning_tokens": 48
+      },
+      "at": "2026-09-21T19:14:19.420Z",
+      "forwardedAt": "2026-09-21T19:14:19.424Z",
+      "finishedAt": "2026-09-21T19:14:25.298Z"
+    }
+  ],
+  "author_checks": [
+    {
+      "sessionID": "ses_f3aa31956ffeHb58aFTa5tLpIY",
+      "callID": "call_6tWAWSf6RDg6G1Ttf1WcOvNg",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 18.8.0 && yarn eslint packages/material-ui/src/Select/Select.js packages/material-ui/src/TextField/TextField.test.js",
+      "status": "completed",
+      "exit": 0,
+      "output_sha256": "35a1b4c9eb9ac91b7634a08449afb28d798f5669099d9100311efb2f17263408"
+    },
+    {
+      "sessionID": "ses_f3aa31956ffeHb58aFTa5tLpIY",
+      "callID": "call_JQ8LDMnxswGzpWfvT2ofdzSk",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 18.8.0 && ./node_modules/.bin/cross-env NODE_ENV=test ./node_modules/.bin/mocha packages/material-ui/src/TextField/TextField.test.js packages/material-ui/src/Select/Select.test.js --exclude '**/node_modules/**'",
+      "status": "completed",
+      "exit": null,
+      "output_sha256": "637fadebbeece9dd474d30746331840be682edbb71dce494557e33dfb4702484"
+    },
+    {
+      "sessionID": "ses_f3aa31956ffeHb58aFTa5tLpIY",
+      "callID": "call_r2f0DGDRULHJRYi6wHwxftwI",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 18.8.0 && yarn eslint packages/material-ui/src/Select/Select.js packages/material-ui/src/TextField/TextField.test.js",
+      "status": "completed",
+      "exit": 0,
+      "output_sha256": "069bfb7bee864c4853ec2b28624b4b168fb2bfb6aa740d6015a22e3cebc5e8c6"
+    },
+    {
+      "sessionID": "ses_f3aa31956ffeHb58aFTa5tLpIY",
+      "callID": "call_Oh8Q0VRWxQGFpCOvSQigkfDn",
+      "command": "git diff --check && git diff -- packages/material-ui/src/Select/Select.js packages/material-ui/src/TextField/TextField.test.js",
+      "status": "completed",
+      "exit": 0,
+      "output_sha256": "51c49891cf651d4e2adb65ff598735e446e0fd7f90883e371dc9a96f360bc536"
+    },
+    {
+      "sessionID": "ses_f3aa31956ffeHb58aFTa5tLpIY",
+      "callID": "call_1E6srVK8jLBpxAEKQDzFyax0",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 18.8.0 && ./node_modules/.bin/cross-env NODE_ENV=test ./node_modules/.bin/mocha packages/material-ui/src/TextField/TextField.test.js --exit",
+      "status": "completed",
+      "exit": 0,
+      "output_sha256": "4c7db0e706931ad240fc5aa849f1c4723bf075a7dced7d2ac74addee919725fe"
+    },
+    {
+      "sessionID": "ses_f3aa31956ffeHb58aFTa5tLpIY",
+      "callID": "call_pJZv7yQWDTmxFXCYoXjVaYo9",
+      "command": ". /usr/local/nvm/nvm.sh && nvm use 18.8.0 && ./node_modules/.bin/cross-env NODE_ENV=test ./node_modules/.bin/mocha packages/material-ui/src/Select/Select.test.js --exit",
+      "status": "completed",
+      "exit": 0,
+      "output_sha256": "8271a949f37794c94e57a69ab848128643ab13ec5f7f333a451a97c0ba95965e"
+    }
+  ],
+  "tools_by_kind": {
+    "apply_patch": 2,
+    "bash": 10,
+    "glob": 1,
+    "grep": 6,
+    "read": 11,
+    "todowrite": 3
+  },
+  "end_to_end_ms": 491991,
+  "setup_before_native_ms": 19552,
+  "post_native_exit_capture_cleanup_ms": 937,
+  "native_sessions": 1,
+  "native_tools": 33,
+  "pending_tools": 0,
+  "native_session_finishes": {
+    "ses_f3aa31956ffeHb58aFTa5tLpIY": "stop"
+  },
+  "execution_elapsed_ms": 471502,
+  "native_cleanup_elapsed_ms": 58,
+  "native_elapsed_ms": 471560,
+  "stop": {
+    "ownTaskDeadlineTriggered": false,
+    "terminationVerified": true,
+    "captureSaved": true,
+    "forwardingClosed": true,
+    "relayRemoved": true,
+    "activeProviderHandlers": 0,
+    "providerServerStateMayRemainUnknown": false
+  },
+  "native_output": {
+    "version": 1,
+    "runID": "template-dev-aa834d85-6de8-414e-94f0-9733e17ffe3e",
+    "containerID": "cc04fac3b40aad7468dc1e965c63566acd062f89bff4803a02e766be86958e21",
+    "sourceRoot": "/work/data/opencode/tool-output",
+    "sourceKind": "native combined tool output",
+    "limits": {
+      "fileBytes": 67108864,
+      "totalBytes": 268435456,
+      "files": 128,
+      "exportMs": 30000
+    },
+    "files": [],
+    "errors": [],
+    "evidenceComplete": true,
+    "elapsedMs": 72,
+    "bytes": 0
+  },
+  "evaluator_seconds": 87.177,
+  "evaluator_created_removed_match": true,
+  "evaluation_summary": {
+    "path": "local/plain-mui-18141/evaluation/summary.json",
+    "bytes": 9535,
+    "sha256": "60e0356e0aafb4146a1320a01c7ced29a4574d629e27a8f61d86a4ce5dddef0b"
+  },
+  "final_response_retained": true,
+  "final_response_sha256": "e5ccef4192f8af2c3f4ce5da7ed7ef34c7b654173e14146246bfbcb1a708cb8e",
+  "raw_capture_receipts": [
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/capture.json",
+      "bytes": 76,
+      "sha256": "f23124d52211ac1c0e1060ceb0551bd584b7963264747a9edd0fd75e1cb27ebc"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/completed.json",
+      "bytes": 312,
+      "sha256": "bd32bdd3ac50263dba9e8b0d7635f41e4a4fb2acf628195a4116157549376119"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/evidence-capture.json",
+      "bytes": 105,
+      "sha256": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/input-verification.json",
+      "bytes": 62,
+      "sha256": "867a067c49d23563b6bbcd041993ab9dae84bc609f2e6e9fa59f192b9ae7ac4b"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/model.patch",
+      "bytes": 1703,
+      "sha256": "eb850fc680f60bf4b7b55ff490edd232f53bd8fc324e93c3123003bd7b0a33a2"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/native-evidence.json",
+      "bytes": 311289,
+      "sha256": "a7e351ecaf675c6b1982d5a807ee49145e36a9e538fc84e083bb9639a922b27e"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/native-output/attempt-3daac2dd-db81-4579-b321-c52dd9260503.json",
+      "bytes": 472,
+      "sha256": "0b4b4078a09c127ffc1aaffb0c4127a9f1175a46333c28c2d4a3b16c451db2e1"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/native-output/manifest.json",
+      "bytes": 472,
+      "sha256": "0b4b4078a09c127ffc1aaffb0c4127a9f1175a46333c28c2d4a3b16c451db2e1"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/patch-capture-process.json",
+      "bytes": 33,
+      "sha256": "5c846afdf4d73aa66f9d740f78f3495333be054db21f33555ca11b4a26b599a6"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/patch-capture.json",
+      "bytes": 113,
+      "sha256": "472e5eb89b1f070d2ec78daae49e07341048fc85222a1a941ac749c48cd97044"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/provider-metadata.json",
+      "bytes": 17850,
+      "sha256": "e11ef067c325fac8648ff3ce68050cf94f0b4dd15fc492ad9c9b5e4b842da6a8"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/request-1.json",
+      "bytes": 4276,
+      "sha256": "cc9837ca68d6c8c5abab50a08d0c008a41f609de39c4b2c9b9579dedcc693135"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/request-10.json",
+      "bytes": 182738,
+      "sha256": "4f87098c58cf86f226fb28d93de9f6ba4292611fb8000e3afbcc8064f1ffc11d"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/request-11.json",
+      "bytes": 195901,
+      "sha256": "279e39efbea3596c8dc32ff36004e75bd34833fdc5a2da7401322dde96d2edf0"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/request-12.json",
+      "bytes": 200933,
+      "sha256": "f22856566f81f5d5feda7cad52582b84c51aa6367d15de5188a33a80a64c06e2"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/request-13.json",
+      "bytes": 204769,
+      "sha256": "9c35a2731117f0d65df1cef31ee9217edafa90e9c5edd32f93c75996611477a6"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/request-14.json",
+      "bytes": 212201,
+      "sha256": "d014bbc04acfc41f56a6b9b4adcb5742f86b05b747dbf7860dc2ec44d0862408"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/request-15.json",
+      "bytes": 217540,
+      "sha256": "0c6c447cf2cf79f1536cc879af5dab320aa7aacd89d1575a5225316d335d4e2c"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/request-2.json",
+      "bytes": 29921,
+      "sha256": "0f819773ef8f6fedfb260bd68488a161878517079c90fcef89f1b5ce6b6fd558"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/request-3.json",
+      "bytes": 32730,
+      "sha256": "d9d0c8fc23739ddfd57a053e8a07679f0f00f75a46d23173983af833f5131942"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/request-4.json",
+      "bytes": 47891,
+      "sha256": "beb3d8258561d5e9e8530be7828ca54e7c3354c6d9665e295a7a0116f120a674"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/request-5.json",
+      "bytes": 102221,
+      "sha256": "19e4f0caf4117cbbcc0e7c22042e6ab2b01daf53d16602bf1f2de4a1c4ecebc8"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/request-6.json",
+      "bytes": 148853,
+      "sha256": "1f9ea0b148592b237d4879cf6ace8fc7c332763568da7cf5f79574249a97b6ec"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/request-7.json",
+      "bytes": 152514,
+      "sha256": "5584f2edb3bada5eefae694de5699d77cd87a3f3e1b7dbcc5ccc003fd686e3c7"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/request-8.json",
+      "bytes": 162256,
+      "sha256": "b5168c831760837c09508d4756fb35de18591fa305701e69f98b09d229a1457a"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/request-9.json",
+      "bytes": 179754,
+      "sha256": "7b1d626fe4a2b97f36f902491bd217433339fd8db04534988eeb16c5a7935eda"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/response-1.sse",
+      "bytes": 13085,
+      "sha256": "a31e599944a7d377dfa82ebed0058f805d82b67fed5bfe1c15f19fd7ad790268"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/response-10.sse",
+      "bytes": 83477,
+      "sha256": "2670d0624d62cc3915550de720b9efd9aea51a26dbc8ec7cb92d5c70b5d99e7d"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/response-11.sse",
+      "bytes": 151723,
+      "sha256": "fd037a4f526108993de6b7b313b4abda74d68afc32e4aba6347a18f9c61d776b"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/response-12.sse",
+      "bytes": 74605,
+      "sha256": "a18279be6fe180759a150737dd77d3153bcf70f4f95e83bae3bbe07808188550"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/response-13.sse",
+      "bytes": 104095,
+      "sha256": "47a9d39328a8f44aba2edd5c44573136bb294e13d550e8b8782c05e3feface7c"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/response-14.sse",
+      "bytes": 97897,
+      "sha256": "777e6c2337a1afe6535a9b99efbb00ae893558d7904079657e39bb358859d739"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/response-15.sse",
+      "bytes": 99851,
+      "sha256": "2c204a54e8e5e53013232ca6a3a5c5a6c9e809aaaafd2514277144496126fba7"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/response-2.sse",
+      "bytes": 88038,
+      "sha256": "144befd344aba3485853293d1097d3d48d7deac276e6e14b2bd7b9224ddb8533"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/response-3.sse",
+      "bytes": 62047,
+      "sha256": "c51b15b9405d3327f9b046dc4cc18c7af13dc2646b9fa1e2b511148e6077b11c"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/response-4.sse",
+      "bytes": 70493,
+      "sha256": "c2a7e65b48cc5737e1372ee4cb6beb13b12b61b9692a2343415c03778b2503d7"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/response-5.sse",
+      "bytes": 95067,
+      "sha256": "887144915e6f8e2442d74d95fc60711060b1506efe8915b6ac0bd86f81471b35"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/response-6.sse",
+      "bytes": 73679,
+      "sha256": "077c2b3217ec747c20084f123d1f96fc62c25451a04826a81dc4afa34e340643"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/response-7.sse",
+      "bytes": 168784,
+      "sha256": "0e7b7a62d0c30c2ac23d84ef0b668cdeda3613918297c24eb73acba8affaa4cc"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/response-8.sse",
+      "bytes": 74352,
+      "sha256": "d8ef3187bbda5b21f28ba61f8230d125138d6935bb4625c9eab7e72ad8de0454"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/response-9.sse",
+      "bytes": 88454,
+      "sha256": "35a7d3b3544c463c893d7e9840898e30a0ff083a078843745883e670f4068133"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/result.json",
+      "bytes": 838,
+      "sha256": "b8955035f32dca994cfbdde7f4672c06726385aaa3f59ca15bbc6ed8f207dc9a"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/session/cleanup.json",
+      "bytes": 58,
+      "sha256": "a1b289a69f5bd9c40924b5395e29df6870f9fab8b04e38f1cedc106eff144916"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/session/container.json",
+      "bytes": 1950,
+      "sha256": "55b3090ddc9bf859c9383e199bf8ead4f5f465682ef1966e1b36d0fd66ddbdf3"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/session/events.jsonl",
+      "bytes": 307407,
+      "sha256": "ca57a694917a9890ca59d81764f9ce484a9b3a6f23af103e38830d6436399c55"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/session/finished.json",
+      "bytes": 324,
+      "sha256": "72cf590d01a63f146291acb49ac07df36ab5528bfc26c950ab5221548ce08ee5"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/session/stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/started.json",
+      "bytes": 281,
+      "sha256": "056c5f9218ac9e515c928bac9de2a32d56cd68e157621d7c2c2ad76acc9a2a9b"
+    },
+    {
+      "path": "local/plain-mui-18141/batch/runs/mui__material-ui-18141-P/stop-verification.json",
+      "bytes": 225,
+      "sha256": "52fe5323a7721048db9c6f77a774173b862430ddd3637f53737e02cb3d350d1d"
+    }
+  ],
+  "scope": "Frozen TextField acceptance only, not official PolyBench resolved or a harness comparison."
+}

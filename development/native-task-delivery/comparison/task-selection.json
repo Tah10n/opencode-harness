@@ -1,0 +1,104 @@
+{
+  "tasks": [
+    {
+      "id": "css-layer-bundle",
+      "category": "integration",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "inventory-kit-availability",
+      "category": "integration",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "terminal-table-render",
+      "category": "integration",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "calendar-week-summary",
+      "category": "integration",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "redirect-chain-report",
+      "category": "integration",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "seat-reservation-snapshot",
+      "category": "state",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "inventory-count-delta",
+      "category": "state",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "quiz-progress-migration",
+      "category": "state",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "event-cursor-compaction",
+      "category": "state",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "preference-tombstone-overlay",
+      "category": "state",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "percentile-method-options",
+      "category": "compatibility",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "duration-bigint-adapter",
+      "category": "compatibility",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "map-record-catalog",
+      "category": "compatibility",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "set-query-consumer",
+      "category": "compatibility",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "tuple-point-distance",
+      "category": "compatibility",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "roman-format-core",
+      "category": "refactoring",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "bracket-check-core",
+      "category": "refactoring",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "slug-token-policy",
+      "category": "refactoring",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "histogram-pure-core",
+      "category": "refactoring",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    },
+    {
+      "id": "luhn-checksum-core",
+      "category": "refactoring",
+      "contract": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+    }
+  ]
+}

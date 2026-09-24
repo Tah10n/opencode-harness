@@ -1,0 +1,53 @@
+{
+  "sourceCommit": "51f10ba2d9c005a16231f72094fb5a9773bae687",
+  "baseline": "2b16b6a8ad75b6b852adc5e2189e6d4a8d93eabd",
+  "runtime": "f98a96121e5c4d340f3c674920c57e1cb80258e5",
+  "archiveSha256": "54b66700f95a3adf210e9d660f031671aba255901fcc52705eb05154cb59c391",
+  "exactRestoredConfiguration": true,
+  "oldKnownCompletedResponses": 76,
+  "oldNativeCompleted": true,
+  "oldStop": {
+    "ownTaskDeadlineTriggered": false,
+    "terminationVerified": true,
+    "captureSaved": false,
+    "forwardingClosed": true,
+    "relayRemoved": false,
+    "activeProviderHandlers": 0,
+    "providerServerStateMayRemainUnknown": false
+  },
+  "recovery": {
+    "copiedExistingDataOnly": true,
+    "newProviderRequests": 0,
+    "removed": "template-dev-e9061724-2d5d-4dce-8161-ca1657435a81",
+    "result": {
+      "status": 0,
+      "kind": "evidence_complete",
+      "patchStatus": 0,
+      "outputStatus": 0,
+      "errors": []
+    },
+    "at": "2026-09-23T11:22:12.409Z"
+  },
+  "patchSha256": "e2833390b036f9339a776cb58cf82379f3541d191a10f978fd8b40294c33f3a6",
+  "draftTreeSha256": "6f7eba1ed5a55925a5d692fef8af57a181182ccce5657da53a57e589fc074625",
+  "integrity": {
+    "equivalent": true,
+    "actualTreeVerified": true,
+    "patches": [
+      {
+        "sha256": "e2833390b036f9339a776cb58cf82379f3541d191a10f978fd8b40294c33f3a6",
+        "bytes": 32889,
+        "applied": true,
+        "treeSha256": "6f7eba1ed5a55925a5d692fef8af57a181182ccce5657da53a57e589fc074625"
+      },
+      {
+        "sha256": "e2833390b036f9339a776cb58cf82379f3541d191a10f978fd8b40294c33f3a6",
+        "bytes": 32889,
+        "applied": true,
+        "treeSha256": "6f7eba1ed5a55925a5d692fef8af57a181182ccce5657da53a57e589fc074625"
+      }
+    ]
+  },
+  "materializationEdits": 0,
+  "historicalManifestUnchanged": true
+}

@@ -1,0 +1,461 @@
+{
+  "serverless": [
+    {
+      "arm": "P",
+      "test": "#mergeIamTemplates() should ensure IAM policies for custom and canonically named functions",
+      "actual_resource_sequence": [
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/new-service-dev*:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/foo-bar:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/new-service-dev*:*:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/foo-bar:*:*"
+      ],
+      "expected_resource_sequence": [
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/foo-bar:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/new-service-dev*:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/foo-bar:*:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/new-service-dev*:*:*"
+      ],
+      "same_resource_multiset": true,
+      "same_display_line_multiset": true,
+      "interpretation": "Order-sensitive frozen acceptance fails. No test or scoring normalization was applied. This observation alone does not establish different IAM permissions."
+    },
+    {
+      "arm": "H0",
+      "test": "#mergeIamTemplates() should ensure IAM policies for custom and canonically named functions",
+      "actual_resource_sequence": [
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/new-service-dev*:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/foo-bar:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/new-service-dev*:*:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/foo-bar:*:*"
+      ],
+      "expected_resource_sequence": [
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/foo-bar:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/new-service-dev*:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/foo-bar:*:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/new-service-dev*:*:*"
+      ],
+      "same_resource_multiset": true,
+      "same_display_line_multiset": true,
+      "interpretation": "Order-sensitive frozen acceptance fails. No test or scoring normalization was applied. This observation alone does not establish different IAM permissions."
+    },
+    {
+      "arm": "H1",
+      "test": "#mergeIamTemplates() should ensure IAM policies for custom and canonically named functions",
+      "actual_resource_sequence": [
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/new-service-dev*:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/foo-bar:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/new-service-dev*:*:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/foo-bar:*:*"
+      ],
+      "expected_resource_sequence": [
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/foo-bar:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/new-service-dev*:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/foo-bar:*:*",
+        "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/new-service-dev*:*:*"
+      ],
+      "same_resource_multiset": true,
+      "same_display_line_multiset": true,
+      "interpretation": "Order-sensitive frozen acceptance fails. No test or scoring normalization was applied. This observation alone does not establish different IAM permissions."
+    }
+  ],
+  "svelte": [
+    {
+      "arm": "P",
+      "F_extra_failures_over_gold": [],
+      "E_extra_failures_over_gold": [
+        {
+          "test": "css combinator-child",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<div class=\"svelte-xyz test\"><div class=\"svelte-xyz\">Testing...</div></div>' == '<div class=\"test svelte-xyz\"><div class=\"svelte-xyz\">Testing...</div></div>'",
+          "detail_sha256": "acd2df89e912d066ee4f11e6f67f39f68356ca65250b7a1be6cc20c6ac7eed6b"
+        },
+        {
+          "test": "css omit-scoping-attribute-class-dynamic",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<p class=\"svelte-xyz whatever\">this is styled</p><p class=\"bar\">this is unstyled</p>' == '<p class=\"whatever svelte-xyz\">this is styled</p><p class=\"bar\">this is unstyled</p>'",
+          "detail_sha256": "825a41529c96cc167998847de74a4d753f257394bc828767d399b06a8138ad15"
+        },
+        {
+          "test": "css omit-scoping-attribute-class-static",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<p class=\"svelte-xyz foo\">this is styled</p><p class=\"bar\">this is unstyled</p>' == '<p class=\"foo svelte-xyz\">this is styled</p><p class=\"bar\">this is unstyled</p>'",
+          "detail_sha256": "1c61ecefdcadedd17b0af5289c620a2e181d59a970b1a0c14e376ca18aaba915"
+        },
+        {
+          "test": "css omit-scoping-attribute-descendant-global-inner-class",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<div class=\"svelte-xyz foo\"></div>' == '<div class=\"foo svelte-xyz\"></div>'",
+          "detail_sha256": "0cc1b6d6ac0d3512d4da7d83f6ebdb85e009518786bd261ddabc0f410b835245"
+        },
+        {
+          "test": "css refs-qualified",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<button class=\"svelte-xyz active\" svelte-ref-button=\"\">deactivate</button>' == '<button class=\"active svelte-xyz\" svelte-ref-button=\"\">deactivate</button>'",
+          "detail_sha256": "01dd504f0642282b0e1b67bbbff1edee0b3f6d9217d18a80fd14c34808e64784"
+        },
+        {
+          "test": "css unused-selector",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<div class=\"svelte-xyz foo\"></div>' == '<div class=\"foo svelte-xyz\"></div>'",
+          "detail_sha256": "7f1c1ed9f758bc5927bd06f0a83b5f555177c6f154b79be000b476a1f2c6e7a3"
+        },
+        {
+          "test": "css unused-selector-leading",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<div class=\"svelte-xyz bar\"></div>' == '<div class=\"bar svelte-xyz\"></div>'",
+          "detail_sha256": "57d9172b9ff88164d67a17ee32ca00360724a2abfdb03c4910a834cd735fbdc7"
+        },
+        {
+          "test": "css unused-selector-ternary",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<div class=\"svelte-xyz active\"></div>' == '<div class=\"active svelte-xyz\"></div>'",
+          "detail_sha256": "eaee2b1f2f4033681f7b2c2bce1d166d983c201d840ab207508c097526060b5e"
+        },
+        {
+          "test": "js collapses-text-around-comments",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'/* generated by Svelte vX.Y.Z */\\n' +\n  'import { appendNode, assign, createElement, createText, detachNode, init, insertNode, noop, proto, setAttribute } from \"svelte/shared.js\";\\n' +\n  '\\n' +\n  'function data() {\\n' +\n  '\\treturn { foo: 42 }\\n' +\n  '};\\n' +\n  '\\n' +\n  'function encapsulateStyles(node) {\\n' +\n  '\\tsetAttribute(node, \"class\", \"svelte-2794052100\");\\n' +\n  '}\\n' +\n  '\\n' +\n  'function add_css() {\\n' +\n  '\\tvar style = createElement(\"style\");\\n' +\n  \"\\tstyle.id = 'svelte-279405210",
+          "detail_sha256": "72ed52a4efc90a2838828afe8ebbf5bbdff242c03ea55edb1a696b589f5f5d9c"
+        },
+        {
+          "test": "js css-media-query",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'/* generated by Svelte vX.Y.Z */\\n' +\n  'import { appendNode, assign, createElement, detachNode, init, insertNode, noop, proto, setAttribute } from \"svelte/shared.js\";\\n' +\n  '\\n' +\n  'function encapsulateStyles(node) {\\n' +\n  '\\tsetAttribute(node, \"class\", \"svelte-3905933315\");\\n' +\n  '}\\n' +\n  '\\n' +\n  'function add_css() {\\n' +\n  '\\tvar style = createElement(\"style\");\\n' +\n  \"\\tstyle.id = 'svelte-3905933315-style';\\n\" +\n  '\\tstyle.textContent = \"@media(min-width: 1px){div.svelte-3905933315,.",
+          "detail_sha256": "6d6716bc5de452ea08276294842744a6dcf9a02913a128f52480c8b6dc308ff6"
+        },
+        {
+          "test": "ssr styles",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "Expected values to be loosely deep-equal:\n\n'<div class=\"svelte-724714405\">red</div>'\n\nshould loosely deep-equal\n\n'<div class=\"svelte-bzh57p\">red</div>'",
+          "detail_sha256": "caf62f492b95151cea18e571fe507f79f52792934c55a0dd4bfac6c1ac542cf3"
+        },
+        {
+          "test": "ssr styles-nested",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "Expected values to be loosely deep-equal:\n\n'<div class=\"svelte-724714405\">red</div><div class=\"svelte-300476157\">green: foo</div><div class=\"svelte-300476157\">green: bar</div>'\n\nshould loosely deep-equal\n\n'<div class=\"svelte-bzh57p\">red</div><div class=\"svelte-4yw8vx\">green: foo</div><div class=\"svelte-4yw8vx\">green: bar</div>'",
+          "detail_sha256": "4bcc7c4ed28b40fad2d7fc76565c0d45fd13bdfa9343860f1400458e035af59f"
+        }
+      ],
+      "F_tests": 1677,
+      "E_tests": 1677
+    },
+    {
+      "arm": "H0",
+      "F_extra_failures_over_gold": [],
+      "E_extra_failures_over_gold": [
+        {
+          "test": "css combinator-child",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<div class=\"svelte-xyz test\"><div class=\"svelte-xyz\">Testing...</div></div>' == '<div class=\"test svelte-xyz\"><div class=\"svelte-xyz\">Testing...</div></div>'",
+          "detail_sha256": "a150c50b219f6f727f658943fdc226c1fd6d0ae381b162e272d2261f753bf834"
+        },
+        {
+          "test": "css omit-scoping-attribute-class-dynamic",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<p class=\"svelte-xyz whatever\">this is styled</p><p class=\"bar\">this is unstyled</p>' == '<p class=\"whatever svelte-xyz\">this is styled</p><p class=\"bar\">this is unstyled</p>'",
+          "detail_sha256": "a88f1e7796090b8439c048e6a79a2834c7bb58ae9fb8ce9f0d48248d0b3b6bfa"
+        },
+        {
+          "test": "css omit-scoping-attribute-class-static",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<p class=\"svelte-xyz foo\">this is styled</p><p class=\"bar\">this is unstyled</p>' == '<p class=\"foo svelte-xyz\">this is styled</p><p class=\"bar\">this is unstyled</p>'",
+          "detail_sha256": "82b3407a088e38ef65e8682ccac0516f9284d882b441c123da47f3c493d7163f"
+        },
+        {
+          "test": "css omit-scoping-attribute-descendant-global-inner-class",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<div class=\"svelte-xyz foo\"></div>' == '<div class=\"foo svelte-xyz\"></div>'",
+          "detail_sha256": "85ea308bf0c30d1a8c281d1ff0927d608a6fe3ebe145314d806bd2e6ef359a25"
+        },
+        {
+          "test": "css refs-qualified",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<button class=\"svelte-xyz active\" svelte-ref-button=\"\">deactivate</button>' == '<button class=\"active svelte-xyz\" svelte-ref-button=\"\">deactivate</button>'",
+          "detail_sha256": "fa5380f020049d689d023c62fd61253431ae248abd82c275696ad966b1a9e646"
+        },
+        {
+          "test": "css unused-selector",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<div class=\"svelte-xyz foo\"></div>' == '<div class=\"foo svelte-xyz\"></div>'",
+          "detail_sha256": "a65d3392f2cc18bdd33e64ee203d9e0e8e247d03ee0128f37e7099b386b61550"
+        },
+        {
+          "test": "css unused-selector-leading",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<div class=\"svelte-xyz bar\"></div>' == '<div class=\"bar svelte-xyz\"></div>'",
+          "detail_sha256": "ea7196a840aa6975bab70601b503c83e2dba258886896dbc0cd84963a70d7733"
+        },
+        {
+          "test": "css unused-selector-ternary",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<div class=\"svelte-xyz active\"></div>' == '<div class=\"active svelte-xyz\"></div>'",
+          "detail_sha256": "b7338fcdd45c11802268dbad11c78bd17fe14aae69d9441309d4c9527def7341"
+        },
+        {
+          "test": "js collapses-text-around-comments",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'/* generated by Svelte vX.Y.Z */\\n' +\n  'import { appendNode, assign, createElement, createText, detachNode, init, insertNode, noop, proto } from \"svelte/shared.js\";\\n' +\n  '\\n' +\n  'function data() {\\n' +\n  '\\treturn { foo: 42 }\\n' +\n  '};\\n' +\n  '\\n' +\n  'function add_css() {\\n' +\n  '\\tvar style = createElement(\"style\");\\n' +\n  \"\\tstyle.id = 'svelte-2794052100-style';\\n\" +\n  '\\tstyle.textContent = \"p.svelte-2794052100,.svelte-2794052100 p{color:red}\";\\n' +\n  '\\tappendNode(style, document.head",
+          "detail_sha256": "5f7e3141158d3ad72240058a4c910d3214799171e7f9cff5d8d4a7b4bf0fae66"
+        },
+        {
+          "test": "js css-media-query",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'/* generated by Svelte vX.Y.Z */\\n' +\n  'import { appendNode, assign, createElement, detachNode, init, insertNode, noop, proto } from \"svelte/shared.js\";\\n' +\n  '\\n' +\n  'function add_css() {\\n' +\n  '\\tvar style = createElement(\"style\");\\n' +\n  \"\\tstyle.id = 'svelte-3905933315-style';\\n\" +\n  '\\tstyle.textContent = \"@media(min-width: 1px){div.svelte-3905933315,.svelte-3905933315 div{color:red}}\";\\n' +\n  '\\tappendNode(style, document.head);\\n' +\n  '}\\n' +\n  '\\n' +\n  'function create_main_fragment",
+          "detail_sha256": "a75e4d81745542c390ae942090a2e9d4291e2255ac334e7d7d304a4aba6a4a51"
+        },
+        {
+          "test": "ssr styles",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "Expected values to be loosely deep-equal:\n\n'<div class=\"svelte-724714405\">red</div>'\n\nshould loosely deep-equal\n\n'<div class=\"svelte-bzh57p\">red</div>'",
+          "detail_sha256": "caf62f492b95151cea18e571fe507f79f52792934c55a0dd4bfac6c1ac542cf3"
+        },
+        {
+          "test": "ssr styles-nested",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "Expected values to be loosely deep-equal:\n\n'<div class=\"svelte-724714405\">red</div><div class=\"svelte-300476157\">green: foo</div><div class=\"svelte-300476157\">green: bar</div>'\n\nshould loosely deep-equal\n\n'<div class=\"svelte-bzh57p\">red</div><div class=\"svelte-4yw8vx\">green: foo</div><div class=\"svelte-4yw8vx\">green: bar</div>'",
+          "detail_sha256": "4bcc7c4ed28b40fad2d7fc76565c0d45fd13bdfa9343860f1400458e035af59f"
+        }
+      ],
+      "F_tests": 1681,
+      "E_tests": 1677
+    },
+    {
+      "arm": "H1",
+      "F_extra_failures_over_gold": [
+        {
+          "test": "runtime event-handler-event-methods (shared helpers)",
+          "name": null,
+          "kind": "other",
+          "message": "Cannot read properties of null (reading 'dispatchEvent')",
+          "detail_sha256": "7b5384f5ae0edf82149ed79f7e6cb56db90c728903901036807d205dab928eee"
+        },
+        {
+          "test": "runtime event-handler-event-methods (shared helpers , hydration)",
+          "name": null,
+          "kind": "other",
+          "message": "skipping test, already failed",
+          "detail_sha256": "4bc55cbda3d1902b6da1698362f78e80e64705eb1b513dba3ceac90be979fdec"
+        },
+        {
+          "test": "runtime event-handler-event-methods (inline helpers)",
+          "name": null,
+          "kind": "other",
+          "message": "skipping test, already failed",
+          "detail_sha256": "fb9caf5879cdb3d17779c98510cbe406db01ca4c33094fc0255bdb46a1d9a8bd"
+        }
+      ],
+      "E_extra_failures_over_gold": [
+        {
+          "test": "css combinator-child",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<div class=\"svelte-xyz test\"><div class=\"svelte-xyz\">Testing...</div></div>' == '<div class=\"test svelte-xyz\"><div class=\"svelte-xyz\">Testing...</div></div>'",
+          "detail_sha256": "9ab67e84c12c5be8bde141bf928cd2058582ae45c9b70d2db1699c2f196eadd1"
+        },
+        {
+          "test": "css omit-scoping-attribute-class-dynamic",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<p class=\"svelte-xyz whatever\">this is styled</p><p class=\"bar\">this is unstyled</p>' == '<p class=\"whatever svelte-xyz\">this is styled</p><p class=\"bar\">this is unstyled</p>'",
+          "detail_sha256": "d0eeee180d11cd96e8231dc69923b045e0e1e6e539033292438a66ab2e6f7f0b"
+        },
+        {
+          "test": "css omit-scoping-attribute-class-static",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<p class=\"svelte-xyz foo\">this is styled</p><p class=\"bar\">this is unstyled</p>' == '<p class=\"foo svelte-xyz\">this is styled</p><p class=\"bar\">this is unstyled</p>'",
+          "detail_sha256": "1ccf3150b7a7056952222ae118fc79f7f57f36d768dd5b386ffea99df60ec9d9"
+        },
+        {
+          "test": "css omit-scoping-attribute-descendant-global-inner-class",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<div class=\"svelte-xyz foo\"></div>' == '<div class=\"foo svelte-xyz\"></div>'",
+          "detail_sha256": "70e096656b298e5a0fe891399dea55c208fd367417e3061a0d279d3a7ea4b492"
+        },
+        {
+          "test": "css refs-qualified",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<button class=\"svelte-xyz active\" svelte-ref-button=\"\">deactivate</button>' == '<button class=\"active svelte-xyz\" svelte-ref-button=\"\">deactivate</button>'",
+          "detail_sha256": "fa5380f020049d689d023c62fd61253431ae248abd82c275696ad966b1a9e646"
+        },
+        {
+          "test": "css unused-selector",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<div class=\"svelte-xyz foo\"></div>' == '<div class=\"foo svelte-xyz\"></div>'",
+          "detail_sha256": "76ea94647f460848731b6def366075936dfa4f0e44fe3fa9800de7c7999570d1"
+        },
+        {
+          "test": "css unused-selector-leading",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<div class=\"svelte-xyz bar\"></div>' == '<div class=\"bar svelte-xyz\"></div>'",
+          "detail_sha256": "e66553f082fadac1ff7dd74bd22cb47ec643ffff68a6ecb87fe8c2755e3e7943"
+        },
+        {
+          "test": "css unused-selector-ternary",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'<div class=\"svelte-xyz active\"></div>' == '<div class=\"active svelte-xyz\"></div>'",
+          "detail_sha256": "b7338fcdd45c11802268dbad11c78bd17fe14aae69d9441309d4c9527def7341"
+        },
+        {
+          "test": "js collapses-text-around-comments",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'/* generated by Svelte vX.Y.Z */\\n' +\n  'import { appendNode, assign, createElement, createText, detachNode, init, insertNode, noop, proto } from \"svelte/shared.js\";\\n' +\n  '\\n' +\n  'function data() {\\n' +\n  '\\treturn { foo: 42 }\\n' +\n  '};\\n' +\n  '\\n' +\n  'function encapsulateStyles(node) {\\n' +\n  '\\tnode.classList.add(\"svelte-2794052100\");\\n' +\n  '}\\n' +\n  '\\n' +\n  'function add_css() {\\n' +\n  '\\tvar style = createElement(\"style\");\\n' +\n  \"\\tstyle.id = 'svelte-2794052100-style';\\n\" +\n  '\\tsty",
+          "detail_sha256": "ad16e1d6c1728bbdf206f733e95e61eb77795d1f8e37deaadef8ffbfd0693746"
+        },
+        {
+          "test": "js css-media-query",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "'/* generated by Svelte vX.Y.Z */\\n' +\n  'import { appendNode, assign, createElement, detachNode, init, insertNode, noop, proto } from \"svelte/shared.js\";\\n' +\n  '\\n' +\n  'function encapsulateStyles(node) {\\n' +\n  '\\tnode.classList.add(\"svelte-3905933315\");\\n' +\n  '}\\n' +\n  '\\n' +\n  'function add_css() {\\n' +\n  '\\tvar style = createElement(\"style\");\\n' +\n  \"\\tstyle.id = 'svelte-3905933315-style';\\n\" +\n  '\\tstyle.textContent = \"@media(min-width: 1px){div.svelte-3905933315,.svelte-3905933315 div{c",
+          "detail_sha256": "022bebef14735607bdd51f65cc5f9fed1ff22590526a42cf30699c5eb3a056f3"
+        },
+        {
+          "test": "runtime event-handler-event-methods (shared helpers)",
+          "name": null,
+          "kind": "other",
+          "message": "Cannot read properties of null (reading 'dispatchEvent')",
+          "detail_sha256": "abe4dd01b9b37ed2889de350d2ab7b1a0c8ed65424079903eeda8f7d00f58ad4"
+        },
+        {
+          "test": "runtime event-handler-event-methods (shared helpers , hydration)",
+          "name": null,
+          "kind": "other",
+          "message": "skipping test, already failed",
+          "detail_sha256": "4bc55cbda3d1902b6da1698362f78e80e64705eb1b513dba3ceac90be979fdec"
+        },
+        {
+          "test": "runtime event-handler-event-methods (inline helpers)",
+          "name": null,
+          "kind": "other",
+          "message": "skipping test, already failed",
+          "detail_sha256": "fb9caf5879cdb3d17779c98510cbe406db01ca4c33094fc0255bdb46a1d9a8bd"
+        },
+        {
+          "test": "ssr styles",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "Expected values to be loosely deep-equal:\n\n'<div class=\"svelte-724714405\">red</div>'\n\nshould loosely deep-equal\n\n'<div class=\"svelte-bzh57p\">red</div>'",
+          "detail_sha256": "279a17adec763cc845baaf0a1b32ba9865e62d7f0f472a3e8790141309eaf805"
+        },
+        {
+          "test": "ssr styles-nested",
+          "name": "AssertionError",
+          "kind": "assertion",
+          "message": "Expected values to be loosely deep-equal:\n\n'<div class=\"svelte-724714405\">red</div><div class=\"svelte-300476157\">green: foo</div><div class=\"svelte-300476157\">green: bar</div>'\n\nshould loosely deep-equal\n\n'<div class=\"svelte-bzh57p\">red</div><div class=\"svelte-4yw8vx\">green: foo</div><div class=\"svelte-4yw8vx\">green: bar</div>'",
+          "detail_sha256": "a855fe9cbe19e2d37ad73cdbb0b3f7605e4c29cdf374ab7d5ada71afd7ef8185"
+        }
+      ],
+      "F_tests": 1681,
+      "E_tests": 1677
+    }
+  ],
+  "repeat_comparison": [
+    {
+      "instance_id": "serverless__serverless-6534",
+      "arm": "P",
+      "world": "F",
+      "same_pass_fail_counts": true,
+      "same_failed_test_names": true
+    },
+    {
+      "instance_id": "serverless__serverless-6534",
+      "arm": "P",
+      "world": "E",
+      "same_pass_fail_counts": true,
+      "same_failed_test_names": true
+    },
+    {
+      "instance_id": "serverless__serverless-6534",
+      "arm": "H0",
+      "world": "F",
+      "same_pass_fail_counts": true,
+      "same_failed_test_names": true
+    },
+    {
+      "instance_id": "serverless__serverless-6534",
+      "arm": "H0",
+      "world": "E",
+      "same_pass_fail_counts": true,
+      "same_failed_test_names": true
+    },
+    {
+      "instance_id": "serverless__serverless-6534",
+      "arm": "H1",
+      "world": "F",
+      "same_pass_fail_counts": true,
+      "same_failed_test_names": true
+    },
+    {
+      "instance_id": "serverless__serverless-6534",
+      "arm": "H1",
+      "world": "E",
+      "same_pass_fail_counts": true,
+      "same_failed_test_names": true
+    },
+    {
+      "instance_id": "sveltejs__svelte-1190",
+      "arm": "P",
+      "world": "F",
+      "same_pass_fail_counts": true,
+      "same_failed_test_names": true
+    },
+    {
+      "instance_id": "sveltejs__svelte-1190",
+      "arm": "P",
+      "world": "E",
+      "same_pass_fail_counts": true,
+      "same_failed_test_names": true
+    },
+    {
+      "instance_id": "sveltejs__svelte-1190",
+      "arm": "H0",
+      "world": "F",
+      "same_pass_fail_counts": true,
+      "same_failed_test_names": true
+    },
+    {
+      "instance_id": "sveltejs__svelte-1190",
+      "arm": "H1",
+      "world": "F",
+      "same_pass_fail_counts": true,
+      "same_failed_test_names": true
+    }
+  ],
+  "H1_behavioral_regression": {
+    "input": "test/runtime/samples/event-handler-event-methods/main.html contains <button class='allow-propagation'>click me</button>",
+    "generated_statement": "div$.innerHTML = \"<button>click me</button>\";",
+    "log_sha256": "674c741a2c94bf800b41293ec4a1e9b6bf2136467731bd2a3fe6a9e56a5dddc7",
+    "cause": "Element.ts skips classAttribute regardless of _needsCssClass; the optimized unscoped button loses its existing class. The unchanged test querySelector returns null and dispatchEvent throws. Two later variants short-circuit after that failure.",
+    "source_patch": "development/polybench-pilot/results/patches/H1/sveltejs__svelte-1190.patch"
+  }
+}

@@ -1,0 +1,16 @@
+import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {get,hash,save,init,apply} from '../chain.mjs';
+import {projectManifest,verifyPatches} from '../patch-integrity.mjs';
+const root=path.resolve('local/ledger-review-delivery/post-capture-followup'),old=root+'/history/real/A/runs/account-switch-ledger-A';
+const historical=get('development/ledger-review-delivery/manifest.json');
+for(const [file,sha]of Object.entries(historical.files))assert.equal(hash(execFileSync('git',['show','51f10ba2:'+file])),sha);
+const restored=get('local/ledger-review-delivery/prepared.json'),prior=get(root+'/history/prepared.json');assert.deepEqual(restored,prior);
+const records=get(old+'/provider-metadata.json');assert.equal(records.length,76);assert.ok(records.every(r=>r.forwarded&&r.serverCompletion==='completed'&&r.recording.evidenceComplete));
+const originalStop=get(old+'/stop-verification.json');assert.equal(originalStop.terminationVerified,true);assert.equal(originalStop.activeProviderHandlers,0);assert.equal(originalStop.providerServerStateMayRemainUnknown,false);
+const recovery=get(old+'/recovery.json');console.log(recovery);
+const baseline=path.resolve('local/ledger-review-delivery/baseline'),draft=root+'/D0';fs.cpSync(baseline,draft,{recursive:true});init(draft);apply(draft,path.resolve('development/ledger-review-delivery/D0.patch'));
+const expected=get(old+'/recovered-delivery-tree.json');assert.deepEqual(projectManifest(draft),expected);
+const integrity=verifyPatches({baseline,patches:[fs.readFileSync('development/ledger-review-delivery/D0.patch'),fs.readFileSync('development/ledger-review-delivery/M.partial.patch')],evidenceDir:root+'/D0-integrity',expectedTree:expected});
+const proof={sourceCommit:'51f10ba2d9c005a16231f72094fb5a9773bae687',baseline:restored.baseline,runtime:restored.runtime,archiveSha256:get('local/ledger-review-delivery/private-evidence-index.json').archiveSha256,exactRestoredConfiguration:true,oldKnownCompletedResponses:76,oldNativeCompleted:get('development/ledger-review-delivery/delivery-receipt.json').nativeCompleted,oldStop:originalStop,recovery,patchSha256:hash(fs.readFileSync('development/ledger-review-delivery/D0.patch')),draftTreeSha256:hash(JSON.stringify(expected)),integrity,materializationEdits:0,historicalManifestUnchanged:true};
+save('development/ledger-review-delivery/post-capture-followup/provenance.json',proof);console.log('PASS: exact D0 bytes/modes, archived records, pinned bundles and frozen historical inputs');

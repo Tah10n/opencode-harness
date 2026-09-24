@@ -1,0 +1,291 @@
+diff --git a/README.md b/README.md
+index 4a26073..7313bff 100644
+--- a/README.md
++++ b/README.md
+@@ -196,10 +196,12 @@ parseQuery("tags=javascript&tags=web&tags=dev");
+ // { tags: ["javascript", "web", "dev"] }
+ ```
+ 
+-### `stringifyQuery(query)`
++### `stringifyQuery(query, options?)`
+ 
+ Stringfies and encodes a query object into a query string.
+ 
++Pass `{ sort: true }` to serialize query keys in ascending JavaScript string order. Repeated values from arrays retain their original order.
++
+ **Example:**
+ 
+ ```js
+@@ -208,6 +210,9 @@ stringifyQuery({ foo: 'bar', baz: 'qux' })
+ 
+ stringifyQuery({ foo: 'bar', baz: undefined })
+ // 'foo=bar'
++
++stringifyQuery({ z: 'last', a: 'first' }, { sort: true })
++// 'a=first&z=last'
+ ```
+ 
+ ## Utils
+@@ -538,14 +543,18 @@ Adds or replaces protocol of the input URL.
+ withProtocol("http://example.com", "ftp://"); // "ftp://example.com"
+ ```
+ 
+-### `withQuery(input, query)`
++### `withQuery(input, query, options?)`
+ 
+ Add/Replace the query section of the URL.
+ 
++The optional third argument accepts the same `{ sort?: boolean }` options as `stringifyQuery`. Sorting is applied after the existing URL query and the supplied query object are merged.
++
+ **Example:**
+ 
+ ```js
+ withQuery("/foo?page=a", { token: "secret" }); // "/foo?page=a&token=secret"
++withQuery("/foo?page=a", { token: "secret" }, { sort: true });
++// "/foo?page=a&token=secret"
+ ```
+ 
+ ### `withTrailingSlash(input, respectQueryAndFragment?)`
+diff --git a/src/query.ts b/src/query.ts
+index 6fbcaaa..f2e5557 100644
+--- a/src/query.ts
++++ b/src/query.ts
+@@ -18,6 +18,10 @@ export type QueryObject = Record<string, QueryValue | QueryValue[]>;
+ 
+ export type ParsedQuery = Record<string, string | string[]>;
+ 
++export interface QueryOptions {
++  sort?: boolean;
++}
++
+ // const EmptyObject = /* @__PURE__ */ (() => {
+ //   const C = function () {};
+ //   C.prototype = Object.create(null);
+@@ -117,6 +121,9 @@ export function encodeQueryItem(
+ /**
+  * Stringfies and encodes a query object into a query string.
+  *
++ * Pass `{ sort: true }` to serialize query keys in ascending JavaScript string
++ * order. Repeated values from arrays retain their original order.
++ *
+  * @example
+  *
+  * ```js
+@@ -125,12 +132,26 @@ export function encodeQueryItem(
+  *
+  * stringifyQuery({ foo: 'bar', baz: undefined })
+  * // 'foo=bar'
++ *
++ * stringifyQuery({ z: 'last', a: 'first' }, { sort: true })
++ * // 'a=first&z=last'
+  * ```
+  *
++ * @param query - The query object to stringify.
++ * @param [options] - Options to use while stringifying.
++ * @param [options.sort] - Sort query keys in ascending string order.
++ *
+  * @group Query_utils
+  */
+-export function stringifyQuery(query: QueryObject): string {
+-  return Object.keys(query)
++export function stringifyQuery(
++  query: QueryObject,
++  options?: QueryOptions,
++): string {
++  const keys = Object.keys(query);
++  if (options?.sort) {
++    keys.sort();
++  }
++  return keys
+     .filter((k) => query[k] !== undefined)
+     .map((k) => encodeQueryItem(k, query[k]))
+     .filter(Boolean)
+diff --git a/src/utils.ts b/src/utils.ts
+index ea98aba..fdf5f62 100644
+--- a/src/utils.ts
++++ b/src/utils.ts
+@@ -1,5 +1,11 @@
+ import { parseURL, stringifyParsedURL } from "./parse";
+-import { QueryObject, parseQuery, stringifyQuery, ParsedQuery } from "./query";
++import {
++  QueryObject,
++  parseQuery,
++  stringifyQuery,
++  ParsedQuery,
++  QueryOptions,
++} from "./query";
+ import {
+   decode,
+   decodePath,
+@@ -337,18 +343,33 @@ export function withoutBase(input: string, base: string) {
+ /**
+  * Add/Replace the query section of the URL.
+  *
++ * The optional third argument accepts the same `{ sort?: boolean }` options as
++ * `stringifyQuery`. Sorting is applied after the existing URL query and the
++ * supplied query object are merged.
++ *
+  * @example
+  *
+  * ```js
+  * withQuery("/foo?page=a", { token: "secret" }); // "/foo?page=a&token=secret"
++ * withQuery("/foo?page=a", { token: "secret" }, { sort: true });
++ * // "/foo?page=a&token=secret"
+  * ```
+  *
++ * @param input - The URL to update.
++ * @param query - Query values to add or replace.
++ * @param [options] - Options to use while stringifying the query.
++ * @param [options.sort] - Sort query keys in ascending string order.
++ *
+  * @group utils
+  */
+-export function withQuery(input: string, query: QueryObject): string {
++export function withQuery(
++  input: string,
++  query: QueryObject,
++  options?: QueryOptions,
++): string {
+   const parsed = parseURL(input);
+   const mergedQuery = { ...parseQuery(parsed.search), ...query };
+-  parsed.search = stringifyQuery(mergedQuery);
++  parsed.search = stringifyQuery(mergedQuery, options);
+   return stringifyParsedURL(parsed);
+ }
+ 
+diff --git a/test/query.test.ts b/test/query.test.ts
+index 8ef15e4..7ee22ce 100644
+--- a/test/query.test.ts
++++ b/test/query.test.ts
+@@ -1,5 +1,59 @@
+ import { describe, expect, test } from "vitest";
+-import { filterQuery, getQuery, withQuery } from "../src";
++import {
++  filterQuery,
++  getQuery,
++  parseQuery,
++  stringifyQuery,
++  withQuery,
++} from "../src";
++
++describe("stringifyQuery", () => {
++  test("preserves the default key order and sorts when requested", () => {
++    const query = { z: "last", a: "first", é: "unicode" };
++
++    expect(stringifyQuery(query)).toBe("z=last&a=first&%C3%A9=unicode");
++    expect(stringifyQuery(query, { sort: false })).toBe(
++      "z=last&a=first&%C3%A9=unicode",
++    );
++    expect(stringifyQuery(query, { sort: true })).toBe(
++      "a=first&z=last&%C3%A9=unicode",
++    );
++  });
++
++  test("retains values and their order without mutating the input", () => {
++    const query = {
++      z: 0,
++      tags: ["third", "first", ""],
++      flag: false,
++      empty: "",
++      nil: null,
++      omitted: undefined,
++      object: { value: "unchanged" },
++    };
++
++    expect(stringifyQuery(query, { sort: true })).toBe(
++      "empty&flag=false&nil&object=%7B%22value%22:%22unchanged%22%7D&tags=third&tags=first&tags=&z=0",
++    );
++    expect(query).toEqual({
++      z: 0,
++      tags: ["third", "first", ""],
++      flag: false,
++      empty: "",
++      nil: null,
++      omitted: undefined,
++      object: { value: "unchanged" },
++    });
++  });
++
++  test("keeps parsing pollution defenses", () => {
++    const parsed = parseQuery(
++      "__proto__=polluted&constructor=ignored&safe=value",
++    );
++
++    expect(parsed).toEqual({ safe: "value" });
++    expect(Object.getPrototypeOf(parsed)).toBe(null);
++  });
++});
+ 
+ describe("withQuery", () => {
+   const tests = [
+@@ -70,6 +124,40 @@ describe("withQuery", () => {
+       expect(withQuery(t.input, t.query)).toBe(t.out);
+     });
+   }
++
++  test("sorts decoded existing keys after merging", () => {
++    expect(
++      withQuery(
++        "https://example.com/path?z=existing&%C3%A9=unicode#section",
++        { "a key": "supplied", z: "replaced" },
++        { sort: true },
++      ),
++    ).toBe(
++      "https://example.com/path?a+key=supplied&z=replaced&%C3%A9=unicode#section",
++    );
++    expect(
++      withQuery("/path?z=existing&%C3%A9=unicode#section", {
++        "a key": "supplied",
++      }),
++    ).toBe("/path?z=existing&%C3%A9=unicode&a+key=supplied#section");
++    expect(
++      withQuery(
++        "/path?z=existing&%C3%A9=unicode#section",
++        { "a key": "supplied" },
++        { sort: false },
++      ),
++    ).toBe("/path?z=existing&%C3%A9=unicode&a+key=supplied#section");
++  });
++
++  test("does not mutate supplied arrays or objects", () => {
++    const query = { tags: ["one", "two"], data: { nested: true } };
++    const original = structuredClone(query);
++
++    expect(withQuery("/path?z=0", query, { sort: true })).toBe(
++      "/path?data=%7B%22nested%22:true%7D&tags=one&tags=two&z=0",
++    );
++    expect(query).toEqual(original);
++  });
+ });
+ 
+ describe("filterQuery", () => {
+diff --git a/test/types.test-d.ts b/test/types.test-d.ts
+index e28c503..ba30bcb 100644
+--- a/test/types.test-d.ts
++++ b/test/types.test-d.ts
+@@ -1,5 +1,11 @@
+ import { describe, expectTypeOf, test } from "vitest";
+-import { getQuery, parseQuery } from "../src";
++import {
++  getQuery,
++  parseQuery,
++  stringifyQuery,
++  withQuery,
++  type QueryOptions,
++} from "../src";
+ 
+ describe("query", () => {
+   test("getQuery generic type support", () => {
+@@ -11,4 +17,12 @@ describe("query", () => {
+     const result = parseQuery<{ foo: string }>("http://foo.com/?foo=bar");
+     expectTypeOf(result).toEqualTypeOf<{ foo: string }>();
+   });
++
++  test("query options are public", () => {
++    const options: QueryOptions = { sort: true };
++
++    stringifyQuery({ foo: "bar" }, options);
++    withQuery("/", { foo: "bar" }, options);
++    expectTypeOf(options).toEqualTypeOf<{ sort?: boolean }>();
++  });
+ });

@@ -1,0 +1,20 @@
+{
+  "phase": "Recorded after reading neutral patches and independent grading, before arm mapping and explanatory traces",
+  "rubric": "Frozen PLAN.md and original task A; no new criteria",
+  "rows": [
+    {
+      "id": "n01",
+      "Q": false,
+      "reason": "subscribe uses the old EventListener alias without contextual receiver typing. Independent new-type consumer fails TS2683 and TS2322; explicit this annotation in the author's positive test masks the missing API inference.",
+      "runtime": "Registration identity and copied-array removal preserve duplicate independence, ordinary removal/re-registration, current dispatch and recursive self-cancellation. Existing validation and receiver normalization are preserved.",
+      "coverage": "All eight required runtime regression groups, CommonJS and ESM consumer coverage, positive/negative type files and documentation are present; existing test assertions are retained. Runtime, ESM, build and legacy-type acceptance passed. New contextual receiver typing fails."
+    },
+    {
+      "id": "n02",
+      "Q": true,
+      "reason": "Independent runtime, ESM, build, legacy/new-type acceptance pass; contextual subscribe typing and callable void cancellation are implemented.",
+      "runtime": "The cancellation closure retains one listener record and an idempotency flag; removal constructs a new array, preserving current dispatch and subsequent/recursive removal semantics. Existing registration behavior and return values are retained.",
+      "coverage": "All eight required runtime regression groups, CommonJS and ESM consumer coverage, positive/negative event/context/cancellation type cases and lifecycle documentation are present. Existing assertions are retained; no filename/helper requirement was applied."
+    }
+  ]
+}

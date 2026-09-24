@@ -1,0 +1,3 @@
+# notification-channel-router
+
+planChannels resolves known name or fallback, validates every target then returns first-occurrence deduplicated order. Missing target RangeError('unknown channel: original'); empty request[] without requiring fallback. Stable string arrays<=100, special names literal. createNotifier snapshots own enumerable data function handlers, ignores inherited, nonfunction TypeError; later mutation irrelevant. notify plans fully before serial awaited dispatch, undefined thisArg/one unchanged message, ordered {channel,result} with identity retained. First exact error stops; fallback only unknown names, never retry on failed send. No global transport lookup. Run npm test.

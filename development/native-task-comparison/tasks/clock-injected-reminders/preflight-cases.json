@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/reminder-core.mjs": "export function selectDue(reminders,now){\n if(!Number.isSafeInteger(now)||now<0)throw new RangeError('clock');\n const result=[];for(const item of reminders)if(item.enabled&&item.dueAt!==null&&now>=item.dueAt)result.push(item);return result;\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "exclusive-due-boundary",
+      "file": "src/reminder-core.mjs",
+      "replacement": "export function selectDue(reminders,now){\n if(!Number.isSafeInteger(now)||now<0)throw new RangeError('clock');\n return reminders.filter(item=>item.enabled&&item.dueAt!==null&&item.dueAt<now);\n}\n"
+    },
+    {
+      "name": "clock-per-reminder",
+      "file": "src/reminders.mjs",
+      "replacement": "import {selectDue} from './reminder-core.mjs';export function dueReminders(reminders,{clock=Date.now}={}){return reminders.flatMap(item=>selectDue([item],clock()));}\n"
+    }
+  ]
+}

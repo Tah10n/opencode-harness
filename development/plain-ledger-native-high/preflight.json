@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "arm": "P",
+      "nativeStop": true,
+      "nodeAndGitAvailable": true,
+      "originalTestsPassed": true,
+      "gitDiff": true
+    }
+  ],
+  "realProviderRequests": 0,
+  "stop": {
+    "ownTaskDeadlineTriggered": false,
+    "terminationVerified": true,
+    "captureSaved": true,
+    "forwardingClosed": true,
+    "relayRemoved": true,
+    "activeProviderHandlers": 0,
+    "providerServerStateMayRemainUnknown": false
+  },
+  "scriptedRequests": 8,
+  "rawResultSha256": "a7a4617a06d89a9f996c366ae37fdafa3d1fcbc3225eac22a619b8c9e0992006",
+  "retainedOutputSha256": "61f0c1ac1dd213595b2280f8ef163f7ad26ef38e84ea7dfbb1a66878eba65451"
+}

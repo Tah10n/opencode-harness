@@ -1,0 +1,78 @@
+{
+  "actualInitialPromptExactRemoval": true,
+  "toolInventoryIdentical": true,
+  "receipts": {
+    "AR0": {
+      "request": "request-3.json",
+      "sha256": "a8952762f67b2bf7933874bdd06008e577ef3fffd953416c4715f68b1d65ef9a"
+    },
+    "AR1": {
+      "request": "request-3.json",
+      "sha256": "0cf2bf73515c18a189efc4897cb29326cb3083b3fb48e49cdb7f8578c10a723e"
+    }
+  },
+  "removalBytesInTransportText": 1506,
+  "normalization": "None. Removed the exact block in its observed OpenCode text representation, including the separator; no path/session substitutions.",
+  "pathsAndSessions": {
+    "AR0": {
+      "executionDirectory": "/work/repo/.git/harness-task/d6deb21a-3ef2-4fe6-8421-a77e3bdc2f5e/worktree",
+      "sessions": [
+        {
+          "id": "ses_f37b2160affeu4qB0iXVj5JN3g",
+          "parent_id": null,
+          "directory": "/work/repo",
+          "agent": "build",
+          "model": "{\"id\":\"gpt-5.6-luna\",\"providerID\":\"openai\",\"variant\":\"high\"}",
+          "tokens_input": 13142,
+          "tokens_output": 115,
+          "tokens_reasoning": 88,
+          "tokens_cache_read": 0,
+          "tokens_cache_write": 0
+        },
+        {
+          "id": "ses_f37b1fdc0ffeJJ3MPnpWc6EYUp",
+          "parent_id": "ses_f37b2160affeu4qB0iXVj5JN3g",
+          "directory": "/work/repo/.git/harness-task/d6deb21a-3ef2-4fe6-8421-a77e3bdc2f5e/worktree",
+          "agent": "build",
+          "model": "{\"id\":\"gpt-5.6-luna\",\"providerID\":\"openai\",\"variant\":\"high\"}",
+          "tokens_input": 4771068,
+          "tokens_output": 18536,
+          "tokens_reasoning": 22930,
+          "tokens_cache_read": 11769344,
+          "tokens_cache_write": 0
+        }
+      ],
+      "captureDirectory": "/work/repo/.git/harness-task/d6deb21a-3ef2-4fe6-8421-a77e3bdc2f5e/worktree"
+    },
+    "AR1": {
+      "executionDirectory": "/work/repo/.git/harness-task/d4c23d13-53f7-4de0-90ac-85190f1f1225/worktree",
+      "sessions": [
+        {
+          "id": "ses_f3798bcacffeJN2OXEfgML6rU0",
+          "parent_id": null,
+          "directory": "/work/repo",
+          "agent": "build",
+          "model": "{\"id\":\"gpt-5.6-luna\",\"providerID\":\"openai\",\"variant\":\"high\"}",
+          "tokens_input": 13141,
+          "tokens_output": 118,
+          "tokens_reasoning": 94,
+          "tokens_cache_read": 0,
+          "tokens_cache_write": 0
+        },
+        {
+          "id": "ses_f3798a008ffe1uU219EoHk5a1h",
+          "parent_id": "ses_f3798bcacffeJN2OXEfgML6rU0",
+          "directory": "/work/repo/.git/harness-task/d4c23d13-53f7-4de0-90ac-85190f1f1225/worktree",
+          "agent": "build",
+          "model": "{\"id\":\"gpt-5.6-luna\",\"providerID\":\"openai\",\"variant\":\"high\"}",
+          "tokens_input": 4767975,
+          "tokens_output": 15994,
+          "tokens_reasoning": 19364,
+          "tokens_cache_read": 11984384,
+          "tokens_cache_write": 0
+        }
+      ],
+      "captureDirectory": "/work/repo/.git/harness-task/d4c23d13-53f7-4de0-90ac-85190f1f1225/worktree"
+    }
+  }
+}

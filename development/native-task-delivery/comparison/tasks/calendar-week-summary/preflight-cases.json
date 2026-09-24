@@ -1,0 +1,12 @@
+{
+  "alternative": {
+    "src/week.mjs": "export function weekStart(day){const t=Date.parse(day+'T00:00:00Z'),dow=new Date(t).getUTCDay();return new Date(t-((dow||7)-1)*86400000).toISOString().slice(0,10);}"
+  },
+  "mutants": [
+    {
+      "name": "group-by-day",
+      "file": "src/week.mjs",
+      "replacement": "export function weekStart(day){return day;}"
+    }
+  ]
+}

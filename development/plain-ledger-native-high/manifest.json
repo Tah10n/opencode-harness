@@ -1,0 +1,119 @@
+{
+  "version": 1,
+  "stage": "frozen_before_model_requests",
+  "freezeSha256": "e1126689c60fbf511228261dff6ba24da4c3c19e392aa1bf3cd1ce9e4b93b7db",
+  "baseline": "2b16b6a8ad75b6b852adc5e2189e6d4a8d93eabd",
+  "reference": "9e389a6dbc1b0c9813599fb61eceb6958d8c4de4",
+  "referenceRepairSha256": "05105df0eafad600895060197ce2343fead52e7fe6781d748ef4c5ec51591d13",
+  "image": "sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6",
+  "opencode": "1.18.26",
+  "node": "v24.19.0",
+  "git": "2.39.5",
+  "model": "openai/gpt-5.6-luna",
+  "reasoning": "high",
+  "budgetSeconds": 1800,
+  "slots": [
+    {
+      "slot": 1,
+      "task": "account-switch-ledger",
+      "arm": "P",
+      "status": "not_started"
+    }
+  ],
+  "config": {
+    "model": "openai/gpt-5.6-luna",
+    "small_model": "openai/gpt-5.6-luna",
+    "provider": {
+      "openai": {
+        "options": {
+          "baseURL": "http://127.0.0.1:4099/v1",
+          "apiKey": "development-no-credential"
+        },
+        "models": {
+          "gpt-5.6-luna": {
+            "options": {
+              "reasoningEffort": "high"
+            },
+            "variants": {
+              "high": {
+                "reasoningEffort": "high"
+              }
+            }
+          }
+        }
+      }
+    },
+    "permission": {
+      "external_directory": {
+        "*": "deny"
+      }
+    }
+  },
+  "offlineConfig": {
+    "permission": {
+      "webfetch": "deny"
+    },
+    "agent": {
+      "build": {
+        "permission": {
+          "webfetch": "deny"
+        }
+      }
+    }
+  },
+  "input": {
+    "baseline": "2b16b6a8ad75b6b852adc5e2189e6d4a8d93eabd",
+    "archiveSha256": "ea549fcc30d8facef77af8ebebc280910a24537e44ad8c6cfcbdc4888b5dcab1",
+    "originalTaskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+    "environmentSha256": "aa0afe37ca2ec1f3564642a02842d71472b72b88225069be22a4cbbe8fb114cc",
+    "promptSha256": "1873295e7730dd9688759dbd93f98480bbe7a5f9d991f8f4f2b99f1a57f54082",
+    "sourceManifestSha256": "15f4f3ce26468bad1afe37617a7e43da80abcf8e26ec24a5f99bafd0317ce1ea",
+    "dependenciesManifestSha256": "9ffe7e4785dea3e53e9a3248fddddabb7df675022ae3466439c9c8296c07d5fd",
+    "gitHistoryAbsent": true,
+    "realProviderRequests": 0
+  },
+  "authorHarness": false,
+  "behavioralChecks": 23,
+  "assessmentPlanSha256": "ce7a712c0ceeeb0a93cfd144062511c85806e7791c5441c57080bec4df0e2be0",
+  "preflightSha256": "ca8da591abc0c4e0027ec3addbae40979a14ec41a8e1c4746690c00478e5f548",
+  "files": {
+    "development/plain-ledger-native-high/PLAN.md": "ce7a712c0ceeeb0a93cfd144062511c85806e7791c5441c57080bec4df0e2be0",
+    "development/plain-ledger-native-high/REFERENCE-COMPATIBILITY.md": "de19cf0c23cd00d5424dc9c190751f19615adf302d29a4d6ef34dd1cf2f99700",
+    "development/plain-ledger-native-high/account-switch-ledger.test.mjs": "cac8e70672237ed629aea9198adf924751943f3b8b20d114c3b76c97c6d9002c",
+    "development/plain-ledger-native-high/calibration-receipts.json": "4cce3240a0f69a8d35d04c667c18181305298221c9edbc800bcd4afc3accfa05",
+    "development/plain-ledger-native-high/cli-persistence.test.mjs": "69d64508aedea998897ef9b539486cf6fae887d0269f999c0ff667c95b31a9d1",
+    "development/plain-ledger-native-high/environment.txt": "aa0afe37ca2ec1f3564642a02842d71472b72b88225069be22a4cbbe8fb114cc",
+    "development/plain-ledger-native-high/freeze.mjs": "4bec2ec43e62c1372ba098c4a7cf0a73b838a7df5b5f790539458947e05ada76",
+    "development/plain-ledger-native-high/kimi-migration.test.mjs": "d48fdbd2e9593ce2575c6dcc8e8421af5f6da1c089463b25218a56b5a6335ca6",
+    "development/plain-ledger-native-high/ledger-lifecycle.test.mjs": "0f049d12080a488c159b26716f43275b0d66751102d71521dcf77fbe88411ceb",
+    "development/plain-ledger-native-high/legacy-input.test.mjs": "d0cdb9449b719b2bc16874b3e81777c380ddb40b6e5bd597e45a8c286ac5f324",
+    "development/plain-ledger-native-high/migration-0.4.3.json": "7c0b0ef89805cd301173b07d611ffe1fa0c163e909ad142f21028b39ccdde4c7",
+    "development/plain-ledger-native-high/migration-contract.test.mjs": "d0f21acc82bfedf7e4ea72469f25259baed3b3fbb633dc87b2fa90093483febc",
+    "development/plain-ledger-native-high/original-PLAN.md": "29302c9d793743584fcf7c62ca6538aea35216734904ce85336fcc0e3a544758",
+    "development/plain-ledger-native-high/original-before.json": "efcd121d039f48b7ea4dee7129ae0383ba518915dccff15e320924492a0dd9b1",
+    "development/plain-ledger-native-high/original-task.txt": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+    "development/plain-ledger-native-high/preflight.mjs": "47bef979f826b7db6c0d759b5856177016849dd3ea64956d30d7c44ae979612a",
+    "development/plain-ledger-native-high/prepare-input.mjs": "770ec6823493b091c3b3d290108e5656f59b95ca1329131a5d436c251311e02c",
+    "development/plain-ledger-native-high/provenance.json": "a944586455807a760575eec95b670627b9c0c3e3c66b987edf0cced4ea0f8d96",
+    "development/plain-ledger-native-high/reference-compatibility-receipts.json": "2388441f754a1a86f5d005074cb7eada7bfb3fc6d7b7dbe96a45e98ed61737fd",
+    "development/plain-ledger-native-high/reference-compatibility.patch": "05105df0eafad600895060197ce2343fead52e7fe6781d748ef4c5ec51591d13",
+    "development/plain-ledger-native-high/run.mjs": "0dc938f7c87205150e856ce3340e816d1c680ce29e5ef3d220d29cb69ecb8381",
+    "development/polybench-pilot/run.mjs": "351fc8fbd3f9237666936d4f634cb232cd55538ab5b5b5aa557b7faaac1853aa",
+    "development/native-task-ab/run-comparison.mjs": "2f6f5ed96eb40ccccb167b3b68ebd4ea4dc71b43726abb599f19d90c7c6172d4",
+    "development/native-task-abc/native-run.mjs": "5d691871022fcf4f2117212c33b463849e791d7ebe120adc68e7ca419ee0d293",
+    "development/native-task-integrated/container-session.mjs": "60b2d069bd284868da431e17c85852b2c1c8753951aedef7ad3a69f9f1c71e72",
+    "development/native-task-integrated/container-relay.mjs": "db186a20946348867504c48d7faca8f40a93fdfa122e1102f581e8cf5377f1b3",
+    "development/native-task-utility/container/stop-workload.mjs": "b21c23f5a334dc54af340e2773e3e56427aa27a946231769d36df249ea54a69e",
+    "development/polybench-pilot/capture.mjs": "8ce3f0344bf45f8e25ef0317c914c21a566db717357e2d490803bc4dc2e3c7bc",
+    "development/native-output-retention/output-files.mjs": "bcc90984aa4e3ddc4048fc674f7762c245d5c0fb25ad8d053aae17a598ce0477",
+    "development/native-task-ab/extract-candidate.py": "aa5244bd4a5cc394344b266f0107728d9b70e190bad55de47c46dd10f28603de",
+    "development/native-task-offline/build.json": "16c5621afb56082001998a0f17f385ac90e4bdd31a19eeb215926de2e748ee61",
+    "/Users/tahion/dev/opencode-harness/.worktrees/verified-change-harness/local/template-toolchain-20260908/package/bin/opencode": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe",
+    "local/polybench-pilot/batch/freeze.json": "30008a1e389c67a40c4bfee0969b119f7c76cf0ee24a44364af261def605d216",
+    "local/polybench-pilot/batch/freeze-commit.json": "09580a67c738a05a5f21f554f2c76fa351e7a835c54bb86e75a99d10934fac86",
+    "local/polybench-pilot/batch/scheduling-paused.json": "69385be23d2edc8776accef8cd2b91cdbdf496a026e37bff9698862e8d29c6bd",
+    "local/polybench-pilot/batch/outcome.json": "8c1f279fc4b3b2ee0c63d5cc88b9c84ee1cfefdcbd683ab55dfcb95e7ed80402"
+  },
+  "realProviderRequestsBeforeFreeze": 0,
+  "projectVerify": "unavailable: pinned pnpm and web dependencies not cached"
+}

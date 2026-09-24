@@ -1,0 +1,12 @@
+{
+  "originalPreflightPreserved": true,
+  "correction": "Pre-create OpenCode initialization .gitignore before read-only mount",
+  "changedBundleFiles": [
+    ".gitignore"
+  ],
+  "originalBundleSha256": "a95a48181deefc2d73d5a9795089f7a8ac1826fbcd63aa1829d89f8cd6dfb9af",
+  "correctedBundleSha256": "c36a91a041ad38248be2b2b33a554ed628678c6d167e86af405418d34ecdce0e",
+  "candidatesChanged": false,
+  "reviewerChanged": false,
+  "realProviderRequests": 0
+}

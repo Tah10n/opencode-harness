@@ -1,0 +1,222 @@
+{
+  "coder/code-server": {
+    "H1-P": {
+      "R": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 6,
+        "unknown": 3
+      },
+      "D_bench": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 6,
+        "unknown": 3
+      }
+    },
+    "H0-P": {
+      "R": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 5,
+        "unknown": 3
+      },
+      "D_bench": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 5,
+        "unknown": 3
+      }
+    },
+    "H1-H0": {
+      "R": {
+        "wins": 1,
+        "losses": 0,
+        "ties": 5,
+        "unknown": 3
+      },
+      "D_bench": {
+        "wins": 1,
+        "losses": 0,
+        "ties": 5,
+        "unknown": 3
+      }
+    }
+  },
+  "microsoft/vscode": {
+    "H1-P": {
+      "R": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 6,
+        "unknown": 3
+      },
+      "D_bench": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 6,
+        "unknown": 3
+      }
+    },
+    "H0-P": {
+      "R": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 5,
+        "unknown": 3
+      },
+      "D_bench": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 5,
+        "unknown": 3
+      }
+    },
+    "H1-H0": {
+      "R": {
+        "wins": 1,
+        "losses": 0,
+        "ties": 5,
+        "unknown": 3
+      },
+      "D_bench": {
+        "wins": 1,
+        "losses": 0,
+        "ties": 5,
+        "unknown": 3
+      }
+    }
+  },
+  "mui/material-ui": {
+    "H1-P": {
+      "R": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 5,
+        "unknown": 2
+      },
+      "D_bench": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 5,
+        "unknown": 2
+      }
+    },
+    "H0-P": {
+      "R": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 4,
+        "unknown": 2
+      },
+      "D_bench": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 4,
+        "unknown": 2
+      }
+    },
+    "H1-H0": {
+      "R": {
+        "wins": 1,
+        "losses": 0,
+        "ties": 4,
+        "unknown": 2
+      },
+      "D_bench": {
+        "wins": 1,
+        "losses": 0,
+        "ties": 4,
+        "unknown": 2
+      }
+    }
+  },
+  "serverless/serverless": {
+    "H1-P": {
+      "R": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 3,
+        "unknown": 4
+      },
+      "D_bench": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 3,
+        "unknown": 4
+      }
+    },
+    "H0-P": {
+      "R": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 2,
+        "unknown": 4
+      },
+      "D_bench": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 2,
+        "unknown": 4
+      }
+    },
+    "H1-H0": {
+      "R": {
+        "wins": 1,
+        "losses": 0,
+        "ties": 2,
+        "unknown": 4
+      },
+      "D_bench": {
+        "wins": 1,
+        "losses": 0,
+        "ties": 2,
+        "unknown": 4
+      }
+    }
+  },
+  "sveltejs/svelte": {
+    "H1-P": {
+      "R": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 4,
+        "unknown": 4
+      },
+      "D_bench": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 4,
+        "unknown": 4
+      }
+    },
+    "H0-P": {
+      "R": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 4,
+        "unknown": 4
+      },
+      "D_bench": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 4,
+        "unknown": 4
+      }
+    },
+    "H1-H0": {
+      "R": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 4,
+        "unknown": 4
+      },
+      "D_bench": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 4,
+        "unknown": 4
+      }
+    }
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "findings": [
+    {
+      "id": "A1",
+      "candidate": "candidate-A",
+      "classification": "confirmed",
+      "claim": "### Medium — valid events are dropped whenever a scan also contains unsupported data\n\n- **Evidence:** `packages/connector/lib/adapters/shared.mjs:455-468, 481-493, 523-525`; `packages/connector/lib/adapters/opencode.mjs:94-116`\n- **Trigger:** A JSONL/SQLite source contains one malformed or unsupported candidate plus an unrelated valid usage record.\n- **Impact:** The valid record is parsed but not added to the ledger. The final result uses `eventLedgerEntries(...)` and ignores the local `entries` accumulator, so the valid usage can be omitted repeatedly. OpenCode explicitly skips ledger acceptance when `unsupported` is true.\n- **Smallest safe fix:** Accept valid records into the ledger even when the pass is partial; preserve the partial warning/diagnostic and only withhold unsupported records.",
+      "contract": "Preserve complete/partial semantics and count unrelated valid events.",
+      "entryPoint": "adapterFor(antigravity).collect and adapterFor(opencode).collect",
+      "input": "One valid 15-token event together with one unsupported event in JSONL or SQLite.",
+      "actual": "Both public collectors return empty entries, partial, rather than retaining 15.",
+      "reproduction": "candidate-A-observations.json: A1 (two paths)",
+      "limits": "Does not generalize to every malformed record or every adapter; no candidate repair."
+    },
+    {
+      "id": "A2",
+      "candidate": "candidate-A",
+      "classification": "confirmed",
+      "claim": "### Medium — unterminated tails can double-count already accepted events\n\n- **Evidence:** `packages/connector/lib/adapters/shared.mjs:476-479, 523-525`; `packages/connector/lib/adapters/claude.mjs:159-163, 222-225`\n- **Trigger:** An already accepted event is later observed as an unterminated final line after a file rewrite, truncation, or move.\n- **Impact:** The accepted tuple remains in `ledger`, while the same parsed tuple is emitted through `provisionalEntries`/`provisionalMessages`, causing duplicate totals.\n- **Smallest safe fix:** Carry provisional records with their hashed identities and suppress any identity already present in `ledger.events` or `ledger.legacyIds`.",
+      "contract": "Moving/truncating history cannot count an already accepted event twice.",
+      "entryPoint": "Public Antigravity and Claude collect with serialized prior state",
+      "input": "Accept a 15-token newline-terminated event; remove its file, move the same event to an unterminated line.",
+      "actual": "Both collectors return 30, partial, instead of 15.",
+      "reproduction": "candidate-A-observations.json: A2 (two adapters)",
+      "limits": "Confirmed move-to-new-path trigger. Existing-path rewrite with previous && !appended can withhold provisional totals, so the broad title is not universal."
+    },
+    {
+      "id": "A3",
+      "candidate": "candidate-A",
+      "classification": "confirmed",
+      "claim": "### Medium — ledger eviction permits later duplicate accounting\n\n- **Evidence:** `packages/connector/lib/adapters/shared.mjs:154-159`\n- **Trigger:** More than `65,536` distinct events are accepted, then an evicted event reappears in copied or restored history.\n- **Impact:** Its identity is no longer retained, so it is accepted and counted again. Marking the current pass partial does not preserve the no-duplicate guarantee on later passes.\n- **Smallest safe fix:** Do not evict identities while claiming exact deduplication; use a durable overflow/fail-closed state or another exact retention strategy.",
+      "contract": "Bounded storage must preserve accepted usage and exact no-reacceptance accounting.",
+      "entryPoint": "Public Antigravity collect after JSON reload of implementation-native state at 65536 events",
+      "input": "Seed the native serialized accepted tuple shape at capacity, accept 7 tokens, then replay the evicted first identity.",
+      "actual": "Total is 65542 rather than 65543. The first identity is evicted then accepted anew; another is evicted. Both passes partial.",
+      "reproduction": "candidate-A-observations.json: A3",
+      "limits": "Confirms loss and identity reacceptance. This reproduction does not show two simultaneous copies in returned totals or parse 65536 separate records. Prior assessment treated overflow as source-reviewed concern, not one of the four confirmed miss-table items."
+    },
+    {
+      "id": "B1",
+      "candidate": "candidate-B",
+      "classification": "confirmed",
+      "claim": "### HIGH — OpenCode preflight fails open on malformed or incomplete evidence\n\n- **Path/lines:** `packages/connector/lib/opencode-cutover-preflight.mjs:386-405`\n- **Trigger:** `config.json` is malformed, or an OpenCode source has a missing/invalid `sourceId` or sequence. Syntax errors return successfully, and invalid sources are filtered out; an empty result returns without blocking.\n- **Impact:** Guarded mutators such as `source add/remove` can proceed without proving the required 0.4.4 exact-ID cutover, potentially allowing accepted usage loss or duplication.\n- **Smallest safe fix:** Treat unreadable config and any malformed OpenCode source metadata as `opencode_cutover_required`; never return success when cutover evidence is unavailable.",
+      "contract": "Exact-ID cutover requirements remain fail closed.",
+      "entryPoint": "assertOpenCodeUpgradeReady -> real CLI source add -> withOpenCodeLifecycleMutation -> sourceCommand",
+      "input": "Existing accepted-state evidence with malformed config JSON, invalid OpenCode sourceId, or invalid sequence, in a valid private marked state directory.",
+      "actual": "All three guards return without rejection; CLI exits 0 and creates sources.json without confirmed cutover.",
+      "reproduction": "candidate-B-cli-observations.json (three paths)",
+      "limits": "Guard bypass is confirmed. No production account or actual accepted-usage deletion was exercised; HIGH is retained as reviewer wording, not independently established severity. The first fixture lacked the required marker and exited before the target mutation; that attempt is retained separately."
+    },
+    {
+      "id": "B2",
+      "candidate": "candidate-B",
+      "classification": "confirmed",
+      "claim": "### MEDIUM — Disconnected logical Codex accounts cannot be reactivated\n\n- **Path/lines:** `apps/web/app/api/installations/current/sources/register/route.ts:150-197`\n- **Trigger:** A logical Codex source already exists for the installation but has `status = 'disconnected'`, then registration is retried after reconnect/revocation.\n- **Impact:** The endpoint returns `source_registration_conflict` instead of restoring the existing mapping. Account switching after reconnect remains stuck in setup-pending and cannot recover the prior logical account.\n- **Smallest safe fix:** For a matching disconnected source and physical profile, reactivate and return the existing mapping inside the locked transaction.",
+      "contract": "Existing candidate reconnect/registration path promises reuse of saved logical mappings; this is an additional implementation defect on a surface excluded from the original connector task, not a newly imposed original-task requirement.",
+      "entryPoint": "DELETE installations/current -> connect pairing -> POST installations/current/sources/register",
+      "input": "Same installation and local logical Codex source are retained after revoke; user reconnects its physical profile.",
+      "actual": "Revoke marks logical row disconnected. exactPairingSources excludes logical rows, so pairing activates physical rows only. connect then explicitly registers saved logical rows; register requires existing.status === active and returns 409 source_registration_conflict.",
+      "reproduction": "Source chain: packages/connector/bin/viberacing.mjs:519,712; apps/web/app/api/installations/current/route.ts:340; apps/web/app/api/pairing/approve/route.ts:139,302; apps/web/app/api/installations/current/sources/register/route.ts:192,304",
+      "limits": "Confirmed by source control flow; live PostgreSQL/server execution NOT RUN. Does not justify mandatory expansion of original task into Codex discovery or a blanket reactivation policy. Proposed repair was not validated."
+    },
+    {
+      "id": "B3",
+      "candidate": "candidate-B",
+      "classification": "confirmed",
+      "claim": "### MEDIUM — Legacy event migration does not detect conflicting tuples\n\n- **Path/lines:** `packages/connector/lib/adapters/shared.mjs:126-134, 511-519`\n- **Trigger:** A migrated 0.4.3 event identity is observed again with different counters.\n- **Impact:** The old event is skipped based only on its date; the first tuple is retained, but collection is not marked partial and `local_event_identity_conflict` is not emitted. The result can falsely report complete data.\n- **Smallest safe fix:** Preserve a bounded legacy identity-to-tuple mapping, compare migrated events exactly, and set partial/conflict diagnostics while continuing unrelated events.",
+      "contract": "Conservative 0.4.3 migration; conflicting tuples retain accepted data and flag partial/conflict while unrelated events continue.",
+      "entryPoint": "Actual baseline Antigravity collect -> serialize old state -> current Antigravity collect on moved file",
+      "input": "Old event accepted at 15; same legacy identity reappears with 150 plus unrelated new event of 7.",
+      "actual": "Totals preserve 22, but completeness is complete and diagnostics empty, despite known conflicting counters.",
+      "reproduction": "candidate-B-observations.json: B3",
+      "limits": "Old state contains aggregate totals and ID/date aliases, not exact per-ID tuples. Reconstructing unavailable tuples as suggested is not demonstrated. A conservative uncertainty policy would need a separate design; no hidden reference schema or diagnostic spelling is required."
+    },
+    {
+      "id": "B4",
+      "candidate": "candidate-B",
+      "classification": "confirmed",
+      "claim": "## 3. Unfulfilled explicitly requested obligations\n\n- Original requirement: **“Do not ... change package versions.”**\n- Evidence: `packages/connector/package.json:3` and `packages/connector/lib/version.mjs:2` change the connector to `0.5.0`.",
+      "contract": "Do not change package versions; release/version changes are outside this task.",
+      "entryPoint": "Full implementation diff from shared baseline",
+      "input": "packages/connector/package.json and packages/connector/lib/version.mjs",
+      "actual": "Both change connector version 0.4.4 to 0.5.0.",
+      "reproduction": "git diff from the prepared baseline; both exact source files inspected",
+      "limits": "Direct original-task scope violation in the unchanged historical full control. No version files were removed or repaired to make the control pass."
+    }
+  ],
+  "otherStatements": [
+    {
+      "candidate": "candidate-A",
+      "classification": "hypothesis",
+      "claim": "Should pre-ledger OpenCode cutoverPending aliases be treated as accepted identities when their exact usage tuples are unavailable?",
+      "disposition": "Question only, not concrete detection of any of the four known cutover/corruption/diagnostic defects."
+    },
+    {
+      "candidate": "candidate-A",
+      "classification": "limitation",
+      "claim": "The three requested connector test commands were not run.",
+      "disposition": "Reviewer correctly marks its checks NOT RUN. Prior author suite evidence remains separate; this is not counted as a defect or false claim that historical suites never ran."
+    }
+  ],
+  "knownAR0Misses": [
+    {
+      "id": "confirmed-cutover",
+      "status": "missed",
+      "reason": "No concrete trigger/path finding for this pre-frozen violation in the final reviewer answer."
+    },
+    {
+      "id": "missing-cutover",
+      "status": "missed",
+      "reason": "No concrete trigger/path finding for this pre-frozen violation in the final reviewer answer."
+    },
+    {
+      "id": "corrupt-state",
+      "status": "missed",
+      "reason": "No concrete trigger/path finding for this pre-frozen violation in the final reviewer answer."
+    },
+    {
+      "id": "diagnostic-consumer",
+      "status": "missed",
+      "reason": "No concrete trigger/path finding for this pre-frozen violation in the final reviewer answer."
+    }
+  ],
+  "counts": {
+    "candidate-A": {
+      "confirmed": 3,
+      "unsupported": 0,
+      "incorrect": 0,
+      "unverified": 0,
+      "hypotheses": 1,
+      "knownMisses": 4
+    },
+    "candidate-B": {
+      "confirmed": 4,
+      "confirmedOriginalTaskViolations": 3,
+      "confirmedAdditionalImplementationDefects": 1,
+      "unsupported": 0,
+      "incorrect": 0,
+      "unverified": 0,
+      "hypotheses": 0
+    }
+  },
+  "receipts": [
+    {
+      "file": "candidate-A-observations.json",
+      "bytes": 2010,
+      "sha256": "45216d2b1a4dd03515fb74a8939b30d1f3658c2036e2768744b43d9759cb911d",
+      "exitCode": 0,
+      "environment": "Pinned Node 24 Linux; network none; read-only candidate and baseline; UID node; tmpfs scratch"
+    },
+    {
+      "file": "candidate-B-observations.json",
+      "bytes": 1866,
+      "sha256": "b2b42342316045cb1b73d8ecf74fb9955a9a242f11cada733e190a6e51ee67de",
+      "exitCode": 0,
+      "environment": "Pinned Node 24 Linux; network none; read-only candidate and baseline; UID node; tmpfs scratch"
+    },
+    {
+      "file": "candidate-B-cli-observations.json",
+      "bytes": 1074,
+      "sha256": "a757617e8691d9c3cc5d756849905ec6a535b2175176b567450688339f79b6ec",
+      "exitCode": 0,
+      "environment": "Pinned Node 24 Linux; network none; read-only candidate and baseline; UID node; tmpfs scratch"
+    }
+  ],
+  "repairRisk": "B3 cannot recover exact legacy tuples that old state never stored. B2 lies in excluded Codex/server work. Neither suggestion is trusted repair authority; no test weakening or patches were applied.",
+  "decision": "Positive concrete detection signal on AR0, with four known misses. Control also has real defects, so specificity on correct implementations is unproven. Extra unused skill tool in both inventories is a protocol deviation. No reliability, delivery improvement or promotion claim."
+}

@@ -1,0 +1,153 @@
+{
+  "realProviderRequests": 0,
+  "installed": [
+    {
+      "name": "final-H",
+      "passed": true,
+      "results": [
+        {
+          "arm": "H",
+          "nativeCompleted": true,
+          "terminationVerified": true,
+          "scriptedRequests": 19,
+          "elapsedMs": 6888
+        }
+      ]
+    },
+    {
+      "name": "final-R",
+      "passed": true,
+      "results": [
+        {
+          "arm": "R",
+          "nativeCompleted": true,
+          "terminationVerified": true,
+          "scriptedRequests": 16,
+          "elapsedMs": 5665
+        }
+      ]
+    },
+    {
+      "name": "final-default",
+      "passed": true,
+      "results": [
+        {
+          "arm": "P",
+          "nativeCompleted": true,
+          "terminationVerified": true,
+          "scriptedRequests": 10,
+          "elapsedMs": 3263
+        },
+        {
+          "arm": "H00",
+          "nativeCompleted": true,
+          "terminationVerified": true,
+          "scriptedRequests": 12,
+          "elapsedMs": 4370
+        }
+      ]
+    },
+    {
+      "name": "final-cancel",
+      "passed": true,
+      "results": [
+        {
+          "arm": "H",
+          "stopReason": {
+            "kind": "cancelled",
+            "name": "AbortError",
+            "message": "This operation was aborted"
+          },
+          "diagnosticChildTerminated": true,
+          "terminationVerified": true,
+          "scriptedRequests": 13
+        }
+      ]
+    }
+  ],
+  "localChecks": [
+    "verify-native-sensitivity-dependencies",
+    "verify-native-sensitivity",
+    "verify-native-task-investigation",
+    "verify-native-template",
+    "verify-scheduler",
+    "verify-scheduler-transport",
+    "verify-native-task"
+  ],
+  "integrationReview": {
+    "count": 1,
+    "findings": 1,
+    "resolved": [
+      "Dependency byte/mode/link/new-package preservation after investigator tools; .cache remains writable"
+    ],
+    "evidence": "Offline package answer=7/8 regression rejects test patch checked against a modified dependency"
+  },
+  "fullVerifier": {
+    "status": "verification_failed",
+    "reason": "PROCESS_CONTAINMENT_UNAVAILABLE",
+    "mandatoryStagesUnavailable": true
+  },
+  "historicalCampaignsResumed": 0,
+  "calibration": [
+    {
+      "task": "quick-lru-take",
+      "label": "reference",
+      "exit": 0
+    },
+    {
+      "task": "quick-lru-take",
+      "label": "alternative",
+      "exit": 0
+    },
+    {
+      "task": "quick-lru-take",
+      "label": "wrong-0",
+      "exit": 1
+    },
+    {
+      "task": "quick-lru-take",
+      "label": "wrong-1",
+      "exit": 1
+    },
+    {
+      "task": "denque-drain",
+      "label": "reference",
+      "exit": 0
+    },
+    {
+      "task": "denque-drain",
+      "label": "alternative",
+      "exit": 0
+    },
+    {
+      "task": "denque-drain",
+      "label": "wrong-0",
+      "exit": 1
+    },
+    {
+      "task": "denque-drain",
+      "label": "wrong-1",
+      "exit": 1
+    },
+    {
+      "task": "eventemitter-collect",
+      "label": "reference",
+      "exit": 0
+    },
+    {
+      "task": "eventemitter-collect",
+      "label": "alternative",
+      "exit": 0
+    },
+    {
+      "task": "eventemitter-collect",
+      "label": "wrong-0",
+      "exit": 1
+    },
+    {
+      "task": "eventemitter-collect",
+      "label": "wrong-1",
+      "exit": 1
+    }
+  ]
+}

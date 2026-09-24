@@ -1,0 +1,1 @@
+export const apply = (store, actions) => { const result=[]; for(const action of actions) { switch(action.type) { case 'publish':result.push(store.publish(action.id));break;case 'cancel':result.push(store.cancel(action.id));break;default:result.push(false); } } return result; };

@@ -1,0 +1,48 @@
+{
+  "sources": [
+    {
+      "archiveFile": "map/plan.md",
+      "sha256": "29302c9d793743584fcf7c62ca6538aea35216734904ce85336fcc0e3a544758",
+      "bytes": 6075
+    },
+    {
+      "archiveFile": "map/account-switch-ledger/task.txt",
+      "sha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+      "bytes": 1468
+    },
+    {
+      "archiveFile": "map/account-switch-ledger/before.json",
+      "sha256": "efcd121d039f48b7ea4dee7129ae0383ba518915dccff15e320924492a0dd9b1",
+      "bytes": 3282
+    },
+    {
+      "source": "2b16b6a8ad75b6b852adc5e2189e6d4a8d93eabd",
+      "archiveSha256": "ea549fcc30d8facef77af8ebebc280910a24537e44ad8c6cfcbdc4888b5dcab1",
+      "archiveBytes": 3676160
+    },
+    {
+      "source": "9e389a6dbc1b0c9813599fb61eceb6958d8c4de4",
+      "archiveSha256": "15d78b59aa6818fb0c55cd29b4ac30f8fb3c4d5ae808083632a09746bff12348",
+      "archiveBytes": 3952640
+    },
+    {
+      "probe": "account-switch-ledger.test.mjs",
+      "sha256": "cac8e70672237ed629aea9198adf924751943f3b8b20d114c3b76c97c6d9002c",
+      "unchanged": true
+    },
+    {
+      "probe": "ledger-lifecycle.test.mjs",
+      "sha256": "0f049d12080a488c159b26716f43275b0d66751102d71521dcf77fbe88411ceb",
+      "unchanged": true
+    },
+    {
+      "fixture": "migration-0.4.3.json",
+      "sourceCommit": "9e389a6dbc1b0c9813599fb61eceb6958d8c4de4",
+      "sourcePath": "packages/connector/test/fixtures/migration-0.4.3.json",
+      "sha256": "7c0b0ef89805cd301173b07d611ffe1fa0c163e909ad142f21028b39ccdde4c7",
+      "unchanged": true
+    }
+  ],
+  "baselineOriginalTestsVerified": true,
+  "realRequests": 0
+}

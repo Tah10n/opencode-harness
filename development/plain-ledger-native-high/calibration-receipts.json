@@ -1,0 +1,190 @@
+{
+  "referenceUniversalCorrectness": false,
+  "fullyCalibrated": true,
+  "realProviderRequests": 0,
+  "receipts": [
+    {
+      "file": "local/plain-ledger-native-high/baseline-legacy-input.json",
+      "sha256": "05fc8bf727880267a285539a4dad5a030ba15490d08963adcb0d47bfdc78c710",
+      "bytes": 1288,
+      "exitCode": 0,
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/baseline-original-tests.json",
+      "sha256": "36da4b12cd09d408f13cc3b00295fe45aa5e06a04b508fa9b7708018b1bde5ad",
+      "bytes": 19836,
+      "exitCode": 0,
+      "counts": {
+        "tests": 203,
+        "pass": 203,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/baseline-probes.json",
+      "sha256": "c55a71894aba305b05e01f84e67c48b17701421af76e44cf3bf3cb2011bf32aa",
+      "bytes": 6747,
+      "exitCode": 1,
+      "counts": {
+        "tests": 6,
+        "pass": 0,
+        "fail": 6,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-legacy-input.json",
+      "sha256": "cedfe53dfb348eb8bdfa1ab3789c248810e4ea7d60ef0c1cde464c2659e562b6",
+      "bytes": 3374,
+      "exitCode": 1,
+      "counts": {
+        "tests": 2,
+        "pass": 0,
+        "fail": 2,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-original-tests.json",
+      "sha256": "4568f526d79b4538ad0c6eec96ed769cc397e81784800471ecebb19ef57d48c1",
+      "bytes": 36930,
+      "exitCode": 1,
+      "counts": {
+        "tests": 246,
+        "pass": 241,
+        "fail": 5,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-probes.json",
+      "sha256": "a5d0c44c42d97ff85ea74a74aae58a06b1ed17573970c619c2e9e48ea83cc43e",
+      "bytes": 1717,
+      "exitCode": 0,
+      "counts": {
+        "tests": 6,
+        "pass": 6,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/baseline-kimi-migration.json",
+      "sha256": "494f9883c6b5f15e2050df369625d614fa0aa9ba5a49b4730ca240978d751ec5",
+      "bytes": 2163,
+      "exitCode": 1,
+      "counts": {
+        "tests": 1,
+        "pass": 0,
+        "fail": 1,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-kimi-migration.json",
+      "sha256": "51a93edc7c9e293f89fc26e844bb2f8085f55363ee0efb8d450f82e6d2af9219",
+      "bytes": 1239,
+      "exitCode": 0,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/baseline-cli-persistence.json",
+      "sha256": "2522a67ae4c00bd659cbe04298a7842f448aeaca1a6ad90a21c1760ab6b9e934",
+      "bytes": 11003,
+      "exitCode": 1,
+      "counts": {
+        "tests": 6,
+        "pass": 0,
+        "fail": 6,
+        "skipped": 0
+      },
+      "interpretation": "superseded fixture path error for Antigravity"
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-compat-fixed-cli-persistence.json",
+      "sha256": "b50a67a6e4e7e98a398f22263f5dcef975d73aeec4b541232b562f27ea8b97c7",
+      "bytes": 2630,
+      "exitCode": 1,
+      "counts": {
+        "tests": 6,
+        "pass": 5,
+        "fail": 1,
+        "skipped": 0
+      },
+      "interpretation": "superseded fixture path error for Antigravity"
+    },
+    {
+      "file": "local/plain-ledger-native-high/baseline-cli-persistence-v2.json",
+      "sha256": "6b90f8f7f658e162b5c5473811ba57a137b1664275e3e009c97165a8aa0b4b4c",
+      "bytes": 11244,
+      "exitCode": 1,
+      "counts": {
+        "tests": 6,
+        "pass": 0,
+        "fail": 6,
+        "skipped": 0
+      },
+      "interpretation": "contract calibration"
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-compat-fixed-cli-persistence-v2.json",
+      "sha256": "fc6d0b01f656144b2c39924d651cd68af0358ca7fb3c0d8805f0c7acf97cf35f",
+      "bytes": 1665,
+      "exitCode": 0,
+      "counts": {
+        "tests": 6,
+        "pass": 6,
+        "fail": 0,
+        "skipped": 0
+      },
+      "interpretation": "contract calibration"
+    },
+    {
+      "file": "local/plain-ledger-native-high/baseline-migration-contract.json",
+      "sha256": "55f50f6ec4af6abd0afbef765ed40e2ac1aa8f8bd4f65f6c79f65d3724d222a6",
+      "bytes": 8492,
+      "exitCode": 1,
+      "counts": {
+        "tests": 8,
+        "pass": 0,
+        "fail": 8,
+        "skipped": 0
+      },
+      "interpretation": "contract calibration"
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-compat-fixed-migration-contract.json",
+      "sha256": "dfeb1e0e7db4ae97d2e3300f977d052a9a8c95e84647d958b0e26bac1c55e9d8",
+      "bytes": 2081,
+      "exitCode": 0,
+      "counts": {
+        "tests": 8,
+        "pass": 8,
+        "fail": 0,
+        "skipped": 0
+      },
+      "interpretation": "contract calibration"
+    }
+  ],
+  "additionalProbeHashes": {
+    "development/plain-ledger-native-high/legacy-input.test.mjs": "d0cdb9449b719b2bc16874b3e81777c380ddb40b6e5bd597e45a8c286ac5f324",
+    "development/plain-ledger-native-high/cli-persistence.test.mjs": "69d64508aedea998897ef9b539486cf6fae887d0269f999c0ff667c95b31a9d1",
+    "development/plain-ledger-native-high/account-switch-ledger.test.mjs": "cac8e70672237ed629aea9198adf924751943f3b8b20d114c3b76c97c6d9002c",
+    "development/plain-ledger-native-high/ledger-lifecycle.test.mjs": "0f049d12080a488c159b26716f43275b0d66751102d71521dcf77fbe88411ceb",
+    "development/plain-ledger-native-high/kimi-migration.test.mjs": "d48fdbd2e9593ce2575c6dcc8e8421af5f6da1c089463b25218a56b5a6335ca6",
+    "development/plain-ledger-native-high/migration-contract.test.mjs": "d0f21acc82bfedf7e4ea72469f25259baed3b3fbb633dc87b2fa90093483febc"
+  },
+  "scope": "23 behavioral tests plus predeclared preservation source review; historical reference discrepancy retained and explicitly repaired in separate copy"
+}

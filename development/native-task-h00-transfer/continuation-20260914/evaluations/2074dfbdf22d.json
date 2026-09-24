@@ -1,0 +1,122 @@
+{
+  "id": "2074dfbdf22d",
+  "task": "eventemitter-prepend",
+  "project": "eventemitter3",
+  "Q": 1,
+  "findings": [],
+  "contentReview": {
+    "id": "2074dfbdf22d",
+    "task": "eventemitter-prepend",
+    "project": "eventemitter3",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "behaviorReview": "Extends original addListener helper with optional prepend boolean; retains validation, normalized context and once removal path. New prepends use unshift when listeners already form array; previous append registration path and emit/off functions unchanged.",
+    "retainedTestsReview": "All original independent regression cases retained, new CJS/ESM cases and type fixture added.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Mixed append/once/prepend/latest-prepend order with explicit receivers and two arguments, return this and second-emission persistent ordering."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Recursive prependOnce invokes once exactly once; regular prepended persists and removeListener removes it."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Symbol event emits twice with expected once/persistent order; both APIs exercised by ESM import; invalid handler on string event retains original registration."
+      }
+    ],
+    "typesReview": "Event-specific generic declarations plus test/types.ts checks inferred string/number params for both methods, empty-argument event, typed context and expected compile rejection of swapped number/string callback.",
+    "docsReview": "README removes stale unavailable-method claim and explains reverse registration ordering and optional-context examples.",
+    "contentFindings": [],
+    "pending": [
+      "ordinary project checks and ESM",
+      "independent public API checks",
+      "ordinary patch applicability",
+      "delivered TypeScript consumer compilation"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "applicability": {
+    "id": "2074dfbdf22d",
+    "task": "eventemitter-prepend",
+    "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "60898eb7b10ae52fbff4bdf695e89bc1e3840150a4c4df9dfd90e5b1abb34eaa",
+    "excludedPreparationArtifacts": [],
+    "types": {
+      "compiler": "6.0.3",
+      "exit": 0,
+      "output": "",
+      "fixtures": [
+        "test/types.ts"
+      ],
+      "scope": "Delivered standalone consumer checked with the same host compiler as calibration; ordinary runtime checks run separately on Linux arm64."
+    }
+  },
+  "sourcePatchSha256": "60898eb7b10ae52fbff4bdf695e89bc1e3840150a4c4df9dfd90e5b1abb34eaa",
+  "sourcePatchBytes": 10117,
+  "assessmentNotes": [],
+  "slot": 30,
+  "repetition": 2,
+  "arm": "P",
+  "D": 1,
+  "verification": [
+    {
+      "artifact": "reviews/2074dfbdf22d/independent/result.json",
+      "exit": 0,
+      "elapsedMs": 614,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Independent behavior passed",
+      "fullLocalOutputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/2074dfbdf22d/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 1056,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "\n> eventemitter3@5.0.4 test-esm\n> mocha test/test.mjs\n\n\n\n  ✔ exports `EventEmitter` as default export\n  ✔ exports `EventEmitter` as a named export\n  ✔ exposes prepending methods to ESM consumers\n\n  3 passing (1ms)\n",
+      "fullLocalOutputSha256": "dc27ec6f3c6de54388aaa5be349bf677ecd5b962a4c269d32c83d6200457929e",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "normalHandoff": true,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "lastNativeTextSha256": "9c328002ab8b1268fbf04a18dcd46bde8cf0509dfebb9e34d5f2c16ebbeedb71",
+    "normalFinalResponse": true,
+    "finalResponseExcerpt": "Implemented `prependListener` and `prependOnceListener` with newest-first ordering, context handling, once removal, symbols, filtering, and generic declarations.\n\nAdded:\n- CommonJS and ESM regressions\n- Recursive and invalid-handler tests\n- `test/types.ts` declaration fixture\n- README API documentation\n\nChecks:\n- `npm test`: 44 passing\n- `npm run test-esm`: 3 passing\n- `npm run rollup`: passed\n- Syntax and diff checks: passed\n- Type-check unavailable; no TypeScript compiler is installed, and fetching one failed due network resolution.",
+    "authorExplanationExcerpt": null,
+    "reportFindings": []
+  }
+}

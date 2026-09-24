@@ -1,0 +1,80 @@
+{
+  "evaluator": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+  "mode": "predictions",
+  "instances": [
+    "serverless__serverless-2434",
+    "serverless__serverless-6534",
+    "serverless__serverless-6842",
+    "sveltejs__svelte-5452",
+    "mui__material-ui-20356",
+    "sveltejs__svelte-1190"
+  ],
+  "subset_sha256": "f8ed1a65d80da2db31567668e0d0ae0bd95337f7203150a08c584107208d92a7",
+  "images": {
+    "polybench_javascript_serverless__serverless-2434": {
+      "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-2434:v1.1",
+      "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-2434@sha256:8785107b8605e443d82f4b6c2baac5f739163c277124c68d8b7a65bfc448052f",
+      "id": "sha256:8785107b8605e443d82f4b6c2baac5f739163c277124c68d8b7a65bfc448052f",
+      "architecture": "amd64",
+      "os": "linux",
+      "size": 5124369073,
+      "workdir": "/testbed"
+    },
+    "polybench_typescript_mui__material-ui-20356": {
+      "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-20356:v1.1",
+      "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-20356@sha256:7acde0dad3050de6a079120cf982095a8c11e3c41c5e8932155ce1f33081e3f7",
+      "id": "sha256:7acde0dad3050de6a079120cf982095a8c11e3c41c5e8932155ce1f33081e3f7",
+      "architecture": "amd64",
+      "os": "linux",
+      "size": 8821349006,
+      "workdir": "/testbed"
+    },
+    "polybench_javascript_serverless__serverless-6534": {
+      "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6534:v1.1",
+      "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6534@sha256:8600be77e4c2e4456f8587222423922fd33b4a70162c127bb1c16c8a55a3792f",
+      "id": "sha256:8600be77e4c2e4456f8587222423922fd33b4a70162c127bb1c16c8a55a3792f",
+      "architecture": "amd64",
+      "os": "linux",
+      "size": 5445541482,
+      "workdir": "/testbed"
+    },
+    "polybench_javascript_serverless__serverless-6842": {
+      "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6842:v1.1",
+      "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6842@sha256:2cf0633139250bf901f75ac7755a7cf4a11909cf4fd788888ffdb2806666c514",
+      "id": "sha256:2cf0633139250bf901f75ac7755a7cf4a11909cf4fd788888ffdb2806666c514",
+      "architecture": "amd64",
+      "os": "linux",
+      "size": 5455965446,
+      "workdir": "/testbed"
+    },
+    "polybench_javascript_sveltejs__svelte-5452": {
+      "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-5452:v1.1",
+      "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-5452@sha256:5dab9b6eddbfc538785901ce27e19cc373bbb78e31e0b4d94574d547d061403f",
+      "id": "sha256:5dab9b6eddbfc538785901ce27e19cc373bbb78e31e0b4d94574d547d061403f",
+      "architecture": "amd64",
+      "os": "linux",
+      "size": 5812387399,
+      "workdir": "/testbed"
+    },
+    "polybench_javascript_sveltejs__svelte-1190": {
+      "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1190:v1.1",
+      "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1190@sha256:28167366b3d50bb7b6cc3441186980d6022986d9fc60d6e6a193c7aa7cb7b858",
+      "id": "sha256:28167366b3d50bb7b6cc3441186980d6022986d9fc60d6e6a193c7aa7cb7b858",
+      "architecture": "amd64",
+      "os": "linux",
+      "size": 5438511802,
+      "workdir": "/testbed"
+    }
+  },
+  "prepared_dependencies": {},
+  "wrapper_sha256": "a2021a3064c0528cc88bddf0ac3a5a9faa1b74fb2aef7414a727b6a9fd0b30d7",
+  "container_boundary": {
+    "network": "none",
+    "cap_drop": [
+      "ALL"
+    ],
+    "no_new_privileges": true,
+    "memory": "8g",
+    "cpus": 4
+  }
+}

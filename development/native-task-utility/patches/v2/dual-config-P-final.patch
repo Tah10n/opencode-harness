@@ -1,0 +1,113 @@
+diff --git a/README.md b/README.md
+index 8ddbdd5..a77a3f7 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,21 @@
+ # dual-config
+ 
+ Run `npm test` with Node.js 24.
++
++## Configuration
++
++Both CommonJS and ESM entry points accept a legacy mode string or an options
++object:
++
++```js
++configure('compact');
++configure({mode: 'pretty', indent: 4});
++```
++
++The modes are `compact` and `pretty`. String modes use indentation `0` and
++`2`, respectively. An object requires `mode`; its optional `indent` must be
++an integer from `0` through `8`, inclusive. If `indent` is omitted, the
++mode's legacy default is used, and `indent: 0` is valid for `pretty`.
++
++Null, arrays, missing or non-string modes, and invalid indentation values
++throw `TypeError`. An invalid supplied mode string throws `RangeError`.
+diff --git a/index.cjs b/index.cjs
+index a6f3982..5f0a184 100644
+--- a/index.cjs
++++ b/index.cjs
+@@ -1 +1,32 @@
+-function configure(mode){if(!['compact','pretty'].includes(mode))throw new RangeError('Invalid mode');return {mode,indent:mode==='pretty'?2:0};}module.exports=configure;
++function configure(option) {
++  let mode;
++  let indent;
++
++  if (typeof option === 'string') {
++    mode = option;
++  } else {
++    if (option === null || typeof option !== 'object' || Array.isArray(option) || !Object.prototype.hasOwnProperty.call(option, 'mode')) {
++      throw new TypeError('Options must include a mode');
++    }
++
++    mode = option.mode;
++    if (typeof mode !== 'string') {
++      throw new TypeError('Mode must be a string');
++    }
++  }
++
++  if (!['compact', 'pretty'].includes(mode)) {
++    throw new RangeError('Invalid mode');
++  }
++
++  if (typeof option === 'object' && Object.prototype.hasOwnProperty.call(option, 'indent')) {
++    indent = option.indent;
++    if (!Number.isInteger(indent) || indent < 0 || indent > 8) {
++      throw new TypeError('Indent must be an integer from 0 through 8');
++    }
++  }
++
++  return {mode, indent: indent === undefined ? mode === 'pretty' ? 2 : 0 : indent};
++}
++
++module.exports = configure;
+diff --git a/test/consumer.test.mjs b/test/consumer.test.mjs
+index d80237c..7b13083 100644
+--- a/test/consumer.test.mjs
++++ b/test/consumer.test.mjs
+@@ -1,2 +1,42 @@
+-import {test} from 'node:test';import assert from 'node:assert/strict';import {createRequire} from 'node:module';import configure,{configure as named} from '../index.mjs';import {render} from '../consumer.mjs';const require=createRequire(import.meta.url);
+-test('legacy CJS and ESM entry points',()=>{assert.deepEqual(configure('pretty'),named('pretty'));assert.deepEqual(require('../index.cjs')('pretty'),{mode:'pretty',indent:2});assert.equal(render({x:1},'compact'),'\u007b"x":1}');assert.throws(()=>configure('wide'),RangeError);});
++import {test} from 'node:test';
++import assert from 'node:assert/strict';
++import {createRequire} from 'node:module';
++import configure, {configure as named} from '../index.mjs';
++import {render as renderEsm} from '../consumer.mjs';
++
++const require = createRequire(import.meta.url);
++const configureCjs = require('../index.cjs');
++const {render: renderCjs} = require('../consumer.cjs');
++
++test('legacy CJS and ESM entry points', () => {
++  assert.deepEqual(configure('compact'), {mode: 'compact', indent: 0});
++  assert.deepEqual(configure('pretty'), named('pretty'));
++  assert.deepEqual(configureCjs('pretty'), {mode: 'pretty', indent: 2});
++  assert.equal(renderEsm({x: 1}, 'compact'), '\u007b"x":1}');
++  assert.equal(renderCjs({x: 1}, 'compact'), '\u007b"x":1}');
++  assert.throws(() => configure('wide'), RangeError);
++});
++
++test('CJS and ESM consumers render object options', () => {
++  const options = {mode: 'pretty', indent: 4};
++  assert.equal(renderEsm({x: 1}, options), '{\n    "x": 1\n}');
++  assert.equal(renderCjs({x: 1}, options), '{\n    "x": 1\n}');
++  assert.equal(renderEsm({x: 1}, {mode: 'pretty', indent: 0}), '{"x":1}');
++  assert.equal(renderCjs({x: 1}, {mode: 'pretty', indent: 0}), '{"x":1}');
++  assert.deepEqual(options, {mode: 'pretty', indent: 4});
++});
++
++test('invalid object options use the documented errors', () => {
++  for (const render of [renderEsm, renderCjs]) {
++    assert.throws(() => render({}, {mode: 'compact', indent: 1.5}), TypeError);
++    assert.throws(() => render({}, {mode: 'compact', indent: 9}), TypeError);
++    assert.throws(() => render({}, {mode: 'compact', indent: NaN}), TypeError);
++    assert.throws(() => render({}, {}), TypeError);
++    assert.throws(() => render({}, null), TypeError);
++  }
++
++  assert.throws(() => configure({mode: 'wide'}), RangeError);
++  assert.throws(() => configure({mode: 'compact', indent: '2'}), TypeError);
++  assert.throws(() => configure({mode: 'compact', indent: undefined}), TypeError);
++  assert.throws(() => configure([]), TypeError);
++});

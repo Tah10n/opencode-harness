@@ -1,0 +1,1 @@
+export function createBucket(capacity,perSecond,now){let tokens=capacity;return {take(cost=1){if(tokens>=cost){tokens-=cost;return {allowed:true,retryAfterMs:0};}return {allowed:false,retryAfterMs:1000};}};}

@@ -1,0 +1,152 @@
+diff --git a/README.md b/README.md
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,15 @@
+ # quoted-contact-import
+ 
+ Small local library. Run `npm test`.
++
++`parseRows(text)` parses comma-separated records. LF and CRLF terminate records;
++CRLF and LF inside double-quoted fields are preserved. A quoted field starts
++with `"`, may contain commas and line breaks, and uses `""` for a literal
++quote. After its closing quote only a comma, record terminator, or end of input
++is valid. Whitespace is never trimmed, backslashes have no special meaning,
++and malformed quoting or bare CR throws `SyntaxError`.
++
++`importContacts(text)` treats the first row as case-sensitive headers. Headers
++must be unique and include `name` and `email`; other columns are ignored. Each
++data row must have the same width as the header row, otherwise a `TypeError` is
++thrown. Empty input and a valid header-only input return an empty array.
+diff --git a/src/contacts.mjs b/src/contacts.mjs
+--- a/src/contacts.mjs
++++ b/src/contacts.mjs
+@@ -1 +1,16 @@
+-import {parseRows} from './csv.mjs';export function importContacts(text){const [head,...rows]=parseRows(text);return rows.map(row=>({name:row[0],email:row[1]}));}
++import {parseRows} from './csv.mjs';
++
++export function importContacts(text) {
++  const rows = parseRows(text);
++  if (rows.length === 0) return [];
++
++  const [headers, ...data] = rows;
++  if (new Set(headers).size !== headers.length) throw new TypeError('Headers must be unique');
++  const nameIndex = headers.indexOf('name');
++  const emailIndex = headers.indexOf('email');
++  if (nameIndex === -1 || emailIndex === -1) throw new TypeError('Headers must include name and email');
++  return data.map((row) => {
++    if (row.length !== headers.length) throw new TypeError('Row width does not match headers');
++    return {name: row[nameIndex], email: row[emailIndex]};
++  });
++}
+diff --git a/src/csv.mjs b/src/csv.mjs
+--- a/src/csv.mjs
++++ b/src/csv.mjs
+@@ -1 +1,77 @@
+-export function parseRows(text){return text.trim().split(/\r?\n/).map(row=>row.split(','));}
++export function parseRows(text) {
++  if (text.length === 0) return [];
++
++  const rows = [];
++  let row = [];
++  let field = '';
++  let quoted = false;
++  let closedQuote = false;
++  let atFieldStart = true;
++  let justTerminated = false;
++
++  const finishField = () => {
++    row.push(field);
++    field = '';
++    atFieldStart = true;
++    closedQuote = false;
++  };
++  const finishRow = () => {
++    if (row.length === 0 && field.length === 0 && !closedQuote && rows.length > 0) {
++      justTerminated = true;
++      return;
++    }
++    finishField();
++    rows.push(row);
++    row = [];
++    justTerminated = true;
++  };
++
++  for (let i = 0; i < text.length; i += 1) {
++    const character = text[i];
++    justTerminated = false;
++
++    if (quoted) {
++      if (character === '"') {
++        if (text[i + 1] === '"') {
++          field += '"';
++          i += 1;
++        } else {
++          quoted = false;
++          closedQuote = true;
++        }
++      } else {
++        field += character;
++      }
++      continue;
++    }
++
++    if (closedQuote) {
++      if (character === ',') finishField();
++      else if (character === '\n') finishRow();
++      else if (character === '\r' && text[i + 1] === '\n') {
++        i += 1;
++        finishRow();
++      } else throw new SyntaxError('Unexpected character after closing quote');
++      continue;
++    }
++
++    if (atFieldStart && character === '"') {
++      quoted = true;
++      atFieldStart = false;
++    } else if (character === ',') finishField();
++    else if (character === '\n') finishRow();
++    else if (character === '\r' && text[i + 1] === '\n') {
++      i += 1;
++      finishRow();
++    } else if (character === '\r') throw new SyntaxError('Bare carriage return');
++    else if (character === '"') throw new SyntaxError('Quote in unquoted field');
++    else {
++      field += character;
++      atFieldStart = false;
++    }
++  }
++
++  if (quoted) throw new SyntaxError('Unclosed quoted field');
++  if (!justTerminated) finishRow();
++  return rows;
++}
+diff --git a/test/contacts.test.mjs b/test/contacts.test.mjs
+--- a/test/contacts.test.mjs
++++ b/test/contacts.test.mjs
+@@ -1,2 +1,25 @@
+ import {test} from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';
+-import {importContacts} from '../src/contacts.mjs';test('legacy simple import',()=>{assert.deepEqual(importContacts('name,email\nAda,a@x'),[{name:'Ada',email:'a@x'}]);});
++import {parseRows} from '../src/csv.mjs';
++import {importContacts} from '../src/contacts.mjs';
++
++test('legacy simple import', () => {
++  assert.deepEqual(importContacts('name,email\nAda,a@x'), [{name: 'Ada', email: 'a@x'}]);
++});
++
++test('parses escaped quotes, commas, and newlines', () => {
++  assert.deepEqual(parseRows('name,note\nAda,"said ""hi, there""\nnext"\r\n'), [
++    ['name', 'note'],
++    ['Ada', 'said "hi, there"\nnext'],
++  ]);
++});
++
++test('imports reordered headers and ignores other columns', () => {
++  assert.deepEqual(importContacts('email,ignored,name\na@x,value,Ada\n'), [{name: 'Ada', email: 'a@x'}]);
++});
++
++test('rejects malformed quoting and row widths', () => {
++  assert.throws(() => parseRows('name,email\nAda,"bad'), SyntaxError);
++  assert.throws(() => parseRows('name,email\nAda,ba"d'), SyntaxError);
++  assert.throws(() => importContacts('name,email\nAda'), TypeError);
++  assert.throws(() => importContacts('name,name,email\nAda,Ada,a@x'), TypeError);
++});

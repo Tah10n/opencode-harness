@@ -1,0 +1,383 @@
+{
+  "slot": 3,
+  "task": "legacy-runtime-reload",
+  "arm": "D",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 372672,
+  "requests": 47,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": null,
+  "repairs": null,
+  "toolCalls": 50,
+  "sessions": 2,
+  "phaseCount": 1,
+  "execution": "completed",
+  "terminationVerified": true,
+  "cleanupVerified": true,
+  "observedUsage": {
+    "input_tokens": 1990350,
+    "cached_tokens": 879104,
+    "output_tokens": 11783,
+    "reasoning_tokens": 4378,
+    "total_tokens": 2002133
+  },
+  "usageComplete": true,
+  "requestEfforts": {
+    "none": 1,
+    "low": 46
+  },
+  "httpStatuses": {
+    "200": 47
+  },
+  "artifactWorkflowStatus": "incomplete",
+  "artifactRepairs": 1,
+  "nativeToolOutputParsed": false,
+  "stages": [
+    {
+      "label": "implementation",
+      "role": "author",
+      "elapsedMs": 275410
+    },
+    {
+      "label": "correction",
+      "role": "author",
+      "elapsedMs": 84926
+    }
+  ],
+  "correctionReasons": [
+    "Missing final verification after the last mutation: node --test packages/connector/test/state-security.test.mjs",
+    "Missing final verification after the last mutation: node --test packages/connector/test/config.test.mjs --test-name-pattern='runtime|state|executable'",
+    "Missing final verification after the last mutation: git diff --check",
+    "Existing test/fixture content changed or was removed; assess necessary scenario preservation using the exact diff and added tests."
+  ],
+  "coverageObservation": "no_existing_test_changes_observed",
+  "limits": [
+    "Some observed project checks failed, lacked test results or were not repeated after the last mutation."
+  ],
+  "phaseChecks": {
+    "D0": {
+      "checksCurrent": false,
+      "changedTestFiles": [
+        "packages/connector/test/state-security.test.mjs"
+      ],
+      "latestChecks": [
+        {
+          "command": "node --test packages/connector/test/state-security.test.mjs",
+          "workdir": ".",
+          "provenance": "initial Node test workflow",
+          "exit": 1,
+          "state": "completed",
+          "current": false,
+          "tests": 10,
+          "successful": false
+        },
+        {
+          "command": "node --test packages/connector/test/config.test.mjs --test-name-pattern='runtime|state|executable'",
+          "workdir": ".",
+          "provenance": "initial Node test workflow",
+          "exit": 1,
+          "state": "completed",
+          "current": false,
+          "tests": 76,
+          "successful": false
+        },
+        {
+          "command": "git diff --check",
+          "workdir": "<delivery-worktree>",
+          "provenance": "explicit original task",
+          "exit": 0,
+          "state": "completed",
+          "current": false,
+          "tests": null,
+          "successful": true
+        }
+      ]
+    },
+    "final": {
+      "checksCurrent": false,
+      "changedTestFiles": [],
+      "latestChecks": [
+        {
+          "command": "node --test packages/connector/test/state-security.test.mjs",
+          "workdir": ".",
+          "provenance": "initial Node test workflow",
+          "exit": 0,
+          "state": "completed",
+          "current": true,
+          "tests": 9,
+          "successful": true
+        },
+        {
+          "command": "node --test packages/connector/test/config.test.mjs --test-name-pattern='runtime|state|executable'",
+          "workdir": ".",
+          "provenance": "initial Node test workflow",
+          "exit": 1,
+          "state": "completed",
+          "current": false,
+          "tests": 76,
+          "successful": false
+        },
+        {
+          "command": "git diff --check",
+          "workdir": "<delivery-worktree>",
+          "provenance": "explicit original task",
+          "exit": 0,
+          "state": "completed",
+          "current": true,
+          "tests": null,
+          "successful": true
+        },
+        {
+          "command": "node --test packages/connector/test/executables.test.mjs packages/connector/test/config.test.mjs --test-name-pattern='runtime|executable|installation identity'",
+          "workdir": ".",
+          "provenance": "initial Node test workflow",
+          "exit": 1,
+          "state": "completed",
+          "current": true,
+          "tests": 82,
+          "successful": false
+        }
+      ]
+    }
+  },
+  "packet": "H2",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/lib/config.mjs"
+    ],
+    "patchSha256": "89c7c137cb1e27ed175c10af24d89492b891eda2a07463cfa839a72d01f08748"
+  },
+  "grading": {
+    "final": {
+      "packet": "H2",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 2,
+            "pass": 2,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 2,
+            "pass": 2,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "legacy-acceptance": {
+          "code": 1,
+          "timedOut": false,
+          "counts": {
+            "tests": 9,
+            "pass": 7,
+            "fail": 2,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 1,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 0,
+            "fail": 1,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": false,
+      "cleanup": 0
+    },
+    "D0": {
+      "packet": "H2",
+      "phase": "D0",
+      "checks": {
+        "ordinary": {
+          "code": 1,
+          "timedOut": false,
+          "counts": {
+            "tests": 16,
+            "pass": 14,
+            "fail": 1,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 2,
+            "pass": 2,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 2,
+            "pass": 2,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "legacy-acceptance": {
+          "code": 1,
+          "timedOut": false,
+          "counts": {
+            "tests": 9,
+            "pass": 7,
+            "fail": 2,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 1,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 0,
+            "fail": 1,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": false,
+      "cleanup": 0
+    }
+  },
+  "sourceReview": {
+    "packet": "H2",
+    "assessmentScope": "Final source and delivered tests/README inspection by the integrator who knows the schedule; independent frozen executable checks are reported separately.",
+    "phases": {
+      "D0": {
+        "sourceConformsToTask": false,
+        "necessaryCoverageDelivered": false,
+        "documentationDelivered": true,
+        "newRegressionFound": true,
+        "notes": [
+          "Frozen full-layout legacy acceptance fails with \"state contains an unrelated entry: lib\" in both phases. recognizedLegacyRuntimePaths applies info.nlink !== 1 to directories as well as files, so the nested adapters directory is rejected on the Linux task filesystem. The complete-layout failure is separate from the subset/cardinality ambiguity.",
+          "No completed new project regression for legacy migration, executable resolution or repeated reload is delivered. Existing tests alone cannot exercise the newly accepted layout.",
+          "README describes the new layout, but says seven lib files while the task and allowlist contain six.",
+          "D0 changes an existing callback closing line to a stray comment terminator and leaves an unfinished added regression in a comment. This corrupts the supplied suite. The exact-layout count condition is false instead of a cardinality check.",
+          "The frozen supplemental reload evaluator uses a subset of known legacy files. Task wording is ambiguous on whole-set presence; preserve this raw failure separately and do not use the cardinality requirement alone to fail the task. Complete-layout acceptance, directory handling and missing delivered regressions are separate questions."
+        ],
+        "evidence": [
+          "packages/connector/lib/config.mjs recognizedLegacyRuntimePaths",
+          "packages/connector/test/state-security.test.mjs",
+          "packages/connector/README.md legacy migration paragraph"
+        ],
+        "oldCoveragePreserved": false,
+        "newRequiredCoverageDelivered": false
+      },
+      "final": {
+        "sourceConformsToTask": false,
+        "necessaryCoverageDelivered": false,
+        "documentationDelivered": true,
+        "newRegressionFound": false,
+        "notes": [
+          "Frozen full-layout legacy acceptance fails with \"state contains an unrelated entry: lib\" in both phases. recognizedLegacyRuntimePaths applies info.nlink !== 1 to directories as well as files, so the nested adapters directory is rejected on the Linux task filesystem. The complete-layout failure is separate from the subset/cardinality ambiguity.",
+          "No completed new project regression for legacy migration, executable resolution or repeated reload is delivered. Existing tests alone cannot exercise the newly accepted layout.",
+          "README describes the new layout, but says seven lib files while the task and allowlist contain six.",
+          "The corrective pass restores state-security.test.mjs byte-for-byte to the original and removes the unfinished regression. It reinstates the exact file cardinality condition. This repairs the damaged old suite but does not supply the required new acceptance/rejection/reload regressions.",
+          "Some native commands passed pattern options after test file arguments and ran broad integration suites with scheduler timeouts. Preserve raw failures; independent targeted checks remain separate.",
+          "The frozen supplemental reload evaluator uses a subset of known legacy files. Task wording is ambiguous on whole-set presence; preserve this raw failure separately and do not use the cardinality requirement alone to fail the task. Complete-layout acceptance, directory handling and missing delivered regressions are separate questions.",
+          "The damaged old suite is repaired (external ordinary check changes from SyntaxError to passed). The required legacy behavior remains unfixed; no additional failing pre-existing product behavior was established by the scoped preservation checks. The second legacy check fails on diagnostic wording before later assertions, so it does not prove a privacy boundary was weakened."
+        ],
+        "evidence": [
+          "packages/connector/lib/config.mjs recognizedLegacyRuntimePaths",
+          "packages/connector/test/state-security.test.mjs",
+          "packages/connector/README.md legacy migration paragraph"
+        ],
+        "oldCoveragePreserved": true,
+        "newRequiredCoverageDelivered": false
+      }
+    }
+  },
+  "D0Available": true,
+  "D0FinalPatchEqual": false,
+  "publicPathNormalization": "Delivery-worktree runtime prefix normalized; raw local evidence is unchanged.",
+  "assessment": {
+    "final": {
+      "workingBehaviorObserved": false,
+      "deliveredChecksPassed": true,
+      "allFrozenChecksPassed": false,
+      "necessaryCoverageDelivered": false,
+      "oldCoveragePreserved": true,
+      "newRequiredCoverageDelivered": false,
+      "documentationDelivered": true,
+      "completePatchDelivery": false,
+      "newRegressionFound": false
+    },
+    "D0": {
+      "workingBehaviorObserved": false,
+      "deliveredChecksPassed": false,
+      "allFrozenChecksPassed": false,
+      "necessaryCoverageDelivered": false,
+      "oldCoveragePreserved": false,
+      "newRequiredCoverageDelivered": false,
+      "documentationDelivered": true,
+      "completePatchDelivery": false,
+      "newRegressionFound": true
+    }
+  },
+  "D0FinalChangedPaths": [
+    "packages/connector/lib/config.mjs",
+    "packages/connector/test/state-security.test.mjs"
+  ],
+  "D0FinalTreeEqual": false
+}

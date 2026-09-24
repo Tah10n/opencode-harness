@@ -1,0 +1,897 @@
+diff --git a/README.md b/README.md
+index 0051482c422963fa51b0376d153e4a039780e754..499ae205334300dcfb7a6e0bfee052bc457cc3f5 100644
+--- a/README.md
++++ b/README.md
+@@ -1,38 +1,40 @@
+-# Tahion Personal Site
+-
+-Fast static Vite + React + TypeScript portfolio with an interactive WebGL backdrop and local Prompt Cockpit.
+-
+-## Requirements
+-
+-- Node.js `>=22.12.0`
+-- npm `>=10.0.0`
+-
+-The local machine currently uses Node `24.15.0`; `.nvmrc` and `.node-version` are pinned to that version for reproducible setup.
+-
+-## Commands
+-
+-```bash
+-npm install
+-npm run dev
+-npm run check
+-npm run build
+-npm run preview
+-```
+-
+-- `npm run dev` starts Vite at `http://127.0.0.1:5173/Tahion_Personal_site/`.
+-- `npm run preview` serves the production build at `http://127.0.0.1:4173/Tahion_Personal_site/`.
+-- `npm run check` runs ESLint, Prettier check, TypeScript, and production build.
+-
+-## Content
+-
+-Portfolio copy, links, skills, and project cards live in `src/data/profile.ts`.
+-
+-## Deployment
+-
+-Vite is configured for GitHub Pages project hosting with:
+-
+-```ts
+-base: "/Tahion_Personal_site/";
+-```
+-
+-If the repository or deploy path changes, update `vite.config.ts`.
++# Tahion Personal Site
++
++Fast static Vite + React + TypeScript portfolio with an interactive WebGL backdrop and local Prompt Cockpit.
++
++## Requirements
++
++- Node.js `>=22.12.0`
++- npm `>=10.0.0`
++
++The local machine currently uses Node `24.15.0`; `.nvmrc` and `.node-version` are pinned to that version for reproducible setup.
++
++## Commands
++
++```bash
++npm install
++npm run dev
++npm run check
++npm run build
++npm run preview
++```
++
++- `npm run dev` starts Vite at `http://127.0.0.1:5173/Tahion_Personal_site/`.
++- `npm run preview` serves the production build at `http://127.0.0.1:4173/Tahion_Personal_site/`.
++- `npm run check` runs ESLint, Prettier check, TypeScript, and production build.
++
++## Content
++
++Portfolio copy, links, skills, and project cards live in `src/data/profile.ts`.
++
++## Deployment
++
++Vite is configured for GitHub Pages project hosting with:
++
++```ts
++base: "/Tahion_Personal_site/";
++```
++
++If the repository or deploy path changes, update `vite.config.ts`.
++
++Background preferences are stored at tahion.visual.preferences as version 1, variant and theme. Valid legacy raw variant/theme keys migrate once and remain untouched. Invalid current records remain intact and use defaults. Local selections persist both fields. LocalStorage events update controls, backdrop and document theme without echo writes; blocked storage leaves in-memory controls usable.
+diff --git a/package.json b/package.json
+index d7c0527b66b87f5e48e4c035514945b1d547214a..b83fe85c0dbdcf239663d1f7b5a491a9615ad060 100644
+--- a/package.json
++++ b/package.json
+@@ -1,39 +1,40 @@
+-{
+-  "name": "tahion-personal-site",
+-  "private": true,
+-  "version": "0.1.0",
+-  "type": "module",
+-  "scripts": {
+-    "dev": "vite --host 127.0.0.1 --port 5173",
+-    "build": "tsc --noEmit && vite build",
+-    "preview": "vite preview --host 127.0.0.1 --port 4173",
+-    "typecheck": "tsc --noEmit",
+-    "lint": "eslint .",
+-    "format": "prettier . --write",
+-    "format:check": "prettier . --check",
+-    "check": "npm run lint && npm run format:check && npm run build"
+-  },
+-  "engines": {
+-    "node": ">=22.12.0",
+-    "npm": ">=10.0.0"
+-  },
+-  "dependencies": {
+-    "lucide-react": "^0.561.0",
+-    "react": "^19.2.3",
+-    "react-dom": "^19.2.3"
+-  },
+-  "devDependencies": {
+-    "@eslint/js": "^10.0.1",
+-    "@types/react": "^19.2.14",
+-    "@types/react-dom": "^19.2.3",
+-    "@vitejs/plugin-react": "^5.1.1",
+-    "eslint": "^10.2.1",
+-    "eslint-plugin-react-hooks": "^7.1.1",
+-    "eslint-plugin-react-refresh": "^0.5.2",
+-    "globals": "^17.5.0",
+-    "prettier": "^3.8.3",
+-    "typescript": "^5.9.3",
+-    "typescript-eslint": "^8.59.0",
+-    "vite": "^7.2.7"
+-  }
+-}
++{
++  "name": "tahion-personal-site",
++  "private": true,
++  "version": "0.1.0",
++  "type": "module",
++  "scripts": {
++    "dev": "vite --host 127.0.0.1 --port 5173",
++    "build": "tsc --noEmit && vite build",
++    "preview": "vite preview --host 127.0.0.1 --port 4173",
++    "typecheck": "tsc --noEmit",
++    "lint": "eslint .",
++    "format": "prettier . --write",
++    "format:check": "prettier . --check",
++    "check": "npm run lint && npm run format:check && npm test && npm run build",
++    "test": "node --test --experimental-strip-types \"tests/*.test.ts\""
++  },
++  "engines": {
++    "node": ">=22.12.0",
++    "npm": ">=10.0.0"
++  },
++  "dependencies": {
++    "lucide-react": "^0.561.0",
++    "react": "^19.2.3",
++    "react-dom": "^19.2.3"
++  },
++  "devDependencies": {
++    "@eslint/js": "^10.0.1",
++    "@types/react": "^19.2.14",
++    "@types/react-dom": "^19.2.3",
++    "@vitejs/plugin-react": "^5.1.1",
++    "eslint": "^10.2.1",
++    "eslint-plugin-react-hooks": "^7.1.1",
++    "eslint-plugin-react-refresh": "^0.5.2",
++    "globals": "^17.5.0",
++    "prettier": "^3.8.3",
++    "typescript": "^5.9.3",
++    "typescript-eslint": "^8.59.0",
++    "vite": "^7.2.7"
++  }
++}
+diff --git a/src/App.tsx b/src/App.tsx
+index a9d786f8a5696b2eb9b2f4bb691a0503227260b7..1877c333d19d4a2f86fb8223be4e17aebd691d36 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -1,274 +1,270 @@
+-import {
+-  ArrowUpRight,
+-  BrainCircuit,
+-  Code2,
+-  Cpu,
+-  Gauge,
+-  Github,
+-  Layers3,
+-  Mail,
+-  MapPin,
+-  Palette,
+-  Send,
+-  TerminalSquare,
+-  Zap,
+-} from "lucide-react";
+-import { useEffect, useState } from "react";
+-import { PromptCockpit } from "./components/PromptCockpit";
+-import { BackdropTheme, BackdropVariant, ShaderBackdrop } from "./components/ShaderBackdrop";
+-import { profile } from "./data/profile";
+-
+-const iconMap = [BrainCircuit, Code2, Gauge, Cpu];
+-
+-const backdropVariants: { id: BackdropVariant; label: string }[] = [
+-  { id: "signal", label: "Signal" },
+-  { id: "topography", label: "Topo" },
+-  { id: "radar", label: "Radar" },
+-];
+-
+-const backdropThemes: { id: BackdropTheme; label: string }[] = [
+-  { id: "acid", label: "Acid" },
+-  { id: "plasma", label: "Plasma" },
+-  { id: "ice", label: "Ice" },
+-];
+-
+-const variantStorageKey = "tahion.backdrop.variant";
+-const themeStorageKey = "tahion.backdrop.theme";
+-
+-function readStoredChoice<T extends string>(key: string, fallback: T, allowed: readonly T[]) {
+-  const stored = window.localStorage.getItem(key);
+-  return allowed.includes(stored as T) ? (stored as T) : fallback;
+-}
+-
+-function App() {
+-  const [backdropVariant, setBackdropVariant] = useState<BackdropVariant>(() =>
+-    readStoredChoice(
+-      variantStorageKey,
+-      "signal",
+-      backdropVariants.map((item) => item.id),
+-    ),
+-  );
+-  const [backdropTheme, setBackdropTheme] = useState<BackdropTheme>(() =>
+-    readStoredChoice(
+-      themeStorageKey,
+-      "acid",
+-      backdropThemes.map((item) => item.id),
+-    ),
+-  );
+-
+-  useEffect(() => {
+-    window.localStorage.setItem(variantStorageKey, backdropVariant);
+-  }, [backdropVariant]);
+-
+-  useEffect(() => {
+-    window.localStorage.setItem(themeStorageKey, backdropTheme);
+-    document.documentElement.dataset.siteTheme = backdropTheme;
+-  }, [backdropTheme]);
+-
+-  const activeVariantLabel =
+-    backdropVariants.find((item) => item.id === backdropVariant)?.label ?? "Signal";
+-  const activeThemeLabel =
+-    backdropThemes.find((item) => item.id === backdropTheme)?.label ?? "Acid";
+-
+-  return (
+-    <main>
+-      <section className="hero" aria-labelledby="hero-title">
+-        <ShaderBackdrop variant={backdropVariant} theme={backdropTheme} />
+-        <div className="hero-content">
+-          <header className="topbar">
+-            <a className="brand" href="#hero-title" aria-label="Tahion home">
+-              <TerminalSquare size={22} aria-hidden="true" />
+-              <span>{profile.handle}</span>
+-            </a>
+-            <div className="topbar-actions">
+-              <nav aria-label="Primary navigation">
+-                <a href="#work">Work</a>
+-                <a href="#tools">Tools</a>
+-                <a href="#contact">Contact</a>
+-              </nav>
+-
+-              <div className="visual-controls" aria-label="Visual controls">
+-                <div className="segmented-control" aria-label="Background variant">
+-                  <span>
+-                    <Layers3 size={14} aria-hidden="true" />
+-                  </span>
+-                  {backdropVariants.map((item) => (
+-                    <button
+-                      key={item.id}
+-                      type="button"
+-                      className={backdropVariant === item.id ? "is-active" : ""}
+-                      onClick={() => setBackdropVariant(item.id)}
+-                    >
+-                      {item.label}
+-                    </button>
+-                  ))}
+-                </div>
+-
+-                <div className="segmented-control theme-control" aria-label="Color theme">
+-                  <span>
+-                    <Palette size={14} aria-hidden="true" />
+-                  </span>
+-                  {backdropThemes.map((item) => (
+-                    <button
+-                      key={item.id}
+-                      type="button"
+-                      className={backdropTheme === item.id ? "is-active" : ""}
+-                      onClick={() => setBackdropTheme(item.id)}
+-                    >
+-                      <i aria-hidden="true" data-swatch={item.id} />
+-                      {item.label}
+-                    </button>
+-                  ))}
+-                </div>
+-              </div>
+-            </div>
+-          </header>
+-
+-          <div className="cockpit-grid">
+-            <section className="identity-panel" aria-label="Portfolio introduction">
+-              <span className="eyebrow">
+-                <Zap size={15} aria-hidden="true" />
+-                AI-native product builder
+-              </span>
+-              <h1 id="hero-title">{profile.name}</h1>
+-              <p className="headline">{profile.headline}</p>
+-              <p className="bio">{profile.bio}</p>
+-
+-              <div className="signal-row">
+-                <span className="signal-pill">
+-                  <MapPin size={15} aria-hidden="true" />
+-                  <span className="signal-text">{profile.location}</span>
+-                </span>
+-                <span className="signal-pill">
+-                  <span className="signal-text">{profile.availability}</span>
+-                </span>
+-              </div>
+-
+-              <div className="hero-actions">
+-                <a href="#tools" className="primary-action">
+-                  Open cockpit
+-                  <ArrowUpRight size={17} aria-hidden="true" />
+-                </a>
+-                <a href={`mailto:${profile.contactCta.email}`} className="secondary-action">
+-                  Contact
+-                  <Mail size={17} aria-hidden="true" />
+-                </a>
+-              </div>
+-            </section>
+-
+-            <aside className="telemetry-panel" aria-label="Live build telemetry">
+-              <div className="telemetry-top">
+-                <span>System signal</span>
+-                <strong>Fast static</strong>
+-              </div>
+-              <div className="telemetry-meter" aria-hidden="true">
+-                <span />
+-              </div>
+-              <dl>
+-                <div>
+-                  <dt>Runtime</dt>
+-                  <dd>React + Vite</dd>
+-                </div>
+-                <div>
+-                  <dt>Data</dt>
+-                  <dd>Local-first</dd>
+-                </div>
+-                <div>
+-                  <dt>Network</dt>
+-                  <dd>Zero AI calls</dd>
+-                </div>
+-                <div>
+-                  <dt>Backdrop</dt>
+-                  <dd>{activeVariantLabel}</dd>
+-                </div>
+-                <div>
+-                  <dt>Theme</dt>
+-                  <dd>{activeThemeLabel}</dd>
+-                </div>
+-              </dl>
+-            </aside>
+-          </div>
+-        </div>
+-      </section>
+-
+-      <section className="content-band" id="work" aria-labelledby="work-title">
+-        <div className="section-heading">
+-          <span className="eyebrow">Portfolio surface</span>
+-          <h2 id="work-title">Selected work signals</h2>
+-        </div>
+-
+-        <div className="project-grid">
+-          {profile.projects.map((project) => (
+-            <article className="project-card" key={project.title}>
+-              <div>
+-                <span>{project.signal}</span>
+-                <h3>{project.title}</h3>
+-              </div>
+-              <p>{project.description}</p>
+-              <div className="project-meta">
+-                <span>{project.type}</span>
+-                <span>{project.status}</span>
+-              </div>
+-              <ul>
+-                {project.stack.map((item) => (
+-                  <li key={item}>{item}</li>
+-                ))}
+-              </ul>
+-            </article>
+-          ))}
+-        </div>
+-      </section>
+-
+-      <section className="content-band skills-band" aria-labelledby="skills-title">
+-        <div className="section-heading">
+-          <span className="eyebrow">Operating range</span>
+-          <h2 id="skills-title">Where the site points</h2>
+-        </div>
+-
+-        <div className="skill-grid">
+-          {profile.skills.map((skill, index) => {
+-            const Icon = iconMap[index % iconMap.length];
+-
+-            return (
+-              <article className="skill-item" key={skill.label}>
+-                <Icon size={22} aria-hidden="true" />
+-                <h3>{skill.label}</h3>
+-                <p>{skill.description}</p>
+-              </article>
+-            );
+-          })}
+-        </div>
+-      </section>
+-
+-      <section className="tool-band" id="tools" aria-labelledby="tools-title">
+-        <div className="section-heading">
+-          <span className="eyebrow">Useful surface</span>
+-          <h2 id="tools-title">AI vibe tool, running locally</h2>
+-        </div>
+-        <PromptCockpit />
+-      </section>
+-
+-      <section className="contact-band" id="contact" aria-labelledby="contact-title">
+-        <div>
+-          <span className="eyebrow">{profile.contactCta.eyebrow}</span>
+-          <h2 id="contact-title">{profile.contactCta.title}</h2>
+-          <p>{profile.contactCta.body}</p>
+-        </div>
+-        <div className="contact-actions">
+-          <a href={`mailto:${profile.contactCta.email}`}>
+-            <Send size={17} aria-hidden="true" />
+-            {profile.contactCta.email}
+-          </a>
+-          {profile.links.map((link) => (
+-            <a key={link.label} href={link.href} target="_blank" rel="noreferrer">
+-              {link.label === "GitHub" ? <Github size={17} aria-hidden="true" /> : null}
+-              {link.label}
+-            </a>
+-          ))}
+-        </div>
+-      </section>
+-    </main>
+-  );
+-}
+-
+-export default App;
++import { createPreferences } from "./preferences";
++import {
++  ArrowUpRight,
++  BrainCircuit,
++  Code2,
++  Cpu,
++  Gauge,
++  Github,
++  Layers3,
++  Mail,
++  MapPin,
++  Palette,
++  Send,
++  TerminalSquare,
++  Zap,
++} from "lucide-react";
++import { useEffect, useState } from "react";
++import { PromptCockpit } from "./components/PromptCockpit";
++import { BackdropTheme, BackdropVariant, ShaderBackdrop } from "./components/ShaderBackdrop";
++import { profile } from "./data/profile";
++
++const iconMap = [BrainCircuit, Code2, Gauge, Cpu];
++
++const backdropVariants: { id: BackdropVariant; label: string }[] = [
++  { id: "signal", label: "Signal" },
++  { id: "topography", label: "Topo" },
++  { id: "radar", label: "Radar" },
++];
++
++const backdropThemes: { id: BackdropTheme; label: string }[] = [
++  { id: "acid", label: "Acid" },
++  { id: "plasma", label: "Plasma" },
++  { id: "ice", label: "Ice" },
++];
++
++function App() {
++  const [controller] = useState(() => {
++    let storage: Storage | undefined;
++    try {
++      storage = window.localStorage;
++    } catch {
++      /* storage unavailable */
++    }
++    return createPreferences(storage);
++  });
++  const [preferences, setPreferences] = useState(controller.value);
++  const backdropVariant = preferences.variant,
++    backdropTheme = preferences.theme;
++  const setBackdropVariant = (variant: BackdropVariant) =>
++    setPreferences(controller.choose({ variant }));
++  const setBackdropTheme = (theme: BackdropTheme) => setPreferences(controller.choose({ theme }));
++  useEffect(() => {
++    document.documentElement.dataset.siteTheme = backdropTheme;
++  }, [backdropTheme]);
++  useEffect(() => {
++    const receive = (event: StorageEvent) => {
++      const next = controller.receive(event);
++      if (next) setPreferences(next);
++    };
++    window.addEventListener("storage", receive);
++    return () => window.removeEventListener("storage", receive);
++  }, [controller]);
++
++  const activeVariantLabel =
++    backdropVariants.find((item) => item.id === backdropVariant)?.label ?? "Signal";
++  const activeThemeLabel =
++    backdropThemes.find((item) => item.id === backdropTheme)?.label ?? "Acid";
++
++  return (
++    <main>
++      <section className="hero" aria-labelledby="hero-title">
++        <ShaderBackdrop variant={backdropVariant} theme={backdropTheme} />
++        <div className="hero-content">
++          <header className="topbar">
++            <a className="brand" href="#hero-title" aria-label="Tahion home">
++              <TerminalSquare size={22} aria-hidden="true" />
++              <span>{profile.handle}</span>
++            </a>
++            <div className="topbar-actions">
++              <nav aria-label="Primary navigation">
++                <a href="#work">Work</a>
++                <a href="#tools">Tools</a>
++                <a href="#contact">Contact</a>
++              </nav>
++
++              <div className="visual-controls" aria-label="Visual controls">
++                <div className="segmented-control" aria-label="Background variant">
++                  <span>
++                    <Layers3 size={14} aria-hidden="true" />
++                  </span>
++                  {backdropVariants.map((item) => (
++                    <button
++                      key={item.id}
++                      type="button"
++                      className={backdropVariant === item.id ? "is-active" : ""}
++                      onClick={() => setBackdropVariant(item.id)}
++                    >
++                      {item.label}
++                    </button>
++                  ))}
++                </div>
++
++                <div className="segmented-control theme-control" aria-label="Color theme">
++                  <span>
++                    <Palette size={14} aria-hidden="true" />
++                  </span>
++                  {backdropThemes.map((item) => (
++                    <button
++                      key={item.id}
++                      type="button"
++                      className={backdropTheme === item.id ? "is-active" : ""}
++                      onClick={() => setBackdropTheme(item.id)}
++                    >
++                      <i aria-hidden="true" data-swatch={item.id} />
++                      {item.label}
++                    </button>
++                  ))}
++                </div>
++              </div>
++            </div>
++          </header>
++
++          <div className="cockpit-grid">
++            <section className="identity-panel" aria-label="Portfolio introduction">
++              <span className="eyebrow">
++                <Zap size={15} aria-hidden="true" />
++                AI-native product builder
++              </span>
++              <h1 id="hero-title">{profile.name}</h1>
++              <p className="headline">{profile.headline}</p>
++              <p className="bio">{profile.bio}</p>
++
++              <div className="signal-row">
++                <span className="signal-pill">
++                  <MapPin size={15} aria-hidden="true" />
++                  <span className="signal-text">{profile.location}</span>
++                </span>
++                <span className="signal-pill">
++                  <span className="signal-text">{profile.availability}</span>
++                </span>
++              </div>
++
++              <div className="hero-actions">
++                <a href="#tools" className="primary-action">
++                  Open cockpit
++                  <ArrowUpRight size={17} aria-hidden="true" />
++                </a>
++                <a href={`mailto:${profile.contactCta.email}`} className="secondary-action">
++                  Contact
++                  <Mail size={17} aria-hidden="true" />
++                </a>
++              </div>
++            </section>
++
++            <aside className="telemetry-panel" aria-label="Live build telemetry">
++              <div className="telemetry-top">
++                <span>System signal</span>
++                <strong>Fast static</strong>
++              </div>
++              <div className="telemetry-meter" aria-hidden="true">
++                <span />
++              </div>
++              <dl>
++                <div>
++                  <dt>Runtime</dt>
++                  <dd>React + Vite</dd>
++                </div>
++                <div>
++                  <dt>Data</dt>
++                  <dd>Local-first</dd>
++                </div>
++                <div>
++                  <dt>Network</dt>
++                  <dd>Zero AI calls</dd>
++                </div>
++                <div>
++                  <dt>Backdrop</dt>
++                  <dd>{activeVariantLabel}</dd>
++                </div>
++                <div>
++                  <dt>Theme</dt>
++                  <dd>{activeThemeLabel}</dd>
++                </div>
++              </dl>
++            </aside>
++          </div>
++        </div>
++      </section>
++
++      <section className="content-band" id="work" aria-labelledby="work-title">
++        <div className="section-heading">
++          <span className="eyebrow">Portfolio surface</span>
++          <h2 id="work-title">Selected work signals</h2>
++        </div>
++
++        <div className="project-grid">
++          {profile.projects.map((project) => (
++            <article className="project-card" key={project.title}>
++              <div>
++                <span>{project.signal}</span>
++                <h3>{project.title}</h3>
++              </div>
++              <p>{project.description}</p>
++              <div className="project-meta">
++                <span>{project.type}</span>
++                <span>{project.status}</span>
++              </div>
++              <ul>
++                {project.stack.map((item) => (
++                  <li key={item}>{item}</li>
++                ))}
++              </ul>
++            </article>
++          ))}
++        </div>
++      </section>
++
++      <section className="content-band skills-band" aria-labelledby="skills-title">
++        <div className="section-heading">
++          <span className="eyebrow">Operating range</span>
++          <h2 id="skills-title">Where the site points</h2>
++        </div>
++
++        <div className="skill-grid">
++          {profile.skills.map((skill, index) => {
++            const Icon = iconMap[index % iconMap.length];
++
++            return (
++              <article className="skill-item" key={skill.label}>
++                <Icon size={22} aria-hidden="true" />
++                <h3>{skill.label}</h3>
++                <p>{skill.description}</p>
++              </article>
++            );
++          })}
++        </div>
++      </section>
++
++      <section className="tool-band" id="tools" aria-labelledby="tools-title">
++        <div className="section-heading">
++          <span className="eyebrow">Useful surface</span>
++          <h2 id="tools-title">AI vibe tool, running locally</h2>
++        </div>
++        <PromptCockpit />
++      </section>
++
++      <section className="contact-band" id="contact" aria-labelledby="contact-title">
++        <div>
++          <span className="eyebrow">{profile.contactCta.eyebrow}</span>
++          <h2 id="contact-title">{profile.contactCta.title}</h2>
++          <p>{profile.contactCta.body}</p>
++        </div>
++        <div className="contact-actions">
++          <a href={`mailto:${profile.contactCta.email}`}>
++            <Send size={17} aria-hidden="true" />
++            {profile.contactCta.email}
++          </a>
++          {profile.links.map((link) => (
++            <a key={link.label} href={link.href} target="_blank" rel="noreferrer">
++              {link.label === "GitHub" ? <Github size={17} aria-hidden="true" /> : null}
++              {link.label}
++            </a>
++          ))}
++        </div>
++      </section>
++    </main>
++  );
++}
++
++export default App;
+diff --git a/src/preferences.ts b/src/preferences.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..cf6d285fb068f23055d4e6e1c72a045d2ff68aa8
+--- /dev/null
++++ b/src/preferences.ts
+@@ -0,0 +1,68 @@
++export type Preferences = {
++  variant: "signal" | "topography" | "radar";
++  theme: "acid" | "plasma" | "ice";
++};
++export const preferenceKey = "tahion.visual.preferences";
++const defaults: Preferences = { variant: "signal", theme: "acid" };
++const variants = ["signal", "topography", "radar"];
++const themes = ["acid", "plasma", "ice"];
++function parse(raw: string | null): Preferences | null {
++  try {
++    const value = JSON.parse(raw ?? "null");
++    if (
++      value?.version === 1 &&
++      typeof value.variant === "string" &&
++      variants.includes(value.variant) &&
++      typeof value.theme === "string" &&
++      themes.includes(value.theme)
++    )
++      return { variant: value.variant, theme: value.theme };
++  } catch {
++    /* invalid storage */
++  }
++  return null;
++}
++export function createPreferences(storage: Storage | undefined) {
++  let current = { ...defaults };
++  const save = () => {
++    try {
++      storage?.setItem(preferenceKey, JSON.stringify({ version: 1, ...current }));
++    } catch {
++      /* in-memory selection survives */
++    }
++  };
++  try {
++    const raw = storage?.getItem(preferenceKey) ?? null;
++    if (raw !== null) current = parse(raw) ?? { ...defaults };
++    else {
++      const variant = storage?.getItem("tahion.backdrop.variant") ?? "";
++      const theme = storage?.getItem("tahion.backdrop.theme") ?? "";
++      const v = variants.includes(variant),
++        t = themes.includes(theme);
++      current = {
++        variant: v ? (variant as Preferences["variant"]) : "signal",
++        theme: t ? (theme as Preferences["theme"]) : "acid",
++      };
++      if (v || t) save();
++    }
++  } catch {
++    current = { ...defaults };
++  }
++  return {
++    get value() {
++      return { ...current };
++    },
++    choose(change: Partial<Preferences>) {
++      current = { ...current, ...change };
++      save();
++      return { ...current };
++    },
++    receive(event: Pick<StorageEvent, "key" | "newValue" | "storageArea">) {
++      if (!storage || event.key !== preferenceKey || event.storageArea !== storage) return null;
++      const next = event.newValue === null ? { ...defaults } : parse(event.newValue);
++      if (!next) return null;
++      current = next;
++      return { ...current };
++    },
++  };
++}
+diff --git a/tests/preferences.test.ts b/tests/preferences.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..e1059c87ba23c5c6b3c0b4a5643b91c331b3602b
+--- /dev/null
++++ b/tests/preferences.test.ts
+@@ -0,0 +1,101 @@
++import test from "node:test";
++import assert from "node:assert/strict";
++import { createPreferences, preferenceKey } from "../src/preferences.ts";
++function memory(initial: Record<string, string> = {}) {
++  const values = { ...initial };
++  let writes = 0;
++  return {
++    getItem: (key: string) => values[key] ?? null,
++    setItem: (key: string, value: string) => {
++      values[key] = value;
++      writes++;
++    },
++    get writes() {
++      return writes;
++    },
++    values,
++  };
++}
++const asStorage = (store: ReturnType<typeof memory>) => store as unknown as Storage;
++test("legacy migration preserves either old field and repeats safely", () => {
++  for (const variant of ["signal", "topography", "radar"]) {
++    for (const theme of ["acid", "plasma", "ice"]) {
++      const store = memory({ "tahion.backdrop.variant": variant, "tahion.backdrop.theme": theme });
++      assert.deepEqual(createPreferences(asStorage(store)).value, { variant, theme });
++      assert.deepEqual(JSON.parse(store.values[preferenceKey]), { version: 1, variant, theme });
++      createPreferences(asStorage(store));
++      assert.equal(store.writes, 1);
++      assert.equal(store.values["tahion.backdrop.variant"], variant);
++    }
++  }
++  const store = memory({ "tahion.backdrop.variant": "bad", "tahion.backdrop.theme": "ice" });
++  assert.deepEqual(createPreferences(asStorage(store)).value, { variant: "signal", theme: "ice" });
++});
++test("current precedence, invalid data and unavailable storage", () => {
++  const store = memory({
++    [preferenceKey]: JSON.stringify({ version: 1, variant: "radar", theme: "ice" }),
++    "tahion.backdrop.variant": "topography",
++  });
++  assert.deepEqual(createPreferences(asStorage(store)).value, { variant: "radar", theme: "ice" });
++  assert.equal(store.writes, 0);
++  for (const value of [
++    "{",
++    "null",
++    JSON.stringify({ version: 2, variant: "radar", theme: "ice" }),
++    JSON.stringify({ version: 1, variant: "bad", theme: "ice" }),
++  ]) {
++    const s = memory({ [preferenceKey]: value });
++    assert.deepEqual(createPreferences(asStorage(s)).value, { variant: "signal", theme: "acid" });
++    assert.equal(s.writes, 0);
++  }
++  assert.deepEqual(createPreferences(undefined).choose({ theme: "ice" }), {
++    variant: "signal",
++    theme: "ice",
++  });
++  const blocked = {
++    getItem() {
++      throw Error();
++    },
++    setItem() {
++      throw Error();
++    },
++  } as unknown as Storage;
++  assert.deepEqual(createPreferences(blocked).choose({ variant: "radar" }), {
++    variant: "radar",
++    theme: "acid",
++  });
++});
++test("selection persists both values and reloads", () => {
++  const store = memory();
++  const c = createPreferences(asStorage(store));
++  assert.equal(store.writes, 0);
++  c.choose({ variant: "topography" });
++  c.choose({ theme: "plasma" });
++  c.choose({ theme: "plasma" });
++  assert.deepEqual(createPreferences(asStorage(store)).value, {
++    variant: "topography",
++    theme: "plasma",
++  });
++});
++test("events have no echo, preserve latest field and ignore irrelevant data", () => {
++  const store = memory(),
++    s = asStorage(store),
++    c = createPreferences(s);
++  const event = (newValue: string | null, key = preferenceKey, storageArea = s) => ({
++    newValue,
++    key,
++    storageArea,
++  });
++  assert.deepEqual(
++    c.receive(event(JSON.stringify({ version: 1, variant: "radar", theme: "ice" }))),
++    { variant: "radar", theme: "ice" },
++  );
++  assert.equal(store.writes, 0);
++  assert.deepEqual(c.choose({ theme: "plasma" }), { variant: "radar", theme: "plasma" });
++  const writes = store.writes;
++  assert.equal(c.receive(event("bad")), null);
++  assert.equal(c.receive(event(null, "other")), null);
++  assert.equal(c.receive(event(null, preferenceKey, {} as Storage)), null);
++  assert.deepEqual(c.receive(event(null)), { variant: "signal", theme: "acid" });
++  assert.equal(store.writes, writes);
++});

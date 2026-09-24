@@ -1,0 +1,11 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';
+import {get,save,hash} from '../chain.mjs';import {projectManifest} from '../patch-integrity.mjs';
+const dev='development/ledger-review-delivery/post-capture-followup',local='local/ledger-review-delivery/post-capture-followup/evaluation-final';
+const e=get(local+'/summary.json');assert.equal(e.assessment_integrity,'verified');
+assert.deepEqual(projectManifest(local+'/F'),projectManifest(local+'/E'));assert.deepEqual(projectManifest(local+'/F'),get(dev+'/final-files.json'));
+const suites=e.E.map(row=>{const log=get(row.file),top=log.stdout.split('ℹ tests')[0],cases=top.split('\n').filter(x=>/^[✔✖] /.test(x)).map(x=>({status:x.startsWith('✔')?'pass':'fail',name:x.slice(2).replace(/ \([\d.]+ms\)$/,'')}));assert.equal(cases.length,row.counts.tests);return {...row,cases};});
+save(dev+'/raw-probes.json',{scope:'unchanged frozen 23 probes on untouched full final patch; raw outcomes are not semantic Q',summary:e.contractTests,suites});
+save(dev+'/supplemental-observations.json',JSON.parse(get(local+'/E-supplemental.json').stdout));
+const verify=get(local+'/F-project-verify.json');assert.ok(verify.stderr.includes('Network access disabled'));
+save(dev+'/evaluation-receipt.json',{patchSha256:e.patchSha256,delivery_apply:e.delivery_apply,assessment_integrity:e.assessment_integrity,unchangedImplementationCopies:true,actualDeliveryTreeMatched:true,projectChecks:e.F.map(r=>({suite:r.file.split('/').at(-1),...r.counts,exitCode:r.exitCode,sha256:r.sha256})),projectVerify:{status:'unavailable',exitCode:verify.exitCode,reason:'Pinned pnpm 11.7.0 unavailable in the offline environment',sha256:hash(fs.readFileSync(local+'/F-project-verify.json'))},raw23:e.contractTests,selected:get(dev+'/selected-observations.json')});
+console.log('PASS final application, actual delivery/F/E tree identity and raw 23-probe accounting');

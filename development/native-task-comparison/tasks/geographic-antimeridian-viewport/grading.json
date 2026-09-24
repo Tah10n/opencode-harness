@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert antimeridian crossing bounds and integrated projected marker order.",
+    "Assert equal-arc ties, +/-180 identity, collapsed axes, empty and invalid dimensions/points."
+  ],
+  "docDelivery": [
+    "Explain canonical longitude, minimal arc and deterministic tie choice.",
+    "Document linear projection, collapsed-axis centering and supported coordinate/pixel domain."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Integer global coordinates with minimal circular longitude arc, deterministic equal-gap tie and linear viewport projection.",
+  "independence": "Integrate minimal circular longitude bounds with point projection and viewport consumer across the antimeridian."
+}

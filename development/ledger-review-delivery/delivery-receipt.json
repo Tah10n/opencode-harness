@@ -1,0 +1,98 @@
+{
+  "freezeCommit": "4eab8635117d306a2c3fbeeefcf3de59aecb1fed",
+  "nativeCompleted": true,
+  "exitCode": 0,
+  "timedOut": false,
+  "terminationVerified": true,
+  "observerStatus": "incomplete",
+  "observerRemaining": [
+    "Unresolved additional project check failure: node --test packages/connector/test/readers.test.mjs --test-name-pattern='event ledgers|OpenCode keeps exact-ID'"
+  ],
+  "scheduledStages": {
+    "A": "native_completed; capture wrapper failed; evidence recovered",
+    "R": "not_started",
+    "F": "not_started"
+  },
+  "stop": {
+    "kind": "execution_or_capture_error",
+    "slot": 1,
+    "message": "Cannot read properties of undefined (reading 'map')"
+  },
+  "originalStopFacts": {
+    "ownTaskDeadlineTriggered": false,
+    "terminationVerified": true,
+    "captureSaved": false,
+    "forwardingClosed": true,
+    "relayRemoved": false,
+    "activeProviderHandlers": 0,
+    "providerServerStateMayRemainUnknown": false
+  },
+  "recovery": {
+    "copiedExistingDataOnly": true,
+    "newProviderRequests": 0,
+    "sourceContainerRemoved": true
+  },
+  "patchSha256": "e2833390b036f9339a776cb58cf82379f3541d191a10f978fd8b40294c33f3a6",
+  "fullPartialSha256": "e2833390b036f9339a776cb58cf82379f3541d191a10f978fd8b40294c33f3a6",
+  "integrity": {
+    "fullReportRead": true,
+    "compactReportHasStages": false,
+    "oneAuthor": true,
+    "repairs": 0,
+    "integrity": {
+      "equivalent": true,
+      "actualTreeVerified": true,
+      "patches": [
+        {
+          "sha256": "e2833390b036f9339a776cb58cf82379f3541d191a10f978fd8b40294c33f3a6",
+          "bytes": 32889,
+          "applied": true,
+          "treeSha256": "6f7eba1ed5a55925a5d692fef8af57a181182ccce5657da53a57e589fc074625"
+        },
+        {
+          "sha256": "e2833390b036f9339a776cb58cf82379f3541d191a10f978fd8b40294c33f3a6",
+          "bytes": 32889,
+          "applied": true,
+          "treeSha256": "6f7eba1ed5a55925a5d692fef8af57a181182ccce5657da53a57e589fc074625"
+        }
+      ]
+    },
+    "partialPortableMatches": true,
+    "newProviderRequests": 0
+  },
+  "delivery_apply": true,
+  "assessment_integrity": "verified",
+  "projectChecks": [
+    {
+      "suite": "F-readers.json",
+      "tests": 88,
+      "pass": 88,
+      "fail": 0,
+      "skipped": 0,
+      "exitCode": 0
+    },
+    {
+      "suite": "F-config.json",
+      "tests": 103,
+      "pass": 103,
+      "fail": 0,
+      "skipped": 0,
+      "exitCode": 0
+    },
+    {
+      "suite": "F-protocol.json",
+      "tests": 14,
+      "pass": 14,
+      "fail": 0,
+      "skipped": 0,
+      "exitCode": 0
+    }
+  ],
+  "projectVerify": {
+    "status": "unavailable",
+    "reason": "pinned pnpm 11.7.0 absent; offline network disabled",
+    "exitCode": 1
+  },
+  "realReviewerInventory": "not_started; exact inventory established only in scripted preflight",
+  "modelRetries": 0
+}

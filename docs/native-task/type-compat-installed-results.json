@@ -1,0 +1,308 @@
+{
+  "installed": "1.18.26",
+  "platform": "Linux",
+  "network": "none, loopback scripted provider only",
+  "realProviderCalls": 0,
+  "results": [
+    {
+      "mode": "emitter",
+      "installed": {
+        "native-task-plugin.mjs": "9a1f4fcd8b99a87402e6116fb287e2e9d32e03b8b4d396f59bb5449370bbb8e8",
+        "native-type-compat.mjs": "96f85cbc7ee01f3aeedc31cea51c0dd5c452afe220b4683df1b2d5fd987d9007",
+        "native-type-compat-worker.mjs": "c9cc1ff4922488ba1058d11af9f609a3fc5cef4a98aed7941ef5e8fe2f3eafc2",
+        "native-type-compat-generator.mjs": "321eff1892c9a5327e7f6e38f23a986c1be3fbaf26da5662b99cd27cac50cc68"
+      },
+      "requests": 13,
+      "received": true,
+      "finalReceipt": true,
+      "terminalStatus": "incomplete",
+      "terminationVerified": true,
+      "originalCheckoutAndIndexUnchanged": true,
+      "baselinePreparationMs": 94,
+      "baselineInputBytes": 11945559,
+      "diagnosticStatus": "no-difference-in-checked-scope",
+      "current": true,
+      "analyses": [
+        {
+          "status": "reproduced-incompatibility",
+          "snapshot": "43b616c2d411ca195cf8db8d98f98f9a49b7547c80958c91ca7bf98040790ee0",
+          "baselineSnapshot": "14379786064ede6f88352fa151e90bcdb8271fc488a31f075879b2a2e10045fb",
+          "cost": {
+            "elapsedMs": 4458,
+            "transferredInputBytes": 12248023,
+            "outputBytes": 13639,
+            "compilations": 13,
+            "inputBytes": 11945766,
+            "files": 54,
+            "preparationMs": 101,
+            "totalMs": 4642,
+            "readBytes": 35837298,
+            "fileReads": 162
+          },
+          "process": {
+            "exit": 0,
+            "signal": null,
+            "terminationVerified": true
+          },
+          "consumers": [
+            {
+              "sha256": "76b7eb65fee44190e3a1b8e9c7c9893b046ed0ab058c5fe5e5a985153281f45a",
+              "status": "reproduced-incompatibility",
+              "route": "EventEmitter<{ sample: [string] }, string>.listeners() -> returned[0]"
+            },
+            {
+              "sha256": "df6dbf193f1aea004d5a1195f6ce198c9d6d668304e51e9cf32bac0dc3ed33d9",
+              "status": "reproduced-incompatibility",
+              "route": "EventEmitter<{ sample: [string] }, { sample: [string] }>.listeners() -> returned[0]"
+            },
+            {
+              "sha256": "9187068c17d9a1265379ee4187dd6fcabe248641b499e68042bb10e6b94f9d7b",
+              "status": "reproduced-incompatibility",
+              "route": "EventEmitter<{ sample: [string] }, { marker: string }>.listeners() -> returned[0]"
+            },
+            {
+              "sha256": "494f55d7e3e2f7214c3fcef8f7f23afe3c64f1b5f109f2b45dd5d5aca874c5bb",
+              "status": "no-difference-in-checked-scope",
+              "route": "UserDraft.original() -> returned[\"action\"]"
+            }
+          ]
+        },
+        {
+          "status": "no-difference-in-checked-scope",
+          "snapshot": "ba5a8edbd27db2162242ed143b88ee465546f5d36d38b0410fdb3ad92a74391b",
+          "baselineSnapshot": "14379786064ede6f88352fa151e90bcdb8271fc488a31f075879b2a2e10045fb",
+          "cost": {
+            "elapsedMs": 4499,
+            "transferredInputBytes": 12247993,
+            "outputBytes": 12581,
+            "compilations": 13,
+            "inputBytes": 11945736,
+            "files": 54,
+            "preparationMs": 127,
+            "totalMs": 4700,
+            "readBytes": 35837208,
+            "fileReads": 162
+          },
+          "process": {
+            "exit": 0,
+            "signal": null,
+            "terminationVerified": true
+          },
+          "consumers": [
+            {
+              "sha256": "76b7eb65fee44190e3a1b8e9c7c9893b046ed0ab058c5fe5e5a985153281f45a",
+              "status": "no-difference-in-checked-scope",
+              "route": "EventEmitter<{ sample: [string] }, string>.listeners() -> returned[0]"
+            },
+            {
+              "sha256": "df6dbf193f1aea004d5a1195f6ce198c9d6d668304e51e9cf32bac0dc3ed33d9",
+              "status": "no-difference-in-checked-scope",
+              "route": "EventEmitter<{ sample: [string] }, { sample: [string] }>.listeners() -> returned[0]"
+            },
+            {
+              "sha256": "9187068c17d9a1265379ee4187dd6fcabe248641b499e68042bb10e6b94f9d7b",
+              "status": "no-difference-in-checked-scope",
+              "route": "EventEmitter<{ sample: [string] }, { marker: string }>.listeners() -> returned[0]"
+            },
+            {
+              "sha256": "494f55d7e3e2f7214c3fcef8f7f23afe3c64f1b5f109f2b45dd5d5aca874c5bb",
+              "status": "no-difference-in-checked-scope",
+              "route": "UserDraft.original() -> returned[\"action\"]"
+            }
+          ]
+        }
+      ],
+      "upstreamMocha": "42 passing",
+      "portableChecks": "passed",
+      "patchSha256": "92b9ba8c5dd8933ffc5ab1fd7f18732fc71b69640f7050baeb72ddc3c26f176b"
+    },
+    {
+      "mode": "parcel",
+      "installed": {
+        "native-task-plugin.mjs": "9a1f4fcd8b99a87402e6116fb287e2e9d32e03b8b4d396f59bb5449370bbb8e8",
+        "native-type-compat.mjs": "96f85cbc7ee01f3aeedc31cea51c0dd5c452afe220b4683df1b2d5fd987d9007",
+        "native-type-compat-worker.mjs": "c9cc1ff4922488ba1058d11af9f609a3fc5cef4a98aed7941ef5e8fe2f3eafc2",
+        "native-type-compat-generator.mjs": "321eff1892c9a5327e7f6e38f23a986c1be3fbaf26da5662b99cd27cac50cc68"
+      },
+      "requests": 13,
+      "received": true,
+      "finalReceipt": true,
+      "terminalStatus": "incomplete",
+      "terminationVerified": true,
+      "originalCheckoutAndIndexUnchanged": true,
+      "baselinePreparationMs": 98,
+      "baselineInputBytes": 11942098,
+      "diagnosticStatus": "no-difference-in-checked-scope",
+      "current": true,
+      "analyses": [
+        {
+          "status": "reproduced-incompatibility",
+          "snapshot": "c64613f1b566674ff2168da0a78a2f73fbdfec4a6037e5b83a46ec638d1e1f3c",
+          "baselineSnapshot": "2f6a466d07bac99d7dc790eef52f62ce51eb2c6c67acbc4386cd9dcbfac54686",
+          "cost": {
+            "elapsedMs": 3177,
+            "transferredInputBytes": 12240741,
+            "outputBytes": 3298,
+            "compilations": 9,
+            "inputBytes": 11942140,
+            "files": 54,
+            "preparationMs": 106,
+            "totalMs": 3359,
+            "readBytes": 35826420,
+            "fileReads": 162
+          },
+          "process": {
+            "exit": 0,
+            "signal": null,
+            "terminationVerified": true
+          },
+          "consumers": [
+            {
+              "sha256": "b3a03044c31c08b02bf86cf1e2b704880fe388cd76c5cb4c8205ed9035a3f4c7",
+              "status": "reproduced-incompatibility",
+              "route": "Parcel.lookup() -> returned[\"action\"]"
+            },
+            {
+              "sha256": "1c63853eb23de59f327bf3ab17f25b1a2e9ff552837bf0e8f65810772f2300c5",
+              "status": "no-difference-in-checked-scope",
+              "route": "UserDraft.original() -> returned[\"action\"]"
+            }
+          ]
+        },
+        {
+          "status": "no-difference-in-checked-scope",
+          "snapshot": "98ebd638e56f8491bbc291a5678c5592c1ab9d4f00d0f5fb4812dd2399d1cdb0",
+          "baselineSnapshot": "2f6a466d07bac99d7dc790eef52f62ce51eb2c6c67acbc4386cd9dcbfac54686",
+          "cost": {
+            "elapsedMs": 3106,
+            "transferredInputBytes": 12240718,
+            "outputBytes": 2935,
+            "compilations": 9,
+            "inputBytes": 11942117,
+            "files": 54,
+            "preparationMs": 101,
+            "totalMs": 3281,
+            "readBytes": 35826351,
+            "fileReads": 162
+          },
+          "process": {
+            "exit": 0,
+            "signal": null,
+            "terminationVerified": true
+          },
+          "consumers": [
+            {
+              "sha256": "b3a03044c31c08b02bf86cf1e2b704880fe388cd76c5cb4c8205ed9035a3f4c7",
+              "status": "no-difference-in-checked-scope",
+              "route": "Parcel.lookup() -> returned[\"action\"]"
+            },
+            {
+              "sha256": "1c63853eb23de59f327bf3ab17f25b1a2e9ff552837bf0e8f65810772f2300c5",
+              "status": "no-difference-in-checked-scope",
+              "route": "UserDraft.original() -> returned[\"action\"]"
+            }
+          ]
+        }
+      ],
+      "portableChecks": "passed",
+      "patchSha256": "8a5c4492b78439f8e257952957af124d938289a9f3189a839b0b33b31dc33c3a"
+    },
+    {
+      "mode": "off",
+      "installed": {
+        "native-task-plugin.mjs": "9a1f4fcd8b99a87402e6116fb287e2e9d32e03b8b4d396f59bb5449370bbb8e8",
+        "native-type-compat.mjs": "96f85cbc7ee01f3aeedc31cea51c0dd5c452afe220b4683df1b2d5fd987d9007",
+        "native-type-compat-worker.mjs": "c9cc1ff4922488ba1058d11af9f609a3fc5cef4a98aed7941ef5e8fe2f3eafc2",
+        "native-type-compat-generator.mjs": "321eff1892c9a5327e7f6e38f23a986c1be3fbaf26da5662b99cd27cac50cc68"
+      },
+      "requests": 11,
+      "received": false,
+      "finalReceipt": false,
+      "terminalStatus": "incomplete",
+      "terminationVerified": true,
+      "originalCheckoutAndIndexUnchanged": true,
+      "upstreamMocha": "42 passing",
+      "portableChecks": "passed",
+      "patchSha256": "ba4279824d7d62e9196c6a339e748bae38116bf15db3ae499564222d1d393238"
+    },
+    {
+      "mode": "allowed-break",
+      "installed": {
+        "native-task-plugin.mjs": "9a1f4fcd8b99a87402e6116fb287e2e9d32e03b8b4d396f59bb5449370bbb8e8",
+        "native-type-compat.mjs": "96f85cbc7ee01f3aeedc31cea51c0dd5c452afe220b4683df1b2d5fd987d9007",
+        "native-type-compat-worker.mjs": "c9cc1ff4922488ba1058d11af9f609a3fc5cef4a98aed7941ef5e8fe2f3eafc2",
+        "native-type-compat-generator.mjs": "321eff1892c9a5327e7f6e38f23a986c1be3fbaf26da5662b99cd27cac50cc68"
+      },
+      "requests": 11,
+      "received": true,
+      "finalReceipt": false,
+      "terminalStatus": "incomplete",
+      "terminationVerified": true,
+      "originalCheckoutAndIndexUnchanged": true,
+      "baselinePreparationMs": 99,
+      "baselineInputBytes": 11942105,
+      "diagnosticStatus": "reproduced-incompatibility",
+      "current": true,
+      "analyses": [
+        {
+          "status": "reproduced-incompatibility",
+          "snapshot": "7be0783566d7d4af4d99cbff0fd74107817dac729ced834620f97ab9d75745ca",
+          "baselineSnapshot": "3425420349aa8c5d6f5b6d9d25c49aa4c97c04d4e9053c8701039d4168cd607c",
+          "cost": {
+            "elapsedMs": 3150,
+            "transferredInputBytes": 12240741,
+            "outputBytes": 3256,
+            "compilations": 9,
+            "inputBytes": 11942147,
+            "files": 54,
+            "preparationMs": 116,
+            "totalMs": 3340,
+            "readBytes": 35826441,
+            "fileReads": 162
+          },
+          "process": {
+            "exit": 0,
+            "signal": null,
+            "terminationVerified": true
+          },
+          "consumers": [
+            {
+              "sha256": "b3a03044c31c08b02bf86cf1e2b704880fe388cd76c5cb4c8205ed9035a3f4c7",
+              "status": "reproduced-incompatibility",
+              "route": "Parcel.lookup() -> returned[\"action\"]"
+            },
+            {
+              "sha256": "1c63853eb23de59f327bf3ab17f25b1a2e9ff552837bf0e8f65810772f2300c5",
+              "status": "no-difference-in-checked-scope",
+              "route": "UserDraft.original() -> returned[\"action\"]"
+            }
+          ]
+        }
+      ],
+      "portableChecks": "passed",
+      "patchSha256": "5697ef86a85ffa39747dc4d6c1ced481501670998c995e25005b6c6882eff93b"
+    },
+    {
+      "mode": "no-command",
+      "installed": {
+        "native-task-plugin.mjs": "9a1f4fcd8b99a87402e6116fb287e2e9d32e03b8b4d396f59bb5449370bbb8e8",
+        "native-type-compat.mjs": "96f85cbc7ee01f3aeedc31cea51c0dd5c452afe220b4683df1b2d5fd987d9007",
+        "native-type-compat-worker.mjs": "c9cc1ff4922488ba1058d11af9f609a3fc5cef4a98aed7941ef5e8fe2f3eafc2",
+        "native-type-compat-generator.mjs": "321eff1892c9a5327e7f6e38f23a986c1be3fbaf26da5662b99cd27cac50cc68"
+      },
+      "requests": 10,
+      "received": false,
+      "finalReceipt": false,
+      "terminalStatus": "incomplete",
+      "terminationVerified": true,
+      "originalCheckoutAndIndexUnchanged": true,
+      "baselinePreparationMs": 116,
+      "baselineInputBytes": 11942102,
+      "diagnosticStatus": "NOT RUN",
+      "current": false,
+      "analyses": [],
+      "portableChecks": "passed",
+      "patchSha256": "5697ef86a85ffa39747dc4d6c1ced481501670998c995e25005b6c6882eff93b"
+    }
+  ]
+}

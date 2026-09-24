@@ -1,0 +1,716 @@
+{
+  "instance_id": "serverless__serverless-6534",
+  "arm": "P",
+  "base_commit": "d4c8bc1450d31275596b26bb7464a6f1b28392af",
+  "image": {
+    "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6534:v1.1",
+    "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6534@sha256:8600be77e4c2e4456f8587222423922fd33b4a70162c127bb1c16c8a55a3792f",
+    "id": "sha256:8600be77e4c2e4456f8587222423922fd33b4a70162c127bb1c16c8a55a3792f",
+    "architecture": "amd64",
+    "os": "linux",
+    "size": 5445541482,
+    "workdir": "/testbed"
+  },
+  "source_patch": "development/polybench-pilot/results/patches/P/serverless__serverless-6534.patch",
+  "model_sha256": "856c8a1b7cbbe6aa384f1b1c9e2e0523bacc3d13dbf7b8bd9a19fb476765a0fa",
+  "test_sha256": "33a2d899db2bfc5dc663d853eb18f97bdbccb2df9ec5a304807935de4b51369d",
+  "prediction_bytes_equal": true,
+  "final_newline": true,
+  "cr_bytes": 0,
+  "model_hunks": {
+    "lib/plugins/aws/package/lib/mergeIamTemplates.js": [
+      {
+        "patch_line": 5,
+        "header": "@@ -90,18 +90,25 @@ module.exports = {",
+        "base_start": 90,
+        "base_count": 18
+      }
+    ],
+    "lib/plugins/aws/package/lib/mergeIamTemplates.test.js": [
+      {
+        "patch_line": 45,
+        "header": "@@ -139,10 +139,6 @@ describe('#mergeIamTemplates()', () => {",
+        "base_start": 139,
+        "base_count": 10
+      },
+      {
+        "patch_line": 56,
+        "header": "@@ -178,11 +174,6 @@ describe('#mergeIamTemplates()', () => {",
+        "base_start": 178,
+        "base_count": 11
+      },
+      {
+        "patch_line": 68,
+        "header": "@@ -194,11 +185,6 @@ describe('#mergeIamTemplates()', () => {",
+        "base_start": 194,
+        "base_count": 11
+      }
+    ]
+  },
+  "test_hunks": {
+    "lib/plugins/aws/package/lib/mergeIamTemplates.test.js": [
+      {
+        "patch_line": 5,
+        "header": "@@ -127,7 +127,7 @@ describe('#mergeIamTemplates()', () => {",
+        "base_start": 127,
+        "base_count": 7
+      },
+      {
+        "patch_line": 14,
+        "header": "@@ -138,6 +138,91 @@ describe('#mergeIamTemplates()', () => {",
+        "base_start": 138,
+        "base_count": 6
+      },
+      {
+        "patch_line": 106,
+        "header": "@@ -183,11 +268,106 @@ describe('#mergeIamTemplates()', () => {",
+        "base_start": 183,
+        "base_count": 11
+      },
+      {
+        "patch_line": 213,
+        "header": "@@ -197,12 +377,12 @@ describe('#mergeIamTemplates()', () => {",
+        "base_start": 197,
+        "base_count": 12
+      }
+    ]
+  },
+  "scenarios": {
+    "B+M": {
+      "commands": [
+        {
+          "cmd": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.048,
+          "output_sha256": "3df7002622349db1be624cc8351340dfd287d712c44731f969ca9a7317a6d6b0",
+          "output": "d4c8bc1450d31275596b26bb7464a6f1b28392af\n"
+        },
+        {
+          "cmd": [
+            "git",
+            "diff",
+            "--exit-code",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 1,
+          "seconds": 0.1503,
+          "output_sha256": "0c542b110bcad5745194607683ea8342b105845faa581561936ddac1d578e3bf"
+        },
+        {
+          "cmd": [
+            "git",
+            "diff",
+            "--name-only",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0728,
+          "output_sha256": "c750b6d776c1db92b55fcecbb51c80be008aae877e78a28691b3ae79be9ea63e"
+        },
+        {
+          "cmd": [
+            "git",
+            "restore",
+            "--source=HEAD",
+            "--staged",
+            "--worktree",
+            "--",
+            "Dockerfile"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0667,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "cmd": [
+            "git",
+            "--version"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0375,
+          "output_sha256": "30279da57eb04a496cb207bc2f7c7e04d9c94788be5bc68824e6727e283b264b",
+          "output": "git version 2.34.1\n"
+        },
+        {
+          "cmd": [
+            "patch",
+            "--version"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0344,
+          "output_sha256": "0f262d227713e53ac79165163c1ec3d84fe55fdea2d7b80fce954e2c924ca12a",
+          "output": "GNU patch 2.7.6\nCopyright (C) 2003, 2009-2012 Free Software Foundation, Inc.\nCopyright (C) 1988 Larry Wall\n\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n\nWritten by Larry Wall and Paul Eggert\n"
+        },
+        {
+          "cmd": [
+            "git",
+            "apply",
+            "--binary",
+            "--check",
+            "/testbed/patch_code.diff"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0474,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "cmd": [
+            "git",
+            "apply",
+            "--binary",
+            "/testbed/patch_code.diff"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0504,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "image_baseline_diff_sha256": "0c542b110bcad5745194607683ea8342b105845faa581561936ddac1d578e3bf",
+      "image_baseline_changed_files": [
+        "Dockerfile"
+      ],
+      "baseline_policy": "exact tracked B; baked unrelated build edits restored before any patch",
+      "snapshots": [
+        {
+          "label": "B",
+          "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "changed_files": [],
+          "untracked": [],
+          "artifacts": {}
+        },
+        {
+          "label": "after strict M",
+          "diff_sha256": "0c8e3959cbd37f52b6fae212559ddddb7c46dee73ade9ccea7feaf0baf4f15c8",
+          "changed_files": [
+            "lib/plugins/aws/package/lib/mergeIamTemplates.js",
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+          ],
+          "untracked": [
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        },
+        {
+          "label": "immediately before upstream cleanup",
+          "diff_sha256": "0c8e3959cbd37f52b6fae212559ddddb7c46dee73ade9ccea7feaf0baf4f15c8",
+          "changed_files": [
+            "lib/plugins/aws/package/lib/mergeIamTemplates.js",
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+          ],
+          "untracked": [
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        }
+      ],
+      "strict_M": 0
+    },
+    "B+T+strict-M": {
+      "commands": [
+        {
+          "cmd": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0483,
+          "output_sha256": "3df7002622349db1be624cc8351340dfd287d712c44731f969ca9a7317a6d6b0",
+          "output": "d4c8bc1450d31275596b26bb7464a6f1b28392af\n"
+        },
+        {
+          "cmd": [
+            "git",
+            "diff",
+            "--exit-code",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 1,
+          "seconds": 0.1465,
+          "output_sha256": "0c542b110bcad5745194607683ea8342b105845faa581561936ddac1d578e3bf"
+        },
+        {
+          "cmd": [
+            "git",
+            "diff",
+            "--name-only",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0718,
+          "output_sha256": "c750b6d776c1db92b55fcecbb51c80be008aae877e78a28691b3ae79be9ea63e"
+        },
+        {
+          "cmd": [
+            "git",
+            "restore",
+            "--source=HEAD",
+            "--staged",
+            "--worktree",
+            "--",
+            "Dockerfile"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0676,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "cmd": [
+            "git",
+            "--version"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0365,
+          "output_sha256": "30279da57eb04a496cb207bc2f7c7e04d9c94788be5bc68824e6727e283b264b",
+          "output": "git version 2.34.1\n"
+        },
+        {
+          "cmd": [
+            "patch",
+            "--version"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.032,
+          "output_sha256": "0f262d227713e53ac79165163c1ec3d84fe55fdea2d7b80fce954e2c924ca12a",
+          "output": "GNU patch 2.7.6\nCopyright (C) 2003, 2009-2012 Free Software Foundation, Inc.\nCopyright (C) 1988 Larry Wall\n\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n\nWritten by Larry Wall and Paul Eggert\n"
+        },
+        {
+          "cmd": [
+            "git",
+            "apply",
+            "--binary",
+            "--check",
+            "/testbed/patch_test.diff"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0468,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "cmd": [
+            "git",
+            "apply",
+            "--binary",
+            "/testbed/patch_test.diff"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0495,
+          "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "cmd": [
+            "git",
+            "apply",
+            "--binary",
+            "--check",
+            "/testbed/patch_code.diff"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 1,
+          "seconds": 0.0498,
+          "output_sha256": "efdc6034a9d945fdb2ec7d8911a3241f1d2e6b172243fe6e8006bc3eadb116f1"
+        }
+      ],
+      "image_baseline_diff_sha256": "0c542b110bcad5745194607683ea8342b105845faa581561936ddac1d578e3bf",
+      "image_baseline_changed_files": [
+        "Dockerfile"
+      ],
+      "baseline_policy": "exact tracked B; baked unrelated build edits restored before any patch",
+      "snapshots": [
+        {
+          "label": "B",
+          "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "changed_files": [],
+          "untracked": [],
+          "artifacts": {}
+        },
+        {
+          "label": "after strict T",
+          "diff_sha256": "f110e8a6201bec9741bc244d66a6c0085dc70b156abe3c6c656c202bff60d65e",
+          "changed_files": [
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+          ],
+          "untracked": [
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        },
+        {
+          "label": "immediately before upstream cleanup",
+          "diff_sha256": "f110e8a6201bec9741bc244d66a6c0085dc70b156abe3c6c656c202bff60d65e",
+          "changed_files": [
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+          ],
+          "untracked": [
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        }
+      ],
+      "strict_T": 0,
+      "strict_M_after_T": 1
+    },
+    "official-B+T+M": {
+      "commands": [
+        {
+          "cmd": [
+            "git",
+            "rev-parse",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.0462,
+          "output_sha256": "3df7002622349db1be624cc8351340dfd287d712c44731f969ca9a7317a6d6b0",
+          "output": "d4c8bc1450d31275596b26bb7464a6f1b28392af\n"
+        },
+        {
+          "cmd": [
+            "git",
+            "diff",
+            "--exit-code",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 1,
+          "seconds": 0.1416,
+          "output_sha256": "0c542b110bcad5745194607683ea8342b105845faa581561936ddac1d578e3bf"
+        },
+        {
+          "cmd": [
+            "git",
+            "diff",
+            "--name-only",
+            "HEAD"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.071,
+          "output_sha256": "c750b6d776c1db92b55fcecbb51c80be008aae877e78a28691b3ae79be9ea63e"
+        },
+        {
+          "cmd": [
+            "git",
+            "--version"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.035,
+          "output_sha256": "30279da57eb04a496cb207bc2f7c7e04d9c94788be5bc68824e6727e283b264b",
+          "output": "git version 2.34.1\n"
+        },
+        {
+          "cmd": [
+            "patch",
+            "--version"
+          ],
+          "cwd": "/testbed",
+          "user": null,
+          "exit_code": 0,
+          "seconds": 0.032,
+          "output_sha256": "0f262d227713e53ac79165163c1ec3d84fe55fdea2d7b80fce954e2c924ca12a",
+          "output": "GNU patch 2.7.6\nCopyright (C) 2003, 2009-2012 Free Software Foundation, Inc.\nCopyright (C) 1988 Larry Wall\n\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n\nWritten by Larry Wall and Paul Eggert\n"
+        },
+        {
+          "cmd": "git apply -v --ignore-whitespace --reject /testbed/patch_test.diff",
+          "cwd": "/testbed",
+          "user": "root",
+          "exit_code": 0,
+          "seconds": 0.0517,
+          "output_sha256": "6d5ed45ff7bcbfbfc7bd81fc2aee3cbd5727aced8d48047fd5886c01125ae67c",
+          "observations": [
+            "Checking patch lib/plugins/aws/package/lib/mergeIamTemplates.test.js...",
+            "Applied patch lib/plugins/aws/package/lib/mergeIamTemplates.test.js cleanly."
+          ]
+        },
+        {
+          "cmd": "git apply -v --ignore-whitespace --reject /testbed/patch_code.diff",
+          "cwd": "/testbed",
+          "user": "root",
+          "exit_code": 1,
+          "seconds": 0.0513,
+          "output_sha256": "31d427f531cc9733b5ebca8a715d757aae445ab3e0c6c647652bc1800c88ca3d",
+          "observations": [
+            "Checking patch lib/plugins/aws/package/lib/mergeIamTemplates.js...",
+            "Checking patch lib/plugins/aws/package/lib/mergeIamTemplates.test.js...",
+            "Hunk #1 succeeded at 224 (offset 85 lines).",
+            "error: patch failed: lib/plugins/aws/package/lib/mergeIamTemplates.test.js:178",
+            "error: patch failed: lib/plugins/aws/package/lib/mergeIamTemplates.test.js:194",
+            "Applied patch lib/plugins/aws/package/lib/mergeIamTemplates.js cleanly.",
+            "Applying patch lib/plugins/aws/package/lib/mergeIamTemplates.test.js with 2 rejects...",
+            "Hunk #1 applied cleanly.",
+            "Rejected hunk #2.",
+            "Rejected hunk #3."
+          ]
+        },
+        {
+          "cmd": "patch --batch --fuzz=5 -p1 -f -i /testbed/patch_code.diff",
+          "cwd": "/testbed",
+          "user": "root",
+          "exit_code": 1,
+          "seconds": 0.0452,
+          "output_sha256": "c4c506d5c8f90ec9cba2e2256f325c4cdc5631deede2953ad989b689be5103b3",
+          "observations": [
+            "patching file lib/plugins/aws/package/lib/mergeIamTemplates.js",
+            "Hunk #1 FAILED at 90.",
+            "1 out of 1 hunk FAILED -- saving rejects to file lib/plugins/aws/package/lib/mergeIamTemplates.js.rej",
+            "patching file lib/plugins/aws/package/lib/mergeIamTemplates.test.js",
+            "Hunk #1 succeeded at 315 (offset 176 lines).",
+            "Hunk #2 succeeded at 355 with fuzz 3 (offset 181 lines).",
+            "Hunk #3 succeeded at 366 with fuzz 3 (offset 181 lines)."
+          ]
+        }
+      ],
+      "image_baseline_diff_sha256": "0c542b110bcad5745194607683ea8342b105845faa581561936ddac1d578e3bf",
+      "image_baseline_changed_files": [
+        "Dockerfile"
+      ],
+      "baseline_policy": "original image without reset",
+      "snapshots": [
+        {
+          "label": "B",
+          "diff_sha256": "0c542b110bcad5745194607683ea8342b105845faa581561936ddac1d578e3bf",
+          "changed_files": [
+            "Dockerfile"
+          ],
+          "untracked": [],
+          "artifacts": {}
+        },
+        {
+          "label": "after git",
+          "diff_sha256": "cb2d24c3b11ab4dcf76ad31e848e2a3a0f968555c408f5d66307c97f7a1cf6c5",
+          "changed_files": [
+            "Dockerfile",
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+          ],
+          "untracked": [
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        },
+        {
+          "label": "before official M",
+          "diff_sha256": "cb2d24c3b11ab4dcf76ad31e848e2a3a0f968555c408f5d66307c97f7a1cf6c5",
+          "changed_files": [
+            "Dockerfile",
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+          ],
+          "untracked": [
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {}
+        },
+        {
+          "label": "after git",
+          "diff_sha256": "fcae99dd99d46565cb5bcf76acfef9a9a8a88dd51d0b9740ccbdd09a5e00dd64",
+          "changed_files": [
+            "Dockerfile",
+            "lib/plugins/aws/package/lib/mergeIamTemplates.js",
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+          ],
+          "untracked": [
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js.rej",
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js.rej": {
+              "sha256": "315fe261693503715325bea20067a725e7d6c0b48b60a49e9a2e32d1f83ce835",
+              "bytes": 1339,
+              "hunk_headers": [
+                "@@ -178,11 +174,6 @@",
+                "@@ -194,11 +185,6 @@"
+              ]
+            }
+          }
+        },
+        {
+          "label": "after patch",
+          "diff_sha256": "e60a5a02788488b516e4a4bc1b8f16f72d0af912f68922d63cbb542b60be0999",
+          "changed_files": [
+            "Dockerfile",
+            "lib/plugins/aws/package/lib/mergeIamTemplates.js",
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+          ],
+          "untracked": [
+            "lib/plugins/aws/package/lib/mergeIamTemplates.js.orig",
+            "lib/plugins/aws/package/lib/mergeIamTemplates.js.rej",
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js.orig",
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js.rej",
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {
+            "lib/plugins/aws/package/lib/mergeIamTemplates.js.orig": {
+              "sha256": "fe402cd1185b2e9e0e2aa05d2029630afb51b3c59616ed85d05f16d3a76baa16",
+              "bytes": 8685
+            },
+            "lib/plugins/aws/package/lib/mergeIamTemplates.js.rej": {
+              "sha256": "b060dc70cd50b4a19b9c439980d91c58117d83ea002a2f6986aca2e0620a2d58",
+              "bytes": 1698,
+              "hunk_headers": [
+                "@@ -90,18 +90,25 @@"
+              ]
+            },
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js.orig": {
+              "sha256": "878635d40711207b3ab163841ff32c3bf8c2d7bc6bf01497708015d67724c8fb",
+              "bytes": 26927
+            },
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js.rej": {
+              "sha256": "315fe261693503715325bea20067a725e7d6c0b48b60a49e9a2e32d1f83ce835",
+              "bytes": 1339,
+              "hunk_headers": [
+                "@@ -178,11 +174,6 @@",
+                "@@ -194,11 +185,6 @@"
+              ]
+            }
+          }
+        },
+        {
+          "label": "immediately before upstream cleanup",
+          "diff_sha256": "e60a5a02788488b516e4a4bc1b8f16f72d0af912f68922d63cbb542b60be0999",
+          "changed_files": [
+            "Dockerfile",
+            "lib/plugins/aws/package/lib/mergeIamTemplates.js",
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+          ],
+          "untracked": [
+            "lib/plugins/aws/package/lib/mergeIamTemplates.js.orig",
+            "lib/plugins/aws/package/lib/mergeIamTemplates.js.rej",
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js.orig",
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js.rej",
+            "patch_code.diff",
+            "patch_test.diff"
+          ],
+          "artifacts": {
+            "lib/plugins/aws/package/lib/mergeIamTemplates.js.orig": {
+              "sha256": "fe402cd1185b2e9e0e2aa05d2029630afb51b3c59616ed85d05f16d3a76baa16",
+              "bytes": 8685
+            },
+            "lib/plugins/aws/package/lib/mergeIamTemplates.js.rej": {
+              "sha256": "b060dc70cd50b4a19b9c439980d91c58117d83ea002a2f6986aca2e0620a2d58",
+              "bytes": 1698,
+              "hunk_headers": [
+                "@@ -90,18 +90,25 @@"
+              ]
+            },
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js.orig": {
+              "sha256": "878635d40711207b3ab163841ff32c3bf8c2d7bc6bf01497708015d67724c8fb",
+              "bytes": 26927
+            },
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js.rej": {
+              "sha256": "315fe261693503715325bea20067a725e7d6c0b48b60a49e9a2e32d1f83ce835",
+              "bytes": 1339,
+              "hunk_headers": [
+                "@@ -178,11 +174,6 @@",
+                "@@ -194,11 +185,6 @@"
+              ]
+            }
+          }
+        }
+      ],
+      "official_T": 0,
+      "official_M": "exception: Failed to apply patch."
+    }
+  },
+  "elapsed_seconds": 35.461,
+  "common_baseline_comparison": [
+    {
+      "path": "lib/plugins/aws/package/lib/mergeIamTemplates.test.js",
+      "sha256": {
+        "B": "333b471c5d88850d8fee1ba3adcc6fe0469fcc7a7e5257848ff872dab5cda0f3",
+        "T": "0ff27380dd8e06b99d9788cea81cdd3591ee5ef5c282184e68f25261b19cc5e3",
+        "M": "8a9f0c25a310063c9fe37f8c13a2da1299a40faf066e43867861103cb4fbe6aa"
+      },
+      "T_equals_M": false,
+      "only_terminal_LF_differs": false,
+      "base_relative_changed_ranges": {
+        "T": [
+          "@@ -130 +130 @@",
+          "@@ -140,0 +141,85 @@",
+          "@@ -185,0 +271,90 @@",
+          "@@ -190,0 +366,5 @@",
+          "@@ -200 +380 @@",
+          "@@ -205 +385 @@"
+        ],
+        "M": [
+          "@@ -142,4 +141,0 @@",
+          "@@ -181,5 +176,0 @@",
+          "@@ -197,5 +187,0 @@"
+        ]
+      }
+    }
+  ],
+  "first_git_rejected_hunks": [
+    {
+      "path": "lib/plugins/aws/package/lib/mergeIamTemplates.test.js",
+      "base_start": 178,
+      "classification": [
+        "structural-overlap",
+        "changed-context-after-test-split"
+      ]
+    },
+    {
+      "path": "lib/plugins/aws/package/lib/mergeIamTemplates.test.js",
+      "base_start": 194,
+      "classification": [
+        "structural-overlap",
+        "changed-context-after-test-split"
+      ]
+    }
+  ],
+  "semantic_limit": "Application diagnosis only; implementation correctness and test strength unproven.",
+  "classification": [
+    "changed-context-after-test-split",
+    "structural-overlap"
+  ],
+  "first_rejection_scope": "tests/fixtures only; production hunks applied by git before fallback",
+  "fallback_scope": "production and tests may be rejected or duplicated on the already modified tree; no reverse-switch or reset"
+}

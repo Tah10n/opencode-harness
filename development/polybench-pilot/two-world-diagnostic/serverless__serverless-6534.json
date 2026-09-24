@@ -1,0 +1,54 @@
+{
+  "instance_id": "serverless__serverless-6534",
+  "base_commit": "d4c8bc1450d31275596b26bb7464a6f1b28392af",
+  "dataset_revision": "b3fca77b637379f0c01ad86d18753a7ac1998b53",
+  "evaluator": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+  "image": {
+    "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6534:v1.1",
+    "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6534@sha256:8600be77e4c2e4456f8587222423922fd33b4a70162c127bb1c16c8a55a3792f",
+    "id": "sha256:8600be77e4c2e4456f8587222423922fd33b4a70162c127bb1c16c8a55a3792f",
+    "architecture": "amd64",
+    "os": "linux",
+    "size": 5445541482,
+    "workdir": "/testbed"
+  },
+  "test_patch_sha256": "33a2d899db2bfc5dc663d853eb18f97bdbccb2df9ec5a304807935de4b51369d",
+  "gold_sha256": "86ce56afe611b83c277195196c490f15d61a72a5d32a548822025cb1c1863d15",
+  "assessment_tree": "bb7e80a3e6c69637ffe62c469097ac5f61579157",
+  "assessment_inventory_sha256": "04cea446dcc0e1be2936a673dc56af880b59cad9a4ff4b170fb78cfec36bcbf3",
+  "directories": [],
+  "files": [
+    "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+  ],
+  "source": "exact B + unchanged official T; added paths copied, absent paths removed, modes retained",
+  "assessment_command": ". /usr/local/nvm/nvm.sh && npx mocha lib/plugins/aws/package/lib/mergeIamTemplates.test.js --reporter json",
+  "delivered_command": ". /usr/local/nvm/nvm.sh && npx mocha lib/plugins/aws/package/lib/mergeIamTemplates.test.js --reporter json",
+  "execution_overlay": {
+    "Dockerfile": {
+      "mode": 436,
+      "kind": "file",
+      "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+    }
+  },
+  "fixed_execution_inputs": [
+    "package.json",
+    ".gitignore"
+  ],
+  "source_import_targets": [
+    "lib/Serverless.js",
+    "lib/plugins/aws/provider/awsProvider.js",
+    "lib/plugins/aws/package/index.js",
+    "lib/plugins/aws/package/lib/mergeIamTemplates.js"
+  ],
+  "build_outputs": [],
+  "build_output_files": [],
+  "mutable_execution_paths": [
+    "Dockerfile"
+  ],
+  "control_test": "lib/plugins/aws/package/lib/mergeIamTemplates.test.js",
+  "timeout_seconds": 1200,
+  "roles": {
+    "lib/plugins/aws/package/lib/mergeIamTemplates.test.js": "test runner and assertions"
+  },
+  "rationale": "Explicit Mocha file; imports chai plus local Serverless, AwsProvider and AwsPackage production modules. No local test helper. Package Mocha settings must remain B. Other author test files are preserved but not discovered by this targeted command."
+}

@@ -1,0 +1,2969 @@
+{
+  "mode": "evaluate",
+  "provider_calls": 0,
+  "cases": [
+    {
+      "delivery_apply": true,
+      "model_sha256": "856c8a1b7cbbe6aa384f1b1c9e2e0523bacc3d13dbf7b8bd9a19fb476765a0fa",
+      "full_git_tree": "d904a0328dc3b7c24836b3ebab3e1c864f91317d",
+      "test_sha256": "33a2d899db2bfc5dc663d853eb18f97bdbccb2df9ec5a304807935de4b51369d",
+      "base_commit": "d4c8bc1450d31275596b26bb7464a6f1b28392af",
+      "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6534@sha256:8600be77e4c2e4456f8587222423922fd33b4a70162c127bb1c16c8a55a3792f",
+      "instance_id": "serverless__serverless-6534",
+      "arm": "P",
+      "E": {
+        "instance_id": "serverless__serverless-6534",
+        "label": "serverless__serverless-6534-P-E",
+        "world": "E",
+        "command": ". /usr/local/nvm/nvm.sh && npx mocha lib/plugins/aws/package/lib/mergeIamTemplates.test.js --reporter json",
+        "timeout_seconds": 1200,
+        "acceptance_diag": {
+          "instance_id": "serverless__serverless-6534",
+          "patch_applied": true,
+          "generation": true,
+          "with_logs": true,
+          "all_f2p_passed": false,
+          "no_p2p_failed": true,
+          "resolved": false
+        },
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1041,
+          "differences": [
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+          ]
+        },
+        "source_inventory_sha256": "9bab55adf625a94af26c955272abf6b75b2be2852eea3c732bf1628737099027",
+        "full_inventory_sha256": "a1db9cf0b1bc9ae8a15313ac69f726870eac0a715b4877dd25d7fa4ee21a9210",
+        "import_targets": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "build_inputs_sha256": "b5fb8c342f05211aeeb1a95783c8c84d2a5a3a82b0f038898d5d5ca0285633af",
+        "execution_overlay": {
+          "Dockerfile": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+          }
+        },
+        "exit_code": 1,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 2.99,
+        "output_sha256": "76decbd4b20be2604ee74fd8a77f0cdc25e0b241a9495690ac6f55edc4cd4d33",
+        "source_mutations": {
+          "Dockerfile": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "33e49261fb35b175605506dc6d1f387824f6c077f39eeefb968b3ce158b6ca56"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {},
+        "resolved_modules": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "runner_stats": {
+          "suites": 2,
+          "tests": 25,
+          "passes": 24,
+          "pending": 0,
+          "failures": 1,
+          "start": "2026-09-18T05:11:55.374Z",
+          "end": "2026-09-18T05:11:55.492Z",
+          "duration": 118
+        },
+        "passed": 24,
+        "failed": 1,
+        "delivered_checks": "failed",
+        "missing_required_tests": [],
+        "seconds": 6.251,
+        "test_set": "test-sets/ed9f33272c6de9886b57bd562444397343f3364040b8d2242d49013ac1663903.json",
+        "failures": [
+          {
+            "test": "#mergeIamTemplates() should ensure IAM policies for custom and canonically named functions",
+            "name": null,
+            "kind": "assertion",
+            "message": "expected { Type: 'AWS::IAM::Role', \u2026(1) } to deeply equal { Type: 'AWS::IAM::Role', \u2026(1) }",
+            "detail_sha256": "a025bc78c67421d08aeaf8c7e4bdc95dd0a26a3a6649b07df8164e651cbb4785"
+          }
+        ],
+        "failure_kinds": {
+          "assertion": 1,
+          "test_timeout": 0,
+          "other": 0
+        }
+      },
+      "F": {
+        "instance_id": "serverless__serverless-6534",
+        "label": "serverless__serverless-6534-P-F",
+        "world": "F",
+        "command": ". /usr/local/nvm/nvm.sh && npx mocha lib/plugins/aws/package/lib/mergeIamTemplates.test.js --reporter json",
+        "timeout_seconds": 1200,
+        "acceptance_diag": null,
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1041,
+          "differences": []
+        },
+        "source_inventory_sha256": "a1db9cf0b1bc9ae8a15313ac69f726870eac0a715b4877dd25d7fa4ee21a9210",
+        "full_inventory_sha256": "a1db9cf0b1bc9ae8a15313ac69f726870eac0a715b4877dd25d7fa4ee21a9210",
+        "import_targets": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "build_inputs_sha256": "b5fb8c342f05211aeeb1a95783c8c84d2a5a3a82b0f038898d5d5ca0285633af",
+        "execution_overlay": {
+          "Dockerfile": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+          }
+        },
+        "exit_code": 0,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 2.92,
+        "output_sha256": "aeb0972a3231ef7839ff946285cbbd839cf36cbb5729e83228c32d1adb3b4a7e",
+        "source_mutations": {
+          "Dockerfile": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "33e49261fb35b175605506dc6d1f387824f6c077f39eeefb968b3ce158b6ca56"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {},
+        "resolved_modules": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "runner_stats": {
+          "suites": 2,
+          "tests": 23,
+          "passes": 23,
+          "pending": 0,
+          "failures": 0,
+          "start": "2026-09-18T05:11:48.257Z",
+          "end": "2026-09-18T05:11:48.369Z",
+          "duration": 112
+        },
+        "passed": 23,
+        "failed": 0,
+        "delivered_checks": "passed",
+        "seconds": 6.985,
+        "test_set": "test-sets/1c6ac1179e31bca9261fb587dd5439dd35e4e27bc80fecfa5a77809016e4d947.json",
+        "failures": [],
+        "failure_kinds": {
+          "assertion": 0,
+          "test_timeout": 0,
+          "other": 0
+        }
+      },
+      "historical": {
+        "R": false,
+        "T": true,
+        "D_bench": false,
+        "status": "started"
+      }
+    },
+    {
+      "delivery_apply": true,
+      "model_sha256": "173cfae9a3fef2611140b9340c1df453601353b1f3560dc3410304cec787d59b",
+      "full_git_tree": "6b8e4bf2886c32405c7ef022c46decc34e091b4b",
+      "test_sha256": "33a2d899db2bfc5dc663d853eb18f97bdbccb2df9ec5a304807935de4b51369d",
+      "base_commit": "d4c8bc1450d31275596b26bb7464a6f1b28392af",
+      "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6534@sha256:8600be77e4c2e4456f8587222423922fd33b4a70162c127bb1c16c8a55a3792f",
+      "instance_id": "serverless__serverless-6534",
+      "arm": "H0",
+      "E": {
+        "instance_id": "serverless__serverless-6534",
+        "label": "serverless__serverless-6534-H0-E",
+        "world": "E",
+        "command": ". /usr/local/nvm/nvm.sh && npx mocha lib/plugins/aws/package/lib/mergeIamTemplates.test.js --reporter json",
+        "timeout_seconds": 1200,
+        "acceptance_diag": {
+          "instance_id": "serverless__serverless-6534",
+          "patch_applied": true,
+          "generation": true,
+          "with_logs": true,
+          "all_f2p_passed": false,
+          "no_p2p_failed": true,
+          "resolved": false
+        },
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1041,
+          "differences": [
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+          ]
+        },
+        "source_inventory_sha256": "b18ebb4152130d2bce3e3187bd033eed446c3a7427bbc31d1dd640cfd7109fea",
+        "full_inventory_sha256": "8e3e0e9f94ad89f1593d53b54487dfa7d12931e6639663226be3fc31c9d5d174",
+        "import_targets": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "build_inputs_sha256": "966ec7f6f37a80f7f7b4666a3791ba054277cf8b6b1670a1c2ea113f15c0c722",
+        "execution_overlay": {
+          "Dockerfile": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+          }
+        },
+        "exit_code": 1,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 2.665,
+        "output_sha256": "1dc99bf2c11f83f1dd1cbd427672bc25f202d1619ca11b4c07d0f8c23e53e82c",
+        "source_mutations": {
+          "Dockerfile": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "33e49261fb35b175605506dc6d1f387824f6c077f39eeefb968b3ce158b6ca56"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {},
+        "resolved_modules": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "runner_stats": {
+          "suites": 2,
+          "tests": 25,
+          "passes": 24,
+          "pending": 0,
+          "failures": 1,
+          "start": "2026-09-18T05:12:08.452Z",
+          "end": "2026-09-18T05:12:08.571Z",
+          "duration": 119
+        },
+        "passed": 24,
+        "failed": 1,
+        "delivered_checks": "failed",
+        "missing_required_tests": [],
+        "seconds": 5.942,
+        "test_set": "test-sets/ed9f33272c6de9886b57bd562444397343f3364040b8d2242d49013ac1663903.json",
+        "failures": [
+          {
+            "test": "#mergeIamTemplates() should ensure IAM policies for custom and canonically named functions",
+            "name": null,
+            "kind": "assertion",
+            "message": "expected { Type: 'AWS::IAM::Role', \u2026(1) } to deeply equal { Type: 'AWS::IAM::Role', \u2026(1) }",
+            "detail_sha256": "8ac27c8fa1a2f15d24c17a9ead78e0be613c06ccdd27cc84e14224ce100490d1"
+          }
+        ],
+        "failure_kinds": {
+          "assertion": 1,
+          "test_timeout": 0,
+          "other": 0
+        }
+      },
+      "F": {
+        "instance_id": "serverless__serverless-6534",
+        "label": "serverless__serverless-6534-H0-F",
+        "world": "F",
+        "command": ". /usr/local/nvm/nvm.sh && npx mocha lib/plugins/aws/package/lib/mergeIamTemplates.test.js --reporter json",
+        "timeout_seconds": 1200,
+        "acceptance_diag": null,
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1041,
+          "differences": []
+        },
+        "source_inventory_sha256": "8e3e0e9f94ad89f1593d53b54487dfa7d12931e6639663226be3fc31c9d5d174",
+        "full_inventory_sha256": "8e3e0e9f94ad89f1593d53b54487dfa7d12931e6639663226be3fc31c9d5d174",
+        "import_targets": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "build_inputs_sha256": "966ec7f6f37a80f7f7b4666a3791ba054277cf8b6b1670a1c2ea113f15c0c722",
+        "execution_overlay": {
+          "Dockerfile": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+          }
+        },
+        "exit_code": 0,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 3.09,
+        "output_sha256": "db4aab52fa85f98725f22801eaf0512710e3a4828b92f1fb9166002ab2a104ab",
+        "source_mutations": {
+          "Dockerfile": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "33e49261fb35b175605506dc6d1f387824f6c077f39eeefb968b3ce158b6ca56"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {},
+        "resolved_modules": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "runner_stats": {
+          "suites": 2,
+          "tests": 24,
+          "passes": 24,
+          "pending": 0,
+          "failures": 0,
+          "start": "2026-09-18T05:12:02.513Z",
+          "end": "2026-09-18T05:12:02.618Z",
+          "duration": 105
+        },
+        "passed": 24,
+        "failed": 0,
+        "delivered_checks": "passed",
+        "seconds": 6.703,
+        "test_set": "test-sets/4f570bf6b1ac7ae4749030988e50b290d3689f4cadd8a5363e90206604cd027a.json",
+        "failures": [],
+        "failure_kinds": {
+          "assertion": 0,
+          "test_timeout": 0,
+          "other": 0
+        }
+      },
+      "historical": {
+        "R": false,
+        "T": true,
+        "D_bench": false,
+        "status": "started"
+      }
+    },
+    {
+      "delivery_apply": true,
+      "model_sha256": "6beb8ddd3a5d4700a914a549dd415beea379bd78863270e60563fde0f2f997e9",
+      "full_git_tree": "87e8e14a8b89575c151ffb969b3dcaf5851b5ebc",
+      "test_sha256": "33a2d899db2bfc5dc663d853eb18f97bdbccb2df9ec5a304807935de4b51369d",
+      "base_commit": "d4c8bc1450d31275596b26bb7464a6f1b28392af",
+      "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6534@sha256:8600be77e4c2e4456f8587222423922fd33b4a70162c127bb1c16c8a55a3792f",
+      "instance_id": "serverless__serverless-6534",
+      "arm": "H1",
+      "E": {
+        "instance_id": "serverless__serverless-6534",
+        "label": "serverless__serverless-6534-H1-E",
+        "world": "E",
+        "command": ". /usr/local/nvm/nvm.sh && npx mocha lib/plugins/aws/package/lib/mergeIamTemplates.test.js --reporter json",
+        "timeout_seconds": 1200,
+        "acceptance_diag": {
+          "instance_id": "serverless__serverless-6534",
+          "patch_applied": true,
+          "generation": true,
+          "with_logs": true,
+          "all_f2p_passed": false,
+          "no_p2p_failed": true,
+          "resolved": false
+        },
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1041,
+          "differences": [
+            "lib/plugins/aws/package/lib/mergeIamTemplates.test.js"
+          ]
+        },
+        "source_inventory_sha256": "0da4cb1406c21a6ad7bc8afba8f6805ddd77d703d5a7766c21fff0f0584ba05e",
+        "full_inventory_sha256": "448ab29352e0a242223a94f5d0211a32e7f0965c4852f009f4207022edeafe84",
+        "import_targets": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "build_inputs_sha256": "7c1325d43f63baae56608699417eae80422c25dfe54145d5a54cb80f2a0ab11d",
+        "execution_overlay": {
+          "Dockerfile": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+          }
+        },
+        "exit_code": 1,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 2.637,
+        "output_sha256": "0513923a460538e544ccd7c3f8ebc26594530e0ffbf6a724d2d06e8591f8c7ed",
+        "source_mutations": {
+          "Dockerfile": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "33e49261fb35b175605506dc6d1f387824f6c077f39eeefb968b3ce158b6ca56"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {},
+        "resolved_modules": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "runner_stats": {
+          "suites": 2,
+          "tests": 25,
+          "passes": 24,
+          "pending": 0,
+          "failures": 1,
+          "start": "2026-09-18T05:12:20.621Z",
+          "end": "2026-09-18T05:12:20.729Z",
+          "duration": 108
+        },
+        "passed": 24,
+        "failed": 1,
+        "delivered_checks": "failed",
+        "missing_required_tests": [],
+        "seconds": 5.799,
+        "test_set": "test-sets/ed9f33272c6de9886b57bd562444397343f3364040b8d2242d49013ac1663903.json",
+        "failures": [
+          {
+            "test": "#mergeIamTemplates() should ensure IAM policies for custom and canonically named functions",
+            "name": null,
+            "kind": "assertion",
+            "message": "expected { Type: 'AWS::IAM::Role', \u2026(1) } to deeply equal { Type: 'AWS::IAM::Role', \u2026(1) }",
+            "detail_sha256": "8ac27c8fa1a2f15d24c17a9ead78e0be613c06ccdd27cc84e14224ce100490d1"
+          }
+        ],
+        "failure_kinds": {
+          "assertion": 1,
+          "test_timeout": 0,
+          "other": 0
+        }
+      },
+      "F": {
+        "instance_id": "serverless__serverless-6534",
+        "label": "serverless__serverless-6534-H1-F",
+        "world": "F",
+        "command": ". /usr/local/nvm/nvm.sh && npx mocha lib/plugins/aws/package/lib/mergeIamTemplates.test.js --reporter json",
+        "timeout_seconds": 1200,
+        "acceptance_diag": null,
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1041,
+          "differences": []
+        },
+        "source_inventory_sha256": "448ab29352e0a242223a94f5d0211a32e7f0965c4852f009f4207022edeafe84",
+        "full_inventory_sha256": "448ab29352e0a242223a94f5d0211a32e7f0965c4852f009f4207022edeafe84",
+        "import_targets": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "build_inputs_sha256": "7c1325d43f63baae56608699417eae80422c25dfe54145d5a54cb80f2a0ab11d",
+        "execution_overlay": {
+          "Dockerfile": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+          }
+        },
+        "exit_code": 0,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 2.824,
+        "output_sha256": "7a066deba56574ec56c9e9a5cafe5c5731726e6fbca09cc0c1e4abf0bfaa35b5",
+        "source_mutations": {
+          "Dockerfile": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "33e49261fb35b175605506dc6d1f387824f6c077f39eeefb968b3ce158b6ca56"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "1f0b1ccc4f909b75c3fd1195d8d3db894b61dc25e960a0b55158ddb0aa6c8163"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {},
+        "resolved_modules": [
+          "/testbed/lib/Serverless.js",
+          "/testbed/lib/plugins/aws/provider/awsProvider.js",
+          "/testbed/lib/plugins/aws/package/index.js",
+          "/testbed/lib/plugins/aws/package/lib/mergeIamTemplates.js"
+        ],
+        "runner_stats": {
+          "suites": 2,
+          "tests": 23,
+          "passes": 23,
+          "pending": 0,
+          "failures": 0,
+          "start": "2026-09-18T05:12:14.838Z",
+          "end": "2026-09-18T05:12:14.958Z",
+          "duration": 120
+        },
+        "passed": 23,
+        "failed": 0,
+        "delivered_checks": "passed",
+        "seconds": 5.884,
+        "test_set": "test-sets/1c6ac1179e31bca9261fb587dd5439dd35e4e27bc80fecfa5a77809016e4d947.json",
+        "failures": [],
+        "failure_kinds": {
+          "assertion": 0,
+          "test_timeout": 0,
+          "other": 0
+        }
+      },
+      "historical": {
+        "R": false,
+        "T": true,
+        "D_bench": false,
+        "status": "started"
+      }
+    },
+    {
+      "delivery_apply": true,
+      "model_sha256": "16187e0e46946257ab31de6e62ea5653068e3e6001c4d8c2dc0e9c001b99c6e9",
+      "full_git_tree": "e8c5ea6844e4c82156c1f2bc1cebe47771eb62c2",
+      "test_sha256": "865f82b594d861f5ecbae4f058002f89ccaf318d07ce2a1ff8fa8fd41120f4ac",
+      "base_commit": "0c3e44ac05c651c12c94e047bf712cb86278d345",
+      "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1190@sha256:28167366b3d50bb7b6cc3441186980d6022986d9fc60d6e6a193c7aa7cb7b858",
+      "instance_id": "sveltejs__svelte-1190",
+      "arm": "P",
+      "E": {
+        "instance_id": "sveltejs__svelte-1190",
+        "label": "sveltejs__svelte-1190-P-E",
+        "world": "E",
+        "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm pkg set scripts.lint=\"echo noop\" && npm run test -- --reporter json --exit",
+        "timeout_seconds": 1200,
+        "acceptance_diag": {
+          "instance_id": "sveltejs__svelte-1190",
+          "patch_applied": true,
+          "generation": true,
+          "with_logs": true,
+          "all_f2p_passed": false,
+          "no_p2p_failed": true,
+          "resolved": false
+        },
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1916,
+          "differences": [
+            "test/css/index.js",
+            "test/css/samples/combinator-child/expected.html",
+            "test/css/samples/descendant-selector-non-top-level-outer/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-static/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.html",
+            "test/css/samples/refs-qualified/expected.html",
+            "test/css/samples/refs/expected.html",
+            "test/css/samples/unused-selector-leading/expected.html",
+            "test/css/samples/unused-selector-ternary/expected.html",
+            "test/css/samples/unused-selector/expected.html",
+            "test/js/samples/collapses-text-around-comments/expected-bundle.js",
+            "test/js/samples/collapses-text-around-comments/expected.js",
+            "test/js/samples/css-media-query/expected-bundle.js",
+            "test/js/samples/css-media-query/expected.js",
+            "test/server-side-rendering/samples/styles-nested/_actual.css",
+            "test/server-side-rendering/samples/styles-nested/_actual.html",
+            "test/server-side-rendering/samples/styles-nested/_expected.css",
+            "test/server-side-rendering/samples/styles-nested/_expected.html",
+            "test/server-side-rendering/samples/styles/_actual.css",
+            "test/server-side-rendering/samples/styles/_actual.html",
+            "test/server-side-rendering/samples/styles/_expected.css",
+            "test/server-side-rendering/samples/styles/_expected.html",
+            "test/sourcemaps/samples/css-cascade-false/output.css",
+            "test/sourcemaps/samples/css-cascade-false/output.css.map",
+            "test/sourcemaps/samples/css/output.css",
+            "test/sourcemaps/samples/css/output.css.map"
+          ]
+        },
+        "source_inventory_sha256": "18d68fe080730783999b618e91c3660f842c82985251c0f09b8d69481f981e17",
+        "full_inventory_sha256": "13f852ef5fe8932f09b1361b8e33b0ae5f283611e1d87592eebc894a298ba8cb",
+        "import_targets": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js"
+        ],
+        "build_inputs_sha256": "9c83726514f1e46648ead3617b0776d5ddab2b2178ca211351363f4543c2debd",
+        "execution_overlay": {
+          "package.json": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+          },
+          "yarn.lock": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+          }
+        },
+        "exit_code": 23,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 110.857,
+        "output_sha256": "438abf70008a6d8105506146f5999e4464c4f7a6b20ad10897af9724a60cd477",
+        "source_mutations": {
+          "package.json": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "68c157e3d08190b151027775fb8b57a00b6ec81d2be3c2056335d00b498b0f90"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+            }
+          },
+          "test/server-side-rendering/samples/styles-nested/_actual.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "b00572102ab4ce2864f0693652e60afb32c715ec8f18f4fa5a785f7efd3f9cf7"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "beb3c200ad647bbc5eb68388e47a789891f1212171c40589be26513819ba120b"
+            }
+          },
+          "test/server-side-rendering/samples/styles-nested/_actual.html": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "c4b09f0b7710aa940387c40dea1a6dea2241cb68c4d98ce9be4acc1f4297d73f"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "074940dbd18be19c35d0377f5d3d33543b3c61f4e1842f1321f1999c6a6dc6c1"
+            }
+          },
+          "test/server-side-rendering/samples/styles/_actual.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "38fa0b7ce65683e4f08419df6059714c244554d26f2a361ccd31a1f84808719a"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "c13a12e4b113e73ce7332889e72880a18b4f90177637013874b3e52ca53527a2"
+            }
+          },
+          "test/server-side-rendering/samples/styles/_actual.html": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7f2cfd01d5699de1dcd47113cec03ef7bb1327df6c4a253a96a75bf3d937c06a"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "65aca918d8449bcba5e2857ba80145efa6c17e14c02b03a41db21174c27c857a"
+            }
+          },
+          "test/sourcemaps/samples/css-cascade-false/output.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "37869336fe989e75e08192b1964efff1990fa62bae2ea4c19dc4758a1ced82d6"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "676e0db4589cc91a3a8a4be89f49d806b92f339abb984542311a5f08f5597bb9"
+            }
+          },
+          "test/sourcemaps/samples/css-cascade-false/output.css.map": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "0c585caf3c9063a25617ca47885929986baa141d42bdeac19765da68609cb12d"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "3ab6cf096daeaf815e5592436018edac76d3a665da42f63d9e9a424f5ac0d4d8"
+            }
+          },
+          "test/sourcemaps/samples/css/output.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7cdfb4ba21a658af6c3c72f09ea1802bb317795c66478bd088c67f61d0bb75e3"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "5dbe22f77bd4d0283387bf139f2c594f70027ac3ffb06f95421e570c082ae50a"
+            }
+          },
+          "test/sourcemaps/samples/css/output.css.map": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7a9be97c6327b1389c469ce68e7d01e7500e20f31d150b55c77a2b3afd63eb71"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "565cfcb8f8c40d7fa03d5f957f9ea61213576a90d826b4302bce66c6e6a4745e"
+            }
+          },
+          "yarn.lock": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "ff0602af5e3e7ab7038a2cdb0f49fcaea48d816b707a705610fe6a867fab8c0d"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {
+          "compiler/svelte.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "c4c61d2bff2b60fa2b1da431a90027e01bb7c8311111ad910ec95808244e781e"
+          },
+          "compiler/svelte.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "27e9414780a3092dc12da9683ae6bddf8543d7fb54517026331c2ad36c229409"
+          },
+          "shared.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "435f4c03fae641ab095970036f4917db06fd93b7e921b11cd287f0c97bf37ead"
+          },
+          "src/generators/dom/shared.ts": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "437634bf11a74f2e74590c3906ba7408d6848505345a370faaeb1f6c50d74d4a"
+          },
+          "ssr/register.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "9c3231e5e9b8efd1b0cfbfa12de8196e8d1782151204ab83fa8736a0f569d877"
+          },
+          "ssr/register.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "8258f583e14ec69f334276650be5e370aa72f3c234f6a6ac773523416cdd43ce"
+          },
+          "store.umd.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "e6192955ee99d919d9bac8a34d97038b5d77fabaf8697ba3019879283a7f25c5"
+          }
+        },
+        "resolved_modules": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js",
+          "/testbed/compiler/svelte.js",
+          "/testbed/ssr/register.js",
+          "/testbed/shared.js",
+          "/testbed/store.umd.js"
+        ],
+        "runner_stats": {
+          "suites": 25,
+          "tests": 1730,
+          "passes": 1654,
+          "pending": 53,
+          "failures": 23,
+          "start": "2026-09-18T05:14:36.300Z",
+          "end": "2026-09-18T05:16:11.570Z",
+          "duration": 95270
+        },
+        "passed": 1654,
+        "failed": 23,
+        "delivered_checks": "failed",
+        "missing_required_tests": [],
+        "seconds": 114.697,
+        "test_set": "test-sets/e1d56840121bd6e8d4fa7b28385f7a98679d9062d10cd40b54d24f6d5f703151.json",
+        "failures": [
+          {
+            "test": "css combinator-child",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<div class=\"svelte-xyz test\"><div class=\"svelte-xyz\">Testing...</div></div>' == '<div class=\"test svelte-xyz\"><div class=\"svelte-xyz\">Testing...</div></div>'",
+            "detail_sha256": "acd2df89e912d066ee4f11e6f67f39f68356ca65250b7a1be6cc20c6ac7eed6b"
+          },
+          {
+            "test": "css omit-scoping-attribute-class-dynamic",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<p class=\"svelte-xyz whatever\">this is styled</p><p class=\"bar\">this is unstyled</p>' == '<p class=\"whatever svelte-xyz\">this is styled</p><p class=\"bar\">this is unstyled</p>'",
+            "detail_sha256": "825a41529c96cc167998847de74a4d753f257394bc828767d399b06a8138ad15"
+          },
+          {
+            "test": "css omit-scoping-attribute-class-static",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<p class=\"svelte-xyz foo\">this is styled</p><p class=\"bar\">this is unstyled</p>' == '<p class=\"foo svelte-xyz\">this is styled</p><p class=\"bar\">this is unstyled</p>'",
+            "detail_sha256": "1c61ecefdcadedd17b0af5289c620a2e181d59a970b1a0c14e376ca18aaba915"
+          },
+          {
+            "test": "css omit-scoping-attribute-descendant-global-inner-class",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<div class=\"svelte-xyz foo\"></div>' == '<div class=\"foo svelte-xyz\"></div>'",
+            "detail_sha256": "0cc1b6d6ac0d3512d4da7d83f6ebdb85e009518786bd261ddabc0f410b835245"
+          },
+          {
+            "test": "css refs-qualified",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<button class=\"svelte-xyz active\" svelte-ref-button=\"\">deactivate</button>' == '<button class=\"active svelte-xyz\" svelte-ref-button=\"\">deactivate</button>'",
+            "detail_sha256": "01dd504f0642282b0e1b67bbbff1edee0b3f6d9217d18a80fd14c34808e64784"
+          },
+          {
+            "test": "css unused-selector",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<div class=\"svelte-xyz foo\"></div>' == '<div class=\"foo svelte-xyz\"></div>'",
+            "detail_sha256": "7f1c1ed9f758bc5927bd06f0a83b5f555177c6f154b79be000b476a1f2c6e7a3"
+          },
+          {
+            "test": "css unused-selector-leading",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<div class=\"svelte-xyz bar\"></div>' == '<div class=\"bar svelte-xyz\"></div>'",
+            "detail_sha256": "57d9172b9ff88164d67a17ee32ca00360724a2abfdb03c4910a834cd735fbdc7"
+          },
+          {
+            "test": "css unused-selector-ternary",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<div class=\"svelte-xyz active\"></div>' == '<div class=\"active svelte-xyz\"></div>'",
+            "detail_sha256": "eaee2b1f2f4033681f7b2c2bce1d166d983c201d840ab207508c097526060b5e"
+          },
+          {
+            "test": "custom-elements escaped-css",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "d6f634c80e913bf3233041f1c7b236c51207e2e94213da7c5e62548883d3645d"
+          },
+          {
+            "test": "custom-elements html",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "d5cef427332a6958b13f8f6481975727ef304e4a6b2c114c54ca1685657af252"
+          },
+          {
+            "test": "custom-elements html-slots",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "10df769706a67fca8bd65883cd4e106107c36327a81c821c9d96f9d4d2baa61e"
+          },
+          {
+            "test": "custom-elements nested",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "fe023ff743df34c7f7965d42c24c9598a8a8c4847190d5b8470875890c9f9612"
+          },
+          {
+            "test": "custom-elements new",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "11b64b735ec943a36bca4dd4f973175e4307cbca93877400672d8423ff3b24f9"
+          },
+          {
+            "test": "custom-elements new-styled",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "898091408df5c51856c7c503ec9f04ff2bdd513ed000a0ce4ee71489ff46e129"
+          },
+          {
+            "test": "custom-elements no-missing-prop-warnings",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "0cd066f1911ab0cb4dc137ccb7c6a179dbdca7728bba2c45218aaf76c1c5cce7"
+          },
+          {
+            "test": "custom-elements oncreate",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "31bb464fa90c7a1c5ae282535e562b57f4e42d8f118806fffb001ff0c4177f3e"
+          },
+          {
+            "test": "js collapses-text-around-comments",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'/* generated by Svelte vX.Y.Z */\\n' +\n  'import { appendNode, assign, createElement, createText, detachNode, init, insertNode, noop, proto, setAttribute } from \"svelte/shared.js\";\\n' +\n  '\\n' +\n  'function data() {\\n' +\n  '\\treturn { foo: 42 }\\n' +\n  '};\\n' +\n  '\\n' +\n  'function encapsulateStyles(node) {\\n' +\n  '\\tsetAttribute(node, \"class\", \"svelte-2794052100\");\\n' +\n  '}\\n' +\n  '\\n' +\n  'function add_css() {\\n' +\n  '\\tvar style = createElement(\"style\");\\n' +\n  \"\\tstyle.id = 'svelte-279405210",
+            "detail_sha256": "72ed52a4efc90a2838828afe8ebbf5bbdff242c03ea55edb1a696b589f5f5d9c"
+          },
+          {
+            "test": "js css-media-query",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'/* generated by Svelte vX.Y.Z */\\n' +\n  'import { appendNode, assign, createElement, detachNode, init, insertNode, noop, proto, setAttribute } from \"svelte/shared.js\";\\n' +\n  '\\n' +\n  'function encapsulateStyles(node) {\\n' +\n  '\\tsetAttribute(node, \"class\", \"svelte-3905933315\");\\n' +\n  '}\\n' +\n  '\\n' +\n  'function add_css() {\\n' +\n  '\\tvar style = createElement(\"style\");\\n' +\n  \"\\tstyle.id = 'svelte-3905933315-style';\\n\" +\n  '\\tstyle.textContent = \"@media(min-width: 1px){div.svelte-3905933315,.",
+            "detail_sha256": "6d6716bc5de452ea08276294842744a6dcf9a02913a128f52480c8b6dc308ff6"
+          },
+          {
+            "test": "runtime binding-select (shared helpers)",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n[\n  HTMLOptionElement {\n    __value: 'one'\n  },\n  HTMLOptionElement {\n    __value: 'two'\n  },\n  HTMLOptionElement {\n    __value: 'three'\n  }\n]\n\nshould loosely deep-equal\n\nHTMLOptionsCollection {}",
+            "detail_sha256": "c9c19142a13900656a4ce4be6d6f77d9f2322af0307e492bcece60bcd04e022c"
+          },
+          {
+            "test": "runtime binding-select (shared helpers , hydration)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "13ea6706b966ce56e1316fedf2549f9ed41699cb9cacfff2aef2c5f73033d266"
+          },
+          {
+            "test": "runtime binding-select (inline helpers)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "9c0a580aa3760a7036be87705f352a5ebd5a92bfcc07e2903ea823ac7f44b9b0"
+          },
+          {
+            "test": "ssr styles",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n'<div class=\"svelte-724714405\">red</div>'\n\nshould loosely deep-equal\n\n'<div class=\"svelte-bzh57p\">red</div>'",
+            "detail_sha256": "caf62f492b95151cea18e571fe507f79f52792934c55a0dd4bfac6c1ac542cf3"
+          },
+          {
+            "test": "ssr styles-nested",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n'<div class=\"svelte-724714405\">red</div><div class=\"svelte-300476157\">green: foo</div><div class=\"svelte-300476157\">green: bar</div>'\n\nshould loosely deep-equal\n\n'<div class=\"svelte-bzh57p\">red</div><div class=\"svelte-4yw8vx\">green: foo</div><div class=\"svelte-4yw8vx\">green: bar</div>'",
+            "detail_sha256": "4bcc7c4ed28b40fad2d7fc76565c0d45fd13bdfa9343860f1400458e035af59f"
+          }
+        ],
+        "failure_kinds": {
+          "assertion": 13,
+          "test_timeout": 8,
+          "other": 2
+        }
+      },
+      "F": {
+        "instance_id": "sveltejs__svelte-1190",
+        "label": "sveltejs__svelte-1190-P-F",
+        "world": "F",
+        "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm pkg set scripts.lint=\"echo noop\" && npm run test -- --reporter json --exit",
+        "timeout_seconds": 1200,
+        "acceptance_diag": null,
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1916,
+          "differences": []
+        },
+        "source_inventory_sha256": "13f852ef5fe8932f09b1361b8e33b0ae5f283611e1d87592eebc894a298ba8cb",
+        "full_inventory_sha256": "13f852ef5fe8932f09b1361b8e33b0ae5f283611e1d87592eebc894a298ba8cb",
+        "import_targets": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js"
+        ],
+        "build_inputs_sha256": "9c83726514f1e46648ead3617b0776d5ddab2b2178ca211351363f4543c2debd",
+        "execution_overlay": {
+          "package.json": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+          },
+          "yarn.lock": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+          }
+        },
+        "exit_code": 11,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 111.464,
+        "output_sha256": "41e4d3bb075b4dea357dc41e448df24b12b346d5b74ef317d1d5abeb2d86ab6e",
+        "source_mutations": {
+          "package.json": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "68c157e3d08190b151027775fb8b57a00b6ec81d2be3c2056335d00b498b0f90"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+            }
+          },
+          "test/server-side-rendering/samples/styles-nested/_actual.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "745e2e863990264ddc64c680d5d312087d68cad6c3d25b4528aac742ec6346e1"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "beb3c200ad647bbc5eb68388e47a789891f1212171c40589be26513819ba120b"
+            }
+          },
+          "test/server-side-rendering/samples/styles-nested/_actual.html": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "797698a0808be7543ca8c8c0f24f256a975154468ac012ed8a6e97f1bc68da12"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "074940dbd18be19c35d0377f5d3d33543b3c61f4e1842f1321f1999c6a6dc6c1"
+            }
+          },
+          "test/server-side-rendering/samples/styles/_actual.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "87cda4fd5173a67073ffc040333d4f99db66234f8f91b5a0e328ebbb53b5df71"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "c13a12e4b113e73ce7332889e72880a18b4f90177637013874b3e52ca53527a2"
+            }
+          },
+          "test/server-side-rendering/samples/styles/_actual.html": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "fd8f3462820eadce4bb59e8d73bf2d29bdb8c864a0d0c55188443b9a08f9ff54"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "65aca918d8449bcba5e2857ba80145efa6c17e14c02b03a41db21174c27c857a"
+            }
+          },
+          "yarn.lock": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "ff0602af5e3e7ab7038a2cdb0f49fcaea48d816b707a705610fe6a867fab8c0d"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {
+          "compiler/svelte.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "c4c61d2bff2b60fa2b1da431a90027e01bb7c8311111ad910ec95808244e781e"
+          },
+          "compiler/svelte.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "27e9414780a3092dc12da9683ae6bddf8543d7fb54517026331c2ad36c229409"
+          },
+          "shared.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "435f4c03fae641ab095970036f4917db06fd93b7e921b11cd287f0c97bf37ead"
+          },
+          "src/generators/dom/shared.ts": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "437634bf11a74f2e74590c3906ba7408d6848505345a370faaeb1f6c50d74d4a"
+          },
+          "ssr/register.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "9c3231e5e9b8efd1b0cfbfa12de8196e8d1782151204ab83fa8736a0f569d877"
+          },
+          "ssr/register.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "8258f583e14ec69f334276650be5e370aa72f3c234f6a6ac773523416cdd43ce"
+          },
+          "store.umd.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "e6192955ee99d919d9bac8a34d97038b5d77fabaf8697ba3019879283a7f25c5"
+          }
+        },
+        "resolved_modules": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js",
+          "/testbed/compiler/svelte.js",
+          "/testbed/ssr/register.js",
+          "/testbed/shared.js",
+          "/testbed/store.umd.js"
+        ],
+        "runner_stats": {
+          "suites": 25,
+          "tests": 1730,
+          "passes": 1666,
+          "pending": 53,
+          "failures": 11,
+          "start": "2026-09-18T05:12:38.703Z",
+          "end": "2026-09-18T05:14:16.800Z",
+          "duration": 98097
+        },
+        "passed": 1666,
+        "failed": 11,
+        "delivered_checks": "failed",
+        "seconds": 114.914,
+        "test_set": "test-sets/90182742b2e3c45ed1d093862d573e18c82b3eb189525e2f52cc183526ce8bc8.json",
+        "failures": [
+          {
+            "test": "custom-elements escaped-css",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "6b148176f4adb428d419a71dd087b840fcb72f191c354c642f112634ea19d0dc"
+          },
+          {
+            "test": "custom-elements html",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "9071e790a816dc7c1986b6a254621df5b8a111b020e51fab87342f459b0d33b5"
+          },
+          {
+            "test": "custom-elements html-slots",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "19a4b3a101747f9a2bfb14942212aef36f951f6d80ce1d2d803ac18b9598ab50"
+          },
+          {
+            "test": "custom-elements nested",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "fe023ff743df34c7f7965d42c24c9598a8a8c4847190d5b8470875890c9f9612"
+          },
+          {
+            "test": "custom-elements new",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "00fcfee8e0516ed0cb5ff7b56d41039499ad56588268532027b838fb71dec427"
+          },
+          {
+            "test": "custom-elements new-styled",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "bbb4c4d65f1ada823ad028decaa9a1ce3ca84d9b8b1883677c03f7ed8951cdfe"
+          },
+          {
+            "test": "custom-elements no-missing-prop-warnings",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "676e38a04cc0b372548cb098ab549af34b05280744e8c1bedbcc16f7a9d7d230"
+          },
+          {
+            "test": "custom-elements oncreate",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "165135eed5d8a1a3713d6e29ea3bac77a367466289e4d29048396dc4896669c7"
+          },
+          {
+            "test": "runtime binding-select (shared helpers)",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n[\n  HTMLOptionElement {\n    __value: 'one'\n  },\n  HTMLOptionElement {\n    __value: 'two'\n  },\n  HTMLOptionElement {\n    __value: 'three'\n  }\n]\n\nshould loosely deep-equal\n\nHTMLOptionsCollection {}",
+            "detail_sha256": "74fe2940848c4dde5535e9e155188092581762a0d9631a691205a06d98c12451"
+          },
+          {
+            "test": "runtime binding-select (shared helpers , hydration)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "13ea6706b966ce56e1316fedf2549f9ed41699cb9cacfff2aef2c5f73033d266"
+          },
+          {
+            "test": "runtime binding-select (inline helpers)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "9c0a580aa3760a7036be87705f352a5ebd5a92bfcc07e2903ea823ac7f44b9b0"
+          }
+        ],
+        "failure_kinds": {
+          "assertion": 1,
+          "test_timeout": 8,
+          "other": 2
+        }
+      },
+      "historical": {
+        "R": false,
+        "T": true,
+        "D_bench": false,
+        "status": "started"
+      }
+    },
+    {
+      "delivery_apply": true,
+      "model_sha256": "2e2c7e4ba5b4cd22a25762e1ddf24f52d0cbc11eea21d118cf71d14039a6ffc2",
+      "full_git_tree": "fc533b3fec5bd0ff9544ccab4791b46b8d482f53",
+      "test_sha256": "865f82b594d861f5ecbae4f058002f89ccaf318d07ce2a1ff8fa8fd41120f4ac",
+      "base_commit": "0c3e44ac05c651c12c94e047bf712cb86278d345",
+      "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1190@sha256:28167366b3d50bb7b6cc3441186980d6022986d9fc60d6e6a193c7aa7cb7b858",
+      "instance_id": "sveltejs__svelte-1190",
+      "arm": "H0",
+      "E": {
+        "instance_id": "sveltejs__svelte-1190",
+        "label": "sveltejs__svelte-1190-H0-E",
+        "world": "E",
+        "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm pkg set scripts.lint=\"echo noop\" && npm run test -- --reporter json --exit",
+        "timeout_seconds": 1200,
+        "acceptance_diag": {
+          "instance_id": "sveltejs__svelte-1190",
+          "patch_applied": true,
+          "generation": true,
+          "with_logs": true,
+          "all_f2p_passed": false,
+          "no_p2p_failed": true,
+          "resolved": false
+        },
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1918,
+          "differences": [
+            "test/css/index.js",
+            "test/css/samples/attribute-selector-only-name/expected.css",
+            "test/css/samples/attribute-selector-unquoted/expected.css",
+            "test/css/samples/basic/expected.css",
+            "test/css/samples/cascade-false-empty-rule-dev/expected.css",
+            "test/css/samples/cascade-false-global-keyframes/expected.css",
+            "test/css/samples/cascade-false-keyframes-from-to/expected.css",
+            "test/css/samples/cascade-false-keyframes/expected.css",
+            "test/css/samples/cascade-false-pseudo-element/expected.css",
+            "test/css/samples/cascade-false-universal-selector/expected.css",
+            "test/css/samples/cascade-false-universal-selector/expected.html",
+            "test/css/samples/cascade-false/expected.css",
+            "test/css/samples/combinator-child/expected.css",
+            "test/css/samples/combinator-child/expected.html",
+            "test/css/samples/css-vars/expected.css",
+            "test/css/samples/descendant-selector-non-top-level-outer/expected.css",
+            "test/css/samples/descendant-selector-non-top-level-outer/expected.html",
+            "test/css/samples/keyframes/expected.css",
+            "test/css/samples/media-query-word/expected.css",
+            "test/css/samples/media-query/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/expected.css",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-static/expected.css",
+            "test/css/samples/omit-scoping-attribute-class-static/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.html",
+            "test/css/samples/omit-scoping-attribute-id/expected.css",
+            "test/css/samples/omit-scoping-attribute-id/expected.html",
+            "test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-whitespace/expected.css",
+            "test/css/samples/omit-scoping-attribute-whitespace/expected.html",
+            "test/css/samples/omit-scoping-attribute/expected.css",
+            "test/css/samples/omit-scoping-attribute/expected.html",
+            "test/css/samples/refs-qualified/expected.css",
+            "test/css/samples/refs-qualified/expected.html",
+            "test/css/samples/refs/expected.css",
+            "test/css/samples/refs/expected.html",
+            "test/css/samples/supports-query/expected.css",
+            "test/css/samples/universal-selector/expected.css",
+            "test/css/samples/unknown-at-rule/expected.css",
+            "test/css/samples/unused-selector-leading/expected.css",
+            "test/css/samples/unused-selector-leading/expected.html",
+            "test/css/samples/unused-selector-ternary/expected.css",
+            "test/css/samples/unused-selector-ternary/expected.html",
+            "test/css/samples/unused-selector/expected.css",
+            "test/css/samples/unused-selector/expected.html",
+            "test/js/samples/collapses-text-around-comments/expected-bundle.js",
+            "test/js/samples/collapses-text-around-comments/expected.js",
+            "test/js/samples/css-media-query/expected-bundle.js",
+            "test/js/samples/css-media-query/expected.js",
+            "test/runtime/samples/css-scoping-class/_config.js",
+            "test/runtime/samples/css-scoping-class/main.html",
+            "test/server-side-rendering/index.js",
+            "test/server-side-rendering/samples/styles-nested/_actual.css",
+            "test/server-side-rendering/samples/styles-nested/_actual.html",
+            "test/server-side-rendering/samples/styles-nested/_expected.css",
+            "test/server-side-rendering/samples/styles-nested/_expected.html",
+            "test/server-side-rendering/samples/styles/_actual.css",
+            "test/server-side-rendering/samples/styles/_actual.html",
+            "test/server-side-rendering/samples/styles/_expected.css",
+            "test/server-side-rendering/samples/styles/_expected.html",
+            "test/sourcemaps/samples/css-cascade-false/output.css",
+            "test/sourcemaps/samples/css-cascade-false/output.css.map",
+            "test/sourcemaps/samples/css/output.css",
+            "test/sourcemaps/samples/css/output.css.map"
+          ]
+        },
+        "source_inventory_sha256": "8be06074c6af66b5ae2726ccb7584bb21d656f4f48c67e3b05c3a44b85624d40",
+        "full_inventory_sha256": "cb260b3b8a0c150a6e4e079505122e70a98533ee37c1ef518a4737ceacbbcc87",
+        "import_targets": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js"
+        ],
+        "build_inputs_sha256": "3ae3d300c353d47f481de9efb6a5e0d5373deb1f5a191b2697e3d35a9a795e1c",
+        "execution_overlay": {
+          "package.json": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+          },
+          "yarn.lock": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+          }
+        },
+        "exit_code": 23,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 108.86,
+        "output_sha256": "53eabc965a169a974476d470f89742b06f2d74f8f370cda3cf83fa696d7fa4f9",
+        "source_mutations": {
+          "package.json": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "68c157e3d08190b151027775fb8b57a00b6ec81d2be3c2056335d00b498b0f90"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+            }
+          },
+          "test/server-side-rendering/samples/styles-nested/_actual.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "b00572102ab4ce2864f0693652e60afb32c715ec8f18f4fa5a785f7efd3f9cf7"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "beb3c200ad647bbc5eb68388e47a789891f1212171c40589be26513819ba120b"
+            }
+          },
+          "test/server-side-rendering/samples/styles-nested/_actual.html": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "c4b09f0b7710aa940387c40dea1a6dea2241cb68c4d98ce9be4acc1f4297d73f"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "074940dbd18be19c35d0377f5d3d33543b3c61f4e1842f1321f1999c6a6dc6c1"
+            }
+          },
+          "test/server-side-rendering/samples/styles/_actual.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "38fa0b7ce65683e4f08419df6059714c244554d26f2a361ccd31a1f84808719a"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "c13a12e4b113e73ce7332889e72880a18b4f90177637013874b3e52ca53527a2"
+            }
+          },
+          "test/server-side-rendering/samples/styles/_actual.html": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7f2cfd01d5699de1dcd47113cec03ef7bb1327df6c4a253a96a75bf3d937c06a"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "65aca918d8449bcba5e2857ba80145efa6c17e14c02b03a41db21174c27c857a"
+            }
+          },
+          "test/sourcemaps/samples/css-cascade-false/output.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "37869336fe989e75e08192b1964efff1990fa62bae2ea4c19dc4758a1ced82d6"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "676e0db4589cc91a3a8a4be89f49d806b92f339abb984542311a5f08f5597bb9"
+            }
+          },
+          "test/sourcemaps/samples/css-cascade-false/output.css.map": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "0c585caf3c9063a25617ca47885929986baa141d42bdeac19765da68609cb12d"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "3ab6cf096daeaf815e5592436018edac76d3a665da42f63d9e9a424f5ac0d4d8"
+            }
+          },
+          "test/sourcemaps/samples/css/output.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7cdfb4ba21a658af6c3c72f09ea1802bb317795c66478bd088c67f61d0bb75e3"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "5dbe22f77bd4d0283387bf139f2c594f70027ac3ffb06f95421e570c082ae50a"
+            }
+          },
+          "test/sourcemaps/samples/css/output.css.map": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7a9be97c6327b1389c469ce68e7d01e7500e20f31d150b55c77a2b3afd63eb71"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "565cfcb8f8c40d7fa03d5f957f9ea61213576a90d826b4302bce66c6e6a4745e"
+            }
+          },
+          "yarn.lock": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "ff0602af5e3e7ab7038a2cdb0f49fcaea48d816b707a705610fe6a867fab8c0d"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {
+          "compiler/svelte.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "386e05dccb860bada7a38957dde918bfbb9947d497ca5212953f0e3d76646137"
+          },
+          "compiler/svelte.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "f323b01368f5144e319c49aa689fb83453cc92ce03fe02db82ec4086800444dc"
+          },
+          "shared.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "435f4c03fae641ab095970036f4917db06fd93b7e921b11cd287f0c97bf37ead"
+          },
+          "src/generators/dom/shared.ts": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "437634bf11a74f2e74590c3906ba7408d6848505345a370faaeb1f6c50d74d4a"
+          },
+          "ssr/register.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "9c3231e5e9b8efd1b0cfbfa12de8196e8d1782151204ab83fa8736a0f569d877"
+          },
+          "ssr/register.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "8258f583e14ec69f334276650be5e370aa72f3c234f6a6ac773523416cdd43ce"
+          },
+          "store.umd.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "e6192955ee99d919d9bac8a34d97038b5d77fabaf8697ba3019879283a7f25c5"
+          }
+        },
+        "resolved_modules": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js",
+          "/testbed/compiler/svelte.js",
+          "/testbed/ssr/register.js",
+          "/testbed/shared.js",
+          "/testbed/store.umd.js"
+        ],
+        "runner_stats": {
+          "suites": 25,
+          "tests": 1730,
+          "passes": 1654,
+          "pending": 53,
+          "failures": 23,
+          "start": "2026-09-18T05:18:22.393Z",
+          "end": "2026-09-18T05:19:57.414Z",
+          "duration": 95021
+        },
+        "passed": 1654,
+        "failed": 23,
+        "delivered_checks": "failed",
+        "missing_required_tests": [],
+        "seconds": 112.723,
+        "test_set": "test-sets/e1d56840121bd6e8d4fa7b28385f7a98679d9062d10cd40b54d24f6d5f703151.json",
+        "failures": [
+          {
+            "test": "css combinator-child",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<div class=\"svelte-xyz test\"><div class=\"svelte-xyz\">Testing...</div></div>' == '<div class=\"test svelte-xyz\"><div class=\"svelte-xyz\">Testing...</div></div>'",
+            "detail_sha256": "a150c50b219f6f727f658943fdc226c1fd6d0ae381b162e272d2261f753bf834"
+          },
+          {
+            "test": "css omit-scoping-attribute-class-dynamic",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<p class=\"svelte-xyz whatever\">this is styled</p><p class=\"bar\">this is unstyled</p>' == '<p class=\"whatever svelte-xyz\">this is styled</p><p class=\"bar\">this is unstyled</p>'",
+            "detail_sha256": "a88f1e7796090b8439c048e6a79a2834c7bb58ae9fb8ce9f0d48248d0b3b6bfa"
+          },
+          {
+            "test": "css omit-scoping-attribute-class-static",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<p class=\"svelte-xyz foo\">this is styled</p><p class=\"bar\">this is unstyled</p>' == '<p class=\"foo svelte-xyz\">this is styled</p><p class=\"bar\">this is unstyled</p>'",
+            "detail_sha256": "82b3407a088e38ef65e8682ccac0516f9284d882b441c123da47f3c493d7163f"
+          },
+          {
+            "test": "css omit-scoping-attribute-descendant-global-inner-class",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<div class=\"svelte-xyz foo\"></div>' == '<div class=\"foo svelte-xyz\"></div>'",
+            "detail_sha256": "85ea308bf0c30d1a8c281d1ff0927d608a6fe3ebe145314d806bd2e6ef359a25"
+          },
+          {
+            "test": "css refs-qualified",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<button class=\"svelte-xyz active\" svelte-ref-button=\"\">deactivate</button>' == '<button class=\"active svelte-xyz\" svelte-ref-button=\"\">deactivate</button>'",
+            "detail_sha256": "fa5380f020049d689d023c62fd61253431ae248abd82c275696ad966b1a9e646"
+          },
+          {
+            "test": "css unused-selector",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<div class=\"svelte-xyz foo\"></div>' == '<div class=\"foo svelte-xyz\"></div>'",
+            "detail_sha256": "a65d3392f2cc18bdd33e64ee203d9e0e8e247d03ee0128f37e7099b386b61550"
+          },
+          {
+            "test": "css unused-selector-leading",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<div class=\"svelte-xyz bar\"></div>' == '<div class=\"bar svelte-xyz\"></div>'",
+            "detail_sha256": "ea7196a840aa6975bab70601b503c83e2dba258886896dbc0cd84963a70d7733"
+          },
+          {
+            "test": "css unused-selector-ternary",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<div class=\"svelte-xyz active\"></div>' == '<div class=\"active svelte-xyz\"></div>'",
+            "detail_sha256": "b7338fcdd45c11802268dbad11c78bd17fe14aae69d9441309d4c9527def7341"
+          },
+          {
+            "test": "custom-elements escaped-css",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "a3f878f9eb98a2fcf35a8015a672600a35dc6411be865ca2612eca3059892af6"
+          },
+          {
+            "test": "custom-elements html",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "11a101d98703231f76142a5041097303c37058b9603c4a041913c5fec7958a65"
+          },
+          {
+            "test": "custom-elements html-slots",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "d7bd8ebdeea267a94b75035121dad3bef28826fc6f9585a284db337147389a22"
+          },
+          {
+            "test": "custom-elements nested",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "fad53de2ed9e02eede0dfb0c7f673299c460d425a65804c7f0c89a09afebc568"
+          },
+          {
+            "test": "custom-elements new",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "a6383a7d68ec14a351e13b7e6a7b95daad0c90a2646d5940956ea57e9e3ab128"
+          },
+          {
+            "test": "custom-elements new-styled",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "8f05f565877c5e9864a802dd966a5dba2623d3d9af1f34556560c0458039ef81"
+          },
+          {
+            "test": "custom-elements no-missing-prop-warnings",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "7bac4b250334623a050562dad44f402edf67bb00bff0bf3a3347db37c195625e"
+          },
+          {
+            "test": "custom-elements oncreate",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "893dcaad34418e7f654a6daf3902790b9aedf03c2ffa6529cb13971cf45132bc"
+          },
+          {
+            "test": "js collapses-text-around-comments",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'/* generated by Svelte vX.Y.Z */\\n' +\n  'import { appendNode, assign, createElement, createText, detachNode, init, insertNode, noop, proto } from \"svelte/shared.js\";\\n' +\n  '\\n' +\n  'function data() {\\n' +\n  '\\treturn { foo: 42 }\\n' +\n  '};\\n' +\n  '\\n' +\n  'function add_css() {\\n' +\n  '\\tvar style = createElement(\"style\");\\n' +\n  \"\\tstyle.id = 'svelte-2794052100-style';\\n\" +\n  '\\tstyle.textContent = \"p.svelte-2794052100,.svelte-2794052100 p{color:red}\";\\n' +\n  '\\tappendNode(style, document.head",
+            "detail_sha256": "5f7e3141158d3ad72240058a4c910d3214799171e7f9cff5d8d4a7b4bf0fae66"
+          },
+          {
+            "test": "js css-media-query",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'/* generated by Svelte vX.Y.Z */\\n' +\n  'import { appendNode, assign, createElement, detachNode, init, insertNode, noop, proto } from \"svelte/shared.js\";\\n' +\n  '\\n' +\n  'function add_css() {\\n' +\n  '\\tvar style = createElement(\"style\");\\n' +\n  \"\\tstyle.id = 'svelte-3905933315-style';\\n\" +\n  '\\tstyle.textContent = \"@media(min-width: 1px){div.svelte-3905933315,.svelte-3905933315 div{color:red}}\";\\n' +\n  '\\tappendNode(style, document.head);\\n' +\n  '}\\n' +\n  '\\n' +\n  'function create_main_fragment",
+            "detail_sha256": "a75e4d81745542c390ae942090a2e9d4291e2255ac334e7d7d304a4aba6a4a51"
+          },
+          {
+            "test": "runtime binding-select (shared helpers)",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n[\n  HTMLOptionElement {\n    __value: 'one'\n  },\n  HTMLOptionElement {\n    __value: 'two'\n  },\n  HTMLOptionElement {\n    __value: 'three'\n  }\n]\n\nshould loosely deep-equal\n\nHTMLOptionsCollection {}",
+            "detail_sha256": "c9c19142a13900656a4ce4be6d6f77d9f2322af0307e492bcece60bcd04e022c"
+          },
+          {
+            "test": "runtime binding-select (shared helpers , hydration)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "13ea6706b966ce56e1316fedf2549f9ed41699cb9cacfff2aef2c5f73033d266"
+          },
+          {
+            "test": "runtime binding-select (inline helpers)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "9c0a580aa3760a7036be87705f352a5ebd5a92bfcc07e2903ea823ac7f44b9b0"
+          },
+          {
+            "test": "ssr styles",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n'<div class=\"svelte-724714405\">red</div>'\n\nshould loosely deep-equal\n\n'<div class=\"svelte-bzh57p\">red</div>'",
+            "detail_sha256": "caf62f492b95151cea18e571fe507f79f52792934c55a0dd4bfac6c1ac542cf3"
+          },
+          {
+            "test": "ssr styles-nested",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n'<div class=\"svelte-724714405\">red</div><div class=\"svelte-300476157\">green: foo</div><div class=\"svelte-300476157\">green: bar</div>'\n\nshould loosely deep-equal\n\n'<div class=\"svelte-bzh57p\">red</div><div class=\"svelte-4yw8vx\">green: foo</div><div class=\"svelte-4yw8vx\">green: bar</div>'",
+            "detail_sha256": "4bcc7c4ed28b40fad2d7fc76565c0d45fd13bdfa9343860f1400458e035af59f"
+          }
+        ],
+        "failure_kinds": {
+          "assertion": 13,
+          "test_timeout": 8,
+          "other": 2
+        }
+      },
+      "F": {
+        "instance_id": "sveltejs__svelte-1190",
+        "label": "sveltejs__svelte-1190-H0-F",
+        "world": "F",
+        "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm pkg set scripts.lint=\"echo noop\" && npm run test -- --reporter json --exit",
+        "timeout_seconds": 1200,
+        "acceptance_diag": null,
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1918,
+          "differences": []
+        },
+        "source_inventory_sha256": "cb260b3b8a0c150a6e4e079505122e70a98533ee37c1ef518a4737ceacbbcc87",
+        "full_inventory_sha256": "cb260b3b8a0c150a6e4e079505122e70a98533ee37c1ef518a4737ceacbbcc87",
+        "import_targets": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js"
+        ],
+        "build_inputs_sha256": "3ae3d300c353d47f481de9efb6a5e0d5373deb1f5a191b2697e3d35a9a795e1c",
+        "execution_overlay": {
+          "package.json": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+          },
+          "yarn.lock": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+          }
+        },
+        "exit_code": 11,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 109.258,
+        "output_sha256": "a17a09cdc47aa23634eadcedff08e2e205e4e662b020d0d754f484dc7a2a1857",
+        "source_mutations": {
+          "package.json": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "68c157e3d08190b151027775fb8b57a00b6ec81d2be3c2056335d00b498b0f90"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+            }
+          },
+          "test/server-side-rendering/samples/styles-nested/_actual.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "745e2e863990264ddc64c680d5d312087d68cad6c3d25b4528aac742ec6346e1"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "beb3c200ad647bbc5eb68388e47a789891f1212171c40589be26513819ba120b"
+            }
+          },
+          "test/server-side-rendering/samples/styles-nested/_actual.html": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "797698a0808be7543ca8c8c0f24f256a975154468ac012ed8a6e97f1bc68da12"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "074940dbd18be19c35d0377f5d3d33543b3c61f4e1842f1321f1999c6a6dc6c1"
+            }
+          },
+          "test/server-side-rendering/samples/styles/_actual.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "87cda4fd5173a67073ffc040333d4f99db66234f8f91b5a0e328ebbb53b5df71"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "c13a12e4b113e73ce7332889e72880a18b4f90177637013874b3e52ca53527a2"
+            }
+          },
+          "test/server-side-rendering/samples/styles/_actual.html": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "fd8f3462820eadce4bb59e8d73bf2d29bdb8c864a0d0c55188443b9a08f9ff54"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "65aca918d8449bcba5e2857ba80145efa6c17e14c02b03a41db21174c27c857a"
+            }
+          },
+          "test/sourcemaps/samples/css-cascade-false/output.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "dcb2c272e64485bb3543eb6f56f904397f3a1d26b8cb7c9df69bbf9152f5752d"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "676e0db4589cc91a3a8a4be89f49d806b92f339abb984542311a5f08f5597bb9"
+            }
+          },
+          "test/sourcemaps/samples/css-cascade-false/output.css.map": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7ad0021c3d6a3c096c5e7fc60ea2345d090e0ca58774f74709be14eb234622b2"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "3ab6cf096daeaf815e5592436018edac76d3a665da42f63d9e9a424f5ac0d4d8"
+            }
+          },
+          "test/sourcemaps/samples/css/output.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "f50fc8b63026f77c69b07e57f3834a1d96576332269e0c4988c0adb5c5306d22"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "5dbe22f77bd4d0283387bf139f2c594f70027ac3ffb06f95421e570c082ae50a"
+            }
+          },
+          "test/sourcemaps/samples/css/output.css.map": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "1cfcbbdd414396d0499a524a00025fd2cf26d1fe78649dd8cd240020476e6774"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "565cfcb8f8c40d7fa03d5f957f9ea61213576a90d826b4302bce66c6e6a4745e"
+            }
+          },
+          "yarn.lock": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "ff0602af5e3e7ab7038a2cdb0f49fcaea48d816b707a705610fe6a867fab8c0d"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {
+          "compiler/svelte.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "386e05dccb860bada7a38957dde918bfbb9947d497ca5212953f0e3d76646137"
+          },
+          "compiler/svelte.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "f323b01368f5144e319c49aa689fb83453cc92ce03fe02db82ec4086800444dc"
+          },
+          "shared.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "435f4c03fae641ab095970036f4917db06fd93b7e921b11cd287f0c97bf37ead"
+          },
+          "src/generators/dom/shared.ts": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "437634bf11a74f2e74590c3906ba7408d6848505345a370faaeb1f6c50d74d4a"
+          },
+          "ssr/register.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "9c3231e5e9b8efd1b0cfbfa12de8196e8d1782151204ab83fa8736a0f569d877"
+          },
+          "ssr/register.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "8258f583e14ec69f334276650be5e370aa72f3c234f6a6ac773523416cdd43ce"
+          },
+          "store.umd.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "e6192955ee99d919d9bac8a34d97038b5d77fabaf8697ba3019879283a7f25c5"
+          }
+        },
+        "resolved_modules": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js",
+          "/testbed/compiler/svelte.js",
+          "/testbed/ssr/register.js",
+          "/testbed/shared.js",
+          "/testbed/store.umd.js"
+        ],
+        "runner_stats": {
+          "suites": 25,
+          "tests": 1734,
+          "passes": 1670,
+          "pending": 53,
+          "failures": 11,
+          "start": "2026-09-18T05:16:29.287Z",
+          "end": "2026-09-18T05:18:04.619Z",
+          "duration": 95332
+        },
+        "passed": 1670,
+        "failed": 11,
+        "delivered_checks": "failed",
+        "seconds": 112.707,
+        "test_set": "test-sets/a2ad089f7e43e9ce5a7b7447c66af80ca87d42512e5e8dcf69e3db0aaebc3e18.json",
+        "failures": [
+          {
+            "test": "custom-elements escaped-css",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "c1466d76b429d8a07917b781c980ff35fda9c11538b4bc0ac6173139de348c38"
+          },
+          {
+            "test": "custom-elements html",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "0b746720a4589c9a4e19ac572fefdffa6072fc530970ab4954e39604db18826c"
+          },
+          {
+            "test": "custom-elements html-slots",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "d7bd8ebdeea267a94b75035121dad3bef28826fc6f9585a284db337147389a22"
+          },
+          {
+            "test": "custom-elements nested",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "68c679533e71f43dc4e6cdf2f7342d024fbb2020768abc08461db186b884813a"
+          },
+          {
+            "test": "custom-elements new",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "63b199cb4bfeb78b521a0d6444a5ed8e38ed82baf60fc4961b22019839b04b46"
+          },
+          {
+            "test": "custom-elements new-styled",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "79f031e6316bb9ce0d55d7e6d93d5eb9c86c7d6fd348d0dd5f8d81fc63e9b99f"
+          },
+          {
+            "test": "custom-elements no-missing-prop-warnings",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "f35de4aa076d0ff1babe3bcb99d5e8ee4132bdf11195240ff6f1bfb29ea80cdc"
+          },
+          {
+            "test": "custom-elements oncreate",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "165135eed5d8a1a3713d6e29ea3bac77a367466289e4d29048396dc4896669c7"
+          },
+          {
+            "test": "runtime binding-select (shared helpers)",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n[\n  HTMLOptionElement {\n    __value: 'one'\n  },\n  HTMLOptionElement {\n    __value: 'two'\n  },\n  HTMLOptionElement {\n    __value: 'three'\n  }\n]\n\nshould loosely deep-equal\n\nHTMLOptionsCollection {}",
+            "detail_sha256": "35b6a42bd7aada3ae0b85a56be2bf323eb8449f75f9975e02a059dbba041910b"
+          },
+          {
+            "test": "runtime binding-select (shared helpers , hydration)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "13ea6706b966ce56e1316fedf2549f9ed41699cb9cacfff2aef2c5f73033d266"
+          },
+          {
+            "test": "runtime binding-select (inline helpers)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "9c0a580aa3760a7036be87705f352a5ebd5a92bfcc07e2903ea823ac7f44b9b0"
+          }
+        ],
+        "failure_kinds": {
+          "assertion": 1,
+          "test_timeout": 8,
+          "other": 2
+        }
+      },
+      "historical": {
+        "R": false,
+        "T": false,
+        "D_bench": false,
+        "status": "started"
+      }
+    },
+    {
+      "delivery_apply": true,
+      "model_sha256": "0cf9b1a0ef4c3087c2bfa7afea475056916955bd40afc1dc0251ebb42d577453",
+      "full_git_tree": "b9871a77135abac4022ac5f6d3050e7d671c3ac2",
+      "test_sha256": "865f82b594d861f5ecbae4f058002f89ccaf318d07ce2a1ff8fa8fd41120f4ac",
+      "base_commit": "0c3e44ac05c651c12c94e047bf712cb86278d345",
+      "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1190@sha256:28167366b3d50bb7b6cc3441186980d6022986d9fc60d6e6a193c7aa7cb7b858",
+      "instance_id": "sveltejs__svelte-1190",
+      "arm": "H1",
+      "E": {
+        "instance_id": "sveltejs__svelte-1190",
+        "label": "sveltejs__svelte-1190-H1-E",
+        "world": "E",
+        "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm pkg set scripts.lint=\"echo noop\" && npm run test -- --reporter json --exit",
+        "timeout_seconds": 1200,
+        "acceptance_diag": {
+          "instance_id": "sveltejs__svelte-1190",
+          "patch_applied": true,
+          "generation": true,
+          "with_logs": true,
+          "all_f2p_passed": false,
+          "no_p2p_failed": false,
+          "resolved": false
+        },
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1918,
+          "differences": [
+            "test/css/index.js",
+            "test/css/samples/combinator-child/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-static/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.html",
+            "test/css/samples/refs-qualified/expected.html",
+            "test/css/samples/unused-selector-leading/expected.html",
+            "test/css/samples/unused-selector-ternary/expected.html",
+            "test/css/samples/unused-selector/expected.html",
+            "test/js/samples/collapses-text-around-comments/expected-bundle.js",
+            "test/js/samples/collapses-text-around-comments/expected.js",
+            "test/js/samples/css-media-query/expected-bundle.js",
+            "test/js/samples/css-media-query/expected.js",
+            "test/runtime/samples/css-scoping-class/_config.js",
+            "test/runtime/samples/css-scoping-class/main.html",
+            "test/server-side-rendering/samples/styles-nested/_actual.css",
+            "test/server-side-rendering/samples/styles-nested/_actual.html",
+            "test/server-side-rendering/samples/styles-nested/_expected.css",
+            "test/server-side-rendering/samples/styles-nested/_expected.html",
+            "test/server-side-rendering/samples/styles/_actual.css",
+            "test/server-side-rendering/samples/styles/_actual.html",
+            "test/server-side-rendering/samples/styles/_expected.css",
+            "test/server-side-rendering/samples/styles/_expected.html",
+            "test/sourcemaps/samples/css-cascade-false/output.css",
+            "test/sourcemaps/samples/css-cascade-false/output.css.map",
+            "test/sourcemaps/samples/css/output.css",
+            "test/sourcemaps/samples/css/output.css.map"
+          ]
+        },
+        "source_inventory_sha256": "9af4ef9d3ea1d77a9422da10b08f528acd5b708e8a49cb109952b39f663f7d9a",
+        "full_inventory_sha256": "9022fea3ddc6f5e11f7e06663f6d9427bf725efbbe50688b8a0cfbbd789fd57d",
+        "import_targets": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js"
+        ],
+        "build_inputs_sha256": "a6f9e6a98553a69f1287863a890b5cf3701312871a22149c17c00cad92e7ff70",
+        "execution_overlay": {
+          "package.json": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+          },
+          "yarn.lock": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+          }
+        },
+        "exit_code": 26,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 109.813,
+        "output_sha256": "a74c69e977c0049cfd56c89f6f2d8c9ae901685a13cca790b3b5e3985e58feba",
+        "source_mutations": {
+          "package.json": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "68c157e3d08190b151027775fb8b57a00b6ec81d2be3c2056335d00b498b0f90"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+            }
+          },
+          "test/server-side-rendering/samples/styles-nested/_actual.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "b00572102ab4ce2864f0693652e60afb32c715ec8f18f4fa5a785f7efd3f9cf7"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "beb3c200ad647bbc5eb68388e47a789891f1212171c40589be26513819ba120b"
+            }
+          },
+          "test/server-side-rendering/samples/styles-nested/_actual.html": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "c4b09f0b7710aa940387c40dea1a6dea2241cb68c4d98ce9be4acc1f4297d73f"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "074940dbd18be19c35d0377f5d3d33543b3c61f4e1842f1321f1999c6a6dc6c1"
+            }
+          },
+          "test/server-side-rendering/samples/styles/_actual.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "38fa0b7ce65683e4f08419df6059714c244554d26f2a361ccd31a1f84808719a"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "c13a12e4b113e73ce7332889e72880a18b4f90177637013874b3e52ca53527a2"
+            }
+          },
+          "test/server-side-rendering/samples/styles/_actual.html": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7f2cfd01d5699de1dcd47113cec03ef7bb1327df6c4a253a96a75bf3d937c06a"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "65aca918d8449bcba5e2857ba80145efa6c17e14c02b03a41db21174c27c857a"
+            }
+          },
+          "test/sourcemaps/samples/css-cascade-false/output.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "37869336fe989e75e08192b1964efff1990fa62bae2ea4c19dc4758a1ced82d6"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "676e0db4589cc91a3a8a4be89f49d806b92f339abb984542311a5f08f5597bb9"
+            }
+          },
+          "test/sourcemaps/samples/css-cascade-false/output.css.map": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "0c585caf3c9063a25617ca47885929986baa141d42bdeac19765da68609cb12d"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "3ab6cf096daeaf815e5592436018edac76d3a665da42f63d9e9a424f5ac0d4d8"
+            }
+          },
+          "test/sourcemaps/samples/css/output.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7cdfb4ba21a658af6c3c72f09ea1802bb317795c66478bd088c67f61d0bb75e3"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "5dbe22f77bd4d0283387bf139f2c594f70027ac3ffb06f95421e570c082ae50a"
+            }
+          },
+          "test/sourcemaps/samples/css/output.css.map": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "7a9be97c6327b1389c469ce68e7d01e7500e20f31d150b55c77a2b3afd63eb71"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "565cfcb8f8c40d7fa03d5f957f9ea61213576a90d826b4302bce66c6e6a4745e"
+            }
+          },
+          "yarn.lock": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "ff0602af5e3e7ab7038a2cdb0f49fcaea48d816b707a705610fe6a867fab8c0d"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {
+          "compiler/svelte.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "88e0d1a5165b5cd28a5d68b6311e2a97c517e374c4256b1b37e269b00143fa40"
+          },
+          "compiler/svelte.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "f7bbb50c0db671c1ec5ce91af800c1211b694fca990259bfa74429c553854a76"
+          },
+          "shared.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "435f4c03fae641ab095970036f4917db06fd93b7e921b11cd287f0c97bf37ead"
+          },
+          "src/generators/dom/shared.ts": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "437634bf11a74f2e74590c3906ba7408d6848505345a370faaeb1f6c50d74d4a"
+          },
+          "ssr/register.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "9c3231e5e9b8efd1b0cfbfa12de8196e8d1782151204ab83fa8736a0f569d877"
+          },
+          "ssr/register.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "8258f583e14ec69f334276650be5e370aa72f3c234f6a6ac773523416cdd43ce"
+          },
+          "store.umd.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "e6192955ee99d919d9bac8a34d97038b5d77fabaf8697ba3019879283a7f25c5"
+          }
+        },
+        "resolved_modules": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js",
+          "/testbed/compiler/svelte.js",
+          "/testbed/ssr/register.js",
+          "/testbed/shared.js",
+          "/testbed/store.umd.js"
+        ],
+        "runner_stats": {
+          "suites": 25,
+          "tests": 1730,
+          "passes": 1651,
+          "pending": 53,
+          "failures": 26,
+          "start": "2026-09-18T05:22:07.142Z",
+          "end": "2026-09-18T05:23:43.476Z",
+          "duration": 96334
+        },
+        "passed": 1651,
+        "failed": 26,
+        "delivered_checks": "failed",
+        "missing_required_tests": [],
+        "seconds": 113.646,
+        "test_set": "test-sets/70b3f081f491c8a821485e20c3f7e773b6e90c8c3ab01fa5b8143aa3c214779d.json",
+        "failures": [
+          {
+            "test": "css combinator-child",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<div class=\"svelte-xyz test\"><div class=\"svelte-xyz\">Testing...</div></div>' == '<div class=\"test svelte-xyz\"><div class=\"svelte-xyz\">Testing...</div></div>'",
+            "detail_sha256": "9ab67e84c12c5be8bde141bf928cd2058582ae45c9b70d2db1699c2f196eadd1"
+          },
+          {
+            "test": "css omit-scoping-attribute-class-dynamic",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<p class=\"svelte-xyz whatever\">this is styled</p><p class=\"bar\">this is unstyled</p>' == '<p class=\"whatever svelte-xyz\">this is styled</p><p class=\"bar\">this is unstyled</p>'",
+            "detail_sha256": "d0eeee180d11cd96e8231dc69923b045e0e1e6e539033292438a66ab2e6f7f0b"
+          },
+          {
+            "test": "css omit-scoping-attribute-class-static",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<p class=\"svelte-xyz foo\">this is styled</p><p class=\"bar\">this is unstyled</p>' == '<p class=\"foo svelte-xyz\">this is styled</p><p class=\"bar\">this is unstyled</p>'",
+            "detail_sha256": "1ccf3150b7a7056952222ae118fc79f7f57f36d768dd5b386ffea99df60ec9d9"
+          },
+          {
+            "test": "css omit-scoping-attribute-descendant-global-inner-class",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<div class=\"svelte-xyz foo\"></div>' == '<div class=\"foo svelte-xyz\"></div>'",
+            "detail_sha256": "70e096656b298e5a0fe891399dea55c208fd367417e3061a0d279d3a7ea4b492"
+          },
+          {
+            "test": "css refs-qualified",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<button class=\"svelte-xyz active\" svelte-ref-button=\"\">deactivate</button>' == '<button class=\"active svelte-xyz\" svelte-ref-button=\"\">deactivate</button>'",
+            "detail_sha256": "fa5380f020049d689d023c62fd61253431ae248abd82c275696ad966b1a9e646"
+          },
+          {
+            "test": "css unused-selector",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<div class=\"svelte-xyz foo\"></div>' == '<div class=\"foo svelte-xyz\"></div>'",
+            "detail_sha256": "76ea94647f460848731b6def366075936dfa4f0e44fe3fa9800de7c7999570d1"
+          },
+          {
+            "test": "css unused-selector-leading",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<div class=\"svelte-xyz bar\"></div>' == '<div class=\"bar svelte-xyz\"></div>'",
+            "detail_sha256": "e66553f082fadac1ff7dd74bd22cb47ec643ffff68a6ecb87fe8c2755e3e7943"
+          },
+          {
+            "test": "css unused-selector-ternary",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'<div class=\"svelte-xyz active\"></div>' == '<div class=\"active svelte-xyz\"></div>'",
+            "detail_sha256": "b7338fcdd45c11802268dbad11c78bd17fe14aae69d9441309d4c9527def7341"
+          },
+          {
+            "test": "custom-elements escaped-css",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "f9b75d2ddee088a0699d73af10ca47793d2bf71c1aa64e96aeb4808ebca1d79c"
+          },
+          {
+            "test": "custom-elements html",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "11a101d98703231f76142a5041097303c37058b9603c4a041913c5fec7958a65"
+          },
+          {
+            "test": "custom-elements html-slots",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "1638e0a9ec916e608a4bde3e75f3764be1b8f0fde61972dda3729f583d534870"
+          },
+          {
+            "test": "custom-elements nested",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "681909f870a1196cc0641d8271caf8bead069f8cd9d4928b9f6c518ad45f1d83"
+          },
+          {
+            "test": "custom-elements new",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "39fe32b5acc2230667da05c4529dd145c26ca81de9dcf5d13a9a8d7926787394"
+          },
+          {
+            "test": "custom-elements new-styled",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "79f031e6316bb9ce0d55d7e6d93d5eb9c86c7d6fd348d0dd5f8d81fc63e9b99f"
+          },
+          {
+            "test": "custom-elements no-missing-prop-warnings",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "55b66db1eca7fd5dfce19de8cf5d50a2487bef0c13d352668c988a35e9a4477a"
+          },
+          {
+            "test": "custom-elements oncreate",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "63e42f37eaa7cca8b63b86d7d61c0222a6d8aa05f31a48a81469c1cb0dd71518"
+          },
+          {
+            "test": "js collapses-text-around-comments",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'/* generated by Svelte vX.Y.Z */\\n' +\n  'import { appendNode, assign, createElement, createText, detachNode, init, insertNode, noop, proto } from \"svelte/shared.js\";\\n' +\n  '\\n' +\n  'function data() {\\n' +\n  '\\treturn { foo: 42 }\\n' +\n  '};\\n' +\n  '\\n' +\n  'function encapsulateStyles(node) {\\n' +\n  '\\tnode.classList.add(\"svelte-2794052100\");\\n' +\n  '}\\n' +\n  '\\n' +\n  'function add_css() {\\n' +\n  '\\tvar style = createElement(\"style\");\\n' +\n  \"\\tstyle.id = 'svelte-2794052100-style';\\n\" +\n  '\\tsty",
+            "detail_sha256": "ad16e1d6c1728bbdf206f733e95e61eb77795d1f8e37deaadef8ffbfd0693746"
+          },
+          {
+            "test": "js css-media-query",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "'/* generated by Svelte vX.Y.Z */\\n' +\n  'import { appendNode, assign, createElement, detachNode, init, insertNode, noop, proto } from \"svelte/shared.js\";\\n' +\n  '\\n' +\n  'function encapsulateStyles(node) {\\n' +\n  '\\tnode.classList.add(\"svelte-3905933315\");\\n' +\n  '}\\n' +\n  '\\n' +\n  'function add_css() {\\n' +\n  '\\tvar style = createElement(\"style\");\\n' +\n  \"\\tstyle.id = 'svelte-3905933315-style';\\n\" +\n  '\\tstyle.textContent = \"@media(min-width: 1px){div.svelte-3905933315,.svelte-3905933315 div{c",
+            "detail_sha256": "022bebef14735607bdd51f65cc5f9fed1ff22590526a42cf30699c5eb3a056f3"
+          },
+          {
+            "test": "runtime binding-select (shared helpers)",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n[\n  HTMLOptionElement {\n    __value: 'one'\n  },\n  HTMLOptionElement {\n    __value: 'two'\n  },\n  HTMLOptionElement {\n    __value: 'three'\n  }\n]\n\nshould loosely deep-equal\n\nHTMLOptionsCollection {}",
+            "detail_sha256": "c9c19142a13900656a4ce4be6d6f77d9f2322af0307e492bcece60bcd04e022c"
+          },
+          {
+            "test": "runtime binding-select (shared helpers , hydration)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "13ea6706b966ce56e1316fedf2549f9ed41699cb9cacfff2aef2c5f73033d266"
+          },
+          {
+            "test": "runtime binding-select (inline helpers)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "9c0a580aa3760a7036be87705f352a5ebd5a92bfcc07e2903ea823ac7f44b9b0"
+          },
+          {
+            "test": "runtime event-handler-event-methods (shared helpers)",
+            "name": null,
+            "kind": "other",
+            "message": "Cannot read properties of null (reading 'dispatchEvent')",
+            "detail_sha256": "abe4dd01b9b37ed2889de350d2ab7b1a0c8ed65424079903eeda8f7d00f58ad4"
+          },
+          {
+            "test": "runtime event-handler-event-methods (shared helpers , hydration)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "4bc55cbda3d1902b6da1698362f78e80e64705eb1b513dba3ceac90be979fdec"
+          },
+          {
+            "test": "runtime event-handler-event-methods (inline helpers)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "fb9caf5879cdb3d17779c98510cbe406db01ca4c33094fc0255bdb46a1d9a8bd"
+          },
+          {
+            "test": "ssr styles",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n'<div class=\"svelte-724714405\">red</div>'\n\nshould loosely deep-equal\n\n'<div class=\"svelte-bzh57p\">red</div>'",
+            "detail_sha256": "279a17adec763cc845baaf0a1b32ba9865e62d7f0f472a3e8790141309eaf805"
+          },
+          {
+            "test": "ssr styles-nested",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n'<div class=\"svelte-724714405\">red</div><div class=\"svelte-300476157\">green: foo</div><div class=\"svelte-300476157\">green: bar</div>'\n\nshould loosely deep-equal\n\n'<div class=\"svelte-bzh57p\">red</div><div class=\"svelte-4yw8vx\">green: foo</div><div class=\"svelte-4yw8vx\">green: bar</div>'",
+            "detail_sha256": "a855fe9cbe19e2d37ad73cdbb0b3f7605e4c29cdf374ab7d5ada71afd7ef8185"
+          }
+        ],
+        "failure_kinds": {
+          "assertion": 13,
+          "test_timeout": 8,
+          "other": 5
+        }
+      },
+      "F": {
+        "instance_id": "sveltejs__svelte-1190",
+        "label": "sveltejs__svelte-1190-H1-F",
+        "world": "F",
+        "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm pkg set scripts.lint=\"echo noop\" && npm run test -- --reporter json --exit",
+        "timeout_seconds": 1200,
+        "acceptance_diag": null,
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 1918,
+          "differences": []
+        },
+        "source_inventory_sha256": "9022fea3ddc6f5e11f7e06663f6d9427bf725efbbe50688b8a0cfbbd789fd57d",
+        "full_inventory_sha256": "9022fea3ddc6f5e11f7e06663f6d9427bf725efbbe50688b8a0cfbbd789fd57d",
+        "import_targets": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js"
+        ],
+        "build_inputs_sha256": "a6f9e6a98553a69f1287863a890b5cf3701312871a22149c17c00cad92e7ff70",
+        "execution_overlay": {
+          "package.json": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+          },
+          "yarn.lock": {
+            "mode": 436,
+            "kind": "file",
+            "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+          }
+        },
+        "exit_code": 14,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 108.676,
+        "output_sha256": "674c741a2c94bf800b41293ec4a1e9b6bf2136467731bd2a3fe6a9e56a5dddc7",
+        "source_mutations": {
+          "package.json": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "68c157e3d08190b151027775fb8b57a00b6ec81d2be3c2056335d00b498b0f90"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "d0f752eeea3ebbdba0ae53afda35a6d95481ac8329bbd7deda66a5f0b0da4244"
+            }
+          },
+          "test/server-side-rendering/samples/styles-nested/_actual.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "745e2e863990264ddc64c680d5d312087d68cad6c3d25b4528aac742ec6346e1"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "beb3c200ad647bbc5eb68388e47a789891f1212171c40589be26513819ba120b"
+            }
+          },
+          "test/server-side-rendering/samples/styles-nested/_actual.html": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "797698a0808be7543ca8c8c0f24f256a975154468ac012ed8a6e97f1bc68da12"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "074940dbd18be19c35d0377f5d3d33543b3c61f4e1842f1321f1999c6a6dc6c1"
+            }
+          },
+          "test/server-side-rendering/samples/styles/_actual.css": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "87cda4fd5173a67073ffc040333d4f99db66234f8f91b5a0e328ebbb53b5df71"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "c13a12e4b113e73ce7332889e72880a18b4f90177637013874b3e52ca53527a2"
+            }
+          },
+          "test/server-side-rendering/samples/styles/_actual.html": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "fd8f3462820eadce4bb59e8d73bf2d29bdb8c864a0d0c55188443b9a08f9ff54"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "65aca918d8449bcba5e2857ba80145efa6c17e14c02b03a41db21174c27c857a"
+            }
+          },
+          "yarn.lock": {
+            "before": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "ff0602af5e3e7ab7038a2cdb0f49fcaea48d816b707a705610fe6a867fab8c0d"
+            },
+            "after": {
+              "mode": 436,
+              "kind": "file",
+              "sha256": "18dface70b617852bcd231825e66ffeb7878ca610f3431a0652b47dd2298fd6f"
+            }
+          }
+        },
+        "expectations_unchanged": true,
+        "build_outputs": {
+          "compiler/svelte.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "88e0d1a5165b5cd28a5d68b6311e2a97c517e374c4256b1b37e269b00143fa40"
+          },
+          "compiler/svelte.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "f7bbb50c0db671c1ec5ce91af800c1211b694fca990259bfa74429c553854a76"
+          },
+          "shared.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "435f4c03fae641ab095970036f4917db06fd93b7e921b11cd287f0c97bf37ead"
+          },
+          "src/generators/dom/shared.ts": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "437634bf11a74f2e74590c3906ba7408d6848505345a370faaeb1f6c50d74d4a"
+          },
+          "ssr/register.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "9c3231e5e9b8efd1b0cfbfa12de8196e8d1782151204ab83fa8736a0f569d877"
+          },
+          "ssr/register.js.map": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "8258f583e14ec69f334276650be5e370aa72f3c234f6a6ac773523416cdd43ce"
+          },
+          "store.umd.js": {
+            "mode": 420,
+            "kind": "file",
+            "sha256": "e6192955ee99d919d9bac8a34d97038b5d77fabaf8697ba3019879283a7f25c5"
+          }
+        },
+        "resolved_modules": [
+          "/testbed/src/index.ts",
+          "/testbed/src/shared/index.js",
+          "/testbed/store.js",
+          "/testbed/compiler/svelte.js",
+          "/testbed/ssr/register.js",
+          "/testbed/shared.js",
+          "/testbed/store.umd.js"
+        ],
+        "runner_stats": {
+          "suites": 25,
+          "tests": 1734,
+          "passes": 1667,
+          "pending": 53,
+          "failures": 14,
+          "start": "2026-09-18T05:20:14.794Z",
+          "end": "2026-09-18T05:21:49.908Z",
+          "duration": 95114
+        },
+        "passed": 1667,
+        "failed": 14,
+        "delivered_checks": "failed",
+        "seconds": 112.024,
+        "test_set": "test-sets/2a39a522c610fbfba886c53f9add53f8ca1237eeb2442eb4804398e17af9256f.json",
+        "failures": [
+          {
+            "test": "custom-elements escaped-css",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "a3f878f9eb98a2fcf35a8015a672600a35dc6411be865ca2612eca3059892af6"
+          },
+          {
+            "test": "custom-elements html",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "263b9f0116fe526cdc46a8ee1b147b9b0cd86fbffd9d5722541a430822bc0521"
+          },
+          {
+            "test": "custom-elements html-slots",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "3e9ee83bc8cf451e05f58693b7ef0aff538edb92b925ce167f14ac8332412216"
+          },
+          {
+            "test": "custom-elements nested",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "772d54b84a9fd7967e471a546cd6513e299d42478ff68b093ca18bd26a03e4fa"
+          },
+          {
+            "test": "custom-elements new",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "cdb84b1f1c703d3b3a166ae02622aca9ef0d3ab401ab4581438a60af0f759271"
+          },
+          {
+            "test": "custom-elements new-styled",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "a1952029937eda86a3c42307cdb6da08d8355ff72f6b2e4af8e603a8d4517f85"
+          },
+          {
+            "test": "custom-elements no-missing-prop-warnings",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "4b7ef73b6991db5009941ca7860dad01a01522ad4ab8e48ff31d142efed3454f"
+          },
+          {
+            "test": "custom-elements oncreate",
+            "name": null,
+            "kind": "test_timeout",
+            "message": "Timeout of 10000ms exceeded. For async tests and hooks, ensure \"done()\" is called; if returning a Promise, ensure it resolves.",
+            "detail_sha256": "5a00363640174e2cb32a36cf713756a13fe94bb12b67a411c32a5479988509ce"
+          },
+          {
+            "test": "runtime binding-select (shared helpers)",
+            "name": "AssertionError",
+            "kind": "assertion",
+            "message": "Expected values to be loosely deep-equal:\n\n[\n  HTMLOptionElement {\n    __value: 'one'\n  },\n  HTMLOptionElement {\n    __value: 'two'\n  },\n  HTMLOptionElement {\n    __value: 'three'\n  }\n]\n\nshould loosely deep-equal\n\nHTMLOptionsCollection {}",
+            "detail_sha256": "35b6a42bd7aada3ae0b85a56be2bf323eb8449f75f9975e02a059dbba041910b"
+          },
+          {
+            "test": "runtime binding-select (shared helpers , hydration)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "13ea6706b966ce56e1316fedf2549f9ed41699cb9cacfff2aef2c5f73033d266"
+          },
+          {
+            "test": "runtime binding-select (inline helpers)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "9c0a580aa3760a7036be87705f352a5ebd5a92bfcc07e2903ea823ac7f44b9b0"
+          },
+          {
+            "test": "runtime event-handler-event-methods (shared helpers)",
+            "name": null,
+            "kind": "other",
+            "message": "Cannot read properties of null (reading 'dispatchEvent')",
+            "detail_sha256": "7b5384f5ae0edf82149ed79f7e6cb56db90c728903901036807d205dab928eee"
+          },
+          {
+            "test": "runtime event-handler-event-methods (shared helpers , hydration)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "4bc55cbda3d1902b6da1698362f78e80e64705eb1b513dba3ceac90be979fdec"
+          },
+          {
+            "test": "runtime event-handler-event-methods (inline helpers)",
+            "name": null,
+            "kind": "other",
+            "message": "skipping test, already failed",
+            "detail_sha256": "fb9caf5879cdb3d17779c98510cbe406db01ca4c33094fc0255bdb46a1d9a8bd"
+          }
+        ],
+        "failure_kinds": {
+          "assertion": 1,
+          "test_timeout": 8,
+          "other": 5
+        }
+      },
+      "historical": {
+        "R": false,
+        "T": false,
+        "D_bench": false,
+        "status": "started"
+      }
+    }
+  ],
+  "input_hashes": {
+    "development/polybench-pilot/results/repository-sensitivity.json": "8bdcf38f9df1267b4dea59aa8f4d46e95f313ed14f75cb7c7f118dad102684d6",
+    "development/polybench-pilot/results/developing-agent-accounting.json": "a318bafa7749661cc58715cfe964a22a9e7259ba7cc1a601cfcb49dbadd90430",
+    "development/polybench-pilot/results/accounting.json": "b5223305df650bcc54709e3b7cf0daaed3e5dd1884ba42db8cfd58610a72f112",
+    "development/polybench-pilot/results/validation.json": "2c3935a8d1f8057152e10409bc963fa22ceb623933693f2b4506f9686e37921e",
+    "development/polybench-pilot/results/resource-accounting.json": "0b54c20a3ad64e7c263b1c36540365a08d1aa458a5fb5b02a9d5b90dacc4b00f",
+    "development/polybench-pilot/results/svelte-declaration-preparation-observation.json": "3e84dd824d86570b72d1b0243d5b704d55c1e68bf928386efee4d3ad575ab14a",
+    "development/polybench-pilot/results/provider-accounting.json": "730c5595ae5315d9f40266fcf13cf9c68628863db96e72039ae8db689fad2291",
+    "development/polybench-pilot/results/controls/mui__material-ui-17301-baseline.json": "324dade2af72e9ac0acd980effb8d4aa9f12366cd5667bfd0b670671a4963b08",
+    "development/polybench-pilot/results/controls/serverless__serverless-6534-gold.json": "926d4bfe4d20b94713a4cd0f5698a69eaf1850ca0ed5b9d0d0a134c93f6d2958",
+    "development/polybench-pilot/results/controls/coder__code-server-4923-baseline.json": "0eafbe5f322773e37938881a025fe2bad7318c5e2675bf2baee015d577ea9421",
+    "development/polybench-pilot/results/controls/serverless__serverless-2434-baseline.json": "b6d159a173ecf83f5490e4f3062f5e46a0c8c5de75e187466cdaf80c0130ed48",
+    "development/polybench-pilot/results/controls/mui__material-ui-17301-gold.json": "d309a23fa56346b46d9b3f1157b51fda093c819fcd8a8bce077dd87a5df3ff5e",
+    "development/polybench-pilot/results/controls/microsoft__vscode-136347-gold.json": "2731bba6985585c643b614332e5e3cd5d339c715bd3eb53e45f8e1b7549dab2e",
+    "development/polybench-pilot/results/controls/mui__material-ui-20356-gold.json": "b9d7c3720fd6c3754df98bbabbb6debcaa6ef31a0767394ddc824d3ec2c85d45",
+    "development/polybench-pilot/results/controls/serverless__serverless-2434-gold.json": "14bf2e1849173f6dcaeb295e86aae0013e5d09feabf5e00efee1f9b7a19b813a",
+    "development/polybench-pilot/results/controls/serverless__serverless-6842-baseline.json": "be86bbe9437f56b9003a12d21bd5eb12be2800a377e65367c28d9c3ff612e00b",
+    "development/polybench-pilot/results/controls/sveltejs__svelte-5452-gold.json": "8760ccfe0cfc74546145243b8969d06ee4dd81d2aad498f8a7805e42d511b047",
+    "development/polybench-pilot/results/controls/serverless__serverless-6534-baseline.json": "aa37fbc0d4c1141f48d29514a1ea298339ccaca93b031986f58a934c3f094528",
+    "development/polybench-pilot/results/controls/coder__code-server-4923-gold.json": "2a093cdcf1db7062ae3afe4f13f4feea68640a1211c1be4d77d5afce789a192d",
+    "development/polybench-pilot/results/controls/sveltejs__svelte-1190-baseline.json": "eae645122bb42f13722a3b4c6c4930350d8b792c30ce17374854185f153523a6",
+    "development/polybench-pilot/results/controls/sveltejs__svelte-1190-gold.json": "3c58cbb7e140ee790c1d82318063de697783c77bcdcb8da5729f64a966052071",
+    "development/polybench-pilot/results/controls/mui__material-ui-18141-baseline.json": "2d8e22df3b399c00abc653bcb7a76e12c4d65ab32b9778f31b76215a48cdfe49",
+    "development/polybench-pilot/results/controls/mui__material-ui-20356-baseline.json": "acba7fc6435fa630100aa81ade2c64f70edd87f7f8a87c764c837b3039ff4e5f",
+    "development/polybench-pilot/results/controls/serverless__serverless-6842-gold.json": "4daed23c6d3a651ffbc7bd54316e716cf1888d50d4237fc2f47545a59efe47f4",
+    "development/polybench-pilot/results/controls/microsoft__vscode-136347-baseline.json": "877b1692a18c0621c4672507c6f98196543bbb894cb6dd6ecb0a70b97a74af18",
+    "development/polybench-pilot/results/controls/sveltejs__svelte-5452-baseline.json": "4f6fb896ed4decf0ce7cc5917c6b00f2a8b18bb636fad99dc14861e4f8411641",
+    "development/polybench-pilot/results/controls/mui__material-ui-18141-gold.json": "de9d6542bed0e3077e18b10e62596e0d2614b751eb4159d1104da55d47089a84",
+    "development/polybench-pilot/results/predictions/H0.jsonl": "eda56e5f9d65964917ad6e24d3742e909d02be7b1df373caafbe603a3c37c923",
+    "development/polybench-pilot/results/predictions/P.jsonl": "90c868038afb7910a11d191344812bbf120b27d4b6c344e808480673975411cb",
+    "development/polybench-pilot/results/predictions/H1.jsonl": "ba190f7a845126c429d02dd8358c881c8e4f7da4cd8ffdeb910f12175c3ab319",
+    "development/polybench-pilot/results/patches/H1/mui__material-ui-20356.patch": "e5f9f0d33c1b4fde87cbcc2d589edc65817d13067f2323ef358e4108dc123a74",
+    "development/polybench-pilot/results/patches/H1/serverless__serverless-2434.patch": "73d5a2ccb1a776e43369d1390d57fb7e5af2e1eb69960cdd4ce2b75fc81370aa",
+    "development/polybench-pilot/results/patches/H1/sveltejs__svelte-1190.patch": "0cf9b1a0ef4c3087c2bfa7afea475056916955bd40afc1dc0251ebb42d577453",
+    "development/polybench-pilot/results/patches/H1/serverless__serverless-6534.patch": "6beb8ddd3a5d4700a914a549dd415beea379bd78863270e60563fde0f2f997e9",
+    "development/polybench-pilot/results/patches/H1/serverless__serverless-6842.patch": "01661f1d88139ef95b739debc1e021b18d869bd42e30847ca5b081db0fb91e27",
+    "development/polybench-pilot/results/patches/H1/sveltejs__svelte-5452.patch": "8fc0177ce320387098b77bbee5f76dbb23f0efd8c78a230c4e253be1ee67d455",
+    "development/polybench-pilot/results/patches/H0/mui__material-ui-20356.patch": "dcf9fa9f6ce796a8147cd39c2e6dd44a033c153fbf25b48cb33f9cc7ff94482c",
+    "development/polybench-pilot/results/patches/H0/serverless__serverless-2434.patch": "847bead55c4b7207391adad266006ae85f6a9921e817626d5569e507190f1b73",
+    "development/polybench-pilot/results/patches/H0/sveltejs__svelte-1190.patch": "2e2c7e4ba5b4cd22a25762e1ddf24f52d0cbc11eea21d118cf71d14039a6ffc2",
+    "development/polybench-pilot/results/patches/H0/serverless__serverless-6534.patch": "173cfae9a3fef2611140b9340c1df453601353b1f3560dc3410304cec787d59b",
+    "development/polybench-pilot/results/patches/H0/serverless__serverless-6842.patch": "f9bd08a5fb263082cf3edcd4cd36341efc0fba7d6c05c67d8408917ed91df696",
+    "development/polybench-pilot/results/patches/H0/sveltejs__svelte-5452.patch": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "development/polybench-pilot/results/patches/P/mui__material-ui-20356.patch": "781a4eb90073e2675a1a380f6ae738b147494bd39b2a97ecaf6728bb3d35b0e0",
+    "development/polybench-pilot/results/patches/P/serverless__serverless-2434.patch": "40881166d3b82c68d1fb368263da20e6c244fdf7dc2a1111a5981e6fcd1db4f1",
+    "development/polybench-pilot/results/patches/P/sveltejs__svelte-1190.patch": "16187e0e46946257ab31de6e62ea5653068e3e6001c4d8c2dc0e9c001b99c6e9",
+    "development/polybench-pilot/results/patches/P/serverless__serverless-6534.patch": "856c8a1b7cbbe6aa384f1b1c9e2e0523bacc3d13dbf7b8bd9a19fb476765a0fa",
+    "development/polybench-pilot/results/patches/P/serverless__serverless-6842.patch": "a750cdac098b199db151fbdc37f3c14359e7917caa37c12c2d2320c493c43e2f",
+    "development/polybench-pilot/results/patches/P/sveltejs__svelte-5452.patch": "56f73f83b5831096ade8478347f961faf628e25a616845c78f91717849f6f812",
+    "development/polybench-pilot/results/official/H1/provenance.json": "4558cc1468953df205f6b894d158a96d868a7534466ba74feb9690985f99caf8",
+    "development/polybench-pilot/results/official/H1/serverless__serverless-6534_result.json": "3a8be6926218ab8977600f54e5bd7dde7d7dd3f151090aaaebe71257fbdcc630",
+    "development/polybench-pilot/results/official/H1/serverless__serverless-6842_result.json": "4de06a32843f76b8918967dffc5cb76424214b52f6cc42dad006df5d493b36c3",
+    "development/polybench-pilot/results/official/H1/strict-application.jsonl": "f1f9ee467a6076420c326f7e977d26ccf38bd5d4ae2afd45c53bd0956da36e94",
+    "development/polybench-pilot/results/official/H1/mui__material-ui-20356_result.json": "653c651a9fd9f56bfcc73878136df925b9f928c6c79ac76fcea0f6ab31cb60fe",
+    "development/polybench-pilot/results/official/H1/sveltejs__svelte-1190_result.json": "602b8fca8614d796a225a750fec89328339055c41207253853fdc66cc343fd26",
+    "development/polybench-pilot/results/official/H1/serverless__serverless-2434_result.json": "ad40e6348a40482a509dbff4e1dac68aa8039c7922f1dbbd26fd1c4d4586616e",
+    "development/polybench-pilot/results/official/H1/sveltejs__svelte-5452_result.json": "b367c6b359e9a18c74830c7ac6587f4b5541b8e5e0507fd017a8288a4d112464",
+    "development/polybench-pilot/results/official/H0/provenance.json": "4558cc1468953df205f6b894d158a96d868a7534466ba74feb9690985f99caf8",
+    "development/polybench-pilot/results/official/H0/serverless__serverless-6534_result.json": "3a8be6926218ab8977600f54e5bd7dde7d7dd3f151090aaaebe71257fbdcc630",
+    "development/polybench-pilot/results/official/H0/serverless__serverless-6842_result.json": "d7d2c9c1cf7949a0a35f29860629f69b7d87c6bb66982fb07f5b0e903d99d5bd",
+    "development/polybench-pilot/results/official/H0/strict-application.jsonl": "8d170786479b8117a7676395f7bcfb74e1dfa8332cc980ab052d9da445478059",
+    "development/polybench-pilot/results/official/H0/mui__material-ui-20356_result.json": "acba7fc6435fa630100aa81ade2c64f70edd87f7f8a87c764c837b3039ff4e5f",
+    "development/polybench-pilot/results/official/H0/sveltejs__svelte-1190_result.json": "602b8fca8614d796a225a750fec89328339055c41207253853fdc66cc343fd26",
+    "development/polybench-pilot/results/official/H0/serverless__serverless-2434_result.json": "e0c564e172482c2ff36daee24badb8638433675078cef250efbec488c5b902c9",
+    "development/polybench-pilot/results/official/H0/sveltejs__svelte-5452_result.json": "57af288d7f3d9f6f5dcff4fbc7d4147c638104bef4ace22c771d2a7aab057ede",
+    "development/polybench-pilot/results/official/P/provenance.json": "4558cc1468953df205f6b894d158a96d868a7534466ba74feb9690985f99caf8",
+    "development/polybench-pilot/results/official/P/serverless__serverless-6534_result.json": "3a8be6926218ab8977600f54e5bd7dde7d7dd3f151090aaaebe71257fbdcc630",
+    "development/polybench-pilot/results/official/P/serverless__serverless-6842_result.json": "3beae48f19de343068bdca45e90050ff4ef1c815518bd8fb2756f39c3a61a6d0",
+    "development/polybench-pilot/results/official/P/strict-application.jsonl": "aad9f38520fa05a99fca52dde176ba6744b2d79aca8cc39fb3b5ae6434ae8846",
+    "development/polybench-pilot/results/official/P/mui__material-ui-20356_result.json": "653c651a9fd9f56bfcc73878136df925b9f928c6c79ac76fcea0f6ab31cb60fe",
+    "development/polybench-pilot/results/official/P/sveltejs__svelte-1190_result.json": "602b8fca8614d796a225a750fec89328339055c41207253853fdc66cc343fd26",
+    "development/polybench-pilot/results/official/P/serverless__serverless-2434_result.json": "0d5bd3867d9f7a3854e40403f0a651578c19ebd6d630bf408d5c22af67c882d5",
+    "development/polybench-pilot/results/official/P/sveltejs__svelte-5452_result.json": "ee3b14d6a2eef9ecd0bab44d3891575fa98edba1795e33e415ec12cb56d9ca55",
+    "development/polybench-pilot/frozen-manifest.json": "05e9b6c8e2ad8f56e689b6ffd3102dd8d2a589b65c4cea2cea93f0ffcd2bb505",
+    "development/polybench-pilot/REPORT.md": "db55e7ed1a246205068f1e5e62b9e6852098e0b2326548dfda076f9ec38061b9",
+    "development/polybench-pilot/evaluate.py": "a2021a3064c0528cc88bddf0ac3a5a9faa1b74fb2aef7414a727b6a9fd0b30d7",
+    "development/polybench-pilot/run.mjs": "0687eb93e68653451a369ba33af2771ed5f05db7daae636ee3f4a92a8719aae9",
+    "local/polybench-pilot/batch/freeze.json": "30008a1e389c67a40c4bfee0969b119f7c76cf0ee24a44364af261def605d216",
+    "local/polybench-pilot/batch/outcome.json": "8c1f279fc4b3b2ee0c63d5cc88b9c84ee1cfefdcbd683ab55dfcb95e7ed80402",
+    "local/polybench-pilot/batch/scheduling-paused.json": "69385be23d2edc8776accef8cd2b91cdbdf496a026e37bff9698862e8d29c6bd",
+    "local/polybench-pilot/batch/freeze-commit.json": "09580a67c738a05a5f21f554f2c76fa351e7a835c54bb86e75a99d10934fac86"
+  },
+  "driver_sha256": "82036c696ea63553fde23bb75be36dd4c4576c1c3a2570f00d04b128ec3f5edf",
+  "controls_sha256": "890b1c341fcb85ac5c1088c27616eb1435db7d5bf4079019e0bd447efb74f11c",
+  "protocol_commit": "35939cc51f292099d7c171d40d352c155720f9ab",
+  "manifest_hashes": {
+    "serverless__serverless-6534": "d2024d6075c6628d80c734c60d2008024e2b6271af5c55e84062bc8280cbaa9d",
+    "sveltejs__svelte-1190": "1d45deae23d56e43791ad0cf37b6ea2f6ce1c861226418702bcdc880c81cb804"
+  },
+  "historical_inputs_unchanged": true,
+  "created_containers": [
+    "ce81cea532c9ede2748c1f42a3b1cda583e2628ca76ac6ebccf68fb8fdc69a47",
+    "4b9cb358402ca0fd51477d0269e1b928410ea57d7628e66a0493ac24d42187ea",
+    "8a6e5520f982923540afc4bbc06f3017e49d1235487a9612d10af69f33e11d36",
+    "99b5377f01ca2508042994254fcb273765bb3982ad47ad55782c66d139e06569",
+    "4e4a3af0ad451a5174dbc42d9f1163b879b1cf13c348b5325aea7eda3c153194",
+    "fe59057ef4edef0cbd1539b4e00fb672cc095f88427b6e0b77ba974c062277f4",
+    "2f029da2d44467bc17ad8feeb14600f43da968a41bb53761519a3c5a99ca9c73",
+    "545aa52dab1e45f4b7cae8facf323ab4959f0e5787183a887bc75ab2f3bfbe43",
+    "9b7bca7c7f4b5650cf526d2e5c5ff055e43f2f5bdad8e93a415e304d2bd4310a",
+    "930ae2b8cbafee0e38c9d506631f377ec4348cc7af95dc4b5d8795a4d1d330e8",
+    "7f988d4489330bb73fc9afa27c463eefca7f5876a3483c6249c4ae3fd0510616",
+    "1d63d2f1b8a7a38014e1086bbc7f42eaf65b55f13ea1e08d8228940c972a3f00",
+    "a347f348e79c3a4d9303fc9ac924d589de5910a14af0d6ab77b8c55ba3af37d0",
+    "fba07a73825feae38a69f23f7e5f27c1ae5a6b84b663d051faef3d473facdc33"
+  ],
+  "removed_containers": [
+    "4b9cb358402ca0fd51477d0269e1b928410ea57d7628e66a0493ac24d42187ea",
+    "8a6e5520f982923540afc4bbc06f3017e49d1235487a9612d10af69f33e11d36",
+    "99b5377f01ca2508042994254fcb273765bb3982ad47ad55782c66d139e06569",
+    "4e4a3af0ad451a5174dbc42d9f1163b879b1cf13c348b5325aea7eda3c153194",
+    "fe59057ef4edef0cbd1539b4e00fb672cc095f88427b6e0b77ba974c062277f4",
+    "2f029da2d44467bc17ad8feeb14600f43da968a41bb53761519a3c5a99ca9c73",
+    "ce81cea532c9ede2748c1f42a3b1cda583e2628ca76ac6ebccf68fb8fdc69a47",
+    "9b7bca7c7f4b5650cf526d2e5c5ff055e43f2f5bdad8e93a415e304d2bd4310a",
+    "930ae2b8cbafee0e38c9d506631f377ec4348cc7af95dc4b5d8795a4d1d330e8",
+    "7f988d4489330bb73fc9afa27c463eefca7f5876a3483c6249c4ae3fd0510616",
+    "1d63d2f1b8a7a38014e1086bbc7f42eaf65b55f13ea1e08d8228940c972a3f00",
+    "a347f348e79c3a4d9303fc9ac924d589de5910a14af0d6ab77b8c55ba3af37d0",
+    "fba07a73825feae38a69f23f7e5f27c1ae5a6b84b663d051faef3d473facdc33",
+    "545aa52dab1e45f4b7cae8facf323ab4959f0e5787183a887bc75ab2f3bfbe43"
+  ],
+  "seconds": 722.796,
+  "local_summary_sha256": "4d8ac6d01b870b5df761b4554902f1d6f4a5eb40ff47f4fdbea327e50f09dd29",
+  "historical_commit": "9317ccc9e2e3af6cfe7e876acd4541f3e7445f3b",
+  "not_started": 12
+}

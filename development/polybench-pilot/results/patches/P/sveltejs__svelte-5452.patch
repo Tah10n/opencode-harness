@@ -1,0 +1,77 @@
+diff --git a/src/compiler/compile/render_dom/invalidate.ts b/src/compiler/compile/render_dom/invalidate.ts
+index b045db079f33a20e51a536dcdf9bd096775c1818..edae42aa5d597860dc35010107af9cd4dc6a83f2 100644
+--- a/src/compiler/compile/render_dom/invalidate.ts
++++ b/src/compiler/compile/render_dom/invalidate.ts
+@@ -54,7 +54,7 @@ export function invalidate(renderer: Renderer, scope: Scope, node: Node, names:
+ 				)
+ 			);
+ 
+-			if (pass_value) {
++			if (pass_value && !is_store_value) {
+ 				extra_args.unshift({
+ 					type: 'Identifier',
+ 					name: head.name
+@@ -69,6 +69,13 @@ export function invalidate(renderer: Renderer, scope: Scope, node: Node, names:
+ 						? [node, ...extra_args]
+ 						: node;
+ 
++			if (is_store_value && extra_args.length) {
++				invalidate = {
++					type: 'SequenceExpression',
++					expressions: [invalidate, ...extra_args]
++				};
++			}
++
+ 			if (head.subscribable && head.reassigned) {
+ 				const subscribe = `$$subscribe_${head.name}`;
+ 				invalidate = x`${subscribe}(${invalidate})`;
+@@ -79,4 +86,4 @@ export function invalidate(renderer: Renderer, scope: Scope, node: Node, names:
+ 	}
+ 
+ 	return node;
+-}
+\ No newline at end of file
++}
+diff --git a/test/runtime/samples/store-destructuring/_config.js b/test/runtime/samples/store-destructuring/_config.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..95f77e807cbe3f5aa7b7f37b2b5df98ab55d612d
+--- /dev/null
++++ b/test/runtime/samples/store-destructuring/_config.js
+@@ -0,0 +1,17 @@
++export default {
++	html: `
++		<button>update</button>
++		<p>foo: 0</p>
++		<p>bar: 0</p>
++	`,
++
++	async test({ assert, target, window }) {
++		await target.querySelector('button').dispatchEvent(new window.MouseEvent('click'));
++
++		assert.htmlEqual(target.innerHTML, `
++			<button>update</button>
++			<p>foo: 1</p>
++			<p>bar: 2</p>
++		`);
++	}
++};
+diff --git a/test/runtime/samples/store-destructuring/main.svelte b/test/runtime/samples/store-destructuring/main.svelte
+new file mode 100644
+index 0000000000000000000000000000000000000000..bddeb38cb5095e72723520db82fc2964c54a514a
+--- /dev/null
++++ b/test/runtime/samples/store-destructuring/main.svelte
+@@ -0,0 +1,14 @@
++<script>
++	import { writable } from '../../../../store';
++
++	const foo = writable(0);
++	const bar = writable(0);
++
++	function update() {
++		({ foo: $foo, bar: $bar } = { foo: 1, bar: 2 });
++	}
++</script>
++
++<button on:click={update}>update</button>
++<p>foo: {$foo}</p>
++<p>bar: {$bar}</p>

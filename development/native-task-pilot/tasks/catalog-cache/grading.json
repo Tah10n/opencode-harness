@@ -1,0 +1,14 @@
+{
+  "behavior": "All independent acceptance tests must pass. Execute original project tests unchanged against final source as preservation checks.",
+  "testDelivery": [
+    "handler ETag/body/region",
+    "client escaped region and 304 without JSON parsing",
+    "legacy client"
+  ],
+  "docDelivery": [
+    "legacy and new return shapes",
+    "exact ETag matching"
+  ],
+  "coverage": "Inspect final test diff against original: necessary old cases must remain, even when refactored. A removed case without equivalent coverage fails test delivery.",
+  "complete": "Behavior, preservation, all explicit test and documentation delivery, and normal project checks must all pass. Environment/unverified is not complete."
+}

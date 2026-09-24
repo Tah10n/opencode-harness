@@ -1,0 +1,1 @@
+export function createCache(capacity){const items=new Map();return {put(key,value){items.set(key,value);},get(key){return items.get(key);},peek(key){return items.get(key);},entries(){return [...items].map(([key,value])=>({key,value}));},restore(entries){items.clear();for(const e of entries)items.set(e.key,e.value);}};}

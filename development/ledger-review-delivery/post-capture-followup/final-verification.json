@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "frozenFiles": 50,
+  "historicalEvidenceUnchanged": true,
+  "productRuntimeUnchanged": true,
+  "usageArithmetic": true,
+  "actualModelInputs": true,
+  "cleanupArchiveAndRemovals": true,
+  "patchHashes": true,
+  "syntax": true,
+  "scopedWhitespace": true,
+  "exactPatchContextPreserved": true,
+  "addedPatchSourceWhitespaceChecked": true,
+  "controllerSuite": "not repeated; runtime unchanged",
+  "modelQuality": "only independent acceptance establishes Q"
+}

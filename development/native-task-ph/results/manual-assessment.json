@@ -1,0 +1,34 @@
+[
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "P",
+    "behaviorChecks": "passed within retained scoped evaluator",
+    "deliveredRegression": "Adds flat-layout recognition/preservation test but no repeated preparation/fresh reload regression",
+    "completeDelivery": false,
+    "basis": "Explicit repeat-loading regression remains missing; wrong starting input independently invalidates requested comparison."
+  },
+  {
+    "task": "legacy-runtime-reload",
+    "arm": "H",
+    "behaviorChecks": "passed within retained scoped evaluator",
+    "deliveredRegression": "Adds exact flat-layout test, preparation twice in a child process, reload in a fresh child process, unknown-lib rejection and retained legacy bytes",
+    "completeDelivery": null,
+    "basis": "This is an invalid-input run. Scoped behavior and repeat-load coverage passed, but no complete acceptance of the requested D-final continuation is claimed."
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "H",
+    "behaviorChecks": "failed independent 401/403 recovery with Invalid pending payload",
+    "deliveredRegression": "D0 kept disconnected block with incompatible preceding state; correction 1 removed that block; correction 2 appended selected assertions to revoked scenario without restoring a separate disconnected transition; correction 3 changed no patch bytes",
+    "completeDelivery": false,
+    "basis": "Revoked cleanup fails with stale pending payload; independent disconnected scenario not delivered."
+  },
+  {
+    "task": "reconnect-revoked",
+    "arm": "P",
+    "behaviorChecks": "failed independent 401/403 recovery with Invalid pending payload",
+    "deliveredRegression": "Removes obsolete unauthorized rejection; does not add positive 401/403 recovery regression; retains old disconnected block",
+    "completeDelivery": false,
+    "basis": "Required recovery coverage missing and independent revoked cleanup fails."
+  }
+]

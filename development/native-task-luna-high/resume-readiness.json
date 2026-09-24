@@ -1,0 +1,9 @@
+{
+  "priorContainerAbsent": true,
+  "priorAuthorAndToolTerminationVerified": true,
+  "priorRunnerAndDockerRelayProcessesFound": [],
+  "lateResponseCannotReachExecutor": "Container is absent; relay PID 1 and all container processes are gone. Host runner process is absent; author files lived in container tmpfs. The captured archive/patch cannot be mutated by the terminated execution.",
+  "firstSlotAndPublishedResultsPreservedFiles": 18,
+  "oldServerStatusAndUsage": "unknown; user accepts this residual uncertainty",
+  "separateRemainingInputs": true
+}

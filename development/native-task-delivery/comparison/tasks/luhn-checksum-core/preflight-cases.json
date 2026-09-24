@@ -1,0 +1,12 @@
+{
+  "alternative": {
+    "src/luhn.mjs": "export function validDigits(text){if(!/^[0-9]+$/.test(text))return false;return [...text].reverse().reduce((sum,x,i)=>{let n=Number(x);if(i%2)n=n*2>9?n*2-9:n*2;return sum+n;},0)%10===0;}"
+  },
+  "mutants": [
+    {
+      "name": "wrong-parity",
+      "file": "src/luhn.mjs",
+      "replacement": "export function validDigits(text){if(!/^[0-9]+$/.test(text))return false;let sum=0,double=true;for(let i=text.length-1;i>=0;i--){let n=Number(text[i]);if(double){n*=2;if(n>9)n-=9;}sum+=n;double=!double;}return sum%10===0;}"
+    }
+  ]
+}

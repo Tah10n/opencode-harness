@@ -1,0 +1,596 @@
+{
+  "slot": 2,
+  "case": "case-b",
+  "project": "quick-lru",
+  "runtimeSha": "46572619e8a9d567f680667bdf6083a2e82be406",
+  "advertisedInAllAuthorRequests": true,
+  "authorRequests": 19,
+  "diagnosticCalls": 1,
+  "replayCalls": 0,
+  "diagnostics": [
+    {
+      "callID": "call_IXEho0Do4eYsWjDOIAYOjfOi",
+      "originalArguments": {
+        "path": "changed",
+        "check": "test"
+      },
+      "selectedVariant": null,
+      "snapshot": "f7ff422a0e288d12639a034e35269a021629997cbbbc1e3d61fd53c10938daf3",
+      "tests": [
+        {
+          "name": "test.js",
+          "sha256": "7d62a8c7fccbd5d102e76e0fbd19818ea3f00ab8762464842800eb9c354eba9d"
+        }
+      ],
+      "command": "npm run test",
+      "status": "baseline-not-passed",
+      "engineExecuted": false,
+      "baseline": {
+        "exit": 127,
+        "signal": null,
+        "status": "command-rejected",
+        "elapsedMs": 51,
+        "output": "\n> quick-lru@7.3.0 test\n> xo && nyc ava && tsd\n\nsh: 1: xo: not found\n"
+      },
+      "sourceState": "4339f21ad3024f238081ae31e26624e248803d515700a3c6a9683059c3919148",
+      "stale": false,
+      "elapsedMs": 100,
+      "taskDiagnosticMs": 100,
+      "cost": {
+        "commands": 1,
+        "engineMs": 0,
+        "preparationMs": 22,
+        "commandMs": 51,
+        "totalMs": 100
+      },
+      "terminationVerified": true,
+      "variants": []
+    }
+  ],
+  "timeline": [
+    {
+      "index": 1,
+      "callID": "call_Ez3EU0YLVdQxdjYXvgxYyVN6",
+      "tool": "todowrite",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415639118,
+      "completedAt": 1789415639169,
+      "changedState": false,
+      "action": ""
+    },
+    {
+      "index": 2,
+      "callID": "call_l8oI3zxjfLXoPaDuyHuRz7nP",
+      "tool": "glob",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415642683,
+      "completedAt": 1789415642866,
+      "changedState": false,
+      "action": ""
+    },
+    {
+      "index": 3,
+      "callID": "call_DeskRMvoZdE4jRbTIR41PWFZ",
+      "tool": "glob",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415642578,
+      "completedAt": 1789415642917,
+      "changedState": false,
+      "action": ""
+    },
+    {
+      "index": 4,
+      "callID": "call_YYvgzaYySTwOjfIT6YVs034k",
+      "tool": "glob",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415642631,
+      "completedAt": 1789415642969,
+      "changedState": false,
+      "action": ""
+    },
+    {
+      "index": 5,
+      "callID": "call_6axxdiOiOr3SFPcVruBl2DdG",
+      "tool": "glob",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415642739,
+      "completedAt": 1789415643019,
+      "changedState": false,
+      "action": ""
+    },
+    {
+      "index": 6,
+      "callID": "call_KQc9Ecze5wd1YKqLAyow5kil",
+      "tool": "glob",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415642798,
+      "completedAt": 1789415643070,
+      "changedState": false,
+      "action": ""
+    },
+    {
+      "index": 7,
+      "callID": "call_dXitd1a5dCY7RYmXxKijI8sh",
+      "tool": "glob",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415642523,
+      "completedAt": 1789415643123,
+      "changedState": false,
+      "action": ""
+    },
+    {
+      "index": 8,
+      "callID": "call_IRIiOX3wKPedWCKvvDCayS7W",
+      "tool": "read",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415647924,
+      "completedAt": 1789415648307,
+      "changedState": false,
+      "action": "TASK.md"
+    },
+    {
+      "index": 9,
+      "callID": "call_2ieyECO3R0I8iBnncUJILeLC",
+      "tool": "read",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415647979,
+      "completedAt": 1789415648358,
+      "changedState": false,
+      "action": "package.json"
+    },
+    {
+      "index": 10,
+      "callID": "call_8gW6zdL1obxeBl0SoE2oQs8S",
+      "tool": "read",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415648034,
+      "completedAt": 1789415648409,
+      "changedState": false,
+      "action": "index.js"
+    },
+    {
+      "index": 11,
+      "callID": "call_Ju0bO7RptRCRg2iObibaooTu",
+      "tool": "read",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415648244,
+      "completedAt": 1789415648459,
+      "changedState": false,
+      "action": "readme.md"
+    },
+    {
+      "index": 12,
+      "callID": "call_kTRVlaU1LG127hGAtVvxZWHr",
+      "tool": "read",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415648086,
+      "completedAt": 1789415648510,
+      "changedState": false,
+      "action": "index.d.ts"
+    },
+    {
+      "index": 13,
+      "callID": "call_Rdt8d7jTiNDibeHsRwF46JzZ",
+      "tool": "read",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415648192,
+      "completedAt": 1789415648562,
+      "changedState": false,
+      "action": "index.test-d.ts"
+    },
+    {
+      "index": 14,
+      "callID": "call_4zfGfCXfGj931QDvSfSUOoO5",
+      "tool": "read",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415648140,
+      "completedAt": 1789415648624,
+      "changedState": false,
+      "action": "test.js"
+    },
+    {
+      "index": 15,
+      "callID": "call_doahuAuTPWOPGZvVUM6KuEHt",
+      "tool": "bash",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1789415648672,
+      "completedAt": 1789415648758,
+      "changedState": false,
+      "action": "git status --short"
+    },
+    {
+      "index": 16,
+      "callID": "call_pYGuYLTzEn4ZoYgQ2zyWC47e",
+      "tool": "bash",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1789415655754,
+      "completedAt": 1789415655804,
+      "changedState": false,
+      "action": "git diff -- index.js index.d.ts index.test-d.ts readme.md"
+    },
+    {
+      "index": 17,
+      "callID": "call_iFKiW1GIiakK13TMcVwFh0uP",
+      "tool": "bash",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1789415655838,
+      "completedAt": 1789415660229,
+      "changedState": false,
+      "action": "npm test"
+    },
+    {
+      "index": 18,
+      "callID": "call_WozwGUoXTEQqpRmYlm5ete3n",
+      "tool": "grep",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415660263,
+      "completedAt": 1789415660302,
+      "changedState": false,
+      "action": "."
+    },
+    {
+      "index": 19,
+      "callID": "call_7msygIPqL2jwHPxCkvjz9IBb",
+      "tool": "bash",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1789415718511,
+      "completedAt": 1789415718567,
+      "changedState": false,
+      "action": "node --input-type=module -e \"import QuickLRU from './index.js'; const cache = new QuickLRU({maxSize: 2}); let calls = 0; cache.set('key', 42); const result = cache.getOrInsertComputed('key', () => { calls++; return 7; }); console.log(JSON.stringify({result, calls, entries: [...cache]}));\""
+    },
+    {
+      "index": 20,
+      "callID": "call_ognnmt5dJK1neJx13NsDShsG",
+      "tool": "apply_patch",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415767201,
+      "completedAt": 1789415767257,
+      "changedState": true,
+      "action": "apply project patch"
+    },
+    {
+      "index": 21,
+      "callID": "call_ep6nRjt5d6g5ST4YEc6PL3NJ",
+      "tool": "todowrite",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415772575,
+      "completedAt": 1789415772613,
+      "changedState": false,
+      "action": ""
+    },
+    {
+      "index": 22,
+      "callID": "call_KpGLLuX2C038KAd5lB6pLs2i",
+      "tool": "bash",
+      "state": "completed",
+      "exit": 1,
+      "startedAt": 1789415776565,
+      "completedAt": 1789415776972,
+      "changedState": false,
+      "action": "npx ava test.js --match='*getOrInsertComputed*'"
+    },
+    {
+      "index": 23,
+      "callID": "call_CZyvIUIepFDISme9zPWJXIAK",
+      "tool": "apply_patch",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415791599,
+      "completedAt": 1789415791652,
+      "changedState": true,
+      "action": "apply project patch"
+    },
+    {
+      "index": 24,
+      "callID": "call_wbgVeUe520R6EfTYhkylKIin",
+      "tool": "bash",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1789415802911,
+      "completedAt": 1789415803255,
+      "changedState": false,
+      "action": "npx ava test.js --match='*getOrInsertComputed*'"
+    },
+    {
+      "index": 25,
+      "callID": "call_IPfRldlGpG7edGhlhd2C8zHz",
+      "tool": "bash",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1789415822909,
+      "completedAt": 1789415826604,
+      "changedState": false,
+      "action": "npm test"
+    },
+    {
+      "index": 26,
+      "callID": "call_IXEho0Do4eYsWjDOIAYOjfOi",
+      "tool": "harness_sense",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415829152,
+      "completedAt": 1789415829288,
+      "changedState": false,
+      "action": "changed"
+    },
+    {
+      "index": 27,
+      "callID": "call_Zubnr1wiFnOluEEUUKtZr4Zi",
+      "tool": "bash",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1789415848832,
+      "completedAt": 1789415848884,
+      "changedState": false,
+      "action": "git diff --check"
+    },
+    {
+      "index": 28,
+      "callID": "call_rZF7TobYkL01sqED9JfUllHC",
+      "tool": "bash",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1789415848918,
+      "completedAt": 1789415848966,
+      "changedState": false,
+      "action": "git status --short && git diff --stat"
+    },
+    {
+      "index": 29,
+      "callID": "call_CFxsCJEhcbMM63udJJJfztTf",
+      "tool": "bash",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1789415848999,
+      "completedAt": 1789415849049,
+      "changedState": false,
+      "action": "git diff -- test.js index.js index.d.ts index.test-d.ts readme.md"
+    },
+    {
+      "index": 30,
+      "callID": "call_PnMd7oqPrc8iWzDB9HRjP2zS",
+      "tool": "grep",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415849082,
+      "completedAt": 1789415849127,
+      "changedState": false,
+      "action": "."
+    },
+    {
+      "index": 31,
+      "callID": "call_5N8Dua24BiRRjXU2K4I676gY",
+      "tool": "bash",
+      "state": "completed",
+      "exit": 2,
+      "startedAt": 1789415854817,
+      "completedAt": 1789415854859,
+      "changedState": false,
+      "action": "ls node_modules/.bin/xo"
+    },
+    {
+      "index": 32,
+      "callID": "call_BA9ozhsSycyQVF87HsgQa9e4",
+      "tool": "bash",
+      "state": "completed",
+      "exit": 1,
+      "startedAt": 1789415865327,
+      "completedAt": 1789415936389,
+      "changedState": false,
+      "action": "npm ci --ignore-scripts"
+    },
+    {
+      "index": 33,
+      "callID": "call_3qWX00U9CTHq9qXu5yEEdfD7",
+      "tool": "todowrite",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415953037,
+      "completedAt": 1789415953075,
+      "changedState": false,
+      "action": ""
+    },
+    {
+      "index": 34,
+      "callID": "call_kiHw2r5FKajXdus7tgh1N5XQ",
+      "tool": "bash",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1789415969706,
+      "completedAt": 1789415969755,
+      "changedState": false,
+      "action": "git status --short"
+    },
+    {
+      "index": 35,
+      "callID": "call_EV78sCP9U4TZVOXWD1ONgOsY",
+      "tool": "bash",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1789415969816,
+      "completedAt": 1789415969863,
+      "changedState": false,
+      "action": "git diff --check && git diff --stat"
+    },
+    {
+      "index": 36,
+      "callID": "call_WSXv5zrTvMJutLLUrnmeiKOW",
+      "tool": "bash",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1789415969995,
+      "completedAt": 1789415970036,
+      "changedState": false,
+      "action": "git diff --name-only"
+    },
+    {
+      "index": 37,
+      "callID": "call_KDRYCfBnAnKNj1UzooAlcwU1",
+      "tool": "todowrite",
+      "state": "completed",
+      "exit": null,
+      "startedAt": 1789415976278,
+      "completedAt": 1789415976315,
+      "changedState": false,
+      "action": ""
+    }
+  ],
+  "authorSummary": "Реализованный `getOrInsertComputed` покрыт регрессиями в `test.js`:\n\n- hit со `undefined` не вызывает factory и обновляет recency;\n- expired entry вызывает eviction один раз и получает default TTL;\n- ошибки factory сохраняются, ключ не вставляется;\n- object keys и независимые caches проверены.\n\nПубличные декларации, type tests и README уже содержат API-описание.\n\nПроверки:\n- `npx ava test.js --match='*getOrInsertComputed*'`: 3 passed\n- `npm test`: 118 passed, включая XO и TSD\n- `git diff --check`: успешно\n\n`harness_sense` не запустил варианты: изолированный baseline завершился с `xo: not found`. Дополнительный `npm ci` заблокирован сетевой ошибкой `EAI_AGAIN`; эквивалентность мутации не объявляю доказанной.",
+  "patch": "patches/case-b-terminal.patch",
+  "patchSha256": "818d31e1a489b1169e85f4403f6650b53612a89d1507065380fb88e75fe97613",
+  "nativeCompleted": true,
+  "nativeExit": 0,
+  "stopReason": null,
+  "phaseCount": 1,
+  "nativeSessions": 2,
+  "authorSessions": 1,
+  "toolCalls": 38,
+  "workflowStatus": "incomplete",
+  "capturedWorkflowStatus": "incomplete",
+  "workflowRepairs": 0,
+  "completedCommands": [
+    {
+      "command": "npx ava test.js --match='*getOrInsertComputed*'",
+      "exit": 0
+    },
+    {
+      "command": "npm test",
+      "exit": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0
+    },
+    {
+      "command": "git status --short && git diff --stat",
+      "exit": 0
+    },
+    {
+      "command": "git diff -- test.js index.js index.d.ts index.test-d.ts readme.md",
+      "exit": 0
+    },
+    {
+      "command": "git status --short",
+      "exit": 0
+    },
+    {
+      "command": "git diff --check && git diff --stat",
+      "exit": 0
+    },
+    {
+      "command": "git diff --name-only",
+      "exit": 0
+    }
+  ],
+  "termination": {
+    "ownTaskDeadlineTriggered": false,
+    "terminationVerified": true,
+    "captureSaved": true,
+    "forwardingClosed": true,
+    "relayRemoved": true,
+    "activeProviderHandlers": 0,
+    "providerServerStateMayRemainUnknown": false
+  },
+  "usage": {
+    "providerRequests": 22,
+    "requestsWithoutUsage": 0,
+    "inputTokens": 825752,
+    "outputTokens": 12203,
+    "totalTokens": 837955,
+    "cachedInputTokens": 449536,
+    "reasoningTokens": 8302,
+    "cachedSubsetUnknownRequests": 0,
+    "reasoningSubsetUnknownRequests": 0
+  },
+  "executionElapsedMs": 364823,
+  "cleanupElapsedMs": 57,
+  "preparationAndCaptureElapsedMs": 4469,
+  "ordinary": {
+    "exit": 0,
+    "signal": null,
+    "command": [
+      "sh",
+      "-c",
+      "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && npm test"
+    ],
+    "elapsedMs": 7854,
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "realProviderRequests": 0
+  },
+  "independent": {
+    "exit": 0,
+    "signal": null,
+    "command": [
+      "sh",
+      "-c",
+      "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && timeout 10s node .independent.cjs"
+    ],
+    "elapsedMs": 3291,
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "realProviderRequests": 0
+  },
+  "offlineSensitivity": {
+    "status": "observed",
+    "baseline": "passed",
+    "engineExecuted": false,
+    "variants": [
+      {
+        "operator": "ConditionalExpression",
+        "diff": "--- a/index.js\n+++ b/index.js\n@@ 121:6 @@\n-this.#cache.has(key)\n+false",
+        "status": "command-rejected",
+        "output": "\n  ✔ main\n  ✔ maxAge: throws on invalid value\n  ✔ .get() / .set()\n  ✘ [fail]: .getOrInsertComputed() returns hits without computing and refreshes recency\n  ✔ .getOrInsertComputed() preserves factory errors and key/cache identity\n  ✔ .get() - limit\n  ✔ .set() - limit\n  ✔ .set() - update item\n  ✔ .has\n[truncated]\ne): per-item maxAge overrides global maxAge (503ms)\n  ─\n\n  .getOrInsertComputed() returns hits without computing and refreshes recency\n\n  test.js:43\n\n   42:   lru.set('current', undefined);                               \n   43:   t.is(lru.getOrInsertComputed('current', factory), undefined);\n   44:   t.is(calls, 0);                                              \n\n  Difference (- actual, + expected):\n\n  - 'computed'\n  + undefined\n\n  › file://test.js:43:4\n\n\n\n  .getOrInsertComputed() replaces expired entries and uses the default maxAge\n\n  test.js:83\n\n   82:   t.true(lru.expiresIn('stale') > 0 && lru.expiresIn('stale') <= 100);\n   83:   t.is(lru.getOrInsertComputed('stale', () => {                       \n   84:     calls++;                                                          \n\n  Difference (- actual, + expected):\n\n  - 'unexpected'\n  + 'new'\n\n  › file://test.js:83:4\n\n  ─\n\n  2 tests failed\n"
+      }
+    ],
+    "cost": {
+      "commands": 2,
+      "engineMs": 0,
+      "preparationMs": 4182,
+      "commandMs": 1431,
+      "totalMs": 6115
+    },
+    "terminationVerified": true
+  },
+  "changedFromSeed": [
+    "test.js"
+  ],
+  "terminalApplicable": true,
+  "assessment": {
+    "S": false,
+    "T": true,
+    "deliveredRegression": true,
+    "authorSensitivityVerified": false,
+    "addressedReplayUsed": false,
+    "scenario": "A current-generation unexpired key with stored undefined must return undefined without calling the factory. The author discovered and retained this public behavior before diagnostics.",
+    "patch": "Only test.js differs from the seed; three ordinary runtime tests were added. Production and dependency declarations are unchanged, and the original 115 runtime tests remain intact.",
+    "causality": "In a fresh ordinary evaluator copy npm test passes 118 tests plus XO/TSD and independent checks pass. Running the same delivered AVA suite with the assigned condition-false variant fails at test.js:43: computed instead of undefined. This deterministic first rejection does not depend on the additional TTL test's real-time delay.",
+    "attribution": "The regression is author work, but it predates the one failed sense call. The author never received a fresh mutation ref or executed the selected variant, and explicitly reported unresolved sensitivity. Later evaluator success does not turn that unresolved author investigation into S.",
+    "limitations": "Sense baseline selected a worktree-local node_modules containing only cache files and failed with xo: not found. Offline reproduction confirms ordinary npm test creates this state. The author's subsequent npm ci --ignore-scripts failed with EAI_AGAIN inside the network-disabled container; it produced no delivered dependency-file change. Transient node_modules contents are excluded from capture, so their final bytes are not independently certified. No runtime fix or replacement attempt was made."
+  }
+}

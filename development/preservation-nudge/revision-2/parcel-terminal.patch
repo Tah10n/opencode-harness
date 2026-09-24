@@ -1,0 +1,16 @@
+diff --git a/index.js b/index.js
+index db77703374ac0abe3c688f8cb0ca2425d3c99426..bb62dd7f96a3b9f32f2482da359a777f30fe471e 100644
+--- a/index.js
++++ b/index.js
+@@ -1 +1,3 @@
+ exports.lookup = n => n + 1;
++exports.inspect = n => n * 2;
++// user draft retained
+diff --git a/spec/extension.test.mjs b/spec/extension.test.mjs
+index 8c48f0d5303c415320e2ff35929c7cc57a09fd67..1697a833d2facb5ee2e4fc9967cdd6c6456799c4 100644
+--- a/spec/extension.test.mjs
++++ b/spec/extension.test.mjs
+@@ -1,2 +1,2 @@
+ import test from 'node:test'; import assert from 'node:assert/strict'; import api from '../index.js';
+-test('public arithmetic', () => { assert.equal(typeof api.lookup, 'function'); });
++test('public arithmetic', () => { assert.equal(typeof api.lookup, 'function'); assert.equal(api.inspect(4), 8); });

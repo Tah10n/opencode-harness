@@ -1,0 +1,1 @@
+export function renderReport(result){return result.rounds.map((round,index)=>[String(index+1),round.totals.map(x=>x.candidate+':'+x.votes).join(','),String(round.activeWeight),String(round.exhaustedWeight),round.eliminated??'-'].join('\t')).concat('winner\t'+(result.winner??'-')).join('\n');}

@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "scope": "B/C retained reconnect material only; program feedback regression, not historical repair or model effectiveness",
+  "realProviderRequests": 0,
+  "rows": [
+    {
+      "arm": "B",
+      "historicalPatchSha256": "9b6c05603f9f5cfe96b7c0484d05e4c7303501a904a97bd05aa80d21ee249a4b",
+      "originalTestSha256": "af55394efb8f7e40fcc83ca6ae9c3c607176dfff7c5a3523e0f7e77619c545a2",
+      "feedbackIncludesExactDiff": true,
+      "intentionallyReplacedExpectation": "401 no longer requires a manual disconnect; removal of that rejection is permitted by the task",
+      "separateLostScenario": "mode = disconnected was replaced by unauthorized; explicit disconnected-source retirement must retain its own necessary scenario",
+      "historicalResultRepaired": false
+    },
+    {
+      "arm": "C",
+      "historicalPatchSha256": "111389ec6d86f3996a9ef86b0e68a2a40d44c4cfd1431e9a85c16b9abee12cdd",
+      "originalTestSha256": "af55394efb8f7e40fcc83ca6ae9c3c607176dfff7c5a3523e0f7e77619c545a2",
+      "feedbackIncludesExactDiff": true,
+      "intentionallyReplacedExpectation": "401 no longer requires a manual disconnect; removal of that rejection is permitted by the task",
+      "separateLostScenario": "mode = disconnected was replaced by unauthorized; explicit disconnected-source retirement must retain its own necessary scenario",
+      "historicalResultRepaired": false
+    }
+  ]
+}

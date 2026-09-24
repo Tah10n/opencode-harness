@@ -1,0 +1,76 @@
+diff --git a/src/compiler/compile/render_dom/invalidate.ts b/src/compiler/compile/render_dom/invalidate.ts
+index b045db079f33a20e51a536dcdf9bd096775c1818..87095f80478fa56bdca282f8af07f926d87b6d66 100644
+--- a/src/compiler/compile/render_dom/invalidate.ts
++++ b/src/compiler/compile/render_dom/invalidate.ts
+@@ -69,6 +69,14 @@ export function invalidate(renderer: Renderer, scope: Scope, node: Node, names:
+ 						? [node, ...extra_args]
+ 						: node;
+ 
++			if (is_store_value) {
++				tail.forEach(variable => {
++					if (variable.name[0] === '$' && variable.name[1] !== '$') {
++						invalidate = x`@set_store_value(${variable.name.slice(1)}, ${invalidate}, ${variable.name})`;
++					}
++				});
++			}
++
+ 			if (head.subscribable && head.reassigned) {
+ 				const subscribe = `$$subscribe_${head.name}`;
+ 				invalidate = x`${subscribe}(${invalidate})`;
+@@ -79,4 +87,4 @@ export function invalidate(renderer: Renderer, scope: Scope, node: Node, names:
+ 	}
+ 
+ 	return node;
+-}
+\ No newline at end of file
++}
+diff --git a/test/runtime/samples/store-assignment-destructured/_config.js b/test/runtime/samples/store-assignment-destructured/_config.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..fa98a051073f6aeba12e54be151058aeecb4607b
+--- /dev/null
++++ b/test/runtime/samples/store-assignment-destructured/_config.js
+@@ -0,0 +1,28 @@
++import { get, writable } from '../../../../store';
++
++const source = writable({ first: 0, second: 0 });
++const first = writable(-1);
++const second = writable(-1);
++
++export default {
++	props: { source, first, second },
++
++	html: `
++		<p>0</p>
++		<p>0</p>
++	`,
++
++	async test({ assert, target }) {
++		assert.deepEqual(get(source), { first: 0, second: 0 });
++
++		source.set({ first: 1, second: 2 });
++		await Promise.resolve();
++
++		assert.deepEqual(get(first), 1);
++		assert.deepEqual(get(second), 2);
++		assert.htmlEqual(target.innerHTML, `
++			<p>1</p>
++			<p>2</p>
++		`);
++	}
++};
+diff --git a/test/runtime/samples/store-assignment-destructured/main.svelte b/test/runtime/samples/store-assignment-destructured/main.svelte
+new file mode 100644
+index 0000000000000000000000000000000000000000..4150bb7c591e2e4865690aece5d66ac7265db2c7
+--- /dev/null
++++ b/test/runtime/samples/store-assignment-destructured/main.svelte
+@@ -0,0 +1,10 @@
++<script>
++	export let source;
++	export let first;
++	export let second;
++
++	$: ({ first: $first, second: $second } = $source);
++</script>
++
++<p>{$first}</p>
++<p>{$second}</p>

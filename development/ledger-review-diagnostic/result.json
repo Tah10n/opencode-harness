@@ -1,0 +1,178 @@
+{
+  "status": "two-reviews-completed",
+  "rows": [
+    {
+      "slot": 1,
+      "candidate": "candidate-A",
+      "status": "completed",
+      "normalCompletion": true,
+      "elapsedMs": 373444,
+      "requests": 12,
+      "unknownUsageRequests": 0,
+      "usage": {
+        "input_tokens": 485580,
+        "output_tokens": 10391,
+        "cached_tokens": 64512,
+        "reasoning_tokens": 8528
+      },
+      "byRole": {
+        "title": {
+          "requests": 1,
+          "unknownUsage": 0,
+          "input_tokens": 11904,
+          "output_tokens": 83,
+          "cached_tokens": 0,
+          "reasoning_tokens": 72
+        },
+        "work": {
+          "requests": 11,
+          "unknownUsage": 0,
+          "input_tokens": 473676,
+          "output_tokens": 10308,
+          "cached_tokens": 64512,
+          "reasoning_tokens": 8456
+        }
+      },
+      "nativeReads": 22,
+      "integrity": {
+        "snapshotUnchanged": true,
+        "snapshotSha256": "d97d6a28a8f3fe5ce87b9653fd56822bc1672d80a126d547797ff81987bb1342",
+        "taskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+        "base": "a45273e659b839f1e98092161e82650d38b351ea",
+        "head": "1d4c29960067cdcea67fba2522e7406db2355775",
+        "implementationStages": 0,
+        "nativeReads": 22,
+        "tools": [
+          "read",
+          "grep"
+        ],
+        "sessions": 1
+      },
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "recording": "research-full-v1",
+      "offeredTools": [
+        "glob",
+        "grep",
+        "read",
+        "skill"
+      ],
+      "finalResponseParts": 1,
+      "responseSha256": "347f29c16fb69d1d4478ba31e438cc55ec294f5e5ebc97fffd8e9d39e476b93a",
+      "findings": {
+        "confirmed": 3,
+        "unsupported": 0,
+        "incorrect": 0,
+        "unverified": 0,
+        "hypotheses": 1,
+        "knownMisses": 4
+      }
+    },
+    {
+      "slot": 2,
+      "candidate": "candidate-B",
+      "status": "completed",
+      "normalCompletion": true,
+      "elapsedMs": 390595,
+      "requests": 15,
+      "unknownUsageRequests": 0,
+      "usage": {
+        "input_tokens": 2353271,
+        "output_tokens": 12179,
+        "cached_tokens": 765952,
+        "reasoning_tokens": 10338
+      },
+      "byRole": {
+        "title": {
+          "requests": 1,
+          "unknownUsage": 0,
+          "input_tokens": 133834,
+          "output_tokens": 72,
+          "cached_tokens": 0,
+          "reasoning_tokens": 58
+        },
+        "work": {
+          "requests": 14,
+          "unknownUsage": 0,
+          "input_tokens": 2219437,
+          "output_tokens": 12107,
+          "cached_tokens": 765952,
+          "reasoning_tokens": 10280
+        }
+      },
+      "nativeReads": 25,
+      "integrity": {
+        "snapshotUnchanged": true,
+        "snapshotSha256": "6d430ded8c1a434792d3831a496d765090709899cc1f7e60a828cca11b9d7fcd",
+        "taskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+        "base": "05064d33f51980d8b4607e0f0f5dc68866341f34",
+        "head": "892747fc17e42e197e5e0dc0054dbf2105db6b40",
+        "implementationStages": 0,
+        "nativeReads": 25,
+        "tools": [
+          "read",
+          "grep"
+        ],
+        "sessions": 1
+      },
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "recording": "research-full-v1",
+      "offeredTools": [
+        "glob",
+        "grep",
+        "read",
+        "skill"
+      ],
+      "finalResponseParts": 1,
+      "responseSha256": "70bc2adcdb991556b3655ecb899207389552a40d2f479db61848f1d38991651a",
+      "findings": {
+        "confirmed": 4,
+        "confirmedOriginalTaskViolations": 3,
+        "confirmedAdditionalImplementationDefects": 1,
+        "unsupported": 0,
+        "incorrect": 0,
+        "unverified": 0,
+        "hypotheses": 0
+      }
+    }
+  ],
+  "totals": {
+    "requests": 27,
+    "nativeReads": 47,
+    "elapsedMs": 764039,
+    "input_tokens": 2838851,
+    "output_tokens": 22570,
+    "cached_tokens": 830464,
+    "reasoning_tokens": 18866
+  },
+  "recording": "research-full-v1; all 27 provider records complete",
+  "unknownUsageRequests": 0,
+  "implementationRuns": 0,
+  "repairs": 0,
+  "modelRetries": 0,
+  "preparation": {
+    "installedAttempts": 2,
+    "first": "failed before request",
+    "corrected": "passed",
+    "scriptedNativeSessions": 1,
+    "scriptedRequests": 3,
+    "schedulerMockDispatches": 13
+  },
+  "protocolDeviation": "Native skill tool was offered in both sessions and corrected preflight, but never called. Exact three-tool inventory not achieved; no forbidden write/Bash/delegation was called.",
+  "decision": "Positive concrete detection signal on AR0, with four known misses. Control also has real defects, so specificity on correct implementations is unproven. Extra unused skill tool in both inventories is a protocol deviation. No reliability, delivery improvement or promotion claim."
+}

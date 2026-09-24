@@ -1,0 +1,3 @@
+# encoder-decoder-separation
+
+encodeComponent leaves only ASCII alphanumeric/-._~ literal, UTF8 uppercase percent-encodes everything else. decodeComponent accepts lowercase escapes and preserves literal +; this is not application/x-www-form-urlencoded. Invalid percent/UTF8 or unpaired surrogate encode =>URIError; non-string=>TypeError. renderQuery preserves ordered repeated/empty two-string pairs and joins encoded key=value with &. parseQuery('')=[], otherwise each & segment needs =, split first only, decode each component, preserve pairs. Missing = SyntaxError; no ? stripping/dedup.<=10000-unit strings/1000 pairs. Query layer delegates to codec. Run npm test.

@@ -1,0 +1,1 @@
+import {parseCandidates} from './srcset.mjs';export function selectImage(text,cssWidth,dpr,fallback){const candidates=parseCandidates(text);if(!candidates.length)return fallback;const target=candidates[0].kind==='w'?cssWidth*dpr:dpr;const sorted=[...candidates].sort((a,b)=>a.value-b.value);return (sorted.find(c=>c.value>=target)??sorted.at(-1)).url;}

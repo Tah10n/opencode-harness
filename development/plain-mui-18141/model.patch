@@ -1,0 +1,35 @@
+diff --git a/packages/material-ui/src/Select/Select.js b/packages/material-ui/src/Select/Select.js
+index 0fec819d6f32783b77e1d29371a4869a7e37a4bb..4ac2b5dba95f6e3bafe3c659d2d3d69cc5a0fcc4 100644
+--- a/packages/material-ui/src/Select/Select.js
++++ b/packages/material-ui/src/Select/Select.js
+@@ -69,7 +69,7 @@ const Select = React.forwardRef(function Select(props, ref) {
+       type: undefined, // We render a select. We can ignore the type provided by the `Input`.
+       multiple,
+       ...(native
+-        ? {}
++        ? { id }
+         : {
+             autoWidth,
+             displayEmpty,
+diff --git a/packages/material-ui/src/TextField/TextField.test.js b/packages/material-ui/src/TextField/TextField.test.js
+index 238d350f5bdf087488ab2d2514d9bb9ede0381f2..c7cdb97a0fcc7901ef402b915a376099789be7b6 100644
+--- a/packages/material-ui/src/TextField/TextField.test.js
++++ b/packages/material-ui/src/TextField/TextField.test.js
+@@ -136,6 +136,17 @@ describe('<TextField />', () => {
+       expect(select.querySelectorAll('option')).to.have.lengthOf(2);
+     });
+ 
++    it('should label a native select', () => {
++      const { container } = render(
++        <TextField select id="my-select" label="Release: " SelectProps={{ native: true }}>
++          <option value="stable">Stable</option>
++        </TextField>,
++      );
++
++      expect(container.querySelector('select')).to.have.attribute('id', 'my-select');
++      expect(container.querySelector('label')).to.have.attribute('for', 'my-select');
++    });
++
+     it('renders a combobox with the appropriate accessible name', () => {
+       const { getByRole } = render(
+         <TextField select id="my-select" label="Release: " value="stable">

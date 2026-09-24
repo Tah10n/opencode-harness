@@ -1,0 +1,41 @@
+{
+  "runs": [
+    {
+      "phase": "initial known reproduction",
+      "compilations": 4,
+      "elapsedMs": 2025.6583749999998
+    },
+    {
+      "phase": "initial minimal assignability investigation",
+      "compilations": 4,
+      "elapsedMs": 1876.7814999999998
+    },
+    {
+      "phase": "prototype development pilot before final control refinements",
+      "compilations": 82,
+      "elapsedMs": 33710.025625,
+      "acceptedAsFinalEvidence": false
+    },
+    {
+      "phase": "completed expanded matrix before final packaging review",
+      "compilations": 90,
+      "elapsedMs": 36966.792917,
+      "acceptedAsFinalEvidence": false
+    },
+    {
+      "phase": "final saved matrix after closing packaging review",
+      "compilations": 90,
+      "elapsedMs": 39326.149042,
+      "results": "results/results.json"
+    }
+  ],
+  "totalSemanticCompilations": 270,
+  "sumRunElapsedMs": 113905.40745900001,
+  "excludes": "source preparation, syntax checks, review, Git operations and developing agent work",
+  "researchProviderCalls": 0,
+  "newLunaTasks": 0,
+  "newOpenCodeSessions": 0,
+  "developerAgentUsage": "separate, not instrumented; not claimed zero",
+  "syntaxChecks": "node --check check.mjs and generate.mjs",
+  "notes": "The final matrix also performs one deliberately missing-compiler launch, which is not a semantic compilation."
+}

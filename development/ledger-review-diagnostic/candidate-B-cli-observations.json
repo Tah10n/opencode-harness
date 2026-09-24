@@ -1,0 +1,35 @@
+{
+  "arm": "candidate-B",
+  "observations": [
+    {
+      "finding": "B1",
+      "kind": "malformed",
+      "directPreflightRejected": false,
+      "entryPoint": "CLI source add --agent antigravity --name Review fixture",
+      "exitCode": 0,
+      "stdout": "Source saved locally. Run `viberacing connect` to approve it.\n",
+      "stderr": "",
+      "sourcesCreated": true
+    },
+    {
+      "finding": "B1",
+      "kind": "invalid-source-id",
+      "directPreflightRejected": false,
+      "entryPoint": "CLI source add --agent antigravity --name Review fixture",
+      "exitCode": 0,
+      "stdout": "Source saved locally. Run `viberacing connect` to approve it.\n",
+      "stderr": "",
+      "sourcesCreated": true
+    },
+    {
+      "finding": "B1",
+      "kind": "invalid-sequence",
+      "directPreflightRejected": false,
+      "entryPoint": "CLI source add --agent antigravity --name Review fixture",
+      "exitCode": 0,
+      "stdout": "Source saved locally. Run `viberacing connect` to approve it.\n",
+      "stderr": "",
+      "sourcesCreated": true
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "attempt": "bundle preparation before native preflight",
+  "initialError": "EEXIST creating author-bundle/.gitignore",
+  "cause": "Task materializer already creates the exact required .gitignore; the preparation used exclusive creation without checking it.",
+  "correction": "Verify the existing exact bytes; create the file only when absent. Reuse and verify the same baseline and partial bundle.",
+  "nativeSessions": 0,
+  "scriptedProviderRequests": 0,
+  "realProviderRequests": 0
+}

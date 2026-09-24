@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "scriptedNativeOperations": 3,
+  "scriptedRequests": 18,
+  "realRequests": 0,
+  "elapsedMs": 17851,
+  "exactReviewerInventory": true,
+  "unchangedReview": true,
+  "sharedDeadline": true,
+  "greaterThan30MinuteF": true,
+  "actualFailThenPass": true,
+  "falseSuggestionRejected": true,
+  "fullPortablePatch": true,
+  "executableModePreserved": true,
+  "cancellationAndCaptureTransitionControls": true,
+  "resourcesRemoved": true
+}

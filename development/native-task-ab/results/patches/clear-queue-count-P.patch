@@ -1,0 +1,199 @@
+diff --git a/readme.md b/readme.md
+index c011e6c..b368415 100644
+--- a/readme.md
++++ b/readme.md
+@@ -347,7 +347,7 @@ Note that this only limits the number of items waiting to start. There could sti
+ 
+ #### .clear()
+ 
+-Clear the queue.
++Clear the queue and return the number of queued tasks discarded by this call. Active tasks are not included and continue running.
+ 
+ > [!WARNING]
+ > Any promises returned by `.add()` for tasks that were waiting in the queue (not yet running) will **never settle** after calling `.clear()`. This can cause "unsettled top-level await" warnings or hang your process. If you need the promises to settle, use `AbortSignal` for cancellation instead — aborting rejects the `.add()` promise cleanly.
+diff --git a/source/index.ts b/source/index.ts
+index bf7978c..b171409 100644
+--- a/source/index.ts
++++ b/source/index.ts
+@@ -610,9 +610,11 @@ export default class PQueue<QueueType extends Queue<RunFunction, EnqueueOptionsT
+ 	}
+ 
+ 	/**
+-	Clear the queue.
++	Clear the queue and return the number of discarded queued tasks.
+ 	*/
+-	clear(): void {
++	clear(): number {
++		const queuedTaskCount = this.#queue.size;
++
+ 		for (const cleanupQueueAbortHandler of this.#queueAbortListenerCleanupFunctions) {
+ 			cleanupQueueAbortHandler();
+ 		}
+@@ -641,6 +643,8 @@ export default class PQueue<QueueType extends Queue<RunFunction, EnqueueOptionsT
+ 		}
+ 
+ 		this.emit('next');
++
++		return queuedTaskCount;
+ 	}
+ 
+ 	/**
+diff --git a/test-d/index.test-d.ts b/test-d/index.test-d.ts
+index 78da841..9bfe14e 100644
+--- a/test-d/index.test-d.ts
++++ b/test-d/index.test-d.ts
+@@ -4,3 +4,4 @@ import PQueue from '../source/index.js';
+ const queue = new PQueue();
+ 
+ expectType<Promise<string>>(queue.add(async () => '🦄'));
++expectType<number>(queue.clear());
+diff --git a/test/advanced.ts b/test/advanced.ts
+index d3b8dac..1ccb4ea 100644
+--- a/test/advanced.ts
++++ b/test/advanced.ts
+@@ -564,7 +564,7 @@ test('clear() removes queued abort listeners', async () => {
+ 	const queuedTask = queue.add(async () => 'result', {signal: controller.signal});
+ 	assert.equal(getEventListeners(controller.signal, 'abort').length, 1);
+ 
+-	queue.clear();
++	assert.equal(queue.clear(), 1);
+ 	assert.equal(getEventListeners(controller.signal, 'abort').length, 0);
+ 
+ 	controller.abort();
+@@ -596,7 +596,7 @@ test('clear() removes queued abort listeners for shared signals', () => {
+ 
+ 	assert.equal(getEventListeners(controller.signal, 'abort').length, 3);
+ 
+-	queue.clear();
++	assert.equal(queue.clear(), 3);
+ 
+ 	assert.equal(getEventListeners(controller.signal, 'abort').length, 0);
+ });
+@@ -606,7 +606,7 @@ test('clear() lets the same signal be reused without stale queued listeners', as
+ 	const controller = new AbortController();
+ 
+ 	const clearedTask = queue.add(async () => 'cleared', {signal: controller.signal});
+-	queue.clear();
++	assert.equal(queue.clear(), 1);
+ 
+ 	const activeTask = queue.add(async () => 'active', {signal: controller.signal});
+ 	assert.equal(getEventListeners(controller.signal, 'abort').length, 1);
+@@ -642,7 +642,7 @@ test('clear() keeps the running task abort listener while removing queued ones',
+ 
+ 	assert.equal(getEventListeners(controller.signal, 'abort').length, 3);
+ 
+-	queue.clear();
++	assert.equal(queue.clear(), 2);
+ 
+ 	assert.equal(getEventListeners(controller.signal, 'abort').length, 1);
+ 
+@@ -681,7 +681,7 @@ test('clear() only leaves the running task affected when a shared signal aborts
+ 
+ 	const queuedTask = queue.add(async () => 'queued', {signal: controller.signal});
+ 
+-	queue.clear();
++	assert.equal(queue.clear(), 1);
+ 	controller.abort(abortReason);
+ 
+ 	await assert.rejects(runningTask, {message: 'later abort'});
+@@ -711,7 +711,7 @@ test('clear() does not accumulate abort listeners across repeated discard cycles
+ 		queue.add(async () => index, {signal: controller.signal});
+ 		assert.equal(getEventListeners(controller.signal, 'abort').length, 2);
+ 
+-		queue.clear();
++		assert.equal(queue.clear(), 2);
+ 		assert.equal(getEventListeners(controller.signal, 'abort').length, 0);
+ 	}
+ });
+diff --git a/test/basic.ts b/test/basic.ts
+index 1e90246..e4b36ce 100644
+--- a/test/basic.ts
++++ b/test/basic.ts
+@@ -705,8 +705,9 @@ test('.clear()', () => {
+ 	queue.add(async () => delay(20_000));
+ 	assert.equal(queue.size, 4);
+ 	assert.equal(queue.pending, 2);
+-	queue.clear();
++	assert.equal(queue.clear(), 4);
+ 	assert.equal(queue.size, 0);
++	assert.equal(queue.clear(), 0);
+ });
+ 
+ test('.clear() resolves onEmpty() and onIdle() waiters', async () => {
+@@ -718,7 +719,7 @@ test('.clear() resolves onEmpty() and onIdle() waiters', async () => {
+ 	const onEmptyPromise = queue.onEmpty();
+ 	const onIdlePromise = queue.onIdle();
+ 
+-	queue.clear();
++	assert.equal(queue.clear(), 2);
+ 
+ 	await Promise.race([
+ 		Promise.all([onEmptyPromise, onIdlePromise]),
+@@ -732,6 +733,67 @@ test('.clear() resolves onEmpty() and onIdle() waiters', async () => {
+ 	assert.equal(queue.pending, 0);
+ });
+ 
++test('.clear() returns only queued tasks', async () => {
++	const queue = new PQueue({concurrency: 1});
++	const runningTaskDeferred = pDefer<void>();
++
++	const runningTask = queue.add(async () => runningTaskDeferred.promise);
++	queue.add(async () => 'queued 1');
++	queue.add(async () => 'queued 2');
++
++	assert.equal(queue.clear(), 2);
++	assert.equal(queue.pending, 1);
++	assert.equal(queue.size, 0);
++	assert.equal(queue.clear(), 0);
++
++	runningTaskDeferred.resolve();
++	await runningTask;
++});
++
++test('.clear() returns queued tasks for a paused queue', () => {
++	const queue = new PQueue({autoStart: false});
++
++	queue.add(async () => 'queued 1');
++	queue.add(async () => 'queued 2');
++	queue.add(async () => 'queued 3');
++
++	assert.equal(queue.clear(), 3);
++	assert.equal(queue.clear(), 0);
++});
++
++test('.clear() returns queued tasks for a custom queue class', () => {
++	class CustomQueue {
++		readonly #queue: Array<() => Promise<unknown>> = [];
++
++		enqueue(run: () => Promise<unknown>): void {
++			this.#queue.push(run);
++		}
++
++		dequeue(): (() => Promise<unknown>) | undefined {
++			return this.#queue.shift();
++		}
++
++		filter(): Array<() => Promise<unknown>> {
++			return this.#queue;
++		}
++
++		setPriority(): void {
++			return undefined;
++		}
++
++		get size(): number {
++			return this.#queue.length;
++		}
++	}
++
++	const queue = new PQueue({autoStart: false, queueClass: CustomQueue});
++	queue.add(async () => 'queued 1');
++	queue.add(async () => 'queued 2');
++
++	assert.equal(queue.clear(), 2);
++	assert.equal(queue.clear(), 0);
++});
++
+ test('.clear() with running tasks emits empty but not idle', async () => {
+ 	const queue = new PQueue({concurrency: 1});
+ 	const events: string[] = [];

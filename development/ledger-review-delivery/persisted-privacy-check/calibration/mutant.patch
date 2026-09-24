@@ -1,0 +1,12 @@
+diff --git a/packages/connector/lib/adapters/claude.mjs b/packages/connector/lib/adapters/claude.mjs
+index 3afe714..2cd8874 100644
+--- a/packages/connector/lib/adapters/claude.mjs
++++ b/packages/connector/lib/adapters/claude.mjs
+@@ -194,6 +194,7 @@ export async function collectClaude(
+         safeOffset: chunk.safeOffset,
+         tailFingerprint: await fingerprint(file.path, chunk.safeOffset),
+         ids: [...ids],
++        rawIds: analysis.records.map((record) => record.id),
+       };
+       if (!appended) for (const id of previous?.ids ?? []) delete nextState.messages[id];
+       Object.assign(nextState.messages, messages);

@@ -1,0 +1,30 @@
+{
+  "status": "preparation_only_not_admitted",
+  "runtime": "f98a96121e5c4d340f3c674920c57e1cb80258e5",
+  "baseline": "2b16b6a8ad75b6b852adc5e2189e6d4a8d93eabd",
+  "taskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+  "environmentSha256": "aa0afe37ca2ec1f3564642a02842d71472b72b88225069be22a4cbbe8fb114cc",
+  "baselineArchiveSha256": "ea549fcc30d8facef77af8ebebc280910a24537e44ad8c6cfcbdc4888b5dcab1",
+  "baselineTreeSha256": "3a96572c9efc2f90a38c8f296bb0760436ca041034c82a9c466b1f276676acbc",
+  "bundles": {
+    "author": {
+      "sha256": "81629492578a24379215e158bd8484dcd8a32b92911611856ecb9eb9ec5d53be"
+    },
+    "reviewer": {
+      "sha256": "c36a91a041ad38248be2b2b33a554ed628678c6d167e86af405418d34ecdce0e"
+    }
+  },
+  "configHashes": {
+    "author": "53ca7e00ad4c5f97c8c43dc11aaf5db3388bfc97f2052bca03688771d27a7027",
+    "reviewer": "1ead346ddd84a5123dbe6a02771469dd4763e893eba4c1ad4e1ee74c5841fb3a"
+  },
+  "image": "sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "high",
+  "exactReviewerInventory": "NOT RUN",
+  "optionalAugmentations": false,
+  "fullChainPreflight": "not_started",
+  "freezeCommit": null,
+  "deadlineStarted": false,
+  "realProviderRequests": 0
+}

@@ -1,0 +1,7 @@
+{
+  "scope": "Developing agent goal counters sampled before final publication; not benchmark model tokens or billing evidence",
+  "tokens_used_counter": 2441551,
+  "elapsed_seconds_counter": 22633,
+  "sampled_at_unix_seconds": 1789656771,
+  "monetary_cost": null
+}

@@ -1,0 +1,216 @@
+{
+  "version": 1,
+  "stage": "frozen_before_model_requests",
+  "runtimeSha": "fba1960cad4e2cf25831af1be8a21bea0361947d",
+  "freezeSha256": "f0851d2017a9c4b0f54fbacf4fcf871189fef99c4faf58f4cee9aa55de6b7938",
+  "task": {
+    "instance_id": "sveltejs__svelte-1190",
+    "repo": "sveltejs/svelte",
+    "language": "JavaScript",
+    "task_category": "Refactoring",
+    "base_commit": "0c3e44ac05c651c12c94e047bf712cb86278d345",
+    "officialImage": {
+      "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1190:v1.1",
+      "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1190@sha256:28167366b3d50bb7b6cc3441186980d6022986d9fc60d6e6a193c7aa7cb7b858",
+      "id": "sha256:28167366b3d50bb7b6cc3441186980d6022986d9fc60d6e6a193c7aa7cb7b858",
+      "architecture": "amd64",
+      "os": "linux",
+      "size": 5438511802,
+      "workdir": "/testbed"
+    },
+    "authorImage": "sha256:010ecf30e97e43904a58a82f9d0c13642825f7ffbe56d3c2331b19aaaf0c3964",
+    "projectNode": "v16.20.2",
+    "npm": "8.19.4",
+    "promptSha256": "555b2574201e4f0783d3749801195dfbf3c0b2a1a31163c97475d75f1e867dd8",
+    "originalRowCsvSha256": "2d38296cefe3747774e512c53fd3956098020586ee5a2cd7f33c1ee134252129",
+    "lfsAuditSha256": "3909e69332f1718c6027b5a937ff36278846ecd00c80933127ccad8a172ad0ab",
+    "archives": {
+      "base.tar": "45634ea516ebfb4ebeaf1fc5e963342d6c3b19aa6ba4181ab5436fb2b718b2f8",
+      "dependencies.tar": "b9fc80c91a764157cdde6c7251d74126771c32bc64dc5c0acc4646515a3e98ea"
+    },
+    "submodules": [],
+    "preparedExtra": null,
+    "controls": {
+      "gold": {
+        "resultSha256": "3c58cbb7e140ee790c1d82318063de697783c77bcdcb8da5729f64a966052071",
+        "resolved": true,
+        "passed": 1666,
+        "failed": 11
+      },
+      "baseline": {
+        "resultSha256": "eae645122bb42f13722a3b4c6c4930350d8b792c30ce17374854185f153523a6",
+        "resolved": false,
+        "passed": 1618,
+        "failed": 59
+      }
+    },
+    "scriptedPreflightSha256": "4697ba039d448cd3ec1f73a654bf3ec7d904d1b790e0f5a39080ca8bb38c9cbf",
+    "isolationSha256": "2672c6fc0a62a59af3879dd6f55fc05ab9c38f98fae6a66771c5049833290424"
+  },
+  "model": "openai/gpt-5.6-luna",
+  "opencode": "1.18.26",
+  "reasoning": "high",
+  "budgetSeconds": 1800,
+  "flags": {
+    "STRATEGY": "direct",
+    "CONTEXT": 0,
+    "CHECKS": 0,
+    "TYPE_COMPAT": 0,
+    "SENSITIVITY": 0,
+    "INVESTIGATION": 0,
+    "COMMAND_HINTS": 0,
+    "EXTRA_ATTENTION": 0,
+    "PRESERVATION_NUDGE": {
+      "OFF": 0,
+      "ON": 1
+    }
+  },
+  "slots": [
+    {
+      "slot": 1,
+      "task": "sveltejs__svelte-1190",
+      "arm": "OFF",
+      "project": "sveltejs/svelte",
+      "status": "not_started",
+      "A": null,
+      "Q_pair": null,
+      "T": null,
+      "D_pair": null
+    },
+    {
+      "slot": 2,
+      "task": "sveltejs__svelte-1190",
+      "arm": "ON",
+      "project": "sveltejs/svelte",
+      "status": "not_started",
+      "A": null,
+      "Q_pair": null,
+      "T": null,
+      "D_pair": null
+    }
+  ],
+  "inputReceipt": {
+    "candidate": "fba1960cad4e2cf25831af1be8a21bea0361947d",
+    "task": {
+      "instance_id": "sveltejs__svelte-1190",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Refactoring",
+      "base_commit": "0c3e44ac05c651c12c94e047bf712cb86278d345",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1190:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1190@sha256:28167366b3d50bb7b6cc3441186980d6022986d9fc60d6e6a193c7aa7cb7b858",
+        "id": "sha256:28167366b3d50bb7b6cc3441186980d6022986d9fc60d6e6a193c7aa7cb7b858",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 5438511802,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:010ecf30e97e43904a58a82f9d0c13642825f7ffbe56d3c2331b19aaaf0c3964",
+      "projectNode": "v16.20.2",
+      "npm": "8.19.4",
+      "promptSha256": "555b2574201e4f0783d3749801195dfbf3c0b2a1a31163c97475d75f1e867dd8",
+      "originalRowCsvSha256": "2d38296cefe3747774e512c53fd3956098020586ee5a2cd7f33c1ee134252129",
+      "lfsAuditSha256": "3909e69332f1718c6027b5a937ff36278846ecd00c80933127ccad8a172ad0ab",
+      "archives": {
+        "base.tar": "45634ea516ebfb4ebeaf1fc5e963342d6c3b19aa6ba4181ab5436fb2b718b2f8",
+        "dependencies.tar": "b9fc80c91a764157cdde6c7251d74126771c32bc64dc5c0acc4646515a3e98ea"
+      },
+      "submodules": [],
+      "preparedExtra": null,
+      "controls": {
+        "gold": {
+          "resultSha256": "3c58cbb7e140ee790c1d82318063de697783c77bcdcb8da5729f64a966052071",
+          "resolved": true,
+          "passed": 1666,
+          "failed": 11
+        },
+        "baseline": {
+          "resultSha256": "eae645122bb42f13722a3b4c6c4930350d8b792c30ce17374854185f153523a6",
+          "resolved": false,
+          "passed": 1618,
+          "failed": 59
+        }
+      },
+      "scriptedPreflightSha256": "4697ba039d448cd3ec1f73a654bf3ec7d904d1b790e0f5a39080ca8bb38c9cbf",
+      "isolationSha256": "2672c6fc0a62a59af3879dd6f55fc05ab9c38f98fae6a66771c5049833290424"
+    },
+    "sourceManifestSha256": "9c26ced23e09a19e98e66c7e1dd882493886d166821914a5e821f55c104c89ee",
+    "bundleManifestSha256": "9382fafc3bf162c9f55d7232813aa5e2b81bf202a6a3bb4c5957d2fcd84870e6",
+    "promptBytes": 1377,
+    "promptUnchanged": true,
+    "environmentBlockUnchanged": true,
+    "realProviderRequests": 0
+  },
+  "config": {
+    "model": "openai/gpt-5.6-luna",
+    "small_model": "openai/gpt-5.6-luna",
+    "provider": {
+      "openai": {
+        "options": {
+          "baseURL": "http://127.0.0.1:4099/v1",
+          "apiKey": "development-no-credential"
+        },
+        "models": {
+          "gpt-5.6-luna": {
+            "options": {
+              "reasoningEffort": "high"
+            },
+            "variants": {
+              "high": {
+                "reasoningEffort": "high"
+              }
+            }
+          }
+        }
+      }
+    },
+    "permission": {
+      "external_directory": {
+        "*": "deny",
+        "/template/node_modules/typescript/lib/*": "allow",
+        "/diagnostic/*": "allow"
+      }
+    }
+  },
+  "offlineConfig": {
+    "permission": {
+      "webfetch": "deny"
+    },
+    "agent": {
+      "build": {
+        "permission": {
+          "webfetch": "deny"
+        }
+      }
+    }
+  },
+  "files": {
+    "development/preservation-nudge/model-pair/run.mjs": "4b16bb1d4c50a394980bb433d3248a860861acaefd2b777b8c0384867e114d57",
+    "development/preservation-nudge/model-pair/evaluate.py": "42038bfc201c7a373a525b00137d25808a381232b5efdc1f140fa36c7d246ed3",
+    "development/preservation-nudge/model-pair/PLAN.md": "18ce7a60e59c207ed1909fbf4bd357ac7fb354e7d8f996f3e432e9d84002ff18",
+    "development/preservation-nudge/model-pair/TASK.md": "555b2574201e4f0783d3749801195dfbf3c0b2a1a31163c97475d75f1e867dd8",
+    "development/preservation-nudge/model-pair/preflight.json": "07f8b6031365d599638e4807da326d5e9a71639f63ea9992b944ef1b0212f170",
+    "development/native-task-ab/run-comparison.mjs": "4a358a3c6b99b8a8750470797cf2b2d9c505405d489e20b0972ae885d971b462",
+    "development/native-task-abc/native-run.mjs": "5d691871022fcf4f2117212c33b463849e791d7ebe120adc68e7ca419ee0d293",
+    "development/native-task-integrated/container-session.mjs": "2623ebd020bf2c18a8591bf1a0cf156373f0cb4a1aad50150bdf398a408f6438",
+    "development/native-task-integrated/container-relay.mjs": "db186a20946348867504c48d7faca8f40a93fdfa122e1102f581e8cf5377f1b3",
+    "development/native-task-utility/container/stop-workload.mjs": "b21c23f5a334dc54af340e2773e3e56427aa27a946231769d36df249ea54a69e",
+    "development/polybench-pilot/capture.mjs": "c80a89d93cd03fa6b2bbbafb2f2ba7a40e7fc0fc57a9b684f4165f4cda5c540e",
+    "development/polybench-pilot/dependencies.mjs": "2819e63bc1364837123f0d240cd7186c8af1ba22662c62681a330f240677f79b",
+    "development/native-task-ab/extract-candidate.py": "aa5244bd4a5cc394344b266f0107728d9b70e190bad55de47c46dd10f28603de",
+    "development/native-task-offline/build.json": "16c5621afb56082001998a0f17f385ac90e4bdd31a19eeb215926de2e748ee61",
+    "development/polybench-pilot/two-world-diagnostic/driver.py": "82036c696ea63553fde23bb75be36dd4c4576c1c3a2570f00d04b128ec3f5edf",
+    "development/polybench-pilot/two-world-diagnostic/sveltejs__svelte-1190.json": "1d45deae23d56e43791ad0cf37b6ea2f6ce1c861226418702bcdc880c81cb804",
+    "opencode": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe",
+    "local/polybench-pilot/batch/freeze.json": "30008a1e389c67a40c4bfee0969b119f7c76cf0ee24a44364af261def605d216",
+    "local/polybench-pilot/batch/freeze-commit.json": "09580a67c738a05a5f21f554f2c76fa351e7a835c54bb86e75a99d10934fac86",
+    "local/polybench-pilot/batch/scheduling-paused.json": "69385be23d2edc8776accef8cd2b91cdbdf496a026e37bff9698862e8d29c6bd",
+    "local/polybench-pilot/batch/outcome.json": "8c1f279fc4b3b2ee0c63d5cc88b9c84ee1cfefdcbd683ab55dfcb95e7ed80402"
+  },
+  "calibrationSha256": "82c85b12d68300ebe4a96fda03d2438726e0b8e7df85af9a9ed9896a50480a2a",
+  "preflightSha256": "07f8b6031365d599638e4807da326d5e9a71639f63ea9992b944ef1b0212f170",
+  "priorLiveExecutionAbsent": true,
+  "priorPauseFilesPreserved": true,
+  "realProviderRequestsBeforeFreeze": 0
+}

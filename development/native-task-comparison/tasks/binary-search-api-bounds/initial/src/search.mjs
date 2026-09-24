@@ -1,0 +1,1 @@
+export function bounds(values,target){let lower=0,upper=values.length;while(lower<upper){const m=Math.floor((lower+upper)/2);if(values[m]<target)lower=m+1;else upper=m;}const first=lower;upper=values.length;while(lower<upper){const m=Math.floor((lower+upper)/2);if(values[m]<=target)lower=m+1;else upper=m;}return {lower:first,upper:lower};}

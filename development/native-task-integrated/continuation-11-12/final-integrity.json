@@ -1,0 +1,76 @@
+{
+  "checkedAt": "2026-09-15T18:49:35.765Z",
+  "historicalHashesVerified": 95,
+  "oldPublicFilesUnchanged": {
+    "RESULTS.md": "48c8418c033bb9921b675758ad4f7498151ec10c827d6e9727ada005f313031e",
+    "results.json": "02a727705eeaba884c76501edbf613373f0cc0a8a94bd5bbc6ef754398924fb2",
+    "assigned.json": "e9ba2a9cd00a383d0019fe2bb250942fbea251e07de3af5c58e0d5cffa01ea4f",
+    "accounting-audit.json": "953c8e89b5317235d1821d19366ae805952b00e199e7da9a55836f9ddd36069a",
+    "final-integrity.json": "d1cca3f22e3139e43e8191e81a5ac65ff16206eebc44283e8894f7ca2b936cdb"
+  },
+  "trees": [
+    {
+      "directory": "bundle",
+      "files": 6250,
+      "matched": true
+    },
+    {
+      "directory": "plain-dependencies",
+      "files": 3797,
+      "matched": true
+    },
+    {
+      "directory": "inputs/visual-preferences",
+      "files": 9431,
+      "matched": true
+    },
+    {
+      "directory": "inputs/url-search-params",
+      "files": 10551,
+      "matched": true
+    }
+  ],
+  "stops": [
+    {
+      "slot": 11,
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false,
+      "cleanupStatus": 0,
+      "containerAbsent": true
+    },
+    {
+      "slot": 12,
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false,
+      "cleanupStatus": 0,
+      "containerAbsent": true
+    }
+  ],
+  "patchChecks": [
+    {
+      "id": "n08",
+      "sha256": "e03957486a8a5a5f7eab9be7a6654a45bfca8cfbcc67510c3e174032098b3696",
+      "apply": 0,
+      "diffCheck": 0
+    },
+    {
+      "id": "n06",
+      "sha256": "c51e33d78acfbc91a6ad0e7f7a68bb7900ff7ba9539e9e6d8e9f19af908b130a",
+      "apply": 0,
+      "diffCheck": 0
+    }
+  ],
+  "originalFreezeSha256": "7bbd0d7c72f99a06d2a2a5ed4ae429efa261f23b0a7ad2659c44a3ce93891b6a",
+  "amendmentSha256": "33752be6536a134db5563a971e422159eccbdeb80dde01e4d5208a2b8dde084c",
+  "realProbes": 0
+}

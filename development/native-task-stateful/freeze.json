@@ -1,0 +1,461 @@
+{
+  "candidateCommit": "8691b545112e91681aac268ce42d34a8df77ea91",
+  "kind": "stateful-precondition-nine-run-development",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "high",
+  "budgetMs": 900000,
+  "config": {
+    "model": "openai/gpt-5.6-luna",
+    "small_model": "openai/gpt-5.6-luna",
+    "provider": {
+      "openai": {
+        "options": {
+          "baseURL": "http://127.0.0.1:4099/v1",
+          "apiKey": "development-no-credential"
+        },
+        "models": {
+          "gpt-5.6-luna": {
+            "options": {
+              "reasoningEffort": "high"
+            },
+            "variants": {
+              "high": {
+                "reasoningEffort": "high"
+              }
+            }
+          }
+        }
+      }
+    },
+    "permission": {
+      "external_directory": "deny"
+    }
+  },
+  "inputManifests": {
+    "queue-batch-P": {
+      "AGENTS.md": {
+        "sha256": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+        "executable": false
+      },
+      "README.md": {
+        "sha256": "6a2eef6a3cfadc02f78095220e294e7e652441452ee0d39cda3a529a125b3d9c",
+        "executable": false
+      },
+      "TASK.md": {
+        "sha256": "d43fc1203b97b053d2e21a602502a1c169cad06c9ac364ec146c8ad806889fd3",
+        "executable": false
+      },
+      "package.json": {
+        "sha256": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+        "executable": false
+      },
+      "src/queue.mjs": {
+        "sha256": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa",
+        "executable": false
+      },
+      "src/worker.mjs": {
+        "sha256": "6ed1e74cd6531111fb4636216d08f22aa8b18496c18599fec078df33f665d744",
+        "executable": false
+      },
+      "test/worker.test.mjs": {
+        "sha256": "2425598a855b2bf87bebcd0e07379cb4b28d7f589bcfa5dd7bcb99243e2eb70e",
+        "executable": false
+      }
+    },
+    "queue-batch-H0": {
+      "AGENTS.md": {
+        "sha256": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+        "executable": false
+      },
+      "README.md": {
+        "sha256": "6a2eef6a3cfadc02f78095220e294e7e652441452ee0d39cda3a529a125b3d9c",
+        "executable": false
+      },
+      "TASK.md": {
+        "sha256": "d43fc1203b97b053d2e21a602502a1c169cad06c9ac364ec146c8ad806889fd3",
+        "executable": false
+      },
+      "package.json": {
+        "sha256": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+        "executable": false
+      },
+      "src/queue.mjs": {
+        "sha256": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa",
+        "executable": false
+      },
+      "src/worker.mjs": {
+        "sha256": "6ed1e74cd6531111fb4636216d08f22aa8b18496c18599fec078df33f665d744",
+        "executable": false
+      },
+      "test/worker.test.mjs": {
+        "sha256": "2425598a855b2bf87bebcd0e07379cb4b28d7f589bcfa5dd7bcb99243e2eb70e",
+        "executable": false
+      }
+    },
+    "queue-batch-H1": {
+      "AGENTS.md": {
+        "sha256": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+        "executable": false
+      },
+      "README.md": {
+        "sha256": "6a2eef6a3cfadc02f78095220e294e7e652441452ee0d39cda3a529a125b3d9c",
+        "executable": false
+      },
+      "TASK.md": {
+        "sha256": "d43fc1203b97b053d2e21a602502a1c169cad06c9ac364ec146c8ad806889fd3",
+        "executable": false
+      },
+      "package.json": {
+        "sha256": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+        "executable": false
+      },
+      "src/queue.mjs": {
+        "sha256": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa",
+        "executable": false
+      },
+      "src/worker.mjs": {
+        "sha256": "6ed1e74cd6531111fb4636216d08f22aa8b18496c18599fec078df33f665d744",
+        "executable": false
+      },
+      "test/worker.test.mjs": {
+        "sha256": "2425598a855b2bf87bebcd0e07379cb4b28d7f589bcfa5dd7bcb99243e2eb70e",
+        "executable": false
+      }
+    },
+    "editor-cancel-H0": {
+      "AGENTS.md": {
+        "sha256": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+        "executable": false
+      },
+      "README.md": {
+        "sha256": "ea91a999a902d647c8e81dd457dea5a713e82217ed8c888911ab6c64a67a7003",
+        "executable": false
+      },
+      "TASK.md": {
+        "sha256": "de9319edccffbf081a8d6f2e29ff96e5cf7bb3b8d86b8717b476ae0c13cb2efa",
+        "executable": false
+      },
+      "package.json": {
+        "sha256": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+        "executable": false
+      },
+      "src/drafts.mjs": {
+        "sha256": "a6004483712e4307795ae33ee6e0051c75b69405f4ee5a3052de16cc6422b5e6",
+        "executable": false
+      },
+      "src/editor.mjs": {
+        "sha256": "9d458dcc209f164fca1b7f3748358d62335ea68e7167ac08d4bfbea57c3396c7",
+        "executable": false
+      },
+      "test/editor.test.mjs": {
+        "sha256": "9eb3c89deb5e1dcb6305f911caf649d0822fbab7bb61f4a918db13c89972acce",
+        "executable": false
+      }
+    },
+    "editor-cancel-H1": {
+      "AGENTS.md": {
+        "sha256": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+        "executable": false
+      },
+      "README.md": {
+        "sha256": "ea91a999a902d647c8e81dd457dea5a713e82217ed8c888911ab6c64a67a7003",
+        "executable": false
+      },
+      "TASK.md": {
+        "sha256": "de9319edccffbf081a8d6f2e29ff96e5cf7bb3b8d86b8717b476ae0c13cb2efa",
+        "executable": false
+      },
+      "package.json": {
+        "sha256": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+        "executable": false
+      },
+      "src/drafts.mjs": {
+        "sha256": "a6004483712e4307795ae33ee6e0051c75b69405f4ee5a3052de16cc6422b5e6",
+        "executable": false
+      },
+      "src/editor.mjs": {
+        "sha256": "9d458dcc209f164fca1b7f3748358d62335ea68e7167ac08d4bfbea57c3396c7",
+        "executable": false
+      },
+      "test/editor.test.mjs": {
+        "sha256": "9eb3c89deb5e1dcb6305f911caf649d0822fbab7bb61f4a918db13c89972acce",
+        "executable": false
+      }
+    },
+    "editor-cancel-P": {
+      "AGENTS.md": {
+        "sha256": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+        "executable": false
+      },
+      "README.md": {
+        "sha256": "ea91a999a902d647c8e81dd457dea5a713e82217ed8c888911ab6c64a67a7003",
+        "executable": false
+      },
+      "TASK.md": {
+        "sha256": "de9319edccffbf081a8d6f2e29ff96e5cf7bb3b8d86b8717b476ae0c13cb2efa",
+        "executable": false
+      },
+      "package.json": {
+        "sha256": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+        "executable": false
+      },
+      "src/drafts.mjs": {
+        "sha256": "a6004483712e4307795ae33ee6e0051c75b69405f4ee5a3052de16cc6422b5e6",
+        "executable": false
+      },
+      "src/editor.mjs": {
+        "sha256": "9d458dcc209f164fca1b7f3748358d62335ea68e7167ac08d4bfbea57c3396c7",
+        "executable": false
+      },
+      "test/editor.test.mjs": {
+        "sha256": "9eb3c89deb5e1dcb6305f911caf649d0822fbab7bb61f4a918db13c89972acce",
+        "executable": false
+      }
+    },
+    "invite-single-use-H1": {
+      "AGENTS.md": {
+        "sha256": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+        "executable": false
+      },
+      "README.md": {
+        "sha256": "598321003648cc055674d1c36a7ca500cea3ff835bfd2cb2728fe459d2f24403",
+        "executable": false
+      },
+      "TASK.md": {
+        "sha256": "84dd934497c2e79fe109ff3dfedcb1d92e2906ab9fda77adc1bd39d85b44946a",
+        "executable": false
+      },
+      "package.json": {
+        "sha256": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+        "executable": false
+      },
+      "src/ledger.mjs": {
+        "sha256": "413e6cbb834f032d30c6f25e68e1c663bcfac6f23149cc5147c5bcdb6ae6621f",
+        "executable": false
+      },
+      "src/redeem.mjs": {
+        "sha256": "43f2e33efcee29d6d7ff2ded5fa2d66dc6cd191ba91dcb53cdd9a62a353a7e82",
+        "executable": false
+      },
+      "src/route.mjs": {
+        "sha256": "67756d5bec704d10d27340e3f40860c6bc3eb186de523d2b6e8b2a7017cb6339",
+        "executable": false
+      },
+      "test/invite.test.mjs": {
+        "sha256": "dec962b477750212d9711c85822f44ed64e177ff4a94584acf052f2f7127d8d2",
+        "executable": false
+      }
+    },
+    "invite-single-use-P": {
+      "AGENTS.md": {
+        "sha256": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+        "executable": false
+      },
+      "README.md": {
+        "sha256": "598321003648cc055674d1c36a7ca500cea3ff835bfd2cb2728fe459d2f24403",
+        "executable": false
+      },
+      "TASK.md": {
+        "sha256": "84dd934497c2e79fe109ff3dfedcb1d92e2906ab9fda77adc1bd39d85b44946a",
+        "executable": false
+      },
+      "package.json": {
+        "sha256": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+        "executable": false
+      },
+      "src/ledger.mjs": {
+        "sha256": "413e6cbb834f032d30c6f25e68e1c663bcfac6f23149cc5147c5bcdb6ae6621f",
+        "executable": false
+      },
+      "src/redeem.mjs": {
+        "sha256": "43f2e33efcee29d6d7ff2ded5fa2d66dc6cd191ba91dcb53cdd9a62a353a7e82",
+        "executable": false
+      },
+      "src/route.mjs": {
+        "sha256": "67756d5bec704d10d27340e3f40860c6bc3eb186de523d2b6e8b2a7017cb6339",
+        "executable": false
+      },
+      "test/invite.test.mjs": {
+        "sha256": "dec962b477750212d9711c85822f44ed64e177ff4a94584acf052f2f7127d8d2",
+        "executable": false
+      }
+    },
+    "invite-single-use-H0": {
+      "AGENTS.md": {
+        "sha256": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+        "executable": false
+      },
+      "README.md": {
+        "sha256": "598321003648cc055674d1c36a7ca500cea3ff835bfd2cb2728fe459d2f24403",
+        "executable": false
+      },
+      "TASK.md": {
+        "sha256": "84dd934497c2e79fe109ff3dfedcb1d92e2906ab9fda77adc1bd39d85b44946a",
+        "executable": false
+      },
+      "package.json": {
+        "sha256": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+        "executable": false
+      },
+      "src/ledger.mjs": {
+        "sha256": "413e6cbb834f032d30c6f25e68e1c663bcfac6f23149cc5147c5bcdb6ae6621f",
+        "executable": false
+      },
+      "src/redeem.mjs": {
+        "sha256": "43f2e33efcee29d6d7ff2ded5fa2d66dc6cd191ba91dcb53cdd9a62a353a7e82",
+        "executable": false
+      },
+      "src/route.mjs": {
+        "sha256": "67756d5bec704d10d27340e3f40860c6bc3eb186de523d2b6e8b2a7017cb6339",
+        "executable": false
+      },
+      "test/invite.test.mjs": {
+        "sha256": "dec962b477750212d9711c85822f44ed64e177ff4a94584acf052f2f7127d8d2",
+        "executable": false
+      }
+    }
+  },
+  "baseCommit": "1f554ee4fbc705b31bc0f6d4f96b0a92cd6026c7",
+  "schedule": [
+    {
+      "slot": 1,
+      "task": "queue-batch",
+      "arm": "P"
+    },
+    {
+      "slot": 2,
+      "task": "queue-batch",
+      "arm": "H0"
+    },
+    {
+      "slot": 3,
+      "task": "queue-batch",
+      "arm": "H1"
+    },
+    {
+      "slot": 4,
+      "task": "editor-cancel",
+      "arm": "H0"
+    },
+    {
+      "slot": 5,
+      "task": "editor-cancel",
+      "arm": "H1"
+    },
+    {
+      "slot": 6,
+      "task": "editor-cancel",
+      "arm": "P"
+    },
+    {
+      "slot": 7,
+      "task": "invite-single-use",
+      "arm": "H1"
+    },
+    {
+      "slot": 8,
+      "task": "invite-single-use",
+      "arm": "P"
+    },
+    {
+      "slot": 9,
+      "task": "invite-single-use",
+      "arm": "H0"
+    }
+  ],
+  "frozenAt": "2026-09-11T14:01:47Z",
+  "frozenFiles": 11127,
+  "soleMaterializedDifference": [
+    "native-task-workflow.mjs"
+  ],
+  "materializedHashes": {
+    "materialized/H1/native-task-plugin.mjs": "c60fa0ed7793937bac0820240f8a55c260a2ae2faa57c96e295840c6c32ff5e6",
+    "materialized/H1/review-context.mjs": "8775ae59ef3d3b5b432798f909f94869d43b7561b4b5f144f972e5bcce20e312",
+    "materialized/H1/native-review-context.mjs": "8775ae59ef3d3b5b432798f909f94869d43b7561b4b5f144f972e5bcce20e312",
+    "materialized/H1/native-task-workflow.mjs": "08c0352858d9de38056996efe5da165b15811e4ce05b65434ac52ee6f67854c0",
+    "materialized/H1/opencode.json": "b9074880921a1991d14c10e656e42ac56bf6e416a99b4d3c7b3a25a72f4883c2",
+    "materialized/H1/core.md": "9adcc862446ac6c0e5a407ec89e2f65fe4a249aedcc34ba36f143f3589edd4f7",
+    "materialized/H1/native-task-observations.mjs": "85889aa51b8257e649af44b98b356ff1f733628e6be560444b97ead1368bc3a6",
+    "materialized/H0/native-task-plugin.mjs": "c60fa0ed7793937bac0820240f8a55c260a2ae2faa57c96e295840c6c32ff5e6",
+    "materialized/H0/review-context.mjs": "8775ae59ef3d3b5b432798f909f94869d43b7561b4b5f144f972e5bcce20e312",
+    "materialized/H0/native-review-context.mjs": "8775ae59ef3d3b5b432798f909f94869d43b7561b4b5f144f972e5bcce20e312",
+    "materialized/H0/native-task-workflow.mjs": "7845c27e1015dc6a4479d5589c5081481d007c73d2dbe6c76ca7a2848ed211cc",
+    "materialized/H0/opencode.json": "b9074880921a1991d14c10e656e42ac56bf6e416a99b4d3c7b3a25a72f4883c2",
+    "materialized/H0/core.md": "9adcc862446ac6c0e5a407ec89e2f65fe4a249aedcc34ba36f143f3589edd4f7",
+    "materialized/H0/native-task-observations.mjs": "85889aa51b8257e649af44b98b356ff1f733628e6be560444b97ead1368bc3a6"
+  },
+  "taskHashes": {
+    "tasks/editor-cancel/grading.json": "870ef2d39f15e174ba051f1fc258ea9efc9eed5b9a7fc514bbddeff97cd8e5be",
+    "tasks/editor-cancel/controls.json": "73bbc77812c7f0101d6ae6e6602c624133a04b26558317b7a09ef419e82a8e0e",
+    "tasks/editor-cancel/initial/README.md": "ea91a999a902d647c8e81dd457dea5a713e82217ed8c888911ab6c64a67a7003",
+    "tasks/editor-cancel/initial/package.json": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+    "tasks/editor-cancel/initial/TASK.md": "de9319edccffbf081a8d6f2e29ff96e5cf7bb3b8d86b8717b476ae0c13cb2efa",
+    "tasks/editor-cancel/initial/AGENTS.md": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+    "tasks/editor-cancel/initial/test/editor.test.mjs": "9eb3c89deb5e1dcb6305f911caf649d0822fbab7bb61f4a918db13c89972acce",
+    "tasks/editor-cancel/initial/src/drafts.mjs": "a6004483712e4307795ae33ee6e0051c75b69405f4ee5a3052de16cc6422b5e6",
+    "tasks/editor-cancel/initial/src/editor.mjs": "9d458dcc209f164fca1b7f3748358d62335ea68e7167ac08d4bfbea57c3396c7",
+    "tasks/editor-cancel/acceptance/acceptance.test.mjs": "e8f34a9b703be5400688c7764fcc51ef1cb31f9003bcca03848485753b7aab01",
+    "tasks/editor-cancel/reference/README.md": "9a0cbde3ba228c3cbac3f272918b068832cd1fcc41e7038573260685111ee445",
+    "tasks/editor-cancel/reference/package.json": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+    "tasks/editor-cancel/reference/TASK.md": "de9319edccffbf081a8d6f2e29ff96e5cf7bb3b8d86b8717b476ae0c13cb2efa",
+    "tasks/editor-cancel/reference/AGENTS.md": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+    "tasks/editor-cancel/reference/test/editor.test.mjs": "1c65d5330c4d13ba6e79e0b91226a1a87fe459e7ce4bb65ad82da3119fe43736",
+    "tasks/editor-cancel/reference/test/new.test.mjs": "23c86106e831f734cdc197475fc16dc0184fc8dd6ffce1a74448c3001e237c59",
+    "tasks/editor-cancel/reference/src/drafts.mjs": "a6004483712e4307795ae33ee6e0051c75b69405f4ee5a3052de16cc6422b5e6",
+    "tasks/editor-cancel/reference/src/editor.mjs": "25a7a584a0f6c46457add7288aa1061de90bf098ed5d79e14c7dbc6c8aadc60c",
+    "tasks/queue-batch/grading.json": "01a9babc8982e087e4af479001713c8e2f434e2442aaee51060d6a3e71ea3012",
+    "tasks/queue-batch/controls.json": "9dd2975ddd410e600aa3fbe1508b08e2c5835c7ba0024415c973d1b3d9802d9b",
+    "tasks/queue-batch/initial/README.md": "6a2eef6a3cfadc02f78095220e294e7e652441452ee0d39cda3a529a125b3d9c",
+    "tasks/queue-batch/initial/package.json": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+    "tasks/queue-batch/initial/TASK.md": "d43fc1203b97b053d2e21a602502a1c169cad06c9ac364ec146c8ad806889fd3",
+    "tasks/queue-batch/initial/AGENTS.md": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+    "tasks/queue-batch/initial/test/worker.test.mjs": "2425598a855b2bf87bebcd0e07379cb4b28d7f589bcfa5dd7bcb99243e2eb70e",
+    "tasks/queue-batch/initial/src/worker.mjs": "6ed1e74cd6531111fb4636216d08f22aa8b18496c18599fec078df33f665d744",
+    "tasks/queue-batch/initial/src/queue.mjs": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa",
+    "tasks/queue-batch/acceptance/acceptance.test.mjs": "dff02d606fb64287a9a2ab2569fbdbbe9b45b2c06b08ce4e43ecb776c164aa41",
+    "tasks/queue-batch/reference/README.md": "a98756477a0b26958eadf3c4850deb1417040407a435ff3fca73d77dbad8a666",
+    "tasks/queue-batch/reference/package.json": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+    "tasks/queue-batch/reference/TASK.md": "d43fc1203b97b053d2e21a602502a1c169cad06c9ac364ec146c8ad806889fd3",
+    "tasks/queue-batch/reference/AGENTS.md": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+    "tasks/queue-batch/reference/test/worker.test.mjs": "9f66f5cb358e83fd48c2631c7693f9b422d9e32d08f815343399394b624356ea",
+    "tasks/queue-batch/reference/test/new.test.mjs": "710d84c859adc60e3fdf9db62ed747e269c3a156e1c01b0a33beb858cd5fe24b",
+    "tasks/queue-batch/reference/src/worker.mjs": "bc3350e37b4cd215d4f9d143e2bd8b1a369253392a6f55a7374b9ba418121207",
+    "tasks/queue-batch/reference/src/queue.mjs": "9c472648518dc957c1fe295daf0bce3578152fa60c0fa6a439af0bdbc8b89ffa",
+    "tasks/invite-single-use/grading.json": "e059059a4dfd3c5d3d013372bb050370a54bbe9ef03aaf0f6ce1dae7dceec208",
+    "tasks/invite-single-use/controls.json": "5e5f49fcf8b9f2237bdb1bb39a5e14ce5d1568d0f7b9b22dbc7afe03dfa31c73",
+    "tasks/invite-single-use/initial/README.md": "598321003648cc055674d1c36a7ca500cea3ff835bfd2cb2728fe459d2f24403",
+    "tasks/invite-single-use/initial/package.json": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+    "tasks/invite-single-use/initial/TASK.md": "84dd934497c2e79fe109ff3dfedcb1d92e2906ab9fda77adc1bd39d85b44946a",
+    "tasks/invite-single-use/initial/AGENTS.md": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+    "tasks/invite-single-use/initial/test/invite.test.mjs": "dec962b477750212d9711c85822f44ed64e177ff4a94584acf052f2f7127d8d2",
+    "tasks/invite-single-use/initial/src/route.mjs": "67756d5bec704d10d27340e3f40860c6bc3eb186de523d2b6e8b2a7017cb6339",
+    "tasks/invite-single-use/initial/src/ledger.mjs": "413e6cbb834f032d30c6f25e68e1c663bcfac6f23149cc5147c5bcdb6ae6621f",
+    "tasks/invite-single-use/initial/src/redeem.mjs": "43f2e33efcee29d6d7ff2ded5fa2d66dc6cd191ba91dcb53cdd9a62a353a7e82",
+    "tasks/invite-single-use/acceptance/acceptance.test.mjs": "38dc0a51d881130aba2dde21b4558a8274b6aa6facdb72a84631d54f7eda65b8",
+    "tasks/invite-single-use/reference/README.md": "9c8b24c2817837bfe2243fd5a4f78dfc32f9de2b8b015d062ba0d24136fd1639",
+    "tasks/invite-single-use/reference/package.json": "94c4514598a53843bcec0bf7c132e1e710f489121cb092371b72d850cb7bd8a9",
+    "tasks/invite-single-use/reference/TASK.md": "84dd934497c2e79fe109ff3dfedcb1d92e2906ab9fda77adc1bd39d85b44946a",
+    "tasks/invite-single-use/reference/AGENTS.md": "d883c33b856f57f220cc6120e8a9e2ff4d577612780dfc35c83538ef0cf43926",
+    "tasks/invite-single-use/reference/test/invite.test.mjs": "0a60596087a34617164fab57f3aacbeaf22552632b7a81d576ad5634489652b5",
+    "tasks/invite-single-use/reference/test/new.test.mjs": "015f2adfe65c01f1c5ef39fb9c14538c51a05be7b6b000c649fd2589f959c231",
+    "tasks/invite-single-use/reference/src/route.mjs": "67756d5bec704d10d27340e3f40860c6bc3eb186de523d2b6e8b2a7017cb6339",
+    "tasks/invite-single-use/reference/src/ledger.mjs": "413e6cbb834f032d30c6f25e68e1c663bcfac6f23149cc5147c5bcdb6ae6621f",
+    "tasks/invite-single-use/reference/src/redeem.mjs": "2909cd3fa1a15f0d7990ce76244e10baa6512dee0e39f103ba953a3fb1d4b165"
+  },
+  "instructionDiffSha256": "d948591da37130335a326b6c7beefe082b0f956700f7bd8466a9f77ae2555450",
+  "scriptedPreflights": {
+    "H0": {
+      "status": "passed",
+      "requests": 8,
+      "realProviderCalls": 0,
+      "elapsedMs": 3292
+    },
+    "H1": {
+      "status": "passed",
+      "requests": 8,
+      "realProviderCalls": 0,
+      "elapsedMs": 3576
+    }
+  },
+  "realProviderCallsBeforeSeries": 0
+}

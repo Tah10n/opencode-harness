@@ -1,0 +1,153 @@
+{
+  "patchReapplication": [
+    {
+      "task": "protocol-error-api",
+      "arm": "A",
+      "finalCleanReapplyEqualsGradedBytesAndModes": true,
+      "phases": {
+        "final": {
+          "applies": true,
+          "whitespaceClean": true,
+          "patchSha256": "c91fc661a9755b67640c8c423cd5ae6b54827197448c52649abe04a637c71b9b"
+        }
+      }
+    },
+    {
+      "task": "protocol-error-api",
+      "arm": "D",
+      "finalCleanReapplyEqualsGradedBytesAndModes": true,
+      "phases": {
+        "final": {
+          "applies": true,
+          "whitespaceClean": true,
+          "patchSha256": "b02e25d620e4b5f9678bfd459f4c4a5d5a03f8fa1ee184befd1cc77a25e586d9"
+        }
+      }
+    },
+    {
+      "task": "legacy-runtime-reload",
+      "arm": "D",
+      "finalCleanReapplyEqualsGradedBytesAndModes": true,
+      "phases": {
+        "final": {
+          "applies": true,
+          "whitespaceClean": true,
+          "patchSha256": "89c7c137cb1e27ed175c10af24d89492b891eda2a07463cfa839a72d01f08748"
+        },
+        "D0": {
+          "applies": true,
+          "whitespaceClean": true,
+          "patchSha256": "086448be038faa82b839d25e71a51b1b91de5705960767f0aabaea5bed46a9be"
+        }
+      }
+    },
+    {
+      "task": "legacy-runtime-reload",
+      "arm": "A",
+      "finalCleanReapplyEqualsGradedBytesAndModes": true,
+      "phases": {
+        "final": {
+          "applies": true,
+          "whitespaceClean": true,
+          "patchSha256": "627b6a3bf0950cae60ac4f34ee75e4f0f18f1e37de4bdd48569f5871427c57c2"
+        }
+      }
+    },
+    {
+      "task": "reconnect-revoked",
+      "arm": "D",
+      "finalCleanReapplyEqualsGradedBytesAndModes": true,
+      "phases": {
+        "final": {
+          "applies": true,
+          "whitespaceClean": true,
+          "patchSha256": "5578826a04112f1c92d826d171bd365f6c09d99f40f14f4a1140a62d09a5e01e"
+        },
+        "D0": {
+          "applies": true,
+          "whitespaceClean": true,
+          "patchSha256": "bc59c31f78694fa37a0f6123254715f6ea5f6e5ed25728e9060f41ea68208532"
+        }
+      }
+    },
+    {
+      "task": "reconnect-revoked",
+      "arm": "A",
+      "finalCleanReapplyEqualsGradedBytesAndModes": true,
+      "phases": {
+        "final": {
+          "applies": true,
+          "whitespaceClean": true,
+          "patchSha256": "2c4821ffe43a73a2cc0c22e20ae81c2ee5705411c8c81f571989fdde4853efb6"
+        }
+      }
+    },
+    {
+      "task": "request-module-extraction",
+      "arm": "A",
+      "finalCleanReapplyEqualsGradedBytesAndModes": true,
+      "phases": {
+        "final": {
+          "applies": true,
+          "whitespaceClean": true,
+          "patchSha256": "77149c7182914f5e0a9998bb033a036a43761af3b3ef4cfe10255b1250bb47e6"
+        }
+      }
+    },
+    {
+      "task": "request-module-extraction",
+      "arm": "D",
+      "finalCleanReapplyEqualsGradedBytesAndModes": true,
+      "phases": {
+        "final": {
+          "applies": true,
+          "whitespaceClean": true,
+          "patchSha256": "620b77755fa6f3dc96726657953fd3ad63f23588ec4655a91e899d58800dc63d"
+        },
+        "D0": {
+          "applies": true,
+          "whitespaceClean": true,
+          "patchSha256": "ababf3f5ace494811273d69acd1b6b6b2fbf57c72a85e5d141c469edc8d584a2"
+        }
+      }
+    }
+  ],
+  "originalCheckouts": [
+    {
+      "task": "protocol-error-api",
+      "originalCheckoutPreserved": true,
+      "changedPaths": []
+    },
+    {
+      "task": "legacy-runtime-reload",
+      "originalCheckoutPreserved": true,
+      "changedPaths": []
+    },
+    {
+      "task": "reconnect-revoked",
+      "originalCheckoutPreserved": true,
+      "changedPaths": []
+    },
+    {
+      "task": "request-module-extraction",
+      "originalCheckoutPreserved": true,
+      "changedPaths": []
+    }
+  ],
+  "freeze": {
+    "frozenFileCount": 9099,
+    "allFrozenFilesUnchanged": true,
+    "mismatchCount": 0,
+    "runtimeHashesMatch": {
+      "native-task-plugin.mjs": true,
+      "native-task-workflow.mjs": true,
+      "native-task-observations.mjs": true,
+      "native-review-context.mjs": true
+    },
+    "candidateCommit": "3b877f69782619f0ce6097d894bf0158cb365355",
+    "head": "3b877f69782619f0ce6097d894bf0158cb365355"
+  },
+  "allModelRunTerminationVerified": true,
+  "allModelRunCleanupVerified": true,
+  "allGraderCleanupVerified": true
+}

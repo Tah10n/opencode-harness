@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/lines.mjs": "export class LineDecoder{\n constructor(){this.characters=[];this.closed=false;}\n push(chunk){\n  if(this.closed)throw Object.assign(new Error('closed'),{code:'LINE_DECODER_CLOSED'});\n  const result=[];\n  for(const char of chunk){if(char==='\\n'){if(this.characters.at(-1)==='\\r')this.characters.pop();result.push(this.characters.join(''));this.characters=[];}else this.characters.push(char);}\n  return result;\n }\n finish(){if(this.closed)return [];this.closed=true;const final=this.characters.join('');this.characters=[];return final===''?[]:[final];}\n}\nexport function splitLines(text){const parser=new LineDecoder();const lines=parser.push(text);return lines.concat(parser.finish());}\n"
+  },
+  "mutants": [
+    {
+      "name": "keeps-crlf-cr",
+      "file": "src/lines.mjs",
+      "replacement": "export class LineDecoder{\n #pending='';#closed=false;\n push(chunk){\n  if(this.#closed)throw Object.assign(new Error('closed'),{code:'LINE_DECODER_CLOSED'});\n  const parts=(this.#pending+chunk).split('\\n');this.#pending=parts.pop();\n  return parts;\n }\n finish(){if(this.#closed)return [];this.#closed=true;const result=this.#pending===''?[]:[this.#pending];this.#pending='';return result;}\n}\nexport function splitLines(text){const decoder=new LineDecoder();return [...decoder.push(text),...decoder.finish()];}\n"
+    },
+    {
+      "name": "drops-unterminated-final",
+      "file": "src/lines.mjs",
+      "replacement": "export class LineDecoder{\n #pending='';#closed=false;\n push(chunk){\n  if(this.#closed)throw Object.assign(new Error('closed'),{code:'LINE_DECODER_CLOSED'});\n  const parts=(this.#pending+chunk).split('\\n');this.#pending=parts.pop();\n  return parts.map(line=>line.endsWith('\\r')?line.slice(0,-1):line);\n }\n finish(){if(this.#closed)return [];this.#closed=true;const result=[];this.#pending='';return result;}\n}\nexport function splitLines(text){const decoder=new LineDecoder();return [...decoder.push(text),...decoder.finish()];}\n"
+    }
+  ]
+}

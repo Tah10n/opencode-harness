@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "admitted": true,
+  "frozenAt": "2026-09-23T11:03:38.860Z",
+  "runtime": "f98a96121e5c4d340f3c674920c57e1cb80258e5",
+  "baseline": "2b16b6a8ad75b6b852adc5e2189e6d4a8d93eabd",
+  "baselineTreeSha256": "3a96572c9efc2f90a38c8f296bb0760436ca041034c82a9c466b1f276676acbc",
+  "baselineArchiveSha256": "ea549fcc30d8facef77af8ebebc280910a24537e44ad8c6cfcbdc4888b5dcab1",
+  "taskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+  "environmentSha256": "aa0afe37ca2ec1f3564642a02842d71472b72b88225069be22a4cbbe8fb114cc",
+  "bundles": {
+    "author": {
+      "sha256": "81629492578a24379215e158bd8484dcd8a32b92911611856ecb9eb9ec5d53be"
+    },
+    "reviewer": {
+      "sha256": "c36a91a041ad38248be2b2b33a554ed628678c6d167e86af405418d34ecdce0e"
+    }
+  },
+  "configHashes": {
+    "author": "53ca7e00ad4c5f97c8c43dc11aaf5db3388bfc97f2052bca03688771d27a7027",
+    "reviewer": "1ead346ddd84a5123dbe6a02771469dd4763e893eba4c1ad4e1ee74c5841fb3a"
+  },
+  "image": "sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6",
+  "opencode": "1.18.26",
+  "node": "24.19.0",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "high",
+  "route": "https://chatgpt.com/backend-api/codex/responses",
+  "stages": [
+    {
+      "stage": "A",
+      "command": "/harness-task direct",
+      "maxMs": 1800000
+    },
+    {
+      "stage": "R",
+      "command": "/harness-review",
+      "maxMs": 600000,
+      "tools": [
+        "glob",
+        "grep",
+        "read"
+      ]
+    },
+    {
+      "stage": "F",
+      "command": "/harness-task direct",
+      "maxMs": "remaining shared budget"
+    }
+  ],
+  "sharedBudgetMs": 3600000,
+  "deadlineOrigin": "first real native launch, never reset",
+  "optionalAugmentations": false,
+  "recordingProfile": "research-full-v1",
+  "realRoot": "local/ledger-review-delivery/real",
+  "stopRules": [
+    "unknown_submission",
+    "auth/quota",
+    "fatal denial",
+    "cancellation",
+    "evidence_incomplete",
+    "unverified termination",
+    "shared deadline",
+    "any operation admission pause"
+  ],
+  "maxAuthorRuns": 2,
+  "maxReviews": 1,
+  "retries": 0,
+  "availabilityProbes": 0,
+  "realSmokes": 0,
+  "acceptance": "ACCEPTANCE.md",
+  "files": {
+    "development/ledger-review-delivery/run.mjs": "776445b5f6ef0bdab1469d1a9801713c3d3591cf2ccf9344c11707914d1d9838",
+    "development/ledger-review-delivery/chain.mjs": "bf48691d2f18ff0c8134a2e446002acbad8b00848ba1a4a92afe164aee891dbf",
+    "development/ledger-review-delivery/operation.mjs": "96898b782744663f78ede16e16edfeb0bcfdb5910730c36b68aaf0a94b2f4371",
+    "development/native-task-ab/run-comparison.mjs": "670b13231c7e784cd8e67de438a847ee8f7048506f3d84825bdcbd5384fc6ae0",
+    "development/native-task-ab/native-run.mjs": "2919b1ad069edd60f2922dfd04d485aad52a0c486d1042697ffcf3b77344eaca",
+    "development/native-task-abc/native-run.mjs": "5d691871022fcf4f2117212c33b463849e791d7ebe120adc68e7ca419ee0d293",
+    "development/native-task-ab/provider-recording.mjs": "8f70d5d5ac2e35776dfcaf1950c7a10b943a26417cd015c57657f3d94f873bad",
+    "development/native-output-retention/output-files.mjs": "bcc90984aa4e3ddc4048fc674f7762c245d5c0fb25ad8d053aae17a598ce0477",
+    "development/native-task-investigation/availability-probe.mjs": "d4f823f55a49e422afe72e92ffbfea7729b00c4ebe940ef4b75d859dacc8b594",
+    "development/ledger-review-delivery/patch-integrity.mjs": "629a3ebc3159ae8eef0517b9289571f124312a11b362b323a0f1bf5e8fd41173",
+    "development/native-task-integrated/run.mjs": "3bcc007b7f821c2efc1748dd357375606f076604fe142a05467b85942bc74b76",
+    "development/native-task-integrated/container-session.mjs": "86e03ae938d46c3ec9156bcf73aca057c8b028775e0903ba1e446ea2905a4905",
+    "development/native-task-utility/container/stop-workload.mjs": "b21c23f5a334dc54af340e2773e3e56427aa27a946231769d36df249ea54a69e",
+    "development/native-task-ab/capture-candidate.mjs": "d388246826eb92dd408b853c4fe8fc929c259a9d03b89d169b75b2143544c669",
+    "development/native-task-integrated/native-run.mjs": "ac842a7ee1ebb743e0c038000b7f8e769a45578b98cef40d74a59b5c2e0e9bf0",
+    "development/polybench-pilot/capture.mjs": "8ce3f0344bf45f8e25ef0317c914c21a566db717357e2d490803bc4dc2e3c7bc",
+    "development/direct-assertion-review/model-pair/run.mjs": "588dc8749ae83a9ab38c40fc32ef26b6f11c80f4140019da43e0932379fbbcb0",
+    "development/ledger-review-delivery/supplemental.mjs": "fef6e323d6195e806ccff14ef900b4dd19a662d82d9ecab9f6e41c111216d831",
+    "development/ledger-review-delivery/evaluate.py": "1910502594072dc850617233b36456f3a30bf1a4b043a68592d570b79529ff82",
+    "development/ledger-review-delivery/ACCEPTANCE.md": "6cd163a1ee3d8ce9de7abaa658215e6bb664d68d435361abb4f04eb6c08f6b1b",
+    "development/ledger-review-delivery/preflight-tree-verified.json": "c5b5e2df7518d233a2edfef733bafff51c47c9024716989bf092588c16494c47",
+    "development/plain-ledger-native-high/original-task.txt": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+    "development/plain-ledger-native-high/environment.txt": "aa0afe37ca2ec1f3564642a02842d71472b72b88225069be22a4cbbe8fb114cc",
+    "development/plain-ledger-native-high/account-switch-ledger.test.mjs": "cac8e70672237ed629aea9198adf924751943f3b8b20d114c3b76c97c6d9002c",
+    "development/plain-ledger-native-high/ledger-lifecycle.test.mjs": "0f049d12080a488c159b26716f43275b0d66751102d71521dcf77fbe88411ceb",
+    "development/plain-ledger-native-high/legacy-input.test.mjs": "d0cdb9449b719b2bc16874b3e81777c380ddb40b6e5bd597e45a8c286ac5f324",
+    "development/plain-ledger-native-high/kimi-migration.test.mjs": "d48fdbd2e9593ce2575c6dcc8e8421af5f6da1c089463b25218a56b5a6335ca6",
+    "development/plain-ledger-native-high/migration-contract.test.mjs": "d0f21acc82bfedf7e4ea72469f25259baed3b3fbb633dc87b2fa90093483febc",
+    "development/plain-ledger-native-high/cli-persistence.test.mjs": "69d64508aedea998897ef9b539486cf6fae887d0269f999c0ff667c95b31a9d1",
+    "development/ledger-review-delivery/preflight-capture-verification.json": "2db0f1523dfbbde5eeb3477d7a6aab6de0a702ce99314d76ec2d4b1918a05596",
+    "development/ledger-review-delivery/handoff-template.txt": "07556dbc091bb14a5146f4e9f34b25d37f4bb26969d6f92d3df14a1082d35609"
+  }
+}

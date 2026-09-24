@@ -1,0 +1,149 @@
+{
+  "oldRawIdsPresent": true,
+  "oldStateSha256": "239d717028f9efc7d1fcfbe2d3eee38217642d6925466480c2179fe144e6d5b1",
+  "receipts": [
+    {
+      "acceptedEntries": 2,
+      "acceptedSequence": "1",
+      "label": "unchanged final",
+      "rawIdsAbsent": false,
+      "requestPath": "/api/usage",
+      "rows": [
+        [
+          "2026-09-21",
+          "15",
+          "10",
+          "5",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2026-09-22",
+          "11",
+          "7",
+          "4",
+          "0",
+          "0",
+          "0"
+        ]
+      ],
+      "stateBytes": 3029,
+      "stateJsonValid": true,
+      "stateSha256": "239d717028f9efc7d1fcfbe2d3eee38217642d6925466480c2179fe144e6d5b1"
+    },
+    {
+      "acceptedEntries": 2,
+      "acceptedSequence": "2",
+      "label": "fixed after source deletion",
+      "rawIdsAbsent": true,
+      "requestPath": "/api/usage",
+      "rows": [
+        [
+          "2026-09-21",
+          "15",
+          "10",
+          "5",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2026-09-22",
+          "11",
+          "7",
+          "4",
+          "0",
+          "0",
+          "0"
+        ]
+      ],
+      "stateBytes": 1655,
+      "stateJsonValid": true,
+      "stateSha256": "5e84737a458c22bb44970daf72cfa3c0af7f85db4f4a7e2134d975160018e997"
+    },
+    {
+      "acceptedEntries": 3,
+      "acceptedSequence": "3",
+      "label": "fixed old plus new",
+      "rawIdsAbsent": true,
+      "requestPath": "/api/usage",
+      "rows": [
+        [
+          "2026-09-21",
+          "15",
+          "10",
+          "5",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2026-09-22",
+          "11",
+          "7",
+          "4",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2026-09-23",
+          "5",
+          "3",
+          "2",
+          "0",
+          "0",
+          "0"
+        ]
+      ],
+      "stateBytes": 4293,
+      "stateJsonValid": true,
+      "stateSha256": "fea237b107870e290cd5d088079bb1eca9e1a4b69ea90f678bd75070994dab4a"
+    },
+    {
+      "acceptedEntries": 3,
+      "acceptedSequence": "4",
+      "label": "fixed reload",
+      "rawIdsAbsent": true,
+      "requestPath": "/api/usage",
+      "rows": [
+        [
+          "2026-09-21",
+          "15",
+          "10",
+          "5",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2026-09-22",
+          "11",
+          "7",
+          "4",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "2026-09-23",
+          "5",
+          "3",
+          "2",
+          "0",
+          "0",
+          "0"
+        ]
+      ],
+      "stateBytes": 4293,
+      "stateJsonValid": true,
+      "stateSha256": "8d49626a5301c9c33445bf3faa4e81ec4a00386b1609286fc78e4f105dc65c1b"
+    }
+  ],
+  "syntheticProviderIds": [
+    "calibration-legacy-alpha",
+    "b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7",
+    "calibration-new-gamma"
+  ]
+}

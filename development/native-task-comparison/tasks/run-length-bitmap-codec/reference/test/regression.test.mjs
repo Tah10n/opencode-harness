@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {encode,decode} from '../src/bitmap.mjs';test('runs cross row boundary and empty area',()=>{const bits=[0,1,1,1,1,0],p=encode(3,2,bits);assert.deepEqual(p,{width:3,height:2,start:0,runs:[1,4,1]});assert.deepEqual(decode(p),bits);assert.deepEqual(encode(0,3,[]),{width:0,height:3,start:null,runs:[]});});test('invalid runs and coverage',()=>{assert.throws(()=>decode({width:2,height:1,start:0,runs:[0,2]}),TypeError);assert.throws(()=>decode({width:2,height:1,start:0,runs:[1]}),RangeError);});

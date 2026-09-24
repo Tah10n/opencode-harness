@@ -1,0 +1,15 @@
+diff --git a/draft.txt b/draft.txt
+index c922fa2103a28e319d3d27b01a2c4035be826857..f96cd797b8a2b9a3061840b11c4bdce185825f93 100644
+--- a/draft.txt
++++ b/draft.txt
+@@ -1 +1,2 @@
+-initial user draft
++staged user draft
++unstaged addition
+diff --git a/notes.txt b/notes.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..8bb6f12bb436d9cdaf5d435b0a17206aabba1673
+--- /dev/null
++++ b/notes.txt
+@@ -0,0 +1 @@
++untracked user note

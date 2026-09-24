@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/image.mjs": "import {parseCandidates} from './srcset.mjs';export function selectImage(text,cssWidth,dpr,fallback){const cs=parseCandidates(text);if(!cs.length)return fallback;const target=cs[0].kind==='w'?cssWidth*dpr:dpr;let large=cs[0],best;for(const c of cs){if(c.value>large.value)large=c;if(c.value>=target&&(!best||c.value<best.value))best=c;}return (best??large).url;}\n"
+  },
+  "mutants": [
+    {
+      "name": "density-scaled-by-css-width",
+      "file": "src/image.mjs",
+      "replacement": "import {parseCandidates} from './srcset.mjs';export function selectImage(text,cssWidth,dpr,fallback){const candidates=parseCandidates(text);if(!candidates.length)return fallback;const target=cssWidth*dpr;const sorted=[...candidates].sort((a,b)=>a.value-b.value);return (sorted.find(c=>c.value>=target)??sorted.at(-1)).url;}\n"
+    },
+    {
+      "name": "duplicate-descriptors-accepted",
+      "file": "src/srcset.mjs",
+      "replacement": "export function parseCandidates(text){if(!text.trim())return [];const out=[],seen=new Set();let kind;for(const item of text.split(',')){const m=/^\\s*(\\S+) +([0-9]+(?:\\.[0-9]+)?)([wx])\\s*$/.exec(item);if(!m||/[^\\x00-\\x7f]/.test(m[1])||/^data:/i.test(m[1]))throw new TypeError('candidate syntax');const value=Number(m[2]);if(value<=0||(m[3]==='w'&&!Number.isInteger(value))||(kind&&kind!==m[3]))throw new TypeError('descriptor');kind=m[3];seen.add(value);out.push({url:m[1],value,kind});}return out;}\n"
+    }
+  ]
+}

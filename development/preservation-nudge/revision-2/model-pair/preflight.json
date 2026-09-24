@@ -1,0 +1,205 @@
+{
+  "passed": true,
+  "realProviderRequests": 0,
+  "checks": [
+    {
+      "arm": "OFF",
+      "nativeCompleted": true,
+      "stopVerified": true,
+      "requests": 8,
+      "terminalResponses": 8,
+      "usage": {
+        "input": 8,
+        "output": 8
+      },
+      "noWebfetch": true,
+      "parentAndAuthorInventories": true,
+      "rawEventsUnchanged": true,
+      "patchApplies": true,
+      "patchSha256": "f115c00cc4fcf3e3241dd34505357a1a3f1aec4ceaa6cdef39323581a8087611",
+      "checks": [
+        {
+          "command": "node -e 'for(let i=0;i<5000;i++)console.log((i===0?\"BEGIN\":i===2500?\"HIDDEN_MIDDLE\":i===4999?\"END\":\"LINE\")+\":\"+i+\":\"+\"x\".repeat(60))'",
+          "exit": 0,
+          "durationMs": 4214
+        },
+        {
+          "command": "node --version && npm --version && node -e 'if(!require(\"fs\").existsSync(\"node_modules/mocha\"))throw Error(\"Missing project dependencies\");console.log(\"PREPARED_WORKTREE_OK\")'",
+          "exit": 0,
+          "durationMs": 4854
+        },
+        {
+          "command": "npm run build",
+          "exit": 0,
+          "durationMs": 14303
+        }
+      ],
+      "advisoryState": null
+    },
+    {
+      "arm": "ON",
+      "nativeCompleted": true,
+      "stopVerified": true,
+      "requests": 8,
+      "terminalResponses": 8,
+      "usage": {
+        "input": 8,
+        "output": 8
+      },
+      "noWebfetch": true,
+      "parentAndAuthorInventories": true,
+      "rawEventsUnchanged": true,
+      "patchApplies": true,
+      "patchSha256": "f115c00cc4fcf3e3241dd34505357a1a3f1aec4ceaa6cdef39323581a8087611",
+      "checks": [
+        {
+          "command": "node -e 'for(let i=0;i<5000;i++)console.log((i===0?\"BEGIN\":i===2500?\"HIDDEN_MIDDLE\":i===4999?\"END\":\"LINE\")+\":\"+i+\":\"+\"x\".repeat(60))'",
+          "exit": 0,
+          "durationMs": 4390
+        },
+        {
+          "command": "node --version && npm --version && node -e 'if(!require(\"fs\").existsSync(\"node_modules/mocha\"))throw Error(\"Missing project dependencies\");console.log(\"PREPARED_WORKTREE_OK\")'",
+          "exit": 0,
+          "durationMs": 5009
+        },
+        {
+          "command": "npm run build",
+          "exit": 0,
+          "durationMs": 15524
+        }
+      ],
+      "advisoryState": {
+        "version": 2,
+        "additionalReads": 4,
+        "eligibleEvents": 0,
+        "status": "skipped/unknown",
+        "baselineSnapshot": "37036cd477a74d6f8b33435247e83e3e8c117b17d479bffb5bb7ae0189260eae",
+        "considered": 3,
+        "reasons": {
+          "no_production_change": 3
+        },
+        "attachedBlocks": 0,
+        "addedBytes": 0,
+        "classificationMs": 0.6199569999989762,
+        "reason": "no_production_change"
+      }
+    }
+  ],
+  "advisory": {
+    "revision": 2,
+    "installed": "1.18.26",
+    "network": "none; loopback scripted provider",
+    "realProviderCalls": 0,
+    "scriptedAuthor": true,
+    "results": [
+      {
+        "mode": "parcel",
+        "baselineCaseModified": true,
+        "installed": {
+          "native-task-plugin.mjs": "b36b42d827454ee8121eb08c075699107259b33836b8285374b5bef02ee57740",
+          "native-task-observations.mjs": "31c5338a74cb958fe2a0532dbc81a8822084aadb8068aca44405c6bc92a42eae",
+          "native-preservation-nudge.mjs": "77d37df386654e567ae39f9c04fcbaef00eeec4f275193cc78f5e2217cbbdaa6"
+        },
+        "requests": 14,
+        "requestEvidence": [
+          {
+            "kind": "feature-receipt",
+            "request": 8,
+            "sha256": "3cb581c172d1378bb536568e728e430eb5c07b5b5ebbf9db573e00e993973431",
+            "advisoryInLastTool": true,
+            "advisorySha256": "c8f72ea1611a9569598992ab75d3bd816e11b255e1fb5c3f62e9be435b2ec941",
+            "advisoryBytes": 624
+          },
+          {
+            "kind": "existing-check-receipt",
+            "request": 9,
+            "sha256": "672918ea077cd69c0733d87ab1cf9a35cd6e11927d6642a6c4d358d38b7d4c99",
+            "failureInLastTool": true
+          }
+        ],
+        "received": true,
+        "receivedFailure": true,
+        "status": "checks_passed",
+        "checks": [
+          {
+            "command": "node -e 'for(let i=0;i<5000;i++)console.log((i===0?\"BEGIN\":i===2500?\"HIDDEN_MIDDLE\":i===4999?\"END\":\"LINE\")+\":\"+i+\":\"+\"x\".repeat(60))'",
+            "exit": 0,
+            "durationMs": 196
+          },
+          {
+            "command": "node --test spec/extension.test.mjs",
+            "exit": 0,
+            "durationMs": 107
+          },
+          {
+            "command": "node --test spec/old.test.js",
+            "exit": 1,
+            "durationMs": 106
+          },
+          {
+            "command": "node --test spec/extension.test.mjs",
+            "exit": 0,
+            "durationMs": 102
+          },
+          {
+            "command": "node --test spec/old.test.js",
+            "exit": 0,
+            "durationMs": 102
+          },
+          {
+            "command": "npm test",
+            "exit": 0,
+            "durationMs": 311
+          }
+        ],
+        "advisory": {
+          "version": 2,
+          "additionalReads": 2,
+          "eligibleEvents": 1,
+          "status": "attached_to_receipt",
+          "baselineSnapshot": "1290fc27daf975e15537ed1bcf30eb6f3fca2d19bbbace1bbabfca1c13dcd820",
+          "considered": 6,
+          "reasons": {
+            "no_production_change": 1,
+            "already_attached": 4
+          },
+          "attachedBlocks": 1,
+          "addedBytes": 624,
+          "classificationMs": 0.9571250000008149,
+          "reason": "already_attached",
+          "candidate": {
+            "callID": "fixture-7",
+            "baselineSnapshot": "1290fc27daf975e15537ed1bcf30eb6f3fca2d19bbbace1bbabfca1c13dcd820",
+            "snapshot": "22813675d82f7c5a64c6ab0ab024fcc34f914c4ae8bce203bbae5d6e4dcb1090",
+            "scope": "spec/extension.test.mjs: public arithmetic",
+            "observedCount": 1,
+            "selection": {
+              "runner": "node",
+              "file": "spec/extension.test.mjs"
+            }
+          }
+        },
+        "portable": {
+          "exit": 0,
+          "durationMs": 163,
+          "patchSha256": "ab3ac7e2837d18fc73c04944280491f96f022163b64c9236841929c5d5015400",
+          "bytesAndModes": true
+        },
+        "originalCheckoutAndIndexUnchanged": true
+      }
+    ],
+    "retention": {
+      "evidenceComplete": true,
+      "files": [
+        {
+          "size": 353899,
+          "sha256": "20f0acd6e38c39f3a94b84afdd9a19b2621aa2b7b585a15340051f9d8674dfb1",
+          "archiveComplete": true,
+          "linkStatus": "linked"
+        }
+      ],
+      "hiddenTailInRequests": false
+    }
+  },
+  "scriptedRequests": 30
+}

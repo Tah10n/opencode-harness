@@ -1,0 +1,159 @@
+diff --git a/README.md b/README.md
+index e45aa10..90bb2ef 100644
+--- a/README.md
++++ b/README.md
+@@ -72,6 +72,24 @@ EE.on('another-event', emitted, context);
+ EE.removeListener('another-event', emitted, context);
+ ```
+ 
++### Subscriptions
++
++`EventEmitter.subscribe` adds a persistent listener like `on`, including its
++event arguments and optional context, and returns an `unsubscribe` function for
++that specific registration:
++
++```js
++var unsubscribe = EE.subscribe('another-event', emitted, context);
++
++unsubscribe();
++unsubscribe(); // Cancellation is safe to repeat.
++```
++
++Unlike `off` and `removeListener`, which remove every matching listener,
++`unsubscribe` only removes the registration that created it. It remains safe to
++call after `off`, `removeListener`, or `removeAllListeners`, including when the
++same function is registered again later.
++
+ ### Tests and benchmarks
+ 
+ To run tests run `npm test`. To run the benchmarks run `npm run benchmark`.
+diff --git a/index.d.ts b/index.d.ts
+index fab37fd..ca9555d 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -57,6 +57,16 @@ declare class EventEmitter<
+     context?: Context
+   ): this;
+ 
++  /**
++   * Add a persistent listener and return a function that removes this exact
++   * registration.
++   */
++  subscribe<T extends EventEmitter.EventNames<EventTypes>>(
++    event: T,
++    fn: EventEmitter.EventListener<EventTypes, T>,
++    context?: Context
++  ): EventEmitter.Unsubscribe;
++
+   /**
+    * Remove the listeners of a given event.
+    */
+@@ -84,6 +94,10 @@ declare namespace EventEmitter {
+     (...args: Args): void;
+   }
+ 
++  export interface Unsubscribe {
++    (): void;
++  }
++
+   export interface EventEmitterStatic {
+     new <
+       EventTypes extends ValidEventTypes = string | symbol,
+diff --git a/index.js b/index.js
+index 6ea485c..9ccb694 100644
+--- a/index.js
++++ b/index.js
+@@ -56,6 +56,11 @@ function EE(fn, context, once) {
+  * @private
+  */
+ function addListener(emitter, event, fn, context, once) {
++  addListenerEntry(emitter, event, fn, context, once);
++  return emitter;
++}
++
++function addListenerEntry(emitter, event, fn, context, once) {
+   if (typeof fn !== 'function') {
+     throw new TypeError('The listener must be a function');
+   }
+@@ -67,7 +72,7 @@ function addListener(emitter, event, fn, context, once) {
+   else if (!emitter._events[evt].fn) emitter._events[evt].push(listener);
+   else emitter._events[evt] = [emitter._events[evt], listener];
+ 
+-  return emitter;
++  return listener;
+ }
+ 
+ /**
+@@ -82,6 +87,26 @@ function clearEvent(emitter, evt) {
+   else delete emitter._events[evt];
+ }
+ 
++function removeListenerEntry(emitter, event, listener) {
++  var evt = prefix ? prefix + event : event
++    , listeners = emitter._events[evt];
++
++  if (!listeners) return;
++  if (listeners === listener) {
++    clearEvent(emitter, evt);
++    return;
++  }
++
++  if (listeners.fn) return;
++
++  for (var i = 0, events = [], length = listeners.length; i < length; i++) {
++    if (listeners[i] !== listener) events.push(listeners[i]);
++  }
++
++  if (events.length) emitter._events[evt] = events.length === 1 ? events[0] : events;
++  else clearEvent(emitter, evt);
++}
++
+ /**
+  * Minimal `EventEmitter` interface that is molded against the Node.js
+  * `EventEmitter` interface.
+@@ -241,6 +266,25 @@ EventEmitter.prototype.once = function once(event, fn, context) {
+   return addListener(this, event, fn, context, true);
+ };
+ 
++/**
++ * Add a persistent listener and return a function that removes this exact
++ * registration.
++ *
++ * @param {(String|Symbol)} event The event name.
++ * @param {Function} fn The listener function.
++ * @param {*} [context=this] The context to invoke the listener with.
++ * @returns {Function} A function that removes this registration.
++ * @public
++ */
++EventEmitter.prototype.subscribe = function subscribe(event, fn, context) {
++  var emitter = this
++    , listener = addListenerEntry(emitter, event, fn, context, false);
++
++  return function unsubscribe() {
++    removeListenerEntry(emitter, event, listener);
++  };
++};
++
+ /**
+  * Remove the listeners of a given event.
+  *
+diff --git a/test/test.mjs b/test/test.mjs
+index 7b50c82..c501579 100644
+--- a/test/test.mjs
++++ b/test/test.mjs
+@@ -7,3 +7,15 @@ it('exports `EventEmitter` as default export', () => {
+ it('exports `EventEmitter` as a named export', () => {
+   new EventEmitter();
+ })
++
++it('exposes subscribe to ESM consumers', () => {
++  const emitter = new EventEmitter();
++  let calls = 0;
++  const unsubscribe = emitter.subscribe('event', () => calls++);
++
++  emitter.emit('event');
++  unsubscribe();
++  emitter.emit('event');
++
++  if (calls !== 1) throw new Error('subscribe should be available to ESM consumers');
++})

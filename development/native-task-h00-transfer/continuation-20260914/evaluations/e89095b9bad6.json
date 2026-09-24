@@ -1,0 +1,113 @@
+{
+  "id": "e89095b9bad6",
+  "task": "fastq-running-tasks",
+  "project": "fastq",
+  "Q": 1,
+  "findings": [],
+  "contentReview": {
+    "id": "e89095b9bad6",
+    "task": "fastq-running-tasks",
+    "project": "fastq",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete-pending-mechanical-checks",
+    "Q": null,
+    "behaviorReview": "Uses circular sentinel list of active Task objects. Every direct/promoted start inserts at tail; worked unlinks before reading callback and clearing value. New snapshots copy values in start order and task links clear on completion. Existing scheduler, receivers and release flow unchanged.",
+    "retainedTestsReview": "Original callback/promise and type examples retained; new suites added.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Deferred workers distinguish running from queued; modifying returned snapshot does not change active list."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Duplicate and undefined completions assert current value absent at callback entry, queued promotion is visible, reused pooled task tracked and prior modified snapshot remains stable after reuse."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Paused/concurrency-changed queue stays unstarted; resume and later concurrency increase promote expected order. Promise fulfillment/rejection retains results and removes settled values."
+      }
+    ],
+    "typesReview": "Shared queue declaration adds runningTasks(): T[]; existing typed callback and promise consumer examples use the added API.",
+    "docsReview": "README API link and docs specify fresh shallow snapshot, start order, duplicate/undefined preservation and exclusion of queued/paused work.",
+    "contentFindings": [],
+    "pending": [
+      "ordinary project checks and TypeScript",
+      "independent public API checks",
+      "ordinary patch applicability"
+    ],
+    "recordStage": "Initial neutral review retained as history; final Q, findings and assessmentNotes supersede pending hypotheses."
+  },
+  "ordinaryExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "applicability": {
+    "id": "e89095b9bad6",
+    "task": "fastq-running-tasks",
+    "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "4287df7b8c6b73ac23b7fc49ac62bab28dae1f03a8ae4cc0295ba8ff8f86213b",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "sourcePatchSha256": "4287df7b8c6b73ac23b7fc49ac62bab28dae1f03a8ae4cc0295ba8ff8f86213b",
+  "sourcePatchBytes": 10057,
+  "assessmentNotes": [],
+  "slot": 34,
+  "repetition": 2,
+  "arm": "P",
+  "D": 1,
+  "verification": [
+    {
+      "artifact": "reviews/e89095b9bad6/independent/result.json",
+      "exit": 0,
+      "elapsedMs": 2113,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "Independent behavior passed",
+      "fullLocalOutputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "supersededDiagnostic": false
+    },
+    {
+      "artifact": "reviews/e89095b9bad6/ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 5008,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "# ok\n\n----------|---------|----------|---------|---------|-------------------\nFile      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s \n----------|---------|----------|---------|---------|-------------------\nAll files |     100 |      100 |     100 |     100 |                   \n queue.js |     100 |      100 |     100 |     100 |                   \n----------|---------|----------|---------|---------|-------------------\n\n> fastq@1.20.3 typescript\n> tsc --project ./test/tsconfig.json\n",
+      "fullLocalOutputSha256": "29a28e25a781f1071e3f56bf7bbd0efe39a24b652badb6b1f934e8b84aaced8e",
+      "supersededDiagnostic": false
+    }
+  ],
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "normalHandoff": true,
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "lastNativeTextSha256": "064acf4f33d2e6506a99f68ed01d2fccc98ddd481c187eca76040d455a7848f8",
+    "normalFinalResponse": true,
+    "finalResponseExcerpt": "Implemented `runningTasks(): T[]` for callback and promise queues.\n\n- Tracks active tasks in start order with duplicates and `undefined`.\n- Removes tasks before completion callbacks/error handlers.\n- Preserves pooling, scheduling, results, rejection, drain, and queue behavior.\n- Added callback/promise regression tests, TypeScript coverage, and README API docs.\n\nChecks passed:\n\n- `npm test`\n- `npm run typescript`\n- `git diff --check`\n- 100% coverage across statements, branches, functions, and lines.",
+    "authorExplanationExcerpt": null,
+    "reportFindings": []
+  }
+}

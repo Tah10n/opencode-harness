@@ -1,0 +1,8 @@
+{
+  "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-5452@sha256:5dab9b6eddbfc538785901ce27e19cc373bbb78e31e0b4d94574d547d061403f",
+  "path": "types/runtime/index.d.ts",
+  "exit": 0,
+  "stdout": "PRESENT\n",
+  "stderr": "",
+  "scope": "Read-only observation of original image, no frozen input or model changes"
+}

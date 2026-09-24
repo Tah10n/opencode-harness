@@ -1,0 +1,27 @@
+{
+  "realTaskRuns": 36,
+  "primaryTaskRuns": 30,
+  "transferStarted": 6,
+  "transferScheduledNotStarted": 2,
+  "realSmokes": 0,
+  "providerRequests": 1030,
+  "requestsWithoutUsage": 3,
+  "knownUsage": {
+    "input_tokens": 45122668,
+    "output_tokens": 465764,
+    "total_tokens": 45588432,
+    "cached_tokens": 16266752,
+    "reasoning_tokens": 241894
+  },
+  "transferSlotWallMs": 2667930,
+  "primarySlotWallMs": 13286275,
+  "transferAOutputs": 29,
+  "transferAElapsedMs": 2293.144169999956,
+  "transferBOutputs": 7,
+  "transferBExecutions": 3,
+  "transferBElapsedMs": 43126.750351999995,
+  "monetaryCharges": "unavailable",
+  "serverCompletionUnknown": 3,
+  "operationalPause": "unknown_submission at transfer slot 6, existing 180 second stream boundary, before task deadline",
+  "notZeroCaveat": "Known tokens exclude unknown requests; cached/reasoning tokens are subsets."
+}

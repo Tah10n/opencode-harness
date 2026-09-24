@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/commands.mjs": "function valid(name){if(typeof name!=='string'||!(/^[A-Za-z_][A-Za-z0-9_-]*$/).test(name))throw new TypeError('command name');}\nfunction fail(code){throw Object.assign(new Error(code),{code});}\nexport function createCommands(entries){\n const rows=entries.map(e=>{valid(e.name);const aliases=[...(e.aliases??[])];aliases.forEach(valid);return {name:e.name,description:e.description??'',aliases,handler:e.run};});\n for(let i=0;i<rows.length;i++)for(let j=0;j<i;j++){\n  if(rows[i].name===rows[j].name)fail('DUPLICATE_COMMAND');\n  if(rows[i].aliases.some(a=>rows[j].aliases.some(b=>a.toLowerCase()===b.toLowerCase())))fail('ALIAS_COLLISION');\n }\n return {run(name,...args){valid(name);const row=rows.find(r=>r.name===name)??rows.find(r=>r.aliases.some(a=>a.toLowerCase()===name.toLowerCase()));if(!row)fail('UNKNOWN_COMMAND');return Reflect.apply(row.handler,undefined,args);},\n help(){return rows.map(r=>({name:r.name,description:r.description,aliases:r.aliases.slice()}));}};\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "alias-before-canonical",
+      "file": "src/commands.mjs",
+      "replacement": "const valid=name=>{if(typeof name!=='string'||!(/^[A-Za-z_][A-Za-z0-9_-]*$/).test(name))throw new TypeError('command name');return name;};\nconst fail=code=>Object.assign(new Error(code),{code});\nexport function createCommands(entries){\n const exact=new Map(),aliases=new Map(),rows=[];\n for(const entry of entries){\n  const name=valid(entry.name);if(exact.has(name))throw fail('DUPLICATE_COMMAND');\n  const row={name,description:entry.description??'',aliases:[...(entry.aliases??[])],handler:entry.run};\n  exact.set(name,row);rows.push(row);\n }\n for(const row of rows)for(const alias of row.aliases){const key=valid(alias).toLowerCase();if(aliases.has(key)&&aliases.get(key)!==row)throw fail('ALIAS_COLLISION');aliases.set(key,row);}\n return {run(name,...args){valid(name);const row=aliases.get(name.toLowerCase())??exact.get(name);if(!row)throw fail('UNKNOWN_COMMAND');return Reflect.apply(row.handler,undefined,args);},\n help(){return rows.map(({name,description,aliases})=>({name,description,aliases:[...aliases]}));}};\n}\n"
+    },
+    {
+      "name": "allows-cross-command-alias-collision",
+      "file": "src/commands.mjs",
+      "replacement": "const valid=name=>{if(typeof name!=='string'||!(/^[A-Za-z_][A-Za-z0-9_-]*$/).test(name))throw new TypeError('command name');return name;};\nconst fail=code=>Object.assign(new Error(code),{code});\nexport function createCommands(entries){\n const exact=new Map(),aliases=new Map(),rows=[];\n for(const entry of entries){\n  const name=valid(entry.name);if(exact.has(name))throw fail('DUPLICATE_COMMAND');\n  const row={name,description:entry.description??'',aliases:[...(entry.aliases??[])],handler:entry.run};\n  exact.set(name,row);rows.push(row);\n }\n for(const row of rows)for(const alias of row.aliases){const key=valid(alias).toLowerCase();aliases.set(key,row);}\n return {run(name,...args){valid(name);const row=exact.get(name)??aliases.get(name.toLowerCase());if(!row)throw fail('UNKNOWN_COMMAND');return Reflect.apply(row.handler,undefined,args);},\n help(){return rows.map(({name,description,aliases})=>({name,description,aliases:[...aliases]}));}};\n}\n"
+    }
+  ]
+}

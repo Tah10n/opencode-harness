@@ -1,0 +1,172 @@
+{
+  "schedulerRegression": {
+    "passed": true,
+    "scenarios": 16,
+    "mockProviderDispatches": 13,
+    "realProviderRequests": 0,
+    "modes": [
+      "long-stream",
+      "connection-timeout",
+      "nonsettling-handler",
+      "terminal-own-deadline",
+      "quota-body-deadline",
+      "auth-body-deadline",
+      "unattributed-timeout",
+      "managed-deadline",
+      "late-response",
+      "foreign-abort-near-deadline",
+      "unknown-execution",
+      "unexplained-disconnect",
+      "quota",
+      "authorization",
+      "capture-failure",
+      "cleanup-failure"
+    ],
+    "rawReceiptSha256": "24d0867caba91434bfe81d2d6ad8b49e1b7829d9a4f39b11e6471fa45701cb63"
+  },
+  "preparationStructuralChecksPassed": true,
+  "installedPreflightPassed": false,
+  "scriptedPreflightAttempts": 1,
+  "scriptedNativeSessions": 0,
+  "scriptedRequests": 0,
+  "realReviewerSessions": 0,
+  "realProviderRequests": 0,
+  "implementationRuns": 0,
+  "reviewerUsage": {
+    "input": 0,
+    "output": 0,
+    "cachedSubset": 0,
+    "reasoningSubset": 0,
+    "unknownUsageRequests": 0
+  },
+  "preflightElapsedMs": 4890,
+  "slots": [
+    {
+      "slot": 1,
+      "candidate": "candidate-A",
+      "status": "not_started",
+      "normalCompletion": null,
+      "findings": null,
+      "misses": null,
+      "elapsedMs": 0,
+      "requests": 0,
+      "nativeReads": 0
+    },
+    {
+      "slot": 2,
+      "candidate": "candidate-B",
+      "status": "not_started",
+      "normalCompletion": null,
+      "findings": null,
+      "misses": null,
+      "elapsedMs": 0,
+      "requests": 0,
+      "nativeReads": 0
+    }
+  ],
+  "snapshots": [
+    {
+      "candidate": "candidate-A",
+      "base": "a45273e659b839f1e98092161e82650d38b351ea",
+      "head": "a45273e659b839f1e98092161e82650d38b351ea",
+      "snapshotSha256": "80175b3485859c0cf917c35c782c263b9414e74ee874018760fc137c6f25c050",
+      "diffBytes": 36612,
+      "untracked": [],
+      "taskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+      "scope": "host structural read-rule fixture only; not installed reviewer proof"
+    },
+    {
+      "candidate": "candidate-B",
+      "base": "05064d33f51980d8b4607e0f0f5dc68866341f34",
+      "head": "05064d33f51980d8b4607e0f0f5dc68866341f34",
+      "snapshotSha256": "514c47c946fa2ec32bfd43b960731f25636f1569684971ec4f8aa3a644f2df8b",
+      "diffBytes": 476807,
+      "untracked": [
+        "apps/web/app/api/accounts/delete/route.test.ts",
+        "apps/web/app/api/accounts/notices/dismiss/route.test.ts",
+        "apps/web/app/api/accounts/notices/dismiss/route.ts",
+        "apps/web/app/api/installations/current/sources/register/route.test.ts",
+        "apps/web/app/api/installations/current/sources/register/route.ts",
+        "apps/web/database/006_account_switch_sources.sql",
+        "apps/web/database/007_account_switch_safety.sql",
+        "packages/connector/lib/opencode-cutover-preflight.mjs",
+        "packages/connector/test/antigravity-compatibility.test.mjs",
+        "packages/connector/test/fixtures/codex-get-account-response.schema.json",
+        "packages/connector/test/fixtures/migration-0.4.3.json"
+      ],
+      "taskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+      "scope": "host structural read-rule fixture only; not installed reviewer proof"
+    }
+  ],
+  "receipts": [
+    {
+      "file": "local/ledger-review-diagnostic/preflight/attempt.json",
+      "bytes": 555,
+      "sha256": "859fd3c9a466e139cde20f17fbc71583980fe45e6cbfe0d8ee55c02508da07eb"
+    },
+    {
+      "file": "local/ledger-review-diagnostic/preflight/outcome.json",
+      "bytes": 378,
+      "sha256": "a02841170c166a532ae03b8e549882058b2a61034900cd83d417b1a2f1dbcdfd"
+    },
+    {
+      "file": "local/ledger-review-diagnostic/preflight/scheduling-paused.json",
+      "bytes": 333,
+      "sha256": "90bd536e2b90cfda204f8d1ad18985678c2f65457186ae1005bfac0411c4950d"
+    },
+    {
+      "file": "local/ledger-review-diagnostic/preflight/runs/neutral-review-candidate-A/provider-metadata.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "file": "local/ledger-review-diagnostic/preflight/runs/neutral-review-candidate-A/native-evidence.json",
+      "bytes": 41,
+      "sha256": "9ec326e326a996ba8aded670fdeec0bf21e511fc9b2dee3252aa23c7cbaabcbb"
+    },
+    {
+      "file": "local/ledger-review-diagnostic/preflight/runs/neutral-review-candidate-A/stop-verification.json",
+      "bytes": 227,
+      "sha256": "34d6aa9de56049cb9403c5313a05b11b848b94656c1660493abb757b30556b73"
+    },
+    {
+      "file": "local/ledger-review-diagnostic/preflight/runs/neutral-review-candidate-A/recovery.json",
+      "bytes": 297,
+      "sha256": "c9e859045928408064f8ea4c1b552acb44034f8436c6ed04997bc6872fe6c405"
+    },
+    {
+      "file": "local/ledger-review-diagnostic/preflight/runs/neutral-review-candidate-A/capture-error.json",
+      "bytes": 596,
+      "sha256": "afef9720caccad84547e8225eea610a5e615cfb9121067e4623e57c828184cc1"
+    },
+    {
+      "file": "local/ledger-review-diagnostic/preflight/runs/neutral-review-candidate-A/session/retained-resource.json",
+      "bytes": 604,
+      "sha256": "82950531cb381da0662fd2a477b585f04b87477237e19d5aff1a64524a10fed0"
+    },
+    {
+      "file": "local/ledger-review-diagnostic/preflight/runs/neutral-review-candidate-A/evidence-capture.json",
+      "bytes": 105,
+      "sha256": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+    },
+    {
+      "file": "local/ledger-review-diagnostic/preflight/runs/neutral-review-candidate-A/native-output/manifest.json",
+      "bytes": 472,
+      "sha256": "8a165b51e0539c4df60466b5664e442cfd9b0167b1d8c1e82ab977d95ed97957"
+    }
+  ],
+  "recovery": {
+    "copiedExistingDataOnly": true,
+    "newProviderRequests": 0,
+    "evidenceComplete": true,
+    "containerRemoved": true
+  },
+  "missingChecks": [
+    "Installed full task/base/diff delivery",
+    "Native read and actual provider tool inventory",
+    "Request/raw response recording in a reviewer session",
+    "Normal reviewer completion",
+    "Real reviewer utility and findings validation"
+  ],
+  "decision": "unproven: preparation blocker; no model observations"
+}

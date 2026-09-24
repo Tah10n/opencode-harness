@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Old versions survive set/delete while prefix results sort before limiting.",
+    "Nested input and output mutations cannot change stored versions."
+  ],
+  "docDelivery": [
+    "Persistent updates, duplicate initialization, missing deletion and internal structure freedom.",
+    "ASCII prefix/limit semantics and detached value ownership."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Nonempty ASCII keys, ASCII prefix including empty, limit omitted or integer 0..1000; values ordinary acyclic JSON without getters/custom methods/undefined/symbols/nonfinite numbers/-0. Initial entries dense {key,value} array, duplicate keys last value wins.",
+  "independence": "Implement persistent prefix dictionary updates, deletion and sorted prefix queries with snapshot isolation."
+}

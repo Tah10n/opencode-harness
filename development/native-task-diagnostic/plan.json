@@ -1,0 +1,49 @@
+{
+  "kind": "directed-stateful-coverage-development",
+  "publishedHead": "d482d39b6d922b9c584efda2f335f35a5e5a0ffc",
+  "model": "openai/gpt-5.6-luna",
+  "reasoningEffort": "high",
+  "openCodeVersion": "1.18.26",
+  "budgetMs": 900000,
+  "maximumCorrections": 3,
+  "retries": 0,
+  "schedule": [
+    {
+      "slot": 1,
+      "task": "queue-lost-retry",
+      "arm": "H0"
+    },
+    {
+      "slot": 2,
+      "task": "queue-lost-retry",
+      "arm": "H1"
+    },
+    {
+      "slot": 3,
+      "task": "editor-precompleted",
+      "arm": "H1"
+    },
+    {
+      "slot": 4,
+      "task": "editor-precompleted",
+      "arm": "H0"
+    },
+    {
+      "slot": 5,
+      "task": "queue-valid-empty",
+      "arm": "H0"
+    },
+    {
+      "slot": 6,
+      "task": "queue-valid-empty",
+      "arm": "H1"
+    }
+  ],
+  "order": "Two H0-first pairs and one H1-first pair: closest possible pair balance for three pairs; first-arm counts differ by one.",
+  "origin": "Intentionally constructed defects, not naturally observed error frequencies. A retains the authored vacuous queue regression from the previous compact project; B deliberately precancels a replacement before the consumer action; control uses meaningful authored queue coverage. No model selection runs, reconnect inputs or prior model patches used. Production is correct initially in all three.",
+  "variants": "Exact existing materialized H0/H1 and dependency bundles from native-task-stateful, with only its recorded instruction delta.",
+  "stop": "Existing quota/access/unknown submission and unverified local completion stop all remaining scheduling. Ordinary failures continue remaining slots; no retries.",
+  "grading": "Frozen external behavioral evaluator plus delivered suite sensitivity and manual semantic patch/tool inspection. Credit correct equivalent coverage without requiring an added precondition. Workflow status separate. No helper names, exception subtype or reference layout required.",
+  "decision": "Close this hypothesis after these six slots. Equal repairs means no demonstrated rule advantage; assertions alone are not repair advantage. A helpful difference without control harm is only local development evidence. No automatic rewording or additional benchmark.",
+  "historical": "Previous nine runs and frozen 2/3 plus separate contract 3/3 remain unchanged."
+}

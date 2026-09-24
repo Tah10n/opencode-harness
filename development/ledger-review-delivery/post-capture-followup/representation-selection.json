@@ -1,0 +1,31 @@
+{
+  "scope": "Post-chain parameter selection under frozen ACCEPTANCE.md section 5; no model feedback or new acceptance criterion",
+  "delivery": "followup final",
+  "patchSha256": "225094f080a304fe598200d5c4f8252ad20af2ef2c08b5d35ab9967509f7b8b7",
+  "storage": {
+    "source": "packages/connector/lib/adapters/shared.mjs:7-9,116-164",
+    "exportedCountBound": "maximumEventLedgerEntries",
+    "exportedByteBound": "maximumEventLedgerBytes",
+    "observedCountBound": 65536,
+    "observedByteBound": 16777216,
+    "exercise": "Reach the actual byte bound with distinct valid Antigravity records containing decimal integer input_tokens strings of 250000 digits; each JSONL line stays below the existing 1000000-byte line limit. All state is collector-produced; no seeded ledger. Remove input, replay an early accepted event, then a new event.",
+    "unexercised": "Separate 65536-entry boundary need not be reached to reach the implementation's actual storage bound; report separately."
+  },
+  "corruption": {
+    "source": "packages/connector/lib/adapters/shared.mjs:116-134 and adapters/antigravity.mjs:111-128",
+    "selector": "/eventLedger/version",
+    "before": 1,
+    "after": -1,
+    "provenance": "JSON roundtrip of a real successful collector result; assert actual field before mutation; delete source file then collect"
+  },
+  "additionalTransitions": "Complete previously declared mixed-valid/unsupported case with a prior accepted state and a subsequent source deletion; preserve every accepted valid event. Same frozen clause, no new threshold.",
+  "limits": {
+    "seconds": 180,
+    "fixtureBytes": 268435456
+  },
+  "modelRequests": 0,
+  "representationChanged": false,
+  "selectionBasis": "Final public shared.mjs exports the same version, entry and byte bounds and returned nextState.eventLedger; choose the identical observed-state corruption and corrected fresh-path retention procedure. No synthetic ledger and no changed expected behavior.",
+  "stateProbe": "selected-state.mjs: exact two existing state transitions extracted from selected-probes.mjs; skip its known invalid saturation setup",
+  "retentionProbe": "../retention-probe.mjs: unchanged corrected procedure"
+}

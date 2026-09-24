@@ -1,0 +1,1 @@
+export function rows(input){const entries=input instanceof Map?[...input]:Object.entries(input);for(const [key,value]of entries)if(typeof key!=='string'||typeof value!=='number'||!Number.isFinite(value))throw new TypeError('entry');return entries.map(([key,price])=>({key,price}));}export function total(input){return rows(input).reduce((n,r)=>n+r.price,0);}

@@ -1,0 +1,448 @@
+{
+  "arm": "AR0",
+  "initialAuthorRequest": {
+    "request": 3,
+    "sha256": "a8952762f67b2bf7933874bdd06008e577ef3fffd953416c4715f68b1d65ef9a",
+    "fullTask": true,
+    "newBlock": false,
+    "toolInventory": [
+      "apply_patch",
+      "bash",
+      "glob",
+      "grep",
+      "read",
+      "skill",
+      "todowrite"
+    ]
+  },
+  "selectedEvents": [
+    {
+      "nativeIndex": 68,
+      "partID": "prt_0c858587e001e1lsnN3GVXp6Sr",
+      "sessionID": "ses_f37b1fdc0ffeJJ3MPnpWc6EYUp",
+      "callID": "call_00hX96k8ZVuM7UMb7CoNYiUB",
+      "tool": "bash",
+      "labels": [
+        "observed-related-failure",
+        "public-test-execution"
+      ],
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "inputSha256": "0c83de08ad9ecf39fd73d91e3696067c19a90ba0f00d3e66ea60049fa7b5728e",
+      "exit": 1,
+      "receiptBytes": 19620,
+      "receiptSha256": "8db677d61385cbddc52c65d5d61f676fed6837df08124f601b895e318da6ec92",
+      "delivery": {
+        "firstRequest": 36,
+        "bytes": 19620,
+        "sha256": "8db677d61385cbddc52c65d5d61f676fed6837df08124f601b895e318da6ec92",
+        "requestSha256": "5b35c8f9cb39e192bef7f72ed94c2c755c3e5a218f536c937f47c6b6fc41e234"
+      },
+      "excerpt": "kages/connector/test/readers.test.mjs:3586:1\n\u2716 parses valid usage from an oversized JSONL record and marks the pass partial (9.136333ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  undefined !== '20'\n  \n      at TestContext.<anonymous> (file:///work/repo/.git/harness-task/d6deb21a-3ef2-4fe6-8421-a77e3bdc2f5e/worktree/packages/connector/test/readers.test.mjs:3611:10)\n      at async Test.run (node:internal/test_runner/test:1389:7)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: undefined,\n    expected: '20',\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
+      "nextNativeAction": {
+        "partID": "prt_0c85871ff001cUKUyvXi5kMtsW",
+        "tool": "bash"
+      }
+    },
+    {
+      "nativeIndex": 75,
+      "partID": "prt_0c8598190001mwIZrZufce7AYp",
+      "sessionID": "ses_f37b1fdc0ffeJJ3MPnpWc6EYUp",
+      "callID": "call_iZro1YDFGPWrUWoTxnt8TJNu",
+      "tool": "bash",
+      "labels": [
+        "observed-related-failure",
+        "public-test-execution"
+      ],
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "inputSha256": "0c83de08ad9ecf39fd73d91e3696067c19a90ba0f00d3e66ea60049fa7b5728e",
+      "exit": 1,
+      "receiptBytes": 11009,
+      "receiptSha256": "e2b3b596fa58d190ada71d9c2fc461af75893d35c12e36465f527b702312bf80",
+      "delivery": {
+        "firstRequest": 43,
+        "bytes": 11009,
+        "sha256": "e2b3b596fa58d190ada71d9c2fc461af75893d35c12e36465f527b702312bf80",
+        "requestSha256": "5f770c2a5100ee4860a67218631aa3351230b269679c2ea082902b9566c4a306"
+      },
+      "excerpt": "ions (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1389:7)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: { files: { '/work/tmp/viberacing-incremental-jsonl-jbfI1t/antigravity.jsonl': [Object] }, eventLedger: { version: 1, events: [Object], legacy: [], legacyIds: {} }, parserVersion: 1 },\n    expected: { files: { '/work/tmp/viberacing-incremental-jsonl-jbfI1t/antigravity.jsonl': [Object] }, eventLedger: { version: 1, events: [Object], legacy: [], legacyIds: {} }, parserVersion: 1 },\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\n",
+      "nextNativeAction": {
+        "partID": "prt_0c859d01b0013b82WouNulfCqF",
+        "tool": "read"
+      }
+    },
+    {
+      "nativeIndex": 78,
+      "partID": "prt_0c85a1fc1001aHVLtcX8BUYxas",
+      "sessionID": "ses_f37b1fdc0ffeJJ3MPnpWc6EYUp",
+      "callID": "call_rLR1Cbmm2N1eos9ZVLi4lCUi",
+      "tool": "bash",
+      "labels": [
+        "observed-related-failure",
+        "public-test-execution"
+      ],
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "inputSha256": "0c83de08ad9ecf39fd73d91e3696067c19a90ba0f00d3e66ea60049fa7b5728e",
+      "exit": 1,
+      "receiptBytes": 9758,
+      "receiptSha256": "14ef6cec3a64d07f31158335ddb0e600d7757b70ac7c349a2d949811448249e0",
+      "delivery": {
+        "firstRequest": 46,
+        "bytes": 9758,
+        "sha256": "14ef6cec3a64d07f31158335ddb0e600d7757b70ac7c349a2d949811448249e0",
+        "requestSha256": "fce34c4fb50dcdca789c9062ba748d775a483a60cbecc69571fab8f638ddf3a8"
+      },
+      "excerpt": "the last complete byte offset (4.643083ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n  + actual - expected\n  \n    [\n  +   '2026-08-10',\n      '2026-08-11'\n    ]\n  \n      at TestContext.<anonymous> (file:///work/repo/.git/harness-task/d6deb21a-3ef2-4fe6-8421-a77e3bdc2f5e/worktree/packages/connector/test/readers.test.mjs:3565:10)\n      at async Test.run (node:internal/test_runner/test:1389:7)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: [ '2026-08-10', '2026-08-11' ],\n    expected: [ '2026-08-11' ],\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\n",
+      "nextNativeAction": {
+        "partID": "prt_0c85a413e001vPSyRfK6w1s9Rm",
+        "tool": "bash"
+      }
+    },
+    {
+      "nativeIndex": 80,
+      "partID": "prt_0c85b53f0001k6wI2p4C0kDSRc",
+      "sessionID": "ses_f37b1fdc0ffeJJ3MPnpWc6EYUp",
+      "callID": "call_ZCQUqgFaM3EAN6q1qWH685OJ",
+      "tool": "bash",
+      "labels": [
+        "public-test-execution"
+      ],
+      "command": "node --test --test-name-pattern='keeps committed JSONL state' packages/connector/test/readers.test.mjs",
+      "inputSha256": "d3abfb68fbcc72445e541def361192580655f0bf74b245917f1db752b2c51647",
+      "exit": 1,
+      "receiptBytes": 1663,
+      "receiptSha256": "dc16860827a4172317ddbef34636d955e4e5ceeb871a25f18d1d5af58149801d",
+      "delivery": {
+        "firstRequest": 48,
+        "bytes": 1663,
+        "sha256": "dc16860827a4172317ddbef34636d955e4e5ceeb871a25f18d1d5af58149801d",
+        "requestSha256": "7ba9e5e971f7aba13177d2506b662d357236a4c5c515c2e5656831dec5f559b6"
+      },
+      "excerpt": "rs.test.mjs:2897:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1389:7)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {\n    generatedMessage: false,\n    code: 'ERR_ASSERTION',\n    actual: [ { date: '2026-08-10', totalTokens: '70', inputTokens: '14', outputTokens: '40', cacheReadTokens: '6', cacheWriteTokens: '0', reasoningTokens: '10' } ],\n    expected: [ { date: '2026-08-10', totalTokens: '35', inputTokens: '7', outputTokens: '20', cacheReadTokens: '3', cacheWriteTokens: '0', reasoningTokens: '5' } ],\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\n",
+      "nextNativeAction": {
+        "partID": "prt_0c85b61f1001OeA6B3BudElG56",
+        "tool": "bash"
+      }
+    },
+    {
+      "nativeIndex": 84,
+      "partID": "prt_0c85c51a8001g175cr5tmwDdaP",
+      "sessionID": "ses_f37b1fdc0ffeJJ3MPnpWc6EYUp",
+      "callID": "call_BQZHeQgQ2jU9ugNP9jygb7Bv",
+      "tool": "apply_patch",
+      "labels": [
+        "related-test-edit"
+      ],
+      "command": null,
+      "inputSha256": "7f7723cdafa2b70ed2f79ffa732c00fd5936cc90c693e175ea619e7c3da3412f",
+      "exit": null,
+      "receiptBytes": 80,
+      "receiptSha256": "10f850144224a2d56a6c1128964e4727d8f7faa46e350193df025f9825d38acd",
+      "delivery": {
+        "firstRequest": 52,
+        "bytes": 80,
+        "sha256": "10f850144224a2d56a6c1128964e4727d8f7faa46e350193df025f9825d38acd",
+        "requestSha256": "6630322d33bec5dd2d8cb87ba6c598d496b38f22403fdf787b4164fbe0e7b2ae"
+      },
+      "excerpt": "*** Begin Patch\n*** Update File: packages/connector/test/readers.test.mjs\n@@\n   const truncated = await adapter.collect({ dataPath: path }, range, duplicate.nextState);\n   assert.deepEqual(\n     truncated.entries.map((entry) => entry.date),\n-    [\"2026-08-11\"],\n+    [\"2026-08-10\", \"2026-08-11\"],\n   );\n });\n+\n+test(\"event ledgers survive copied, moved, and truncated account histories\", async (context) => {\n+  const range = { rangeStart: \"2026-07-15\", rangeEnd: \"2026-08-14\" };\n+  const claude = JSON.parse((await fixture(\"claude.jsonl\")).trim());\n+  const qwen = JSON.parse((await fixture(\"qwen.jsonl\")).trim());\n+  const gemini = JSON.parse(await fixture(\"gemini.json\"))[0];\n+  const antigravity = safeCaptureRecord(\n+    \"antigravity\",\n+    (await fixture(\"antigravity.jsonl\")).trim(),\n+  );\n+  const kimiLines = (await fixture(\"kimi.jsonl\")).trim().split(\"\\n\");\n+  const cases = [\n+    {\n+      agentId: \"claude_code\",\n+      name: \"session.jsonl\",\n+      first: JSON.stringify(claude),\n+      second: JSON.stringify({\n+        ...claude,\n+        timestamp: \"2026-08-11T12:00:00Z\",\n+        message: { ...claude.message, id: \"switch-claude\" },\n+      }),\n+      source: {},\n+    },\n+    {\n+      agentId: \"qwen_code\",\n+      name: \"token-usage-2026-08.jsonl\",\n+      first: JSON.stringify(qwen),\n+      second: JSON.stringify({ ...qwen, id: \"switch-qwen\", timestamp: \"2026-08-11T12:00:00Z\" }),\n+      source: {},\n+    },\n+    {\n+      agentId: \"gemini_cli\",\n+      name: \"session-switch.jsonl\",\n+      first: JSON.stringify(gemini),\n+      second: JSON.stringify({ ...gemini, id: \"switch-gemini\", timestamp: \"2026-08-11T12:00:00Z\" }),\n+      source: {},\n+    },\n+    {\n+      agentId: \"antigravity\",\n+      name: \"capture.jsonl\",\n+      first: JSON.stringify(antigravity),\n+      second: JSON.",
+      "nextNativeAction": {
+        "partID": "prt_0c85cd277001sUjkFy0mjVFHfz",
+        "tool": "apply_patch"
+      }
+    },
+    {
+      "nativeIndex": 86,
+      "partID": "prt_0c85d0090001Nz4qdLdpGk6oeq",
+      "sessionID": "ses_f37b1fdc0ffeJJ3MPnpWc6EYUp",
+      "callID": "call_ow3VjnHgtVzeqzlAGrbe8CjZ",
+      "tool": "bash",
+      "labels": [
+        "observed-related-failure",
+        "public-test-execution"
+      ],
+      "command": "node --test --test-name-pattern='event ledgers|conflicting event|keeps committed JSONL|JSONL collectors reuse' packages/connector/test/readers.test.mjs",
+      "inputSha256": "7372d796be81fc44f685623abca0a3af3b927470a44d92f764e37d925bae2818",
+      "exit": 1,
+      "receiptBytes": 2607,
+      "receiptSha256": "462145c09b6d4e94abf2538528d360518b2d7d890f7661238f9ba3000f50ad36",
+      "delivery": {
+        "firstRequest": 54,
+        "bytes": 2607,
+        "sha256": "462145c09b6d4e94abf2538528d360518b2d7d890f7661238f9ba3000f50ad36",
+        "requestSha256": "c5e67ac9f617650d1ed85b8410da97f9a1a11bc8a4329592c14ed017454539dc"
+      },
+      "excerpt": "StrictEqual',\n    diff: 'simple'\n  }\n\ntest at packages/connector/test/readers.test.mjs:3571:1\n\u2716 event ledgers survive copied, moved, and truncated account histories (16.10375ms)\n  AssertionError [ERR_ASSERTION]: kimi_code\n  \n  30n !== 40n\n  \n      at TestContext.<anonymous> (file:///work/repo/.git/harness-task/d6deb21a-3ef2-4fe6-8421-a77e3bdc2f5e/worktree/packages/connector/test/readers.test.mjs:3640:12)\n      at async Test.run (node:internal/test_runner/test:1389:7)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {\n    generatedMessage: false,\n    code: 'ERR_ASSERTION',\n    actual: 30n,\n    expected: 40n,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
+      "nextNativeAction": {
+        "partID": "prt_0c85d411e001rmximrN7MtvmHu",
+        "tool": "bash"
+      }
+    },
+    {
+      "nativeIndex": 90,
+      "partID": "prt_0c85df176001rKDOkpYzrrICwV",
+      "sessionID": "ses_f37b1fdc0ffeJJ3MPnpWc6EYUp",
+      "callID": "call_Syzim6tHl9m5LLcT0hrObSyW",
+      "tool": "bash",
+      "labels": [
+        "observed-related-failure",
+        "public-test-execution"
+      ],
+      "command": "node --test --test-name-pattern='keeps committed JSONL state|event ledgers|conflicting event|JSONL collectors reuse' packages/connector/test/readers.test.mjs",
+      "inputSha256": "eaa9b86807ee211a0b8b4ce35dfa825af6e8069f7d2377acf226f8a8d4f64171",
+      "exit": 1,
+      "receiptBytes": 2076,
+      "receiptSha256": "cd191978c805326fd889d7366442e6573d340e44e0a36706999b6cf7cf59af9a",
+      "delivery": {
+        "firstRequest": 58,
+        "bytes": 2076,
+        "sha256": "cd191978c805326fd889d7366442e6573d340e44e0a36706999b6cf7cf59af9a",
+        "requestSha256": "ddbd8a1768c7213f3a7f13b0531935c3709622c7bb97793dc08b41ce9d4706d2"
+      },
+      "excerpt": "est_runner/test:1389:7)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {\n    generatedMessage: false,\n    code: 'ERR_ASSERTION',\n    actual: [ { date: '2026-08-10', totalTokens: '35', inputTokens: '7', outputTokens: '20', cacheReadTokens: '3', cacheWriteTokens: '0', reasoningTokens: '5' }, { date: '2026-08-12', totalTokens: '35', inputTokens: '7', outputTokens: '20', cacheReadTokens: '3', cacheWriteTokens: '0', reasoningTokens: '5' } ],\n    expected: [ { date: '2026-08-10', totalTokens: '35', inputTokens: '7', outputTokens: '20', cacheReadTokens: '3', cacheWriteTokens: '0', reasoningTokens: '5' } ],\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\n",
+      "nextNativeAction": {
+        "partID": "prt_0c85e34b7001gYrSvKkTJAdfl7",
+        "tool": "apply_patch"
+      }
+    },
+    {
+      "nativeIndex": 94,
+      "partID": "prt_0c85f9316001LcL6YvlnwK9Io5",
+      "sessionID": "ses_f37b1fdc0ffeJJ3MPnpWc6EYUp",
+      "callID": "call_QvS6gavifUpSnsfdYyB5tAG0",
+      "tool": "bash",
+      "labels": [
+        "public-test-execution"
+      ],
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "inputSha256": "0c83de08ad9ecf39fd73d91e3696067c19a90ba0f00d3e66ea60049fa7b5728e",
+      "exit": 0,
+      "receiptBytes": 7671,
+      "receiptSha256": "05be3034a64d763b8e740ffe33104c55cecb1b27a9cd2c55b3ac19e61fba6b75",
+      "delivery": {
+        "firstRequest": 62,
+        "bytes": 7671,
+        "sha256": "05be3034a64d763b8e740ffe33104c55cecb1b27a9cd2c55b3ac19e61fba6b75",
+        "requestSha256": "0ce156e951df89f07c04d7366146c0f30946f1715149c3f993e413f09b3fd786"
+      },
+      "excerpt": "accept their configured JSONL file directly (1.268459ms)\n\u2714 JSONL collectors reuse unchanged state and resume at the last complete byte offset (4.958917ms)\n\u2714 event ledgers survive copied, moved, and truncated account histories (15.116959ms)\n\u2714 conflicting event tuples retain the first tuple and accept unrelated events (2.418042ms)\n\u2714 collector limits are explicit partial results with diagnostics (0.333875ms)\n\u2714 parses valid usage from an oversized JSONL record and marks the pass partial (7.230333ms)\n\u2714 capture wrapper uses the current executable and required headless structured flags (0.180708ms)\n\u2139 tests 88\n\u2139 suites 0\n\u2139 pass 88\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 339.076625\n",
+      "nextNativeAction": {
+        "partID": "prt_0c85fa8ce0011aWeEzH0G2Ikrh",
+        "tool": "bash"
+      }
+    },
+    {
+      "nativeIndex": 101,
+      "partID": "prt_0c8606591001bBNwMVgOxDsGsb",
+      "sessionID": "ses_f37b1fdc0ffeJJ3MPnpWc6EYUp",
+      "callID": "call_T4nzWGce9A850HFgx83AQUWI",
+      "tool": "apply_patch",
+      "labels": [
+        "related-test-edit"
+      ],
+      "command": null,
+      "inputSha256": "7cd06dc9efe816e4faf4fde0fbdb9c6ffc92cb9c109a81d90ef41752649623b7",
+      "exit": null,
+      "receiptBytes": 80,
+      "receiptSha256": "10f850144224a2d56a6c1128964e4727d8f7faa46e350193df025f9825d38acd",
+      "delivery": {
+        "firstRequest": 67,
+        "bytes": 80,
+        "sha256": "10f850144224a2d56a6c1128964e4727d8f7faa46e350193df025f9825d38acd",
+        "requestSha256": "e12c8443ec4ef82828c3b9e8db24fca09aea6b31ca10c54d8d64e56607320441"
+      },
+      "excerpt": "*** Begin Patch\n*** Update File: packages/connector/test/readers.test.mjs\n@@\n test(\"reads OpenCode assistant usage and avoids cache double-counting\", async () => {\n@@\n });\n+\n+test(\"OpenCode event ledgers retain accepted rows after database history switches\", async (context) => {\n+  const directory = await mkdtemp(join(tmpdir(), \"viberacing-opencode-event-ledger-\"));\n+  context.after(() => rm(directory, { force: true, recursive: true }));\n+  const path = join(directory, \"opencode.db\");\n+  const { DatabaseSync } = await import(\"node:sqlite\");\n+  const database = new DatabaseSync(path);\n+  database.exec(\"CREATE TABLE message (id TEXT PRIMARY KEY, time_created INTEGER, data TEXT)\");\n+  const insert = database.prepare(\"INSERT INTO message (id, time_created, data) VALUES (?, ?, ?)\");\n+  const message = (id, date) => [\n+    id,\n+    Date.parse(`${date}T12:00:00Z`),\n+    JSON.stringify({ role: \"assistant\", tokens: { input: 5, output: 4, total: 9 } }),\n+  ];\n+  insert.run(...message(\"opencode-event-a\", \"2026-08-10\"));\n+  database.close();\n+  const range = { rangeStart: \"2026-07-15\", rangeEnd: \"2026-08-14\" };\n+  const adapter = adapterFor(\"opencode\");\n+  const source = { dataPath: path };\n+  const first = await adapter.collect(source, range, {});\n+\n+  const switchedDatabase = new DatabaseSync(path);\n+  switchedDatabase.prepare(\"DELETE FROM message\").run();\n+  switchedDatabase\n+    .prepare(\"INSERT INTO message (id, time_created, data) VALUES (?, ?, ?)\")\n+    .run(...message(\"opencode-event-a\", \"2026-08-10\"));\n+  switchedDatabase\n+    .prepare(\"INSERT INTO message (id, time_created, data) VALUES (?, ?, ?)\")\n+    .run(...message(\"opencode-event-b\", \"2026-08-11\"));\n+  switchedDatabase.close();\n+  const switched = await adapter.collect(source, range, first.nextState);\n+  assert.equal",
+      "nextNativeAction": {
+        "partID": "prt_0c860b8cf001A3EnUwGSswAMhI",
+        "tool": "bash"
+      }
+    },
+    {
+      "nativeIndex": 102,
+      "partID": "prt_0c860b8cf001A3EnUwGSswAMhI",
+      "sessionID": "ses_f37b1fdc0ffeJJ3MPnpWc6EYUp",
+      "callID": "call_axoozfHIZHKX8NOY0EOPVIaa",
+      "tool": "bash",
+      "labels": [
+        "public-test-execution"
+      ],
+      "command": "node --test --test-name-pattern='OpenCode event ledgers|conflicting event|event ledgers' packages/connector/test/readers.test.mjs",
+      "inputSha256": "812e84fca4867dda2c65bfc57121bae828448b4cb1c6af0e23e775652a14cddd",
+      "exit": 0,
+      "receiptBytes": 385,
+      "receiptSha256": "4ad1b916957e2bbed1a841446e1856a366cfda4b0bbd964ec86ba6b93d623687",
+      "delivery": {
+        "firstRequest": 68,
+        "bytes": 385,
+        "sha256": "4ad1b916957e2bbed1a841446e1856a366cfda4b0bbd964ec86ba6b93d623687",
+        "requestSha256": "c0f9a2e7fbb72854ca13e086b7429030466517af5f27798894b93a7858bd7c05"
+      },
+      "excerpt": "\u2714 OpenCode event ledgers retain accepted rows after database history switches (10.551792ms)\n\u2714 event ledgers survive copied, moved, and truncated account histories (22.894542ms)\n\u2714 conflicting event tuples retain the first tuple and accept unrelated events (4.078ms)\n\u2139 tests 3\n\u2139 suites 0\n\u2139 pass 3\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 80.487084\n",
+      "nextNativeAction": {
+        "partID": "prt_0c8611172001HOIFLRuCIk78Qt",
+        "tool": "grep"
+      }
+    },
+    {
+      "nativeIndex": 117,
+      "partID": "prt_0c8635fcc001kaT5UU45lYj6E0",
+      "sessionID": "ses_f37b1fdc0ffeJJ3MPnpWc6EYUp",
+      "callID": "call_OAs2YKdM6RBuVGf615LLxt3r",
+      "tool": "bash",
+      "labels": [
+        "public-test-execution"
+      ],
+      "command": "node --test --test-name-pattern='event collectors migrate|event ledgers|OpenCode event ledgers|conflicting event' packages/connector/test/readers.test.mjs",
+      "inputSha256": "2d8657ada2853f41b2457d84273cdf0f7649cb66b61adac446f1863f1ec46d24",
+      "exit": 0,
+      "receiptBytes": 482,
+      "receiptSha256": "076d19426755cf2eeb3b64db3dfe8c5e6b94cf9df3254dd79e0b2caa9eb65d31",
+      "delivery": {
+        "firstRequest": 81,
+        "bytes": 482,
+        "sha256": "076d19426755cf2eeb3b64db3dfe8c5e6b94cf9df3254dd79e0b2caa9eb65d31",
+        "requestSha256": "e5ccf378fc2cadedf252db2897e60ff25ccd1bc498cfedbdac7c1c0e7f4a260b"
+      },
+      "excerpt": "\u2714 OpenCode event ledgers retain accepted rows after database history switches (16.055208ms)\n\u2714 event ledgers survive copied, moved, and truncated account histories (44.312834ms)\n\u2714 conflicting event tuples retain the first tuple and accept unrelated events (2.856041ms)\n\u2714 event collectors migrate pre-ledger state without re-counting its known IDs (1.770834ms)\n\u2139 tests 4\n\u2139 suites 0\n\u2139 pass 4\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 128.466292\n",
+      "nextNativeAction": {
+        "partID": "prt_0c86397e2001VFh4lZ03NCwKZ3",
+        "tool": "apply_patch"
+      }
+    },
+    {
+      "nativeIndex": 120,
+      "partID": "prt_0c8643bbb001Pp1rGWqtdO37Jr",
+      "sessionID": "ses_f37b1fdc0ffeJJ3MPnpWc6EYUp",
+      "callID": "call_iSHi1osEjx8mWMGX1oMY9RIq",
+      "tool": "bash",
+      "labels": [
+        "public-test-execution"
+      ],
+      "command": "node --test --test-name-pattern='event ledgers|conflicting event|event collectors migrate|OpenCode event ledgers' packages/connector/test/readers.test.mjs && node --test packages/connector/test/claude-security.test.mjs",
+      "inputSha256": "0230bcf0b31ab4a338a767e2aca62f5a1df4ac0f35cf7a35332e8cb16118fb6f",
+      "exit": 0,
+      "receiptBytes": 663,
+      "receiptSha256": "a1bc8db0d795f0cf4d179b473069d4c77673c254553931a9b96cd47aade4df07",
+      "delivery": {
+        "firstRequest": 84,
+        "bytes": 663,
+        "sha256": "a1bc8db0d795f0cf4d179b473069d4c77673c254553931a9b96cd47aade4df07",
+        "requestSha256": "39a902f291b99e5e4a10bca1670a345fc31cef603dd34cf0bf93ab217a385285"
+      },
+      "excerpt": "\u2714 OpenCode event ledgers retain accepted rows after database history switches (12.211375ms)\n\u2714 event ledgers survive copied, moved, and truncated account histories (25.985042ms)\n\u2714 conflicting event tuples retain the first tuple and accept unrelated events (4.174ms)\n\u2714 event collectors migrate pre-ledger state without re-counting its known IDs (3.376042ms)\n\u2139 tests 4\n\u2139 suites 0\n\u2139 pass 4\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 88.240084\n\u2714 Claude message ids cannot mutate collector prototypes (9.568583ms)\n\u2139 tests 1\n\u2139 suites 0\n\u2139 pass 1\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 43.114084\n",
+      "nextNativeAction": {
+        "partID": "prt_0c864518e001JVPk55ZuaH0UJO",
+        "tool": "bash"
+      }
+    },
+    {
+      "nativeIndex": 121,
+      "partID": "prt_0c864518e001JVPk55ZuaH0UJO",
+      "sessionID": "ses_f37b1fdc0ffeJJ3MPnpWc6EYUp",
+      "callID": "call_fdFTctGCq9elpyio0gQYc6V9",
+      "tool": "bash",
+      "labels": [
+        "public-test-execution"
+      ],
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "inputSha256": "0c83de08ad9ecf39fd73d91e3696067c19a90ba0f00d3e66ea60049fa7b5728e",
+      "exit": 0,
+      "receiptBytes": 7847,
+      "receiptSha256": "452f184daaf10639679b503ebbb976d425846b31973e306db7ee7d1ddbd35888",
+      "delivery": {
+        "firstRequest": 85,
+        "bytes": 7847,
+        "sha256": "452f184daaf10639679b503ebbb976d425846b31973e306db7ee7d1ddbd35888",
+        "requestSha256": "0f08707c3121987823702a1e19d91217401b821d346a1f003d084194c17c9070"
+      },
+      "excerpt": "anged state and resume at the last complete byte offset (5.52425ms)\n\u2714 event ledgers survive copied, moved, and truncated account histories (18.282ms)\n\u2714 conflicting event tuples retain the first tuple and accept unrelated events (3.071875ms)\n\u2714 event collectors migrate pre-ledger state without re-counting its known IDs (3.952833ms)\n\u2714 collector limits are explicit partial results with diagnostics (0.455834ms)\n\u2714 parses valid usage from an oversized JSONL record and marks the pass partial (8.223125ms)\n\u2714 capture wrapper uses the current executable and required headless structured flags (0.24225ms)\n\u2139 tests 90\n\u2139 suites 0\n\u2139 pass 90\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 400.243416\n",
+      "nextNativeAction": {
+        "partID": "prt_0c8645ea8001LoXmNQiJd1CXLh",
+        "tool": "bash"
+      }
+    },
+    {
+      "nativeIndex": 129,
+      "partID": "prt_0c865c129001W2Vvz5FuEQE7qL",
+      "sessionID": "ses_f37b1fdc0ffeJJ3MPnpWc6EYUp",
+      "callID": "call_ZBPU2hMiR0LyIbAOYZ0HLbcV",
+      "tool": "bash",
+      "labels": [
+        "public-test-execution"
+      ],
+      "command": "node --test --test-name-pattern='OpenCode event ledgers|OpenCode marks unsupported' packages/connector/test/readers.test.mjs",
+      "inputSha256": "44924d56084c11320718c485fafa16f2ab44c5db38896ff88f316e69b57d4528",
+      "exit": 0,
+      "receiptBytes": 315,
+      "receiptSha256": "908a32912f178ea4804f8601647ba421479a169f4be657042ddd3a1f5377f3e0",
+      "delivery": {
+        "firstRequest": 91,
+        "bytes": 315,
+        "sha256": "908a32912f178ea4804f8601647ba421479a169f4be657042ddd3a1f5377f3e0",
+        "requestSha256": "8bab7611a6d90b68f2ddcd2744faf21c012b26bd163ba251caf613977e67d931"
+      },
+      "excerpt": "\u2714 OpenCode event ledgers retain accepted rows after database history switches (14.587208ms)\n\u2714 OpenCode marks unsupported assistant usage partial instead of authoritatively clearing days (2.415875ms)\n\u2139 tests 2\n\u2139 suites 0\n\u2139 pass 2\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 65.6795\n",
+      "nextNativeAction": {
+        "partID": "prt_0c865d1fb001CO5Ez8CUpxQGYW",
+        "tool": "bash"
+      }
+    },
+    {
+      "nativeIndex": 130,
+      "partID": "prt_0c865d1fb001CO5Ez8CUpxQGYW",
+      "sessionID": "ses_f37b1fdc0ffeJJ3MPnpWc6EYUp",
+      "callID": "call_U1AWXWWuAsdXdzp8OJU3mfGQ",
+      "tool": "bash",
+      "labels": [
+        "public-test-execution"
+      ],
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "inputSha256": "0c83de08ad9ecf39fd73d91e3696067c19a90ba0f00d3e66ea60049fa7b5728e",
+      "exit": 0,
+      "receiptBytes": 7848,
+      "receiptSha256": "5809f7c82a0b01ae285f07f998d3de0ce72f481c3be0350086afd570de1d417f",
+      "delivery": {
+        "firstRequest": 92,
+        "bytes": 7848,
+        "sha256": "5809f7c82a0b01ae285f07f998d3de0ce72f481c3be0350086afd570de1d417f",
+        "requestSha256": "6f3ba3de1a31f6f7a9f8dbf120f5354ba5fb23539f66deea4b65fc42be54c4ee"
+      },
+      "excerpt": "ged state and resume at the last complete byte offset (5.68875ms)\n\u2714 event ledgers survive copied, moved, and truncated account histories (18.079125ms)\n\u2714 conflicting event tuples retain the first tuple and accept unrelated events (2.968292ms)\n\u2714 event collectors migrate pre-ledger state without re-counting its known IDs (4.765542ms)\n\u2714 collector limits are explicit partial results with diagnostics (0.489667ms)\n\u2714 parses valid usage from an oversized JSONL record and marks the pass partial (7.145042ms)\n\u2714 capture wrapper uses the current executable and required headless structured flags (0.210083ms)\n\u2139 tests 90\n\u2139 suites 0\n\u2139 pass 90\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 483.2355\n",
+      "nextNativeAction": {
+        "partID": "prt_0c865e32a001CFENMGDvZv35cm",
+        "tool": "bash"
+      }
+    }
+  ],
+  "visibleAssistantStatements": [
+    {
+      "firstRequest": 14,
+      "text": "The implementation will keep the ledger inside each adapter\u2019s persisted state, not in upload payloads: hashed identities plus sanitized date/token tuples only. Existing 0.4.3 file contributions will be carried as an unattributed content-free baseline while old raw identity maps are converted or discarded; current scans then add only identities not already observed. I\u2019ll preserve partial-pass retention by committing ledger changes only for fully parsed records, except identity conflicts, which produce a partial result while unrelated records continue.",
+      "fullTextSha256": "3e747b799111d112f03111fabaece692535b612e8085f0604a1a9645303719cf"
+    },
+    {
+      "firstRequest": 36,
+      "text": "The core path is now wired: event analyzers expose sanitized `(identity, tuple)` records, JSONL collectors and OpenCode commit bounded ledgers, Claude migrates its prior identity map to hashes, and connection/sync state transfers adapter state by stable local source ID when server source IDs change. I\u2019m running the reader suite diagnostically before adding regressions to catch preserved-contract breakage introduced by the refactor.",
+      "fullTextSha256": "b09552bdfb6811aa40e9ccc25226f32ff932799e1fb9e203483e3b337df1b462"
+    },
+    {
+      "firstRequest": 52,
+      "text": "The preservation failures are narrowed to two intentional semantic changes: a committed event now remains in the ledger after file truncation, and a replacement with a new event identity is treated as a new event. I fixed provisional-tail aggregation so uncommitted partial records are shown without being added to the ledger; next I\u2019m adding explicit switch/conflict regressions and updating only the truncation assertion that the task deliberately replaces.",
+      "fullTextSha256": "5db956afef461d457d9fd446a5d455e118a28ae71ba336872a4ca0afee86c590"
+    },
+    {
+      "firstRequest": 83,
+      "text": "The focused regressions now cover all five JSONL event adapters, OpenCode SQLite history replacement, conflicting tuples, and conservative pre-ledger migration; Claude\u2019s persisted identity keys are hashed as well. The implementation review also caught and fixed bounded-ledger partial signaling and a legacy Claude partial-state path that could otherwise retain raw IDs. I\u2019m starting the final checks now: targeted new behavior first, then the three requested preservation suites in separate invocations.",
+      "fullTextSha256": "d3b5f894cb26840d456b3093952ad67b61969991279d7371cdf7e2ff264c3f27"
+    },
+    {
+      "firstRequest": 88,
+      "text": "All final behavior and preservation checks pass: targeted ledger/migration/conflict tests, the full reader suite, config suite, protocol suite, and Claude state-security regression. I\u2019m doing the final diff/scope review now, then I\u2019ll attempt the repository-mandated `corepack pnpm verify`; if the documented uncached dependency limitation blocks it, I\u2019ll report that as unavailable rather than treating it as a pass.",
+      "fullTextSha256": "cf729b6e21f343de97398d76040d581d6cb519f939ae9f7303700fc1d1bf9709"
+    },
+    {
+      "firstRequest": 91,
+      "text": "The final review found one preservation edge case in OpenCode: an unsupported partial scan must retain an existing ledger\u2019s accepted entries, while still returning the old empty result when no ledger exists. That is fixed; I\u2019m rerunning the new OpenCode regression and all three requested suites after this last edit.",
+      "fullTextSha256": "662a77e58173a22c3bcd6a01a5477745a0d7e3f0b7ccc69ac044cc66d69d1ee7"
+    }
+  ],
+  "scope": "Selected native tool outputs, actual next request receipts and subsequent actions only. No attribution from instruction presence; raw provider SSE absent. Full outputs remain private, with linked spill files where present."
+}

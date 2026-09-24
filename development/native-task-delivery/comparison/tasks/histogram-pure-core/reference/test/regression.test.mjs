@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';import {fileURLToPath} from 'node:url';const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const m0=await import(path.join(root,"src/counts.mjs"));const m1=await import(path.join(root,"src/summary.mjs"));
+test("first order differs from summary ranking",()=>{const v=['b','a','b','A'];assert.deepEqual(m0.counts(v),[{value:'b',count:2},{value:'a',count:1},{value:'A',count:1}]);assert.deepEqual(m1.summary(v),{entries:[{value:'b',count:2},{value:'A',count:1},{value:'a',count:1}],total:4});});
+test("special keys and frozen input",()=>{const v=Object.freeze(['__proto__','', '__proto__','constructor']);assert.deepEqual(m0.counts(v),[{value:'__proto__',count:2},{value:'',count:1},{value:'constructor',count:1}]);assert.equal(v.length,4);const x=m0.counts(['a']);x[0].count=9;assert.equal(m0.counts(['a'])[0].count,1);});
+test("empty",()=>{assert.deepEqual(m1.summary([]),{entries:[],total:0});});

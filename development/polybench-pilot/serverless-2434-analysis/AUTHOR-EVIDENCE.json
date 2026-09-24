@@ -1,0 +1,917 @@
+[
+  {
+    "arm": "P",
+    "tools": [
+      {
+        "nativeToolIndex": 5,
+        "callID": "call_zR5eNdoYITZmw7pKKTloxV9L",
+        "tool": "read",
+        "status": "completed",
+        "time": {
+          "start": 1789640220730,
+          "end": 1789640220776
+        },
+        "input": {
+          "filePath": "/work/repo/lib/classes/Service.js",
+          "offset": 1,
+          "limit": 260
+        },
+        "receiptSha256": "d3898c9a31d8c087c4b1a4c71905a8d94d2f6b8c4531b432ecd8bd1e19c48945",
+        "exitCode": null,
+        "nativeTruncated": false,
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-5.json",
+          "requestNumber": 5,
+          "outputSha256": "d3898c9a31d8c087c4b1a4c71905a8d94d2f6b8c4531b432ecd8bd1e19c48945",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 6,
+        "callID": "call_EEhaj2vkbaRoQKMQODDOIuEK",
+        "tool": "read",
+        "status": "completed",
+        "time": {
+          "start": 1789640220734,
+          "end": 1789640220777
+        },
+        "input": {
+          "filePath": "/work/repo/lib/classes/Variables.js",
+          "offset": 1,
+          "limit": 360
+        },
+        "receiptSha256": "18eebad29582afaad5d18ba3f412782e8304f8dbd233aa2f8ca8d811c96717b1",
+        "exitCode": null,
+        "nativeTruncated": false,
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-5.json",
+          "requestNumber": 5,
+          "outputSha256": "18eebad29582afaad5d18ba3f412782e8304f8dbd233aa2f8ca8d811c96717b1",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 7,
+        "callID": "call_IZkqS0g64zB9shfpBOMioAot",
+        "tool": "read",
+        "status": "completed",
+        "time": {
+          "start": 1789640220738,
+          "end": 1789640220794
+        },
+        "input": {
+          "filePath": "/work/repo/lib/classes/Service.test.js",
+          "offset": 1,
+          "limit": 420
+        },
+        "receiptSha256": "65ab146092f2ab9d983043e29d25ba562ad0d766f35dfa74ddef5510de2f9115",
+        "exitCode": null,
+        "nativeTruncated": true,
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-5.json",
+          "requestNumber": 5,
+          "outputSha256": "65ab146092f2ab9d983043e29d25ba562ad0d766f35dfa74ddef5510de2f9115",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 10,
+        "callID": "call_AYlsuYwc4odlbiMpQ2s1Vhmu",
+        "tool": "read",
+        "status": "completed",
+        "time": {
+          "start": 1789640230143,
+          "end": 1789640230163
+        },
+        "input": {
+          "filePath": "/work/repo/lib/classes/Service.test.js",
+          "offset": 390,
+          "limit": 180
+        },
+        "receiptSha256": "610031b061dad205bf39757284cdddb3d7a1506798f8efe1c34541a010d82f04",
+        "exitCode": null,
+        "nativeTruncated": false,
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-6.json",
+          "requestNumber": 6,
+          "outputSha256": "610031b061dad205bf39757284cdddb3d7a1506798f8efe1c34541a010d82f04",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 11,
+        "callID": "call_hzuLtHnotnECoDXibWhqdXlR",
+        "tool": "read",
+        "status": "completed",
+        "time": {
+          "start": 1789640230146,
+          "end": 1789640230160
+        },
+        "input": {
+          "filePath": "/work/repo/lib/classes/Variables.test.js",
+          "offset": 1,
+          "limit": 420
+        },
+        "receiptSha256": "3a4bb78a357175547c0670a92f79bd982ce33c419db8daef50a3a97e819cf62c",
+        "exitCode": null,
+        "nativeTruncated": true,
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-6.json",
+          "requestNumber": 6,
+          "outputSha256": "3a4bb78a357175547c0670a92f79bd982ce33c419db8daef50a3a97e819cf62c",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 12,
+        "callID": "call_Mg70OY0KKqkKqI9evKjMo6pX",
+        "tool": "read",
+        "status": "completed",
+        "time": {
+          "start": 1789640230151,
+          "end": 1789640230168
+        },
+        "input": {
+          "filePath": "/work/repo/lib/Serverless.js",
+          "offset": 1,
+          "limit": 280
+        },
+        "receiptSha256": "49a39abce341e89a8d19fbb9b96f5c47196de7d909afe2b6e31714364c387637",
+        "exitCode": null,
+        "nativeTruncated": false,
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-6.json",
+          "requestNumber": 6,
+          "outputSha256": "49a39abce341e89a8d19fbb9b96f5c47196de7d909afe2b6e31714364c387637",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 19,
+        "callID": "call_FsdxIfVNmYJMxQ9ASBaBK6P5",
+        "tool": "read",
+        "status": "completed",
+        "time": {
+          "start": 1789640258769,
+          "end": 1789640258776
+        },
+        "input": {
+          "filePath": "/work/repo/lib/classes/Variables.test.js",
+          "offset": 365,
+          "limit": 180
+        },
+        "receiptSha256": "13100b745c91ec00c526c7813a20ef9fbdde7c5fc6e249886718f10e7245f8be",
+        "exitCode": null,
+        "nativeTruncated": false,
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-8.json",
+          "requestNumber": 8,
+          "outputSha256": "13100b745c91ec00c526c7813a20ef9fbdde7c5fc6e249886718f10e7245f8be",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 26,
+        "callID": "call_PV5UmwV9NFvihLJH253kLKt7",
+        "tool": "apply_patch",
+        "status": "completed",
+        "time": {
+          "start": 1789640322223,
+          "end": 1789640322241
+        },
+        "receiptSha256": "3ec7fa567c5eaeafd0ad32b304e4b0822d7d9f2436d40b3559de125adc095f3d",
+        "exitCode": null,
+        "nativeTruncated": false,
+        "patchSha256": "6490b8de6561424efe3493de5b3264c8371cb8fcac875dd5e706276b2a94f1ef",
+        "files": [
+          "/work/repo/lib/classes/Service.js",
+          "/work/repo/lib/classes/Variables.js",
+          "/work/repo/lib/classes/Service.test.js"
+        ],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-11.json",
+          "requestNumber": 11,
+          "outputSha256": "3ec7fa567c5eaeafd0ad32b304e4b0822d7d9f2436d40b3559de125adc095f3d",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 27,
+        "callID": "call_GkgmfWASiAXtt6kPH8rjcqCV",
+        "tool": "bash",
+        "status": "completed",
+        "time": {
+          "start": 1789640327521,
+          "end": 1789640329665
+        },
+        "input": {
+          "command": "./node_modules/.bin/mocha lib/classes/Service.test.js lib/classes/Variables.test.js -- -R spec",
+          "workdir": "/work/repo",
+          "timeout": 120000
+        },
+        "receiptSha256": "0534517c3127686262e2d27e83027e37b4f56943a0d5f23ca9e23ba008fd0462",
+        "exitCode": 0,
+        "nativeTruncated": false,
+        "reportedCounts": [
+          "62 passing"
+        ],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-12.json",
+          "requestNumber": 12,
+          "outputSha256": "0534517c3127686262e2d27e83027e37b4f56943a0d5f23ca9e23ba008fd0462",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": [
+            "62 passing"
+          ]
+        }
+      },
+      {
+        "nativeToolIndex": 29,
+        "callID": "call_evaDIUpkDiZtAMZzLsu4jjXb",
+        "tool": "bash",
+        "status": "completed",
+        "time": {
+          "start": 1789640349955,
+          "end": 1789640357936
+        },
+        "input": {
+          "command": "npm run lint",
+          "workdir": "/work/repo",
+          "timeout": 120000
+        },
+        "receiptSha256": "a92d7f1106a8723c93af9837688394f68a15270d2fed1e5906430a36d6ee6b60",
+        "exitCode": 1,
+        "nativeTruncated": false,
+        "reportedCounts": [],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-14.json",
+          "requestNumber": 14,
+          "outputSha256": "a92d7f1106a8723c93af9837688394f68a15270d2fed1e5906430a36d6ee6b60",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 30,
+        "callID": "call_iD8Tcdefg9M8YVGjKdS0IIKd",
+        "tool": "bash",
+        "status": "completed",
+        "time": {
+          "start": 1789640349960,
+          "end": 1789640363228
+        },
+        "input": {
+          "command": "npm test",
+          "workdir": "/work/repo",
+          "timeout": 120000
+        },
+        "receiptSha256": "f374e42b248eb18d7f030f6bfd3c0855fea90cd744fa51d9ddcaed5ae0b02f07",
+        "exitCode": 0,
+        "nativeTruncated": false,
+        "reportedCounts": [],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-14.json",
+          "requestNumber": 14,
+          "outputSha256": "f374e42b248eb18d7f030f6bfd3c0855fea90cd744fa51d9ddcaed5ae0b02f07",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 32,
+        "callID": "call_lhnlNIE9FmOerc4GL3MF2TyM",
+        "tool": "bash",
+        "status": "completed",
+        "time": {
+          "start": 1789640385618,
+          "end": 1789640388532
+        },
+        "input": {
+          "command": "./node_modules/.bin/eslint lib/classes/Service.js lib/classes/Variables.js lib/classes/Service.test.js",
+          "workdir": "/work/repo",
+          "timeout": 120000
+        },
+        "receiptSha256": "027d098e402ac4ae8cdefc7ad4561f151ef3e2fcc7dc85b7556835336da776b4",
+        "exitCode": 0,
+        "nativeTruncated": false,
+        "reportedCounts": [],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-15.json",
+          "requestNumber": 15,
+          "outputSha256": "027d098e402ac4ae8cdefc7ad4561f151ef3e2fcc7dc85b7556835336da776b4",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 35,
+        "callID": "call_Ag9TzywAlK2hjWvud5hnhACr",
+        "tool": "apply_patch",
+        "status": "completed",
+        "time": {
+          "start": 1789640412920,
+          "end": 1789640412927
+        },
+        "receiptSha256": "017544552ed9acd14078e8351fd61c2373c7af5e720a6b1ff08d14c0c9df82d8",
+        "exitCode": null,
+        "nativeTruncated": false,
+        "patchSha256": "12e5fe6a82e10ce2a64e3f22b9eaa37baa2643bd9b3c9e2cc8175a9df34ff6f9",
+        "files": [
+          "/work/repo/lib/classes/Service.js",
+          "/work/repo/lib/classes/Service.test.js"
+        ],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-16.json",
+          "requestNumber": 16,
+          "outputSha256": "017544552ed9acd14078e8351fd61c2373c7af5e720a6b1ff08d14c0c9df82d8",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 36,
+        "callID": "call_GD4sHlPfE6rfb4w48fm5ojCa",
+        "tool": "bash",
+        "status": "completed",
+        "time": {
+          "start": 1789640421394,
+          "end": 1789640424321
+        },
+        "input": {
+          "command": "./node_modules/.bin/mocha lib/classes/Service.test.js lib/classes/Variables.test.js --reporter dot",
+          "workdir": "/work/repo",
+          "timeout": 120000
+        },
+        "receiptSha256": "dd9273a1d42bac839c3cff77dcb63edd4485f146d536039ed896ea73b3d6a77c",
+        "exitCode": 0,
+        "nativeTruncated": false,
+        "reportedCounts": [
+          "63 passing"
+        ],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-17.json",
+          "requestNumber": 17,
+          "outputSha256": "dd9273a1d42bac839c3cff77dcb63edd4485f146d536039ed896ea73b3d6a77c",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": [
+            "63 passing"
+          ]
+        }
+      },
+      {
+        "nativeToolIndex": 37,
+        "callID": "call_NBvinGOh6idIlxMNoUpB1YWd",
+        "tool": "bash",
+        "status": "completed",
+        "time": {
+          "start": 1789640421445,
+          "end": 1789640424702
+        },
+        "input": {
+          "command": "./node_modules/.bin/eslint lib/classes/Service.js lib/classes/Variables.js lib/classes/Service.test.js",
+          "workdir": "/work/repo",
+          "timeout": 120000
+        },
+        "receiptSha256": "f2d8880ffe2606334f107effefeba0264949826000de5f87ec10969d8874d5fc",
+        "exitCode": 0,
+        "nativeTruncated": false,
+        "reportedCounts": [],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-17.json",
+          "requestNumber": 17,
+          "outputSha256": "f2d8880ffe2606334f107effefeba0264949826000de5f87ec10969d8874d5fc",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 43,
+        "callID": "call_KA4J0ujeh0qmTVGiRHVKIE9G",
+        "tool": "read",
+        "status": "completed",
+        "time": {
+          "start": 1789640438131,
+          "end": 1789640438135
+        },
+        "input": {
+          "filePath": "/work/repo/TASK.md",
+          "offset": 1,
+          "limit": 120
+        },
+        "receiptSha256": "b0cf2fbd56a1cf2d9349940a0c004f0a4794a27618766f20ea1c3d68e4e45b9a",
+        "exitCode": null,
+        "nativeTruncated": false,
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-19.json",
+          "requestNumber": 19,
+          "outputSha256": "b0cf2fbd56a1cf2d9349940a0c004f0a4794a27618766f20ea1c3d68e4e45b9a",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 44,
+        "callID": "call_NZHOXabA2xID2ipIv9XcEM46",
+        "tool": "apply_patch",
+        "status": "completed",
+        "time": {
+          "start": 1789640459209,
+          "end": 1789640459213
+        },
+        "receiptSha256": "0d493d66105c3d16f4cee99c7105fe458bdf6f35b8a33fe494fa3756d52a04ff",
+        "exitCode": null,
+        "nativeTruncated": false,
+        "patchSha256": "fa6d0e266fe9f09b1265ecb893f6368acb557cc3606972163203b0c08c11a0b2",
+        "files": [
+          "/work/repo/lib/classes/Service.js"
+        ],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-20.json",
+          "requestNumber": 20,
+          "outputSha256": "0d493d66105c3d16f4cee99c7105fe458bdf6f35b8a33fe494fa3756d52a04ff",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 45,
+        "callID": "call_mjITFmXE5lYavMYixXPGMUNY",
+        "tool": "bash",
+        "status": "completed",
+        "time": {
+          "start": 1789640466279,
+          "end": 1789640469165
+        },
+        "input": {
+          "command": "./node_modules/.bin/mocha lib/classes/Service.test.js lib/classes/Variables.test.js --reporter dot",
+          "workdir": "/work/repo",
+          "timeout": 120000
+        },
+        "receiptSha256": "c50bfa8b14ee948eed2b1c456e3dabafc7d9d15b5a1c1f66cb0557e6a1520e31",
+        "exitCode": 0,
+        "nativeTruncated": false,
+        "reportedCounts": [
+          "63 passing"
+        ],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-21.json",
+          "requestNumber": 21,
+          "outputSha256": "c50bfa8b14ee948eed2b1c456e3dabafc7d9d15b5a1c1f66cb0557e6a1520e31",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": [
+            "63 passing"
+          ]
+        }
+      },
+      {
+        "nativeToolIndex": 46,
+        "callID": "call_0dkxymvzOYHSoDb22M42t8Ob",
+        "tool": "bash",
+        "status": "completed",
+        "time": {
+          "start": 1789640466299,
+          "end": 1789640469470
+        },
+        "input": {
+          "command": "./node_modules/.bin/eslint lib/classes/Service.js lib/classes/Variables.js lib/classes/Service.test.js",
+          "workdir": "/work/repo",
+          "timeout": 120000
+        },
+        "receiptSha256": "b82b417f3a1f9e3c127c7113e3cae380eb5cdf44443f9b592fd6ecac2e9b023b",
+        "exitCode": 0,
+        "nativeTruncated": false,
+        "reportedCounts": [],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-21.json",
+          "requestNumber": 21,
+          "outputSha256": "b82b417f3a1f9e3c127c7113e3cae380eb5cdf44443f9b592fd6ecac2e9b023b",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 48,
+        "callID": "call_2Ig3ZetBSWsTAcx7ilKvnEe4",
+        "tool": "read",
+        "status": "completed",
+        "time": {
+          "start": 1789640473407,
+          "end": 1789640473413
+        },
+        "input": {
+          "filePath": "/work/repo/lib/classes/Service.js",
+          "offset": 145,
+          "limit": 52
+        },
+        "receiptSha256": "688b6c58468d9d5c015ef5a2a981b4fc066feb617d9d9d31397ca8f69bb6c9c6",
+        "exitCode": null,
+        "nativeTruncated": true,
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-22.json",
+          "requestNumber": 22,
+          "outputSha256": "688b6c58468d9d5c015ef5a2a981b4fc066feb617d9d9d31397ca8f69bb6c9c6",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      }
+    ],
+    "terminal": {
+      "exitCode": 0,
+      "signal": null,
+      "termination": {
+        "terminationVerified": true,
+        "killed": []
+      },
+      "timedOut": false,
+      "stopReason": null,
+      "nativeCompleted": true,
+      "executionElapsedMs": 300911,
+      "requests": 23,
+      "requestsWithoutUsage": 0
+    },
+    "missingDeliveryEvidence": [],
+    "originalTaskRequest": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/request-2.json",
+    "terminalResponse": "local/polybench-pilot/batch/runs/serverless__serverless-2434-P/response-23.sse",
+    "terminalClaim": "63 targeted tests passing; modified files lint clean; broader unrelated failures acknowledged"
+  },
+  {
+    "arm": "H0",
+    "tools": [
+      {
+        "nativeToolIndex": 76,
+        "callID": "call_PbEDpmuPPhB5uNRXIj3QWDYh",
+        "tool": "apply_patch",
+        "status": "completed",
+        "time": {
+          "start": 1789641316996,
+          "end": 1789641318699
+        },
+        "receiptSha256": "7a9f0fac49067211861af1f82c120cbac455b98cbb49b002216e4a9e33c34f10",
+        "exitCode": null,
+        "nativeTruncated": false,
+        "patchSha256": "9925b5ddc72c3d490d7f667c44977b516e9af240e008cc1c9399e55a92b14d34",
+        "files": [
+          "lib/classes/Variables.js",
+          "lib/Serverless.js"
+        ],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-H0/request-39.json",
+          "requestNumber": 39,
+          "outputSha256": "7a9f0fac49067211861af1f82c120cbac455b98cbb49b002216e4a9e33c34f10",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 77,
+        "callID": "call_gsq9zowVcDQhphhbqcqEPsTZ",
+        "tool": "bash",
+        "status": "completed",
+        "time": {
+          "start": 1789641323869,
+          "end": 1789641327441
+        },
+        "input": {
+          "command": "./node_modules/.bin/mocha lib/classes/Service.test.js --grep \"load function events from a file variable\"",
+          "workdir": ".",
+          "timeout": 120000
+        },
+        "receiptSha256": "53824532fb3f7a743275dc02e0d5bae2ea46260d4c5c30fccb83bb335d08d0d4",
+        "exitCode": 0,
+        "nativeTruncated": false,
+        "reportedCounts": [
+          "1 passing"
+        ],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-H0/request-40.json",
+          "requestNumber": 40,
+          "outputSha256": "53824532fb3f7a743275dc02e0d5bae2ea46260d4c5c30fccb83bb335d08d0d4",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": [
+            "1 passing"
+          ]
+        }
+      },
+      {
+        "nativeToolIndex": 78,
+        "callID": "call_Dh64LAQgZMGmIJ5pjprVLZG2",
+        "tool": "bash",
+        "status": "completed",
+        "time": {
+          "start": 1789641334395,
+          "end": 1789641338115
+        },
+        "input": {
+          "command": "./node_modules/.bin/mocha lib/classes/Service.test.js lib/classes/Variables.test.js lib/Serverless.test.js",
+          "workdir": ".",
+          "timeout": 120000
+        },
+        "receiptSha256": "47fb4eb214b2d301c78328e002c0ce69f6f5c1d5201ed35d832a772c191afd50",
+        "exitCode": 2,
+        "nativeTruncated": false,
+        "reportedCounts": [
+          "85 passing",
+          "2 failing"
+        ],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-H0/request-41.json",
+          "requestNumber": 41,
+          "outputSha256": "47fb4eb214b2d301c78328e002c0ce69f6f5c1d5201ed35d832a772c191afd50",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": [
+            "85 passing",
+            "2 failing"
+          ]
+        }
+      },
+      {
+        "nativeToolIndex": 79,
+        "callID": "call_t2clcdNRGdn7KSSeHzefhXxU",
+        "tool": "bash",
+        "status": "completed",
+        "time": {
+          "start": 1789641345809,
+          "end": 1789641350096
+        },
+        "input": {
+          "command": "./node_modules/.bin/eslint lib/Serverless.js lib/classes/Service.js lib/classes/Variables.js lib/classes/Service.test.js",
+          "workdir": ".",
+          "timeout": 120000
+        },
+        "receiptSha256": "0b8dfca3d759e0faf9e0dcccdd5444821718c93da2d45cdfb81e17c4fa64176d",
+        "exitCode": 0,
+        "nativeTruncated": false,
+        "reportedCounts": [],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-H0/request-42.json",
+          "requestNumber": 42,
+          "outputSha256": "0b8dfca3d759e0faf9e0dcccdd5444821718c93da2d45cdfb81e17c4fa64176d",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 80,
+        "callID": "call_LAUFISEDhidCjLWhuWyKuPpn",
+        "tool": "bash",
+        "status": "completed",
+        "time": {
+          "start": 1789641395476,
+          "end": 1789641404055
+        },
+        "input": {
+          "command": "npm run lint",
+          "workdir": ".",
+          "timeout": 120000
+        },
+        "receiptSha256": "9422950f8a75f8adfb468adb285c15c94be2e6945457aa9ae1318896e7678c87",
+        "exitCode": 1,
+        "nativeTruncated": false,
+        "reportedCounts": [],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-H0/request-43.json",
+          "requestNumber": 43,
+          "outputSha256": "9422950f8a75f8adfb468adb285c15c94be2e6945457aa9ae1318896e7678c87",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      }
+    ],
+    "terminal": {
+      "exitCode": 0,
+      "signal": null,
+      "termination": {
+        "terminationVerified": true,
+        "killed": []
+      },
+      "timedOut": false,
+      "stopReason": null,
+      "nativeCompleted": true,
+      "executionElapsedMs": 909378,
+      "requests": 46,
+      "requestsWithoutUsage": 0
+    },
+    "missingDeliveryEvidence": []
+  },
+  {
+    "arm": "H1",
+    "tools": [
+      {
+        "nativeToolIndex": 52,
+        "callID": "call_UHXEaaj49ZOPpAycbgStJ0il",
+        "tool": "apply_patch",
+        "status": "completed",
+        "time": {
+          "start": 1789641899353,
+          "end": 1789641901153
+        },
+        "receiptSha256": "2196ea6118fc34101f62b5f9f5b1c2495b14b8b88bf350dc7e026cae463f7b9d",
+        "exitCode": null,
+        "nativeTruncated": false,
+        "patchSha256": "ec7ffca4fd7d9de5fbb1f8a8f3b2d23a449a216a3326bc6334e6a85128f537ed",
+        "files": [
+          "lib/classes/Service.js",
+          "lib/Serverless.js"
+        ],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-H1/request-18.json",
+          "requestNumber": 18,
+          "outputSha256": "2196ea6118fc34101f62b5f9f5b1c2495b14b8b88bf350dc7e026cae463f7b9d",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 61,
+        "callID": "call_0PnTN76xoc2FVXLYa6plMH4T",
+        "tool": "apply_patch",
+        "status": "completed",
+        "time": {
+          "start": 1789642018908,
+          "end": 1789642020548
+        },
+        "receiptSha256": "0d493d66105c3d16f4cee99c7105fe458bdf6f35b8a33fe494fa3756d52a04ff",
+        "exitCode": null,
+        "nativeTruncated": false,
+        "patchSha256": "db6640760de56795d18766ed82609cef484e62a4926124da2433550af28b54ef",
+        "files": [
+          "lib/classes/Service.js"
+        ],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-H1/request-25.json",
+          "requestNumber": 25,
+          "outputSha256": "0d493d66105c3d16f4cee99c7105fe458bdf6f35b8a33fe494fa3756d52a04ff",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 63,
+        "callID": "call_JZPpR8ztlThEGuXpOdnmD2v8",
+        "tool": "bash",
+        "status": "completed",
+        "time": {
+          "start": 1789642041154,
+          "end": 1789642044767
+        },
+        "input": {
+          "command": "./node_modules/.bin/mocha lib/classes/Service.test.js",
+          "workdir": ".",
+          "timeout": 120000
+        },
+        "receiptSha256": "ca7d8062be3e8c8128b8b62f1016cde22d285090a07e849f4dba98915897d665",
+        "exitCode": 0,
+        "nativeTruncated": false,
+        "reportedCounts": [
+          "28 passing"
+        ],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-H1/request-27.json",
+          "requestNumber": 27,
+          "outputSha256": "ca7d8062be3e8c8128b8b62f1016cde22d285090a07e849f4dba98915897d665",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": [
+            "28 passing"
+          ]
+        }
+      },
+      {
+        "nativeToolIndex": 64,
+        "callID": "call_lJZSVrBvNnuf6oNwOm8FjNR6",
+        "tool": "bash",
+        "status": "completed",
+        "time": {
+          "start": 1789642051446,
+          "end": 1789642054968
+        },
+        "input": {
+          "command": "./node_modules/.bin/mocha lib/classes/Variables.test.js",
+          "workdir": ".",
+          "timeout": 120000
+        },
+        "receiptSha256": "1c405c77ef92d61ddc659a37683c8494a0f2a6e746545bf069672a3d8fc0ea9d",
+        "exitCode": 0,
+        "nativeTruncated": false,
+        "reportedCounts": [
+          "34 passing"
+        ],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-H1/request-28.json",
+          "requestNumber": 28,
+          "outputSha256": "1c405c77ef92d61ddc659a37683c8494a0f2a6e746545bf069672a3d8fc0ea9d",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": [
+            "34 passing"
+          ]
+        }
+      },
+      {
+        "nativeToolIndex": 65,
+        "callID": "call_G72HYtf4cmkOOvQr1XgxUThT",
+        "tool": "bash",
+        "status": "completed",
+        "time": {
+          "start": 1789642059668,
+          "end": 1789642063575
+        },
+        "input": {
+          "command": "./node_modules/.bin/eslint lib/classes/Service.js lib/Serverless.js lib/classes/Service.test.js",
+          "workdir": ".",
+          "timeout": 120000
+        },
+        "receiptSha256": "bff36e13c2246d842170aceda7294aaec4e731a05c34a2d3ab5608df6f6e8b8f",
+        "exitCode": 0,
+        "nativeTruncated": false,
+        "reportedCounts": [],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-H1/request-29.json",
+          "requestNumber": 29,
+          "outputSha256": "bff36e13c2246d842170aceda7294aaec4e731a05c34a2d3ab5608df6f6e8b8f",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      },
+      {
+        "nativeToolIndex": 66,
+        "callID": "call_txcLHTQHXUJtuwttmWySEkn7",
+        "tool": "bash",
+        "status": "completed",
+        "time": {
+          "start": 1789642070507,
+          "end": 1789642074043
+        },
+        "input": {
+          "command": "./node_modules/.bin/mocha lib/Serverless.test.js",
+          "workdir": ".",
+          "timeout": 120000
+        },
+        "receiptSha256": "0229d6643c5cdb700968629f26a57560235d55b89eef9f3063f9fbb8c314df47",
+        "exitCode": 2,
+        "nativeTruncated": false,
+        "reportedCounts": [
+          "24 passing",
+          "2 failing"
+        ],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-H1/request-30.json",
+          "requestNumber": 30,
+          "outputSha256": "0229d6643c5cdb700968629f26a57560235d55b89eef9f3063f9fbb8c314df47",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": [
+            "24 passing",
+            "2 failing"
+          ]
+        }
+      },
+      {
+        "nativeToolIndex": 74,
+        "callID": "call_K2kWbVehZm9LIr8692d9BUB4",
+        "tool": "bash",
+        "status": "completed",
+        "time": {
+          "start": 1789642123607,
+          "end": 1789642137096
+        },
+        "input": {
+          "command": "npm test",
+          "workdir": ".",
+          "timeout": 120000
+        },
+        "receiptSha256": "3553bac16cfb078277ec62a7ecee99d6ca89c1c96179fc61ae089141f450eac8",
+        "exitCode": 0,
+        "nativeTruncated": false,
+        "reportedCounts": [],
+        "firstActualProviderRequest": {
+          "path": "local/polybench-pilot/batch/runs/serverless__serverless-2434-H1/request-32.json",
+          "requestNumber": 32,
+          "outputSha256": "3553bac16cfb078277ec62a7ecee99d6ca89c1c96179fc61ae089141f450eac8",
+          "sameBytesAsNativeReceipt": true,
+          "reportedCounts": []
+        }
+      }
+    ],
+    "terminal": {
+      "exitCode": 0,
+      "signal": null,
+      "termination": {
+        "terminationVerified": true,
+        "killed": []
+      },
+      "timedOut": false,
+      "stopReason": null,
+      "nativeCompleted": true,
+      "executionElapsedMs": 711662,
+      "requests": 35,
+      "requestsWithoutUsage": 0
+    },
+    "missingDeliveryEvidence": []
+  }
+]

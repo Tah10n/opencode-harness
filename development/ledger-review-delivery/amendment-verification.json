@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "scope": "model-free amendment and original failed-attempt replay",
+  "hostCeilingAccepts3150000And3600000": true,
+  "outOfBoundsRejected": true,
+  "stageAndGlobalBudgetArithmetic": true,
+  "transitionStops": true,
+  "recordedParentAndTitleReplay": true,
+  "missingAuthorTaskRejected": true,
+  "missingFinalReviewRejected": true,
+  "nativeAuthorStarts": 0,
+  "realProviderRequests": 0,
+  "originalPreflight": "FAILED; original session never resumed",
+  "reviewerInventory": "NOT RUN",
+  "patchApplication": "NOT RUN",
+  "unknownSyntheticResponsePreserved": true,
+  "collectorCaptureComplete": true,
+  "deliveryAssertionFailed": true
+}

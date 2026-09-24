@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/lines.mjs": "const normalize=s=>s.replace(/\\r\\n?/g,'\\n');export function createIndex(input){let text=normalize(input);const starts=()=>{const out=[0];for(let i=0;i<text.length;i++)if(text[i]==='\\n')out.push(i+1);return out;};const validOffset=n=>{if(!Number.isInteger(n)||n<0||n>text.length)throw new RangeError('offset');};return {text(){return text;},starts,replace(start,end,value){validOffset(start);validOffset(end);if(start>end)throw new RangeError('range');text=text.slice(0,start)+normalize(value)+text.slice(end);},locate(at){validOffset(at);const ss=starts();let low=0,high=ss.length;while(low+1<high){const mid=Math.floor((low+high)/2);if(ss[mid]<=at)low=mid;else high=mid;}const line=low;return {line,column:at-ss[line]};},offset(line,column){const ss=starts();if(!Number.isInteger(line)||line<0||line>=ss.length||!Number.isInteger(column)||column<0)throw new RangeError('position');const length=(line+1<ss.length?ss[line+1]-1:text.length)-ss[line];if(column>length)throw new RangeError('column');return ss[line]+column;}};}\n"
+  },
+  "mutants": [
+    {
+      "name": "lone-CR-not-normalized",
+      "file": "src/lines.mjs",
+      "replacement": "const normalize=s=>s.replace(/\\r\\n/g,'\\n');export function createIndex(input){let text=normalize(input);const starts=()=>{const out=[0];for(let i=0;i<text.length;i++)if(text[i]==='\\n')out.push(i+1);return out;};const validOffset=n=>{if(!Number.isInteger(n)||n<0||n>text.length)throw new RangeError('offset');};return {text(){return text;},starts,replace(start,end,value){validOffset(start);validOffset(end);if(start>end)throw new RangeError('range');text=text.slice(0,start)+normalize(value)+text.slice(end);},locate(at){validOffset(at);const ss=starts();let line=0;while(line+1<ss.length&&ss[line+1]<=at)line++;return {line,column:at-ss[line]};},offset(line,column){const ss=starts();if(!Number.isInteger(line)||line<0||line>=ss.length||!Number.isInteger(column)||column<0)throw new RangeError('position');const length=(line+1<ss.length?ss[line+1]-1:text.length)-ss[line];if(column>length)throw new RangeError('column');return ss[line]+column;}};}\n"
+    },
+    {
+      "name": "newline-belongs-next-line",
+      "file": "src/lines.mjs",
+      "replacement": "const normalize=s=>s.replace(/\\r\\n?/g,'\\n');export function createIndex(input){let text=normalize(input);const starts=()=>{const out=[0];for(let i=0;i<text.length;i++)if(text[i]==='\\n')out.push(i+1);return out;};const validOffset=n=>{if(!Number.isInteger(n)||n<0||n>text.length)throw new RangeError('offset');};return {text(){return text;},starts,replace(start,end,value){validOffset(start);validOffset(end);if(start>end)throw new RangeError('range');text=text.slice(0,start)+normalize(value)+text.slice(end);},locate(at){validOffset(at);const ss=starts();let line=0;while(line+1<ss.length&&ss[line+1]-1<=at)line++;return {line,column:at-ss[line]};},offset(line,column){const ss=starts();if(!Number.isInteger(line)||line<0||line>=ss.length||!Number.isInteger(column)||column<0)throw new RangeError('position');const length=(line+1<ss.length?ss[line+1]-1:text.length)-ss[line];if(column>length)throw new RangeError('column');return ss[line]+column;}};}\n"
+    }
+  ]
+}

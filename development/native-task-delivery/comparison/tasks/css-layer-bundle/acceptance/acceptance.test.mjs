@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';const root=process.env.PILOT_SOURCE;
+const m0=await import(path.join(root,"src/layers.mjs"));const m1=await import(path.join(root,"src/bundle.mjs"));
+test("dependency ordering reaches bundle",()=>{assert.equal(m1.bundle([{name:'z',css:'Z'},{name:'a',css:'A'},{name:'b',css:'B'}],[['z','a']]),'@layer b { B }\n@layer z { Z }\n@layer a { A }');});
+test("cycle and immutable input",()=>{const names=Object.freeze(['b','a']);assert.deepEqual(m0.orderLayers(names,[]),['a','b']);assert.deepEqual(names,['b','a']);assert.throws(()=>m0.orderLayers(['a'],[['a','a']]),{name:'RangeError',message:'cycle'});});
+test("empty and duplicate edges",()=>{assert.equal(m1.bundle([],[]),'');assert.deepEqual(m0.orderLayers(['c','b','a'],[['a','b'],['a','b']]),['a','b','c']);});

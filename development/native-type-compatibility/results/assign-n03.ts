@@ -1,0 +1,11 @@
+import Old from './baseline';
+import New from './n03';
+type Events = { sample: [string] };
+type Receiver = { marker: string };
+declare const modern: New<Events, Receiver>;
+const instance: Old<Events, Receiver> = modern;
+const constructor: typeof Old = New;
+type OldSurface = Old<Events, Receiver>;
+type NewSurface = New<Events, Receiver>;
+declare const methods: { [K in keyof OldSurface]: K extends keyof NewSurface ? NewSurface[K] : unknown };
+const oldMethods: OldSurface = methods;

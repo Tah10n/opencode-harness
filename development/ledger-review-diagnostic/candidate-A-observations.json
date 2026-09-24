@@ -1,0 +1,100 @@
+{
+  "arm": "candidate-A",
+  "observations": [
+    {
+      "finding": "A1",
+      "path": "antigravity public collect with one valid and one unsupported record",
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "actual": [],
+      "completeness": "partial"
+    },
+    {
+      "finding": "A1",
+      "path": "OpenCode public SQLite collect",
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "actual": [],
+      "completeness": "partial"
+    },
+    {
+      "finding": "A2",
+      "agent": "antigravity",
+      "entryPoint": "adapterFor(agent).collect",
+      "before": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-10",
+          "30"
+        ]
+      ],
+      "completeness": "partial"
+    },
+    {
+      "finding": "A2",
+      "agent": "claude_code",
+      "entryPoint": "adapterFor(agent).collect",
+      "before": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-10",
+          "30"
+        ]
+      ],
+      "completeness": "partial"
+    },
+    {
+      "finding": "A3",
+      "entryPoint": "antigravity public collect; serialized native ledger at cap",
+      "beforeTotal": "65536",
+      "expectedAfterNew": "65543",
+      "afterNew": [
+        [
+          "2026-08-10",
+          "65542"
+        ]
+      ],
+      "firstIdentityEvicted": true,
+      "firstIdentityReaccepted": true,
+      "afterReplay": [
+        [
+          "2026-08-10",
+          "65542"
+        ]
+      ],
+      "completenessAfterNew": "partial",
+      "completenessAfterReplay": "partial",
+      "limits": "Seeded implementation-native serialized state, not 65536 parser executions; no simultaneous doubled-total claim"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "freezeAndUnchangedM": true,
+  "providerAccountingAndReceiptDelivery": true,
+  "frozenBehavioralInventory": 23,
+  "FTestsPassed": 204,
+  "EPass": 10,
+  "EFail": 13,
+  "projectVerify": "unavailable, not passing",
+  "scriptedPreflights": 1,
+  "realAttempts": 1,
+  "authorRepairOrContinuation": false,
+  "syntax": "Python AST and touched launcher/diagnostic Node syntax checked",
+  "sharedChangeScope": "Single ledger schedule and existing recorder experiment allowlists only",
+  "collectorTransportPolicyLibDefaultsUnchanged": true,
+  "scopedWhitespace": true,
+  "containers": [
+    {
+      "phase": "preflight",
+      "container": "template-dev-f642dd80-4b0e-438c-ab69-33901bfcf033",
+      "absent": true,
+      "inspectExit": 1,
+      "diagnostic": "error: no such object",
+      "firstVerifierError": "Case-sensitive No such object assertion rejected lowercase Docker diagnostic; inspected absence itself was confirmed."
+    },
+    {
+      "phase": "batch",
+      "container": "template-dev-9f9d6385-7503-4ad1-ac7b-05e87de0e991",
+      "absent": true,
+      "inspectExit": 1,
+      "diagnostic": "error: no such object: template-dev-9f9d6385-7503-4ad1-ac7b-05e87de0e991"
+    }
+  ],
+  "resultSha256": "02cc5ef798d74807dd31cdd172e5c9d9a20dbe046c1d582c37505391bcc0d164",
+  "assessmentSha256": "0814e453d194304ac58f723c5e492c0088bb6b56cdbfb027ffb4fb753f24c051",
+  "trajectorySha256": "aab12876e9230ced6090936c1f7ac522489e804cf44c831ac8a5e564bbaef2e6",
+  "manifestSha256": "1f4155d8ce80a892cefd47e4c65524f4f5d4932bbf479ac348f923eb43bff938",
+  "reportSha256": "a2c8ebb0d949a060a71c2cac8509f024a7b83704ac13597e1c604e49d177618b",
+  "modelPatchSha256": "203f503a88faaa37d0e1a3b4f884507355b9efef0c92bab1e6a1af9819b173b5",
+  "remoteBeforePublication": {
+    "url": "https://github.com/Tah10n/opencode-harness/pull/25",
+    "head": "fa8daa7e5b8ec47d0fabc3ccaed6955db6217707",
+    "draft": true,
+    "base": "feat/native-template-regression-workflow"
+  },
+  "CI": "not represented by local checks; inspect after final push"
+}

@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Duplicate and explicit empty values survive parse/serialize round trip.",
+    "set replaces at first position and returned entries are detached."
+  ],
+  "docDelivery": [
+    "Ordered multimap edit semantics and missing/empty distinction.",
+    "Canonical form encoding, valid UTF-8 domain and no original-spelling guarantee."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Text with optional leading ?, & separated components and first = separator; percent sequences valid UTF-8, raw strings well-formed Unicode. Malformed escapes/unpaired surrogates outside domain. Keys/values arbitrary well-formed strings including empty.",
+  "independence": "Implement query parameter multimap edit/serialize preserving duplicate value order and explicit empty values."
+}

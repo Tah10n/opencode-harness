@@ -1,0 +1,62 @@
+{
+  "generatedFrom": "v0.4.3",
+  "range": { "rangeStart": "2026-07-15", "rangeEnd": "2026-08-14" },
+  "kimi": {
+    "record": "{\"type\":\"usage.record\",\"model\":\"synthetic-model\",\"usage\":{\"inputOther\":10,\"output\":5,\"inputCacheRead\":3,\"inputCacheCreation\":2},\"time\":1786363200000}",
+    "state": {
+      "files": {
+        "$SOURCE_FILE": {
+          "size": 150,
+          "modifiedAt": 0,
+          "ino": 0,
+          "safeOffset": 150,
+          "tailFingerprint": "49ad5ca267f89d75fdf3b29b4196c72bb6e7b4a5d95c604b47ca908d24612eb8",
+          "eventDays": {
+            "888125f9212b265ad64480b607e52e6f7f030249ee63b7bc8c6a3491aa198a10": "2026-08-10"
+          },
+          "entries": [
+            {
+              "date": "2026-08-10",
+              "totalTokens": "20",
+              "inputTokens": "10",
+              "outputTokens": "5",
+              "cacheReadTokens": "3",
+              "cacheWriteTokens": "2",
+              "reasoningTokens": "0"
+            }
+          ]
+        }
+      },
+      "parserVersion": 1
+    }
+  },
+  "gemini": {
+    "record": "{\"id\":\"event-1\",\"type\":\"gemini\",\"timestamp\":\"2026-08-10T12:00:00Z\",\"tokens\":{\"input\":10,\"output\":5,\"cached\":3,\"thoughts\":2,\"tool\":0,\"total\":17}}",
+    "state": {
+      "files": {
+        "$SOURCE_FILE": {
+          "size": 145,
+          "modifiedAt": 0,
+          "ino": 0,
+          "safeOffset": 145,
+          "tailFingerprint": "c3b5af9b719d1fbc253edcb2d988bc12dc918957b55c7f789a6929eaba75e296",
+          "eventDays": {
+            "ce36863f51b6baf9d16397ffb3e9af506b284a816f72d487e55943c1fd974d6d": "2026-08-10"
+          },
+          "entries": [
+            {
+              "date": "2026-08-10",
+              "totalTokens": "17",
+              "inputTokens": "7",
+              "outputTokens": "5",
+              "cacheReadTokens": "3",
+              "cacheWriteTokens": "0",
+              "reasoningTokens": "2"
+            }
+          ]
+        }
+      },
+      "parserVersion": 2
+    }
+  }
+}

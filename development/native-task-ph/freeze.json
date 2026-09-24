@@ -1,0 +1,39 @@
+{
+  "kind": "selected-incomplete-D-final-development-diagnostics",
+  "candidateCommit": "ce862219a7d493804c0f69d25e0df569218d9eb9",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "low",
+  "budgetMs": 900000,
+  "preflightPassed": true,
+  "frozenFiles": 7774,
+  "schedule": [
+    {
+      "slot": 1,
+      "task": "legacy-runtime-reload",
+      "arm": "P"
+    },
+    {
+      "slot": 2,
+      "task": "legacy-runtime-reload",
+      "arm": "H"
+    },
+    {
+      "slot": 3,
+      "task": "reconnect-revoked",
+      "arm": "H"
+    },
+    {
+      "slot": 4,
+      "task": "reconnect-revoked",
+      "arm": "P"
+    }
+  ],
+  "inputPatches": {
+    "legacy-runtime-reload": "89c7c137cb1e27ed175c10af24d89492b891eda2a07463cfa839a72d01f08748",
+    "reconnect-revoked": "5578826a04112f1c92d826d171bd365f6c09d99f40f14f4a1140a62d09a5e01e"
+  },
+  "inputTreeHashes": {
+    "legacy-runtime-reload": "618e3fdf8578ce9d9c18b87e58b6ef28d1c75bd6cdf9615709f7f6f569798cc3",
+    "reconnect-revoked": "6cc1aecb88e04ba859264bb1dcf74f9644b0e41c816e969d2dfa4c14cb700443"
+  }
+}

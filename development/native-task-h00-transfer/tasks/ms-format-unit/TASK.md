@@ -1,0 +1,8 @@
+Add a unit option to format and numeric ms calls: unit?: 'ms' | 's' | 'm' | 'h' | 'd' | 'w' | 'mo' | 'y'. When set, always format in that unit using the existing unit conversion constants, Math.round(value / unitSize), and the existing short/long style and pluralization threshold (absolute input >= 1.5 units). Milliseconds preserve the numeric value without rounding as before. The default automatic unit choice is unchanged. Validate unknown runtime unit values with an Error, without requiring any subtype or message. String parsing paths and parseStrict remain unchanged and do not apply formatting options. Export the options type, keep overload return types, and generate usable public declarations. Document forced units with short/long examples.
+
+Required delivered regression scenarios:
+- A forced smaller/larger unit differs from automatic selection, including month/year constants and fractional milliseconds.
+- Negative rounding, zero and long singular/plural boundary preserve specified behavior.
+- Invalid runtime unit throws on formatting, existing parsing/default formatting remain compatible, and type tests reject invalid units.
+
+Deliver implementation, ordinary project regression tests, applicable public TypeScript declarations/type tests, and README/API documentation. Preserve existing independent regression scenarios and all behavior not explicitly changed. Use the project test tools; run relevant checks after the last edit and report what actually ran and any limitations. A different valid implementation or test organization is acceptable. Do not commit, publish, or change dependencies merely to make a check pass. The supported evaluation platform is Linux arm64, Node 24.19; browser deployment and other Node versions are outside this task.

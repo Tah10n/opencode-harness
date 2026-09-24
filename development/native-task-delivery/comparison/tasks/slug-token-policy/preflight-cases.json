@@ -1,0 +1,12 @@
+{
+  "alternative": {
+    "src/tokens.mjs": "export function tokens(text){return text.toLowerCase().match(/[a-z0-9]+/g)??[];}"
+  },
+  "mutants": [
+    {
+      "name": "truncate-with-trailing-hyphen",
+      "file": "src/slug.mjs",
+      "replacement": "import {tokens} from './tokens.mjs';export function slug(text,max=40){return tokens(text).join('-').slice(0,max)||'untitled';}"
+    }
+  ]
+}

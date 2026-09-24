@@ -1,0 +1,35 @@
+{
+  "taskExecutionSeconds": 1800.059,
+  "stopWorkloadSeconds": 0.055,
+  "postNativeCaptureCleanupSeconds": 1.356,
+  "cleanupIncludesStopWorkload": true,
+  "requestsByRole": {
+    "title": 1,
+    "parent": 1,
+    "author": 49
+  },
+  "nativeTools": 123,
+  "bashCommands": 33,
+  "bashWallSeconds": 549.869,
+  "npmTestIncludingBuildSeconds": 472.761,
+  "lintSeconds": 8.418,
+  "hostOverhead": {
+    "advisoryClassifierMs": 2.6107500002835877,
+    "additionalReadAttempts": 10,
+    "totalAdvisoryHostOverheadMs": null,
+    "limitation": "Classifier timing excludes all hook reads, bookkeeping and queue overhead; total host overhead was not independently timed."
+  },
+  "money": null,
+  "moneyReason": "No trustworthy bill; incomplete final-request usage.",
+  "preparation": {
+    "realProviderRequests": 0,
+    "scriptedRequests": 30,
+    "calibration": "Prior byte-identical Svelte calibration reused; no rerun.",
+    "scriptedSvelteTaskSeconds": 112.906,
+    "failedPreparation": [
+      "Initial sandbox denied worktree metadata creation; allowed escalation succeeded, before scripted/model work.",
+      "First local commit normalized TASK CRLF; a scoped -text rule and follow-up freeze commit restored exact bytes before dispatch."
+    ]
+  },
+  "developingAgent": "Separate from Luna; usage not available from experiment recorder."
+}

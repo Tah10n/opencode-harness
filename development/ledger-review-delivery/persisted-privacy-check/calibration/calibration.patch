@@ -1,0 +1,125 @@
+diff --git a/packages/connector/lib/adapters/claude.mjs b/packages/connector/lib/adapters/claude.mjs
+index 7018dd3..3afe714 100644
+--- a/packages/connector/lib/adapters/claude.mjs
++++ b/packages/connector/lib/adapters/claude.mjs
+@@ -1,5 +1,6 @@
+ import { join, resolve } from "node:path";
+ import { homedir } from "node:os";
++import { createHash } from "node:crypto";
+ import {
+   componentEntry,
+   diagnosePath,
+@@ -14,6 +15,27 @@ import {
+ } from "./shared.mjs";
+ 
+ const claudeParserVersion = 1;
++const claudeIdentityVersion = 1;
++
++function privateMessageId(id) {
++  return `sha256:${createHash("sha256").update(id).digest("hex")}`;
++}
++
++function privateClaudeState(state) {
++  const migrate = state.identityVersion !== claudeIdentityVersion;
++  const messages = Object.create(null);
++  for (const [id, entry] of Object.entries(state.messages ?? {}))
++    messages[migrate ? privateMessageId(id) : id] = entry;
++  const files = Object.fromEntries(
++    Object.entries(state.files ?? {}).map(([path, file]) => [path, {
++      ...file,
++      ids: Array.isArray(file.ids)
++        ? file.ids.map((id) => migrate ? privateMessageId(id) : id)
++        : file.ids,
++    }]),
++  );
++  return { ...state, identityVersion: claudeIdentityVersion, files, messages };
++}
+ 
+ function classifiedContribution(line) {
+   let record;
+@@ -84,7 +106,7 @@ export async function collectClaude(
+ ) {
+   const stateCompatible =
+     state.parserVersion === claudeParserVersion && validEventLedger(state.eventLedger);
+-  const compatibleState = stateCompatible ? state : {};
++  const compatibleState = stateCompatible ? privateClaudeState(state) : {};
+   const discovered = await walk(source.dataPath, [".jsonl"], 10_000);
+   const nextState = {
+     files: { ...(compatibleState.files ?? {}) },
+@@ -152,15 +174,17 @@ export async function collectClaude(
+         if ((!previous || appended) &&
+           (!tailAnalysis || tailAnalysis.stats.unsupportedCandidates === 0))
+           for (const value of tailAnalysis?.records ?? [])
+-            if (!ids.has(value.id)) provisionalMessages[value.id] = value.entry;
++            if (!ids.has(privateMessageId(value.id)))
++              provisionalMessages[privateMessageId(value.id)] = value.entry;
+         continue;
+       }
+       observations.push(...analysis.records);
+       const messages = Object.create(null);
+       for (const value of analysis.records) {
+-        if (!ids.has(value.id)) {
+-          messages[value.id] = value.entry;
+-          ids.add(value.id);
++        const id = privateMessageId(value.id);
++        if (!ids.has(id)) {
++          messages[id] = value.entry;
++          ids.add(id);
+         }
+       }
+       const fileState = {
+@@ -203,7 +227,7 @@ export async function collectClaude(
+     return {
+       entries: mergeEntries(previousMessages),
+       completeness: "partial",
+-      nextState: state,
++      nextState: privateClaudeState(state),
+       warnings: ["unreadable_or_unbounded_session_data"],
+       diagnostics: [
+         ...(unreadable ? [{ code: "local_store_unreadable", phase: "collect" }] : []),
+@@ -220,7 +244,12 @@ export async function collectClaude(
+         ? mergeEntries([...ledger.entries, ...Object.values(provisionalMessages)])
+         : mergeEntries([...Object.values(nextState.messages), ...Object.values(provisionalMessages)]),
+     completeness: partial || conflict || ledger.limited ? "partial" : "complete",
+-    nextState: { ...nextState, parserVersion: claudeParserVersion, eventLedger: ledger.ledger },
++    nextState: {
++      ...nextState,
++      parserVersion: claudeParserVersion,
++      identityVersion: claudeIdentityVersion,
++      eventLedger: ledger.ledger,
++    },
+     warnings: [
+       ...(partial ? ["unreadable_or_unbounded_session_data"] : []),
+       ...(schemaUnsupported ? ["unsupported_usage_records"] : []),
+diff --git a/packages/connector/test/claude-security.test.mjs b/packages/connector/test/claude-security.test.mjs
+index ca7a0e4..620b6d5 100644
+--- a/packages/connector/test/claude-security.test.mjs
++++ b/packages/connector/test/claude-security.test.mjs
+@@ -24,21 +24,16 @@ test("Claude message ids cannot mutate collector prototypes", async (context) =>
+   const range = { rangeStart: "2026-08-01", rangeEnd: "2026-08-31" };
+   const first = await collectClaude({ dataPath: directory }, range);
+   assert.equal(Object.getPrototypeOf(first.nextState.messages), null);
+-  assert.deepEqual(Object.keys(first.nextState.messages).sort(), [
+-    "__proto__",
+-    "constructor",
+-    "prototype",
+-  ]);
++  assert.equal(Object.keys(first.nextState.messages).length, 3);
++  for (const id of ["__proto__", "constructor", "prototype"])
++    assert.ok(!Object.hasOwn(first.nextState.messages, id));
+   assert.doesNotThrow(() => JSON.parse(JSON.stringify(first.nextState)));
+   await appendFile(path, `${message("__proto__", 100)}\n${message("ordinary", 4)}\n`);
+   const second = await collectClaude({ dataPath: directory }, range, first.nextState);
+   assert.equal(Object.getPrototypeOf(second.nextState.messages), null);
+-  assert.deepEqual(Object.keys(second.nextState.messages).sort(), [
+-    "__proto__",
+-    "constructor",
+-    "ordinary",
+-    "prototype",
+-  ]);
++  assert.equal(Object.keys(second.nextState.messages).length, 4);
++  for (const id of ["__proto__", "constructor", "ordinary", "prototype"])
++    assert.ok(!Object.hasOwn(second.nextState.messages, id));
+   assert.equal(second.entries[0].totalTokens, "14");
+   assert.equal(second.completeness, "partial");
+ });

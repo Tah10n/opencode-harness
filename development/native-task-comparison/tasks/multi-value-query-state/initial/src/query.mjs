@@ -1,0 +1,1 @@
+export function createQuery(text=''){const p=new URLSearchParams(text),map=new Map(p);return {append(k,v){map.set(k,v);},set(k,v){map.set(k,v);},delete(k){map.delete(k);},getAll(k){return map.has(k)?[map.get(k)]:[];},entries(){return [...map];},serialize(){return new URLSearchParams(map).toString();}};}

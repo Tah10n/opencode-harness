@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/collect.mjs": "export function collectErrors(value,rules,options={}){\n const result=[];let index=0;\n while(index<rules.length){const problem=Reflect.apply(rules[index++],undefined,[value]);if(problem==null)continue;result[result.length]=problem;if(options.firstOnly===true)return result;}\n return result;\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "drops-falsey-errors",
+      "file": "src/collect.mjs",
+      "replacement": "export function collectErrors(value,rules,{firstOnly=false}={}){\n const errors=[];for(const rule of rules){const error=rule(value);if(error){errors.push(error);if(firstOnly)break;}}return errors;\n}\n"
+    },
+    {
+      "name": "all-api-still-first-only",
+      "file": "src/validation.mjs",
+      "replacement": "import {collectErrors} from './collect.mjs';\nconst nameRule=r=>typeof r.name!=='string'||r.name.trim()===''?{field:'name',code:'required'}:r.name.trim().length>40?{field:'name',code:'too_long'}:null;\nconst ageRule=r=>!Number.isInteger(r.age)||r.age<18||r.age>120?{field:'age',code:'invalid'}:null;\nconst emailRule=r=>{\n const absent=r.email===null||r.email===undefined||(typeof r.email==='string'&&r.email.trim()==='');\n if(absent)return r.newsletter===true?{field:'email',code:'required'}:null;\n return typeof r.email!=='string'||!(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$/).test(r.email.trim())?{field:'email',code:'invalid'}:null;\n};\nconst rules=[nameRule,ageRule,emailRule];\nexport function validate(record){return collectErrors(record,rules,{firstOnly:true})[0]??null;}\nexport function validateAll(record){return collectErrors(record,rules,{firstOnly:true});}\n"
+    }
+  ]
+}

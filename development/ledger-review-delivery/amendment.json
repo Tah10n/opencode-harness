@@ -1,0 +1,13 @@
+{
+  "authorization": "User explicitly approved raising the development budget ceiling to 3600000 ms while limiting F to the shared remainder.",
+  "previousHead": "5bcc1c669c814dd28c54d449adfe767ee2e6b111",
+  "changedSharedFiles": [
+    "development/native-task-integrated/container-session.mjs",
+    "development/native-task-integrated/container-relay.mjs"
+  ],
+  "onlySharedChange": ">1800000 becomes >3600000",
+  "samePilot": true,
+  "newPilot": false,
+  "priorBudgetFailurePreserved": true,
+  "realDispatchAuthorizedOnlyAfterSuccessfulPreflightAndCommittedFreeze": true
+}

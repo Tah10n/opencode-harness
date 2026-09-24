@@ -1,0 +1,12 @@
+{
+  "alternative": {
+    "src/brackets.mjs": "export function inspect(text){const stack=[],pairs={')':'(',']':'[','}':'{'};for(let i=0;i<text.length;i++){const c=text[i];if('([{'.includes(c))stack.push([c,i]);else if(Object.hasOwn(pairs,c)){if(!stack.length||stack[stack.length-1][0]!==pairs[c])return {ok:false,index:i};stack.pop();}}return stack.length?{ok:false,index:Math.min(...stack.map(x=>x[1]))}:{ok:true,index:null};}"
+  },
+  "mutants": [
+    {
+      "name": "latest-opener",
+      "file": "src/brackets.mjs",
+      "replacement": "export function inspect(text){const stack=[],pairs={')':'(',']':'[','}':'{'};for(let i=0;i<text.length;i++){const c=text[i];if('([{'.includes(c))stack.push([c,i]);else if(Object.hasOwn(pairs,c)){if(!stack.length||stack.at(-1)[0]!==pairs[c])return {ok:false,index:i};stack.pop();}}return stack.length?{ok:false,index:stack.at(-1)[1]}:{ok:true,index:null};}"
+    }
+  ]
+}

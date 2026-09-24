@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/names.mjs": "import {normalizeName} from './normalize.mjs';\nimport {validateNormalized,displayNormalized} from './name-core.mjs';\nexport const validateName=raw=>validateNormalized(normalizeName(raw));\nexport const displayName=raw=>displayNormalized(normalizeName(raw));\nexport function processName(raw,options={}){\n const convert=options.normalize===undefined?normalizeName:options.normalize;\n const normalized=convert(raw);const problem=validateNormalized(normalized);\n if(problem!==null)return {ok:false,error:problem};\n return {ok:true,name:normalized,label:displayNormalized(normalized)};\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "normalizes-again-for-label",
+      "file": "src/names.mjs",
+      "replacement": "import {normalizeName} from './normalize.mjs';\nimport {validateNormalized,displayNormalized} from './name-core.mjs';\nexport function validateName(raw){return validateNormalized(normalizeName(raw));}\nexport function displayName(raw){return displayNormalized(normalizeName(raw));}\nexport function processName(raw,{normalize=normalizeName}={}){\n const name=normalize(raw),error=validateNormalized(name);\n return error?{ok:false,error}:{ok:true,name,label:displayNormalized(normalize(raw))};\n}\n"
+    },
+    {
+      "name": "normalizes-inside-core",
+      "file": "src/name-core.mjs",
+      "replacement": "export function validateNormalized(name){name=name.trim().toLowerCase();if(name==='')return 'empty';if(name.length>20)return 'too_long';if(!(/^[a-z][a-z0-9_-]*$/).test(name))return 'invalid';return null;}\nexport function displayNormalized(name){return '@'+name;}\n"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "task": {
+    "passed": true,
+    "realTemporaryFiles": true,
+    "nativeStateAndPermissions": true,
+    "threeCorrectionBound": true,
+    "realProviderRequests": 0
+  },
+  "template": {
+    "passed": true,
+    "temporary": "/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/native-template-check-OsXAoY",
+    "checks": [
+      "two-file bundle",
+      "settings preserved",
+      "dry run",
+      "collision refusal",
+      "symlink refusal",
+      "absolute path",
+      "native CLI without historical code",
+      "unsupported flags refused"
+    ]
+  },
+  "review": {
+    "findings": [
+      "Unsafe positive integer missing from queue evaluator",
+      "Clock count missing for present invitation"
+    ],
+    "resolution": "Added acceptance cases and substantive negative controls; reran reference, initial, all negative and valid alternative checks successfully. No instruction revision.",
+    "passes": 1
+  },
+  "installed": [
+    {
+      "mode": "stateful",
+      "status": "checks_passed",
+      "repairs": 1,
+      "termination": {
+        "verified": true,
+        "abortRequests": 0,
+        "pendingTools": 0,
+        "activeTools": 0,
+        "abortErrors": []
+      },
+      "scriptedRequests": 8
+    },
+    {
+      "passed": true,
+      "installedWorkflow": true,
+      "scenarios": 1,
+      "scriptedRequests": 9,
+      "workflowRequests": 8,
+      "auxiliaryRequests": 1,
+      "realProviderRequests": 0,
+      "temp": "/var/folders/7c/7f6jz3sx20q9bpczsmclnj900000gp/T/native-task-fixture-QhcRCA"
+    }
+  ]
+}

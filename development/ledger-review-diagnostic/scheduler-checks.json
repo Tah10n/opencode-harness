@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "scenarios": 16,
+  "mockProviderDispatches": 13,
+  "realProviderRequests": 0,
+  "modes": [
+    "long-stream",
+    "connection-timeout",
+    "nonsettling-handler",
+    "terminal-own-deadline",
+    "quota-body-deadline",
+    "auth-body-deadline",
+    "unattributed-timeout",
+    "managed-deadline",
+    "late-response",
+    "foreign-abort-near-deadline",
+    "unknown-execution",
+    "unexplained-disconnect",
+    "quota",
+    "authorization",
+    "capture-failure",
+    "cleanup-failure"
+  ],
+  "rawReceiptSha256": "24d0867caba91434bfe81d2d6ad8b49e1b7829d9a4f39b11e6471fa45701cb63"
+}

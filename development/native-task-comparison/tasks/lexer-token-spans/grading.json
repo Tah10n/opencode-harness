@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert number/operator/eof spans across original whitespace and leading zeroes.",
+    "Assert precedence, associativity and exact lexical/parser failure positions."
+  ],
+  "docDelivery": [
+    "Document public token shape, UTF16 span convention and limited grammar.",
+    "Explain eager lexical errors before parsing and unchanged evaluator."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Bounded integer expression language with eager lexical validation, exact errors and original UTF16 spans.",
+  "manualBehavior": [
+    "Evaluator uses exported lexer rather than retaining duplicate tokenization; no dynamic execution of source."
+  ],
+  "independence": "Separate expression lexing from evaluation while preserving precedence, token spans and exact syntax failures."
+}

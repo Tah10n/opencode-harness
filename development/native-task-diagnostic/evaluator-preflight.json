@@ -1,0 +1,411 @@
+{
+  "passed": true,
+  "realProviderRequests": 0,
+  "results": [
+    {
+      "task": "queue-lost-retry",
+      "kind": "initial",
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "contract": {
+        "passed": true
+      },
+      "disabled": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "semanticFailure": false
+    },
+    {
+      "task": "queue-lost-retry",
+      "kind": "reference",
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "contract": {
+        "passed": true
+      },
+      "disabled": {
+        "exit": 1,
+        "signal": null,
+        "counts": {
+          "tests": 3,
+          "pass": 2,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": true,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "semanticFailure": true
+    },
+    {
+      "task": "queue-lost-retry",
+      "kind": "alternative",
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "contract": {
+        "passed": true
+      },
+      "disabled": {
+        "exit": 1,
+        "signal": null,
+        "counts": {
+          "tests": 3,
+          "pass": 2,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": true,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "semanticFailure": true
+    },
+    {
+      "task": "queue-lost-retry",
+      "kind": "guard-detects-broken-setup",
+      "exit": 1,
+      "signal": null,
+      "counts": {
+        "tests": 1,
+        "pass": 0,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "assertionFailure": true,
+      "syntaxOrLoadingFailure": false,
+      "stderrPresent": false
+    },
+    {
+      "task": "queue-lost-retry",
+      "kind": "precondition-only-disabled",
+      "exit": 0,
+      "signal": null,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "assertionFailure": false,
+      "syntaxOrLoadingFailure": false,
+      "stderrPresent": false
+    },
+    {
+      "task": "editor-precompleted",
+      "kind": "initial",
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "contract": {
+        "passed": true
+      },
+      "disabled": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "semanticFailure": false
+    },
+    {
+      "task": "editor-precompleted",
+      "kind": "reference",
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "contract": {
+        "passed": true
+      },
+      "disabled": {
+        "exit": 1,
+        "signal": null,
+        "counts": {
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": true,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "semanticFailure": true
+    },
+    {
+      "task": "editor-precompleted",
+      "kind": "alternative",
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "contract": {
+        "passed": true
+      },
+      "disabled": {
+        "exit": 1,
+        "signal": null,
+        "counts": {
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": true,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "semanticFailure": true
+    },
+    {
+      "task": "editor-precompleted",
+      "kind": "guard-detects-broken-setup",
+      "exit": 1,
+      "signal": null,
+      "counts": {
+        "tests": 1,
+        "pass": 0,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "assertionFailure": true,
+      "syntaxOrLoadingFailure": false,
+      "stderrPresent": false
+    },
+    {
+      "task": "editor-precompleted",
+      "kind": "precondition-only-disabled",
+      "exit": 0,
+      "signal": null,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "assertionFailure": false,
+      "syntaxOrLoadingFailure": false,
+      "stderrPresent": false
+    },
+    {
+      "task": "queue-valid-empty",
+      "kind": "initial",
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "contract": {
+        "passed": true
+      },
+      "disabled": {
+        "exit": 1,
+        "signal": null,
+        "counts": {
+          "tests": 3,
+          "pass": 2,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": true,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "semanticFailure": true
+    },
+    {
+      "task": "queue-valid-empty",
+      "kind": "reference",
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "contract": {
+        "passed": true
+      },
+      "disabled": {
+        "exit": 1,
+        "signal": null,
+        "counts": {
+          "tests": 3,
+          "pass": 2,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": true,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "semanticFailure": true
+    },
+    {
+      "task": "queue-valid-empty",
+      "kind": "alternative",
+      "ordinary": {
+        "exit": 0,
+        "signal": null,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": false,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "contract": {
+        "passed": true
+      },
+      "disabled": {
+        "exit": 1,
+        "signal": null,
+        "counts": {
+          "tests": 3,
+          "pass": 2,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "assertionFailure": true,
+        "syntaxOrLoadingFailure": false,
+        "stderrPresent": false
+      },
+      "semanticFailure": true
+    },
+    {
+      "task": "queue-valid-empty",
+      "kind": "valid-idle-disabled",
+      "exit": 0,
+      "signal": null,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "assertionFailure": false,
+      "syntaxOrLoadingFailure": false,
+      "stderrPresent": false
+    }
+  ],
+  "limitations": "Bounded public-entry-point mutation and one alternative per task; not an exhaustive proof over all possible implementations. Manual patch review supplements these checks."
+}

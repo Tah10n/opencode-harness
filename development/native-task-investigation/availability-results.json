@@ -1,0 +1,312 @@
+{
+  "status": "stopped-local-probe-text-extraction-error",
+  "productCandidate": "9cd8ffb4dfcfd32f1a7a65ac9c3eaca44728d2e7",
+  "launcherCommit": "f16e60a8df804311e296b06104cdacee4b0eedbe",
+  "amendment": {
+    "firstSlot": 3,
+    "lastSlot": 9,
+    "availabilityRequests": 1,
+    "sha256": "93c7c09d8a2b67c8ef94c48a368f825307de6259a41fc95f8898960b0708cdf5",
+    "originalFreezeSha256": "198d694521294c5f1eb0255a67f92ad61b8595f4a1b89d74cc4f94911afdd384",
+    "originalPauseSha256": "12dc97cc581de95af5d565163ab46fc84dbd4cef4b1964af3f41452692eb2811",
+    "previousPauseSha256": "d7a3cddaa4963eaede6623954efbb4add1929f828d52de9895d6f1563825a537",
+    "historicalFilesVerified": 41,
+    "policy": "One independent neutral availability request, followed only on normal completed nonempty response by original slots 3\u20139. No retries, old sessions, replacements or further continuation. Historical remote outcomes remain unknown."
+  },
+  "probe": {
+    "forwardedRequests": 1,
+    "auxiliaryRequests": 0,
+    "retries": 0,
+    "model": "gpt-5.6-luna",
+    "effort": "high",
+    "deadlineMs": 120000,
+    "serverCompletion": "completed",
+    "textObservedInCompletedItem": "Okay",
+    "normalStreamEnd": true,
+    "usage": {
+      "input_tokens": 18,
+      "output_tokens": 29,
+      "total_tokens": 47,
+      "cached_tokens": 0,
+      "reasoning_tokens": 22
+    },
+    "elapsedMs": 9117,
+    "launcherAdmissionSuccess": false,
+    "launcherReason": "completion-or-text-unconfirmed",
+    "rawEvidenceSha256": "f0fdabbcfe69a4c4113a61dd43bb736274482f223c5a9def40f0971e3c2d2c2a",
+    "localRecordSha256": "c7432b7efda9e12feea85647e1066fd6ea27a757c9fc5f6c81e8f4c88b731c84",
+    "pauseSha256": "0e32eb5556f164360af74331459a8b243bd152b03e3bac7899cb31d38691beb6"
+  },
+  "interpretation": "Provider availability was observed. The one-shot launcher falsely rejected the response because response.completed.output was empty while response.output_item.done contained the completed assistant text. This is a local preparation defect, not overload or unknown server completion.",
+  "stop": {
+    "processExitCode": 0,
+    "handlerFinished": true,
+    "activeProviderHandlers": 0,
+    "connectionClosed": true,
+    "newTaskRuns": 0,
+    "newTaskContainers": 0,
+    "historicalEvidenceUnchanged": true,
+    "newPausePreserved": true,
+    "furtherProbeOrContinuation": false
+  },
+  "slots": [
+    {
+      "slot": 1,
+      "task": "quick-lru-take",
+      "arm": "P",
+      "period": "original",
+      "status": "interrupted-before-implementation",
+      "Q": false,
+      "T": false,
+      "D": false,
+      "patch": "patches/quick-lru-take-P.patch",
+      "patchBytes": 0,
+      "reason": "Provider/transport interruption; required take API absent; no normal native stop."
+    },
+    {
+      "slot": 2,
+      "task": "quick-lru-take",
+      "arm": "R",
+      "period": "amended",
+      "status": "interrupted-before-implementation",
+      "Q": false,
+      "T": false,
+      "D": false,
+      "patch": "patches/quick-lru-take-R.patch",
+      "patchBytes": 0,
+      "reason": "Provider/transport interruption; required take API absent; no normal native stop."
+    },
+    {
+      "slot": 3,
+      "task": "quick-lru-take",
+      "arm": "H",
+      "period": null,
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null,
+      "admittedRange": "third-period-3-9"
+    },
+    {
+      "slot": 4,
+      "task": "denque-drain",
+      "arm": "R",
+      "period": null,
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null,
+      "admittedRange": "third-period-3-9"
+    },
+    {
+      "slot": 5,
+      "task": "denque-drain",
+      "arm": "H",
+      "period": null,
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null,
+      "admittedRange": "third-period-3-9"
+    },
+    {
+      "slot": 6,
+      "task": "denque-drain",
+      "arm": "P",
+      "period": null,
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null,
+      "admittedRange": "third-period-3-9"
+    },
+    {
+      "slot": 7,
+      "task": "eventemitter-collect",
+      "arm": "H",
+      "period": null,
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null,
+      "admittedRange": "third-period-3-9"
+    },
+    {
+      "slot": 8,
+      "task": "eventemitter-collect",
+      "arm": "P",
+      "period": null,
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null,
+      "admittedRange": "third-period-3-9"
+    },
+    {
+      "slot": 9,
+      "task": "eventemitter-collect",
+      "arm": "R",
+      "period": null,
+      "status": "not-started",
+      "Q": null,
+      "T": null,
+      "D": null,
+      "admittedRange": "third-period-3-9"
+    }
+  ],
+  "historicalPeriods": [
+    {
+      "name": "original",
+      "admittedSlots": [
+        1
+      ],
+      "forwardedRequests": 4,
+      "knownTokens": 6418,
+      "unknownUsageRequests": 3,
+      "auxiliaryRetries": 1
+    },
+    {
+      "name": "amended",
+      "admittedSlots": [
+        2
+      ],
+      "forwardedRequests": 2,
+      "knownTokens": null,
+      "unknownUsageRequests": 2,
+      "auxiliaryRetries": 0,
+      "taskRetries": 0,
+      "realSmokes": 0,
+      "nativeExecutionMs": 2491,
+      "nativeCleanupMs": 57,
+      "preNativePreparationMs": 4803,
+      "summedRequestElapsedMs": 2038,
+      "overlappingRequestIntervals": true
+    }
+  ],
+  "accounting": {
+    "historicalForwardedRequests": 6,
+    "availabilityRequests": 1,
+    "combinedRequests": 7,
+    "knownTokenSubtotal": 6465,
+    "unknownUsageRequests": 5,
+    "totalTokens": null,
+    "monetaryCost": null,
+    "preparationEvaluationDeveloperWork": "Separate; cumulative usage and wall time not reliably measured. Local scripted checks made zero real provider requests."
+  },
+  "validation": {
+    "passed": true,
+    "realProviderRequests": 0,
+    "scenarios": [
+      {
+        "mode": "valid",
+        "passed": true,
+        "startedSlots": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "upstreamRequests": 1,
+        "rejection": null
+      },
+      {
+        "mode": "failed-probe",
+        "passed": true,
+        "startedSlots": [],
+        "upstreamRequests": 1,
+        "rejection": null
+      },
+      {
+        "mode": "empty-probe",
+        "passed": true,
+        "startedSlots": [],
+        "upstreamRequests": 1,
+        "rejection": null
+      },
+      {
+        "mode": "wrong-first",
+        "passed": true,
+        "startedSlots": [],
+        "upstreamRequests": 0,
+        "rejection": "Invalid explicit continuation amendment"
+      },
+      {
+        "mode": "changed-pause",
+        "passed": true,
+        "startedSlots": [],
+        "upstreamRequests": 0,
+        "rejection": "Amendment does not authorize this pause"
+      },
+      {
+        "mode": "old-container-present",
+        "passed": true,
+        "startedSlots": [],
+        "upstreamRequests": 0,
+        "rejection": "Historical container still exists"
+      },
+      {
+        "mode": "unstarted-artifact",
+        "passed": true,
+        "startedSlots": [],
+        "upstreamRequests": 0,
+        "rejection": "Unrecognized historical run directory"
+      },
+      {
+        "mode": "changed-bundle",
+        "passed": true,
+        "startedSlots": [],
+        "upstreamRequests": 0,
+        "rejection": "Installed runtime changed: product"
+      },
+      {
+        "mode": "missing-capture",
+        "passed": true,
+        "startedSlots": [],
+        "upstreamRequests": 0,
+        "rejection": "Historical capture/accounting missing"
+      },
+      {
+        "mode": "changed-history",
+        "passed": true,
+        "startedSlots": [],
+        "upstreamRequests": 0,
+        "rejection": "Historical artifact changed: runs/task0-P/provider-metadata.json"
+      },
+      {
+        "mode": "missing-history-hash",
+        "passed": true,
+        "startedSlots": [],
+        "upstreamRequests": 0,
+        "rejection": "Missing historical artifact hash: candidate.tar"
+      },
+      {
+        "mode": "unallowed-launcher",
+        "passed": true,
+        "startedSlots": [],
+        "upstreamRequests": 0,
+        "rejection": "Amendment exceeds launcher scope"
+      },
+      {
+        "mode": "existing-continuation",
+        "passed": true,
+        "startedSlots": [],
+        "upstreamRequests": 0,
+        "rejection": "Continuation directory already exists; never overwrite or automatically resume"
+      },
+      {
+        "mode": "task-pause",
+        "passed": true,
+        "startedSlots": [
+          3
+        ],
+        "upstreamRequests": 1,
+        "rejection": null
+      }
+    ]
+  },
+  "validationLimitation": "Fixtures used text in response.completed.output and failed to cover the actual route output-item form. Passing 14 scenarios did not prove adapter compatibility. Final diff review also missed this defect. PROCESS_CONTAINMENT_UNAVAILABLE remains a separate full-verifier limitation.",
+  "comparison": "No new patches or H investigator work; original Q/T/D remain false for slots 1\u20132 and unknown/not-started for slots 3\u20139. No quality or lift claim. Substantive comparison remains incomplete."
+}

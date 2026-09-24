@@ -1,0 +1,141 @@
+{
+  "patchSha256": "203f503a88faaa37d0e1a3b4f884507355b9efef0c92bab1e6a1af9819b173b5",
+  "delivery_apply": true,
+  "applyReceipt": {
+    "file": "local/plain-ledger-native-high/evaluation/apply.json",
+    "sha256": "e0ec65c362c9bd55c85c347e4413789967ab402950ca9dc40fd559dac3b42ab3",
+    "exitCode": 0,
+    "counts": {
+      "tests": null,
+      "pass": null,
+      "fail": null,
+      "skipped": null
+    }
+  },
+  "assessment_integrity": "verified",
+  "F": [
+    {
+      "file": "local/plain-ledger-native-high/evaluation/F-readers.json",
+      "sha256": "551c0694b1d5e50a4da38e7a6ad9c2185b2cc89e013743560ff7b81dfc5e273f",
+      "exitCode": 0,
+      "counts": {
+        "tests": 87,
+        "pass": 87,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/evaluation/F-config.json",
+      "sha256": "c5e871991519bb87c5019a946508ff16ae5b6bfc76d73c205be5bab17015b575",
+      "exitCode": 0,
+      "counts": {
+        "tests": 103,
+        "pass": 103,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/evaluation/F-protocol.json",
+      "sha256": "32203791446315a6bc3d0e767c849901a483b429339018b9289e68cd63f689fa",
+      "exitCode": 0,
+      "counts": {
+        "tests": 14,
+        "pass": 14,
+        "fail": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "E": [
+    {
+      "file": "local/plain-ledger-native-high/evaluation/E-account-switch-ledger.json",
+      "sha256": "9b4114062458b645d587abb19db861acc862a80a3dac05136da468e554520571",
+      "exitCode": 0,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/evaluation/E-ledger-lifecycle.json",
+      "sha256": "239000228e3b0ef9950072378759a2e0f0b6e34b96f302f5f41d0193516025ea",
+      "exitCode": 1,
+      "counts": {
+        "tests": 5,
+        "pass": 0,
+        "fail": 5,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/evaluation/E-legacy-input.json",
+      "sha256": "03bcb1139ef436c011f68fd11e8b9621622783fe5e8b56d186f35691a1065aad",
+      "exitCode": 0,
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/evaluation/E-kimi-migration.json",
+      "sha256": "f85b86618b147a1ffd858e31136f6a2b10dc873725008c0dc17ceb31f2f3ca77",
+      "exitCode": 1,
+      "counts": {
+        "tests": 1,
+        "pass": 0,
+        "fail": 1,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/evaluation/E-migration-contract.json",
+      "sha256": "8d8ba7ee3d9471da94fbdd00982885357190fa1bbf76df7a538b0144d3ba64d3",
+      "exitCode": 1,
+      "counts": {
+        "tests": 8,
+        "pass": 1,
+        "fail": 7,
+        "skipped": 0
+      }
+    },
+    {
+      "file": "local/plain-ledger-native-high/evaluation/E-cli-persistence.json",
+      "sha256": "6952513bbf1a8348a196ca2fed39535d6542be6f87a4e891e2452dea852d1052",
+      "exitCode": 0,
+      "counts": {
+        "tests": 6,
+        "pass": 6,
+        "fail": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "projectVerify": {
+    "file": "local/plain-ledger-native-high/evaluation/F-project-verify.json",
+    "sha256": "0a31d32d162abd48dff5179d2ca35e84bab875af7f473639e13033c588a5054c",
+    "exitCode": 1,
+    "counts": {
+      "tests": null,
+      "pass": null,
+      "fail": null,
+      "skipped": null
+    }
+  },
+  "implementationTreeSha256": "705763b53d71a460219c3d80d66abff87b9d7d8b27bad7eae49beb1bdf375cc9",
+  "unchangedImplementationCopies": true,
+  "baselineInputSha256": "ea549fcc30d8facef77af8ebebc280910a24537e44ad8c6cfcbdc4888b5dcab1",
+  "Q": null,
+  "contractTests": {
+    "tests": 23,
+    "pass": 10,
+    "fail": 13,
+    "skipped": 0
+  },
+  "completeBehavioralInventory": true
+}

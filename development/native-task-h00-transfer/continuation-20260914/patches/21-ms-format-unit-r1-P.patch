@@ -1,0 +1,192 @@
+diff --git a/README.md b/README.md
+index d752132..92186de 100644
+--- a/README.md
++++ b/README.md
+@@ -43,6 +43,18 @@ ms(-3 * 60000, { long: true })        // "-3 minutes"
+ ms(ms('10 hours'), { long: true })    // "10 hours"
+ ```
+ 
++### Force a Format Unit
++
++Use `unit` to format a number in a specific unit instead of choosing one automatically.
++
++```ts
++import { format, ms } from 'ms';
++
++ms(90000, { unit: 's' })                 // "90s"
++format(90000, { unit: 'm', long: true }) // "2 minutes"
++format(31557600000, { unit: 'mo' })      // "12mo"
++```
++
+ ### Input Formats (Units)
+ 
+ ```ts
+diff --git a/src/format.test.ts b/src/format.test.ts
+index cdabb0f..108e085 100644
+--- a/src/format.test.ts
++++ b/src/format.test.ts
+@@ -1,5 +1,5 @@
+ import { describe, expect, it } from '@jest/globals';
+-import { format } from './index';
++import { format, ms, type Options } from './index';
+ 
+ // numbers
+ 
+@@ -203,6 +203,46 @@ describe('format(number)', () => {
+   });
+ });
+ 
++describe('format(number, { unit })', () => {
++  const year = 365.25 * 24 * 60 * 60 * 1000;
++  const month = year / 12;
++
++  it('should force short formatting to the requested unit', () => {
++    expect(format(0.5, { unit: 'ms' })).toBe('0.5ms');
++    expect(format(1500, { unit: 's' })).toBe('2s');
++    expect(format(60 * 1000, { unit: 'm' })).toBe('1m');
++    expect(format(60 * 60 * 1000, { unit: 'h' })).toBe('1h');
++    expect(format(24 * 60 * 60 * 1000, { unit: 'd' })).toBe('1d');
++    expect(format(7 * 24 * 60 * 60 * 1000, { unit: 'w' })).toBe('1w');
++    expect(format(year, { unit: 'mo' })).toBe('12mo');
++    expect(format(year, { unit: 'y' })).toBe('1y');
++  });
++
++  it('should allow a forced unit to differ from automatic selection', () => {
++    expect(format(90_000)).toBe('2m');
++    expect(format(90_000, { unit: 'ms' })).toBe('90000ms');
++    expect(format(month, { unit: 'y' })).toBe('0y');
++    expect(format(year, { unit: 'mo' })).toBe('12mo');
++  });
++
++  it('should preserve rounding and pluralization boundaries', () => {
++    expect(format(-2500, { unit: 's' })).toBe('-2s');
++    expect(format(0, { long: true, unit: 'h' })).toBe('0 hour');
++    expect(format(1499, { long: true, unit: 's' })).toBe('1 second');
++    expect(format(1500, { long: true, unit: 's' })).toBe('2 seconds');
++    expect(format(-1500, { long: true, unit: 's' })).toBe('-1 seconds');
++    expect(format(0.5, { long: true, unit: 'ms' })).toBe('0.5 ms');
++  });
++
++  it('should reject unknown runtime units while leaving string parsing unchanged', () => {
++    const invalidOptions = { unit: 'invalid' } as unknown as Options;
++
++    expect(() => format(1000, invalidOptions)).toThrow(Error);
++    expect(() => ms(1000, invalidOptions)).toThrow(Error);
++    expect(ms('1s', invalidOptions)).toBe(1000);
++  });
++});
++
+ // invalid inputs
+ 
+ describe('format(invalid inputs)', () => {
+diff --git a/src/index.ts b/src/index.ts
+index d50e3c7..c3e811f 100644
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -31,11 +31,17 @@ export type StringValue =
+   | `${number}${UnitAnyCase}`
+   | `${number} ${UnitAnyCase}`;
+ 
+-interface Options {
++type FormatUnit = 'ms' | 's' | 'm' | 'h' | 'd' | 'w' | 'mo' | 'y';
++
++export interface Options {
+   /**
+    * Set to `true` to use verbose formatting. Defaults to `false`.
+    */
+   long?: boolean;
++  /**
++   * Force formatting to use this unit instead of choosing one automatically.
++   */
++  unit?: FormatUnit;
+ }
+ 
+ /**
+@@ -160,7 +166,14 @@ export function parseStrict(value: StringValue): number {
+ /**
+  * Short format for `ms`.
+  */
+-function fmtShort(ms: number): StringValue {
++function fmtShort(ms: number, unit?: FormatUnit): StringValue {
++  if (unit !== undefined) {
++    const { size, short } = getUnit(unit);
++    return unit === 'ms'
++      ? (`${ms}${short}` as StringValue)
++      : (`${Math.round(ms / size)}${short}` as StringValue);
++  }
++
+   const msAbs = Math.abs(ms);
+   if (msAbs >= y) {
+     return `${Math.round(ms / y)}y`;
+@@ -189,7 +202,12 @@ function fmtShort(ms: number): StringValue {
+ /**
+  * Long format for `ms`.
+  */
+-function fmtLong(ms: number): StringValue {
++function fmtLong(ms: number, unit?: FormatUnit): StringValue {
++  if (unit !== undefined) {
++    const { size, long } = getUnit(unit);
++    return unit === 'ms' ? `${ms} ms` : plural(ms, Math.abs(ms), size, long);
++  }
++
+   const msAbs = Math.abs(ms);
+   if (msAbs >= y) {
+     return plural(ms, msAbs, y, 'year');
+@@ -227,7 +245,37 @@ export function format(ms: number, options?: Options): string {
+     throw new Error('Value provided to ms.format() must be of type number.');
+   }
+ 
+-  return options?.long ? fmtLong(ms) : fmtShort(ms);
++  return options?.long
++    ? fmtLong(ms, options?.unit)
++    : fmtShort(ms, options?.unit);
++}
++
++function getUnit(unit: FormatUnit): {
++  size: number;
++  short: string;
++  long: string;
++} {
++  switch (unit) {
++    case 'ms':
++      return { size: 1, short: 'ms', long: 'millisecond' };
++    case 's':
++      return { size: s, short: 's', long: 'second' };
++    case 'm':
++      return { size: m, short: 'm', long: 'minute' };
++    case 'h':
++      return { size: h, short: 'h', long: 'hour' };
++    case 'd':
++      return { size: d, short: 'd', long: 'day' };
++    case 'w':
++      return { size: w, short: 'w', long: 'week' };
++    case 'mo':
++      return { size: mo, short: 'mo', long: 'month' };
++    case 'y':
++      return { size: y, short: 'y', long: 'year' };
++    default:
++      unit satisfies never;
++      throw new Error();
++  }
+ }
+ 
+ /**
+diff --git a/src/type-tests.ts b/src/type-tests.ts
+new file mode 100644
+index 0000000..0a4bb60
+--- /dev/null
++++ b/src/type-tests.ts
+@@ -0,0 +1,13 @@
++import { format, ms, type Options } from './index';
++
++const options: Options = { long: true, unit: 'mo' };
++const formatted: string = format(1, options);
++const formattedByMs: string = ms(1, { unit: 'y' });
++const parsed: number = ms('1s');
++
++void formatted;
++void formattedByMs;
++void parsed;
++
++// @ts-expect-error - formatting units are limited to the supported abbreviations.
++format(1, { unit: 'invalid' });

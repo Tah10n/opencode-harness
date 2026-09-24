@@ -1,0 +1,9 @@
+{
+  "sourceCommit": "1cebebb082163250a0f78269acc164edfc3c6268",
+  "oldFreezeSha256": "6af463711b4e8b5318417bc4944d95e44258c6afa590e6ed079c632931136dc9",
+  "runtimeAndInstructionsMatch": true,
+  "configOnlyInstallationPathNormalization": true,
+  "dependenciesMatch": true,
+  "unmodifiedInactiveModulesRetained": true,
+  "realProviderRequests": 0
+}

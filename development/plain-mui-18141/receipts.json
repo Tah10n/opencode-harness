@@ -1,0 +1,291 @@
+{
+  "version": 1,
+  "freeze_commit": "e0ebb4fefa836f73e731ec86a4ee0c93414a6ed5",
+  "preparation": [
+    {
+      "path": "local/plain-mui-18141/calibration",
+      "summary": {
+        "path": "local/plain-mui-18141/calibration/summary.json",
+        "bytes": 13153,
+        "sha256": "e3c14b9910b800fc3897ab9775f26ca16fc7de5c7158a0ab7e1707043fbd28a1"
+      },
+      "seconds": 187.093,
+      "calibration_passed": false,
+      "historical_guard_unchanged": false,
+      "created_count": 6,
+      "removed_count": 6,
+      "all_created_removed": true,
+      "cases": [
+        {
+          "arm": "baseline",
+          "F": {
+            "assessment_integrity": "error",
+            "passed": null,
+            "failed": null,
+            "test_seconds": 4.632,
+            "seconds": 36.395,
+            "error": "no parsed tests (build/load error)",
+            "missing_required_tests": null
+          },
+          "E": {
+            "assessment_integrity": "error",
+            "passed": null,
+            "failed": null,
+            "test_seconds": 4.456,
+            "seconds": 37.093,
+            "error": "no parsed tests (build/load error)",
+            "missing_required_tests": null
+          }
+        },
+        {
+          "arm": "gold",
+          "F": {
+            "assessment_integrity": "error",
+            "passed": null,
+            "failed": null,
+            "test_seconds": 4.569,
+            "seconds": 36.073,
+            "error": "no parsed tests (build/load error)",
+            "missing_required_tests": null
+          },
+          "E": {
+            "assessment_integrity": "error",
+            "passed": null,
+            "failed": null,
+            "test_seconds": 4.745,
+            "seconds": 35.822,
+            "error": "no parsed tests (build/load error)",
+            "missing_required_tests": null
+          }
+        },
+        {
+          "arm": "gold-overlap",
+          "E": {
+            "assessment_integrity": "error",
+            "passed": null,
+            "failed": null,
+            "test_seconds": 4.602,
+            "seconds": 35.084,
+            "error": "no parsed tests (build/load error)",
+            "missing_required_tests": null
+          }
+        }
+      ],
+      "raw_outputs": [
+        {
+          "path": "local/plain-mui-18141/calibration/baseline-E/raw-test.log",
+          "bytes": 10314,
+          "sha256": "ba94ceaa79e1e6c7a16941567095fb28b563b6ce312cd5ac5120c75a9a4ba442"
+        },
+        {
+          "path": "local/plain-mui-18141/calibration/baseline-F/raw-test.log",
+          "bytes": 10256,
+          "sha256": "92926e041593835193fcdaef114e0f77e13d8b01970e7873bd98d2c683e9772a"
+        },
+        {
+          "path": "local/plain-mui-18141/calibration/gold-E/raw-test.log",
+          "bytes": 10314,
+          "sha256": "ba94ceaa79e1e6c7a16941567095fb28b563b6ce312cd5ac5120c75a9a4ba442"
+        },
+        {
+          "path": "local/plain-mui-18141/calibration/gold-F/raw-test.log",
+          "bytes": 10256,
+          "sha256": "92926e041593835193fcdaef114e0f77e13d8b01970e7873bd98d2c683e9772a"
+        },
+        {
+          "path": "local/plain-mui-18141/calibration/gold-overlap-E/raw-test.log",
+          "bytes": 10314,
+          "sha256": "ba94ceaa79e1e6c7a16941567095fb28b563b6ce312cd5ac5120c75a9a4ba442"
+        }
+      ]
+    },
+    {
+      "path": "local/plain-mui-18141/calibration-2",
+      "summary": {
+        "path": "local/plain-mui-18141/calibration-2/summary.json",
+        "bytes": 31860,
+        "sha256": "1b0d0b11a834e156af4eef98ac297d0e1fa976e5cfbd5e3419892d6bcbbe44ca"
+      },
+      "seconds": 257.818,
+      "calibration_passed": true,
+      "historical_guard_unchanged": true,
+      "created_count": 6,
+      "removed_count": 6,
+      "all_created_removed": true,
+      "cases": [
+        {
+          "arm": "baseline",
+          "F": {
+            "assessment_integrity": "verified",
+            "passed": 18,
+            "failed": 0,
+            "test_seconds": 10.228,
+            "seconds": 49.001,
+            "error": null,
+            "missing_required_tests": null
+          },
+          "E": {
+            "assessment_integrity": "verified",
+            "passed": 18,
+            "failed": 2,
+            "test_seconds": 10.3,
+            "seconds": 45.148,
+            "error": null,
+            "missing_required_tests": []
+          }
+        },
+        {
+          "arm": "gold",
+          "F": {
+            "assessment_integrity": "verified",
+            "passed": 18,
+            "failed": 0,
+            "test_seconds": 10.411,
+            "seconds": 48.036,
+            "error": null,
+            "missing_required_tests": null
+          },
+          "E": {
+            "assessment_integrity": "verified",
+            "passed": 20,
+            "failed": 0,
+            "test_seconds": 11.161,
+            "seconds": 51.939,
+            "error": null,
+            "missing_required_tests": []
+          }
+        },
+        {
+          "arm": "gold-overlap",
+          "E": {
+            "assessment_integrity": "verified",
+            "passed": 20,
+            "failed": 0,
+            "test_seconds": 12.634,
+            "seconds": 56.468,
+            "error": null,
+            "missing_required_tests": []
+          }
+        }
+      ],
+      "raw_outputs": [
+        {
+          "path": "local/plain-mui-18141/calibration-2/baseline-E/raw-test.log",
+          "bytes": 20810,
+          "sha256": "95e0b460483d26213dc2181fd2963f34c68eca99a3d2035d07f7543de062a812"
+        },
+        {
+          "path": "local/plain-mui-18141/calibration-2/baseline-F/raw-test.log",
+          "bytes": 7116,
+          "sha256": "04445d3177f21b3ac3d16b7d76eb75ded62a6202660651f811a8de00a7db5363"
+        },
+        {
+          "path": "local/plain-mui-18141/calibration-2/gold-E/raw-test.log",
+          "bytes": 8107,
+          "sha256": "c01c48f71af9d9b46f3d54d510977842486d479fe2810a885e2cdbd48e837320"
+        },
+        {
+          "path": "local/plain-mui-18141/calibration-2/gold-F/raw-test.log",
+          "bytes": 7116,
+          "sha256": "c26f411137fbf077e3999cf267e84beda82c8c5bb47244c91064fed2d66a230a"
+        },
+        {
+          "path": "local/plain-mui-18141/calibration-2/gold-overlap-E/raw-test.log",
+          "bytes": 8109,
+          "sha256": "a84d843018940ae6fc666e0c50aa599446509c44d4c3c1622dca3cecc84172da"
+        }
+      ]
+    }
+  ],
+  "scripted_preflight": {
+    "runs": 1,
+    "real_provider_requests": 0,
+    "synthetic_requests": 7,
+    "tools": 5,
+    "result": {
+      "path": "local/plain-mui-18141/preflight/runs/mui__material-ui-18141-P/result.json",
+      "bytes": 834,
+      "sha256": "38cb784b5e48e3f34c7257d7fe489f122ba6010624f079a42543205a274ddee4"
+    },
+    "native_output_manifest": {
+      "path": "local/plain-mui-18141/preflight/runs/mui__material-ui-18141-P/native-output/manifest.json",
+      "bytes": 1347,
+      "sha256": "ea70296a75afd14cf7e8e95e2c48cdda91cd17724b13d4314f2211821ec22a03"
+    },
+    "stop": {
+      "path": "local/plain-mui-18141/preflight/runs/mui__material-ui-18141-P/stop-verification.json",
+      "bytes": 225,
+      "sha256": "52fe5323a7721048db9c6f77a774173b862430ddd3637f53737e02cb3d350d1d"
+    },
+    "cleanup": {
+      "path": "local/plain-mui-18141/preflight/runs/mui__material-ui-18141-P/session/cleanup.json",
+      "bytes": 58,
+      "sha256": "a1b289a69f5bd9c40924b5395e29df6870f9fab8b04e38f1cedc106eff144916"
+    }
+  },
+  "preparation_evaluator_seconds": 444.911,
+  "additional_preparation_overhead_seconds": null,
+  "developing_agent_usage": "separate platform goal snapshot in developing-agent-accounting.json; not author provider usage",
+  "money": null,
+  "policy_rejections": 2,
+  "rejections_started_process": false,
+  "old_pause_hashes_verified": true,
+  "old_reports_results_prompts_unchanged": true,
+  "pre_dispatch_status": {
+    "status": "not_started",
+    "reason": "execution permission auto-review rejected before process creation; awaiting direct user confirmation",
+    "attempts": 0,
+    "provider_requests": 0,
+    "tools": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cached_tokens_included_in_input": 0,
+    "reasoning_tokens_included_in_output": 0,
+    "unknown_requests": 0,
+    "elapsed_seconds": 0,
+    "cleanup_seconds": 0,
+    "delivery_apply": null,
+    "F_checks": "not_run",
+    "assessment_integrity": "not_run",
+    "acceptance_diag": null,
+    "Q": null,
+    "T": null,
+    "D": null
+  },
+  "real_run": {
+    "status": "finished",
+    "delivery_apply": true,
+    "F_checks": "passed",
+    "assessment_integrity": "verified",
+    "acceptance_diag": true,
+    "Q": true,
+    "T": true,
+    "D": true,
+    "usage": {
+      "requests": 15,
+      "requests_without_usage": 0,
+      "input_tokens": {
+        "observed": 472182,
+        "unknown_requests": 0
+      },
+      "output_tokens": {
+        "observed": 5002,
+        "unknown_requests": 0
+      },
+      "cached_tokens": {
+        "observed": 146432,
+        "unknown_requests": 0
+      },
+      "reasoning_tokens": {
+        "observed": 2525,
+        "unknown_requests": 0
+      },
+      "money": null
+    },
+    "native_tools": 33,
+    "execution_elapsed_ms": 471502,
+    "native_cleanup_elapsed_ms": 58,
+    "evaluator_seconds": 87.177
+  },
+  "direct_user_confirmation_received": true
+}

@@ -1,0 +1,100 @@
+{
+  "slot": 6,
+  "case": "case-3",
+  "task": "quick-lru-computed",
+  "arm": "H0",
+  "seedSha256": "bb4805eb1ff89ae2e1fa0a0ab2bdd9d24c34b92df122513d530f00fd5958914d",
+  "Q": 1,
+  "D": 1,
+  "assessment": {
+    "Q": 1,
+    "reason": "Retained the complete control implementation, finite-TTL discrimination and type coverage. Added valid recency/expiry/absence assertions and documented recency and error propagation. No new regression found within the frozen contract checks and full delivered diff.",
+    "ordinaryProjectAndTypesPassed": true,
+    "independentBehaviorPassed": true,
+    "requiredGapDiscriminated": true,
+    "newControlRegression": false,
+    "substantiveObservationUsed": false,
+    "assessmentMethod": "One assessor reviewed the complete delivered diffs, seed-to-final changes, ordinary/independent results and actual failing assertions. The assessor also monitored the runs; no independent blinding claim."
+  },
+  "patch": "patches/06-case-3-H0.patch",
+  "patchSha256": "1ceea446b552f59c07104eec08c72aeb76351cdd9d85df5a761417421212fe90",
+  "terminalPatch": "terminal-patches/06-case-3-H0.patch",
+  "terminalPatchSha256": "0741db29fee800cde5539db1d475fa5e224ea397e55ad85ee3119bef5f278042",
+  "handoffNamesPatch": true,
+  "terminalPatchApplicable": true,
+  "changed": [
+    "index.d.ts",
+    "index.js",
+    "index.test-d.ts",
+    "readme.md",
+    "test.js"
+  ],
+  "deleted": [],
+  "omittedPreparationFiles": [],
+  "nativeCompleted": true,
+  "nativeExit": 0,
+  "lastStepFinish": "stop",
+  "workflowStatus": "incomplete",
+  "requests": 16,
+  "toolCalls": 26,
+  "authorSessions": 1,
+  "preparationAndCaptureMs": 4921,
+  "diagnosticElapsedMs": 0,
+  "executionMs": 178903,
+  "cleanupMs": 52,
+  "elapsedMs": 178955,
+  "usage": {
+    "input_tokens": 479834,
+    "output_tokens": 6702,
+    "total_tokens": 486536,
+    "cached_tokens": 247808,
+    "reasoning_tokens": 4199,
+    "unknownRequests": 0
+  },
+  "terminationVerified": true,
+  "containerRemoved": true,
+  "originalDiagnosticCommands": [],
+  "sensitivityEvents": [],
+  "checks": {
+    "ordinary": {
+      "exit": 0,
+      "elapsedMs": 7208,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && npm test"
+      ],
+      "outputSha256": "1f96696a91bf4bde4f204f8258c6cb63634d9789a521c0aff0419827bfc27473",
+      "outputExcerpt": "> quick-lru@7.3.0 test\n  118 tests passed",
+      "realProviderRequests": 0
+    },
+    "independent": {
+      "exit": 0,
+      "elapsedMs": 3014,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && timeout 10s node .independent.cjs"
+      ],
+      "outputSha256": "f9c69e05a31a62e04881e10139c67883f681accefebbe3f3ff50d81e2a6a7a6e",
+      "outputExcerpt": "Independent behavior passed",
+      "realProviderRequests": 0
+    },
+    "sensitivity": {
+      "exit": 1,
+      "elapsedMs": 3401,
+      "terminationVerified": true,
+      "command": [
+        "sh",
+        "-c",
+        "git apply --check .delivery.patch && git apply .delivery.patch && rm .delivery.patch && node .diagnostic.cjs && node_modules/.bin/ava"
+      ],
+      "outputSha256": "6613f3e444a42cedd428de1a976faf0fca0edd734a57281bd2233523027a9a5d",
+      "outputExcerpt": "turns non-expired items (206ms)\n  ✔ maxAge: peek() lazily removes expired recent items (206ms)\n  ✔ maxAge: peek() lazily removes expired non-recent items (206ms)\n  ✔ maxAge: has() deletes expired items and returns false (206ms)\n  ✔ maxAge: keys() returns only non-expired keys (205ms)\n  ✔ maxAge: keys() returns empty when all items expired (205ms)\n  ✔ maxAge: values() returns empty when all items expired (205ms)\n  ✔ maxAge: values() returns only non-expired values (205ms)\n  ✔ maxAge: entriesDescending() excludes expired entries (206ms)\n  ✔ maxAge: entriesDescending() excludes expired entries from old cache (206ms)\n  ✔ maxAge: entriesDescending() returns all non-expired entries in order (206ms)\n  ✔ maxAge: entriesAscending() excludes expired entries (206ms)\n  ✔ maxAge: entriesAscending() excludes expired non-recent entries (206ms)\n  ✔ maxAge: entriesAscending() returns only non-expired entries (207ms)\n  ✔ maxAge: entries() returns only non-expired entries (207ms)\n  ✔ maxAge: forEach() excludes expired entries (207ms)\n  ✔ maxAge: iterator excludes expired items (207ms)\n  ✔ maxAge: iterator excludes expired items from old cache (207ms)\n  ✔ set(maxAge): setting the same key refreshes expiration (208ms)\n  ✔ set(maxAge): items without expiration never expire (409ms)\n  ✔ set(maxAge): ignores non-numeric maxAge option (410ms)\n  ✔ maxAge: setting an item with a local expiration (508ms)\n  ✔ set(maxAge): per-item maxAge overrides global maxAge (509ms)\n  ─\n\n  .getOrInsertComputed() replaces expired entries with the default TTL\n\n  test.js:80\n\n   79:   const remaining = lru.expiresIn('key');      \n   80:   t.true(remaining > 500 && remaining <= 1000);\n   81:   t.is(lru.get('key'), 'fresh');               \n\n  Value is not `true`:\n\n  false\n\n  › file://test.js:80:8\n\n  ─\n\n  1 test failed\n",
+      "realProviderRequests": 0
+    }
+  },
+  "authorClaimExcerpt": "\nImplemented and completed `getOrInsertComputed` delivery.\n\n- Runtime behavior, expiry/eviction, errors, object keys, and cache isolation covered.\n- Added TypeScript declarations and type tests.\n- Updated README/API documentation.\n- Strengthened required regressions.\n\nChecks passed:\n\n- Focused AVA tests: 3 passed\n- `npx tsd`\n- Full `npm test`: 118 tests passed\n- `git diff --check`\n\nNo commit or dependency changes made."
+}

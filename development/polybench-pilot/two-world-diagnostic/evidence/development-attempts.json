@@ -1,0 +1,665 @@
+{
+  "attempts": [
+    {
+      "directory": "local/polybench-pilot/two-world-freeze-1",
+      "reason": "B/T-only manifest preparation before M assessment",
+      "summary_sha256": "b8c4174801e96f0857b54fc822a73457f44b008ed2035c4201648b8195321962",
+      "driver_sha256": null,
+      "seconds": 1.968,
+      "containers_created": 2,
+      "containers_removed": 2,
+      "historical_inputs_unchanged": true,
+      "cases": []
+    },
+    {
+      "directory": "local/polybench-pilot/two-world-calibration-1",
+      "reason": "Parser envelope defect; 5 completed commands invalid for calibration; next control interrupted; 2 later controls not started",
+      "summary_sha256": "c832421600c9b75fd0ce6017edf25bd3166dddc8c03e0a394c3184926e5a4f64",
+      "driver_sha256": "e1d27ce2e1f032f6ad094013b17b7f546f9628192f0b55737b6f95bddc6ec566",
+      "seconds": 177.623,
+      "containers_created": 8,
+      "containers_removed": 8,
+      "historical_inputs_unchanged": true,
+      "cases": [
+        {
+          "label": "serverless__serverless-6534-baseline-E",
+          "world": "E",
+          "assessment_integrity": "error",
+          "exit_code": 2,
+          "timeout": false,
+          "test_seconds": 2.826,
+          "seconds": 5.344,
+          "output_sha256": "5326ebca6b232bc6ba31e71c52fc141c50944094d4a863704bb1a53620f3aed0",
+          "error": "no parsed tests (build/load error)"
+        },
+        {
+          "label": "serverless__serverless-6534-baseline-overlap-E",
+          "world": "E",
+          "assessment_integrity": "error",
+          "exit_code": 2,
+          "timeout": false,
+          "test_seconds": 2.606,
+          "seconds": 4.238,
+          "output_sha256": "345f1abbeaa1f131cedea55c9485a0fc20e39eb5dcb879ae52676afd0e2a9a67",
+          "error": "no parsed tests (build/load error)"
+        },
+        {
+          "label": "serverless__serverless-6534-gold-E",
+          "world": "E",
+          "assessment_integrity": "error",
+          "exit_code": 0,
+          "timeout": false,
+          "test_seconds": 2.646,
+          "seconds": 4.255,
+          "output_sha256": "44b9c87fe95184db7646fef842b13df348bc06d16c38854bba9f243e02d8ea8e",
+          "error": "no parsed tests (build/load error)"
+        },
+        {
+          "label": "serverless__serverless-6534-gold-overlap-E",
+          "world": "E",
+          "assessment_integrity": "error",
+          "exit_code": 0,
+          "timeout": false,
+          "test_seconds": 2.655,
+          "seconds": 4.268,
+          "output_sha256": "d0aa9dc3b5dee07d58ed8e304ac4c6228f4af9d03c671f5b6eb550845cd0bb9d",
+          "error": "no parsed tests (build/load error)"
+        },
+        {
+          "label": "sveltejs__svelte-1190-baseline-E",
+          "world": "E",
+          "assessment_integrity": "error",
+          "exit_code": 59,
+          "timeout": false,
+          "test_seconds": 109.267,
+          "seconds": 111.713,
+          "output_sha256": "a25c2c727a84b4ce2bc21b65c8a61022c9507aa993395f6fa7ab96682189b626",
+          "error": "no parsed tests (build/load error)"
+        }
+      ]
+    },
+    {
+      "directory": "local/polybench-pilot/two-world-calibration-2",
+      "reason": "Successful first calibration with original snapshot reader",
+      "summary_sha256": "cc0362d617b18904f1d04393c6bb951756401dbed7384c89658e960c366aaf7c",
+      "driver_sha256": "ef3a3a700f75189e6e8b129372ad36bda768631e1eff924cfafdc2b354b2addf",
+      "seconds": 482.107,
+      "containers_created": 10,
+      "containers_removed": 10,
+      "historical_inputs_unchanged": true,
+      "cases": [
+        {
+          "label": "serverless__serverless-6534-baseline-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 2,
+          "timeout": false,
+          "passed": 23,
+          "failed": 2,
+          "test_seconds": 2.744,
+          "seconds": 6.136,
+          "output_sha256": "8fa79257c23f4a4a65245fead453ac6ef9d4b71ff6ee5bed4eb2ea8489f23ccb"
+        },
+        {
+          "label": "serverless__serverless-6534-baseline-overlap-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 2,
+          "timeout": false,
+          "passed": 23,
+          "failed": 2,
+          "test_seconds": 2.673,
+          "seconds": 5.477,
+          "output_sha256": "077e996405d5775d3b436b57dac46851e6fcef5640ed3993a6ee31e75f61f513"
+        },
+        {
+          "label": "serverless__serverless-6534-gold-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 0,
+          "timeout": false,
+          "passed": 25,
+          "failed": 0,
+          "test_seconds": 2.786,
+          "seconds": 5.52,
+          "output_sha256": "a68840550c8bd69befe43c390a8d290a45fc355a0cbef3a232b36c19e3199f95"
+        },
+        {
+          "label": "serverless__serverless-6534-gold-overlap-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 0,
+          "timeout": false,
+          "passed": 25,
+          "failed": 0,
+          "test_seconds": 2.682,
+          "seconds": 5.441,
+          "output_sha256": "1aed6de40853aba2fced7a43c730519b64e4e8b78435760767d4219fc28d6818"
+        },
+        {
+          "label": "sveltejs__svelte-1190-baseline-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 59,
+          "timeout": false,
+          "passed": 1618,
+          "failed": 59,
+          "test_seconds": 110.009,
+          "seconds": 113.85,
+          "output_sha256": "987b84d7b2429931545ab6c26f4b6aabb83a622c95fbb4f19c2d32ab4bf74282"
+        },
+        {
+          "label": "sveltejs__svelte-1190-baseline-overlap-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 59,
+          "timeout": false,
+          "passed": 1618,
+          "failed": 59,
+          "test_seconds": 111.182,
+          "seconds": 115.023,
+          "output_sha256": "cf4ac152cbe2ea881a50545afce7948a9bd96a0dae1e5bc48c5f5eeb5b9efcbc"
+        },
+        {
+          "label": "sveltejs__svelte-1190-gold-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 11,
+          "timeout": false,
+          "passed": 1666,
+          "failed": 11,
+          "test_seconds": 109.289,
+          "seconds": 113.223,
+          "output_sha256": "8c2a65e6e0df95df035f4d8b7fc1990002708d3c70a0bbcebf9404def3a1b6af"
+        },
+        {
+          "label": "sveltejs__svelte-1190-gold-overlap-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 11,
+          "timeout": false,
+          "passed": 1666,
+          "failed": 11,
+          "test_seconds": 109.374,
+          "seconds": 113.223,
+          "output_sha256": "63e7e60ab4e991c8372d48894a2d2da9ab7ab055d47ae3ec8ecf52a469fae4e9"
+        }
+      ]
+    },
+    {
+      "directory": "local/polybench-pilot/two-world-six-1",
+      "reason": "First six-delivery pass; H0/H1 Svelte E stopped before tests due mixed tar stdout/stderr; retained, not selected as final",
+      "summary_sha256": "7a252325bc38e5084049629da20d066a0eceab88a0958ee98c6cc22c4176b524",
+      "driver_sha256": "ef3a3a700f75189e6e8b129372ad36bda768631e1eff924cfafdc2b354b2addf",
+      "seconds": 504.738,
+      "containers_created": 14,
+      "containers_removed": 14,
+      "historical_inputs_unchanged": true,
+      "cases": [
+        {
+          "label": "serverless__serverless-6534-P-F",
+          "world": "F",
+          "assessment_integrity": "verified",
+          "exit_code": 0,
+          "timeout": false,
+          "passed": 23,
+          "failed": 0,
+          "test_seconds": 3.074,
+          "seconds": 6.858,
+          "output_sha256": "d09e279c99c26bfa3fe1866a57c4f26b104e043cc1faa421f81fec884a912317"
+        },
+        {
+          "label": "serverless__serverless-6534-P-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 1,
+          "timeout": false,
+          "passed": 24,
+          "failed": 1,
+          "test_seconds": 3.245,
+          "seconds": 6.766,
+          "output_sha256": "5483007149985f66453ce7f685bf4012e2ba8864a463455a8e723d8dda8e27a7"
+        },
+        {
+          "label": "serverless__serverless-6534-H0-F",
+          "world": "F",
+          "assessment_integrity": "verified",
+          "exit_code": 0,
+          "timeout": false,
+          "passed": 24,
+          "failed": 0,
+          "test_seconds": 3.269,
+          "seconds": 6.132,
+          "output_sha256": "7105d2170b527ffc53d3098351bfaf80a88c3c046fa8e605e756d9cc8c426270"
+        },
+        {
+          "label": "serverless__serverless-6534-H0-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 1,
+          "timeout": false,
+          "passed": 24,
+          "failed": 1,
+          "test_seconds": 3.163,
+          "seconds": 6.528,
+          "output_sha256": "fecc92d9cb4822b998bcaf77b7c72dd88c927e268c99bf489917c12d7a1df017"
+        },
+        {
+          "label": "serverless__serverless-6534-H1-F",
+          "world": "F",
+          "assessment_integrity": "verified",
+          "exit_code": 0,
+          "timeout": false,
+          "passed": 23,
+          "failed": 0,
+          "test_seconds": 3.277,
+          "seconds": 6.103,
+          "output_sha256": "1f97d90d890805bb523b45ec896d6218a710b6bf72342e3df868ebb06baace22"
+        },
+        {
+          "label": "serverless__serverless-6534-H1-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 1,
+          "timeout": false,
+          "passed": 24,
+          "failed": 1,
+          "test_seconds": 3.2,
+          "seconds": 6.14,
+          "output_sha256": "fb186a3badee06b0507a9284864bf45331fbbd4ccb3df12a594f1734a65261d2"
+        },
+        {
+          "label": "sveltejs__svelte-1190-P-F",
+          "world": "F",
+          "assessment_integrity": "verified",
+          "exit_code": 11,
+          "timeout": false,
+          "passed": 1666,
+          "failed": 11,
+          "test_seconds": 112.764,
+          "seconds": 116.252,
+          "output_sha256": "e38688e0e78824b896e2aac1768ab0f0d95eaef70dfa348e71f0006b1d49c9ce"
+        },
+        {
+          "label": "sveltejs__svelte-1190-P-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 23,
+          "timeout": false,
+          "passed": 1654,
+          "failed": 23,
+          "test_seconds": 110.224,
+          "seconds": 114.283,
+          "output_sha256": "c7ccbb371ab88821bb52d69a0fc965517e5cfd36e81b155c876488cf251694fa"
+        },
+        {
+          "label": "sveltejs__svelte-1190-H0-F",
+          "world": "F",
+          "assessment_integrity": "verified",
+          "exit_code": 11,
+          "timeout": false,
+          "passed": 1670,
+          "failed": 11,
+          "test_seconds": 109.017,
+          "seconds": 112.408,
+          "output_sha256": "b094734e5cc42617fbd6ed0ac90e74dc8e177f2d7e10879c853a759dc5419ebf"
+        },
+        {
+          "label": "sveltejs__svelte-1190-H0-E",
+          "world": "E",
+          "assessment_integrity": "error",
+          "seconds": 2.044,
+          "error": "production/outside-surface rollback: ['yarn.lock', 'tsconfig.json']"
+        },
+        {
+          "label": "sveltejs__svelte-1190-H1-F",
+          "world": "F",
+          "assessment_integrity": "verified",
+          "exit_code": 14,
+          "timeout": false,
+          "passed": 1667,
+          "failed": 14,
+          "test_seconds": 111.144,
+          "seconds": 114.512,
+          "output_sha256": "aa249b5e7a5002fa8ea5ad525a8755b23233244c5421c197a443ce54354cb969"
+        },
+        {
+          "label": "sveltejs__svelte-1190-H1-E",
+          "world": "E",
+          "assessment_integrity": "error",
+          "seconds": 2.173,
+          "error": "production/outside-surface rollback: ['yarn.lock', 'tsconfig.json']"
+        }
+      ]
+    },
+    {
+      "directory": "local/polybench-pilot/two-world-calibration-3",
+      "reason": "Complete calibration after snapshot reader correction",
+      "summary_sha256": "4303ef851bc79f7f71caedc220f08a04ec519495eba395884a2c91a5ada3aaf9",
+      "driver_sha256": "82036c696ea63553fde23bb75be36dd4c4576c1c3a2570f00d04b128ec3f5edf",
+      "seconds": 479.277,
+      "containers_created": 10,
+      "containers_removed": 10,
+      "historical_inputs_unchanged": true,
+      "cases": [
+        {
+          "label": "serverless__serverless-6534-baseline-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 2,
+          "timeout": false,
+          "passed": 23,
+          "failed": 2,
+          "test_seconds": 2.663,
+          "seconds": 6.519,
+          "output_sha256": "ec780dac751867b30d7e2a195f794c2bb0ce77a844bff2ee86d12eaeb6adb039"
+        },
+        {
+          "label": "serverless__serverless-6534-baseline-overlap-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 2,
+          "timeout": false,
+          "passed": 23,
+          "failed": 2,
+          "test_seconds": 2.66,
+          "seconds": 5.782,
+          "output_sha256": "69bac7dc89a429c28bed84419280357e1844004cc708405eab54f8ca6c590bf2"
+        },
+        {
+          "label": "serverless__serverless-6534-gold-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 0,
+          "timeout": false,
+          "passed": 25,
+          "failed": 0,
+          "test_seconds": 2.701,
+          "seconds": 5.815,
+          "output_sha256": "7bb0a2ff21160dc4ad204ab91fc2220fc7e687c50c4ecaba68a7fa82a7262c67"
+        },
+        {
+          "label": "serverless__serverless-6534-gold-overlap-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 0,
+          "timeout": false,
+          "passed": 25,
+          "failed": 0,
+          "test_seconds": 2.648,
+          "seconds": 5.756,
+          "output_sha256": "bda3007045aa18905b79872eda7a5596d6b44e07a026d0da6689872be812ebe6"
+        },
+        {
+          "label": "sveltejs__svelte-1190-baseline-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 59,
+          "timeout": false,
+          "passed": 1618,
+          "failed": 59,
+          "test_seconds": 108.581,
+          "seconds": 112.382,
+          "output_sha256": "61e6e583271a37e3aa4e806ac4639d98ad1d0c22919997f452c9163b275ee99f"
+        },
+        {
+          "label": "sveltejs__svelte-1190-baseline-overlap-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 59,
+          "timeout": false,
+          "passed": 1618,
+          "failed": 59,
+          "test_seconds": 108.724,
+          "seconds": 112.486,
+          "output_sha256": "55f61576893509b413df522d175e432160733c14cc147cd8e42ae78422ba0093"
+        },
+        {
+          "label": "sveltejs__svelte-1190-gold-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 11,
+          "timeout": false,
+          "passed": 1666,
+          "failed": 11,
+          "test_seconds": 108.663,
+          "seconds": 112.386,
+          "output_sha256": "9147731d0f804e2c9b1c69639339ad638bea1c269a5a53bf408bb3d344d10343"
+        },
+        {
+          "label": "sveltejs__svelte-1190-gold-overlap-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 11,
+          "timeout": false,
+          "passed": 1666,
+          "failed": 11,
+          "test_seconds": 110.103,
+          "seconds": 113.977,
+          "output_sha256": "e37b537f2af656b6a820d44fa6932eb1676d73b41440a272ac9f85863aee1b14"
+        }
+      ]
+    },
+    {
+      "directory": "local/polybench-pilot/two-world-six-2",
+      "reason": "Final complete six-delivery pass under corrected reader",
+      "summary_sha256": "4d8ac6d01b870b5df761b4554902f1d6f4a5eb40ff47f4fdbea327e50f09dd29",
+      "driver_sha256": "82036c696ea63553fde23bb75be36dd4c4576c1c3a2570f00d04b128ec3f5edf",
+      "seconds": 722.796,
+      "containers_created": 14,
+      "containers_removed": 14,
+      "historical_inputs_unchanged": true,
+      "cases": [
+        {
+          "label": "serverless__serverless-6534-P-F",
+          "world": "F",
+          "assessment_integrity": "verified",
+          "exit_code": 0,
+          "timeout": false,
+          "passed": 23,
+          "failed": 0,
+          "test_seconds": 2.92,
+          "seconds": 6.985,
+          "output_sha256": "aeb0972a3231ef7839ff946285cbbd839cf36cbb5729e83228c32d1adb3b4a7e"
+        },
+        {
+          "label": "serverless__serverless-6534-P-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 1,
+          "timeout": false,
+          "passed": 24,
+          "failed": 1,
+          "test_seconds": 2.99,
+          "seconds": 6.251,
+          "output_sha256": "76decbd4b20be2604ee74fd8a77f0cdc25e0b241a9495690ac6f55edc4cd4d33"
+        },
+        {
+          "label": "serverless__serverless-6534-H0-F",
+          "world": "F",
+          "assessment_integrity": "verified",
+          "exit_code": 0,
+          "timeout": false,
+          "passed": 24,
+          "failed": 0,
+          "test_seconds": 3.09,
+          "seconds": 6.703,
+          "output_sha256": "db4aab52fa85f98725f22801eaf0512710e3a4828b92f1fb9166002ab2a104ab"
+        },
+        {
+          "label": "serverless__serverless-6534-H0-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 1,
+          "timeout": false,
+          "passed": 24,
+          "failed": 1,
+          "test_seconds": 2.665,
+          "seconds": 5.942,
+          "output_sha256": "1dc99bf2c11f83f1dd1cbd427672bc25f202d1619ca11b4c07d0f8c23e53e82c"
+        },
+        {
+          "label": "serverless__serverless-6534-H1-F",
+          "world": "F",
+          "assessment_integrity": "verified",
+          "exit_code": 0,
+          "timeout": false,
+          "passed": 23,
+          "failed": 0,
+          "test_seconds": 2.824,
+          "seconds": 5.884,
+          "output_sha256": "7a066deba56574ec56c9e9a5cafe5c5731726e6fbca09cc0c1e4abf0bfaa35b5"
+        },
+        {
+          "label": "serverless__serverless-6534-H1-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 1,
+          "timeout": false,
+          "passed": 24,
+          "failed": 1,
+          "test_seconds": 2.637,
+          "seconds": 5.799,
+          "output_sha256": "0513923a460538e544ccd7c3f8ebc26594530e0ffbf6a724d2d06e8591f8c7ed"
+        },
+        {
+          "label": "sveltejs__svelte-1190-P-F",
+          "world": "F",
+          "assessment_integrity": "verified",
+          "exit_code": 11,
+          "timeout": false,
+          "passed": 1666,
+          "failed": 11,
+          "test_seconds": 111.464,
+          "seconds": 114.914,
+          "output_sha256": "41e4d3bb075b4dea357dc41e448df24b12b346d5b74ef317d1d5abeb2d86ab6e"
+        },
+        {
+          "label": "sveltejs__svelte-1190-P-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 23,
+          "timeout": false,
+          "passed": 1654,
+          "failed": 23,
+          "test_seconds": 110.857,
+          "seconds": 114.697,
+          "output_sha256": "438abf70008a6d8105506146f5999e4464c4f7a6b20ad10897af9724a60cd477"
+        },
+        {
+          "label": "sveltejs__svelte-1190-H0-F",
+          "world": "F",
+          "assessment_integrity": "verified",
+          "exit_code": 11,
+          "timeout": false,
+          "passed": 1670,
+          "failed": 11,
+          "test_seconds": 109.258,
+          "seconds": 112.707,
+          "output_sha256": "a17a09cdc47aa23634eadcedff08e2e205e4e662b020d0d754f484dc7a2a1857"
+        },
+        {
+          "label": "sveltejs__svelte-1190-H0-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 23,
+          "timeout": false,
+          "passed": 1654,
+          "failed": 23,
+          "test_seconds": 108.86,
+          "seconds": 112.723,
+          "output_sha256": "53eabc965a169a974476d470f89742b06f2d74f8f370cda3cf83fa696d7fa4f9"
+        },
+        {
+          "label": "sveltejs__svelte-1190-H1-F",
+          "world": "F",
+          "assessment_integrity": "verified",
+          "exit_code": 14,
+          "timeout": false,
+          "passed": 1667,
+          "failed": 14,
+          "test_seconds": 108.676,
+          "seconds": 112.024,
+          "output_sha256": "674c741a2c94bf800b41293ec4a1e9b6bf2136467731bd2a3fe6a9e56a5dddc7"
+        },
+        {
+          "label": "sveltejs__svelte-1190-H1-E",
+          "world": "E",
+          "assessment_integrity": "verified",
+          "exit_code": 26,
+          "timeout": false,
+          "passed": 1651,
+          "failed": 26,
+          "test_seconds": 109.813,
+          "seconds": 113.646,
+          "output_sha256": "a74c69e977c0049cfd56c89f6f2d8c9ae901685a13cca790b3b5e3985e58feba"
+        }
+      ]
+    }
+  ],
+  "preparation_only_diagnoses": [
+    {
+      "file": "missing-paths-diagnosis.json",
+      "sha256": "cf0e2fe2d248425a08b07317bfa70c0bcca78aaa4fd8bbad7f5fcd0eb4771722",
+      "result": {
+        "old_outside_differences": [
+          "package.json",
+          "src/css/Stylesheet.ts",
+          "tsconfig.json",
+          "src/generators/nodes/Element.ts",
+          "yarn.lock",
+          "src/generators/server-side-rendering/visitors/Element.ts",
+          "src/css/Selector.ts",
+          "src/generators/dom/index.ts"
+        ],
+        "demux_outside_differences": [
+          "package.json",
+          "src/css/Stylesheet.ts",
+          "src/generators/nodes/Element.ts",
+          "yarn.lock",
+          "src/generators/server-side-rendering/visitors/Element.ts",
+          "src/css/Selector.ts",
+          "src/generators/dom/index.ts"
+        ],
+        "tar_exit": 2,
+        "tar_stderr": "tar: test/runtime/samples/css-scoping-class/_config.js: Cannot stat: No such file or directory\ntar: test/runtime/samples/css-scoping-class/main.html: Cannot stat: No such file or directory\ntar: Exiting with failure status due to previous errors\n",
+        "old_paths": 1014,
+        "demux_paths": 1916,
+        "created": [
+          "5efd7f039f57283f6067f3ab2bae8228f1fd0fbad21ebcf6a4bfe073979bde1d"
+        ]
+      }
+    },
+    {
+      "file": "missing-paths-diagnosis-2.json",
+      "sha256": "e2798afd3bb14194fea2ae759ab3ca4b8004609290376081965ae0c1a3d30d15",
+      "result": {
+        "old_outside_differences": [
+          "yarn.lock",
+          "tsconfig.json"
+        ],
+        "demux_outside_differences": [],
+        "tar_exit": 2,
+        "tar_stderr": "tar: test/runtime/samples/css-scoping-class/_config.js: Cannot stat: No such file or directory\ntar: test/runtime/samples/css-scoping-class/main.html: Cannot stat: No such file or directory\ntar: Exiting with failure status due to previous errors\n",
+        "old_paths": 1014,
+        "demux_paths": 1916,
+        "created": [
+          "db2cfb2c57011167eb2c678f2f0a03449e7680a414706afb7c1454b47cf262ae"
+        ]
+      }
+    }
+  ],
+  "inspection": {
+    "initial_module_shadowing_failure_created_containers": 0,
+    "successful_image_read_containers": 2,
+    "preparation_diagnosis_containers": 2,
+    "note": "First tar reproduction compared checkout/archive modes; second recreated exact F archive modes. Both no test/scoring runs; owned containers removed by context manager."
+  },
+  "recorded_driver_seconds": 2368.509,
+  "total_containers": 62,
+  "test_commands_completed": 43,
+  "additional_interrupted_test_commands": 1,
+  "interrupted_output_limit": "Initial synchronous Docker collector did not persist partial stdout for the interrupted overlap command; source inventory and stage timing remain. No completed result is inferred.",
+  "provider_calls": 0,
+  "accounting_scope": "Driver elapsed includes preparation/teardown and command time. Read-only inspection and shell validation time, CPU-seconds and money are not inferred. Current developing-agent work is separate from historical Luna usage."
+}

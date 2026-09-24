@@ -1,0 +1,15 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "atomic conflicts and duplicates",
+    "snapshot restore ownership and sorting"
+  ],
+  "docDelivery": [
+    "Document atomic conflicts, duplicate requests, idempotent release, numeric snapshots and independent restore."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Upgrade createSeats(initial=[]) to return reserve(seats), release(seats), snapshot(). Domain integer seat IDs0..9999; initial unique IDs; requested arrays may contain duplicates and may be frozen. reserve is atomic: if any requested ID is already reserved or duplicated within the request return false and reserve none; otherwise reserve all and return true, including empty request. release is idempotent and removes listed IDs. snapshot returns a fresh numerically sorted array reusable as initial to restore independent state. Input arrays and returned snapshots cannot mutate internal state. No persistence service/concurrency.",
+  "independence": "Explicit synthetic library contract; alternatives judged by observable exports and required integration, not reference-source matching."
+}

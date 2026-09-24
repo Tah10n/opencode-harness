@@ -1,0 +1,191 @@
+diff --git a/README.md b/README.md
+index 4a26073f8052ee6704abf6f7fd97a068def50ea5..cd0362d19e7c996dfc0343ef46b42681d662ac18 100644
+--- a/README.md
++++ b/README.md
+@@ -514,6 +514,19 @@ Removes the protocol from the input.
+ withoutProtocol("http://example.com"); // "example.com"
+ ```
+ 
++### `withoutQuery(input, keys?)`
++
++Removes the query section of a URL, or selected query keys, while preserving the raw bytes of the remaining URL and query fields.
++
++**Example:**
++
++```js
++withoutQuery("/foo?bar=1&baz=2#frag"); // "/foo#frag"
++withoutQuery("/foo?bar=1&baz=2", "bar"); // "/foo?baz=2"
++```
++Query keys are decoded using the same rules as `parseQuery`. When keys are
++supplied, retained fields are not decoded or re-serialized.
++
+ ### `withoutTrailingSlash(input, respectQueryAndFragment?)`
+ 
+ Removes the trailing slash from the URL or pathname.
+diff --git a/src/utils.ts b/src/utils.ts
+index ea98aba4e7261c2199eeb69e1d5dede3b15a1130..314212a5d3a267db441bbf41b2527fd15864eb21 100644
+--- a/src/utils.ts
++++ b/src/utils.ts
+@@ -3,6 +3,7 @@ import { QueryObject, parseQuery, stringifyQuery, ParsedQuery } from "./query";
+ import {
+   decode,
+   decodePath,
++  decodeQueryKey,
+   encodeHash,
+   encodeHost,
+   encodePath,
+@@ -352,6 +353,74 @@ export function withQuery(input: string, query: QueryObject): string {
+   return stringifyParsedURL(parsed);
+ }
+ 
++/**
++ * Removes the query section of a URL, or selected query keys, while preserving
++ * the raw bytes of the remaining URL and query fields.
++ *
++ * @example
++ *
++ * ```js
++ * withoutQuery("/foo?bar=1&baz=2#frag"); // "/foo#frag"
++ * withoutQuery("/foo?bar=1&baz=2", "bar"); // "/foo?baz=2"
++ * ```
++ *
++ * Query keys are decoded using the same rules as `parseQuery`. When keys are
++ * supplied, retained fields are not decoded or re-serialized.
++ *
++ * @group utils
++ */
++export function withoutQuery(
++  input: string,
++  keys?: string | readonly string[],
++): string {
++  const fragmentIndex = input.indexOf("#");
++  const queryIndex = input.indexOf("?");
++  if (
++    queryIndex === -1 ||
++    (fragmentIndex !== -1 && queryIndex > fragmentIndex)
++  ) {
++    return input;
++  }
++
++  const prefix = input.slice(0, queryIndex);
++  const fragment = fragmentIndex === -1 ? "" : input.slice(fragmentIndex);
++
++  if (keys === undefined) {
++    return prefix + fragment;
++  }
++
++  const requestedKeys = new Set(typeof keys === "string" ? [keys] : keys);
++  if (requestedKeys.size === 0) {
++    return input;
++  }
++
++  const query = input.slice(
++    queryIndex + 1,
++    fragmentIndex === -1 ? undefined : fragmentIndex,
++  );
++  const retainedFields: string[] = [];
++  let removedField = false;
++
++  for (const field of query.split("&")) {
++    const equalsIndex = field.indexOf("=");
++    const key = decodeQueryKey(
++      equalsIndex === -1 ? field : field.slice(0, equalsIndex),
++    );
++    if (requestedKeys.has(key)) {
++      removedField = true;
++    } else {
++      retainedFields.push(field);
++    }
++  }
++
++  if (!removedField) {
++    return input;
++  }
++
++  const retainedQuery = retainedFields.join("&");
++  return prefix + (retainedQuery ? `?${retainedQuery}` : "") + fragment;
++}
++
+ /**
+  * Removes the query section of the URL.
+  *
+diff --git a/test/query.test.ts b/test/query.test.ts
+index 8ef15e44f0fb7e4099e00787dcb490a467979baa..6d2a0d86be0b1d4a874f7a0005d1f66585c40b48 100644
+--- a/test/query.test.ts
++++ b/test/query.test.ts
+@@ -1,5 +1,5 @@
+ import { describe, expect, test } from "vitest";
+-import { filterQuery, getQuery, withQuery } from "../src";
++import { filterQuery, getQuery, withQuery, withoutQuery } from "../src";
+ 
+ describe("withQuery", () => {
+   const tests = [
+@@ -87,6 +87,45 @@ describe("filterQuery", () => {
+   }
+ });
+ 
++describe("withoutQuery", () => {
++  test.each([
++    ["/foo?bar=1&baz=2#frag", undefined, "/foo#frag"],
++    ["/foo?bar=1", undefined, "/foo"],
++    ["/foo#frag?bar=1", undefined, "/foo#frag?bar=1"],
++    ["/foo?bar=1#frag?baz=2", undefined, "/foo#frag?baz=2"],
++    ["/p?x=1&&y=2#f", "x", "/p?&y=2#f"],
++    ["/p?x=1#f", "x", "/p#f"],
++    ["/p?x=1&x=2&y=3", ["x", "x"], "/p?y=3"],
++    ["/p?flag&x=1", "x", "/p?flag"],
++    ["/p?a=b=c&x=1", "a", "/p?x=1"],
++    ["/p?Foo=1&foo=2", "foo", "/p?Foo=1"],
++    [
++      "/p?a+b=1&space%20key=2&caf%C3%A9=3&keep=%2a",
++      ["a b", "space key", "café"],
++      "/p?keep=%2a",
++    ],
++    ["/p?bad+%ZZ=1&bad%2=2&keep=3", ["bad %ZZ", "bad%2"], "/p?keep=3"],
++    ["/p?__proto__=1&__proto__=2&keep=3", "__proto__", "/p?keep=3"],
++    ["/p?=1&&empty&x=2", "", "/p?empty&x=2"],
++    ["/p?x=1", "missing", "/p?x=1"],
++    ["/p?Keep=%2A&&x=1#Frag?z=2", "missing", "/p?Keep=%2A&&x=1#Frag?z=2"],
++  ])("%s without %s", (input, keys, expected) => {
++    expect(withoutQuery(input, keys)).toBe(expected);
++  });
++
++  test("does not mutate readonly key arrays", () => {
++    const keys = ["x", "x"] as const;
++    expect(withoutQuery("/p?x=1&y=2", keys)).toBe("/p?y=2");
++    expect(keys).toEqual(["x", "x"]);
++  });
++
++  test("returns no-op inputs byte-for-byte unchanged", () => {
++    const keys: readonly string[] = [];
++    const input = "/raw%2f?Keep=%2a&&x=1#Frag?z=2";
++    expect(withoutQuery(input, keys)).toBe(input);
++  });
++});
++
+ describe("getQuery", () => {
+   const tests = {
+     "http://foo.com/foo?test=123&unicode=%E5%A5%BD": {
+diff --git a/test/types.test-d.ts b/test/types.test-d.ts
+index e28c503eaa0456b72e8177b9e0a4f3ed5e536916..65a4f920570cafe36c0e360fdebadb01f705825a 100644
+--- a/test/types.test-d.ts
++++ b/test/types.test-d.ts
+@@ -1,5 +1,5 @@
+ import { describe, expectTypeOf, test } from "vitest";
+-import { getQuery, parseQuery } from "../src";
++import { getQuery, parseQuery, withoutQuery } from "../src";
+ 
+ describe("query", () => {
+   test("getQuery generic type support", () => {
+@@ -11,4 +11,11 @@ describe("query", () => {
+     const result = parseQuery<{ foo: string }>("http://foo.com/?foo=bar");
+     expectTypeOf(result).toEqualTypeOf<{ foo: string }>();
+   });
++
++  test("withoutQuery supports readonly key arrays and returns a string", () => {
++    const keys: readonly string[] = ["foo"];
++    const result = withoutQuery("/path?foo=bar", keys);
++    expectTypeOf(result).toEqualTypeOf<string>();
++    expectTypeOf(withoutQuery("/path?foo=bar", "foo")).toEqualTypeOf<string>();
++  });
+ });

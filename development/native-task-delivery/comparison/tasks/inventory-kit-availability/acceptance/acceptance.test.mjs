@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';const root=process.env.PILOT_SOURCE;
+const m0=await import(path.join(root,"src/kits.mjs"));const m1=await import(path.join(root,"src/quote.mjs"));
+test("combined repeated parts through quote",()=>{assert.deepEqual(m1.quote({a:10,b:9},[{id:'x',parts:[{sku:'a',qty:2},{sku:'a',qty:3},{sku:'b',qty:2}]}]),[{id:'x',available:2}]);});
+test("independent quotes and frozen stock",()=>{const s=Object.freeze({a:4});assert.deepEqual(m1.quote(s,[{id:'x',parts:[{sku:'a',qty:2}]},{id:'y',parts:[{sku:'a',qty:2}]}]),[{id:'x',available:2},{id:'y',available:2}]);assert.deepEqual(s,{a:4});});
+test("missing and special keys",()=>{assert.equal(m0.kitCapacity({},[{sku:'__proto__',qty:1}]),0);assert.equal(m0.kitCapacity({['__proto__']:6},[{sku:'__proto__',qty:2}]),3);assert.equal(m0.kitCapacity({a:2},[]),0);});

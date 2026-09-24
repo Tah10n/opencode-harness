@@ -1,0 +1,3 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {breadcrumbs} from '../src/breadcrumbs.mjs';test('hidden ancestor omitted hidden target included',()=>{const t=[{id:'r',label:'Root',href:'/r',hidden:false,children:[{id:'h',label:'Hidden',href:'/h',hidden:true,children:[{id:'c',label:'Current',href:'/c',hidden:true,children:[]}]}]}];assert.deepEqual(breadcrumbs(t,'c'),[{id:'r',label:'Root',href:'/r',current:false},{id:'c',label:'Current',href:null,current:true}]);});
+test('unknown target gives no breadcrumbs',()=>assert.deepEqual(breadcrumbs([{id:'a',label:'a',href:'a',hidden:false,children:[]}],'missing'),[]));

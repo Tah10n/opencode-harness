@@ -1,0 +1,357 @@
+{
+  "slot": 8,
+  "task": "request-module-extraction",
+  "arm": "D",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 288010,
+  "requests": 32,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": null,
+  "repairs": null,
+  "toolCalls": 34,
+  "sessions": 2,
+  "phaseCount": 1,
+  "execution": "completed",
+  "terminationVerified": true,
+  "cleanupVerified": true,
+  "observedUsage": {
+    "input_tokens": 1310528,
+    "cached_tokens": 484864,
+    "output_tokens": 8037,
+    "reasoning_tokens": 941,
+    "total_tokens": 1318565
+  },
+  "usageComplete": true,
+  "requestEfforts": {
+    "none": 1,
+    "low": 31
+  },
+  "httpStatuses": {
+    "200": 32
+  },
+  "artifactWorkflowStatus": "incomplete",
+  "artifactRepairs": 1,
+  "nativeToolOutputParsed": false,
+  "stages": [
+    {
+      "label": "implementation",
+      "role": "author",
+      "elapsedMs": 202186
+    },
+    {
+      "label": "correction",
+      "role": "author",
+      "elapsedMs": 76639
+    }
+  ],
+  "correctionReasons": [
+    "Missing final verification after the last mutation: node --test",
+    "Missing final verification after the last mutation: node --test --test-name-pattern='installs a runnable connector copy' test/config.test.mjs",
+    "Missing final verification after the last mutation: git diff --check",
+    "Existing test/fixture content changed or was removed; assess necessary scenario preservation using the exact diff and added tests."
+  ],
+  "coverageObservation": "changed_scenarios_require_assessment",
+  "limits": [
+    "Some observed project checks failed, lacked test results or were not repeated after the last mutation."
+  ],
+  "phaseChecks": {
+    "D0": {
+      "checksCurrent": false,
+      "changedTestFiles": [
+        "packages/connector/test/config.test.mjs"
+      ],
+      "latestChecks": [
+        {
+          "command": "node --test",
+          "workdir": "packages/connector",
+          "provenance": "initial Node test workflow",
+          "exit": 1,
+          "state": "completed",
+          "current": false,
+          "tests": 162,
+          "successful": false
+        },
+        {
+          "command": "node --test --test-name-pattern='installs a runnable connector copy' test/config.test.mjs",
+          "workdir": "packages/connector",
+          "provenance": "initial Node test workflow",
+          "exit": 0,
+          "state": "completed",
+          "current": false,
+          "tests": 1,
+          "successful": true
+        },
+        {
+          "command": "git diff --check",
+          "workdir": "<delivery-worktree>",
+          "provenance": "explicit original task",
+          "exit": 0,
+          "state": "completed",
+          "current": false,
+          "tests": null,
+          "successful": true
+        }
+      ]
+    },
+    "final": {
+      "checksCurrent": false,
+      "changedTestFiles": [
+        "packages/connector/test/config.test.mjs"
+      ],
+      "latestChecks": [
+        {
+          "command": "node --test",
+          "workdir": "packages/connector",
+          "provenance": "initial Node test workflow",
+          "exit": 1,
+          "state": "completed",
+          "current": true,
+          "tests": 163,
+          "successful": false
+        },
+        {
+          "command": "node --test --test-name-pattern='installs a runnable connector copy' test/config.test.mjs",
+          "workdir": "packages/connector",
+          "provenance": "initial Node test workflow",
+          "exit": 0,
+          "state": "completed",
+          "current": true,
+          "tests": 1,
+          "successful": true
+        },
+        {
+          "command": "git diff --check",
+          "workdir": "<delivery-worktree>",
+          "provenance": "explicit original task",
+          "exit": 0,
+          "state": "completed",
+          "current": true,
+          "tests": null,
+          "successful": true
+        }
+      ]
+    }
+  },
+  "packet": "K6",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/bin/viberacing.mjs",
+      "packages/connector/lib/config.mjs",
+      "packages/connector/lib/transport.mjs",
+      "packages/connector/test/config.test.mjs",
+      "packages/connector/test/transport.test.mjs"
+    ],
+    "patchSha256": "620b77755fa6f3dc96726657953fd3ad63f23588ec4655a91e899d58800dc63d"
+  },
+  "grading": {
+    "final": {
+      "packet": "K6",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 15,
+            "pass": 15,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 15,
+            "pass": 15,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    },
+    "D0": {
+      "packet": "K6",
+      "phase": "D0",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 15,
+            "pass": 15,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 15,
+            "pass": 15,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    }
+  },
+  "sourceReview": {
+    "packet": "K6",
+    "assessmentScope": "Final source and delivered tests/README inspection by the integrator who knows the schedule; independent frozen executable checks are reported separately.",
+    "phases": {
+      "D0": {
+        "sourceConformsToTask": true,
+        "necessaryCoverageDelivered": true,
+        "oldCoveragePreserved": true,
+        "newRequiredCoverageDelivered": true,
+        "documentationDelivered": true,
+        "newRegressionFound": false,
+        "notes": [
+          "CLI uses one transport module; protocol parsing remains in protocol.mjs. The moved request/retry logic retains timeout, redirect refusal, response/status/code, retry eligibility, bounded Retry-After and exponential backoff.",
+          "The runtime module allowlist and existing runnable installed CLI assertion include transport.mjs. Necessary prior tests and assertions remain.",
+          "A new local-server regression exercises a malformed 429 response followed by 204, bounded Retry-After, two POST attempts and returned completion. README describes transport responsibility.",
+          "D0 leaves the former CLI implementation as a commented block. Its transport test restores the Retry-After control but does not restore NODE_ENV in that test worker. Neither establishes a present behavior or necessary-coverage failure."
+        ],
+        "evidence": [
+          "packages/connector/lib/transport.mjs",
+          "packages/connector/bin/viberacing.mjs",
+          "packages/connector/lib/config.mjs installedRuntimeFiles",
+          "packages/connector/test/config.test.mjs installed module expectation",
+          "packages/connector/test/transport.test.mjs"
+        ]
+      },
+      "final": {
+        "sourceConformsToTask": true,
+        "necessaryCoverageDelivered": true,
+        "oldCoveragePreserved": true,
+        "newRequiredCoverageDelivered": true,
+        "documentationDelivered": true,
+        "newRegressionFound": false,
+        "notes": [
+          "CLI uses one transport module; protocol parsing remains in protocol.mjs. The moved request/retry logic retains timeout, redirect refusal, response/status/code, retry eligibility, bounded Retry-After and exponential backoff.",
+          "The runtime module allowlist and existing runnable installed CLI assertion include transport.mjs. Necessary prior tests and assertions remain.",
+          "A new local-server regression exercises a malformed 429 response followed by 204, bounded Retry-After, two POST attempts and returned completion. README describes transport responsibility.",
+          "Correction removes the obsolete commented CLI copy and restores NODE_ENV in test cleanup. Production transport, installed loading and assertions are unchanged; this is cleanup, not a demonstrated behavior or coverage improvement."
+        ],
+        "evidence": [
+          "packages/connector/lib/transport.mjs",
+          "packages/connector/bin/viberacing.mjs",
+          "packages/connector/lib/config.mjs installedRuntimeFiles",
+          "packages/connector/test/config.test.mjs installed module expectation",
+          "packages/connector/test/transport.test.mjs"
+        ]
+      }
+    }
+  },
+  "D0Available": true,
+  "D0FinalPatchEqual": false,
+  "publicPathNormalization": "Delivery-worktree runtime prefix normalized; raw local evidence is unchanged.",
+  "assessment": {
+    "final": {
+      "workingBehaviorObserved": true,
+      "deliveredChecksPassed": true,
+      "allFrozenChecksPassed": true,
+      "necessaryCoverageDelivered": true,
+      "oldCoveragePreserved": true,
+      "newRequiredCoverageDelivered": true,
+      "documentationDelivered": true,
+      "completePatchDelivery": true,
+      "newRegressionFound": false
+    },
+    "D0": {
+      "workingBehaviorObserved": true,
+      "deliveredChecksPassed": true,
+      "allFrozenChecksPassed": true,
+      "necessaryCoverageDelivered": true,
+      "oldCoveragePreserved": true,
+      "newRequiredCoverageDelivered": true,
+      "documentationDelivered": true,
+      "completePatchDelivery": true,
+      "newRegressionFound": false
+    }
+  },
+  "D0FinalChangedPaths": [
+    "packages/connector/bin/viberacing.mjs",
+    "packages/connector/test/transport.test.mjs"
+  ],
+  "D0FinalTreeEqual": false
+}

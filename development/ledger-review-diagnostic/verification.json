@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "exactFrozenCommit": "9157b29bffa4e1a494b457de8f92aab6a2789e38",
+  "sourceAndValidationCopiesUnchanged": true,
+  "completeSnapshotsInFirstRequests": true,
+  "rawRecordingHashesVerified": true,
+  "originalResponsesUnchanged": true,
+  "usageArithmetic": true,
+  "allFrozenExecutionFilesUnchanged": true,
+  "totals": {
+    "requests": 27,
+    "nativeReads": 47,
+    "elapsedMs": 764039,
+    "input_tokens": 2838851,
+    "output_tokens": 22570,
+    "cached_tokens": 830464,
+    "reasoning_tokens": 18866
+  },
+  "modelCallsByVerifier": 0,
+  "scope": "Artifact/custody/accounting checks; not a second review or model-quality proof"
+}

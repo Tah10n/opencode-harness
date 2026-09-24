@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "A rejected partial-refill request followed by admission at the exact refill time.",
+    "Gate does not call its handler on rejection."
+  ],
+  "docDelivery": [
+    "Continuous refill, capacity cap and retryAfterMs:null for impossible cost.",
+    "Rejected requests do not spend tokens or invoke handlers; backwards clock rejection."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Positive integer capacity, positive finite per-second refill rate, monotonic finite nonnegative millisecond clock, positive integer costs; exact arithmetic examples use representable values. Backwards clock throws RangeError without spending tokens.",
+  "independence": "Integrate injected monotonic clock, token refill and retry-after computation into request admission."
+}

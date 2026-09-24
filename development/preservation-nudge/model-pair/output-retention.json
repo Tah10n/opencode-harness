@@ -1,0 +1,63 @@
+{
+  "limitation": "The reused collector preserved unchanged native outputs and actual provider bodies; it did not export separate full stdout files referenced by truncated Bash receipts before container removal. No attempt is repeated and no missing output is reconstructed.",
+  "arms": [
+    {
+      "arm": "OFF",
+      "truncatedBashOutputs": [
+        {
+          "event": 100,
+          "callID": "call_a8wsuK0mrkVmtX5XY16C9rMi",
+          "command": "source /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test",
+          "outputPath": "/work/data/opencode/tool-output/tool_0c089178a001xAUucjfSaHuVD1",
+          "retainedNativeBytes": 51277,
+          "fullStdoutExported": false
+        },
+        {
+          "event": 102,
+          "callID": "call_vmOSHB7U2bdrh4B5tnW69fvK",
+          "command": "source /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test",
+          "outputPath": "/work/data/opencode/tool-output/tool_0c08b5b77001VsgqHoj5DsfSlz",
+          "retainedNativeBytes": 51303,
+          "fullStdoutExported": false
+        }
+      ]
+    },
+    {
+      "arm": "ON",
+      "truncatedBashOutputs": [
+        {
+          "event": 66,
+          "callID": "call_6z0HEhRyoNOh1YWyCNfYhEo5",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/css/index.js",
+          "outputPath": "/work/data/opencode/tool-output/tool_0c098e583001GD5zR0KMAUICAf",
+          "retainedNativeBytes": 51282,
+          "fullStdoutExported": false
+        },
+        {
+          "event": 73,
+          "callID": "call_IaI1n0rjFxwJyf5yqb6XMeK0",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/css/index.js --grep '^((?!custom-elements).)*$'",
+          "outputPath": "/work/data/opencode/tool-output/tool_0c09a4cc7001VdB1OXpvluFi2T",
+          "retainedNativeBytes": 51303,
+          "fullStdoutExported": false
+        },
+        {
+          "event": 75,
+          "callID": "call_jr5TnPVeX4ZnktdNxMKrgdAo",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/css/index.js --grep '^((?!custom-elements).)*$'",
+          "outputPath": "/work/data/opencode/tool-output/tool_0c09acee80013GjIbXoggzPbit",
+          "retainedNativeBytes": 51280,
+          "fullStdoutExported": false
+        },
+        {
+          "event": 117,
+          "callID": "call_O6aHYVYv94WdPdW7inwDDnAq",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test",
+          "outputPath": "/work/data/opencode/tool-output/tool_0c0a428c5001bNKaqYQIrbeoy5",
+          "retainedNativeBytes": 51310,
+          "fullStdoutExported": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {createIndex} from '../src/lines.mjs';test('normalize and update line starts',()=>{const i=createIndex('a\r\nb\rc');assert.equal(i.text(),'a\nb\nc');i.replace(1,4,'X\r\nY');assert.equal(i.text(),'aX\nYc');assert.deepEqual(i.starts(),[0,3]);assert.deepEqual(i.locate(4),{line:1,column:1});});test('failed edit preserves trailing line',()=>{const i=createIndex('a\n');assert.throws(()=>i.replace(2,1,''),RangeError);assert.equal(i.text(),'a\n');assert.deepEqual(i.locate(2),{line:1,column:0});});

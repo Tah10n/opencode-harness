@@ -1,0 +1,124 @@
+diff --git a/README.md b/README.md
+index b44cce3..8076f29 100644
+--- a/README.md
++++ b/README.md
+@@ -308,3 +308,8 @@ ISC
+ [ci-url]: https://github.com/mcollina/fastq/workflows/ci/badge.svg
+ [npm-badge]: https://badge.fury.io/js/fastq.svg
+ [npm-url]: https://badge.fury.io/js/fastq
++
++
++## fastq-on-idle
++
++The API provides onIdle(): Promise<void> to callback and promise queues. Every call independently resolves once the queue reaches running() === 0 and length() === 0; an already idle queue returns a resolved promise. Waiting must work across pause/resume, multiple concurrent workers, rejection/error completion, kill, killAndDrain and abort of queued work, while waiting for still-running workers. A paused queue with pending tasks is not idle. Do not replace, wrap or overwrite the user-owned drain callback to implement subscription; preserve its identity and ordinary call behavior, including callbacks that enqueue more work. Resolve subscriptions only when the queue is actually idle after those synchronous callbacks. Keep drained() and all existing API behavior compatible.
+diff --git a/index.d.ts b/index.d.ts
+index 262dd04..9a1cc28 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -16,6 +16,7 @@ declare namespace fastq {
+     pause(): any
+     /** Resume the processing of tasks. */
+     resume(): any
++    onIdle(): Promise<void>
+     running(): number
+     /** Returns `false` if there are tasks being processed or waiting to be processed. `true` otherwise. */
+     idle(): boolean
+diff --git a/queue.js b/queue.js
+index e1d56c5..09bd67d 100644
+--- a/queue.js
++++ b/queue.js
+@@ -20,6 +20,7 @@ function fastqueue (context, worker, _concurrency) {
+   var queueTail = null
+   var _running = 0
+   var errorHandler = null
++  var idleWaiters = []
+ 
+   var self = {
+     push: push,
+@@ -46,6 +47,10 @@ function fastqueue (context, worker, _concurrency) {
+ 
+     running: running,
+     resume: resume,
++    onIdle: function () {
++      if (self.idle()) return Promise.resolve()
++      return new Promise(function (resolve) { idleWaiters.push(resolve) })
++    },
+     idle: idle,
+     length: length,
+     getQueue: getQueue,
+@@ -59,6 +64,14 @@ function fastqueue (context, worker, _concurrency) {
+ 
+   return self
+ 
++  function notifyIdle () {
++    if (self.idle()) {
++      var waiting = idleWaiters
++      idleWaiters = []
++      for (var i = 0; i < waiting.length; i++) waiting[i]()
++    }
++  }
++
+   function running () {
+     return _running
+   }
+@@ -179,12 +192,14 @@ function fastqueue (context, worker, _concurrency) {
+     } else if (--_running === 0) {
+       self.drain()
+     }
++    notifyIdle()
+   }
+ 
+   function kill () {
+     queueHead = null
+     queueTail = null
+     self.drain = noop
++    notifyIdle()
+   }
+ 
+   function killAndDrain () {
+@@ -192,6 +207,7 @@ function fastqueue (context, worker, _concurrency) {
+     queueTail = null
+     self.drain()
+     self.drain = noop
++    notifyIdle()
+   }
+ 
+   function abort () {
+@@ -228,6 +244,7 @@ function fastqueue (context, worker, _concurrency) {
+     }
+ 
+     self.drain = noop
++    notifyIdle()
+   }
+ 
+   function error (handler) {
+diff --git a/test/example.ts b/test/example.ts
+index a47d441..b3a25b8 100644
+--- a/test/example.ts
++++ b/test/example.ts
+@@ -81,3 +81,6 @@ async function run () {
+ }
+ 
+ run()
++
++const addedQueue = fastq.promise(async (value: string) => value, 1);
++const idlePromise: Promise<void> = addedQueue.onIdle();
+diff --git a/test/test.js b/test/test.js
+index c59e8c3..eb08b4f 100644
+--- a/test/test.js
++++ b/test/test.js
+@@ -806,3 +806,14 @@ test('abort with error handler', function (t) {
+     })
+   }
+ })
++
++var A = require('assert').strict
++var api = require('../')
++test('new public contract', function (t) {
++  ;(async function () {
++    const dones = []; const q = api((v, cb) => dones.push(cb), 2); await q.onIdle(); q.pause(); q.push(1); let settled = 0; const w1 = q.onIdle().then(() => settled++); const w2 = q.onIdle().then(() => settled++); await Promise.resolve(); A.equal(settled, 0); q.resume(); q.push(2); dones[0](null); await Promise.resolve(); A.equal(settled, 0); dones[1](null); await Promise.all([w1, w2]); A.equal(settled, 2)
++    let drains = 0; const drain = () => { drains++; if (drains === 1)q.push(4) }; q.drain = drain; q.push(3); const wait = q.onIdle(); dones[2](null); A.equal(q.drain, drain); let finished = false; wait.then(() => { finished = true }); await Promise.resolve(); A.equal(finished, false); dones[3](null); await wait; A.equal(q.drain, drain); A.equal(drains, 2)
++    for (const method of ['kill', 'killAndDrain', 'abort']) { const callbacks = []; const r = api((v, cb) => callbacks.push(cb), 1); r.pause(); r.push(1); const idle = r.onIdle(); r[method](); await idle; A.equal(r.idle(), true); r.resume(); r.push(2); r.push(3); let completed = false; const active = r.onIdle().then(() => { completed = true }); r[method](); await Promise.resolve(); A.equal(completed, false); callbacks[0](null); await active }
++    const failure = {}; const p = api.promise(async () => { throw failure }, 1); const task = p.push(1); await A.rejects(task, e => e === failure); await p.onIdle(); A.equal(p.idle(), true)
++  })().then(function () { t.end() }, function (error) { t.fail(error.stack); t.end() })
++})

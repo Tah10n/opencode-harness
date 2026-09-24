@@ -1,0 +1,79 @@
+[
+  {
+    "label": "F6",
+    "slot": 1,
+    "task": "legacy-runtime-reload",
+    "arm": "P",
+    "phase": "final",
+    "passed": true,
+    "checks": {
+      "ordinary": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 25,
+          "pass": 24,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        }
+      },
+      "consumers": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "preservation": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 24,
+          "pass": 23,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 1
+        }
+      },
+      "preserved-consumers": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "fresh-process-migration": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "legacy-preservation": {
+        "code": 0,
+        "timedOut": false,
+        "counts": {
+          "tests": 9,
+          "pass": 9,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      },
+      "cleanup": 0
+    }
+  }
+]

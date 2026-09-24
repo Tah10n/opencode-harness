@@ -1,0 +1,124 @@
+{
+  "id": "8113f808eacc",
+  "task": "denque-remove-where",
+  "project": "denque",
+  "Q": 0,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "patchApplicable": true,
+  "sourcePatchSha256": "4a8b5239943fae318fb44ed4bdbe6bd84ac9dafc7fac404bbbedc9a5735c309e",
+  "decision": "Full delivery does not satisfy the frozen rubric.",
+  "findings": [
+    {
+      "category": "required-coverage-loss",
+      "reason": "Delivered suite passes with configured capacity removed after filtering; only backing length/mask and below-capacity reuse are tested. Both control suites detect the capacity-loss mutation."
+    }
+  ],
+  "contentReview": {
+    "id": "8113f808eacc",
+    "reviewBlindedToArmAndWorkflow": true,
+    "contentReview": "complete",
+    "retainedTestsReview": "Existing regression cases remain unchanged.",
+    "task": "denque-remove-where",
+    "behaviorReview": "Copies original values, evaluates predicates without mutation, then clears occupied slots and writes survivors at same head/mask. Preserves original references, error identity and configured capacity by inspection. Runtime confirmation pending.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "Exact original value/index visit list plus mixed/none/all counts and survivor orders are asserted."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "A true first match precedes thrown exact Error at index 1; original sequence and each reference survive. Nonfunctions throw for empty and populated queues."
+      },
+      {
+        "scenario": 3,
+        "covered": "partial",
+        "evidence": "Actual wrapped capacity-5 filter sees [null,0,false,first,last]; initial duplicate zeros no longer both remain at filtering. Tests storage length/mask and below-capacity reuse only; configured capacity preservation is not distinguished from losing the cap."
+      }
+    ],
+    "typesReview": "Typed predicate uses value.length and numeric index in existing consumer fixture; declaration returns number.",
+    "docsReview": "README and API documentation explain truthy removal, original indexes, atomic error propagation and return count.",
+    "contentFindings": [
+      {
+        "category": "required-coverage-loss",
+        "requirement": "Wrapped/capacity queues with duplicates/falsy values stay usable and preserve capacity after filtering.",
+        "evidence": "Initial duplicates are removed by setup shift/overflow before removeWhere. Subsequent length reaches only 4 with configured capacity 5; no configured-capacity assertion or overflow check.",
+        "impact": "Duplicate processing and loss of configured capacity are not distinguished by the delivered new scenario.",
+        "confirmationPending": "Narrow test-sensitivity variant that clears configured capacity after successful filtering; independent copy only."
+      }
+    ],
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "8113f808eacc",
+    "task": "denque-remove-where",
+    "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "4a8b5239943fae318fb44ed4bdbe6bd84ac9dafc7fac404bbbedc9a5735c309e",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 4,
+  "arm": "P",
+  "D": 0,
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "normalHandoff": true,
+    "workflowStatus": null,
+    "terminalPatchVerification": null,
+    "finalResponseSha256": "8cc5e2df8fefb2475386566e535237770eb706067231bdbfdaec82186ba3f198",
+    "finalResponseExcerpt": "Implemented `removeWhere(predicate): number` with:\n\n- Original-order/index predicate evaluation\n- Atomic behavior when predicates throw\n- Non-function validation, including empty queues\n- Wrapped and capacity-preserving compaction\n- TypeScript declaration and type test\n- JavaScript regression tests\n- README and API documentation\n\nChecks run: `npm test` passed, including 56 tests and TypeScript validation. `git diff --check` passed.",
+    "reportFindings": []
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 1906,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 0,
+      "elapsedMs": 661,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "test-sensitivity/result.json",
+      "exit": 0,
+      "elapsedMs": 1608,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0,
+      "diagnosticExcerpt": "\n  56 passing (200ms)\n\n=============================================================================\nWriting coverage object [/work/repo/coverage/coverage.json]\nWriting coverage reports at [/work/repo/coverage]\n=============================================================================\n\n=============================== Coverage summary ===============================\nStatements   : 99.32% ( 292/294 )",
+      "fullLocalOutputSha256": "de38155f3ce0d54bf93462c08cf20a5247c056a0acce5766b1c53ced84ffb6e0"
+    }
+  ]
+}

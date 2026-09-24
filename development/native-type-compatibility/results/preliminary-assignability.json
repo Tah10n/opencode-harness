@@ -1,0 +1,30 @@
+{
+  "rows": [
+    {
+      "name": "baseline",
+      "status": 0,
+      "output": "",
+      "text": "import Old from './baseline';\nimport New from './baseline';\ntype Events = { sample: [string] };\ntype Receiver = { marker: string };\ndeclare const modern: New<Events, Receiver>;\nconst instance: Old<Events, Receiver> = modern;\nconst constructor: typeof Old = New;\nconst method: Old<Events, Receiver>['listeners'] = modern.listeners;\n"
+    },
+    {
+      "name": "reference",
+      "status": 0,
+      "output": "",
+      "text": "import Old from './baseline';\nimport New from './reference';\ntype Events = { sample: [string] };\ntype Receiver = { marker: string };\ndeclare const modern: New<Events, Receiver>;\nconst instance: Old<Events, Receiver> = modern;\nconst constructor: typeof Old = New;\nconst method: Old<Events, Receiver>['listeners'] = modern.listeners;\n"
+    },
+    {
+      "name": "n03",
+      "status": 0,
+      "output": "",
+      "text": "import Old from './baseline';\nimport New from './n03';\ntype Events = { sample: [string] };\ntype Receiver = { marker: string };\ndeclare const modern: New<Events, Receiver>;\nconst instance: Old<Events, Receiver> = modern;\nconst constructor: typeof Old = New;\nconst method: Old<Events, Receiver>['listeners'] = modern.listeners;\n"
+    },
+    {
+      "name": "n04",
+      "status": 0,
+      "output": "",
+      "text": "import Old from './baseline';\nimport New from './n04';\ntype Events = { sample: [string] };\ntype Receiver = { marker: string };\ndeclare const modern: New<Events, Receiver>;\nconst instance: Old<Events, Receiver> = modern;\nconst constructor: typeof Old = New;\nconst method: Old<Events, Receiver>['listeners'] = modern.listeners;\n"
+    }
+  ],
+  "compilations": 4,
+  "elapsedMs": 1876.7814999999998
+}

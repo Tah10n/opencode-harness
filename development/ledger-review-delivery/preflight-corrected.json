@@ -1,0 +1,81 @@
+{
+  "passed": false,
+  "phase": "scripted A delivery comparison",
+  "cause": "Native terminal diff and external collector diff contain equivalent file changes in different block order; fixture required byte equality.",
+  "admissionStop": {
+    "kind": "execution_or_capture_error",
+    "slot": 1,
+    "reason": "Terminal/external full diff mismatch"
+  },
+  "nativeParentSessions": 1,
+  "nativeAuthorSessions": 1,
+  "nativeTools": 4,
+  "scriptedRequests": 7,
+  "scriptedRequestsWithoutUsage": 0,
+  "syntheticUsage": {
+    "input_tokens": 7,
+    "output_tokens": 7,
+    "total_tokens": 14
+  },
+  "realProviderRequests": 0,
+  "scriptedNativeCompletion": {
+    "exitCode": 0,
+    "signal": null,
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "timedOut": false,
+    "stopReason": null,
+    "researchBoundary": "not-reached",
+    "completedAt": 1790159768157,
+    "executionElapsedMs": 3540,
+    "cleanupElapsedMs": 59,
+    "elapsedMs": 3599,
+    "parseErrors": 0
+  },
+  "elapsedFromScriptedDeadlineMs": 4174,
+  "scriptedStages": {
+    "A": "native_completed; delivery assertion stopped admission",
+    "R": "not_started",
+    "F": "not_started"
+  },
+  "realStages": {
+    "A": "not_started",
+    "R": "not_started",
+    "F": "not_started"
+  },
+  "collectorEvidenceComplete": true,
+  "schedulerCaptureSaved": false,
+  "allRequestRecordingsComplete": true,
+  "postHocSavedPatchEquivalence": true,
+  "actualDeliveryManifestWasNotRecorded": true,
+  "patches": [
+    {
+      "sha256": "6622bf5ed73f236261d0361eee281774035d431f6a0c90fd0bedb4945e289772",
+      "bytes": 1347,
+      "applied": true,
+      "treeSha256": "c8e92c13632cee5df3aa8e8511c152e6c402bc5d4e8ba36f345f5cc50bf3af54"
+    },
+    {
+      "sha256": "8c4db83c661cc7e55763ae4fd44b90d805bc1e8f1951d56a5906a60b174f530d",
+      "bytes": 1347,
+      "applied": true,
+      "treeSha256": "c8e92c13632cee5df3aa8e8511c152e6c402bc5d4e8ba36f345f5cc50bf3af54"
+    }
+  ],
+  "containerRemoved": true,
+  "previousFailurePreserved": true,
+  "nativeRetryAfterThisStop": false,
+  "privateEvidenceHashes": {
+    "chain-result.json": "8971f5e4a023748476c3ea13df7d917705cd3dbd324b9dbab72d0c3dacc1ec40",
+    "attempt.json": "b59769dad7769ff96ccf160f1c976732c1a0ead38d17e8ca80d7ffd681696802",
+    "cleanup-verification.json": "37e48338ab40e92379ac4fb6bd589da5dcdec275b63ce2891fab2654174eb5e8",
+    "A/runs/account-switch-ledger-A/provider-metadata.json": "39f76465aeee011337db8caa9b94621250ff82b568f81192500d9b3fee78d39f",
+    "A/runs/account-switch-ledger-A/evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e",
+    "A/runs/account-switch-ledger-A/error.json": "baf2b93f244dc6e9fb08c3d52d5a9d4b265b9ed109ee0dd46e119df1e05b4db3",
+    "A/runs/account-switch-ledger-A/native-evidence.json": "59b810c43174d6ccc2ef7af177877478b1e5ab02ce53b2fef668d838cfce4e9b",
+    "A/runs/account-switch-ledger-A/session/finished.json": "72ea9d747ff9df8f862ecc0e2e122feac6193149b825baa125066fdc3d85629a",
+    "A/runs/account-switch-ledger-A/session/cleanup.json": "a1b289a69f5bd9c40924b5395e29df6870f9fab8b04e38f1cedc106eff144916"
+  }
+}

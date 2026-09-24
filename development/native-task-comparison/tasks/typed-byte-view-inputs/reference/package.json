@@ -1,0 +1,8 @@
+{
+  "name": "typed-byte-view-inputs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/settlement.mjs": "import {validateEntries} from './entries.mjs';export function reconcile(entries){validateEntries(entries);return [...new Set(entries.map(e=>e.currency))].sort().map(currency=>{const es=entries.filter(e=>e.currency===currency),accounts=[...new Set(es.map(e=>e.account))].sort().map(account=>({account,delta:es.filter(e=>e.account===account).reduce((n,e)=>n+e.delta,0)})),total=accounts.reduce((n,a)=>n+a.delta,0);return {currency,accounts,total,balanced:total===0};});}\n"
+  },
+  "mutants": [
+    {
+      "name": "skip-validation",
+      "file": "src/settlement.mjs",
+      "replacement": "import {validateEntries} from './entries.mjs';export function reconcile(entries){const currencies=new Map();for(const e of entries){let accounts=currencies.get(e.currency);if(!accounts)currencies.set(e.currency,accounts=new Map());accounts.set(e.account,(accounts.get(e.account)??0)+e.delta);}return [...currencies].sort(([a],[b])=>a<b?-1:a>b?1:0).map(([currency,map])=>{const accounts=[...map].sort(([a],[b])=>a<b?-1:a>b?1:0).map(([account,delta])=>({account,delta}));const total=accounts.reduce((n,a)=>n+a.delta,0);return {currency,accounts,total,balanced:total===0};});}\n"
+    },
+    {
+      "name": "drop-zero-net-accounts",
+      "file": "src/settlement.mjs",
+      "replacement": "import {validateEntries} from './entries.mjs';export function reconcile(entries){validateEntries(entries);const currencies=new Map();for(const e of entries){let accounts=currencies.get(e.currency);if(!accounts)currencies.set(e.currency,accounts=new Map());accounts.set(e.account,(accounts.get(e.account)??0)+e.delta);}return [...currencies].sort(([a],[b])=>a<b?-1:a>b?1:0).map(([currency,map])=>{const accounts=[...map].sort(([a],[b])=>a<b?-1:a>b?1:0).map(([account,delta])=>({account,delta})).filter(a=>a.delta!==0);const total=accounts.reduce((n,a)=>n+a.delta,0);return {currency,accounts,total,balanced:total===0};});}\n"
+    }
+  ]
+}

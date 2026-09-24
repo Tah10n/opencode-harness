@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/checksum.mjs": "export function checksum(input){\n const buffer=input instanceof ArrayBuffer?input:ArrayBuffer.isView(input)?input.buffer:null;\n if(!(buffer instanceof ArrayBuffer))throw new TypeError('byte input');\n const offset=input instanceof ArrayBuffer?0:input.byteOffset;\n const length=input instanceof ArrayBuffer?input.byteLength:input.byteLength;\n const view=new DataView(buffer,offset,length);let total=0;\n for(let i=0;i<length;i++)total=(total+view.getUint8(i))%4294967296;\n return total;\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "whole-backing-buffer",
+      "file": "src/checksum.mjs",
+      "replacement": "export function checksum(input){\n let bytes;\n if(input instanceof ArrayBuffer)bytes=new Uint8Array(input);\n else if(ArrayBuffer.isView(input)&&input.buffer instanceof ArrayBuffer)bytes=new Uint8Array(input.buffer);\n else throw new TypeError('byte input');\n let sum=0;for(const byte of bytes)sum=(sum+byte)>>>0;return sum;\n}\n"
+    },
+    {
+      "name": "missing-unsigned-wrap",
+      "file": "src/checksum.mjs",
+      "replacement": "export function checksum(input){\n let bytes;\n if(input instanceof ArrayBuffer)bytes=new Uint8Array(input);\n else if(ArrayBuffer.isView(input)&&input.buffer instanceof ArrayBuffer)bytes=new Uint8Array(input.buffer,input.byteOffset,input.byteLength);\n else throw new TypeError('byte input');\n let sum=0;for(const byte of bytes)sum=sum+byte;return sum;\n}\n"
+    }
+  ]
+}

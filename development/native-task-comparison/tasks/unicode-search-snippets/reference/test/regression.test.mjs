@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {snippets} from '../src/snippets.mjs';import {findMatches} from '../src/matches.mjs';test('astral offsets and context',()=>assert.deepEqual(snippets('x😀y😀z','😀',1),[{start:1,end:2,excerpt:'x😀y'},{start:3,end:4,excerpt:'y😀z'}]));test('non-overlap and invalid empty query',()=>{assert.deepEqual(findMatches('aaa','aa'),[{start:0,end:2}]);assert.throws(()=>findMatches('abc',''),TypeError);});

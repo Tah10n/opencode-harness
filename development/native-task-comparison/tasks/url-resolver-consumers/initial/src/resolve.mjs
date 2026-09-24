@@ -1,0 +1,1 @@
+export function resolveLink(base,link){if(typeof base!=='string'||typeof link!=='string')throw new TypeError('strings');const b=new URL(base);if(!['http:','https:'].includes(b.protocol))throw new TypeError('base protocol');const u=new URL(link,b);if(!['http:','https:'].includes(u.protocol))throw new TypeError('link protocol');return u.href;}

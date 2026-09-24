@@ -1,0 +1,1 @@
+export function summarize(entries){return entries.map(e=>({week:e.day,minutes:e.minutes}));}

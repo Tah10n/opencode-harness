@@ -1,0 +1,9 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import path from 'node:path';
+const base=process.env.PILOT_SOURCE;
+const load=n=>import(path.join(base,n));
+const {queue}=await load('src/queue.mjs'),{work}=await load('src/worker.mjs');
+test('batch snapshot bound prevents repeated retry',()=>{const q=queue([{id:'x',payload:{n:2}},{id:'y',payload:3}]);const seen=[];assert.deepEqual(work(q,j=>{seen.push(j.id);return false;},9),{sent:[],retried:['x','y']});assert.deepEqual(seen,['x','y']);assert.deepEqual(q.snapshot(),{ready:[{id:'x',payload:{n:2}},{id:'y',payload:3}],leased:[]});});
+test('mixed success FIFO and untouched remainder',()=>{const q=queue([{id:'a'},{id:'b'},{id:'c'}]);assert.deepEqual(work(q,j=>j.id==='b',2),{sent:['b'],retried:['a']});assert.deepEqual(q.snapshot(),{ready:[{id:'c'},{id:'a'}],leased:[]});});
+test('zero empty default and invalid atomicity',()=>{for(const n of [-1,1.5,NaN,Infinity,'2',Number.MAX_SAFE_INTEGER+1]){const q=queue([{id:'a'}]);assert.throws(()=>work(q,()=>assert.fail(),n),TypeError);assert.deepEqual(q.snapshot(),{ready:[{id:'a'}],leased:[]});}const q=queue([{id:'a'}]);assert.deepEqual(work(q,()=>assert.fail(),0),{sent:[],retried:[]});assert.equal(q.snapshot().ready.length,1);assert.deepEqual(work(q,()=>true),{sent:['a'],retried:[]});assert.deepEqual(work(q,()=>assert.fail(),3),{sent:[],retried:[]});});

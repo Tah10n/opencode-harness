@@ -1,0 +1,120 @@
+{
+  "containers": [
+    {
+      "container": "template-dev-c38ef567-840d-45c2-93c5-858eadad9c49",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "container-input-verification/reconnect-revoked-H/container.json"
+    },
+    {
+      "container": "template-dev-415b25b1-2836-460b-8d2d-2944632225ab",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "container-input-verification/legacy-runtime-reload-H/container.json"
+    },
+    {
+      "container": "template-dev-58d83fcf-a0b5-4f2c-a27f-e50bc25fa9e3",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "container-input-verification/reconnect-revoked-P/container.json"
+    },
+    {
+      "container": "template-dev-f6ab240c-f7b9-47da-89f7-09f7dc801430",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "container-input-verification/legacy-runtime-reload-P/container.json"
+    },
+    {
+      "container": "template-dev-89608bfc-6506-4006-9b06-2485758d6ee6",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "packets/N8/grading-final/session/container.json"
+    },
+    {
+      "container": "template-dev-0b307cc2-ebe9-4b39-9cea-ed7a725b978e",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "packets/N8/grading-D0/session/container.json"
+    },
+    {
+      "container": "template-dev-9e7675a6-86c6-43c0-b644-c4c55020004b",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "packets/T2/grading-final/session/container.json"
+    },
+    {
+      "container": "template-dev-b31a5de3-e79e-418d-9033-5ce0296cd065",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "packets/F6/grading-final/session/container.json"
+    },
+    {
+      "container": "template-dev-db388b6a-27fd-4bbd-933f-8fcd5a7a67f5",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "packets/F6/supplemental-exact-reload/session/container.json"
+    },
+    {
+      "container": "template-dev-85cc89eb-cb2a-4d7e-b10b-92a7082f8df8",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "packets/J3/grading-final/session/container.json"
+    },
+    {
+      "container": "template-dev-9da4315e-9191-4e12-9616-cb0c87ad0bb4",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "packets/J3/grading-D0/session/container.json"
+    },
+    {
+      "container": "template-dev-111fd4bf-55c0-4c3a-84a1-905f1e1d5cb3",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "packets/J3/supplemental-exact-reload/session/container.json"
+    },
+    {
+      "container": "template-dev-dd4f432c-d25d-40a1-8677-345456ad5241",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "container-preflight/preflight-session/container.json"
+    },
+    {
+      "container": "template-dev-98409fe4-0121-4d75-8ff6-133d589b71f2",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "runs/reconnect-revoked-H/session/container.json"
+    },
+    {
+      "container": "template-dev-21463b6c-0083-49c5-bd13-a8b577785215",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "runs/legacy-runtime-reload-H/session/container.json"
+    },
+    {
+      "container": "template-dev-89c06a1e-6615-4431-9a5f-aaa3d09bfb36",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "runs/reconnect-revoked-P/session/container.json"
+    },
+    {
+      "container": "template-dev-f78d56b5-8702-4b56-a1f6-01b472b65d90",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "runs/legacy-runtime-reload-P/session/container.json"
+    },
+    {
+      "container": "template-dev-bae6bb35-e4eb-46c5-bafe-da31f744903c",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "input-checks/reconnect-revoked/session/container.json"
+    },
+    {
+      "container": "template-dev-8b324703-82ff-4c5a-af05-927707bcda2f",
+      "cleanupStatus": 0,
+      "removed": true,
+      "artifact": "input-checks/legacy-runtime-reload/session/container.json"
+    }
+  ],
+  "allRemoved": true,
+  "providerRequestsDuringOfflineChecks": 0
+}

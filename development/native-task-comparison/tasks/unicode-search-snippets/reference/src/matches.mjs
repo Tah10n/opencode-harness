@@ -1,0 +1,1 @@
+export function findMatches(text,query){if(!query)throw new TypeError('empty query');const t=Array.from(text),q=Array.from(query),out=[];for(let i=0;i<=t.length-q.length;){if(q.every((c,j)=>c===t[i+j])){out.push({start:i,end:i+q.length});i+=q.length;}else i++;}return out;}

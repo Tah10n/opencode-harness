@@ -1,0 +1,103 @@
+{
+  "recordedAt": "2026-09-16T20:20:04.206919+00:00",
+  "mappingReadBeforeReview": false,
+  "reviewer": "Primary developing agent; neutral IDs before mapping/traces, not an independently blinded external evaluator",
+  "rows": [
+    {
+      "id": "n01",
+      "Q": false,
+      "reason": "subscribe uses EventListener without a contextual receiver; frozen new-feature consumer fails TS2683/TS2322. Author positive test never uses this.",
+      "runtimeAndESMAndBuild": true,
+      "independentRuntime": true,
+      "authorTypesPass": true,
+      "existingAssertionsPreserved": true,
+      "coverage": {
+        "duplicateCancellation": true,
+        "removalReregistration": true,
+        "idempotencyCleanup": true,
+        "contextArguments": true,
+        "symbols": true,
+        "invalidCallbacks": true,
+        "duringDispatch": true,
+        "recursiveSelfCancellation": true,
+        "CJS": true,
+        "ESM": true,
+        "positiveNegativeTypes": true,
+        "documentationLifecycleAndOffDistinction": true
+      },
+      "scope": "No required helper, test filename, architecture or Error subtype. Evaluator unchanged."
+    },
+    {
+      "id": "n02",
+      "Q": true,
+      "reason": "All frozen checks pass; separate EventListenerWithContext preserves legacy returned callbacks and provides contextual subscribe receiver. Required project regressions and documentation present.",
+      "runtimeAndESMAndBuild": true,
+      "independentRuntime": true,
+      "authorTypesPass": true,
+      "existingAssertionsPreserved": true,
+      "coverage": {
+        "duplicateCancellation": true,
+        "removalReregistration": true,
+        "idempotencyCleanup": true,
+        "contextArguments": true,
+        "symbols": true,
+        "invalidCallbacks": true,
+        "duringDispatch": true,
+        "recursiveSelfCancellation": true,
+        "CJS": true,
+        "ESM": true,
+        "positiveNegativeTypes": true,
+        "documentationLifecycleAndOffDistinction": true
+      },
+      "scope": "No required helper, test filename, architecture or Error subtype. Evaluator unchanged."
+    },
+    {
+      "id": "n03",
+      "Q": false,
+      "reason": "listeners returns EventListener parameterized by Context; frozen bare-call legacy consumer fails TS2684. New API and author types pass, but old API is narrowed.",
+      "runtimeAndESMAndBuild": true,
+      "independentRuntime": true,
+      "authorTypesPass": true,
+      "existingAssertionsPreserved": true,
+      "coverage": {
+        "duplicateCancellation": true,
+        "removalReregistration": true,
+        "idempotencyCleanup": true,
+        "contextArguments": true,
+        "symbols": true,
+        "invalidCallbacks": true,
+        "duringDispatch": true,
+        "recursiveSelfCancellation": true,
+        "CJS": true,
+        "ESM": true,
+        "positiveNegativeTypes": true,
+        "documentationLifecycleAndOffDistinction": true
+      },
+      "scope": "No required helper, test filename, architecture or Error subtype. Evaluator unchanged."
+    },
+    {
+      "id": "n04",
+      "Q": true,
+      "reason": "All frozen checks pass; listeners preserves baseline signature while subscribe carries contextual this. Required project regressions and documentation present.",
+      "runtimeAndESMAndBuild": true,
+      "independentRuntime": true,
+      "authorTypesPass": true,
+      "existingAssertionsPreserved": true,
+      "coverage": {
+        "duplicateCancellation": true,
+        "removalReregistration": true,
+        "idempotencyCleanup": true,
+        "contextArguments": true,
+        "symbols": true,
+        "invalidCallbacks": true,
+        "duringDispatch": true,
+        "recursiveSelfCancellation": true,
+        "CJS": true,
+        "ESM": true,
+        "positiveNegativeTypes": true,
+        "documentationLifecycleAndOffDistinction": true
+      },
+      "scope": "No required helper, test filename, architecture or Error subtype. Evaluator unchanged."
+    }
+  ]
+}

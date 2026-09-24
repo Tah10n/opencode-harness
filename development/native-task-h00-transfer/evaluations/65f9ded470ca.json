@@ -1,0 +1,128 @@
+{
+  "id": "65f9ded470ca",
+  "task": "eventemitter-prepend",
+  "project": "eventemitter3",
+  "Q": 0,
+  "ordinaryProjectExit": 0,
+  "originalIndependentExit": 0,
+  "interpretedIndependentExit": 0,
+  "patchApplicable": true,
+  "sourcePatchSha256": "8f79f0c9ddf49d9fd516f024344e34bf10ec5c5bc03ceeed3e13a4a5b6ece0f5",
+  "decision": "Full delivery does not satisfy the frozen rubric.",
+  "findings": [
+    {
+      "category": "required-type-test-loss",
+      "reason": "Public declarations supplied, but no required event-specific TypeScript consumer/type regression is delivered."
+    }
+  ],
+  "contentReview": {
+    "id": "65f9ded470ca",
+    "reviewBlindedToArmAndWorkflow": true,
+    "task": "eventemitter-prepend",
+    "contentReview": "complete",
+    "behaviorReview": "Uses the existing helper with a prepend flag. Validation/context construction and existing emit/removal paths are retained. Runtime confirmation pending.",
+    "requiredRegressionReview": [
+      {
+        "scenario": 1,
+        "covered": true,
+        "evidence": "test/test.js: appended regular/once plus two prepended registrations are emitted twice; exact receiver/payload/call order asserted."
+      },
+      {
+        "scenario": 2,
+        "covered": true,
+        "evidence": "Recursive prependOnce call list, remaining regular listener, removal, and empty subsequent emit are asserted."
+      },
+      {
+        "scenario": 3,
+        "covered": true,
+        "evidence": "Symbol registration order asserted; invalid prependOnce must throw and preserve registrations; ESM consumer emits twice and asserts order/once removal."
+      }
+    ],
+    "typesReview": "Public generic declarations are added, but no delivered TypeScript consumer/type regression exists in the patch. Both TASK.md and rubric require applicable type tests. Existing source has no such scenario.",
+    "docsReview": "README corrects unsupported-method list and documents prepend behavior and context with examples.",
+    "retainedTestsReview": "Existing regression scenarios are retained.",
+    "contentFindings": [
+      {
+        "category": "required-coverage-loss",
+        "requirement": "Deliver applicable public TypeScript declarations/type tests.",
+        "evidence": "Changed files are README.md, index.d.ts, index.js, test/test.js, test/test.mjs; no type-use regression is delivered.",
+        "impact": "New event-specific payload inference and rejection have no delivered regression; declarations alone do not satisfy full delivery."
+      }
+    ],
+    "recordStage": "Pre-unblinding content review; final decision is top-level Q."
+  },
+  "applicability": {
+    "id": "65f9ded470ca",
+    "task": "eventemitter-prepend",
+    "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+    "ordinaryGitCopy": true,
+    "administrativeHarnessWorktreeRequired": false,
+    "patchAppliedCleanly": true,
+    "authorSourceBytesAndModesVerified": true,
+    "reconstructedPatchByteIdentical": true,
+    "sourcePatchSha256": "8f79f0c9ddf49d9fd516f024344e34bf10ec5c5bc03ceeed3e13a4a5b6ece0f5",
+    "excludedPreparationArtifacts": [],
+    "types": null
+  },
+  "verificationNotes": {
+    "qualityAssignedBeforeArmMappingRead": true,
+    "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+  },
+  "slot": 6,
+  "arm": "H00",
+  "D": 0,
+  "native": {
+    "completed": true,
+    "exitCode": 0,
+    "signal": null,
+    "lastStepFinish": "stop",
+    "stop": {
+      "ownTaskDeadlineTriggered": false,
+      "terminationVerified": true,
+      "captureSaved": true,
+      "forwardingClosed": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "providerServerStateMayRemainUnknown": false
+    },
+    "normalHandoff": true,
+    "workflowStatus": "incomplete",
+    "terminalPatchVerification": {
+      "slot": 6,
+      "id": "65f9ded470ca",
+      "terminalPatchSha256": "2486528e651c4850a6302d070d8662063e8ff57b6cd149353f59c40d030f682b",
+      "terminalPatchEqualsApplicableSourcePatch": false,
+      "ordinaryAppliedCopyReverseCheckExit": 0,
+      "diagnostic": "",
+      "nativeHandoffNamesDeliveryAndPatch": true,
+      "ordinaryCleanSourceForwardApplyExit": 0,
+      "terminalPatchDeliversAllAuthorBytesAndModes": true
+    },
+    "finalResponseSha256": "68685acbf7315f5226d4e88e21ae57a1c850022fec648816558d8d06f98c32de",
+    "finalResponseExcerpt": "Native task workflow: incomplete.\nDelivery worktree: /work/repo/.git/harness-task/b95b820d-5921-4709-8772-cbf649e1f0ae/worktree.\nTerminal patch: /work/repo/.git/harness-task/b95b820d-5921-4709-8772-cbf649e1f0ae/terminal.patch.\nFull report and tool outputs: /work/repo/.git/harness-task/b95b820d-5921-4709-8772-cbf649e1f0ae.\nOriginal checkout unchanged by workflow transfer.",
+    "reportFindings": [
+      {
+        "category": "misleading-workflow-report",
+        "evidence": "Normal final response lists successful project commands but says No observed relevant project test/check and Executable project verification unavailable or not observed. Delivery worktree and terminal patch are correctly named and usable; this contradiction does not alone remove D."
+      }
+    ]
+  },
+  "verification": [
+    {
+      "artifact": "ordinary-project/result.json",
+      "exit": 0,
+      "elapsedMs": 1142,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    },
+    {
+      "artifact": "independent/result.json",
+      "exit": 0,
+      "elapsedMs": 519,
+      "terminationVerified": true,
+      "containerRemoved": true,
+      "realProviderRequests": 0
+    }
+  ]
+}

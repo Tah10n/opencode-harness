@@ -1,0 +1,186 @@
+{
+  "historicalA": {
+    "requests": 76,
+    "requestsWithoutUsage": 0,
+    "usage": {
+      "input_tokens": 13568381,
+      "output_tokens": 33999,
+      "cached_tokens": 9631232,
+      "reasoning_tokens": 17410
+    },
+    "toolCalls": 122,
+    "tools": {
+      "harness_task": 1,
+      "todowrite": 4,
+      "glob": 2,
+      "grep": 11,
+      "read": 50,
+      "bash": 25,
+      "apply_patch": 29
+    },
+    "parentSessions": 1,
+    "authorSessions": 1,
+    "nativeElapsedMs": 980363,
+    "executionElapsedMs": 980304,
+    "cleanupElapsedMs": 59,
+    "period": "old interrupted pilot; counted once"
+  },
+  "followup": {
+    "stages": {
+      "R": {
+        "status": "native_completed",
+        "requests": 16,
+        "requestsWithoutUsage": 0,
+        "usage": {
+          "input_tokens": 819319,
+          "output_tokens": 14774,
+          "cached_tokens": 219136,
+          "reasoning_tokens": 12564
+        },
+        "toolCalls": 31,
+        "tools": {
+          "grep": 10,
+          "read": 20,
+          "glob": 1
+        },
+        "sessions": 1,
+        "nativeElapsedMs": 320084,
+        "executionElapsedMs": 320032,
+        "stop": {
+          "ownTaskDeadlineTriggered": false,
+          "terminationVerified": true,
+          "captureSaved": true,
+          "forwardingClosed": true,
+          "relayRemoved": true,
+          "activeProviderHandlers": 0,
+          "providerServerStateMayRemainUnknown": false
+        },
+        "nativeCompleted": true
+      },
+      "F": {
+        "status": "native_completed",
+        "requests": 49,
+        "requestsWithoutUsage": 0,
+        "usage": {
+          "input_tokens": 4191917,
+          "output_tokens": 22999,
+          "cached_tokens": 2643968,
+          "reasoning_tokens": 14156
+        },
+        "toolCalls": 79,
+        "tools": {
+          "harness_task": 1,
+          "todowrite": 3,
+          "bash": 27,
+          "glob": 2,
+          "grep": 10,
+          "read": 27,
+          "apply_patch": 9
+        },
+        "sessions": 2,
+        "nativeElapsedMs": 670552,
+        "executionElapsedMs": 670486,
+        "stop": {
+          "ownTaskDeadlineTriggered": false,
+          "terminationVerified": true,
+          "captureSaved": true,
+          "forwardingClosed": true,
+          "relayRemoved": true,
+          "activeProviderHandlers": 0,
+          "providerServerStateMayRemainUnknown": false
+        },
+        "nativeCompleted": true
+      }
+    },
+    "totalRequests": 65,
+    "requestsWithoutUsage": 0,
+    "usage": {
+      "input_tokens": 5011236,
+      "output_tokens": 37773,
+      "cached_tokens": 2863104,
+      "reasoning_tokens": 26720
+    },
+    "globalStart": 1790166003871,
+    "globalDeadline": 1790167803871,
+    "finishedAt": 1790167001908,
+    "elapsedMs": 998037,
+    "requestRoles": {
+      "R/title": {
+        "requests": 1,
+        "usage": {
+          "input_tokens": 10975,
+          "output_tokens": 140,
+          "cached_tokens": 0,
+          "reasoning_tokens": 127
+        }
+      },
+      "R/reviewer": {
+        "requests": 15,
+        "usage": {
+          "input_tokens": 808344,
+          "output_tokens": 14634,
+          "cached_tokens": 219136,
+          "reasoning_tokens": 12437
+        }
+      },
+      "F/title": {
+        "requests": 1,
+        "usage": {
+          "input_tokens": 577,
+          "output_tokens": 92,
+          "cached_tokens": 0,
+          "reasoning_tokens": 80
+        }
+      },
+      "F/parent": {
+        "requests": 2,
+        "usage": {
+          "input_tokens": 13146,
+          "output_tokens": 256,
+          "cached_tokens": 0,
+          "reasoning_tokens": 139
+        }
+      },
+      "F/author": {
+        "requests": 46,
+        "usage": {
+          "input_tokens": 4178194,
+          "output_tokens": 22651,
+          "cached_tokens": 2643968,
+          "reasoning_tokens": 13937
+        }
+      }
+    }
+  },
+  "combined": {
+    "requests": 141,
+    "usage": {
+      "input_tokens": 18579617,
+      "output_tokens": 71772,
+      "cached_tokens": 12494336,
+      "reasoning_tokens": 44130
+    },
+    "continuousRun": false,
+    "oldNativePlusNewChainMs": 1978400
+  },
+  "preparation": {
+    "newScriptedAttempts": 2,
+    "newScriptedRequests": 132,
+    "historicalScriptedRequests": 27,
+    "realModelRequests": 0,
+    "syntheticTokensNotModelUsage": true
+  },
+  "evaluator": {
+    "modelRequests": 0,
+    "accounting": "separate command receipts",
+    "commandReceipts": 14,
+    "selectedChecksElapsedSeconds": 130.602923208,
+    "overallWallTime": "not measured by original evaluator; do not infer from test durations"
+  },
+  "developingAgent": {
+    "excludedFromExperimentUsage": true,
+    "usage": "not measured by provider recorder"
+  },
+  "money": null,
+  "note": "Cached input and reasoning output are included subsets. Known usage only; missing usage remains unknown. Old A and new R/F are separate wall-clock periods."
+}

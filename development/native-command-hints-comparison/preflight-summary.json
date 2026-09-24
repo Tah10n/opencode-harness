@@ -1,0 +1,61 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "task": "A",
+      "arm": "OFF",
+      "fullProjectChecksObserved": true,
+      "containerRemoved": true,
+      "hint": null
+    },
+    {
+      "task": "A",
+      "arm": "ON",
+      "fullProjectChecksObserved": true,
+      "containerRemoved": true,
+      "hint": {
+        "kind": "project-command-hint",
+        "callID": "call_5",
+        "status": "path-found",
+        "missing": "pnpm",
+        "cwd": "/work/repo/.git/harness-task/e3df5c2e-20aa-46ff-a32a-a5eeefe94ea6/worktree",
+        "script": "test",
+        "packageManager": "pnpm@10.33.2",
+        "installed": {
+          "name": "eslint",
+          "version": "10.2.1",
+          "versionBasis": "package metadata, not --version",
+          "executable": "/work/repo/node_modules/.bin/eslint"
+        },
+        "scope": "partial-lint",
+        "routes": [
+          "'/work/repo/node_modules/.bin/eslint' '.'"
+        ],
+        "reason": "Only the declared lint script eslint . prefix; skips lifecycle hooks and remaining commands. Does not restore the original script or test suite.",
+        "notice": "Host-derived context only. Original command failed. Executable path/metadata were read; proposed command has not run. Suite readiness, check success and task correctness are unverified. Native permissions still apply.",
+        "cost": {
+          "paths": 106,
+          "reads": 6,
+          "bytes": 28920,
+          "elapsedMs": 4.887374999999793,
+          "executions": 0
+        }
+      }
+    },
+    {
+      "task": "B",
+      "arm": "ON",
+      "fullProjectChecksObserved": true,
+      "containerRemoved": true,
+      "hint": null
+    },
+    {
+      "task": "B",
+      "arm": "OFF",
+      "fullProjectChecksObserved": true,
+      "containerRemoved": true,
+      "hint": null
+    }
+  ],
+  "realProviderRequests": 0
+}

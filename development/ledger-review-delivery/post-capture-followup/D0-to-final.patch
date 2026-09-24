@@ -1,0 +1,337 @@
+diff --git a/packages/connector/lib/adapters/claude.mjs b/packages/connector/lib/adapters/claude.mjs
+index e62f0bdfd66f5d6945ba837cafbec9256c6b7fb5..7018dd37ed17de6b9e3b6da0c587748fd36d166b 100644
+--- a/packages/connector/lib/adapters/claude.mjs
++++ b/packages/connector/lib/adapters/claude.mjs
+@@ -136,17 +136,22 @@ export async function collectClaude(
+         partial = true;
+         limited = true;
+       }
+-      const provisionalLines =
+-        hasUnterminatedTail && chunk.tail?.trim() ? [...chunk.lines, chunk.tail] : chunk.lines;
+-      const analysis = analyzeClaudeLines(provisionalLines);
++      const analysis = analyzeClaudeLines(chunk.lines);
+       if (analysis.stats.unsupportedCandidates > 0) {
+         partial = true;
+         schemaUnsupported = true;
+         continue;
+       }
+       if (hasUnterminatedTail) {
+-        if (!previous || appended)
+-          for (const value of analysis.records)
++        observations.push(...analysis.records);
++        const tailAnalysis = chunk.tail?.trim() ? analyzeClaudeLines([chunk.tail]) : null;
++        if (tailAnalysis?.stats.unsupportedCandidates > 0) {
++          partial = true;
++          schemaUnsupported = true;
++        }
++        if ((!previous || appended) &&
++          (!tailAnalysis || tailAnalysis.stats.unsupportedCandidates === 0))
++          for (const value of tailAnalysis?.records ?? [])
+             if (!ids.has(value.id)) provisionalMessages[value.id] = value.entry;
+         continue;
+       }
+@@ -186,6 +191,11 @@ export async function collectClaude(
+     if (entry.date < range.rangeStart || entry.date > range.rangeEnd) delete nextState.messages[id];
+   const ledger = observeEventLedger(compatibleState.eventLedger, observations, range);
+   const conflict = ledger.conflict;
++  const ledgerHasAcceptedState =
++    validEventLedger(compatibleState.eventLedger) &&
++    Object.keys(compatibleState.eventLedger.events).length > 0;
++  const useLedgerEntries =
++    ledger.entries.length > 0 || observations.length > 0 || ledgerHasAcceptedState || ledger.limited;
+   if (!stateCompatible && partial && Object.keys(state.files ?? {}).length > 0) {
+     const previousMessages = Object.values(state.messages ?? {}).filter(
+       (entry) => entry.date >= range.rangeStart && entry.date <= range.rangeEnd,
+@@ -206,7 +216,7 @@ export async function collectClaude(
+   }
+   return {
+     entries:
+-      ledger.entries.length > 0
++      useLedgerEntries
+         ? mergeEntries([...ledger.entries, ...Object.values(provisionalMessages)])
+         : mergeEntries([...Object.values(nextState.messages), ...Object.values(provisionalMessages)]),
+     completeness: partial || conflict || ledger.limited ? "partial" : "complete",
+diff --git a/packages/connector/lib/adapters/shared.mjs b/packages/connector/lib/adapters/shared.mjs
+index 823139a9fd29c6fb0092ab6db1ee8fd12676d3d3..939a63f393bfacc727247a4671ea3fe50c2a07ee 100644
+--- a/packages/connector/lib/adapters/shared.mjs
++++ b/packages/connector/lib/adapters/shared.mjs
+@@ -132,7 +132,6 @@ export function observeEventLedger(previous, observations, range) {
+       const entry = ledgerEntry(value);
+       if (entry !== null) events[identity] = entry;
+     }
+-  const unpersisted = [];
+   let conflict = false;
+   let limited = false;
+   for (const observation of observations ?? []) {
+@@ -150,7 +149,6 @@ export function observeEventLedger(previous, observations, range) {
+     const nextSize = ledgerSize({ ...events, [identity]: entry });
+     if (Object.keys(events).length >= maximumEventLedgerEntries || nextSize > maximumEventLedgerBytes) {
+       limited = true;
+-      unpersisted.push(entry);
+       continue;
+     }
+     events[identity] = entry;
+@@ -161,7 +159,7 @@ export function observeEventLedger(previous, observations, range) {
+   );
+   return {
+     ledger: { version: eventLedgerVersion, events },
+-    entries: mergeEntries([...entries, ...unpersisted]),
++    entries: mergeEntries(entries),
+     conflict,
+     limited,
+   };
+@@ -416,9 +414,7 @@ export async function collectJsonl(
+       }
+       const eventDays = appended ? { ...(previous.eventDays ?? {}) } : {};
+       const unseenLines = [];
+-      const provisionalLines =
+-        hasUnterminatedTail && chunk.tail?.trim() ? [...chunk.lines, chunk.tail] : chunk.lines;
+-      for (const line of provisionalLines) {
++      for (const line of chunk.lines) {
+         const event = eventKey?.(line);
+         if (
+           !event ||
+@@ -430,8 +426,7 @@ export async function collectJsonl(
+           continue;
+         }
+         const key = createHash("sha256").update(event.id).digest("hex");
+-        if (eventDays[key] !== undefined) continue;
+-        eventDays[key] = event.date;
++        if (eventDays[key] === undefined) eventDays[key] = event.date;
+         unseenLines.push(line);
+       }
+       if (range)
+@@ -464,11 +459,33 @@ export async function collectJsonl(
+           )
+         : fileEntries;
+       if (hasUnterminatedTail) {
++        if (!Array.isArray(parserOutput)) observations.push(...(parserOutput.records ?? []));
+         if (previous) nextState.files[file.path] = previous;
+         entries.push(...(previous && !appended ? (previous.entries ?? []) : ranged));
+         if (chunk.tail?.trim()) {
+           const provisional = parser([chunk.tail]);
+-          provisionalEntries.push(...(Array.isArray(provisional) ? provisional : provisional.entries));
++          const provisionalUnsupported = Array.isArray(provisional)
++            ? 0
++            : provisional.stats.unsupportedCandidates;
++          if (provisionalUnsupported > 0) {
++            incomplete = true;
++            schemaUnsupported = true;
++          } else {
++            const tailEvent = eventKey?.(chunk.tail);
++            const tailIdentity =
++              typeof tailEvent?.id === "string"
++                ? createHash("sha256").update(tailEvent.id).digest("hex")
++                : null;
++            if (tailIdentity === null || eventDays[tailIdentity] === undefined) {
++              provisionalEntries.push(
++                ...(Array.isArray(provisional) ? provisional : provisional.entries).filter(
++                  (entry) =>
++                    !range ||
++                    (entry.date >= range.rangeStart && entry.date <= range.rangeEnd),
++                ),
++              );
++            }
++          }
+         }
+         continue;
+       }
+@@ -503,13 +520,17 @@ export async function collectJsonl(
+   if (oversized) warnings.push("oversized_jsonl_records");
+   if (schemaUnsupported) warnings.push("unsupported_usage_records");
+   const ledger = observeEventLedger(state.eventLedger, observations, range);
++  const ledgerHasAcceptedState =
++    validEventLedger(state.eventLedger) && Object.keys(state.eventLedger.events).length > 0;
++  const useLedgerEntries =
++    ledger.entries.length > 0 || observations.length > 0 || ledgerHasAcceptedState || ledger.limited;
+   if (ledger.conflict) warnings.push("conflicting_event_usage");
+   if (ledger.limited && !limited) warnings.push("collector_limits_or_unreadable_files");
+   return {
+     entries:
+-      ledger.entries.length > 0
++      useLedgerEntries
+         ? mergeEntries([...ledger.entries, ...provisionalEntries])
+-        : mergeEntries(entries),
++        : mergeEntries([...entries, ...provisionalEntries]),
+     completeness: incomplete || ledger.conflict || ledger.limited ? "partial" : "complete",
+     nextState: { ...nextState, eventLedger: ledger.ledger },
+     warnings,
+diff --git a/packages/connector/test/readers.test.mjs b/packages/connector/test/readers.test.mjs
+index f46281a221794feb3596afe1a61b7f8f94db32eb..802b0f1b4ffec27be2df5bd760517605f4ee18e4 100644
+--- a/packages/connector/test/readers.test.mjs
++++ b/packages/connector/test/readers.test.mjs
+@@ -28,7 +28,11 @@ import {
+   safeCaptureRecord,
+   wrapperInvocation,
+ } from "../lib/readers.mjs";
+-import { jsonLinesChunk } from "../lib/adapters/shared.mjs";
++import {
++  jsonLinesChunk,
++  maximumEventLedgerEntries,
++  observeEventLedger,
++} from "../lib/adapters/shared.mjs";
+ 
+ async function fixture(name) {
+   return readFile(fileURLToPath(new URL(`fixtures/${name}`, import.meta.url)), "utf8");
+@@ -3660,6 +3664,161 @@ test("event ledgers survive an account switch, retain first tuples, and admit ne
+   );
+ });
+ 
++test("JSONL ledgers accept complete records before an unterminated tail", async (context) => {
++  const directory = await mkdtemp(join(tmpdir(), "viberacing-event-ledger-tail-"));
++  context.after(() => rm(directory, { force: true, recursive: true }));
++  const path = join(directory, "token-usage-2026-08.jsonl");
++  const range = { rangeStart: "2026-07-15", rangeEnd: "2026-08-14" };
++  const record = (id, date, inputTokens) =>
++    JSON.stringify({
++      schemaVersion: 1,
++      id,
++      timestamp: `${date}T00:00:00Z`,
++      inputTokens,
++      outputTokens: 0,
++      cachedTokens: 0,
++      thoughtsTokens: 0,
++      totalTokens: inputTokens,
++    });
++
++  await writeFile(path, `${record("event-1", "2026-08-10", 5)}\n`);
++  const first = await adapterFor("qwen_code").collect({ dataPath: directory }, range, {});
++  await writeFile(
++    path,
++    `${record("event-1", "2026-08-10", 5)}\n${record(
++      "event-2",
++      "2026-08-11",
++      7,
++    )}\n${record("event-3", "2026-08-12", 11)}`,
++  );
++  const result = await adapterFor("qwen_code").collect(
++    { dataPath: directory },
++    range,
++    first.nextState,
++  );
++
++  assert.equal(result.completeness, "partial");
++  assert.deepEqual(
++    result.entries.map((entry) => [entry.date, entry.totalTokens]),
++    [
++      ["2026-08-10", "5"],
++      ["2026-08-11", "7"],
++      ["2026-08-12", "11"],
++    ],
++  );
++  assert.equal(Object.keys(result.nextState.eventLedger.events).length, 2);
++});
++
++test("Claude ledgers accept complete records before an unterminated tail", async (context) => {
++  const directory = await mkdtemp(join(tmpdir(), "viberacing-claude-event-ledger-tail-"));
++  context.after(() => rm(directory, { force: true, recursive: true }));
++  const path = join(directory, "session.jsonl");
++  const range = { rangeStart: "2026-07-15", rangeEnd: "2026-08-14" };
++  const record = (id, date, inputTokens) =>
++    JSON.stringify({
++      type: "assistant",
++      timestamp: `${date}T00:00:00Z`,
++      message: {
++        id,
++        role: "assistant",
++        usage: { input_tokens: inputTokens, output_tokens: 0 },
++      },
++    });
++
++  await writeFile(path, `${record("message-1", "2026-08-10", 5)}\n`);
++  const first = await adapterFor("claude_code").collect({ dataPath: directory }, range, {});
++  await writeFile(
++    path,
++    `${record("message-1", "2026-08-10", 5)}\n${record(
++      "message-2",
++      "2026-08-11",
++      7,
++    )}\n${record("message-3", "2026-08-12", 11)}`,
++  );
++  const result = await adapterFor("claude_code").collect(
++    { dataPath: directory },
++    range,
++    first.nextState,
++  );
++
++  assert.equal(result.completeness, "partial");
++  assert.deepEqual(
++    result.entries.map((entry) => [entry.date, entry.totalTokens]),
++    [
++      ["2026-08-10", "5"],
++      ["2026-08-11", "7"],
++      ["2026-08-12", "11"],
++    ],
++  );
++  assert.equal(Object.keys(result.nextState.eventLedger.events).length, 2);
++});
++
++test("event ledger compares duplicate IDs before deduplicating them", async (context) => {
++  const directory = await mkdtemp(join(tmpdir(), "viberacing-event-ledger-conflict-"));
++  context.after(() => rm(directory, { force: true, recursive: true }));
++  const path = join(directory, "token-usage-2026-08.jsonl");
++  const range = { rangeStart: "2026-07-15", rangeEnd: "2026-08-14" };
++  const record = (id, date, inputTokens) =>
++    JSON.stringify({
++      schemaVersion: 1,
++      id,
++      timestamp: `${date}T00:00:00Z`,
++      inputTokens,
++      outputTokens: 0,
++      cachedTokens: 0,
++      thoughtsTokens: 0,
++      totalTokens: inputTokens,
++    });
++
++  await writeFile(path, `${record("event-1", "2026-08-10", 5)}\n`);
++  const first = await adapterFor("qwen_code").collect({ dataPath: directory }, range, {});
++  await writeFile(
++    path,
++    `${record("event-1", "2026-08-10", 99)}\n${record("event-2", "2026-08-11", 7)}\n`,
++  );
++  const result = await adapterFor("qwen_code").collect(
++    { dataPath: directory },
++    range,
++    first.nextState,
++  );
++
++  assert.equal(result.completeness, "partial");
++  assert.deepEqual(result.diagnostics, [{ code: "event_usage_conflict", phase: "collect" }]);
++  assert.deepEqual(
++    result.entries.map((entry) => [entry.date, entry.totalTokens]),
++    [
++      ["2026-08-10", "5"],
++      ["2026-08-11", "7"],
++    ],
++  );
++});
++
++test("a full event ledger does not emit unpersisted overflow observations", () => {
++  const events = Object.fromEntries(
++    Array.from({ length: maximumEventLedgerEntries }, (_, index) => [
++      index.toString(16).padStart(64, "0"),
++      { date: "2026-08-10", totalTokens: "1" },
++    ]),
++  );
++  const previous = { version: 1, events };
++  assert.equal(Object.keys(previous.events).length, maximumEventLedgerEntries);
++
++  const result = observeEventLedger(
++    previous,
++    [
++      { id: "overflow", entry: { date: "2026-08-10", totalTokens: "9" } },
++      { id: "overflow", entry: { date: "2026-08-10", totalTokens: "9" } },
++    ],
++    { rangeStart: "2026-08-10", rangeEnd: "2026-08-10" },
++  );
++
++  assert.equal(result.limited, true);
++  assert.deepEqual(result.entries, [
++    { date: "2026-08-10", totalTokens: "65536" },
++  ]);
++  assert.equal(Object.keys(result.ledger.events).length, maximumEventLedgerEntries);
++});
++
+ test("OpenCode keeps exact-ID cutover fail closed when a ledger tuple conflicts", async (context) => {
+   const directory = await mkdtemp(join(tmpdir(), "viberacing-opencode-event-ledger-"));
+   context.after(() => rm(directory, { force: true, recursive: true }));

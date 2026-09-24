@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert positive/negative half ties and positive zero at core and consumer level.",
+    "Assert per-line invoice tax totals and preserved helper validation/bounds."
+  ],
+  "docDelivery": [
+    "Document one common rounding policy, negative ties and zero normalization.",
+    "Explain helper bounds and per-line invoice totals versus aggregate rounding."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Exact bounded integer ratios, nearest ties toward positive infinity and positive zero; validated tax/share helpers and per-line totals.",
+  "manualBehavior": [
+    "Verify taxCents and shareCents delegate rounding to exported roundRatio instead of retaining separate rounding policies; totals must still use per-line taxCents."
+  ],
+  "independence": "Unify duplicated integer-ratio rounding across billing helpers preserving negative tie policy and totals."
+}

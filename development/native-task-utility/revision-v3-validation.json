@@ -1,0 +1,47 @@
+{
+  "projectTestsPassed": true,
+  "unknownRelayRejected": true,
+  "disguisedWorkloadStopped": true,
+  "relayPreserved": true,
+  "termination": {
+    "terminationVerified": true,
+    "killed": [
+      144
+    ]
+  },
+  "noZombies": true,
+  "realProviderRequests": 0,
+  "installedPreflight": {
+    "status": "passed",
+    "requests": 6,
+    "realProviderCalls": 0,
+    "elapsedMs": 3304,
+    "terminationVerified": true
+  },
+  "originalPreparationFailure": "The first init fixture completed native work, then old PID1-only stop helper killed the moved relay; preserved preflight.log and container cleanup. Corrected exact startup relay PID integration before any real provider call.",
+  "ordinaryPatchPassed": true,
+  "harnessRuntimeAndPromptsUnchanged": true,
+  "lifecycle": {
+    "passed": true,
+    "orphanReaped": true,
+    "disguisedWorkloadsStopped": true,
+    "unknownRelayRejected": true,
+    "relayPreserved": true,
+    "realProviderRequests": 0
+  },
+  "review": {
+    "count": 1,
+    "finding": "Inherited /proc/stat parser mistakes a fake state within process comm for its real state",
+    "reproducedBeforeFix": true,
+    "boundedRemediation": "Read process state after the last closing delimiter",
+    "regressionAfterFix": true
+  },
+  "calibration": {
+    "referencePass": 6,
+    "alternativePass": 6,
+    "initialRejected": 6,
+    "mutantRejected": 6,
+    "supplementalReferenceAndAlternativePass": 4,
+    "legacyReferenceCorrectedOnlyInNewPrivateCopies": true
+  }
+}

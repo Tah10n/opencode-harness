@@ -1,0 +1,143 @@
+{
+  "baseline": "2b16b6a8ad75b6b852adc5e2189e6d4a8d93eabd",
+  "reference": "9e389a6dbc1b0c9813599fb61eceb6958d8c4de4",
+  "taskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+  "taskBytes": 1468,
+  "assignments": [
+    {
+      "slot": 1,
+      "task": "account-switch-ledger",
+      "arm": "candidate-A",
+      "project": "Tah10n/viberacing",
+      "base": "a45273e659b839f1e98092161e82650d38b351ea",
+      "patchSha256": "407c5dabac36c1272d494fd48d812129ccd1d11c556e3d8e7731c47cdfa54fc8",
+      "patchBytes": 36612,
+      "treeSha256": "5558a6355a2f75023cc5e88cd5cc76161aedd55ad43a2b62308b72ef6476f51b"
+    },
+    {
+      "slot": 2,
+      "task": "account-switch-ledger",
+      "arm": "candidate-B",
+      "project": "Tah10n/viberacing",
+      "base": "05064d33f51980d8b4607e0f0f5dc68866341f34",
+      "patchSha256": "85ff10152d549bcb5cf122806f11ae021403ee4ae03d53705ef18031c87c706d",
+      "patchBytes": 476807,
+      "treeSha256": "d1baa12ccfcfe926f30bad07db082aa9b873abfcd5b1c4ae87048b4926828d82"
+    }
+  ],
+  "controlMatchesSavedCalibration": true,
+  "calibrationReceipts": [
+    {
+      "file": "local/plain-ledger-native-high/baseline-legacy-input.json",
+      "sha256": "05fc8bf727880267a285539a4dad5a030ba15490d08963adcb0d47bfdc78c710",
+      "bytes": 1288,
+      "exitCode": 0
+    },
+    {
+      "file": "local/plain-ledger-native-high/baseline-original-tests.json",
+      "sha256": "36da4b12cd09d408f13cc3b00295fe45aa5e06a04b508fa9b7708018b1bde5ad",
+      "bytes": 19836,
+      "exitCode": 0
+    },
+    {
+      "file": "local/plain-ledger-native-high/baseline-probes.json",
+      "sha256": "c55a71894aba305b05e01f84e67c48b17701421af76e44cf3bf3cb2011bf32aa",
+      "bytes": 6747,
+      "exitCode": 1
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-legacy-input.json",
+      "sha256": "cedfe53dfb348eb8bdfa1ab3789c248810e4ea7d60ef0c1cde464c2659e562b6",
+      "bytes": 3374,
+      "exitCode": 1
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-original-tests.json",
+      "sha256": "4568f526d79b4538ad0c6eec96ed769cc397e81784800471ecebb19ef57d48c1",
+      "bytes": 36930,
+      "exitCode": 1
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-probes.json",
+      "sha256": "a5d0c44c42d97ff85ea74a74aae58a06b1ed17573970c619c2e9e48ea83cc43e",
+      "bytes": 1717,
+      "exitCode": 0
+    },
+    {
+      "file": "local/plain-ledger-native-high/baseline-kimi-migration.json",
+      "sha256": "494f9883c6b5f15e2050df369625d614fa0aa9ba5a49b4730ca240978d751ec5",
+      "bytes": 2163,
+      "exitCode": 1
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-kimi-migration.json",
+      "sha256": "51a93edc7c9e293f89fc26e844bb2f8085f55363ee0efb8d450f82e6d2af9219",
+      "bytes": 1239,
+      "exitCode": 0
+    },
+    {
+      "file": "local/plain-ledger-native-high/baseline-cli-persistence.json",
+      "sha256": "2522a67ae4c00bd659cbe04298a7842f448aeaca1a6ad90a21c1760ab6b9e934",
+      "bytes": 11003,
+      "exitCode": 1
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-compat-fixed-cli-persistence.json",
+      "sha256": "b50a67a6e4e7e98a398f22263f5dcef975d73aeec4b541232b562f27ea8b97c7",
+      "bytes": 2630,
+      "exitCode": 1
+    },
+    {
+      "file": "local/plain-ledger-native-high/baseline-cli-persistence-v2.json",
+      "sha256": "6b90f8f7f658e162b5c5473811ba57a137b1664275e3e009c97165a8aa0b4b4c",
+      "bytes": 11244,
+      "exitCode": 1
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-compat-fixed-cli-persistence-v2.json",
+      "sha256": "fc6d0b01f656144b2c39924d651cd68af0358ca7fb3c0d8805f0c7acf97cf35f",
+      "bytes": 1665,
+      "exitCode": 0
+    },
+    {
+      "file": "local/plain-ledger-native-high/baseline-migration-contract.json",
+      "sha256": "55f50f6ec4af6abd0afbef765ed40e2ac1aa8f8bd4f65f6c79f65d3724d222a6",
+      "bytes": 8492,
+      "exitCode": 1
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-compat-fixed-migration-contract.json",
+      "sha256": "dfeb1e0e7db4ae97d2e3300f977d052a9a8c95e84647d958b0e26bac1c55e9d8",
+      "bytes": 2081,
+      "exitCode": 0
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-compat-fix-checks.json",
+      "sha256": "c30f9473bc54ec614c7600a6027078b72bfffaa81caab94a7099c4b4389d0266",
+      "bytes": 2119,
+      "exitCode": 125
+    },
+    {
+      "file": "local/plain-ledger-native-high/compat-fix-before.json",
+      "sha256": "7c0668df4882a3ed2b5752dc33aa56f6c10df5e4c7a77184d2cfea667b9cd4be",
+      "bytes": 5828,
+      "exitCode": 1
+    },
+    {
+      "file": "local/plain-ledger-native-high/reference-compat-fixed-compat-fix-checks.json",
+      "sha256": "037bab8959293989a5ec46457a9e9d004046e01e12c0c1c0cda2648f306aaa8a",
+      "bytes": 14926,
+      "exitCode": 0
+    },
+    {
+      "file": "local/plain-ledger-native-high/compat-fix-verify.json",
+      "sha256": "d0c7b27c23cb9db6a625473a4a99a2fd2e64a5a2861e5cf457e1e717012d44e0",
+      "bytes": 1011,
+      "exitCode": 1
+    }
+  ],
+  "privateAssessmentSha256": "65e70fc7dd560eaf9c39c6e6352ee1d65115e7eb56346b1559811b5074f4ea2e",
+  "bundleSha256": "a95a48181deefc2d73d5a9795089f7a8ac1826fbcd63aa1829d89f8cd6dfb9af",
+  "installationPathMappingOnly": true,
+  "realProviderRequests": 0
+}

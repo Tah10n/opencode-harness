@@ -1,0 +1,45 @@
+{
+  "passed": false,
+  "reason": "Scripted native events preceded last mutation; final-state completedCommands did not retain them, so response stayed below 16000-byte compaction threshold. No product threshold changed.",
+  "requests": 66,
+  "realRequests": 0,
+  "elapsedMs": 26399,
+  "nativeChainStatus": "finished",
+  "executedScriptSha256": "409bb9647094314e8cd270bcb45657d8e7e5a5160f9fb47250bae11a8a872cd7",
+  "receipts": {
+    "A": {
+      "receiptBytes": 6863,
+      "sha256": "297a2800b09e42c1662571471f1b143ed3075010f32d57d46ec1b0744c20f06e",
+      "detailOmitted": false,
+      "resolution": {
+        "run": "cd960659-f11c-4be0-8b95-c708e1f45b21",
+        "parentSession": "ses_f31d4efecffeM9tDsjmVLtP1rk",
+        "sessions": {
+          "author": "ses_f31d4ebdaffePGk46trfCkKHlr"
+        },
+        "compact": false,
+        "resultSha256": "e667f1787de8a35677f2c45cca9d74091f5966c526aac967c04ed928175d1969",
+        "snapshotSha256": "e2905aeb1e2df00bacdbc0cb0d5c1df8a7843cf487a54bca6fdba652ea828218",
+        "patchSha256": "6622bf5ed73f236261d0361eee281774035d431f6a0c90fd0bedb4945e289772"
+      }
+    },
+    "F": {
+      "receiptBytes": 9280,
+      "sha256": "75923028eee6c45888d0d52b869cae0355a5747eafc277555052241374a19b64",
+      "detailOmitted": false,
+      "resolution": {
+        "run": "fc36b3e5-93b3-4d3c-9298-4dc9cb4fe241",
+        "parentSession": "ses_f31d4b0c9ffemSFdHEDqOQKbUf",
+        "sessions": {
+          "author": "ses_f31d4acc6ffeNoxSi2uQ0lJ408"
+        },
+        "compact": false,
+        "resultSha256": "6dedcae8a137236d886d671f79ea7224f00d1caa55822e416b6c7591baa799a6",
+        "snapshotSha256": "f957d8f3e535d3632673fbacbd5a6458557013c81e7ca09bedbcca785e60c363",
+        "patchSha256": "e3b06e2f20a96a5f1cb01f32d3cb43f1264f7e273b7b6f4f85959d18e34f1475"
+      }
+    }
+  },
+  "nextRealDispatch": false,
+  "cleanupVerifiedBeforeAssertion": true
+}

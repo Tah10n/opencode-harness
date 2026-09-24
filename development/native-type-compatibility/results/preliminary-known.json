@@ -1,0 +1,28 @@
+{
+  "node": "v24.19.0",
+  "compiler": "/Users/tahion/dev/opencode-harness/.worktrees/native-task-workflow/local/native-command-hints-comparison/batch/bundle/node_modules/typescript/bin/tsc",
+  "rows": [
+    {
+      "id": "baseline",
+      "status": 0,
+      "output": ""
+    },
+    {
+      "id": "reference",
+      "status": 0,
+      "output": ""
+    },
+    {
+      "id": "n03",
+      "status": 2,
+      "output": "consumer.ts(7,1): error TS2684: The 'this' context of type 'void' is not assignable to method's 'this' of type '{ prefix: string; }'.\n"
+    },
+    {
+      "id": "n04",
+      "status": 2,
+      "output": "consumer.ts(7,1): error TS2684: The 'this' context of type 'void' is not assignable to method's 'this' of type '{ prefix: string; }'.\n"
+    }
+  ],
+  "compilations": 4,
+  "elapsedMs": 2025.6583749999998
+}

@@ -1,0 +1,357 @@
+diff --git a/packages/connector/test/config.test.mjs b/packages/connector/test/config.test.mjs
+index e4ab8c48f303129472ef183257dc5d56f224a265..7a669e6863c15fb4a1590e7f8402d3a0886e6f5c 100644
+--- a/packages/connector/test/config.test.mjs
++++ b/packages/connector/test/config.test.mjs
+@@ -5986,6 +5986,96 @@ test("OpenCode cutover aliases become confirmed only after server acceptance", a
+   assert.doesNotMatch(JSON.stringify(state.adapters[sourceId]), /private-message-id/);
+ });
+ 
++test("a persisted source mapping switch retains the event ledger and counts new usage", async (context) => {
++  const oldSourceId = "64646464-6464-4464-8464-646464646464";
++  const newSourceId = "65656565-6565-4565-8565-656565656565";
++  const oldAccountId = "66666666-6666-4666-8666-666666666666";
++  const newAccountId = "67676767-6767-4767-8767-676767676767";
++  const clientSourceId = "68686868-6868-4868-8868-686868686868";
++  let remoteSourceId = oldSourceId;
++  const usageBodies = [];
++  const server = createServer((request, response) => {
++    const chunks = [];
++    request.on("data", (chunk) => chunks.push(chunk));
++    request.on("end", () => {
++      const body = chunks.length ? JSON.parse(Buffer.concat(chunks).toString("utf8")) : null;
++      response.setHeader("content-type", "application/json");
++      if (request.url === "/api/installations/current") {
++        response.end(JSON.stringify(reconciliationResponse([{ sourceId: remoteSourceId }])));
++        return;
++      }
++      if (request.url === "/api/usage") {
++        usageBodies.push(body);
++        response.end(JSON.stringify(usageResponse(body)));
++        return;
++      }
++      response.statusCode = 404;
++      response.end(JSON.stringify({ error: "not_found" }));
++    });
++  });
++  server.listen(0, "127.0.0.1");
++  await once(server, "listening");
++  context.after(() => server.close());
++  const address = server.address();
++  assert.equal(typeof address, "object");
++
++  const home = await mkdtemp(join(tmpdir(), "viberacing-account-switch-ledger-"));
++  context.after(() => rm(home, { recursive: true, force: true }));
++  const projects = join(home, ".claude", "projects");
++  const session = join(projects, "session.jsonl");
++  await mkdir(projects, { recursive: true });
++  const claudeLine = (id, date, input) =>
++    JSON.stringify({
++      type: "assistant",
++      timestamp: `${date}T12:00:00Z`,
++      message: { id, role: "assistant", usage: { input_tokens: input, output_tokens: 5 } },
++    });
++  await writeFile(session, `${claudeLine("account-one-event", "2026-09-20", 10)}\n`);
++  const origin = `http://127.0.0.1:${address.port}`;
++  const directory = await writeMappedInstallation(home, origin, [
++    {
++      clientSourceId,
++      sourceId: oldSourceId,
++      agentAccountId: oldAccountId,
++      agentId: "claude_code",
++      dataPath: projects,
++      collectionMethod: "claude_jsonl",
++      supportedSurface: "cli",
++      suggestedLabel: "Personal",
++      accountLabel: "Personal",
++    },
++  ]);
++  const environment = connectorEnvironment(home, { NODE_ENV: "test" });
++  await execFileAsync(process.execPath, [connectorPath, "sync"], { env: environment });
++  assert.equal(usageBodies.length, 1);
++
++  const configPath = join(directory, "config.json");
++  const config = JSON.parse(await readFile(configPath, "utf8"));
++  config.sources[0] = {
++    ...config.sources[0],
++    sourceId: newSourceId,
++    agentAccountId: newAccountId,
++    accountLabel: "Work",
++    lastAcceptedSyncSequence: "0",
++  };
++  await writeFile(configPath, `${JSON.stringify(config)}\n`);
++  remoteSourceId = newSourceId;
++  await writeFile(session, `${claudeLine("account-two-event", "2026-09-21", 20)}\n`);
++
++  await execFileAsync(process.execPath, [connectorPath, "sync"], { env: environment });
++  assert.equal(usageBodies.length, 2);
++  assert.deepEqual(
++    usageBodies[1].snapshots[0].entries.map(({ date, totalTokens }) => ({ date, totalTokens })),
++    [
++      { date: "2026-09-20", totalTokens: "15" },
++      { date: "2026-09-21", totalTokens: "25" },
++    ],
++  );
++  const state = JSON.parse(await readFile(join(directory, "state.json"), "utf8"));
++  assert.doesNotMatch(JSON.stringify(state), /account-one-event|account-two-event/);
++  assert.equal(JSON.parse(await readFile(configPath, "utf8")).sources[0].sourceId, newSourceId);
++});
++
+ test("repairs one stale pending snapshot and still delivers the newly collected snapshot", async (context) => {
+   const bodies = [];
+   const server = createServer((request, response) => {
+diff --git a/packages/connector/test/readers.test.mjs b/packages/connector/test/readers.test.mjs
+index e388d09ca7243fa23f0429ca49fa35a8077efc17..2411b90d74556525ff6743e202542e57bec312ce 100644
+--- a/packages/connector/test/readers.test.mjs
++++ b/packages/connector/test/readers.test.mjs
+@@ -3626,3 +3626,251 @@ test("capture wrapper uses the current executable and required headless structur
+   );
+   assert.throws(() => wrapperInvocation("unknown", ["hello"]), /Unsupported wrapper agent/);
+ });
++
++function eventLedgerCases() {
++  return [
++    {
++      name: "Claude",
++      agentId: "claude_code",
++      fileName: "session.jsonl",
++      make(id, date, input) {
++        return JSON.stringify({
++          type: "assistant",
++          timestamp: `${date}T12:00:00Z`,
++          message: {
++            id,
++            role: "assistant",
++            usage: { input_tokens: input, output_tokens: 5 },
++          },
++        });
++      },
++    },
++    {
++      name: "Kimi legacy",
++      agentId: "kimi_code",
++      collectionMethod: "kimi_legacy_wire_jsonl",
++      fileName: "wire.jsonl",
++      make(id, date, input) {
++        return JSON.stringify({
++          type: "StatusUpdate",
++          timestamp: `${date}T12:00:00Z`,
++          message: {
++            type: "StatusUpdate",
++            timestamp: `${date}T12:00:00Z`,
++            payload: {
++              message_id: id,
++              token_usage: { input_other: input, output: 5 },
++            },
++          },
++        });
++      },
++    },
++    {
++      name: "Qwen",
++      agentId: "qwen_code",
++      fileName: "token-usage-2026-08.jsonl",
++      make(id, date, input) {
++        return JSON.stringify({
++          schemaVersion: 1,
++          id,
++          timestamp: `${date}T12:00:00Z`,
++          inputTokens: input,
++          outputTokens: 5,
++          totalTokens: input + 5,
++        });
++      },
++    },
++    {
++      name: "Gemini",
++      agentId: "gemini_cli",
++      fileName: "session-events.jsonl",
++      make(id, date, input) {
++        return JSON.stringify({
++          id,
++          type: "gemini",
++          timestamp: `${date}T12:00:00Z`,
++          tokens: { input, output: 5, total: input + 5 },
++        });
++      },
++    },
++    {
++      name: "Antigravity",
++      agentId: "antigravity",
++      fileName: "capture.jsonl",
++      singleFile: true,
++      make(id, date, input) {
++        return JSON.stringify({
++          id,
++          date,
++          usage: { date, inputTokens: String(input), outputTokens: "5" },
++        });
++      },
++    },
++  ];
++}
++
++function ledgerSource(item, root) {
++  return {
++    dataPath: item.singleFile ? join(root, item.fileName) : root,
++    ...(item.collectionMethod === undefined ? {} : { collectionMethod: item.collectionMethod }),
++  };
++}
++
++async function writeLedgerEvent(root, item, line) {
++  await mkdir(root, { recursive: true });
++  await writeFile(join(root, item.fileName), `${line}\n`);
++}
++
++function dailyTotals(result) {
++  return result.entries.map(({ date, totalTokens }) => ({ date, totalTokens }));
++}
++
++function legacyEventCollectorState(state) {
++  const legacy = { parserVersion: state.parserVersion, files: {} };
++  for (const [path, file] of Object.entries(state.files ?? {})) {
++    legacy.files[path] = Object.fromEntries(
++      ["size", "modifiedAt", "ino", "safeOffset", "tailFingerprint", "eventDays", "entries", "ids"]
++        .filter((key) => file[key] !== undefined)
++        .map((key) => [key, file[key]]),
++    );
++  }
++  if (state.messages !== undefined) legacy.messages = state.messages;
++  return legacy;
++}
++
++test("event collectors conservatively migrate state across copied and truncated session paths", async (context) => {
++  const range = { rangeStart: "2026-08-01", rangeEnd: "2026-08-31" };
++  for (const item of eventLedgerCases()) {
++    const root = await mkdtemp(join(tmpdir(), `viberacing-${item.agentId}-ledger-`));
++    context.after(() => rm(root, { force: true, recursive: true }));
++    const originalRoot = join(root, "original");
++    const switchedRoot = join(root, "switched");
++    const firstLine = item.make("account-one-event", "2026-08-10", 10);
++    const secondLine = item.make("account-two-event", "2026-08-11", 20);
++    await writeLedgerEvent(originalRoot, item, firstLine);
++    const adapter = adapterFor(item.agentId);
++    const first = await adapter.collect(ledgerSource(item, originalRoot), range, {});
++    assert.equal(first.completeness, "complete", item.name);
++
++    await writeLedgerEvent(switchedRoot, item, firstLine);
++    const copied = await adapter.collect(
++      ledgerSource(item, switchedRoot),
++      range,
++      legacyEventCollectorState(first.nextState),
++    );
++    assert.deepEqual(dailyTotals(copied), [{ date: "2026-08-10", totalTokens: "15" }], item.name);
++
++    await writeLedgerEvent(switchedRoot, item, secondLine);
++    const switched = await adapter.collect(
++      ledgerSource(item, switchedRoot),
++      range,
++      copied.nextState,
++    );
++    assert.deepEqual(
++      dailyTotals(switched),
++      [
++        { date: "2026-08-10", totalTokens: "15" },
++        { date: "2026-08-11", totalTokens: "25" },
++      ],
++      item.name,
++    );
++    assert.doesNotMatch(JSON.stringify(switched.nextState), /account-one-event|account-two-event/);
++  }
++});
++
++test("event collectors keep the first tuple for conflicts and still accept unrelated events", async (context) => {
++  const range = { rangeStart: "2026-08-01", rangeEnd: "2026-08-31" };
++  for (const item of eventLedgerCases()) {
++    const root = await mkdtemp(join(tmpdir(), `viberacing-${item.agentId}-conflict-`));
++    context.after(() => rm(root, { force: true, recursive: true }));
++    const pathRoot = join(root, "events");
++    await writeLedgerEvent(pathRoot, item, item.make("stable-event", "2026-08-10", 10));
++    const adapter = adapterFor(item.agentId);
++    const first = await adapter.collect(ledgerSource(item, pathRoot), range, {});
++
++    await writeFile(
++      join(pathRoot, item.fileName),
++      `${item.make("stable-event", "2026-08-10", 20)}\n${item.make("unrelated-event", "2026-08-12", 30)}\n`,
++    );
++    const result = await adapter.collect(ledgerSource(item, pathRoot), range, first.nextState);
++    assert.equal(result.completeness, "partial", item.name);
++    assert.deepEqual(
++      dailyTotals(result),
++      [
++        { date: "2026-08-10", totalTokens: "15" },
++        { date: "2026-08-12", totalTokens: "35" },
++      ],
++      item.name,
++    );
++    assert.doesNotMatch(JSON.stringify(result.nextState), /stable-event|unrelated-event/);
++  }
++});
++
++test("OpenCode retains exact-ID usage across database history replacement", async (context) => {
++  const directory = await mkdtemp(join(tmpdir(), "viberacing-opencode-exact-id-"));
++  context.after(() => rm(directory, { force: true, recursive: true }));
++  const path = join(directory, "opencode.db");
++  const { DatabaseSync } = await import("node:sqlite");
++  const database = new DatabaseSync(path);
++  database.exec("CREATE TABLE message (id TEXT, time_created INTEGER, data TEXT)");
++  database
++    .prepare("INSERT INTO message (id, time_created, data) VALUES (?, ?, ?)")
++    .run(
++      "exact-message-id",
++      Date.parse("2026-08-10T12:00:00Z"),
++      JSON.stringify({ role: "assistant", tokens: { input: 10, output: 5, total: 15 } }),
++    );
++  database.close();
++
++  const range = { rangeStart: "2026-08-01", rangeEnd: "2026-08-31" };
++  const adapter = adapterFor("opencode");
++  const first = await adapter.collect({ dataPath: path }, range, {});
++  assert.equal(first.completeness, "complete");
++
++  const replacement = new DatabaseSync(path);
++  replacement
++    .prepare("DELETE FROM message WHERE id = ?")
++    .run("exact-message-id");
++  replacement
++    .prepare("INSERT INTO message (id, time_created, data) VALUES (?, ?, ?)")
++    .run(
++      "replacement-message-id",
++      Date.parse("2026-08-11T12:00:00Z"),
++      JSON.stringify({ role: "assistant", tokens: { input: 20, output: 5, total: 25 } }),
++    );
++  replacement.close();
++
++  const switched = await adapter.collect({ dataPath: path }, range, first.nextState);
++  assert.equal(switched.completeness, "complete");
++  assert.deepEqual(dailyTotals(switched), [
++    { date: "2026-08-10", totalTokens: "15" },
++    { date: "2026-08-11", totalTokens: "25" },
++  ]);
++  assert.doesNotMatch(JSON.stringify(switched.nextState), /exact-message-id|replacement-message-id/);
++});
++
++test("OpenCode remains fail closed when an assistant row has no exact database ID", async (context) => {
++  const directory = await mkdtemp(join(tmpdir(), "viberacing-opencode-missing-id-"));
++  context.after(() => rm(directory, { force: true, recursive: true }));
++  const path = join(directory, "opencode.db");
++  const { DatabaseSync } = await import("node:sqlite");
++  const database = new DatabaseSync(path);
++  database.exec("CREATE TABLE message (id TEXT, time_created INTEGER, data TEXT)");
++  database
++    .prepare("INSERT INTO message (id, time_created, data) VALUES (?, ?, ?)")
++    .run(
++      null,
++      Date.parse("2026-08-12T12:00:00Z"),
++      JSON.stringify({ role: "assistant", tokens: { input: 30, output: 5, total: 35 } }),
++    );
++  database.close();
++
++  const result = await adapterFor("opencode").collect(
++    { dataPath: path },
++    { rangeStart: "2026-08-01", rangeEnd: "2026-08-31" },
++    {},
++  );
++  assert.equal(result.completeness, "partial");
++  assert.deepEqual(result.entries, []);
++  assert.deepEqual(result.nextState, {});
++});

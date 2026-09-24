@@ -1,0 +1,3 @@
+# dependency-injected-id-source
+
+createRecord(input,existingIds?,{nextId}?) preserves old forms and defaults to crypto.randomUUID. A trimmed name must have1..80 UTF16 units before allocating anything. Allocator runs once with no arguments/undefined thisArg. ID must match [A-Za-z0-9_-]{1,64}; duplicate ID raises ID_COLLISION without retry. Invalid names/IDs throw TypeError and allocator throws retain identity. Set is updated only after validation/uniqueness, then a fresh {id,name} is returned. Input/prior IDs stay intact on failure; equal names need not have equal IDs. No global injection or ID service. Run npm test.

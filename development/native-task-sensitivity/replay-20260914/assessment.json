@@ -1,0 +1,46 @@
+{
+  "case-1-S0": {
+    "Q": false,
+    "D": true,
+    "requiredRegressionDelivered": false,
+    "usefulAuthorChain": false,
+    "productionCorrect": true,
+    "reason": "The original task requires visiting only initially present values, so an empty deque must make zero predicate calls. The delivered normal suite still accepts the standard false-to-true variant of _copyArray(false), which violates that requirement. Correct production and passing ordinary/independent checks do not supply the missing regression.",
+    "chronology": "A toArray assertion strengthening wrapped-capacity setup was added at event 27, before harness_sense at event 34. No test change or repeated diagnostic followed. The final response claimed only equivalent/allowed survivors; the relevant BooleanLiteral survivor was not equivalent.",
+    "preservation": "The only change from the supplied patch is the added public toArray setup assertion. Existing production, tests, types and docs remain intact.",
+    "authorReplayCalls": 0
+  },
+  "case-1-S1": {
+    "Q": false,
+    "D": true,
+    "requiredRegressionDelivered": false,
+    "usefulAuthorChain": false,
+    "productionCorrect": true,
+    "reason": "The final patch is identical to the supplied patch and still lacks the required empty-deque callback regression. Its normal suite accepts the same standard BooleanLiteral variant. Tool availability and passing production do not establish full delivery.",
+    "chronology": "One autonomous harness_sense at event 20 returned the survivor with a replay object. No project edit, distinguishing test or addressed repeat followed. Later ordinary checks reran the existing suite. No useful diagnostic-to-test chain was observed.",
+    "preservation": "All supplied bytes and modes are retained. No new regression was observed, but the required test gap remains.",
+    "authorReplayCalls": 0
+  },
+  "case-2-S1": {
+    "Q": true,
+    "D": true,
+    "controlPreserved": true,
+    "usefulAuthorChain": false,
+    "productionCorrect": true,
+    "reason": "The usable control retains all prior assertions and contract behavior. Added length, shift/unshift and sequence assertions check continued public API usability after a predicate error; docs clarify the existing capacity contract. No production change or assertion weakening occurred.",
+    "chronology": "Test/docs changes at event 19 preceded harness_sense at event 33. The only survivor changes an unspecified Error message; no added assertion is required. The improvement is not attributed to subsequent diagnostics.",
+    "preservation": "Ordinary runtime/type suite and independent public contract checks pass. The control rejects the relevant unconditional-return mutation with a behavioral assertion.",
+    "authorReplayCalls": 0
+  },
+  "case-2-S0": {
+    "Q": true,
+    "D": true,
+    "controlPreserved": true,
+    "usefulAuthorChain": false,
+    "productionCorrect": true,
+    "reason": "The final patch preserves the supplied usable control. Its ordinary runtime/type and independent contract checks pass. The only surviving variant changes an unspecified Error message and requires no correction.",
+    "chronology": "One autonomous harness_sense at event 22; no project edits or diagnostic repeat. Focused, preservation and public capacity checks are retained as author actions, without inventing a diagnostic-to-test change.",
+    "preservation": "Original tests, implementation, types and docs are retained unchanged.",
+    "authorReplayCalls": 0
+  }
+}

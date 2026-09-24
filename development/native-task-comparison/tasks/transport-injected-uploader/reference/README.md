@@ -1,0 +1,3 @@
+# transport-injected-uploader
+
+chunkBytes(bytes,size) returns independent visible-byte Uint8Array copies, ordered with no empty tail. Non-shared Uint8Array/Buffer<=1MiB; size1..1048576 integer; invalid TypeError. upload delegates and snapshots all data before first await. Inject send(chunk,{index,offset,total,final}) using undefined thisArg; serial await, zero-based index/byte offset, exact first rejection/throw identity, no retry. Empty sends nothing but still validates send/size. Source mutation during pending send cannot alter later payloads. Success {bytes,chunks}. Default chunkSize65536. Transport may alter contents/metadata, not detach or resize buffers. Run npm test.

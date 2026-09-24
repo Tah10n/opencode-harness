@@ -1,0 +1,128 @@
+diff --git a/packages/connector/README.md b/packages/connector/README.md
+index 5a1e8c684bc8007a1c7ce110cb2114691c06d0af..1d2281b782f8fb77f1f0e5c330cab59d4ddae09b 100644
+--- a/packages/connector/README.md
++++ b/packages/connector/README.md
+@@ -106,6 +106,13 @@ runtime and owned hooks; its server reconciliation shares the sync lock, and it
+ usage unless the user separately runs `viberacing sync`. A successful compatible reconnect,
+ authenticated sync, or doctor server check clears a prior version-upgrade automatic-sync disable.
+ 
++An older connector's exact flat `bin/viberacing.mjs`, allowlisted `lib/*.mjs`, and historical
++`lib/adapters/*.mjs` layout is recognized as Vibe Racing state and migrated in place. The old files,
++including the historical `cursor.mjs` ownership marker, are retained byte-for-byte; `cursor.mjs` is
++not a supported collector. The current runtime is installed separately under `runtime/` and can be
++prepared repeatedly, including after a fresh process reload. Unknown files, nesting, links, and
++foreign executables remain rejected.
++
+ Codex, Claude Code, Kimi Code, Qwen Code, and Gemini CLI install supported lifecycle triggers.
+ Qwen's trigger currently covers interactive TUI and ACP lifecycle events, not headless `qwen -p`
+ exits. OpenCode uses its read-only SQLite store and a documented `sync`; Antigravity requires the
+diff --git a/packages/connector/lib/config.mjs b/packages/connector/lib/config.mjs
+index bf11763987281875d4086fdf96132da14e39f080..e137acfa243685ef892b223398410b98dc8e5c25 100644
+--- a/packages/connector/lib/config.mjs
++++ b/packages/connector/lib/config.mjs
+@@ -54,7 +54,7 @@ const stateFiles = new Set([
+   "state.json",
+   "dirty.json",
+ ]);
+-const stateDirectories = new Set(["pending", "captures", "runtime", "logs", "bin"]);
++const stateDirectories = new Set(["pending", "captures", "runtime", "logs", "bin", "lib"]);
+ const ownedLockPattern =
+   /^(?:\.viberacing-state|connection-state|sync|dirty|scheduler|scheduler-launch|lifecycle|lifecycle-revoking)\.lock(?:\.recovery(?:\.stale\.[0-9a-f-]{36})?|\.stale\.[0-9a-f-]{36})?$/i;
+ const stateTemporaryPattern =
+@@ -63,6 +63,26 @@ const markerTemporaryPattern = /^\.viberacing-state\.\d+\.[0-9a-f-]{36}\.tmp$/i;
+ const sourceIdPattern =
+   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+ const runtimeVersionPattern = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
++const legacyRuntimeFiles = new Set([
++  "browser.mjs",
++  "config.mjs",
++  "executables.mjs",
++  "readers.mjs",
++  "registry.mjs",
++  "runtime.mjs",
++]);
++const legacyRuntimeAdapterFiles = new Set([
++  "antigravity.mjs",
++  "claude.mjs",
++  "codex.mjs",
++  "cursor.mjs",
++  "gemini.mjs",
++  "kimi.mjs",
++  "opencode.mjs",
++  "qwen-settings.mjs",
++  "qwen.mjs",
++  "shared.mjs",
++]);
+ const legacyCollectionMethods = new Set([
+   "antigravity\0antigravity_cli_capture",
+   "claude_code\0claude_jsonl",
+@@ -146,6 +166,16 @@ function ownedStatePath(path, info) {
+     return false;
+   }
+   if (top === "bin") return parts.length === 2 && parts[1] === "viberacing.mjs" && info.isFile();
++  if (top === "lib") {
++    if (parts.length === 1) return info.isDirectory();
++    if (parts.length === 2)
++      return parts[1] === "adapters"
++        ? info.isDirectory()
++        : legacyRuntimeFiles.has(parts[1]) && info.isFile();
++    if (parts.length === 3 && parts[1] === "adapters")
++      return legacyRuntimeAdapterFiles.has(parts[2]) && info.isFile();
++    return false;
++  }
+   return top === "logs" && parts.length === 2 && parts[1] === "last-error.log" && info.isFile();
+ }
+ 
+diff --git a/packages/connector/test/state-security.test.mjs b/packages/connector/test/state-security.test.mjs
+index 3b2b4c67cbd8c6e6b23e528251c5f7b83b54c8ab..294f30a634ab99875712e100eabc7971baf172f6 100644
+--- a/packages/connector/test/state-security.test.mjs
++++ b/packages/connector/test/state-security.test.mjs
+@@ -154,6 +154,48 @@ test(
+   },
+ );
+ 
++test("recognizes the exact legacy flat runtime and preserves it through preparation and reload", async (context) => {
++  const root = await mkdtemp(join(tmpdir(), "viberacing-flat-runtime-"));
++  context.after(() => rm(root, { recursive: true, force: true }));
++  const state = join(root, ".viberacing");
++  const legacyFiles = [
++    "browser.mjs", "config.mjs", "executables.mjs", "readers.mjs", "registry.mjs", "runtime.mjs",
++  ];
++  const adapters = ["antigravity", "claude", "codex", "cursor", "gemini", "kimi", "opencode", "qwen-settings", "qwen", "shared"];
++  await mkdir(join(state, "bin"), { recursive: true, mode: 0o777 });
++  await mkdir(join(state, "lib", "adapters"), { recursive: true, mode: 0o777 });
++  const contents = new Map([
++    [join(state, "bin", "viberacing.mjs"), "#!/usr/bin/env node\n// old launcher\n"],
++    ...legacyFiles.map((name) => [join(state, "lib", name), `// old ${name}\n`]),
++    ...adapters.map((name) => [join(state, "lib", "adapters", `${name}.mjs`), `// old ${name}\n`]),
++  ]);
++  for (const [path, value] of contents) await writeFile(path, value, { mode: 0o755 });
++  await writeFile(join(state, "installation.json"), JSON.stringify({
++    version: 1, id: "12345678-1234-4123-8123-123456789abc", secret: "legacy_installation_secret_that_is_long_enough",
++  }));
++  await chmod(state, 0o777);
++  const environment = { ...process.env, HOME: root, USERPROFILE: root, NODE_ENV: "test" };
++  await execFileAsync(process.execPath, ["--input-type=module", "--eval", ensureStateScript], { env: environment });
++  const before = new Map(await Promise.all([...contents].map(async ([path]) => [path, await readFile(path, "utf8")])));
++  const runtimeUrl = new URL("../bin/viberacing.mjs", import.meta.url);
++  const prepareScript = `import { prepareRuntime } from ${JSON.stringify(new URL("../lib/config.mjs", import.meta.url).href)}; await prepareRuntime(new URL(${JSON.stringify(runtimeUrl.href)})); await prepareRuntime(new URL(${JSON.stringify(runtimeUrl.href)}));`;
++  await execFileAsync(process.execPath, ["--input-type=module", "--eval", prepareScript], { env: environment });
++  for (const [path, value] of before) assert.equal(await readFile(path, "utf8"), value, path);
++  await execFileAsync(process.execPath, ["--input-type=module", "--eval", ensureStateScript], { env: environment });
++
++  const rejected = join(root, "rejected");
++  const rejectedState = join(rejected, ".viberacing");
++  await mkdir(join(rejectedState, "lib"), { recursive: true });
++  await writeFile(join(rejectedState, "lib", "unknown.mjs"), "foreign\n");
++  await writeFile(join(rejectedState, "installation.json"), await readFile(join(state, "installation.json")));
++  const rejectedEnvironment = { ...environment, HOME: rejected, USERPROFILE: rejected };
++  await assert.rejects(
++    execFileAsync(process.execPath, ["--input-type=module", "--eval", ensureStateScript], { env: rejectedEnvironment }),
++    /unrelated entry/,
++  );
++  assert.equal(await readFile(join(rejectedState, "lib", "unknown.mjs"), "utf8"), "foreign\n");
++});
++
+ test(
+   "POSIX state security accepts a new custom directory but rejects a nonempty dot directory",
+   { skip: process.platform === "win32" },

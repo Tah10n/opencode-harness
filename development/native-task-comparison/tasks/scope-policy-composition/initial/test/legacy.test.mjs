@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {authorize} from '../src/authorize.mjs';test('exact and default',()=>{assert.deepEqual(authorize([],'read','docs/a'),{allowed:false,reason:'no-grant',roles:[]});assert.deepEqual(authorize([{name:'r',rules:[{effect:'allow',action:'read',resource:'docs/a'}]}],'read','docs/a'),{allowed:true,reason:'grant',roles:['r']});});

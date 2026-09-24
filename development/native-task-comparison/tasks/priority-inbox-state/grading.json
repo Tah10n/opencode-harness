@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Deferred high-priority item does not block ready items; equal priority retains insertion order after edits.",
+    "Snapshot restore preserves sequence gaps and invalid restore leaves state intact."
+  ],
+  "docDelivery": [
+    "Readiness boundary, priority/sequence ordering and ID reuse rules.",
+    "Detached snapshot schema, nextSequence gaps and atomic validation."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Unique pending nonempty ASCII IDs; priority integer -10..10; readyAt/now integer0..1e12; safe sequence increments. Ordinary acyclic JSON payloads without custom methods/getters/undefined/symbols/nonfinite/-0. Snapshot exact fields and item shape; invalid sequence, duplicate IDs or priority/time bounds included.",
+  "independence": "Implement priority/deferred item transitions and stable export/import without losing insertion sequence."
+}

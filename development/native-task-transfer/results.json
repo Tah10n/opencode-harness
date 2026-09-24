@@ -1,0 +1,1383 @@
+{
+  "kind": "fixed-product-transfer-pilot",
+  "candidateCommit": "db99470ab3517b741e0452613a9ff04f68a49bc1",
+  "plannedTaskRuns": 12,
+  "executedTaskRuns": 12,
+  "primaryMetric": "Complete delivery under frozen behavior/preservation/project tests/docs/manual atomicity rubric",
+  "pairs": {
+    "BWin": 1,
+    "ALoss": 1,
+    "AWin": 0,
+    "BLoss": 0,
+    "ties": 5
+  },
+  "aggregate": {
+    "A": {
+      "complete": 5,
+      "tasks": 6,
+      "elapsedMs": 521166,
+      "requests": 83,
+      "toolCalls": 121,
+      "sessions": 6,
+      "usage": {
+        "inputTokens": 687902,
+        "outputTokens": 18427,
+        "cacheReadTokensIncludedInInput": 287232,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 3381,
+        "unknownRequests": 0
+      }
+    },
+    "B": {
+      "complete": 6,
+      "tasks": 6,
+      "elapsedMs": 847722,
+      "requests": 128,
+      "toolCalls": 164,
+      "sessions": 18,
+      "usage": {
+        "inputTokens": 1317200,
+        "outputTokens": 30891,
+        "cacheReadTokensIncludedInInput": 380928,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 5859,
+        "unknownRequests": 1
+      }
+    }
+  },
+  "rows": [
+    {
+      "task": "partial-checkout",
+      "arm": "A",
+      "completeUnderFrozenRubric": true,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "deliveryAudit": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "manualBehavior": true,
+        "coverageLost": false,
+        "notes": "Original single-purchase assertions retained. New purchase test asserts duplicate-SKU acceptance/rejection, remaining stock and charge; invalid later line asserts unchanged stock. README states order/whole-line, validation atomicity and accepted-only charge. Source uses Map for pure remaining quantities; no observed requirement violation."
+      },
+      "workflow": null,
+      "elapsedMs": 70712,
+      "requests": 14,
+      "toolCalls": 22,
+      "sessions": 1,
+      "usage": {
+        "inputTokens": 110130,
+        "outputTokens": 2686,
+        "cacheReadTokensIncludedInInput": 7168,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 343,
+        "unknownRequests": 0
+      },
+      "httpStatuses": {
+        "200": 14
+      },
+      "toolErrors": {
+        "ripgrep execution failed": 5
+      },
+      "timedOut": false,
+      "terminationVerified": true,
+      "containerCleanupExit": 0,
+      "patchHashes": {
+        "final.patch": "ad5fc2a638e2fdc4252ec47526a58dc86e2f9d871e1bcbc785e24391ee60b8c0"
+      },
+      "artifactHashes": {
+        "native-evidence.json": "be17d9a5fb6f06ab97caf196b3ee37aa247818e6df7f824b660251625fb169ed",
+        "provider-metadata.json": "bd8675dbd2b55c53ce44e916fd83329bbc85213d90552f77d7e14446b896c0d6",
+        "behavior-grading.json": "2db815f0659a574cd55173b6e7aed6fc533cb839728e1a7444c1468bb32967dd",
+        "result.json": "930795da33b8b413a93dadec994c50e3eb1fdd07cfdec91d0825a3f1672df997"
+      }
+    },
+    {
+      "task": "partial-checkout",
+      "arm": "B",
+      "completeUnderFrozenRubric": true,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "deliveryAudit": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "manualBehavior": true,
+        "coverageLost": false,
+        "d0Complete": true,
+        "notes": "D0 and terminal patches byte-identical. Required duplicate-SKU purchase and invalid-later-line tests delivered with old test retained. README meets all three frozen doc items. No repair, regression or unresolved obligation."
+      },
+      "workflow": {
+        "status": "reviewed_delivery",
+        "repairs": 0,
+        "evidenceCorrections": 0,
+        "limits": [],
+        "remaining": [],
+        "stages": [
+          {
+            "label": "implementation",
+            "role": "author",
+            "elapsedMs": 110139,
+            "supplied": false
+          },
+          {
+            "label": "review-0",
+            "role": "reviewer",
+            "elapsedMs": 23439,
+            "supplied": false
+          }
+        ],
+        "formatCorrections": 0,
+        "d0EqualsFinal": true
+      },
+      "elapsedMs": 141933,
+      "requests": 24,
+      "toolCalls": 37,
+      "sessions": 3,
+      "usage": {
+        "inputTokens": 251007,
+        "outputTokens": 4884,
+        "cacheReadTokensIncludedInInput": 72192,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 717,
+        "unknownRequests": 0
+      },
+      "httpStatuses": {
+        "200": 24
+      },
+      "toolErrors": {
+        "ripgrep execution failed": 1,
+        "sequential-tool guard": 6,
+        "file not found": 2
+      },
+      "timedOut": false,
+      "terminationVerified": true,
+      "containerCleanupExit": 0,
+      "patchHashes": {
+        "D0.patch": "4e8f4e9cd6cd7ab50cb3886d95200c566c7731abafb224fd07a519bc328ac8b6",
+        "final.patch": "4e8f4e9cd6cd7ab50cb3886d95200c566c7731abafb224fd07a519bc328ac8b6"
+      },
+      "artifactHashes": {
+        "native-evidence.json": "8e1fc37682002c3eed27279b2e119dcd049a844e642a21097b02aab572485159",
+        "provider-metadata.json": "931696de8cbe6e86cb47842fb137fcc01d38da5b12bf304df16e14e888bb77f6",
+        "behavior-grading.json": "a6bc8d6006390c7e3cc1da60b0af8aa5db5824eac90f1f769416c57ffb0d3593",
+        "result.json": "3e2e0bdf6e7e80cf4f1c02873828aef69dfa824490a55e1672ad76775ef42086"
+      },
+      "d0": {
+        "behavior": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "preservation": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "ordinary": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "completeUnderFrozenRubric": true
+      }
+    },
+    {
+      "task": "http-error-consumer",
+      "arm": "B",
+      "completeUnderFrozenRubric": true,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "deliveryAudit": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "manualBehavior": true,
+        "coverageLost": false,
+        "d0Complete": true,
+        "notes": "All frozen test/doc categories already exercised in D0:204 no parse, malformed-body status, encoded ID/options on 404 and other-error identity. Frozen rubric did not require duplicate URL/options assertions on every error branch; reviewer asked for stronger coverage, added in reproduction. No production change or independently detected behavior repair. Final code/test/doc delivery complete although workflow incomplete due omitted obligation-0 disposition; do not promote reviewer interpretation to a new required test after result."
+      },
+      "workflow": {
+        "status": "incomplete",
+        "repairs": 0,
+        "evidenceCorrections": 0,
+        "limits": [
+          "Reproduction omitted or duplicated a candidate disposition; unresolved findings retained in admissions"
+        ],
+        "remaining": [
+          {
+            "requirement": "Add required project tests, including encoded ID/options for both findUser outcomes.",
+            "status": "missing",
+            "evidence": "test/http.test.mjs:5 verifies encoded URL/options only in the 404 callback; the separate failure callback accepts no arguments."
+          }
+        ],
+        "stages": [
+          {
+            "label": "implementation",
+            "role": "author",
+            "elapsedMs": 79059,
+            "supplied": false
+          },
+          {
+            "label": "review-0",
+            "role": "reviewer",
+            "elapsedMs": 24191,
+            "supplied": false
+          },
+          {
+            "label": "reproduce-1",
+            "role": "author",
+            "elapsedMs": 32065,
+            "supplied": false
+          }
+        ],
+        "formatCorrections": 0,
+        "d0EqualsFinal": false
+      },
+      "elapsedMs": 142349,
+      "requests": 21,
+      "toolCalls": 26,
+      "sessions": 3,
+      "usage": {
+        "inputTokens": 221080,
+        "outputTokens": 5261,
+        "cacheReadTokensIncludedInInput": 65536,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 828,
+        "unknownRequests": 0
+      },
+      "httpStatuses": {
+        "200": 21
+      },
+      "toolErrors": {
+        "ripgrep execution failed": 3,
+        "sequential-tool guard": 3,
+        "file not found": 1
+      },
+      "timedOut": false,
+      "terminationVerified": true,
+      "containerCleanupExit": 0,
+      "patchHashes": {
+        "D0.patch": "80889295bb4f85149fd738ff709e372535ca9a25715d1156cc2026be102c8657",
+        "final.patch": "7626531a13dc4d8fc1c2e55dd515bd8caf5ec5a6fe9eb5b98415a36e05219588"
+      },
+      "artifactHashes": {
+        "native-evidence.json": "10a355b6c3dabe156152ff82cbf21edc371fa5916886d310c2af05dda608af11",
+        "provider-metadata.json": "f43dcc0418d1f9df625c0408fd51910d81abb63075af1395c8a81a5c155f88c4",
+        "behavior-grading.json": "07f0a3f5e330fbf3bb0a015d2aa7024512e3a3b1c3c655b09e42ccf6e04782b9",
+        "result.json": "a5764322c7887ab88920af7db7fa430d8feaeca9cbfb91a8f34782afd963447e"
+      },
+      "d0": {
+        "behavior": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "preservation": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "ordinary": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 4,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "completeUnderFrozenRubric": true
+      }
+    },
+    {
+      "task": "http-error-consumer",
+      "arm": "A",
+      "completeUnderFrozenRubric": true,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 5,
+          "pass": 5,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "deliveryAudit": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "manualBehavior": true,
+        "coverageLost": false,
+        "notes": "Original JSON-user assertion retained; 204 no parsing, malformed HTTP body status, encoded ID/options 404 and separate rejection identity tests present. README documents HttpError fields,204 null,actual HttpError404 policy. Same frozen minimal test rubric as B/D0: branch-specific duplicate URL/options assertions not required."
+      },
+      "workflow": null,
+      "elapsedMs": 83192,
+      "requests": 13,
+      "toolCalls": 19,
+      "sessions": 1,
+      "usage": {
+        "inputTokens": 100313,
+        "outputTokens": 2626,
+        "cacheReadTokensIncludedInInput": 56832,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 228,
+        "unknownRequests": 0
+      },
+      "httpStatuses": {
+        "200": 13
+      },
+      "toolErrors": {
+        "ripgrep execution failed": 4
+      },
+      "timedOut": false,
+      "terminationVerified": true,
+      "containerCleanupExit": 0,
+      "patchHashes": {
+        "final.patch": "9a7722c6ee2089952cc654a72bd2db87c8389b0b02871fdfcd91dc43f7fee8ab"
+      },
+      "artifactHashes": {
+        "native-evidence.json": "ed96efb22c465c70839d34a01dd27d3c266371ecc93ae287634270b729b96424",
+        "provider-metadata.json": "e9c842ff6030ccdae681f104cf577deb3822a9850403e13b6315d3a93e8f3972",
+        "behavior-grading.json": "6c40ca48c2a02d5d7b8332141f63199610687711a7d8c30742b56981c2318c27",
+        "result.json": "2e7c39d86f90915b4aa43df961468ba9af5e0fe18774d875348eb57650ac48ad"
+      }
+    },
+    {
+      "task": "transactional-settings",
+      "arm": "A",
+      "completeUnderFrozenRubric": true,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "deliveryAudit": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "manualBehavior": true,
+        "coverageLost": false,
+        "notes": "Original legacy callback result and persisted-state assertions retained via helper. Three mandatory tests cover conflict before callback, throw identity/exact bytes, nested changes/deletions/revision. README sync/conflict/atomic all present. Source clones data, checks thenable, JSON.stringify before writes, sibling tmp+rename and finally cleanup; no direct primary write."
+      },
+      "workflow": null,
+      "elapsedMs": 94781,
+      "requests": 16,
+      "toolCalls": 23,
+      "sessions": 1,
+      "usage": {
+        "inputTokens": 145895,
+        "outputTokens": 3337,
+        "cacheReadTokensIncludedInInput": 47616,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 628,
+        "unknownRequests": 0
+      },
+      "httpStatuses": {
+        "200": 16
+      },
+      "toolErrors": {
+        "ripgrep execution failed": 5
+      },
+      "timedOut": false,
+      "terminationVerified": true,
+      "containerCleanupExit": 0,
+      "patchHashes": {
+        "final.patch": "d6517d03385456ca9ce3ad1308adf795215697edf157bc2a42edc0248acbcac8"
+      },
+      "artifactHashes": {
+        "native-evidence.json": "446bb5f5769614d9a3a11c8f78128ef612118725d4a1b8497e5c84daa4d8782f",
+        "provider-metadata.json": "2e00fabbb09cff1a1742ea1f1c630ad70db3b2aa5befaffdbbbfb723b5193945",
+        "behavior-grading.json": "ac614ca970503d1d7fdff35360f4c06a75be55bfb20c253bf54b108b47813148",
+        "result.json": "d8ed3e3b9f9a7c5c29194787922c341e575abb5c8f2d2b5ae5f930ab18426857"
+      }
+    },
+    {
+      "task": "transactional-settings",
+      "arm": "B",
+      "completeUnderFrozenRubric": true,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "deliveryAudit": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "manualBehavior": true,
+        "coverageLost": false,
+        "d0Complete": true,
+        "notes": "D0/terminal identical, all required tests/docs and original assertions present. Source serializes before sibling temp+rename with cleanup. Protocol incomplete despite delivered obligations: current npm test precedes a tool error recorded with before:null, so finalChecks lastMutation invalidates it even though after snapshot unchanged; later git checks cannot make referenced npm current. No production repair or independent behavior regression."
+      },
+      "workflow": {
+        "status": "incomplete",
+        "repairs": 0,
+        "evidenceCorrections": 0,
+        "limits": [
+          "A reviewer-identified required check is failed, missing or stale."
+        ],
+        "remaining": [],
+        "stages": [
+          {
+            "label": "implementation",
+            "role": "author",
+            "elapsedMs": 86778,
+            "supplied": false
+          },
+          {
+            "label": "review-0",
+            "role": "reviewer",
+            "elapsedMs": 27671,
+            "supplied": false
+          }
+        ],
+        "formatCorrections": 0,
+        "d0EqualsFinal": true
+      },
+      "elapsedMs": 120615,
+      "requests": 20,
+      "toolCalls": 26,
+      "sessions": 3,
+      "usage": {
+        "inputTokens": 178261,
+        "outputTokens": 4687,
+        "cacheReadTokensIncludedInInput": 50688,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 869,
+        "unknownRequests": 0
+      },
+      "httpStatuses": {
+        "200": 20
+      },
+      "toolErrors": {
+        "ripgrep execution failed": 3,
+        "sequential-tool guard": 4
+      },
+      "timedOut": false,
+      "terminationVerified": true,
+      "containerCleanupExit": 0,
+      "patchHashes": {
+        "D0.patch": "3aed46f8f4218420169d4c97cad1268b97adb2e02d1ea4558544d2ac1bcd5f80",
+        "final.patch": "3aed46f8f4218420169d4c97cad1268b97adb2e02d1ea4558544d2ac1bcd5f80"
+      },
+      "artifactHashes": {
+        "native-evidence.json": "995670af55299bde4220c9d9bbaf22c54c55ed682834cd1d5d622ad93dc72c37",
+        "provider-metadata.json": "21d1e76de019c2eddb2688cbfa2f553e1d740b632816819fde4d2535b18d8143",
+        "behavior-grading.json": "07f0a3f5e330fbf3bb0a015d2aa7024512e3a3b1c3c655b09e42ccf6e04782b9",
+        "result.json": "aa092308dd5d28bcebf9ea6ad4f58913ca8317bbe97b6ee1881e17751eeb96a6"
+      },
+      "d0": {
+        "behavior": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "preservation": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "ordinary": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 4,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "completeUnderFrozenRubric": true
+      }
+    },
+    {
+      "task": "document-backup",
+      "arm": "B",
+      "completeUnderFrozenRubric": true,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "deliveryAudit": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "manualBehavior": true,
+        "coverageLost": false,
+        "d0Complete": true,
+        "notes": "All three required project tests present, original legacy Unicode/unknown-field assertion retained. README priority/corrupt-save/power-loss caveat delivered. Source validates and serializes before backup write; temp sibling+rename and cleanup. D0/terminal identical. Protocol incomplete: passing npm test preceded before:null sequential-guard error; later diff-check passed but npm reference invalidated by lastMutation. No repair/regression."
+      },
+      "workflow": {
+        "status": "incomplete",
+        "repairs": 0,
+        "evidenceCorrections": 0,
+        "limits": [
+          "A reviewer-identified required check is failed, missing or stale."
+        ],
+        "remaining": [],
+        "stages": [
+          {
+            "label": "implementation",
+            "role": "author",
+            "elapsedMs": 94970,
+            "supplied": false
+          },
+          {
+            "label": "review-0",
+            "role": "reviewer",
+            "elapsedMs": 15331,
+            "supplied": false
+          }
+        ],
+        "formatCorrections": 0,
+        "d0EqualsFinal": true
+      },
+      "elapsedMs": 120148,
+      "requests": 20,
+      "toolCalls": 25,
+      "sessions": 3,
+      "usage": {
+        "inputTokens": 180857,
+        "outputTokens": 4087,
+        "cacheReadTokensIncludedInInput": 62976,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 896,
+        "unknownRequests": 0
+      },
+      "httpStatuses": {
+        "200": 20
+      },
+      "toolErrors": {
+        "ripgrep execution failed": 5,
+        "file not found": 1,
+        "sequential-tool guard": 2
+      },
+      "timedOut": false,
+      "terminationVerified": true,
+      "containerCleanupExit": 0,
+      "patchHashes": {
+        "D0.patch": "c9eb42cab77ad0c51b86d7956e397bd5dc4d3c306a314ec327b6138d0966281e",
+        "final.patch": "c9eb42cab77ad0c51b86d7956e397bd5dc4d3c306a314ec327b6138d0966281e"
+      },
+      "artifactHashes": {
+        "native-evidence.json": "5c72e90490ecd7c1ffb1c553135e31a29131044a6bdc46241fd50d8be70bb6f8",
+        "provider-metadata.json": "f444006559dbcfae684289c34cc1a378f120f27a59f1a5d7eb3b870633aac604",
+        "behavior-grading.json": "9b54ba40f49698a58abe00d5bc75f5110e763600b44a0cb1adbfb0eab6480fbd",
+        "result.json": "1b214cfcec519860f62f4852fecf8712fa80a0f8a174bba42ce6641e27c86649"
+      },
+      "d0": {
+        "behavior": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 4,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "preservation": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "ordinary": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 4,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "completeUnderFrozenRubric": true
+      }
+    },
+    {
+      "task": "document-backup",
+      "arm": "A",
+      "completeUnderFrozenRubric": true,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "deliveryAudit": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "manualBehavior": true,
+        "coverageLost": false,
+        "notes": "Original legacy unknown-field and Unicode test retained. Required fallback read-only, two-save exact backup and invalid-save byte tests delivered. Docs priority/corrupt-save/two-file powerloss all stated. Source validates/JSON serializes before backup write, sibling UUID temp+rename and finally cleanup; no direct primary write.",
+        "limitations": [
+          "Post-run source concern, not executed or scored: custom toJSON returning undefined is outside defined ordinary JSON data tests; A and frozen reference do not guard undefined serialization before backup write, B does. Ambiguous input-domain boundary and grader coverage limitation retained; no post-result evaluator edit or B win inferred."
+        ]
+      },
+      "workflow": null,
+      "elapsedMs": 79385,
+      "requests": 13,
+      "toolCalls": 15,
+      "sessions": 1,
+      "usage": {
+        "inputTokens": 97583,
+        "outputTokens": 2783,
+        "cacheReadTokensIncludedInInput": 50176,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 645,
+        "unknownRequests": 0
+      },
+      "httpStatuses": {
+        "200": 13
+      },
+      "toolErrors": {
+        "ripgrep execution failed": 2,
+        "invalid tool arguments": 1
+      },
+      "timedOut": false,
+      "terminationVerified": true,
+      "containerCleanupExit": 0,
+      "patchHashes": {
+        "final.patch": "459fc37ac8a0b4e38e4146283aaa534b604c37ea024bc381c5a6fc9941a6ef30"
+      },
+      "artifactHashes": {
+        "native-evidence.json": "e7f748880cb566d5dc3101f6871f605498dada1f2732092264e3f60687bac0e1",
+        "provider-metadata.json": "88aa9e6300d7fb067727037f05778f4d6eedd7e4b97129a791450b5ce18b1306",
+        "behavior-grading.json": "a0a970e282899c240dcfd2c4afdf4a3cd099b3409128d9b29ff606c3ac3b244f",
+        "result.json": "55c60b26000337eebd157e091ceec4fe91a23d92d6c9978b2182418298938a0c"
+      }
+    },
+    {
+      "task": "dual-lookup",
+      "arm": "A",
+      "completeUnderFrozenRubric": true,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 8,
+          "pass": 8,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "deliveryAudit": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "manualBehavior": true,
+        "coverageLost": false,
+        "notes": "Old callback consumer retained. Tests demonstrate both style first-completion, throw/rejection identity, Promise consumer ordering/duplicates/empty. README meets dual-return/first-completion/order requirements. Public acceptance uses frozen nonsymmetric duplicate sequence and passes. Project ordering test uses palindrome; recorded bounded coverage, not new required example after result."
+      },
+      "workflow": null,
+      "elapsedMs": 85492,
+      "requests": 13,
+      "toolCalls": 20,
+      "sessions": 1,
+      "usage": {
+        "inputTokens": 109825,
+        "outputTokens": 3263,
+        "cacheReadTokensIncludedInInput": 51200,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 674,
+        "unknownRequests": 0
+      },
+      "httpStatuses": {
+        "200": 13
+      },
+      "toolErrors": {
+        "ripgrep execution failed": 3
+      },
+      "timedOut": false,
+      "terminationVerified": true,
+      "containerCleanupExit": 0,
+      "patchHashes": {
+        "final.patch": "8d74b441be3fe43de2c49b84384c51b8fabb6ba077934d27e135b702c3c720de"
+      },
+      "artifactHashes": {
+        "native-evidence.json": "96e0b5ae9c089d59256948c4f383d8003840866952385fed8c6709bc064cdb83",
+        "provider-metadata.json": "72ecc45b04e86a24eb2c342bc036e6590614d6fbcaff55be4cc118bf27b2eb2a",
+        "behavior-grading.json": "1da7ceea100eea7793122df61938f31179af19c6ebbef2a7111bf6a9d7fc82ce",
+        "result.json": "018dcc1aa9a6b99625acd09be98a7eb8a6845c1d9a0b6d0952342ad4c2b15a5d"
+      }
+    },
+    {
+      "task": "dual-lookup",
+      "arm": "B",
+      "completeUnderFrozenRubric": true,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "deliveryAudit": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "manualBehavior": true,
+        "coverageLost": false,
+        "d0Complete": true,
+        "notes": "D0=terminal; both API style first-completion tests, Promise rejection identity, async consumer order/duplicates/empty and old callback consumer present. Frozen rubric/reference do not separately demand callback error-first plus sync-throw identity; final reviewer stronger demand not scored as missing new required example. Reproduction added failing consumer-callback-throw experiment, then removed and rejected unsupported expected behavior; no old assertions or production changes. Disposition-review cites stale pre-experiment npm alongside final npm, causing internal incomplete. Useful rejection of ungrounded finding, not behavior repair."
+      },
+      "workflow": {
+        "status": "incomplete",
+        "repairs": 0,
+        "evidenceCorrections": 0,
+        "limits": [
+          "A reviewer-identified required check is failed, missing or stale."
+        ],
+        "remaining": [
+          {
+            "requirement": "Add project tests for both API styles with first-completion wins and rejection identity",
+            "status": "missing",
+            "evidence": "test/lookup.test.mjs has first-completion tests for both styles, but rejection identity is asserted only for Promise mode; callback error-first and callback synchronous-throw identity are absent."
+          }
+        ],
+        "stages": [
+          {
+            "label": "implementation",
+            "role": "author",
+            "elapsedMs": 109234,
+            "supplied": false
+          },
+          {
+            "label": "review-0",
+            "role": "reviewer",
+            "elapsedMs": 21380,
+            "supplied": false
+          },
+          {
+            "label": "reproduce-1",
+            "role": "author",
+            "elapsedMs": 42833,
+            "supplied": false
+          },
+          {
+            "label": "disposition-review-1",
+            "role": "reviewer",
+            "elapsedMs": 22772,
+            "supplied": false
+          }
+        ],
+        "formatCorrections": 0,
+        "d0EqualsFinal": true
+      },
+      "elapsedMs": 204706,
+      "requests": 26,
+      "toolCalls": 29,
+      "sessions": 3,
+      "usage": {
+        "inputTokens": 332298,
+        "outputTokens": 7363,
+        "cacheReadTokensIncludedInInput": 90112,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 1720,
+        "unknownRequests": 0
+      },
+      "httpStatuses": {
+        "200": 26
+      },
+      "toolErrors": {
+        "ripgrep execution failed": 3,
+        "file not found": 2,
+        "sequential-tool guard": 1
+      },
+      "timedOut": false,
+      "terminationVerified": true,
+      "containerCleanupExit": 0,
+      "patchHashes": {
+        "D0.patch": "8ebde27d8f829644da6023f23ff8c74c5820a3bbd86dbbc5de88d28a38b38f88",
+        "final.patch": "8ebde27d8f829644da6023f23ff8c74c5820a3bbd86dbbc5de88d28a38b38f88"
+      },
+      "artifactHashes": {
+        "native-evidence.json": "cdf2f2a84b94f503e4047c2ab95ee87e5fba1e72949c4f97e7486f74d0819ba2",
+        "provider-metadata.json": "b40a2c6658574bd8084e8f0f7ca9adb0072a4bd951b8600ae87077c2118e6d40",
+        "behavior-grading.json": "b948338e1fbe5145e9ff8ee47b7aa9820669c60f29fe11c455fc67789e2a9743",
+        "result.json": "916a1521fb02601e64aae5223d6293ae38d1d32212771addc1420ac08b445223"
+      },
+      "d0": {
+        "behavior": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "preservation": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "ordinary": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 6,
+            "pass": 6,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "completeUnderFrozenRubric": true
+      }
+    },
+    {
+      "task": "quoted-contact-import",
+      "arm": "B",
+      "completeUnderFrozenRubric": true,
+      "behavior": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 3,
+          "pass": 3,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "deliveryAudit": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "manualBehavior": true,
+        "coverageLost": false,
+        "d0Complete": true,
+        "notes": "Original simple import test retained. New quoted quote/comma/newline, reordered header+ignored extra, malformed quote and width tests present. README documents grammar and header/error behavior. D0=terminal, no repair; independent acceptance3/3 and ordinary6/6. One observed HTTP503 with unknown usage occurred within native workflow; session nevertheless completed, verified termination and grading passed. Original outer-runner infrastructure error preserved separately."
+      },
+      "workflow": {
+        "status": "reviewed_delivery",
+        "repairs": 0,
+        "evidenceCorrections": 0,
+        "limits": [],
+        "remaining": [],
+        "stages": [
+          {
+            "label": "implementation",
+            "role": "author",
+            "elapsedMs": 94679,
+            "supplied": false
+          },
+          {
+            "label": "review-0",
+            "role": "reviewer",
+            "elapsedMs": 16256,
+            "supplied": false
+          }
+        ],
+        "formatCorrections": 0,
+        "d0EqualsFinal": true
+      },
+      "elapsedMs": 117971,
+      "requests": 17,
+      "toolCalls": 21,
+      "sessions": 3,
+      "usage": {
+        "inputTokens": 153697,
+        "outputTokens": 4609,
+        "cacheReadTokensIncludedInInput": 39424,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 829,
+        "unknownRequests": 1
+      },
+      "httpStatuses": {
+        "200": 16,
+        "503": 1
+      },
+      "toolErrors": {
+        "ripgrep execution failed": 3,
+        "sequential-tool guard": 2,
+        "file not found": 1
+      },
+      "timedOut": false,
+      "terminationVerified": true,
+      "containerCleanupExit": 0,
+      "patchHashes": {
+        "D0.patch": "56ad4eb4932ccfc63693cceae0fabfcfdb0a2ea92df1b643a3319c7ad7c966ef",
+        "final.patch": "56ad4eb4932ccfc63693cceae0fabfcfdb0a2ea92df1b643a3319c7ad7c966ef"
+      },
+      "artifactHashes": {
+        "native-evidence.json": "bb22f0f06f28f493a110c6ad817271ccc304b79f909a1ec4ec519e578a3504c9",
+        "provider-metadata.json": "33863224f51b6d8db184a6759de838031886042dcb1b7e2033e10859063bb71a",
+        "behavior-grading.json": "b948338e1fbe5145e9ff8ee47b7aa9820669c60f29fe11c455fc67789e2a9743",
+        "result.json": "9cdfb89af55674c1d9380edfbec09268083dbefaa6eb4eb999b961bec1549e72"
+      },
+      "d0": {
+        "behavior": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 3,
+            "pass": 3,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "preservation": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "ordinary": {
+          "exitCode": 0,
+          "counts": {
+            "tests": 6,
+            "pass": 6,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "passed": true
+        },
+        "completeUnderFrozenRubric": true
+      },
+      "outerRunnerError": "Stop on infrastructure/provider error; scored slot is retained, never retried"
+    },
+    {
+      "task": "quoted-contact-import",
+      "arm": "A",
+      "completeUnderFrozenRubric": false,
+      "behavior": {
+        "exitCode": 1,
+        "counts": {
+          "tests": 3,
+          "pass": 2,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": false
+      },
+      "preservation": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "ordinary": {
+        "exitCode": 0,
+        "counts": {
+          "tests": 4,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "passed": true
+      },
+      "deliveryAudit": {
+        "testsDelivered": true,
+        "docsDelivered": true,
+        "manualBehavior": true,
+        "coverageLost": false,
+        "notes": "Old simple import preserved; required quoted escaped/comma/newline, reordered-header/extra and malformed quote/width project tests present; docs delivered. Frozen acceptance2/3: parseRows discards an explicit empty record after another row, contrary to TASK. Source finishRow skips empty field/row whenever prior rows exist. New requirement defect, not failure of old preservation test. No retry or repair."
+      },
+      "workflow": null,
+      "elapsedMs": 107604,
+      "requests": 14,
+      "toolCalls": 22,
+      "sessions": 1,
+      "usage": {
+        "inputTokens": 124156,
+        "outputTokens": 3732,
+        "cacheReadTokensIncludedInInput": 74240,
+        "cacheWriteTokensIncludedInInput": 0,
+        "reasoningTokensIncludedInOutput": 863,
+        "unknownRequests": 0
+      },
+      "httpStatuses": {
+        "200": 14
+      },
+      "toolErrors": {
+        "ripgrep execution failed": 5
+      },
+      "timedOut": false,
+      "terminationVerified": true,
+      "containerCleanupExit": 0,
+      "patchHashes": {
+        "final.patch": "e69a607bc97171a6867f37429d29fefc9268a3090dbc257f0a8697846168b4f9"
+      },
+      "artifactHashes": {
+        "native-evidence.json": "04a6defcce85c5cd215b897c60437bc955c3f35fe125213518082a3416454980",
+        "provider-metadata.json": "8f7a34b323fb3a0fb5ef58c5bc67f9711c3e580ac6c872c77c69f7c630e57ca1",
+        "behavior-grading.json": "1395be1561120774f3faa528170ce3c2d7bed6c5ef078156817b55fcc7be3017",
+        "result.json": "475f37b9fdd50ec3346ab5e879218801f145923ef5237f441811159a4e3f0955"
+      }
+    }
+  ],
+  "limitations": [
+    "Six small synthetic tasks, not statistical evidence of general superiority.",
+    "One HTTP503 has unknown usage; observed tokens are not complete billing usage.",
+    "Post-run custom toJSON input-domain/reference blind spot in document-backup A is reported separately and not added as a new scored case.",
+    "All B/D0 satisfy frozen behavior checks; no observed production repair benefit in this corpus."
+  ]
+}

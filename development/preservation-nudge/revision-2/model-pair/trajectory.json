@@ -1,0 +1,1164 @@
+{
+  "arms": [
+    {
+      "arm": "ON",
+      "taskStartEpochMs": 1789993388053,
+      "commands": [
+        {
+          "event": 34,
+          "callID": "call_pXQPWHNfHiLk8hTbkIU5x9zs",
+          "command": "git status --short && git log --oneline -12",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 199.52,
+          "durationSeconds": 3.866,
+          "remainingSecondsAfter": 1596.614,
+          "outputSha256": "d1db8bcf37809e7de87b6f1865a3823189d767e2f2c12b792ebc5f2d4f90a50b",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 9,
+            "requestSha256": "ee6ad24defc73057d9ff8f97ddb2a6764e8b679098005c4e41da3ada439ddd04",
+            "at": "2026-09-21T12:26:56.247Z",
+            "forwarded": true,
+            "receiptSha256": "d1db8bcf37809e7de87b6f1865a3823189d767e2f2c12b792ebc5f2d4f90a50b",
+            "receiptBytes": 26,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 35,
+          "callID": "call_Y1zUAWhnAWWTOfKNAXvXycph",
+          "command": "git branch -a --no-color",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 205.118,
+          "durationSeconds": 3.664,
+          "remainingSecondsAfter": 1591.218,
+          "outputSha256": "65ee1fabd4f62ce94b38982f3c3873a564bf7a6cff0a1c759da478add77fa06f",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 9,
+            "requestSha256": "ee6ad24defc73057d9ff8f97ddb2a6764e8b679098005c4e41da3ada439ddd04",
+            "at": "2026-09-21T12:26:56.247Z",
+            "forwarded": true,
+            "receiptSha256": "65ee1fabd4f62ce94b38982f3c3873a564bf7a6cff0a1c759da478add77fa06f",
+            "receiptBytes": 23,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 36,
+          "callID": "call_hoOoFApLxylmx7HWZFxFxqpv",
+          "command": "git log --all --oneline --grep='scop' -20",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 210.462,
+          "durationSeconds": 3.692,
+          "remainingSecondsAfter": 1585.846,
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 9,
+            "requestSha256": "ee6ad24defc73057d9ff8f97ddb2a6764e8b679098005c4e41da3ada439ddd04",
+            "at": "2026-09-21T12:26:56.247Z",
+            "forwarded": true,
+            "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+            "receiptBytes": 11,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 56,
+          "callID": "call_fx9KLRDhPanuy6nllwfJ6mRe",
+          "command": "git diff --check",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 436.177,
+          "durationSeconds": 3.864,
+          "remainingSecondsAfter": 1359.959,
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 15,
+            "requestSha256": "a915bbce386175b2e130da20fd884c20e68ec4a545698b77f7b6908f3f9f2f2a",
+            "at": "2026-09-21T12:30:28.612Z",
+            "forwarded": true,
+            "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+            "receiptBytes": 11,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 58,
+          "callID": "call_raDi029QzBxxaRTdjTGYk7y9",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep 'omit-scoping-attribute-class-dynamic'",
+          "cwd": ".",
+          "exit": 1,
+          "state": "completed",
+          "startSeconds": 485.185,
+          "durationSeconds": 17.714,
+          "remainingSecondsAfter": 1297.101,
+          "outputSha256": "49759500784e27ddcf8d35008c5b59f6ad5e459161b047f2dc8a528e43642604",
+          "reportTotals": [
+            "0 passing (235ms)",
+            "1 failing"
+          ],
+          "firstModelReceipt": {
+            "request": 17,
+            "requestSha256": "09fda46b1ef00f165134da186eca73e7b682b296fcb9f2dfae94dc7b89c7d0f4",
+            "at": "2026-09-21T12:31:31.448Z",
+            "forwarded": true,
+            "receiptSha256": "49759500784e27ddcf8d35008c5b59f6ad5e459161b047f2dc8a528e43642604",
+            "receiptBytes": 2996,
+            "reportTotals": [
+              "0 passing (235ms)",
+              "1 failing"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 59,
+          "callID": "call_bB3i6EoHBzkzqimntMqacKJH",
+          "command": "rg -l '\\[svelte-xyz\\]' test/css/samples --glob 'expected.css' | wc -l && rg -l 'svelte-xyz' test/css/samples --glob 'expected.html' | wc -l && rg -l '\\[svelte-xyz\\]' test/css/samples --glob 'expected.css'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 544.797,
+          "durationSeconds": 3.863,
+          "remainingSecondsAfter": 1251.34,
+          "outputSha256": "2fbba1cf29a78d8bd916f487fb26aa1a2afa87d0b4acd80ac7fd1910bc410d7a",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 18,
+            "requestSha256": "d297f4c0e946187f172175d72483755166bdbe2437c175eee9cb4c19395b4828",
+            "at": "2026-09-21T12:32:17.231Z",
+            "forwarded": true,
+            "receiptSha256": "2fbba1cf29a78d8bd916f487fb26aa1a2afa87d0b4acd80ac7fd1910bc410d7a",
+            "receiptBytes": 2749,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 60,
+          "callID": "call_gegPXa2Wx7hsDTRBju9ytJKG",
+          "command": "rg -o 'svelte-xyz[^ <\"]*|class=\"[^\"]*\"' test/css/samples --glob 'expected.html' | sort | uniq -c",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 559.964,
+          "durationSeconds": 3.862,
+          "remainingSecondsAfter": 1236.174,
+          "outputSha256": "20e0b16aaaee139a6d60aef1a308000b6ae38a680d4079e9915aa5d13c27dc97",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 19,
+            "requestSha256": "5ec0ab28e7036f6b4388a0c0f32188b3e808e6b0595f7708059b82ae186f7d25",
+            "at": "2026-09-21T12:32:32.382Z",
+            "forwarded": true,
+            "receiptSha256": "20e0b16aaaee139a6d60aef1a308000b6ae38a680d4079e9915aa5d13c27dc97",
+            "receiptBytes": 3452,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 67,
+          "callID": "call_Av5OPuAFDf28rczWDKNJzebU",
+          "command": "perl -pi -e 's/\\[svelte-xyz\\]/.svelte-xyz/g' $(rg -l '\\[svelte-xyz\\]' test/css/samples --glob 'expected.css') && perl -pi -e 's/ svelte-xyz=\"\" class=\"([^\"]*)\"/ class=\"svelte-xyz $1\"/g; s/ svelte-xyz=\"\"/ class=\"svelte-xyz\"/g; s/ svelte-xyz=\\x27\\x27/ class=\"svelte-xyz\"/g' $(rg -l 'svelte-xyz' test/css/samples --glob 'expected.html')",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 604.776,
+          "durationSeconds": 3.965,
+          "remainingSecondsAfter": 1191.259,
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 21,
+            "requestSha256": "6c60871511592ef36f433867866de535a34a3630a557168cf70d14a8586e6d12",
+            "at": "2026-09-21T12:33:17.488Z",
+            "forwarded": true,
+            "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+            "receiptBytes": 11,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 68,
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep 'omit-scoping-attribute-class-(dynamic|static)'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 617.858,
+          "durationSeconds": 17.923,
+          "remainingSecondsAfter": 1164.219,
+          "outputSha256": "a2ff2bd08282e67207cb9312da3355e2306d5b514b35b26db88d87f6b2061e53",
+          "reportTotals": [
+            "2 passing (366ms)"
+          ],
+          "firstModelReceipt": {
+            "request": 22,
+            "requestSha256": "944f78efbc465da12e07e058541033c1ed8c7ca9a3f912abcde41c094707a6fe",
+            "at": "2026-09-21T12:33:44.341Z",
+            "forwarded": true,
+            "receiptSha256": "023453bc59d49becebaab68d5d85727d727ab3131cef86484eb981fc97128f42",
+            "receiptBytes": 3337,
+            "reportTotals": [
+              "2 passing (366ms)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 83,
+          "callID": "call_NjtkGlHOrMhMh0U2fHykJsCc",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep 'css-scoped-dynamic-class'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 800.547,
+          "durationSeconds": 18.973,
+          "remainingSecondsAfter": 980.48,
+          "outputSha256": "2ad8c5415da7c136bb80c1edc4f37514e6126bbb419d9ae073b43a576d0e3dad",
+          "reportTotals": [
+            "4 passing (312ms)"
+          ],
+          "firstModelReceipt": {
+            "request": 27,
+            "requestSha256": "e82c86429a575b521905fe5ed008a743d13f7ef78d271fb9127ab5dddef3a800",
+            "at": "2026-09-21T12:36:48.083Z",
+            "forwarded": true,
+            "receiptSha256": "2ad8c5415da7c136bb80c1edc4f37514e6126bbb419d9ae073b43a576d0e3dad",
+            "receiptBytes": 2770,
+            "reportTotals": [
+              "4 passing (312ms)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 85,
+          "callID": "call_567lwJGyFcr6rJUeWdvh5zHI",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep '^css'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 846.225,
+          "durationSeconds": 18.506,
+          "remainingSecondsAfter": 935.269,
+          "outputSha256": "66681b0200cab306d07a3d1e460e2153b80a78f9b8fdca3e4456de78479fc43b",
+          "reportTotals": [
+            "49 passing (1s)"
+          ],
+          "firstModelReceipt": {
+            "request": 29,
+            "requestSha256": "93a6f73565fe0f35f6cae65d124250a86bf29eb3116be2ab9b2d28cc96686020",
+            "at": "2026-09-21T12:37:33.292Z",
+            "forwarded": true,
+            "receiptSha256": "66681b0200cab306d07a3d1e460e2153b80a78f9b8fdca3e4456de78479fc43b",
+            "receiptBytes": 4507,
+            "reportTotals": [
+              "49 passing (1s)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 86,
+          "callID": "call_z9XTTvFD73Kd7imx0CI8SrJx",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test",
+          "cwd": ".",
+          "exit": 15,
+          "state": "completed",
+          "startSeconds": 879.763,
+          "durationSeconds": 114.233,
+          "remainingSecondsAfter": 806.004,
+          "outputSha256": "b9c20dd29a1785ebcf0fe11445baf2aa71308976459e6573d66fabe38c99ac3f",
+          "reportTotals": [
+            "1666 passing (2m)",
+            "53 pending",
+            "15 failing"
+          ],
+          "firstModelReceipt": {
+            "request": 30,
+            "requestSha256": "550a1ed6e246e56f4e110d8100f3bf5867d00cf239cc65077288aa21331450e9",
+            "at": "2026-09-21T12:39:42.727Z",
+            "forwarded": true,
+            "receiptSha256": "b9c20dd29a1785ebcf0fe11445baf2aa71308976459e6573d66fabe38c99ac3f",
+            "receiptBytes": 51280,
+            "reportTotals": [
+              "1666 passing (2m)",
+              "53 pending",
+              "15 failing"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 96,
+          "callID": "call_MdCoD26u7RBQigjSt91ZfpbX",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep 'css-scoped-dynamic-class|omit-scoping-attribute-class-(dynamic|static)'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1135.131,
+          "durationSeconds": 17.966,
+          "remainingSecondsAfter": 646.903,
+          "outputSha256": "76223925e0783c5b50871bf1528a87510b10bf41f0562c4a19950f3260bc4f7b",
+          "reportTotals": [
+            "6 passing (561ms)"
+          ],
+          "firstModelReceipt": {
+            "request": 34,
+            "requestSha256": "36acd79fba3053336e0a5b6ee0a41d921d09a98d83093d012ef445e058154818",
+            "at": "2026-09-21T12:42:21.689Z",
+            "forwarded": true,
+            "receiptSha256": "76223925e0783c5b50871bf1528a87510b10bf41f0562c4a19950f3260bc4f7b",
+            "receiptBytes": 2926,
+            "reportTotals": [
+              "6 passing (561ms)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 97,
+          "callID": "call_72u5AHYwzvgcdNE4UU2tGacm",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep '^css'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1160.542,
+          "durationSeconds": 18.506,
+          "remainingSecondsAfter": 620.952,
+          "outputSha256": "e8da9041d4c633ffa52f5a8e2b535fedc2e62006019a5b3966d85d81a4f6f585",
+          "reportTotals": [
+            "49 passing (1s)"
+          ],
+          "firstModelReceipt": {
+            "request": 35,
+            "requestSha256": "fa448b8e1703a03ce6026000bc99c241624cdcc2d691dd3dabcf102a4f4041ee",
+            "at": "2026-09-21T12:42:47.610Z",
+            "forwarded": true,
+            "receiptSha256": "e8da9041d4c633ffa52f5a8e2b535fedc2e62006019a5b3966d85d81a4f6f585",
+            "receiptBytes": 4507,
+            "reportTotals": [
+              "49 passing (1s)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 98,
+          "callID": "call_1Qhm0oWxLd8iI8z49DdeM91x",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep 'collapses-text-around-comments|css-media-query|^styles(-nested)?$'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1192.012,
+          "durationSeconds": 17.643,
+          "remainingSecondsAfter": 590.345,
+          "outputSha256": "e3a2c4a7d9ba36a9a36ecd8b26c6acaf04bd4fa5e5d94799707016d31b4a46d6",
+          "reportTotals": [
+            "2 passing (325ms)"
+          ],
+          "firstModelReceipt": {
+            "request": 36,
+            "requestSha256": "7a7e2ffa8831a69f03635e8d2541d51e57d77c0327dcb20264addba25307f665",
+            "at": "2026-09-21T12:43:18.213Z",
+            "forwarded": true,
+            "receiptSha256": "e3a2c4a7d9ba36a9a36ecd8b26c6acaf04bd4fa5e5d94799707016d31b4a46d6",
+            "receiptBytes": 2667,
+            "reportTotals": [
+              "2 passing (325ms)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 99,
+          "callID": "call_l8i4b8YfFyl5rmJJV4kGdF41",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep '^styles|styles-nested'",
+          "cwd": ".",
+          "exit": 1,
+          "state": "completed",
+          "startSeconds": 1216.307,
+          "durationSeconds": 17.819,
+          "remainingSecondsAfter": 565.874,
+          "outputSha256": "f2f101b46a7faa0b9ded6146858c2c84835e73d786d0bfe7f667864237abbeff",
+          "reportTotals": [
+            "0 passing (140ms)",
+            "1 failing"
+          ],
+          "firstModelReceipt": {
+            "request": 37,
+            "requestSha256": "7a5490bd828385b367618c0f78fa7dbf7f9d9b4de1097b86cd63bfbe2f66c437",
+            "at": "2026-09-21T12:43:42.711Z",
+            "forwarded": true,
+            "receiptSha256": "f2f101b46a7faa0b9ded6146858c2c84835e73d786d0bfe7f667864237abbeff",
+            "receiptBytes": 12071,
+            "reportTotals": [
+              "0 passing (140ms)",
+              "1 failing"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 101,
+          "callID": "call_dmV9c1hHo2X4MQLrvyO0bIgR",
+          "command": "cp test/server-side-rendering/samples/styles-nested/_actual.css test/server-side-rendering/samples/styles-nested/_expected.css",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1272.562,
+          "durationSeconds": 3.928,
+          "remainingSecondsAfter": 523.51,
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 39,
+            "requestSha256": "1ee92e8c2478e08d6e6bc321b95bfa7a2597e03cb0be0ee050609a687524a16d",
+            "at": "2026-09-21T12:44:25.223Z",
+            "forwarded": true,
+            "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+            "receiptBytes": 11,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 102,
+          "callID": "call_YcnnwUICEU9uwVhLeVBWTTf0",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep '^styles|styles-nested'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1285.915,
+          "durationSeconds": 17.888,
+          "remainingSecondsAfter": 496.197,
+          "outputSha256": "f44fb17e5139f58faaff7a01bcd6d22a298b71ce0f79b5e1c210bfe6cb01dd56",
+          "reportTotals": [
+            "1 passing (105ms)"
+          ],
+          "firstModelReceipt": {
+            "request": 40,
+            "requestSha256": "ed9094252043970b6a67f674135a67db7ff11be1d428c4f7f3e949e9febc34a2",
+            "at": "2026-09-21T12:44:52.351Z",
+            "forwarded": true,
+            "receiptSha256": "f44fb17e5139f58faaff7a01bcd6d22a298b71ce0f79b5e1c210bfe6cb01dd56",
+            "receiptBytes": 2615,
+            "reportTotals": [
+              "1 passing (105ms)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 103,
+          "callID": "call_eZ7ghD4LwzrhNjRX86STz22r",
+          "command": "git status --short",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1315.269,
+          "durationSeconds": 4.252,
+          "remainingSecondsAfter": 480.479,
+          "outputSha256": "b702520ec3fd512cba00324093dd32d4c1c9f011e7154e730f1e422b7b9f5273",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 41,
+            "requestSha256": "10ba5163fba08e2d41594d65cb5e8f4d67a96e52c89f5f180d9f7a8408501ea0",
+            "at": "2026-09-21T12:45:33.189Z",
+            "forwarded": true,
+            "receiptSha256": "b702520ec3fd512cba00324093dd32d4c1c9f011e7154e730f1e422b7b9f5273",
+            "receiptBytes": 5856,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 104,
+          "callID": "call_hAbF7ohCLUJTnblkM21MUo2i",
+          "command": "git diff --stat && git diff --check",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1321.997,
+          "durationSeconds": 3.97,
+          "remainingSecondsAfter": 474.033,
+          "outputSha256": "d7fe4dfaf19e1ffddd086b7631cf900fa621dafb77bbb7edb5bd7343633caeae",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 41,
+            "requestSha256": "10ba5163fba08e2d41594d65cb5e8f4d67a96e52c89f5f180d9f7a8408501ea0",
+            "at": "2026-09-21T12:45:33.189Z",
+            "forwarded": true,
+            "receiptSha256": "d7fe4dfaf19e1ffddd086b7631cf900fa621dafb77bbb7edb5bd7343633caeae",
+            "receiptBytes": 6164,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 105,
+          "callID": "call_Tt9MekGmdYQtSSbTnUAS1Stv",
+          "command": "git diff -- src/css/Stylesheet.ts src/generators/dom/index.ts src/generators/nodes/Attribute.ts src/generators/nodes/Element.ts src/generators/server-side-rendering/visitors/Element.ts",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1327.808,
+          "durationSeconds": 3.794,
+          "remainingSecondsAfter": 468.398,
+          "outputSha256": "a12416b3fd6fb9dcb2d5775545c3671aeaca39efa4e3b70a71664362d1fb73ba",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 41,
+            "requestSha256": "10ba5163fba08e2d41594d65cb5e8f4d67a96e52c89f5f180d9f7a8408501ea0",
+            "at": "2026-09-21T12:45:33.189Z",
+            "forwarded": true,
+            "receiptSha256": "a12416b3fd6fb9dcb2d5775545c3671aeaca39efa4e3b70a71664362d1fb73ba",
+            "receiptBytes": 6313,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 106,
+          "callID": "call_bPhuT0YdQMeZEPK9KgGpDfIo",
+          "command": "git diff -- test/runtime/samples/css-scoped-dynamic-class test/css/samples/omit-scoping-attribute-class-dynamic test/css/samples/omit-scoping-attribute-class-static",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1333.441,
+          "durationSeconds": 3.829,
+          "remainingSecondsAfter": 462.73,
+          "outputSha256": "a534b3496518eb6f251b3c1d3bd1b8845f260f279a78289e1736ce738b12ff12",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 41,
+            "requestSha256": "10ba5163fba08e2d41594d65cb5e8f4d67a96e52c89f5f180d9f7a8408501ea0",
+            "at": "2026-09-21T12:45:33.189Z",
+            "forwarded": true,
+            "receiptSha256": "a534b3496518eb6f251b3c1d3bd1b8845f260f279a78289e1736ce738b12ff12",
+            "receiptBytes": 1912,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 110,
+          "callID": "call_Rfr4rvEOt75TGoxVhfUgom6j",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep 'css-scoped-dynamic-class'",
+          "cwd": ".",
+          "exit": 3,
+          "state": "completed",
+          "startSeconds": 1424.57,
+          "durationSeconds": 18.947,
+          "remainingSecondsAfter": 356.483,
+          "outputSha256": "aa0d0cfe63d3bcd349170ff0030c098d4a1c30731e92b0cea97ceaf6c1e23353",
+          "reportTotals": [
+            "1 passing (210ms)",
+            "3 failing"
+          ],
+          "firstModelReceipt": {
+            "request": 43,
+            "requestSha256": "6da227fc1c8085dcb585e3e3614255bc0a6f60763b6f852dfc5a707c895f2f20",
+            "at": "2026-09-21T12:47:12.093Z",
+            "forwarded": true,
+            "receiptSha256": "aa0d0cfe63d3bcd349170ff0030c098d4a1c30731e92b0cea97ceaf6c1e23353",
+            "receiptBytes": 6904,
+            "reportTotals": [
+              "1 passing (210ms)",
+              "3 failing"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 112,
+          "callID": "call_hzopfjawd6ywz5guk5qXtnVY",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep 'css-scoped-dynamic-class'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1495.265,
+          "durationSeconds": 18.644,
+          "remainingSecondsAfter": 286.091,
+          "outputSha256": "30878290f75d84011f3d54551b46f04e309f43cca3380e6fc6dc34d29aac4922",
+          "reportTotals": [
+            "4 passing (305ms)"
+          ],
+          "firstModelReceipt": {
+            "request": 45,
+            "requestSha256": "1daa311597b1fcbdbbc45a25357e798c02930d613368f62f1859ded18c2378a8",
+            "at": "2026-09-21T12:48:22.547Z",
+            "forwarded": true,
+            "receiptSha256": "30878290f75d84011f3d54551b46f04e309f43cca3380e6fc6dc34d29aac4922",
+            "receiptBytes": 2770,
+            "reportTotals": [
+              "4 passing (305ms)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 113,
+          "callID": "call_1cYKijqgiBc9Q9gI8uFOwQVh",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep '^css'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1530.775,
+          "durationSeconds": 20.889,
+          "remainingSecondsAfter": 248.336,
+          "outputSha256": "57ffc6e0e2b7e6532f30b45190db4fbec1e9c9d85ebbb2489a7032159f0628b2",
+          "reportTotals": [
+            "49 passing (1s)"
+          ],
+          "firstModelReceipt": {
+            "request": 46,
+            "requestSha256": "ca38ffdf08a4d74f0d65ec391d7db04670dfeda66dfb03c4cab3a9748fefe029",
+            "at": "2026-09-21T12:49:00.283Z",
+            "forwarded": true,
+            "receiptSha256": "57ffc6e0e2b7e6532f30b45190db4fbec1e9c9d85ebbb2489a7032159f0628b2",
+            "receiptBytes": 4507,
+            "reportTotals": [
+              "49 passing (1s)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 114,
+          "callID": "call_PwPmGAIVa0TGZhUgwfCICS1W",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm run lint",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1557.504,
+          "durationSeconds": 8.418,
+          "remainingSecondsAfter": 234.078,
+          "outputSha256": "f89fc25d40dc1724bc9bf88ac0513cb339e023d458fe065d396606fdff1b0f1b",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 47,
+            "requestSha256": "926eccc35b3123eb2506e1cacc9c7ab31346e45581e496a09345911bf90a4965",
+            "at": "2026-09-21T12:49:14.501Z",
+            "forwarded": true,
+            "receiptSha256": "f89fc25d40dc1724bc9bf88ac0513cb339e023d458fe065d396606fdff1b0f1b",
+            "receiptBytes": 497,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 115,
+          "callID": "call_yJXSq6udHM3xPNuCtVxQuYKa",
+          "command": "git diff -- test/sourcemaps/samples/css/output.css test/sourcemaps/samples/css/output.css.map test/sourcemaps/samples/css-cascade-false/output.css test/sourcemaps/samples/css-cascade-false/output.css.map",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1577.58,
+          "durationSeconds": 4.433,
+          "remainingSecondsAfter": 217.987,
+          "outputSha256": "5acf6eb90417874fc1fc80ef698ab9ae9f7f63e2998dc3b0734d874f557a0d5f",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 48,
+            "requestSha256": "a86c92708780eafb8cae3b3d52b9dbb0ae0c5d7bf47e261153fbcd6ba0c32d4d",
+            "at": "2026-09-21T12:49:54.652Z",
+            "forwarded": true,
+            "receiptSha256": "5acf6eb90417874fc1fc80ef698ab9ae9f7f63e2998dc3b0734d874f557a0d5f",
+            "receiptBytes": 1921,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 116,
+          "callID": "call_E9RAcvOJ14cycpBieHpCW7nG",
+          "command": "git diff -- test/js/samples/collapses-text-around-comments test/js/samples/css-media-query test/server-side-rendering/samples/styles test/server-side-rendering/samples/styles-nested",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1584.177,
+          "durationSeconds": 4.514,
+          "remainingSecondsAfter": 211.309,
+          "outputSha256": "3ee6d9132c7744ebe33c05fb7e6233570d7bb141ddc614c44841937a54dbd322",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 48,
+            "requestSha256": "a86c92708780eafb8cae3b3d52b9dbb0ae0c5d7bf47e261153fbcd6ba0c32d4d",
+            "at": "2026-09-21T12:49:54.652Z",
+            "forwarded": true,
+            "receiptSha256": "3ee6d9132c7744ebe33c05fb7e6233570d7bb141ddc614c44841937a54dbd322",
+            "receiptBytes": 5716,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 117,
+          "callID": "call_ob8zE2tBlt0coLKxcdrqBFLs",
+          "command": "git diff --numstat | sort -k1,1nr | head -20",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1590.7,
+          "durationSeconds": 4.265,
+          "remainingSecondsAfter": 205.035,
+          "outputSha256": "7d73533cb1869cbb5fac1924d02e7c59d3783bcb017b3cf79b9188263066e979",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 48,
+            "requestSha256": "a86c92708780eafb8cae3b3d52b9dbb0ae0c5d7bf47e261153fbcd6ba0c32d4d",
+            "at": "2026-09-21T12:49:54.652Z",
+            "forwarded": true,
+            "receiptSha256": "7d73533cb1869cbb5fac1924d02e7c59d3783bcb017b3cf79b9188263066e979",
+            "receiptBytes": 1131,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 118,
+          "callID": "call_9J0X6TPIFY8RKqzri4LBOT0l",
+          "command": "git status --short | rg '_actual|compiler|shared.js|ssr/' || true",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1596.94,
+          "durationSeconds": 4.563,
+          "remainingSecondsAfter": 198.497,
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 48,
+            "requestSha256": "a86c92708780eafb8cae3b3d52b9dbb0ae0c5d7bf47e261153fbcd6ba0c32d4d",
+            "at": "2026-09-21T12:49:54.652Z",
+            "forwarded": true,
+            "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+            "receiptBytes": 11,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 120,
+          "callID": "call_sQwzks3Gw126Q4sqFQrvuSRD",
+          "command": "cp test/server-side-rendering/samples/styles/_actual.css test/server-side-rendering/samples/styles/_expected.css",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1627.388,
+          "durationSeconds": 4.366,
+          "remainingSecondsAfter": 168.246,
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 49,
+            "requestSha256": "96efda8471f517adedf2f64db2dd40d09a6553f9479b14ab7f7a9eba3c40e2bf",
+            "at": "2026-09-21T12:50:20.563Z",
+            "forwarded": true,
+            "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+            "receiptBytes": 11,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 121,
+          "callID": "call_uR0Ow8FxXf17q9fclSTabaPd",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test -- --grep 'ssr styles'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1639.471,
+          "durationSeconds": 19.052,
+          "remainingSecondsAfter": 141.477,
+          "outputSha256": "33d9acec2dff3bb280dfeb8eee1bf3820e80b56b7b317307a9a5704dd9ffacc4",
+          "reportTotals": [
+            "2 passing (145ms)"
+          ],
+          "firstModelReceipt": {
+            "request": 50,
+            "requestSha256": "4216f8785ac83c447be81279d3a7ee6ac85f98400ca114ec4b3934d6edf3d9b3",
+            "at": "2026-09-21T12:50:47.126Z",
+            "forwarded": true,
+            "receiptSha256": "33d9acec2dff3bb280dfeb8eee1bf3820e80b56b7b317307a9a5704dd9ffacc4",
+            "receiptBytes": 2621,
+            "reportTotals": [
+              "2 passing (145ms)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 122,
+          "callID": "call_skgyiMA2qkycqWv2xUAH9cKR",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test",
+          "cwd": ".",
+          "exit": 11,
+          "state": "completed",
+          "startSeconds": 1674.621,
+          "durationSeconds": 118.058,
+          "remainingSecondsAfter": 7.321,
+          "outputSha256": "0b80239a1b2cdb217e5f8e192acc991d6cc4a182ddc6eaa2e07ee6fe6ac869f9",
+          "reportTotals": [
+            "1670 passing (2m)",
+            "53 pending",
+            "11 failing"
+          ],
+          "firstModelReceipt": {
+            "request": 51,
+            "requestSha256": "a4a8d89d69513fe97778a84355e38a49bca6bdd85252417cf232c5d7ad1c6473",
+            "at": "2026-09-21T12:53:01.418Z",
+            "forwarded": true,
+            "receiptSha256": "0b80239a1b2cdb217e5f8e192acc991d6cc4a182ddc6eaa2e07ee6fe6ac869f9",
+            "receiptBytes": 51305,
+            "reportTotals": [
+              "1670 passing (2m)",
+              "53 pending",
+              "11 failing"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": true
+          }
+        }
+      ],
+      "edits": [
+        {
+          "event": 51,
+          "tool": "apply_patch",
+          "paths": [
+            "src/css/Stylesheet.ts",
+            "src/generators/nodes/Element.ts",
+            "src/generators/nodes/Attribute.ts",
+            "src/generators/dom/index.ts",
+            "src/generators/server-side-rendering/visitors/Element.ts"
+          ],
+          "atSeconds": 406.241
+        },
+        {
+          "event": 57,
+          "tool": "apply_patch",
+          "paths": [
+            "src/generators/nodes/Attribute.ts"
+          ],
+          "atSeconds": 468.636
+        },
+        {
+          "event": 82,
+          "tool": "apply_patch",
+          "paths": [
+            "test/css/samples/omit-scoping-attribute-attribute-selector/expected.html",
+            "test/css/samples/refs-qualified/expected.html",
+            "test/runtime/samples/css-scoped-dynamic-class/main.html",
+            "test/runtime/samples/css-scoped-dynamic-class/_config.js"
+          ],
+          "atSeconds": 789.439
+        },
+        {
+          "event": 94,
+          "tool": "apply_patch",
+          "paths": [
+            "src/generators/server-side-rendering/visitors/Element.ts"
+          ],
+          "atSeconds": 1090.277
+        },
+        {
+          "event": 95,
+          "tool": "apply_patch",
+          "paths": [
+            "test/js/samples/collapses-text-around-comments/expected.js",
+            "test/js/samples/collapses-text-around-comments/expected-bundle.js",
+            "test/js/samples/css-media-query/expected.js",
+            "test/js/samples/css-media-query/expected-bundle.js",
+            "test/server-side-rendering/samples/styles/_expected.css",
+            "test/server-side-rendering/samples/styles/_expected.html",
+            "test/server-side-rendering/samples/styles-nested/_expected.css",
+            "test/server-side-rendering/samples/styles-nested/_expected.html"
+          ],
+          "atSeconds": 1114.715
+        },
+        {
+          "event": 109,
+          "tool": "apply_patch",
+          "paths": [
+            "src/generators/nodes/Attribute.ts",
+            "test/runtime/samples/css-scoped-dynamic-class/main.html",
+            "test/runtime/samples/css-scoped-dynamic-class/_config.js"
+          ],
+          "atSeconds": 1415.568
+        },
+        {
+          "event": 111,
+          "tool": "apply_patch",
+          "paths": [
+            "test/runtime/samples/css-scoped-dynamic-class/_config.js"
+          ],
+          "atSeconds": 1487.581
+        }
+      ],
+      "advisoryInRequests": [
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 22,
+          "at": "2026-09-21T12:33:44.341Z",
+          "requestSha256": "944f78efbc465da12e07e058541033c1ed8c7ca9a3f912abcde41c094707a6fe",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 23,
+          "at": "2026-09-21T12:34:16.126Z",
+          "requestSha256": "51b20b3ecdad993fe3aa1da6cfc8acfe14a7e4db891e08e2783376c1f53addb5",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 24,
+          "at": "2026-09-21T12:35:11.858Z",
+          "requestSha256": "ecbaa552df515ac344a6bba28f3f5892987cf4e1953457313665a85f474614e6",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 25,
+          "at": "2026-09-21T12:35:24.905Z",
+          "requestSha256": "786c1f20daa33a68d1bb211accc46aba25dfb724cb24a46655a7470443a831e0",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 26,
+          "at": "2026-09-21T12:36:18.182Z",
+          "requestSha256": "02f8ec4bc1cdf969f48cc8b331af021d07c94f72949366246f1ef112cd1c5b0c",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 27,
+          "at": "2026-09-21T12:36:48.083Z",
+          "requestSha256": "e82c86429a575b521905fe5ed008a743d13f7ef78d271fb9127ab5dddef3a800",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 28,
+          "at": "2026-09-21T12:37:03.487Z",
+          "requestSha256": "61ef2fb950dd07bc86ec605ac195c67b4e9098cba21090282c5ed5e1793d1c4f",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 29,
+          "at": "2026-09-21T12:37:33.292Z",
+          "requestSha256": "93a6f73565fe0f35f6cae65d124250a86bf29eb3116be2ab9b2d28cc96686020",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 30,
+          "at": "2026-09-21T12:39:42.727Z",
+          "requestSha256": "550a1ed6e246e56f4e110d8100f3bf5867d00cf239cc65077288aa21331450e9",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 31,
+          "at": "2026-09-21T12:40:27.948Z",
+          "requestSha256": "bfcd917ca6266204bfa86b60590ddb79b89e2c9c3a4e42c03bb7f172b6daf418",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 32,
+          "at": "2026-09-21T12:41:18.997Z",
+          "requestSha256": "1f465c5d7888ee9f99201b4195652a171a55fe504e9b3f785adc12d5af648dbc",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 33,
+          "at": "2026-09-21T12:41:43.443Z",
+          "requestSha256": "0b513b0fbb45a31546ee256974fa7fe2fb842a2bfb5f69051562b89785c9713a",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 34,
+          "at": "2026-09-21T12:42:21.689Z",
+          "requestSha256": "36acd79fba3053336e0a5b6ee0a41d921d09a98d83093d012ef445e058154818",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 35,
+          "at": "2026-09-21T12:42:47.610Z",
+          "requestSha256": "fa448b8e1703a03ce6026000bc99c241624cdcc2d691dd3dabcf102a4f4041ee",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 36,
+          "at": "2026-09-21T12:43:18.213Z",
+          "requestSha256": "7a7e2ffa8831a69f03635e8d2541d51e57d77c0327dcb20264addba25307f665",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 37,
+          "at": "2026-09-21T12:43:42.711Z",
+          "requestSha256": "7a5490bd828385b367618c0f78fa7dbf7f9d9b4de1097b86cd63bfbe2f66c437",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 38,
+          "at": "2026-09-21T12:44:03.644Z",
+          "requestSha256": "d5d8715aef0e2a6a590a3f31aabb20b6359937ec178c5f8c93a02f4e1fcff9c2",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 39,
+          "at": "2026-09-21T12:44:25.223Z",
+          "requestSha256": "1ee92e8c2478e08d6e6bc321b95bfa7a2597e03cb0be0ee050609a687524a16d",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 40,
+          "at": "2026-09-21T12:44:52.351Z",
+          "requestSha256": "ed9094252043970b6a67f674135a67db7ff11be1d428c4f7f3e949e9febc34a2",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 41,
+          "at": "2026-09-21T12:45:33.189Z",
+          "requestSha256": "10ba5163fba08e2d41594d65cb5e8f4d67a96e52c89f5f180d9f7a8408501ea0",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 42,
+          "at": "2026-09-21T12:46:44.365Z",
+          "requestSha256": "2b647f9718805f62c3e4c66cdb978235e90ccdb42e7f94f2c082fb619343e32f",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 43,
+          "at": "2026-09-21T12:47:12.093Z",
+          "requestSha256": "6da227fc1c8085dcb585e3e3614255bc0a6f60763b6f852dfc5a707c895f2f20",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 44,
+          "at": "2026-09-21T12:47:56.350Z",
+          "requestSha256": "483d7e2c6d15539911f08effd31ff708e8e1fc2b1914d47751aa678dc95189a8",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 45,
+          "at": "2026-09-21T12:48:22.547Z",
+          "requestSha256": "1daa311597b1fcbdbbc45a25357e798c02930d613368f62f1859ded18c2378a8",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 46,
+          "at": "2026-09-21T12:49:00.283Z",
+          "requestSha256": "ca38ffdf08a4d74f0d65ec391d7db04670dfeda66dfb03c4cab3a9748fefe029",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 47,
+          "at": "2026-09-21T12:49:14.501Z",
+          "requestSha256": "926eccc35b3123eb2506e1cacc9c7ab31346e45581e496a09345911bf90a4965",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 48,
+          "at": "2026-09-21T12:49:54.652Z",
+          "requestSha256": "a86c92708780eafb8cae3b3d52b9dbb0ae0c5d7bf47e261153fbcd6ba0c32d4d",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 49,
+          "at": "2026-09-21T12:50:20.563Z",
+          "requestSha256": "96efda8471f517adedf2f64db2dd40d09a6553f9479b14ab7f7a9eba3c40e2bf",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 50,
+          "at": "2026-09-21T12:50:47.126Z",
+          "requestSha256": "4216f8785ac83c447be81279d3a7ee6ac85f98400ca114ec4b3934d6edf3d9b3",
+          "forwarded": true
+        },
+        {
+          "callID": "call_AMxsMEVsHgHHL8VlNIlMvgoF",
+          "request": 51,
+          "at": "2026-09-21T12:53:01.418Z",
+          "requestSha256": "a4a8d89d69513fe97778a84355e38a49bca6bdd85252417cf232c5d7ad1c6473",
+          "forwarded": true
+        }
+      ],
+      "rawToolEventsSha256": "8ad0696ca7abc809abacc454f4c87a311788f453964f57a6801756723248f05e",
+      "limits": "Receipt hashes refer to actual outgoing request context. No hidden reasoning reconstructed. Build freshness requires source/import analysis; ignored author build outputs are not cryptographically retained."
+    }
+  ]
+}

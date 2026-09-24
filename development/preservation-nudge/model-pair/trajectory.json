@@ -1,0 +1,2176 @@
+{
+  "arms": [
+    {
+      "arm": "OFF",
+      "taskStartEpochMs": 1789935472589,
+      "commands": [
+        {
+          "event": 6,
+          "callID": "call_k8UwRshrjkBxwD8zhjTnaPdO",
+          "command": "git status --short && git log --oneline -5",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 46.495,
+          "durationSeconds": 3.63,
+          "remainingSecondsAfter": 1749.875,
+          "outputSha256": "a55a92adcdef240cad0376ae31503a8599a33d13ffb5ac43cc5d6f0baaa9c779",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 5,
+            "requestSha256": "6d8ea7ec12790a13973073a68120f71ac7c9ac51b4058c67c69a4ac934eba012",
+            "at": "2026-09-20T20:18:43.179Z",
+            "forwarded": true,
+            "receiptSha256": "a55a92adcdef240cad0376ae31503a8599a33d13ffb5ac43cc5d6f0baaa9c779",
+            "receiptBytes": 26,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 53,
+          "callID": "call_QIpDyZrgqurGsrEh0s8A71jJ",
+          "command": "source /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm run build",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 474.3,
+          "durationSeconds": 13.442,
+          "remainingSecondsAfter": 1312.258,
+          "outputSha256": "37fed0d7def0c8fdeba1b75a2ad74d147435a44bf22375ecc8fe131351249d30",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 22,
+            "requestSha256": "e52a194452efdf08ab1092801097ead6942408da8f298ac5a508f311a2733193",
+            "at": "2026-09-20T20:26:00.786Z",
+            "forwarded": true,
+            "receiptSha256": "37fed0d7def0c8fdeba1b75a2ad74d147435a44bf22375ecc8fe131351249d30",
+            "receiptBytes": 2395,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 54,
+          "callID": "call_nKTpUW23mdrYfTXfycFOoYE6",
+          "command": "./node_modules/.bin/mocha --opts mocha.opts --grep 'omit-scoping-attribute-class-(static|dynamic)'",
+          "cwd": ".",
+          "exit": 2,
+          "state": "completed",
+          "startSeconds": 496.765,
+          "durationSeconds": 4.903,
+          "remainingSecondsAfter": 1298.332,
+          "outputSha256": "66e032e92dcf0c55d24038667875c3debefc697053003dd6ded00689c9d0f408",
+          "reportTotals": [
+            "0 passing (261ms)",
+            "2 failing"
+          ],
+          "firstModelReceipt": {
+            "request": 23,
+            "requestSha256": "87a946401eff08aad02e9158b68c58d88e693599605b6a80727cf7ad6fb67432",
+            "at": "2026-09-20T20:26:14.718Z",
+            "forwarded": true,
+            "receiptSha256": "66e032e92dcf0c55d24038667875c3debefc697053003dd6ded00689c9d0f408",
+            "receiptBytes": 889,
+            "reportTotals": [
+              "0 passing (261ms)",
+              "2 failing"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 57,
+          "callID": "call_PKUhamy3OFlegMssZuTAED00",
+          "command": "git status --short",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 521.168,
+          "durationSeconds": 3.359,
+          "remainingSecondsAfter": 1275.473,
+          "outputSha256": "f4991f7d91c5435881ee383534e4d1480d6744a6c756507853ce3fe1010f4524",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 24,
+            "requestSha256": "d066069a0db9721f40f560bc1b90b349117c35d58c3aae79361db588bde84510",
+            "at": "2026-09-20T20:26:37.570Z",
+            "forwarded": true,
+            "receiptSha256": "f4991f7d91c5435881ee383534e4d1480d6744a6c756507853ce3fe1010f4524",
+            "receiptBytes": 188,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 63,
+          "callID": "call_mCCXVWWoSK2uNjPoZ2nzYNVN",
+          "command": "source /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm run build",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 702.083,
+          "durationSeconds": 13.433,
+          "remainingSecondsAfter": 1084.484,
+          "outputSha256": "f3550e3665e9092334dbb100fda38b00902658587896b3db06e618b755986eed",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 30,
+            "requestSha256": "5dc1abc47fa831aa87a43997d9196e970a511721677080625d4023bcdb445b88",
+            "at": "2026-09-20T20:29:48.564Z",
+            "forwarded": true,
+            "receiptSha256": "f3550e3665e9092334dbb100fda38b00902658587896b3db06e618b755986eed",
+            "receiptBytes": 2395,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 64,
+          "callID": "call_m8t3RPobypc6niyMit8AyMKa",
+          "command": "./node_modules/.bin/mocha --opts mocha.opts --grep 'omit-scoping-attribute-class-(static|dynamic)'",
+          "cwd": ".",
+          "exit": 2,
+          "state": "completed",
+          "startSeconds": 720.116,
+          "durationSeconds": 4.956,
+          "remainingSecondsAfter": 1074.928,
+          "outputSha256": "1883c65f54e23f4fe452dfdcf5499570a64a863c64075fc25f9dc0e611078a3b",
+          "reportTotals": [
+            "0 passing (280ms)",
+            "2 failing"
+          ],
+          "firstModelReceipt": {
+            "request": 31,
+            "requestSha256": "1d8757f929e5d69d409778f8e9f266302e8d927b88d1b9812fdb2b3750304bcd",
+            "at": "2026-09-20T20:29:58.116Z",
+            "forwarded": true,
+            "receiptSha256": "1883c65f54e23f4fe452dfdcf5499570a64a863c64075fc25f9dc0e611078a3b",
+            "receiptBytes": 889,
+            "reportTotals": [
+              "0 passing (280ms)",
+              "2 failing"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 65,
+          "callID": "call_P3AKHZyzG9jLs8xIpNdBRqTN",
+          "command": "perl -pi -e 'chomp if eof' test/css/samples/*/expected.css",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 737.168,
+          "durationSeconds": 3.408,
+          "remainingSecondsAfter": 1059.424,
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 32,
+            "requestSha256": "7f6f7bd84bc866db1ba2f15cd8017abfba9cb9d49301cf695040c0f60b55771d",
+            "at": "2026-09-20T20:30:13.769Z",
+            "forwarded": true,
+            "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+            "receiptBytes": 11,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 66,
+          "callID": "call_7qoFVnM6SFjBdsYYL1WTsPqr",
+          "command": "./node_modules/.bin/mocha --opts mocha.opts --grep 'omit-scoping-attribute-class-(static|dynamic)'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 745.558,
+          "durationSeconds": 5.037,
+          "remainingSecondsAfter": 1049.405,
+          "outputSha256": "2008db82d11e661e1dd0fd2d700f0e4ea0fc6632fb5b7e7e596409584e4036a6",
+          "reportTotals": [
+            "2 passing (328ms)"
+          ],
+          "firstModelReceipt": {
+            "request": 33,
+            "requestSha256": "bde859b375254d231384f6eeacf1e60b2f01b0d721dd733c8224e72a394b4035",
+            "at": "2026-09-20T20:30:23.637Z",
+            "forwarded": true,
+            "receiptSha256": "2008db82d11e661e1dd0fd2d700f0e4ea0fc6632fb5b7e7e596409584e4036a6",
+            "receiptBytes": 135,
+            "reportTotals": [
+              "2 passing (328ms)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 72,
+          "callID": "call_ZgV0juTQytTHbVXC4UHZZwbP",
+          "command": "./node_modules/.bin/mocha --opts mocha.opts --grep 'css|preserves the scope class'",
+          "cwd": ".",
+          "exit": 2,
+          "state": "completed",
+          "startSeconds": 826.307,
+          "durationSeconds": 16.948,
+          "remainingSecondsAfter": 956.745,
+          "outputSha256": "e817f171f90aae4c35616980741f88e17b4d73cf46d81d1f5dfa8c86b5d0ca14",
+          "reportTotals": [
+            "78 passing (12s)",
+            "2 failing"
+          ],
+          "firstModelReceipt": {
+            "request": 39,
+            "requestSha256": "661d590eeac9118c50b8aac02826edce44bdec1574858d07d67772b796ea8df8",
+            "at": "2026-09-20T20:31:56.440Z",
+            "forwarded": true,
+            "receiptSha256": "e817f171f90aae4c35616980741f88e17b4d73cf46d81d1f5dfa8c86b5d0ca14",
+            "receiptBytes": 5450,
+            "reportTotals": [
+              "78 passing (12s)",
+              "2 failing"
+            ],
+            "runtimeCssPass": true,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 87,
+          "callID": "call_DUYT8P7NEKO0t6yRpPZeKNzj",
+          "command": "git diff --stat && git status --short",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 932.633,
+          "durationSeconds": 3.471,
+          "remainingSecondsAfter": 863.896,
+          "outputSha256": "7140d8f301d6ed9a8a2bb43970073376894a8a557df049240f24bc5893571ef9",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 43,
+            "requestSha256": "f555bd5c7e1ff083e1fc3028291c832a240a8fe40c85effd4157e5c37b52811b",
+            "at": "2026-09-20T20:33:29.165Z",
+            "forwarded": true,
+            "receiptSha256": "7140d8f301d6ed9a8a2bb43970073376894a8a557df049240f24bc5893571ef9",
+            "receiptBytes": 10971,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 92,
+          "callID": "call_RuVWlwdL1fI36tyBeqUYOmCn",
+          "command": "git diff -- test/sourcemaps/samples/css/output.css test/sourcemaps/samples/css/output.css.map test/sourcemaps/samples/css-cascade-false/output.css test/sourcemaps/samples/css-cascade-false/output.css.map",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 959.599,
+          "durationSeconds": 3.426,
+          "remainingSecondsAfter": 836.975,
+          "outputSha256": "5acf6eb90417874fc1fc80ef698ab9ae9f7f63e2998dc3b0734d874f557a0d5f",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 44,
+            "requestSha256": "1b21a1466078d26639dec8973e63f880d0e537bb9d8a382434a0cc2fc5aa69bb",
+            "at": "2026-09-20T20:33:56.083Z",
+            "forwarded": true,
+            "receiptSha256": "5acf6eb90417874fc1fc80ef698ab9ae9f7f63e2998dc3b0734d874f557a0d5f",
+            "receiptBytes": 1921,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 98,
+          "callID": "call_dbvzqIQc6FRjy8exTJW4DaqR",
+          "command": "./node_modules/.bin/mocha --opts mocha.opts --grep 'omit-scoping-attribute-class-(static|dynamic)|preserves the scope class'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1002.68,
+          "durationSeconds": 5.075,
+          "remainingSecondsAfter": 792.245,
+          "outputSha256": "33b6deed3f2c063eda04612023c211273af3689834f7d8abda0e0fe026180e27",
+          "reportTotals": [
+            "3 passing (345ms)"
+          ],
+          "firstModelReceipt": {
+            "request": 47,
+            "requestSha256": "e1bb13e0e144d09b7df4eb3b6bc31b88aae0a813c8af65f34112f241240664ea",
+            "at": "2026-09-20T20:34:40.810Z",
+            "forwarded": true,
+            "receiptSha256": "33b6deed3f2c063eda04612023c211273af3689834f7d8abda0e0fe026180e27",
+            "receiptBytes": 198,
+            "reportTotals": [
+              "3 passing (345ms)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 100,
+          "callID": "call_a8wsuK0mrkVmtX5XY16C9rMi",
+          "command": "source /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test",
+          "cwd": ".",
+          "exit": 13,
+          "state": "completed",
+          "startSeconds": 1029.465,
+          "durationSeconds": 110.835,
+          "remainingSecondsAfter": 659.7,
+          "outputSha256": "1bcf5bc2fb75533755c58112527f2f4603f5074c6b08e002d4e98afd6a5e2d7c",
+          "reportTotals": [
+            "1665 passing (2m)",
+            "53 pending",
+            "13 failing"
+          ],
+          "firstModelReceipt": {
+            "request": 49,
+            "requestSha256": "49c52ca794961b0f6fbde4b80d15033de25e760c130c1ae607eaa55b52f984e5",
+            "at": "2026-09-20T20:36:53.481Z",
+            "forwarded": true,
+            "receiptSha256": "1bcf5bc2fb75533755c58112527f2f4603f5074c6b08e002d4e98afd6a5e2d7c",
+            "receiptBytes": 51277,
+            "reportTotals": [
+              "1665 passing (2m)",
+              "53 pending",
+              "13 failing"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 101,
+          "callID": "call_BNMGXkz3YxGiHNj1sEbnv3Kg",
+          "command": "perl -pi -e 'chomp if eof' test/server-side-rendering/samples/styles/_expected.css test/server-side-rendering/samples/styles-nested/_expected.css",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1161.653,
+          "durationSeconds": 3.365,
+          "remainingSecondsAfter": 634.982,
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 50,
+            "requestSha256": "03ca7af5ad88383a095666a22f0c888047723114ef79ea349075b7ccb753880a",
+            "at": "2026-09-20T20:37:18.220Z",
+            "forwarded": true,
+            "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+            "receiptBytes": 11,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 102,
+          "callID": "call_vmOSHB7U2bdrh4B5tnW69fvK",
+          "command": "source /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test",
+          "cwd": ".",
+          "exit": 11,
+          "state": "completed",
+          "startSeconds": 1178.092,
+          "durationSeconds": 110.548,
+          "remainingSecondsAfter": 511.36,
+          "outputSha256": "d34e4281b63e7dd48bd3632b1c9e337f5986188796bd380d28a4f533776c1b13",
+          "reportTotals": [
+            "1667 passing (2m)",
+            "53 pending",
+            "11 failing"
+          ],
+          "firstModelReceipt": {
+            "request": 51,
+            "requestSha256": "85e43ab4c94edbb64162e7ff6bb5e2266a236ed90b73669855cfa2774450b3fe",
+            "at": "2026-09-20T20:39:21.812Z",
+            "forwarded": true,
+            "receiptSha256": "d34e4281b63e7dd48bd3632b1c9e337f5986188796bd380d28a4f533776c1b13",
+            "receiptBytes": 51303,
+            "reportTotals": [
+              "1667 passing (2m)",
+              "53 pending",
+              "11 failing"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": true
+          }
+        },
+        {
+          "event": 103,
+          "callID": "call_iaN3JIwNJDBo9KPkRoPEc3MQ",
+          "command": "git diff --check && git status --short",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1297.749,
+          "durationSeconds": 3.46,
+          "remainingSecondsAfter": 498.791,
+          "outputSha256": "6c4f3ce2f99a0e7be09fcb9721754f064c5f974ca3f97a209e81c9b04947e6fa",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 52,
+            "requestSha256": "400233d4f632f757219f8b8738e4e01659de1b698713e3d8cce5c309b1154d06",
+            "at": "2026-09-20T20:39:50.763Z",
+            "forwarded": true,
+            "receiptSha256": "6c4f3ce2f99a0e7be09fcb9721754f064c5f974ca3f97a209e81c9b04947e6fa",
+            "receiptBytes": 5827,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 104,
+          "callID": "call_ig1U2XjFMjvFWOTcSWDkOdwe",
+          "command": "git diff -- src/css/Stylesheet.ts src/generators/dom/index.ts src/generators/nodes/Attribute.ts src/generators/nodes/Element.ts src/generators/server-side-rendering/visitors/Element.ts test/css/index.js",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1302.8,
+          "durationSeconds": 3.415,
+          "remainingSecondsAfter": 493.785,
+          "outputSha256": "88a514bd1696e07845a3dee57a3e69df336b76bfa5c2442bffbd1f306687dc0f",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 52,
+            "requestSha256": "400233d4f632f757219f8b8738e4e01659de1b698713e3d8cce5c309b1154d06",
+            "at": "2026-09-20T20:39:50.763Z",
+            "forwarded": true,
+            "receiptSha256": "88a514bd1696e07845a3dee57a3e69df336b76bfa5c2442bffbd1f306687dc0f",
+            "receiptBytes": 6760,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 106,
+          "callID": "call_nOOfrNCJAJkWHQTPL686tEMv",
+          "command": "source /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm run lint",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1310.999,
+          "durationSeconds": 6.682,
+          "remainingSecondsAfter": 482.319,
+          "outputSha256": "2218250e2eb17d678d0c0eccf588798e04b85d6a5ed1706542b5e090afd91e52",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 52,
+            "requestSha256": "400233d4f632f757219f8b8738e4e01659de1b698713e3d8cce5c309b1154d06",
+            "at": "2026-09-20T20:39:50.763Z",
+            "forwarded": true,
+            "receiptSha256": "2218250e2eb17d678d0c0eccf588798e04b85d6a5ed1706542b5e090afd91e52",
+            "receiptBytes": 497,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 108,
+          "callID": "call_PNOKH9dhAAdB6aboPSEWHAys",
+          "command": "git diff --numstat && git diff --name-only",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1334.642,
+          "durationSeconds": 3.493,
+          "remainingSecondsAfter": 461.865,
+          "outputSha256": "e8715d5043e54732b81a148ee9ef782ab496601ca848f0722edbc5d95119afe6",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 53,
+            "requestSha256": "67e773ae7132ee1be370cf9870898827c6bdc2cb684628c2be3ba96021892c67",
+            "at": "2026-09-20T20:40:16.253Z",
+            "forwarded": true,
+            "receiptSha256": "e8715d5043e54732b81a148ee9ef782ab496601ca848f0722edbc5d95119afe6",
+            "receiptBytes": 11477,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 109,
+          "callID": "call_jt9TksJs2JTh8B2tiN2U2HIF",
+          "command": "git diff -- test/server-side-rendering test/sourcemaps test/js/samples/css-media-query test/js/samples/collapses-text-around-comments",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1339.732,
+          "durationSeconds": 3.45,
+          "remainingSecondsAfter": 456.818,
+          "outputSha256": "eec6892f544189c7b128b7e43172258397990db47a41c6d82190f2de9eff724e",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 53,
+            "requestSha256": "67e773ae7132ee1be370cf9870898827c6bdc2cb684628c2be3ba96021892c67",
+            "at": "2026-09-20T20:40:16.253Z",
+            "forwarded": true,
+            "receiptSha256": "eec6892f544189c7b128b7e43172258397990db47a41c6d82190f2de9eff724e",
+            "receiptBytes": 7666,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 110,
+          "callID": "call_Rv4TuAZIAw9LipDq8RUx9agH",
+          "command": "git show HEAD:test/server-side-rendering/samples/styles-nested/_expected.html",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1350.969,
+          "durationSeconds": 3.421,
+          "remainingSecondsAfter": 445.61,
+          "outputSha256": "797698a0808be7543ca8c8c0f24f256a975154468ac012ed8a6e97f1bc68da12",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 54,
+            "requestSha256": "ec154f00fa380dd443bad2d629d96e6bfed97e5646b16fa490189e761bf9b05f",
+            "at": "2026-09-20T20:40:27.474Z",
+            "forwarded": true,
+            "receiptSha256": "797698a0808be7543ca8c8c0f24f256a975154468ac012ed8a6e97f1bc68da12",
+            "receiptBytes": 115,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 112,
+          "callID": "call_ms8vT4e3fUjERVlkngcTRVVK",
+          "command": "perl -pi -e 'chomp if eof' src/css/Stylesheet.ts test/css/index.js test/js/samples/collapses-text-around-comments/expected.js test/js/samples/css-media-query/expected.js",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1372.502,
+          "durationSeconds": 3.422,
+          "remainingSecondsAfter": 424.076,
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 56,
+            "requestSha256": "66705410a6aa182511daea2cf40ba424e75e26fb67b7b97accae5c74c20f6539",
+            "at": "2026-09-20T20:40:49.141Z",
+            "forwarded": true,
+            "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+            "receiptBytes": 11,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 113,
+          "callID": "call_wx8mBOkAJUyLocUO6CU0izvy",
+          "command": "./node_modules/.bin/mocha --opts mocha.opts --grep 'omit-scoping-attribute-class-(static|dynamic)|preserves the scope class'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1386.487,
+          "durationSeconds": 5.085,
+          "remainingSecondsAfter": 408.428,
+          "outputSha256": "dd0ff8a0e35997b09900fcaaef549fe74bd6791048adf1c23b8b115cec3552b3",
+          "reportTotals": [
+            "3 passing (351ms)"
+          ],
+          "firstModelReceipt": {
+            "request": 57,
+            "requestSha256": "af7fc348dde12772e4e6c73861bceda3a7bd6bcef8112ff368473d2b3795baf3",
+            "at": "2026-09-20T20:41:04.650Z",
+            "forwarded": true,
+            "receiptSha256": "dd0ff8a0e35997b09900fcaaef549fe74bd6791048adf1c23b8b115cec3552b3",
+            "receiptBytes": 198,
+            "reportTotals": [
+              "3 passing (351ms)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 114,
+          "callID": "call_rcAzHe0ruTGzsSDjPujQ3IaD",
+          "command": "./node_modules/.bin/mocha --opts mocha.opts --grep '^(css|js|ssr|sourcemaps)'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1400.104,
+          "durationSeconds": 8.413,
+          "remainingSecondsAfter": 391.483,
+          "outputSha256": "51d3f055fb3175867f662116f1abed9ff2f252fdfb7b3069ece2c97bec99b17e",
+          "reportTotals": [
+            "430 passing (4s)",
+            "10 pending"
+          ],
+          "firstModelReceipt": {
+            "request": 58,
+            "requestSha256": "317cf1eff46124fa354967ecd88c71898b2303050f0bb235f1a1776717033890",
+            "at": "2026-09-20T20:41:21.693Z",
+            "forwarded": true,
+            "receiptSha256": "51d3f055fb3175867f662116f1abed9ff2f252fdfb7b3069ece2c97bec99b17e",
+            "receiptBytes": 15045,
+            "reportTotals": [
+              "430 passing (4s)",
+              "10 pending"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 115,
+          "callID": "call_JmN6AoKk1ujIgx7icYroJxJO",
+          "command": "git diff --check && git status --short",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1419.789,
+          "durationSeconds": 3.494,
+          "remainingSecondsAfter": 376.717,
+          "outputSha256": "6c4f3ce2f99a0e7be09fcb9721754f064c5f974ca3f97a209e81c9b04947e6fa",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 59,
+            "requestSha256": "332d2f7274e821c0a04a857894d4be6beb4aeb75a2763aef419c97d874bdd710",
+            "at": "2026-09-20T20:41:47.869Z",
+            "forwarded": true,
+            "receiptSha256": "6c4f3ce2f99a0e7be09fcb9721754f064c5f974ca3f97a209e81c9b04947e6fa",
+            "receiptBytes": 5827,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 116,
+          "callID": "call_Bl4GCHt0D6Nv4EZXN4mr54p7",
+          "command": "git diff --stat",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1424.878,
+          "durationSeconds": 3.472,
+          "remainingSecondsAfter": 371.65,
+          "outputSha256": "1170071e63a9e968738612d414cda501fb743983f1c36270431681f737cac296",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 59,
+            "requestSha256": "332d2f7274e821c0a04a857894d4be6beb4aeb75a2763aef419c97d874bdd710",
+            "at": "2026-09-20T20:41:47.869Z",
+            "forwarded": true,
+            "receiptSha256": "1170071e63a9e968738612d414cda501fb743983f1c36270431681f737cac296",
+            "receiptBytes": 5820,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        }
+      ],
+      "edits": [
+        {
+          "event": 51,
+          "tool": "apply_patch",
+          "paths": [
+            "src/css/Stylesheet.ts",
+            "src/generators/dom/index.ts",
+            "src/generators/nodes/Attribute.ts",
+            "src/generators/server-side-rendering/visitors/Element.ts"
+          ],
+          "atSeconds": 405.543
+        },
+        {
+          "event": 52,
+          "tool": "apply_patch",
+          "paths": [
+            "src/generators/nodes/Attribute.ts",
+            "src/generators/nodes/Element.ts"
+          ],
+          "atSeconds": 439.857
+        },
+        {
+          "event": 58,
+          "tool": "apply_patch",
+          "paths": [
+            "src/generators/nodes/Attribute.ts"
+          ],
+          "atSeconds": 539.626
+        },
+        {
+          "event": 59,
+          "tool": "apply_patch",
+          "paths": [
+            "test/css/samples/attribute-selector-only-name/expected.css",
+            "test/css/samples/attribute-selector-unquoted/expected.css",
+            "test/css/samples/basic/expected.css",
+            "test/css/samples/cascade-false-empty-rule-dev/expected.css",
+            "test/css/samples/cascade-false-global-keyframes/expected.css",
+            "test/css/samples/cascade-false-keyframes-from-to/expected.css",
+            "test/css/samples/cascade-false-keyframes/expected.css",
+            "test/css/samples/cascade-false-pseudo-element/expected.css",
+            "test/css/samples/cascade-false-universal-selector/expected.css",
+            "test/css/samples/cascade-false/expected.css",
+            "test/css/samples/combinator-child/expected.css",
+            "test/css/samples/css-vars/expected.css",
+            "test/css/samples/descendant-selector-non-top-level-outer/expected.css",
+            "test/css/samples/keyframes/expected.css",
+            "test/css/samples/media-query-word/expected.css",
+            "test/css/samples/media-query/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.css",
+            "test/css/samples/omit-scoping-attribute-attribute-selector/expected.css",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/expected.css",
+            "test/css/samples/omit-scoping-attribute-class-static/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.css",
+            "test/css/samples/omit-scoping-attribute-id/expected.css",
+            "test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.css",
+            "test/css/samples/omit-scoping-attribute-whitespace/expected.css",
+            "test/css/samples/omit-scoping-attribute/expected.css",
+            "test/css/samples/refs-qualified/expected.css",
+            "test/css/samples/refs/expected.css",
+            "test/css/samples/supports-query/expected.css",
+            "test/css/samples/universal-selector/expected.css",
+            "test/css/samples/unknown-at-rule/expected.css",
+            "test/css/samples/unused-selector-leading/expected.css",
+            "test/css/samples/unused-selector-ternary/expected.css",
+            "test/css/samples/unused-selector/expected.css"
+          ],
+          "atSeconds": 600.117
+        },
+        {
+          "event": 60,
+          "tool": "apply_patch",
+          "paths": [
+            "test/css/samples/cascade-false-universal-selector/expected.html",
+            "test/css/samples/combinator-child/expected.html",
+            "test/css/samples/descendant-selector-non-top-level-outer/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-static/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.html",
+            "test/css/samples/omit-scoping-attribute-id/expected.html",
+            "test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-whitespace/expected.html",
+            "test/css/samples/omit-scoping-attribute/expected.html",
+            "test/css/samples/refs-qualified/expected.html",
+            "test/css/samples/refs/expected.html",
+            "test/css/samples/unused-selector-leading/expected.html",
+            "test/css/samples/unused-selector-ternary/expected.html",
+            "test/css/samples/unused-selector/expected.html"
+          ],
+          "atSeconds": 643.041
+        },
+        {
+          "event": 62,
+          "tool": "apply_patch",
+          "paths": [
+            "test/css/samples/cascade-false-universal-selector/expected.html",
+            "test/css/samples/combinator-child/expected.html",
+            "test/css/samples/descendant-selector-non-top-level-outer/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-contains/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-case-insensitive/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals-dynamic/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-pipe-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-prefix/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-suffix/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector-word-equals/expected.html",
+            "test/css/samples/omit-scoping-attribute-attribute-selector/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-static/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-class/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-inner/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-descendant-global-outer/expected.html",
+            "test/css/samples/omit-scoping-attribute-id/expected.html",
+            "test/css/samples/omit-scoping-attribute-whitespace-multiple/expected.html",
+            "test/css/samples/omit-scoping-attribute-whitespace/expected.html",
+            "test/css/samples/omit-scoping-attribute/expected.html",
+            "test/css/samples/refs-qualified/expected.html",
+            "test/css/samples/refs/expected.html",
+            "test/css/samples/unused-selector-leading/expected.html",
+            "test/css/samples/unused-selector-ternary/expected.html",
+            "test/css/samples/unused-selector/expected.html"
+          ],
+          "atSeconds": 696.039
+        },
+        {
+          "event": 71,
+          "tool": "apply_patch",
+          "paths": [
+            "test/css/index.js"
+          ],
+          "atSeconds": 820.788
+        },
+        {
+          "event": 84,
+          "tool": "apply_patch",
+          "paths": [
+            "test/js/samples/collapses-text-around-comments/expected-bundle.js",
+            "test/js/samples/collapses-text-around-comments/expected.js",
+            "test/js/samples/css-media-query/expected-bundle.js",
+            "test/js/samples/css-media-query/expected.js"
+          ],
+          "atSeconds": 916.591
+        },
+        {
+          "event": 97,
+          "tool": "apply_patch",
+          "paths": [
+            "test/server-side-rendering/samples/styles-nested/_expected.css",
+            "test/server-side-rendering/samples/styles-nested/_expected.html",
+            "test/server-side-rendering/samples/styles/_expected.css",
+            "test/server-side-rendering/samples/styles/_expected.html"
+          ],
+          "atSeconds": 995.704
+        },
+        {
+          "event": 111,
+          "tool": "apply_patch",
+          "paths": [
+            "test/server-side-rendering/samples/styles-nested/_expected.html"
+          ],
+          "atSeconds": 1367.476
+        }
+      ],
+      "advisoryInRequests": [],
+      "rawToolEventsSha256": "5e0f7ddceae9383a19ed7359237ab3f07e44a077592ba9b33c3d72ad24735b9e",
+      "limits": "Receipt hashes refer to actual outgoing request context. No hidden reasoning reconstructed. Build freshness requires source/import analysis; ignored author build outputs are not cryptographically retained."
+    },
+    {
+      "arm": "ON",
+      "taskStartEpochMs": 1789936947035,
+      "commands": [
+        {
+          "event": 7,
+          "callID": "call_QCmXPQgLQfDOqqTb1KMjkMOa",
+          "command": "git status --short && git log --oneline -5",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 47.811,
+          "durationSeconds": 3.552,
+          "remainingSecondsAfter": 1748.637,
+          "outputSha256": "62ea851d3ef0a9134ccc968bc4bdbb54aad79102408faa4b66b090319ce3e4b5",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 5,
+            "requestSha256": "209f954281e8a45d5f60e5f88e169d96e062e975f33785e2debd3a45a727aa49",
+            "at": "2026-09-20T20:43:18.852Z",
+            "forwarded": true,
+            "receiptSha256": "62ea851d3ef0a9134ccc968bc4bdbb54aad79102408faa4b66b090319ce3e4b5",
+            "receiptBytes": 26,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 39,
+          "callID": "call_8u0PvkP4VmCAkyU3PnEyd31c",
+          "command": "git log --all --oneline --decorate -20",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 183.943,
+          "durationSeconds": 3.471,
+          "remainingSecondsAfter": 1612.586,
+          "outputSha256": "5730d345319d2c21daddbd65b08f39ffe013fccf210b46b9efa25e2147b9da33",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 9,
+            "requestSha256": "7af434eccd88f07ae5b70e4c8f4353f8c9f947fd69df2dd5564be028d7cfd624",
+            "at": "2026-09-20T20:45:34.912Z",
+            "forwarded": true,
+            "receiptSha256": "5730d345319d2c21daddbd65b08f39ffe013fccf210b46b9efa25e2147b9da33",
+            "receiptBytes": 41,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 40,
+          "callID": "call_77J2RF6M8rLsWGcbsWuGpBcY",
+          "command": "git fsck --no-reflogs --unreachable",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 222.771,
+          "durationSeconds": 3.444,
+          "remainingSecondsAfter": 1573.785,
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 10,
+            "requestSha256": "feb87584c9f3064c87bf1fb5199d46a550fe577030ab69ec758e5b92215e14a6",
+            "at": "2026-09-20T20:46:13.704Z",
+            "forwarded": true,
+            "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+            "receiptBytes": 11,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 46,
+          "callID": "call_YmLTUtxRNMLo93DkhKbLMZqJ",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm run build",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 400.805,
+          "durationSeconds": 13.48,
+          "remainingSecondsAfter": 1385.715,
+          "outputSha256": "f66fafd29953afd6d96f8ee4bb5aacdc5dda66fe09fa25baa27f942e3f6df151",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 16,
+            "requestSha256": "f4718357f860e90c79a1e059c536688a367509f2c19cfc1228eb1fea966c5e85",
+            "at": "2026-09-20T20:49:21.769Z",
+            "forwarded": true,
+            "receiptSha256": "f66fafd29953afd6d96f8ee4bb5aacdc5dda66fe09fa25baa27f942e3f6df151",
+            "receiptBytes": 2395,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 47,
+          "callID": "call_8oxsWvXGtcqKcj2r4S9bBGzI",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/css/index.js --grep 'omit-scoping-attribute-class-(static|dynamic)'",
+          "cwd": ".",
+          "exit": 2,
+          "state": "completed",
+          "startSeconds": 421.25,
+          "durationSeconds": 6.665,
+          "remainingSecondsAfter": 1372.085,
+          "outputSha256": "586183530cf43c50def7f852acf8c29d3779d89a3531cd72363758025460cd09",
+          "reportTotals": [
+            "0 passing (268ms)",
+            "2 failing"
+          ],
+          "firstModelReceipt": {
+            "request": 17,
+            "requestSha256": "18493cd903d040bbea74217dc378a11b1192b3aa205550cd05fabd229dd5af12",
+            "at": "2026-09-20T20:49:35.425Z",
+            "forwarded": true,
+            "receiptSha256": "586183530cf43c50def7f852acf8c29d3779d89a3531cd72363758025460cd09",
+            "receiptBytes": 927,
+            "reportTotals": [
+              "0 passing (268ms)",
+              "2 failing"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 49,
+          "callID": "call_LpqEanr8AKCR39FHprSnSWze",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/css/index.js --grep 'omit-scoping-attribute-class-(static|dynamic)'",
+          "cwd": ".",
+          "exit": 2,
+          "state": "completed",
+          "startSeconds": 444.477,
+          "durationSeconds": 6.677,
+          "remainingSecondsAfter": 1348.846,
+          "outputSha256": "9329de3b7163c91d47a1c8407d77d3abf08b72eceec2bca682bc369ffab88d05",
+          "reportTotals": [
+            "0 passing (267ms)",
+            "2 failing"
+          ],
+          "firstModelReceipt": {
+            "request": 19,
+            "requestSha256": "2f3f5d275335c8d3a3a40769da89ab0c8a9750988f9cd7b54177caf51744d03a",
+            "at": "2026-09-20T20:49:58.646Z",
+            "forwarded": true,
+            "receiptSha256": "9329de3b7163c91d47a1c8407d77d3abf08b72eceec2bca682bc369ffab88d05",
+            "receiptBytes": 927,
+            "reportTotals": [
+              "0 passing (267ms)",
+              "2 failing"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 50,
+          "callID": "call_5UfvCBeYwufSwTI3thQovw2F",
+          "command": "od -An -t x1 test/css/samples/omit-scoping-attribute-class-static/expected.css && od -An -t x1 test/css/samples/basic/expected.css",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 457.75,
+          "durationSeconds": 3.413,
+          "remainingSecondsAfter": 1338.837,
+          "outputSha256": "218e353b2b624acc4aeb0aab1305af22291a307888afefe2453daa372ea4d95c",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 20,
+            "requestSha256": "b62ec5e46490da7a477966677a74c0fa605488f2b3a5c45d428a4db1db78c8ff",
+            "at": "2026-09-20T20:50:08.658Z",
+            "forwarded": true,
+            "receiptSha256": "218e353b2b624acc4aeb0aab1305af22291a307888afefe2453daa372ea4d95c",
+            "receiptBytes": 215,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 51,
+          "callID": "call_A05pqduI2R1fINea8wCWDYwB",
+          "command": "git show HEAD:test/css/samples/omit-scoping-attribute-class-static/expected.css | od -An -t x1",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 467.552,
+          "durationSeconds": 3.411,
+          "remainingSecondsAfter": 1329.037,
+          "outputSha256": "25d39e575e49751b6dc6b1054307d2ebd4c659bb18aac7a677ed010d46ae9220",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 21,
+            "requestSha256": "f24babbaab69dca473fbd766c90e6dfa7424df5ad1398be35b14756c62c58597",
+            "at": "2026-09-20T20:50:18.465Z",
+            "forwarded": true,
+            "receiptSha256": "25d39e575e49751b6dc6b1054307d2ebd4c659bb18aac7a677ed010d46ae9220",
+            "receiptBytes": 83,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 52,
+          "callID": "call_gERH2B40g2yYYj44lwZ3lio2",
+          "command": "perl -pi -e 'chomp if eof' test/css/samples/omit-scoping-attribute-class-static/expected.css test/css/samples/omit-scoping-attribute-class-dynamic/expected.css",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 481.166,
+          "durationSeconds": 3.408,
+          "remainingSecondsAfter": 1315.426,
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 22,
+            "requestSha256": "5b8fd8eb232afdb051792ab67cb540e79f9d0339fb8ff7ac769ec3735f4e32ab",
+            "at": "2026-09-20T20:50:32.213Z",
+            "forwarded": true,
+            "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+            "receiptBytes": 11,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 53,
+          "callID": "call_cxzkGwDjpVz9Cy8pLtXePOi8",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/css/index.js --grep 'omit-scoping-attribute-class-(static|dynamic)'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 489.763,
+          "durationSeconds": 6.75,
+          "remainingSecondsAfter": 1303.487,
+          "outputSha256": "f4c69335323d0eda65c646019ae3f5f1ffc9c2157afdee4273753423b5d6e81a",
+          "reportTotals": [
+            "2 passing (325ms)"
+          ],
+          "firstModelReceipt": {
+            "request": 23,
+            "requestSha256": "c43ac410a6e2460e45ebb26a62833f4dfe62b528b5ebe67b0fb0473ee889ef53",
+            "at": "2026-09-20T20:50:44.011Z",
+            "forwarded": true,
+            "receiptSha256": "f4c69335323d0eda65c646019ae3f5f1ffc9c2157afdee4273753423b5d6e81a",
+            "receiptBytes": 173,
+            "reportTotals": [
+              "2 passing (325ms)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 65,
+          "callID": "call_epRil3gmz6dHmIIyr1n5ggJ3",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/css/index.js --grep 'omit-scoping-attribute-class-(static|dynamic)'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 585.473,
+          "durationSeconds": 6.711,
+          "remainingSecondsAfter": 1207.816,
+          "outputSha256": "5bc16455a1a3f8d6af1a55f3b4166f3a2d2f55d32513e901b7152e13da950aaa",
+          "reportTotals": [
+            "2 passing (315ms)"
+          ],
+          "firstModelReceipt": {
+            "request": 30,
+            "requestSha256": "12ea4243d9b27299a46f9e87be389c07620b18dd4e1f4a01652d9d049bebc6b7",
+            "at": "2026-09-20T20:52:19.673Z",
+            "forwarded": true,
+            "receiptSha256": "5bc16455a1a3f8d6af1a55f3b4166f3a2d2f55d32513e901b7152e13da950aaa",
+            "receiptBytes": 173,
+            "reportTotals": [
+              "2 passing (315ms)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 66,
+          "callID": "call_6z0HEhRyoNOh1YWyCNfYhEo5",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/css/index.js",
+          "cwd": ".",
+          "exit": 57,
+          "state": "completed",
+          "startSeconds": 599.413,
+          "durationSeconds": 101.349,
+          "remainingSecondsAfter": 1099.238,
+          "outputSha256": "d6e359d81f38b8b6dd0cdfbe1e05f0424fc56932cbb1a9585f7b281d2e1a9c47",
+          "reportTotals": [
+            "1620 passing (2m)",
+            "53 pending",
+            "57 failing"
+          ],
+          "firstModelReceipt": {
+            "request": 31,
+            "requestSha256": "e9030c77cbcfbf2f4a10d0a5fc424b4ee6e44edd6f316ba508dfb444e4b36e99",
+            "at": "2026-09-20T20:54:08.417Z",
+            "forwarded": true,
+            "receiptSha256": "d6e359d81f38b8b6dd0cdfbe1e05f0424fc56932cbb1a9585f7b281d2e1a9c47",
+            "receiptBytes": 51282,
+            "reportTotals": [
+              "1620 passing (2m)",
+              "53 pending",
+              "57 failing"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 67,
+          "callID": "call_Dqp6ZhgNtKU0pHfHtSimntYI",
+          "command": "git status --short",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 709.339,
+          "durationSeconds": 3.428,
+          "remainingSecondsAfter": 1087.233,
+          "outputSha256": "b89b3bb7ec6ddc75940ebfbc3fd5f7b22cc66cc9c121b550562d04d2be095c1d",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 32,
+            "requestSha256": "c755c3754274be33719c46b65938e06bfacde3cfb9514ee995f666a1058370bc",
+            "at": "2026-09-20T20:54:20.281Z",
+            "forwarded": true,
+            "receiptSha256": "b89b3bb7ec6ddc75940ebfbc3fd5f7b22cc66cc9c121b550562d04d2be095c1d",
+            "receiptBytes": 761,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 68,
+          "callID": "call_AumIgkeb3JUTdfI8hxdR0Qhl",
+          "command": "git diff --stat && git diff -- test/sourcemaps/samples/css/output.css test/sourcemaps/samples/css-cascade-false/output.css",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 724.429,
+          "durationSeconds": 3.432,
+          "remainingSecondsAfter": 1072.139,
+          "outputSha256": "7554ac6bae87cd9c2cd4df5998826b435a7b9c1b03535627dd9459b53aac081d",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 33,
+            "requestSha256": "e82d543c7be270678fdd291eef0662b058fe29873a634b0077ba3254bfd35dcd",
+            "at": "2026-09-20T20:54:46.667Z",
+            "forwarded": true,
+            "receiptSha256": "7554ac6bae87cd9c2cd4df5998826b435a7b9c1b03535627dd9459b53aac081d",
+            "receiptBytes": 1855,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 71,
+          "callID": "call_ngkkfD8LLfMxzcCH0pjtc8pg",
+          "command": "git diff -- src/generators/nodes/Attribute.ts src/generators/nodes/Element.ts src/generators/server-side-rendering/visitors/Element.ts",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 735.736,
+          "durationSeconds": 3.416,
+          "remainingSecondsAfter": 1060.848,
+          "outputSha256": "86ae36852c60b2ee67387c10aacf1996459fb807aaabc854daebd180a328dffd",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 33,
+            "requestSha256": "e82d543c7be270678fdd291eef0662b058fe29873a634b0077ba3254bfd35dcd",
+            "at": "2026-09-20T20:54:46.667Z",
+            "forwarded": true,
+            "receiptSha256": "86ae36852c60b2ee67387c10aacf1996459fb807aaabc854daebd180a328dffd",
+            "receiptBytes": 6869,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 72,
+          "callID": "call_6lGtwckbCvIzNbZ9M4bSnfKl",
+          "command": "for actual in test/css/samples/*/_actual.css; do expected=${actual/_actual.css/expected.css}; if [ -f \"$expected\" ]; then cp \"$actual\" \"$expected\"; fi; done; cp test/sourcemaps/samples/css/output.css test/sourcemaps/samples/css/output.css; cp test/sourcemaps/samples/css-cascade-false/output.css test/sourcemaps/samples/css-cascade-false/output.css",
+          "cwd": ".",
+          "exit": 1,
+          "state": "completed",
+          "startSeconds": 760.243,
+          "durationSeconds": 4.05,
+          "remainingSecondsAfter": 1035.707,
+          "outputSha256": "8c80f0017dc02f40c8a34830054e7f30af7225e38692eafde05acaa99471123c",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 34,
+            "requestSha256": "38fc927a6fad9c876ea51f3431e11364494e703a1be41f9b7192e7f7dfe02e09",
+            "at": "2026-09-20T20:55:11.946Z",
+            "forwarded": true,
+            "receiptSha256": "8c80f0017dc02f40c8a34830054e7f30af7225e38692eafde05acaa99471123c",
+            "receiptBytes": 244,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 73,
+          "callID": "call_IaI1n0rjFxwJyf5yqb6XMeK0",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/css/index.js --grep '^((?!custom-elements).)*$'",
+          "cwd": ".",
+          "exit": 51,
+          "state": "completed",
+          "startSeconds": 771.623,
+          "durationSeconds": 21.272,
+          "remainingSecondsAfter": 1007.105,
+          "outputSha256": "3b0410e4c0c5ff420adc9d0d880b30a65b7600ca266bc0514154072d19265c02",
+          "reportTotals": [
+            "1618 passing (15s)",
+            "53 pending",
+            "51 failing"
+          ],
+          "firstModelReceipt": {
+            "request": 35,
+            "requestSha256": "e544ea4e7b8589ad3eb16fe7a104086a6fc4dba2a0ce86432642cfb198d98c73",
+            "at": "2026-09-20T20:55:40.538Z",
+            "forwarded": true,
+            "receiptSha256": "3b0410e4c0c5ff420adc9d0d880b30a65b7600ca266bc0514154072d19265c02",
+            "receiptBytes": 51303,
+            "reportTotals": [
+              "1618 passing (15s)",
+              "53 pending",
+              "51 failing"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 74,
+          "callID": "call_CDUEERxCCQ6HpmwqOA81B3X9",
+          "command": "for expected in test/css/samples/*/expected.css; do perl -pi -e 's/svelte-\\d+/svelte-xyz/g' \"$expected\"; done",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 802.662,
+          "durationSeconds": 5.476,
+          "remainingSecondsAfter": 991.862,
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 36,
+            "requestSha256": "23ce8e70b6311eae6da1938235e9a73c34ab1e6f19e64a64319b8fe38136280c",
+            "at": "2026-09-20T20:55:55.792Z",
+            "forwarded": true,
+            "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+            "receiptBytes": 11,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 75,
+          "callID": "call_jr5TnPVeX4ZnktdNxMKrgdAo",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts test/css/index.js --grep '^((?!custom-elements).)*$'",
+          "cwd": ".",
+          "exit": 33,
+          "state": "completed",
+          "startSeconds": 813.443,
+          "durationSeconds": 21.467,
+          "remainingSecondsAfter": 965.09,
+          "outputSha256": "ed5edee8f3b8dc81f79531ea5d2dcc6d86ec2bedaef2a2551d5e177c525fe489",
+          "reportTotals": [
+            "1636 passing (15s)",
+            "53 pending",
+            "33 failing"
+          ],
+          "firstModelReceipt": {
+            "request": 37,
+            "requestSha256": "e041c45c6f888fb7e72884c1a78bce365eefe5c91bea4437417b109d7978efbf",
+            "at": "2026-09-20T20:56:22.537Z",
+            "forwarded": true,
+            "receiptSha256": "ed5edee8f3b8dc81f79531ea5d2dcc6d86ec2bedaef2a2551d5e177c525fe489",
+            "receiptBytes": 51280,
+            "reportTotals": [
+              "1636 passing (15s)",
+              "53 pending",
+              "33 failing"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 77,
+          "callID": "call_WC6NdUydJMzxpsvzQ6mJ2E2m",
+          "command": "for actual in test/css/samples/*/_actual.html; do expected=${actual/_actual.html/expected.html}; if [ -f \"$expected\" ]; then cp \"$actual\" \"$expected\"; perl -pi -e 's/svelte-\\d+/svelte-xyz/g' \"$expected\"; fi; done",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 851.356,
+          "durationSeconds": 5.127,
+          "remainingSecondsAfter": 943.517,
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 39,
+            "requestSha256": "0f7b8b5691f4a51c605e405474eb3e5b4cabb4603b0db0b48036fc0e5a047ff9",
+            "at": "2026-09-20T20:56:44.155Z",
+            "forwarded": true,
+            "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+            "receiptBytes": 11,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 78,
+          "callID": "call_XkKVCHpjuBzxHMqEzk97Z1rL",
+          "command": "for sample in collapses-text-around-comments css-media-query; do cp \"test/js/samples/$sample/_actual.js\" \"test/js/samples/$sample/expected.js\"; cp \"test/js/samples/$sample/_actual-bundle.js\" \"test/js/samples/$sample/expected-bundle.js\"; done",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 871.039,
+          "durationSeconds": 3.475,
+          "remainingSecondsAfter": 925.486,
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 40,
+            "requestSha256": "13251dd27a9f9b9b384a5e7b830422d2ab71f307d47d26dd08ce6aae27bef6d6",
+            "at": "2026-09-20T20:57:02.177Z",
+            "forwarded": true,
+            "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+            "receiptBytes": 11,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 80,
+          "callID": "call_QuWuEFXMb6khUgl1FkaiiUKL",
+          "command": "for sample in styles styles-nested; do cp \"test/server-side-rendering/samples/$sample/_actual.html\" \"test/server-side-rendering/samples/$sample/_expected.html\"; cp \"test/server-side-rendering/samples/$sample/_actual.css\" \"test/server-side-rendering/samples/$sample/_expected.css\"; done",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 889.17,
+          "durationSeconds": 3.468,
+          "remainingSecondsAfter": 907.362,
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 42,
+            "requestSha256": "6ff805b2eca225e087d88dab32ca0c6580bb59aa8e5b059c15037dee16673ab0",
+            "at": "2026-09-20T20:57:20.285Z",
+            "forwarded": true,
+            "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+            "receiptBytes": 11,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 82,
+          "callID": "call_q1E6YZIcOwJBj0THNSVHiens",
+          "command": "git status --short",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 916.512,
+          "durationSeconds": 3.453,
+          "remainingSecondsAfter": 880.035,
+          "outputSha256": "71fdb643b27169fbe7e7512c504058064798dac8ae77ddf6479cf1d1db9b5470",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 44,
+            "requestSha256": "53de410b4fb9d79d01b0c37e0475be4a24eb1a0ff7c23ea0810dfa8e9dff3889",
+            "at": "2026-09-20T20:58:07.271Z",
+            "forwarded": true,
+            "receiptSha256": "71fdb643b27169fbe7e7512c504058064798dac8ae77ddf6479cf1d1db9b5470",
+            "receiptBytes": 5895,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 83,
+          "callID": "call_VX37xNWFE6PSUV58w3ZoJRJW",
+          "command": "git diff --stat",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 921.552,
+          "durationSeconds": 3.436,
+          "remainingSecondsAfter": 875.012,
+          "outputSha256": "a3b10013f1039c877775b4cfef5cff72c7398e40d7dc121a4e7a7ffe844569dc",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 44,
+            "requestSha256": "53de410b4fb9d79d01b0c37e0475be4a24eb1a0ff7c23ea0810dfa8e9dff3889",
+            "at": "2026-09-20T20:58:07.271Z",
+            "forwarded": true,
+            "receiptSha256": "a3b10013f1039c877775b4cfef5cff72c7398e40d7dc121a4e7a7ffe844569dc",
+            "receiptBytes": 5588,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 84,
+          "callID": "call_ov7u3ogzPs2uoRFzMMMQv5pk",
+          "command": "git diff -- src/css/Stylesheet.ts src/generators/dom/index.ts test/css/index.js test/css/samples/omit-scoping-attribute-class-dynamic/_config.js",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 926.58,
+          "durationSeconds": 3.451,
+          "remainingSecondsAfter": 869.969,
+          "outputSha256": "48eac9f28f537982117d3bb3b1555d3119da3fea0e2ccb22d370c068842455e8",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 44,
+            "requestSha256": "53de410b4fb9d79d01b0c37e0475be4a24eb1a0ff7c23ea0810dfa8e9dff3889",
+            "at": "2026-09-20T20:58:07.271Z",
+            "forwarded": true,
+            "receiptSha256": "48eac9f28f537982117d3bb3b1555d3119da3fea0e2ccb22d370c068842455e8",
+            "receiptBytes": 2710,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 90,
+          "callID": "call_GaxDnxFOZdl8FBUqxtZ3FLxI",
+          "command": "git diff --check",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 956.989,
+          "durationSeconds": 3.472,
+          "remainingSecondsAfter": 839.539,
+          "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 45,
+            "requestSha256": "551d99d7a020d82063a15d3f5fdcf1473f11f0452888cedebef5b0e702c222e6",
+            "at": "2026-09-20T20:58:33.105Z",
+            "forwarded": true,
+            "receiptSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3",
+            "receiptBytes": 11,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 91,
+          "callID": "call_2CYc5xitkAbyNPrjII1cUcOd",
+          "command": "git diff --numstat | sort -nr | head -20",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 962.077,
+          "durationSeconds": 3.507,
+          "remainingSecondsAfter": 834.416,
+          "outputSha256": "68fe09fd679c8a0b891d11d00ec619d413e1fd1d78b028a8d0c718af4635ed67",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 45,
+            "requestSha256": "551d99d7a020d82063a15d3f5fdcf1473f11f0452888cedebef5b0e702c222e6",
+            "at": "2026-09-20T20:58:33.105Z",
+            "forwarded": true,
+            "receiptSha256": "68fe09fd679c8a0b891d11d00ec619d413e1fd1d78b028a8d0c718af4635ed67",
+            "receiptBytes": 1084,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 92,
+          "callID": "call_AGUQUmfyKDNVHJ5wlkkZnE3H",
+          "command": "git show HEAD:test/css/samples/refs-qualified/expected.html && printf '\\n--- actual ---\\n' && od -An -c test/css/samples/refs-qualified/expected.html",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 971.803,
+          "durationSeconds": 3.486,
+          "remainingSecondsAfter": 824.711,
+          "outputSha256": "55e4ccebf94b1381d634177b60a7569a26fb6db340619ba13443dc010f7a067e",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 46,
+            "requestSha256": "7bf027b37739cff0b2e73693ab043846ed38e3fbf4761bc908f267356f595ccc",
+            "at": "2026-09-20T20:58:42.795Z",
+            "forwarded": true,
+            "receiptSha256": "55e4ccebf94b1381d634177b60a7569a26fb6db340619ba13443dc010f7a067e",
+            "receiptBytes": 423,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 93,
+          "callID": "call_JMOyhjjZv9qijgBzafZcrPZS",
+          "command": "git diff -- test/css/samples -- '*.html'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 982.93,
+          "durationSeconds": 3.469,
+          "remainingSecondsAfter": 813.601,
+          "outputSha256": "924c757bc06eab7f85650506a09785b1d03b473cc96d36eb5d5d2d1213982a33",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 47,
+            "requestSha256": "5aba6e755539d2f17011cb1a02ae6dc014795b1076b9cff6a90ffb587c81a569",
+            "at": "2026-09-20T20:58:53.913Z",
+            "forwarded": true,
+            "receiptSha256": "924c757bc06eab7f85650506a09785b1d03b473cc96d36eb5d5d2d1213982a33",
+            "receiptBytes": 37934,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 97,
+          "callID": "call_XszPsZY2RErJQfGfbWhDqC7h",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm run build",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1046.039,
+          "durationSeconds": 13.614,
+          "remainingSecondsAfter": 740.347,
+          "outputSha256": "ddabe186a21ba9b5b478acd72598ca863ad91b2a76b4d53858979c0d80a0db98",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 51,
+            "requestSha256": "77c872ddc4acc7273b7409f67f1fe75d204fa063bcddff5d3a4825c5a8c652d5",
+            "at": "2026-09-20T21:00:07.155Z",
+            "forwarded": true,
+            "receiptSha256": "ddabe186a21ba9b5b478acd72598ca863ad91b2a76b4d53858979c0d80a0db98",
+            "receiptBytes": 2395,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 98,
+          "callID": "call_DT9KsNOSYwGQay7ejDIi9SI1",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^css omit-scoping-attribute-class-(static|dynamic)$'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1065.954,
+          "durationSeconds": 6.769,
+          "remainingSecondsAfter": 727.277,
+          "outputSha256": "50573599358542527dbdf66a6be6f30e46a891a391c7e615ea42062764e1c8c5",
+          "reportTotals": [
+            "2 passing (318ms)"
+          ],
+          "firstModelReceipt": {
+            "request": 52,
+            "requestSha256": "ca5e42b0c850bb6ea1f0c9d0246393460ea1e0b27ed3bce9f6b3df25a11112ef",
+            "at": "2026-09-20T21:00:20.249Z",
+            "forwarded": true,
+            "receiptSha256": "50573599358542527dbdf66a6be6f30e46a891a391c7e615ea42062764e1c8c5",
+            "receiptBytes": 173,
+            "reportTotals": [
+              "2 passing (318ms)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 99,
+          "callID": "call_2D7OO0Zr669WrL93g2TO48Xp",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^css '",
+          "cwd": ".",
+          "exit": 1,
+          "state": "completed",
+          "startSeconds": 1082.626,
+          "durationSeconds": 7.494,
+          "remainingSecondsAfter": 709.88,
+          "outputSha256": "e0d54e7cf1f89b1888ce7ad1d742f2d6e445dd90e8d32acef0e794dfe1eae57a",
+          "reportTotals": [
+            "48 passing (1s)",
+            "1 failing"
+          ],
+          "firstModelReceipt": {
+            "request": 53,
+            "requestSha256": "275dffa2d22d1551fe4b4f6615dcef9869458f6b40116bcad06021b102a1e5e7",
+            "at": "2026-09-20T21:00:37.625Z",
+            "forwarded": true,
+            "receiptSha256": "e0d54e7cf1f89b1888ce7ad1d742f2d6e445dd90e8d32acef0e794dfe1eae57a",
+            "receiptBytes": 4566,
+            "reportTotals": [
+              "48 passing (1s)",
+              "1 failing"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 102,
+          "callID": "call_M0Nyva25F4howHxhYLmxGvTu",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm run build",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1125.247,
+          "durationSeconds": 13.679,
+          "remainingSecondsAfter": 661.074,
+          "outputSha256": "b375499e9197cae14404e65d55aa508689412fdeef4d916d9b9e7dbb23c85c3d",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 56,
+            "requestSha256": "1f7ee09409619370cc6e3cd0db846b8d90bfed82d8f853aeaac410dd574e9837",
+            "at": "2026-09-20T21:01:26.433Z",
+            "forwarded": true,
+            "receiptSha256": "b375499e9197cae14404e65d55aa508689412fdeef4d916d9b9e7dbb23c85c3d",
+            "receiptBytes": 2395,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 103,
+          "callID": "call_22td8TnlyCGtSVeig0isplEe",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^css omit-scoping-attribute-class-(static|dynamic)$'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1144.323,
+          "durationSeconds": 6.738,
+          "remainingSecondsAfter": 648.939,
+          "outputSha256": "4c927d469cc199b7a425b2adab91944c73ab75e2df15ff4c56ffcbe000ff9df0",
+          "reportTotals": [
+            "2 passing (317ms)"
+          ],
+          "firstModelReceipt": {
+            "request": 57,
+            "requestSha256": "3dfdf05045dae612d68f12f482ead4928b5c9f1ec005182f5e7e390253b9a20a",
+            "at": "2026-09-20T21:01:38.568Z",
+            "forwarded": true,
+            "receiptSha256": "4c927d469cc199b7a425b2adab91944c73ab75e2df15ff4c56ffcbe000ff9df0",
+            "receiptBytes": 173,
+            "reportTotals": [
+              "2 passing (317ms)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 104,
+          "callID": "call_5Rfv4y8VFNihiwEEDwH6P2f8",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^css '",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1157.366,
+          "durationSeconds": 7.537,
+          "remainingSecondsAfter": 635.097,
+          "outputSha256": "e5e52e8b6739eddd9acf73b0864f3c4f17f7fd8ebc0d946a2242f0e89d666b6e",
+          "reportTotals": [
+            "49 passing (1s)"
+          ],
+          "firstModelReceipt": {
+            "request": 58,
+            "requestSha256": "b94379173274d75c9b1fc4fccce8a8126ff363655d5042b538ac8d24de8748f7",
+            "at": "2026-09-20T21:01:52.406Z",
+            "forwarded": true,
+            "receiptSha256": "e5e52e8b6739eddd9acf73b0864f3c4f17f7fd8ebc0d946a2242f0e89d666b6e",
+            "receiptBytes": 2047,
+            "reportTotals": [
+              "49 passing (1s)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 105,
+          "callID": "call_RfH5nk5n3A9ofuyDCyZljG7M",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^js '",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1175.122,
+          "durationSeconds": 8.48,
+          "remainingSecondsAfter": 616.398,
+          "outputSha256": "4457c514275e6dad3501a2fff49022d657657c2d4554c183ec7669ee54dc9558",
+          "reportTotals": [
+            "33 passing (2s)"
+          ],
+          "firstModelReceipt": {
+            "request": 59,
+            "requestSha256": "6af7064ba8ce7dd314e61c56575b3c4088900793cdb56456c2589ff2b5a64b73",
+            "at": "2026-09-20T21:02:11.119Z",
+            "forwarded": true,
+            "receiptSha256": "4457c514275e6dad3501a2fff49022d657657c2d4554c183ec7669ee54dc9558",
+            "receiptBytes": 1669,
+            "reportTotals": [
+              "33 passing (2s)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 106,
+          "callID": "call_GhTgmxBq4BnzUvDB9PdesTlk",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^(styles|styles-nested)$'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1191.087,
+          "durationSeconds": 6.47,
+          "remainingSecondsAfter": 602.443,
+          "outputSha256": "9c6407abb15ef3a8182410efa8f457877f1d7c47bd1b9fb91a285184ff6c6495",
+          "reportTotals": [
+            "0 passing (2ms)"
+          ],
+          "firstModelReceipt": {
+            "request": 60,
+            "requestSha256": "2bbd22cd16d27085e27d0323e430c05a082a76722f68ca46222072c2e145eedd",
+            "at": "2026-09-20T21:02:25.074Z",
+            "forwarded": true,
+            "receiptSha256": "9c6407abb15ef3a8182410efa8f457877f1d7c47bd1b9fb91a285184ff6c6495",
+            "receiptBytes": 59,
+            "reportTotals": [
+              "0 passing (2ms)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 107,
+          "callID": "call_50hvutl2kpUWc8wqqnOxrGx3",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^ssr (styles|styles-nested)$'",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1205.367,
+          "durationSeconds": 6.61,
+          "remainingSecondsAfter": 588.023,
+          "outputSha256": "4ae7bc5b041ce8be766bb5c58e1042ea9fadfc3a49148392970c775c49d1f5cb",
+          "reportTotals": [
+            "2 passing (114ms)"
+          ],
+          "firstModelReceipt": {
+            "request": 61,
+            "requestSha256": "d95a768f6d13acbc4f7772a827cfe3f8285163a5aeee8103833888436de6b5ce",
+            "at": "2026-09-20T21:02:39.492Z",
+            "forwarded": true,
+            "receiptSha256": "4ae7bc5b041ce8be766bb5c58e1042ea9fadfc3a49148392970c775c49d1f5cb",
+            "receiptBytes": 155,
+            "reportTotals": [
+              "2 passing (114ms)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 110,
+          "callID": "call_oa2sVk7RyxhLMoHOcazNSWgh",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && ./node_modules/.bin/mocha --opts mocha.opts --grep '^sourcemaps '",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1262.735,
+          "durationSeconds": 6.676,
+          "remainingSecondsAfter": 530.589,
+          "outputSha256": "c8892cf0d4d1b9a1d2842ded1d3f3d46efa36d5a64fb283d20d08272a5a1d319",
+          "reportTotals": [
+            "8 passing (251ms)"
+          ],
+          "firstModelReceipt": {
+            "request": 64,
+            "requestSha256": "a7f066db5edf695e7eed6ff414a7cf06d083280489317d7ba841211825235384",
+            "at": "2026-09-20T21:03:37.043Z",
+            "forwarded": true,
+            "receiptSha256": "c8892cf0d4d1b9a1d2842ded1d3f3d46efa36d5a64fb283d20d08272a5a1d319",
+            "receiptBytes": 236,
+            "reportTotals": [
+              "8 passing (251ms)"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 111,
+          "callID": "call_CRRF1csOgOvdkmC2ZABxqESQ",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm run lint",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1278.101,
+          "durationSeconds": 6.74,
+          "remainingSecondsAfter": 515.159,
+          "outputSha256": "ccfe0d04456fd625d8977ef121772ea8c7257f6a4d646829e14e98e0e2cdb108",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 65,
+            "requestSha256": "c4876d8d9508e418f3d6196effec5181c949a6e692c4714fe584e38b1758ff37",
+            "at": "2026-09-20T21:03:52.360Z",
+            "forwarded": true,
+            "receiptSha256": "ccfe0d04456fd625d8977ef121772ea8c7257f6a4d646829e14e98e0e2cdb108",
+            "receiptBytes": 497,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 112,
+          "callID": "call_3ySBqiAOo59OPjqgJZi9uNDC",
+          "command": "git diff --check && git status --short",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1300.162,
+          "durationSeconds": 3.475,
+          "remainingSecondsAfter": 496.363,
+          "outputSha256": "71fdb643b27169fbe7e7512c504058064798dac8ae77ddf6479cf1d1db9b5470",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 66,
+            "requestSha256": "7ec4bce4d78db528cab380f3b0f3e6d9c170634921d9151a1494fab6061fc41b",
+            "at": "2026-09-20T21:04:27.767Z",
+            "forwarded": true,
+            "receiptSha256": "71fdb643b27169fbe7e7512c504058064798dac8ae77ddf6479cf1d1db9b5470",
+            "receiptBytes": 5895,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 113,
+          "callID": "call_4XBggCUUMdznuP0HKvtG2WD2",
+          "command": "git diff -- src/generators/nodes/Attribute.ts src/generators/nodes/Element.ts src/generators/server-side-rendering/visitors/Element.ts",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1305.246,
+          "durationSeconds": 3.452,
+          "remainingSecondsAfter": 491.302,
+          "outputSha256": "e4eda9b987c675c4b8974c853e11d30ebba25b5827905d3b38ad274a87ff05d2",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 66,
+            "requestSha256": "7ec4bce4d78db528cab380f3b0f3e6d9c170634921d9151a1494fab6061fc41b",
+            "at": "2026-09-20T21:04:27.767Z",
+            "forwarded": true,
+            "receiptSha256": "e4eda9b987c675c4b8974c853e11d30ebba25b5827905d3b38ad274a87ff05d2",
+            "receiptBytes": 6961,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 114,
+          "callID": "call_zRyyI1N0Tzy2Ll7Aw1oLbq01",
+          "command": "git diff -- test/js/samples/collapses-text-around-comments/expected.js test/js/samples/css-media-query/expected.js test/server-side-rendering/samples/styles/_expected.html test/server-side-rendering/samples/styles-nested/_expected.html",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1310.304,
+          "durationSeconds": 3.462,
+          "remainingSecondsAfter": 486.234,
+          "outputSha256": "8efdc30aa779aacdc6f2e0bd44d4d54f8e61237165e44a6d9677e972e44861ff",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 66,
+            "requestSha256": "7ec4bce4d78db528cab380f3b0f3e6d9c170634921d9151a1494fab6061fc41b",
+            "at": "2026-09-20T21:04:27.767Z",
+            "forwarded": true,
+            "receiptSha256": "8efdc30aa779aacdc6f2e0bd44d4d54f8e61237165e44a6d9677e972e44861ff",
+            "receiptBytes": 2662,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 117,
+          "callID": "call_O6aHYVYv94WdPdW7inwDDnAq",
+          "command": ". /usr/local/nvm/nvm.sh && nvm use 16.20.2 && npm test",
+          "cwd": ".",
+          "exit": 11,
+          "state": "completed",
+          "startSeconds": 1328.705,
+          "durationSeconds": 111.004,
+          "remainingSecondsAfter": 360.291,
+          "outputSha256": "dcf9f966c2aac28b9572cdfa5a6b0e15398808138d1b45aa79f21c7d6212a2ab",
+          "reportTotals": [
+            "1666 passing (2m)",
+            "53 pending",
+            "11 failing"
+          ],
+          "firstModelReceipt": {
+            "request": 67,
+            "requestSha256": "21948a6bd45c8c6d8720946fd8b8f1fbe2afa64ded1f6af13e361090a46e4ab9",
+            "at": "2026-09-20T21:06:27.370Z",
+            "forwarded": true,
+            "receiptSha256": "dcf9f966c2aac28b9572cdfa5a6b0e15398808138d1b45aa79f21c7d6212a2ab",
+            "receiptBytes": 51310,
+            "reportTotals": [
+              "1666 passing (2m)",
+              "53 pending",
+              "11 failing"
+            ],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": true
+          }
+        },
+        {
+          "event": 118,
+          "callID": "call_UoCh7jQVIRUcgWhzDctbAs7E",
+          "command": "git status --short && git diff --check",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1454.238,
+          "durationSeconds": 3.481,
+          "remainingSecondsAfter": 342.281,
+          "outputSha256": "71fdb643b27169fbe7e7512c504058064798dac8ae77ddf6479cf1d1db9b5470",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 68,
+            "requestSha256": "30c86d6212ffe8d8b66296bb8138dff4b623a061a598736b0afa34661fb428db",
+            "at": "2026-09-20T21:06:58.544Z",
+            "forwarded": true,
+            "receiptSha256": "71fdb643b27169fbe7e7512c504058064798dac8ae77ddf6479cf1d1db9b5470",
+            "receiptBytes": 5895,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 119,
+          "callID": "call_cHcZRw4aWN0BuWrhT2DvqVCO",
+          "command": "git diff --stat",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1459.313,
+          "durationSeconds": 3.448,
+          "remainingSecondsAfter": 337.239,
+          "outputSha256": "e50278c89249e3771c2a0ec0bb6531fda3251aed59d860f6abd0a3715bec1d57",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 68,
+            "requestSha256": "30c86d6212ffe8d8b66296bb8138dff4b623a061a598736b0afa34661fb428db",
+            "at": "2026-09-20T21:06:58.544Z",
+            "forwarded": true,
+            "receiptSha256": "e50278c89249e3771c2a0ec0bb6531fda3251aed59d860f6abd0a3715bec1d57",
+            "receiptBytes": 5593,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        },
+        {
+          "event": 120,
+          "callID": "call_zbkS99TQCCp8khr6MbFENXs3",
+          "command": "git diff -- test/sourcemaps/samples/css/output.css.map test/sourcemaps/samples/css-cascade-false/output.css.map",
+          "cwd": ".",
+          "exit": 0,
+          "state": "completed",
+          "startSeconds": 1464.372,
+          "durationSeconds": 3.444,
+          "remainingSecondsAfter": 332.184,
+          "outputSha256": "251e427dbd174080b878ba419c765a1188b0decb89839f02467de62167fcb6c3",
+          "reportTotals": [],
+          "firstModelReceipt": {
+            "request": 68,
+            "requestSha256": "30c86d6212ffe8d8b66296bb8138dff4b623a061a598736b0afa34661fb428db",
+            "at": "2026-09-20T21:06:58.544Z",
+            "forwarded": true,
+            "receiptSha256": "251e427dbd174080b878ba419c765a1188b0decb89839f02467de62167fcb6c3",
+            "receiptBytes": 1080,
+            "reportTotals": [],
+            "runtimeCssPass": false,
+            "eventHandlerDOMPass": false
+          }
+        }
+      ],
+      "edits": [
+        {
+          "event": 42,
+          "tool": "apply_patch",
+          "paths": [
+            "src/css/Stylesheet.ts",
+            "src/generators/dom/index.ts",
+            "src/generators/nodes/Attribute.ts",
+            "src/generators/nodes/Element.ts",
+            "src/generators/server-side-rendering/visitors/Element.ts"
+          ],
+          "atSeconds": 360.34
+        },
+        {
+          "event": 43,
+          "tool": "apply_patch",
+          "paths": [
+            "src/generators/nodes/Attribute.ts"
+          ],
+          "atSeconds": 374.516
+        },
+        {
+          "event": 44,
+          "tool": "apply_patch",
+          "paths": [
+            "src/generators/nodes/Attribute.ts"
+          ],
+          "atSeconds": 382.473
+        },
+        {
+          "event": 48,
+          "tool": "apply_patch",
+          "paths": [
+            "test/css/samples/omit-scoping-attribute-class-static/expected.css",
+            "test/css/samples/omit-scoping-attribute-class-static/expected.html",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/expected.css",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/expected.html"
+          ],
+          "atSeconds": 439.285
+        },
+        {
+          "event": 64,
+          "tool": "apply_patch",
+          "paths": [
+            "test/css/index.js",
+            "test/css/samples/omit-scoping-attribute-class-dynamic/_config.js"
+          ],
+          "atSeconds": 578.285
+        },
+        {
+          "event": 81,
+          "tool": "apply_patch",
+          "paths": [
+            "src/generators/server-side-rendering/visitors/Element.ts"
+          ],
+          "atSeconds": 907.282
+        },
+        {
+          "event": 94,
+          "tool": "apply_patch",
+          "paths": [
+            "src/generators/server-side-rendering/visitors/Element.ts",
+            "test/css/samples/refs-qualified/expected.html"
+          ],
+          "atSeconds": 1004.888
+        },
+        {
+          "event": 101,
+          "tool": "apply_patch",
+          "paths": [
+            "src/generators/server-side-rendering/visitors/Element.ts"
+          ],
+          "atSeconds": 1115.336
+        }
+      ],
+      "advisoryInRequests": [],
+      "rawToolEventsSha256": "9cc71352d64bbdf1c94565aa2a2a2fc6bd44c551affe9d02f1629440885915c4",
+      "limits": "Receipt hashes refer to actual outgoing request context. No hidden reasoning reconstructed. Build freshness requires source/import analysis; ignored author build outputs are not cryptographically retained."
+    }
+  ]
+}

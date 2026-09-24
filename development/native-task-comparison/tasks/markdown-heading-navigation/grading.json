@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Headings inside a fence are excluded while following headings remain.",
+    "Repeated anchors and hierarchy with a skipped heading level."
+  ],
+  "docDelivery": [
+    "Supported ATX/fence grammar and ASCII slug algorithm.",
+    "Nearest lower-level parent and duplicate suffix ordering."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "ASCII text with LF/CRLF; ATX headings # through ###### followed by spaces, optional trailing # decorations. Fences are lines beginning with optional whitespace then three backticks, toggling fenced state; no other Markdown syntax required.",
+  "independence": "Integrate fenced-block-aware heading scanning, repeated anchor slugs and hierarchical table of contents."
+}

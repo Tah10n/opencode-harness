@@ -1,0 +1,1161 @@
+{
+  "rows": [
+    {
+      "slot": 1,
+      "repetition": 1,
+      "arm": "ON",
+      "usefulRepairChain": true,
+      "facts": {
+        "incompatibilityDetected": true,
+        "evidenceReceived": true,
+        "defectRepaired": true,
+        "fullFeatureDelivered": true
+      },
+      "analyses": [
+        {
+          "status": "reproduced-incompatibility",
+          "callID": "call_0RZFMAdRnK2xpiusGOdsF2Nn",
+          "snapshot": "a6b718b0beea34445f87d0bd5be0e2cac5124f78f8930f846a6164c955c9eea3",
+          "baselineSnapshot": "7767ff421dedb3a3fcf86eb70271a7b4174d6e331b6e21ad310636a2a84f8931",
+          "surfaceHash": "5608737de2c5f9a72a3fe45bb9c71f6e3fddd5e7a2414682d4c318cb6e91c607",
+          "delivered": true,
+          "receipt": {
+            "file": "request-14.json",
+            "sha256": "3f86ec52b5005b7b32eff9027a56ad70f6d229630c7caf20634502d4b3b1d078"
+          },
+          "cost": {
+            "elapsedMs": 3848,
+            "transferredInputBytes": 12248091,
+            "outputBytes": 12766,
+            "compilations": 11,
+            "inputBytes": 11947048,
+            "files": 54,
+            "preparationMs": 111,
+            "totalMs": 4032,
+            "readBytes": 35841144,
+            "fileReads": 162
+          },
+          "process": {
+            "exit": 0,
+            "signal": null,
+            "terminationVerified": true
+          },
+          "consumers": [
+            {
+              "id": 0,
+              "provenance": "generated from baseline only",
+              "export": "EventEmitter",
+              "typeArguments": "<{ sample: [string] }, string>",
+              "method": "listeners",
+              "route": "EventEmitter<{ sample: [string] }, string>.listeners() -> returned[0]",
+              "arguments": "\"sample\"",
+              "callbackArguments": "\"sample\"",
+              "baselineThis": null,
+              "text": "import { EventEmitter as API3 } from \"./index\";\ndeclare const subject3: API3<{ sample: [string] }, string>;\nconst returned = subject3[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n",
+              "sha256": "76b7eb65fee44190e3a1b8e9c7c9893b046ed0ab058c5fe5e5a985153281f45a",
+              "status": "reproduced-incompatibility",
+              "baseline": [],
+              "candidate": [
+                {
+                  "code": 2684,
+                  "category": 1,
+                  "file": "/project/__consumer__.ts",
+                  "start": 188,
+                  "message": "The 'this' context of type 'void' is not assignable to method's 'this' of type 'string'."
+                }
+              ]
+            },
+            {
+              "id": 1,
+              "provenance": "generated from baseline only",
+              "export": "EventEmitter",
+              "typeArguments": "<{ sample: [string] }, { sample: [string] }>",
+              "method": "listeners",
+              "route": "EventEmitter<{ sample: [string] }, { sample: [string] }>.listeners() -> returned[0]",
+              "arguments": "\"sample\"",
+              "callbackArguments": "\"sample\"",
+              "baselineThis": null,
+              "text": "import { EventEmitter as API4 } from \"./index\";\ndeclare const subject4: API4<{ sample: [string] }, { sample: [string] }>;\nconst returned = subject4[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n",
+              "sha256": "df6dbf193f1aea004d5a1195f6ce198c9d6d668304e51e9cf32bac0dc3ed33d9",
+              "status": "reproduced-incompatibility",
+              "baseline": [],
+              "candidate": [
+                {
+                  "code": 2684,
+                  "category": 1,
+                  "file": "/project/__consumer__.ts",
+                  "start": 202,
+                  "message": "The 'this' context of type 'void' is not assignable to method's 'this' of type '{ sample: [string]; }'."
+                }
+              ]
+            },
+            {
+              "id": 2,
+              "provenance": "generated from baseline only",
+              "export": "EventEmitter",
+              "typeArguments": "<{ sample: [string] }, { marker: string }>",
+              "method": "listeners",
+              "route": "EventEmitter<{ sample: [string] }, { marker: string }>.listeners() -> returned[0]",
+              "arguments": "\"sample\"",
+              "callbackArguments": "\"sample\"",
+              "baselineThis": null,
+              "text": "import { EventEmitter as API5 } from \"./index\";\ndeclare const subject5: API5<{ sample: [string] }, { marker: string }>;\nconst returned = subject5[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n",
+              "sha256": "9187068c17d9a1265379ee4187dd6fcabe248641b499e68042bb10e6b94f9d7b",
+              "status": "reproduced-incompatibility",
+              "baseline": [],
+              "candidate": [
+                {
+                  "code": 2684,
+                  "category": 1,
+                  "file": "/project/__consumer__.ts",
+                  "start": 200,
+                  "message": "The 'this' context of type 'void' is not assignable to method's 'this' of type '{ marker: string; }'."
+                }
+              ]
+            }
+          ],
+          "compilations": [
+            {
+              "phase": "baseline/preparation",
+              "elapsedMs": 682.04825,
+              "diagnostics": [],
+              "consumerSha256": "08d07856fd42e3e591aa83b44ccf0da1cd096ad4bb4b0d9c739fdceee2a73861"
+            },
+            {
+              "phase": "candidate/preparation",
+              "elapsedMs": 383.6002920000001,
+              "diagnostics": [],
+              "consumerSha256": "08d07856fd42e3e591aa83b44ccf0da1cd096ad4bb4b0d9c739fdceee2a73861"
+            },
+            {
+              "phase": "generation/exports",
+              "elapsedMs": 343.3742500000001,
+              "diagnostics": [],
+              "consumerSha256": "08d07856fd42e3e591aa83b44ccf0da1cd096ad4bb4b0d9c739fdceee2a73861"
+            },
+            {
+              "phase": "generation/roots",
+              "elapsedMs": 265.926833,
+              "diagnostics": [],
+              "consumerSha256": "b8ddc037b312033f526d8b81204608d7c350327f4d846872f28bd5e37fb59494"
+            },
+            {
+              "phase": "generation/returns",
+              "elapsedMs": 304.783375,
+              "diagnostics": [],
+              "consumerSha256": "a6ca35f9426b921ee4d1eca491c2cd3b4469f1f37ae025d2b5ce2b5ea54a9586"
+            },
+            {
+              "phase": "baseline/0",
+              "elapsedMs": 276.8068750000002,
+              "diagnostics": [],
+              "consumerSha256": "76b7eb65fee44190e3a1b8e9c7c9893b046ed0ab058c5fe5e5a985153281f45a"
+            },
+            {
+              "phase": "candidate/0",
+              "elapsedMs": 256.97366699999975,
+              "diagnostics": [
+                {
+                  "code": 2684,
+                  "category": 1,
+                  "file": "/project/__consumer__.ts",
+                  "start": 188,
+                  "message": "The 'this' context of type 'void' is not assignable to method's 'this' of type 'string'."
+                }
+              ],
+              "consumerSha256": "76b7eb65fee44190e3a1b8e9c7c9893b046ed0ab058c5fe5e5a985153281f45a"
+            },
+            {
+              "phase": "baseline/1",
+              "elapsedMs": 312.24087499999996,
+              "diagnostics": [],
+              "consumerSha256": "df6dbf193f1aea004d5a1195f6ce198c9d6d668304e51e9cf32bac0dc3ed33d9"
+            },
+            {
+              "phase": "candidate/1",
+              "elapsedMs": 254.69429200000013,
+              "diagnostics": [
+                {
+                  "code": 2684,
+                  "category": 1,
+                  "file": "/project/__consumer__.ts",
+                  "start": 202,
+                  "message": "The 'this' context of type 'void' is not assignable to method's 'this' of type '{ sample: [string]; }'."
+                }
+              ],
+              "consumerSha256": "df6dbf193f1aea004d5a1195f6ce198c9d6d668304e51e9cf32bac0dc3ed33d9"
+            },
+            {
+              "phase": "baseline/2",
+              "elapsedMs": 258.0082080000002,
+              "diagnostics": [],
+              "consumerSha256": "9187068c17d9a1265379ee4187dd6fcabe248641b499e68042bb10e6b94f9d7b"
+            },
+            {
+              "phase": "candidate/2",
+              "elapsedMs": 252.12458400000014,
+              "diagnostics": [
+                {
+                  "code": 2684,
+                  "category": 1,
+                  "file": "/project/__consumer__.ts",
+                  "start": 200,
+                  "message": "The 'this' context of type 'void' is not assignable to method's 'this' of type '{ marker: string; }'."
+                }
+              ],
+              "consumerSha256": "9187068c17d9a1265379ee4187dd6fcabe248641b499e68042bb10e6b94f9d7b"
+            }
+          ]
+        },
+        {
+          "status": "no-difference-in-checked-scope",
+          "callID": "call_GJm0LYSZEOcCTOgkGhC04FWB",
+          "snapshot": "3651996e10b58fa2f0326b314b8ec8021956ec9b37f3a5c611f8b946e2c35501",
+          "baselineSnapshot": "7767ff421dedb3a3fcf86eb70271a7b4174d6e331b6e21ad310636a2a84f8931",
+          "surfaceHash": "637c0df40988760d489b74263b94c3cdc990af15439b8f7baad4b9033412fa74",
+          "delivered": true,
+          "receipt": {
+            "file": "request-19.json",
+            "sha256": "0eea029c56981ec46c60241ac3c41ef9115847ae4ca0151776f359521674b40e"
+          },
+          "cost": {
+            "elapsedMs": 3851,
+            "transferredInputBytes": 12248082,
+            "outputBytes": 11696,
+            "compilations": 11,
+            "inputBytes": 11947039,
+            "files": 54,
+            "preparationMs": 97,
+            "totalMs": 4018,
+            "readBytes": 35841117,
+            "fileReads": 162
+          },
+          "process": {
+            "exit": 0,
+            "signal": null,
+            "terminationVerified": true
+          },
+          "consumers": [
+            {
+              "id": 0,
+              "provenance": "generated from baseline only",
+              "export": "EventEmitter",
+              "typeArguments": "<{ sample: [string] }, string>",
+              "method": "listeners",
+              "route": "EventEmitter<{ sample: [string] }, string>.listeners() -> returned[0]",
+              "arguments": "\"sample\"",
+              "callbackArguments": "\"sample\"",
+              "baselineThis": null,
+              "text": "import { EventEmitter as API3 } from \"./index\";\ndeclare const subject3: API3<{ sample: [string] }, string>;\nconst returned = subject3[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n",
+              "sha256": "76b7eb65fee44190e3a1b8e9c7c9893b046ed0ab058c5fe5e5a985153281f45a",
+              "status": "no-difference-in-checked-scope",
+              "baseline": [],
+              "candidate": []
+            },
+            {
+              "id": 1,
+              "provenance": "generated from baseline only",
+              "export": "EventEmitter",
+              "typeArguments": "<{ sample: [string] }, { sample: [string] }>",
+              "method": "listeners",
+              "route": "EventEmitter<{ sample: [string] }, { sample: [string] }>.listeners() -> returned[0]",
+              "arguments": "\"sample\"",
+              "callbackArguments": "\"sample\"",
+              "baselineThis": null,
+              "text": "import { EventEmitter as API4 } from \"./index\";\ndeclare const subject4: API4<{ sample: [string] }, { sample: [string] }>;\nconst returned = subject4[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n",
+              "sha256": "df6dbf193f1aea004d5a1195f6ce198c9d6d668304e51e9cf32bac0dc3ed33d9",
+              "status": "no-difference-in-checked-scope",
+              "baseline": [],
+              "candidate": []
+            },
+            {
+              "id": 2,
+              "provenance": "generated from baseline only",
+              "export": "EventEmitter",
+              "typeArguments": "<{ sample: [string] }, { marker: string }>",
+              "method": "listeners",
+              "route": "EventEmitter<{ sample: [string] }, { marker: string }>.listeners() -> returned[0]",
+              "arguments": "\"sample\"",
+              "callbackArguments": "\"sample\"",
+              "baselineThis": null,
+              "text": "import { EventEmitter as API5 } from \"./index\";\ndeclare const subject5: API5<{ sample: [string] }, { marker: string }>;\nconst returned = subject5[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n",
+              "sha256": "9187068c17d9a1265379ee4187dd6fcabe248641b499e68042bb10e6b94f9d7b",
+              "status": "no-difference-in-checked-scope",
+              "baseline": [],
+              "candidate": []
+            }
+          ],
+          "compilations": [
+            {
+              "phase": "baseline/preparation",
+              "elapsedMs": 693.619834,
+              "diagnostics": [],
+              "consumerSha256": "08d07856fd42e3e591aa83b44ccf0da1cd096ad4bb4b0d9c739fdceee2a73861"
+            },
+            {
+              "phase": "candidate/preparation",
+              "elapsedMs": 371.3660419999999,
+              "diagnostics": [],
+              "consumerSha256": "08d07856fd42e3e591aa83b44ccf0da1cd096ad4bb4b0d9c739fdceee2a73861"
+            },
+            {
+              "phase": "generation/exports",
+              "elapsedMs": 340.5233760000001,
+              "diagnostics": [],
+              "consumerSha256": "08d07856fd42e3e591aa83b44ccf0da1cd096ad4bb4b0d9c739fdceee2a73861"
+            },
+            {
+              "phase": "generation/roots",
+              "elapsedMs": 265.698208,
+              "diagnostics": [],
+              "consumerSha256": "b8ddc037b312033f526d8b81204608d7c350327f4d846872f28bd5e37fb59494"
+            },
+            {
+              "phase": "generation/returns",
+              "elapsedMs": 269.53649999999993,
+              "diagnostics": [],
+              "consumerSha256": "a6ca35f9426b921ee4d1eca491c2cd3b4469f1f37ae025d2b5ce2b5ea54a9586"
+            },
+            {
+              "phase": "baseline/0",
+              "elapsedMs": 283.1125830000001,
+              "diagnostics": [],
+              "consumerSha256": "76b7eb65fee44190e3a1b8e9c7c9893b046ed0ab058c5fe5e5a985153281f45a"
+            },
+            {
+              "phase": "candidate/0",
+              "elapsedMs": 334.8748330000003,
+              "diagnostics": [],
+              "consumerSha256": "76b7eb65fee44190e3a1b8e9c7c9893b046ed0ab058c5fe5e5a985153281f45a"
+            },
+            {
+              "phase": "baseline/1",
+              "elapsedMs": 275.59304199999997,
+              "diagnostics": [],
+              "consumerSha256": "df6dbf193f1aea004d5a1195f6ce198c9d6d668304e51e9cf32bac0dc3ed33d9"
+            },
+            {
+              "phase": "candidate/1",
+              "elapsedMs": 266.35424999999987,
+              "diagnostics": [],
+              "consumerSha256": "df6dbf193f1aea004d5a1195f6ce198c9d6d668304e51e9cf32bac0dc3ed33d9"
+            },
+            {
+              "phase": "baseline/2",
+              "elapsedMs": 258.9315840000004,
+              "diagnostics": [],
+              "consumerSha256": "9187068c17d9a1265379ee4187dd6fcabe248641b499e68042bb10e6b94f9d7b"
+            },
+            {
+              "phase": "candidate/2",
+              "elapsedMs": 248.22270799999978,
+              "diagnostics": [],
+              "consumerSha256": "9187068c17d9a1265379ee4187dd6fcabe248641b499e68042bb10e6b94f9d7b"
+            }
+          ]
+        }
+      ],
+      "declarationsBeforeAnalysis": {
+        "path": "declarations/A-r1-ON-before.d.ts",
+        "sha256": "ee6e05f2f6a2eae3152333c3abb2d3ad5f6ffab3adcb6a816737c9e2a409f57e",
+        "surfaceHash": "5608737de2c5f9a72a3fe45bb9c71f6e3fddd5e7a2414682d4c318cb6e91c607",
+        "snapshot": "a6b718b0beea34445f87d0bd5be0e2cac5124f78f8930f846a6164c955c9eea3",
+        "reconstruction": "Exact inverse of captured sole declaration repair applied to final declaration; captured surfaceHash verified"
+      },
+      "compilerBlock": "Type compatibility observation (separate from project command):\nPublic entry: index.d.ts. Result: reproduced-incompatibility.\nCompiler: TypeScript 6.0.3; explicit profile returned-callable-strict-v1. Baseline 7767ff421dedb3a3fcf86eb70271a7b4174d6e331b6e21ad310636a2a84f8931; candidate a6b718b0beea34445f87d0bd5be0e2cac5124f78f8930f846a6164c955c9eea3.\nConsumer (76b7eb65fee44190e3a1b8e9c7c9893b046ed0ab058c5fe5e5a985153281f45a):\nimport { EventEmitter as API3 } from \"./index\";\ndeclare const subject3: API3<{ sample: [string] }, string>;\nconst returned = subject3[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\nBaseline: pass. Candidate: [{\"code\":2684,\"category\":1,\"file\":\"/project/__consumer__.ts\",\"start\":188,\"message\":\"The 'this' context of type 'void' is not assignable to method's 'this' of type 'string'.\"}]\nConsumer (df6dbf193f1aea004d5a1195f6ce198c9d6d668304e51e9cf32bac0dc3ed33d9):\nimport { EventEmitter as API4 } from \"./index\";\ndeclare const subject4: API4<{ sample: [string] }, { sample: [string] }>;\nconst returned = subject4[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\nBaseline: pass. Candidate: [{\"code\":2684,\"category\":1,\"file\":\"/project/__consumer__.ts\",\"start\":202,\"message\":\"The 'this' context of type 'void' is not assignable to method's 'this' of type '{ sample: [string]; }'.\"}]\nConsumer (9187068c17d9a1265379ee4187dd6fcabe248641b499e68042bb10e6b94f9d7b):\nimport { EventEmitter as API5 } from \"./index\";\ndeclare const subject5: API5<{ sample: [string] }, { marker: string }>;\nconst returned = subject5[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\nBaseline: pass. Candidate: [{\"code\":2684,\"category\":1,\"file\":\"/project/__consumer__.ts\",\"start\":200,\"message\":\"The 'this' context of type 'void' is not assignable to method's 'this' of type '{ marker: string; }'.\"}]\nЭтот старый вызов перестал компилироваться при указанных условиях. Проверь, разрешено ли такое изменение исходным заданием.\n69 unsupported/skipped paths; 3 generated consumers (examples are not independent defects).\nScope: bounded class/generic specimens and returned callables only; not full API compatibility or a runtime test. New API types, runtime and task requirements need their own checks. No repair or workflow success is mandated. Full evidence in type-compat.json.\n",
+      "firstRelevantEdit": {
+        "callID": "call_jgs81am8tMt0ro5JcbWuS4ku",
+        "before": "a6b718b0beea34445f87d0bd5be0e2cac5124f78f8930f846a6164c955c9eea3",
+        "after": "3651996e10b58fa2f0326b314b8ec8021956ec9b37f3a5c611f8b946e2c35501",
+        "startedAt": 1789588652022,
+        "completedAt": 1789588652065,
+        "patch": "*** Begin Patch\n*** Update File: index.d.ts\n@@\n   listeners<T extends EventEmitter.EventNames<EventTypes>>(\n     event: T\n-  ): Array<EventEmitter.EventListener<EventTypes, T, Context>>;\n+  ): Array<EventEmitter.EventListener<EventTypes, T>>;\n*** End Patch",
+        "response": "response-14.sse",
+        "responseSha256": "a1a228e810e72c6fd7ccf69faf9f8e4b467b34099901187645eaac71749e3949",
+        "authorExplanation": [
+          "The CommonJS runtime suite passed all 49 tests, including the new cases. Its diagnostic compatibility probe found one declaration regression: adding a required contextual `this` to `listeners()` return values makes previously valid extracted listeners fail when called without a receiver. I’m narrowing that type change so callback parameters for registration methods can expose context, while `listeners()` preserves its existing callable contract."
+        ]
+      },
+      "subsequentAuthorChecks": [
+        {
+          "callID": "call_1BxvGqsAsqDzBV7NI7OxsnK6",
+          "command": "/usr/local/bin/node /template/node_modules/typescript/lib/tsc.js --ignoreConfig --noEmit --strict --target es2020 --module commonjs --moduleResolution node --ignoreDeprecations 6.0 test/types/subscribe.ts",
+          "exit": 0,
+          "time": {
+            "start": 1789588657357,
+            "end": 1789588658026
+          }
+        },
+        {
+          "callID": "call_4fwAXlzUTW7bPi3YCPpPz4bG",
+          "command": "npm run test-esm",
+          "exit": 0,
+          "time": {
+            "start": 1789588662410,
+            "end": 1789588662570
+          }
+        },
+        {
+          "callID": "call_gcjq7F2W2GfkqAO89x2ZKT70",
+          "command": "npm run rollup",
+          "exit": 0,
+          "time": {
+            "start": 1789588666168,
+            "end": 1789588666591
+          }
+        },
+        {
+          "callID": "call_GJm0LYSZEOcCTOgkGhC04FWB",
+          "command": "npm test",
+          "exit": 0,
+          "time": {
+            "start": 1789588671125,
+            "end": 1789588675412
+          }
+        },
+        {
+          "callID": "call_NVG7RXDPk10FIBNTGvcXQKWn",
+          "command": "npm test -- --grep 'EventEmitter#subscribe'",
+          "exit": 0,
+          "time": {
+            "start": 1789588719177,
+            "end": 1789588719412
+          }
+        },
+        {
+          "callID": "call_vkBFf7107Kvuo2K7xqZ37tOk",
+          "command": "npm run test-esm",
+          "exit": 0,
+          "time": {
+            "start": 1789588724033,
+            "end": 1789588724182
+          }
+        },
+        {
+          "callID": "call_pLzp251cKwyTnxc1omn0i1yW",
+          "command": "npm run rollup",
+          "exit": 0,
+          "time": {
+            "start": 1789588727317,
+            "end": 1789588727738
+          }
+        },
+        {
+          "callID": "call_wV0hAoPYhMShABizRwMlJfsL",
+          "command": "/usr/local/bin/node /template/node_modules/typescript/lib/tsc.js --ignoreConfig --noEmit --strict --target es2020 --module commonjs --moduleResolution node --ignoreDeprecations 6.0 test/types/subscribe.ts",
+          "exit": 0,
+          "time": {
+            "start": 1789588734326,
+            "end": 1789588734964
+          }
+        },
+        {
+          "callID": "call_izoDxClWX7TMUVqDgjDw9Jmx",
+          "command": "npm test",
+          "exit": 0,
+          "time": {
+            "start": 1789588737164,
+            "end": 1789588737414
+          }
+        },
+        {
+          "callID": "call_uF6rp7hxMo83Gv2l6VBLlcaH",
+          "command": "git diff --check",
+          "exit": 0,
+          "time": {
+            "start": 1789588757607,
+            "end": 1789588757690
+          }
+        },
+        {
+          "callID": "call_9bhlkpeEDsWoACauQgrnYnAK",
+          "command": "git status --short",
+          "exit": 0,
+          "time": {
+            "start": 1789588757610,
+            "end": 1789588757765
+          }
+        },
+        {
+          "callID": "call_UWZf5ykz07Pcrd3W1ApcfFy0",
+          "command": "git diff --stat",
+          "exit": 0,
+          "time": {
+            "start": 1789588757613,
+            "end": 1789588757838
+          }
+        },
+        {
+          "callID": "call_pHRHFzj5dHbWU8oF2E5v3IyE",
+          "command": "git diff -- index.js index.d.ts README.md test/test.js test/test.mjs test/types/subscribe.ts",
+          "exit": 0,
+          "time": {
+            "start": 1789588757615,
+            "end": 1789588757881
+          }
+        }
+      ],
+      "finalDeclaration": {
+        "path": "declarations/A-r1-ON-final.d.ts",
+        "sha256": "49d6b45ae1d338b137c316b8b6eaee797e2dcc962f06d8b07ca555964ea29911",
+        "surfaceHash": "637c0df40988760d489b74263b94c3cdc990af15439b8f7baad4b9033412fa74"
+      },
+      "terminalSnapshot": "59c862e964851d7e275237fb2971fd715a50f328c41a148601429815e4b8861f",
+      "current": false,
+      "finalLimitation": "Observation belongs to an older snapshot; no late or third run",
+      "thirdAuthorAnalysis": false,
+      "externalFinalAcceptance": {
+        "id": "n04",
+        "task": "A",
+        "applicable": true,
+        "changed": "M\tREADME.md\nM\tindex.d.ts\nM\tindex.js\nM\ttest/test.js\nM\ttest/test.mjs\nA\ttest/types/subscribe.ts\n",
+        "checksPassed": true,
+        "commands": [
+          {
+            "name": "apply",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "changed",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-0",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-1",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-2",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "evaluation-types",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      "attribution": "One listeners returned-callable defect with three consumers. Contextual subscribe typing existed before the warning; it is retained, not credited as created by TYPE_COMPAT. Later non-declaration edits make the stored snapshot stale; final acceptance is independent. No claim that this ON would necessarily fail without the observation."
+    },
+    {
+      "slot": 4,
+      "repetition": 2,
+      "arm": "ON",
+      "usefulRepairChain": true,
+      "facts": {
+        "incompatibilityDetected": true,
+        "evidenceReceived": true,
+        "defectRepaired": true,
+        "fullFeatureDelivered": true
+      },
+      "analyses": [
+        {
+          "status": "reproduced-incompatibility",
+          "callID": "call_N6H64gLxbbIvHQGdUpvKuxzK",
+          "snapshot": "71981456564e6e869575ed0043b629a51b482c677f4ea00cfe21a8bd3bb87abe",
+          "baselineSnapshot": "a78dd934e8b8c69d8f0c7658913e6c25c02420026365a9754e24ebf2238254e0",
+          "surfaceHash": "3391ed674c9102f55222ddddaf83c47df691509a4d1cf4f43ee3224cc6ce6d28",
+          "delivered": true,
+          "receipt": {
+            "file": "request-17.json",
+            "sha256": "bb1e0ded3117c0707bc3804599dcf194dad6087856939aeeb03645fa596823bc"
+          },
+          "cost": {
+            "elapsedMs": 3825,
+            "transferredInputBytes": 12248139,
+            "outputBytes": 12767,
+            "compilations": 11,
+            "inputBytes": 11947096,
+            "files": 54,
+            "preparationMs": 101,
+            "totalMs": 4000,
+            "readBytes": 35841288,
+            "fileReads": 162
+          },
+          "process": {
+            "exit": 0,
+            "signal": null,
+            "terminationVerified": true
+          },
+          "consumers": [
+            {
+              "id": 0,
+              "provenance": "generated from baseline only",
+              "export": "EventEmitter",
+              "typeArguments": "<{ sample: [string] }, string>",
+              "method": "listeners",
+              "route": "EventEmitter<{ sample: [string] }, string>.listeners() -> returned[0]",
+              "arguments": "\"sample\"",
+              "callbackArguments": "\"sample\"",
+              "baselineThis": null,
+              "text": "import { EventEmitter as API3 } from \"./index\";\ndeclare const subject3: API3<{ sample: [string] }, string>;\nconst returned = subject3[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n",
+              "sha256": "76b7eb65fee44190e3a1b8e9c7c9893b046ed0ab058c5fe5e5a985153281f45a",
+              "status": "reproduced-incompatibility",
+              "baseline": [],
+              "candidate": [
+                {
+                  "code": 2684,
+                  "category": 1,
+                  "file": "/project/__consumer__.ts",
+                  "start": 188,
+                  "message": "The 'this' context of type 'void' is not assignable to method's 'this' of type 'string'."
+                }
+              ]
+            },
+            {
+              "id": 1,
+              "provenance": "generated from baseline only",
+              "export": "EventEmitter",
+              "typeArguments": "<{ sample: [string] }, { sample: [string] }>",
+              "method": "listeners",
+              "route": "EventEmitter<{ sample: [string] }, { sample: [string] }>.listeners() -> returned[0]",
+              "arguments": "\"sample\"",
+              "callbackArguments": "\"sample\"",
+              "baselineThis": null,
+              "text": "import { EventEmitter as API4 } from \"./index\";\ndeclare const subject4: API4<{ sample: [string] }, { sample: [string] }>;\nconst returned = subject4[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n",
+              "sha256": "df6dbf193f1aea004d5a1195f6ce198c9d6d668304e51e9cf32bac0dc3ed33d9",
+              "status": "reproduced-incompatibility",
+              "baseline": [],
+              "candidate": [
+                {
+                  "code": 2684,
+                  "category": 1,
+                  "file": "/project/__consumer__.ts",
+                  "start": 202,
+                  "message": "The 'this' context of type 'void' is not assignable to method's 'this' of type '{ sample: [string]; }'."
+                }
+              ]
+            },
+            {
+              "id": 2,
+              "provenance": "generated from baseline only",
+              "export": "EventEmitter",
+              "typeArguments": "<{ sample: [string] }, { marker: string }>",
+              "method": "listeners",
+              "route": "EventEmitter<{ sample: [string] }, { marker: string }>.listeners() -> returned[0]",
+              "arguments": "\"sample\"",
+              "callbackArguments": "\"sample\"",
+              "baselineThis": null,
+              "text": "import { EventEmitter as API5 } from \"./index\";\ndeclare const subject5: API5<{ sample: [string] }, { marker: string }>;\nconst returned = subject5[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n",
+              "sha256": "9187068c17d9a1265379ee4187dd6fcabe248641b499e68042bb10e6b94f9d7b",
+              "status": "reproduced-incompatibility",
+              "baseline": [],
+              "candidate": [
+                {
+                  "code": 2684,
+                  "category": 1,
+                  "file": "/project/__consumer__.ts",
+                  "start": 200,
+                  "message": "The 'this' context of type 'void' is not assignable to method's 'this' of type '{ marker: string; }'."
+                }
+              ]
+            }
+          ],
+          "compilations": [
+            {
+              "phase": "baseline/preparation",
+              "elapsedMs": 673.671875,
+              "diagnostics": [],
+              "consumerSha256": "08d07856fd42e3e591aa83b44ccf0da1cd096ad4bb4b0d9c739fdceee2a73861"
+            },
+            {
+              "phase": "candidate/preparation",
+              "elapsedMs": 375.11129199999993,
+              "diagnostics": [],
+              "consumerSha256": "08d07856fd42e3e591aa83b44ccf0da1cd096ad4bb4b0d9c739fdceee2a73861"
+            },
+            {
+              "phase": "generation/exports",
+              "elapsedMs": 332.7345,
+              "diagnostics": [],
+              "consumerSha256": "08d07856fd42e3e591aa83b44ccf0da1cd096ad4bb4b0d9c739fdceee2a73861"
+            },
+            {
+              "phase": "generation/roots",
+              "elapsedMs": 266.37637500000005,
+              "diagnostics": [],
+              "consumerSha256": "b8ddc037b312033f526d8b81204608d7c350327f4d846872f28bd5e37fb59494"
+            },
+            {
+              "phase": "generation/returns",
+              "elapsedMs": 282.3449999999998,
+              "diagnostics": [],
+              "consumerSha256": "a6ca35f9426b921ee4d1eca491c2cd3b4469f1f37ae025d2b5ce2b5ea54a9586"
+            },
+            {
+              "phase": "baseline/0",
+              "elapsedMs": 272.82283400000006,
+              "diagnostics": [],
+              "consumerSha256": "76b7eb65fee44190e3a1b8e9c7c9893b046ed0ab058c5fe5e5a985153281f45a"
+            },
+            {
+              "phase": "candidate/0",
+              "elapsedMs": 258.298041,
+              "diagnostics": [
+                {
+                  "code": 2684,
+                  "category": 1,
+                  "file": "/project/__consumer__.ts",
+                  "start": 188,
+                  "message": "The 'this' context of type 'void' is not assignable to method's 'this' of type 'string'."
+                }
+              ],
+              "consumerSha256": "76b7eb65fee44190e3a1b8e9c7c9893b046ed0ab058c5fe5e5a985153281f45a"
+            },
+            {
+              "phase": "baseline/1",
+              "elapsedMs": 350.7197510000001,
+              "diagnostics": [],
+              "consumerSha256": "df6dbf193f1aea004d5a1195f6ce198c9d6d668304e51e9cf32bac0dc3ed33d9"
+            },
+            {
+              "phase": "candidate/1",
+              "elapsedMs": 256.77591699999994,
+              "diagnostics": [
+                {
+                  "code": 2684,
+                  "category": 1,
+                  "file": "/project/__consumer__.ts",
+                  "start": 202,
+                  "message": "The 'this' context of type 'void' is not assignable to method's 'this' of type '{ sample: [string]; }'."
+                }
+              ],
+              "consumerSha256": "df6dbf193f1aea004d5a1195f6ce198c9d6d668304e51e9cf32bac0dc3ed33d9"
+            },
+            {
+              "phase": "baseline/2",
+              "elapsedMs": 251.97487500000034,
+              "diagnostics": [],
+              "consumerSha256": "9187068c17d9a1265379ee4187dd6fcabe248641b499e68042bb10e6b94f9d7b"
+            },
+            {
+              "phase": "candidate/2",
+              "elapsedMs": 253.19883299999992,
+              "diagnostics": [
+                {
+                  "code": 2684,
+                  "category": 1,
+                  "file": "/project/__consumer__.ts",
+                  "start": 200,
+                  "message": "The 'this' context of type 'void' is not assignable to method's 'this' of type '{ marker: string; }'."
+                }
+              ],
+              "consumerSha256": "9187068c17d9a1265379ee4187dd6fcabe248641b499e68042bb10e6b94f9d7b"
+            }
+          ]
+        },
+        {
+          "status": "no-difference-in-checked-scope",
+          "callID": "call_aNb21ztTpgS9b6i2KGB1ImYG",
+          "snapshot": "ff135b5ae97b4271982cf9fb5b947136a12fdf2c0b7c6956648994bd91c81b06",
+          "baselineSnapshot": "a78dd934e8b8c69d8f0c7658913e6c25c02420026365a9754e24ebf2238254e0",
+          "surfaceHash": "09cfbeadadc65f55c0afe74d7b3c82029d53378bf35dbd46629859b27c271adc",
+          "delivered": true,
+          "receipt": {
+            "file": "request-19.json",
+            "sha256": "975719206a828540b2e871f67c0dab7f6ef397c8fb3bd47510f22ebd93dc394c"
+          },
+          "cost": {
+            "elapsedMs": 3762,
+            "transferredInputBytes": 12248336,
+            "outputBytes": 11681,
+            "compilations": 11,
+            "inputBytes": 11947284,
+            "files": 54,
+            "preparationMs": 103,
+            "totalMs": 3937,
+            "readBytes": 35841852,
+            "fileReads": 162
+          },
+          "process": {
+            "exit": 0,
+            "signal": null,
+            "terminationVerified": true
+          },
+          "consumers": [
+            {
+              "id": 0,
+              "provenance": "generated from baseline only",
+              "export": "EventEmitter",
+              "typeArguments": "<{ sample: [string] }, string>",
+              "method": "listeners",
+              "route": "EventEmitter<{ sample: [string] }, string>.listeners() -> returned[0]",
+              "arguments": "\"sample\"",
+              "callbackArguments": "\"sample\"",
+              "baselineThis": null,
+              "text": "import { EventEmitter as API3 } from \"./index\";\ndeclare const subject3: API3<{ sample: [string] }, string>;\nconst returned = subject3[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n",
+              "sha256": "76b7eb65fee44190e3a1b8e9c7c9893b046ed0ab058c5fe5e5a985153281f45a",
+              "status": "no-difference-in-checked-scope",
+              "baseline": [],
+              "candidate": []
+            },
+            {
+              "id": 1,
+              "provenance": "generated from baseline only",
+              "export": "EventEmitter",
+              "typeArguments": "<{ sample: [string] }, { sample: [string] }>",
+              "method": "listeners",
+              "route": "EventEmitter<{ sample: [string] }, { sample: [string] }>.listeners() -> returned[0]",
+              "arguments": "\"sample\"",
+              "callbackArguments": "\"sample\"",
+              "baselineThis": null,
+              "text": "import { EventEmitter as API4 } from \"./index\";\ndeclare const subject4: API4<{ sample: [string] }, { sample: [string] }>;\nconst returned = subject4[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n",
+              "sha256": "df6dbf193f1aea004d5a1195f6ce198c9d6d668304e51e9cf32bac0dc3ed33d9",
+              "status": "no-difference-in-checked-scope",
+              "baseline": [],
+              "candidate": []
+            },
+            {
+              "id": 2,
+              "provenance": "generated from baseline only",
+              "export": "EventEmitter",
+              "typeArguments": "<{ sample: [string] }, { marker: string }>",
+              "method": "listeners",
+              "route": "EventEmitter<{ sample: [string] }, { marker: string }>.listeners() -> returned[0]",
+              "arguments": "\"sample\"",
+              "callbackArguments": "\"sample\"",
+              "baselineThis": null,
+              "text": "import { EventEmitter as API5 } from \"./index\";\ndeclare const subject5: API5<{ sample: [string] }, { marker: string }>;\nconst returned = subject5[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\n",
+              "sha256": "9187068c17d9a1265379ee4187dd6fcabe248641b499e68042bb10e6b94f9d7b",
+              "status": "no-difference-in-checked-scope",
+              "baseline": [],
+              "candidate": []
+            }
+          ],
+          "compilations": [
+            {
+              "phase": "baseline/preparation",
+              "elapsedMs": 672.436042,
+              "diagnostics": [],
+              "consumerSha256": "08d07856fd42e3e591aa83b44ccf0da1cd096ad4bb4b0d9c739fdceee2a73861"
+            },
+            {
+              "phase": "candidate/preparation",
+              "elapsedMs": 377.289625,
+              "diagnostics": [],
+              "consumerSha256": "08d07856fd42e3e591aa83b44ccf0da1cd096ad4bb4b0d9c739fdceee2a73861"
+            },
+            {
+              "phase": "generation/exports",
+              "elapsedMs": 340.444667,
+              "diagnostics": [],
+              "consumerSha256": "08d07856fd42e3e591aa83b44ccf0da1cd096ad4bb4b0d9c739fdceee2a73861"
+            },
+            {
+              "phase": "generation/roots",
+              "elapsedMs": 265.74524999999994,
+              "diagnostics": [],
+              "consumerSha256": "b8ddc037b312033f526d8b81204608d7c350327f4d846872f28bd5e37fb59494"
+            },
+            {
+              "phase": "generation/returns",
+              "elapsedMs": 274.4192919999998,
+              "diagnostics": [],
+              "consumerSha256": "a6ca35f9426b921ee4d1eca491c2cd3b4469f1f37ae025d2b5ce2b5ea54a9586"
+            },
+            {
+              "phase": "baseline/0",
+              "elapsedMs": 275.64445799999976,
+              "diagnostics": [],
+              "consumerSha256": "76b7eb65fee44190e3a1b8e9c7c9893b046ed0ab058c5fe5e5a985153281f45a"
+            },
+            {
+              "phase": "candidate/0",
+              "elapsedMs": 253.14695800000027,
+              "diagnostics": [],
+              "consumerSha256": "76b7eb65fee44190e3a1b8e9c7c9893b046ed0ab058c5fe5e5a985153281f45a"
+            },
+            {
+              "phase": "baseline/1",
+              "elapsedMs": 316.0360420000002,
+              "diagnostics": [],
+              "consumerSha256": "df6dbf193f1aea004d5a1195f6ce198c9d6d668304e51e9cf32bac0dc3ed33d9"
+            },
+            {
+              "phase": "candidate/1",
+              "elapsedMs": 249.3015419999997,
+              "diagnostics": [],
+              "consumerSha256": "df6dbf193f1aea004d5a1195f6ce198c9d6d668304e51e9cf32bac0dc3ed33d9"
+            },
+            {
+              "phase": "baseline/2",
+              "elapsedMs": 239.884501,
+              "diagnostics": [],
+              "consumerSha256": "9187068c17d9a1265379ee4187dd6fcabe248641b499e68042bb10e6b94f9d7b"
+            },
+            {
+              "phase": "candidate/2",
+              "elapsedMs": 256.1432080000004,
+              "diagnostics": [],
+              "consumerSha256": "9187068c17d9a1265379ee4187dd6fcabe248641b499e68042bb10e6b94f9d7b"
+            }
+          ]
+        }
+      ],
+      "declarationsBeforeAnalysis": {
+        "path": "declarations/A-r2-ON-before.d.ts",
+        "sha256": "e885655cdd19e5376a260f45f2f6dcd58348023a680faeabf2a6fc8dcaa75e2a",
+        "surfaceHash": "3391ed674c9102f55222ddddaf83c47df691509a4d1cf4f43ee3224cc6ce6d28",
+        "snapshot": "71981456564e6e869575ed0043b629a51b482c677f4ea00cfe21a8bd3bb87abe",
+        "reconstruction": "Exact inverse of captured sole declaration repair applied to final declaration; captured surfaceHash verified"
+      },
+      "compilerBlock": "Type compatibility observation (separate from project command):\nPublic entry: index.d.ts. Result: reproduced-incompatibility.\nCompiler: TypeScript 6.0.3; explicit profile returned-callable-strict-v1. Baseline a78dd934e8b8c69d8f0c7658913e6c25c02420026365a9754e24ebf2238254e0; candidate 71981456564e6e869575ed0043b629a51b482c677f4ea00cfe21a8bd3bb87abe.\nConsumer (76b7eb65fee44190e3a1b8e9c7c9893b046ed0ab058c5fe5e5a985153281f45a):\nimport { EventEmitter as API3 } from \"./index\";\ndeclare const subject3: API3<{ sample: [string] }, string>;\nconst returned = subject3[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\nBaseline: pass. Candidate: [{\"code\":2684,\"category\":1,\"file\":\"/project/__consumer__.ts\",\"start\":188,\"message\":\"The 'this' context of type 'void' is not assignable to method's 'this' of type 'string'.\"}]\nConsumer (df6dbf193f1aea004d5a1195f6ce198c9d6d668304e51e9cf32bac0dc3ed33d9):\nimport { EventEmitter as API4 } from \"./index\";\ndeclare const subject4: API4<{ sample: [string] }, { sample: [string] }>;\nconst returned = subject4[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\nBaseline: pass. Candidate: [{\"code\":2684,\"category\":1,\"file\":\"/project/__consumer__.ts\",\"start\":202,\"message\":\"The 'this' context of type 'void' is not assignable to method's 'this' of type '{ sample: [string]; }'.\"}]\nConsumer (9187068c17d9a1265379ee4187dd6fcabe248641b499e68042bb10e6b94f9d7b):\nimport { EventEmitter as API5 } from \"./index\";\ndeclare const subject5: API5<{ sample: [string] }, { marker: string }>;\nconst returned = subject5[\"listeners\"](\"sample\");\nconst callable = returned[0];\ncallable(\"sample\");\nBaseline: pass. Candidate: [{\"code\":2684,\"category\":1,\"file\":\"/project/__consumer__.ts\",\"start\":200,\"message\":\"The 'this' context of type 'void' is not assignable to method's 'this' of type '{ marker: string; }'.\"}]\nЭтот старый вызов перестал компилироваться при указанных условиях. Проверь, разрешено ли такое изменение исходным заданием.\n69 unsupported/skipped paths; 3 generated consumers (examples are not independent defects).\nScope: bounded class/generic specimens and returned callables only; not full API compatibility or a runtime test. New API types, runtime and task requirements need their own checks. No repair or workflow success is mandated. Full evidence in type-compat.json.\n",
+      "firstRelevantEdit": {
+        "callID": "call_yjZ9pg9Udmtnbc2mJl2n81Ak",
+        "before": "71981456564e6e869575ed0043b629a51b482c677f4ea00cfe21a8bd3bb87abe",
+        "after": "ff135b5ae97b4271982cf9fb5b947136a12fdf2c0b7c6956648994bd91c81b06",
+        "startedAt": 1789589796878,
+        "completedAt": 1789589796921,
+        "patch": "*** Begin Patch\n*** Update File: index.d.ts\n@@\n   listeners<T extends EventEmitter.EventNames<EventTypes>>(\n     event: T\n-  ): Array<EventEmitter.EventListener<EventTypes, T, Context>>;\n+  ): Array<EventEmitter.EventListener<EventTypes, T>>;\n@@\n   on<T extends EventEmitter.EventNames<EventTypes>>(\n     event: T,\n-    fn: EventEmitter.EventListener<EventTypes, T, Context>,\n+    fn: EventEmitter.EventListener<EventTypes, T>,\n     context?: Context\n   ): this;\n   addListener<T extends EventEmitter.EventNames<EventTypes>>(\n     event: T,\n-    fn: EventEmitter.EventListener<EventTypes, T, Context>,\n+    fn: EventEmitter.EventListener<EventTypes, T>,\n     context?: Context\n   ): this;\n@@\n   once<T extends EventEmitter.EventNames<EventTypes>>(\n     event: T,\n-    fn: EventEmitter.EventListener<EventTypes, T, Context>,\n+    fn: EventEmitter.EventListener<EventTypes, T>,\n     context?: Context\n   ): this;\n@@\n   subscribe<T extends EventEmitter.EventNames<EventTypes>>(\n     event: T,\n-    fn: EventEmitter.EventListener<EventTypes, T, Context>,\n+    fn: EventEmitter.EventListenerWithContext<EventTypes, T, Context>,\n     context?: Context\n   ): EventEmitter.Unsubscribe;\n@@\n   removeListener<T extends EventEmitter.EventNames<EventTypes>>(\n     event: T,\n-    fn?: EventEmitter.EventListener<EventTypes, T, Context>,\n+    fn?: EventEmitter.EventListener<EventTypes, T>,\n@@\n   off<T extends EventEmitter.EventNames<EventTypes>>(\n     event: T,\n-    fn?: EventEmitter.EventListener<EventTypes, T, Context>,\n+    fn?: EventEmitter.EventListener<EventTypes, T>,\n@@\n-  export interface ListenerFn<Args extends any[] = any[], Context = any> {\n-    (this: Context, ...args: Args): void;\n+  export interface ListenerFn<Args extends any[] = any[]> {\n+    (...args: Args): void;\n@@\n   export type EventListener<\n     T extends ValidEventTypes,\n-    K extends EventNames<T>,\n-    Context = any\n+    K extends EventNames<T>\n   > = T extends string | symbol\n-    ? (this: Context, ...args: any[]) => void\n+    ? (...args: any[]) => void\n     : (\n-        this: Context,\n         ...args: ArgumentMap<Exclude<T, string | symbol>>[Extract<K, keyof T>]\n       ) => void;\n+\n+  export type EventListenerWithContext<\n+    T extends ValidEventTypes,\n+    K extends EventNames<T>,\n+    Context\n+  > = T extends string | symbol\n+    ? (this: Context, ...args: any[]) => void\n+    : (\n+        this: Context,\n+        ...args: ArgumentMap<Exclude<T, string | symbol>>[Extract<K, keyof T>]\n+      ) => void;\n*** End Patch",
+        "response": "response-17.sse",
+        "responseSha256": "cb2472e8bd65e2b6c336ac4bbd25d832b3e10e199c88ad5c3924293ab23c4fe0",
+        "authorExplanation": [
+          "The preservation run found one declaration regression: adding an explicit `this` parameter to the existing `EventListener` type makes functions returned by `listeners()` require a typed receiver at direct call sites. That behavior was not part of the task. I’m narrowing the new receiver typing to a new subscribe-specific listener alias and restoring the existing `on`/`once`/`listeners` declaration compatibility, then I’ll rerun the type and preservation checks."
+        ]
+      },
+      "subsequentAuthorChecks": [
+        {
+          "callID": "call_ZYGWAyV79Y7OF5P6NYVSvkwO",
+          "command": "/usr/local/bin/node /template/node_modules/typescript/lib/tsc.js --ignoreConfig --noEmit --strict --target es2020 --module commonjs --moduleResolution node --ignoreDeprecations 6.0 test/types.ts",
+          "exit": 2,
+          "time": {
+            "start": 1789589802347,
+            "end": 1789589803120
+          }
+        },
+        {
+          "callID": "call_aNb21ztTpgS9b6i2KGB1ImYG",
+          "command": "npm test",
+          "exit": 0,
+          "time": {
+            "start": 1789589802352,
+            "end": 1789589807333
+          }
+        },
+        {
+          "callID": "call_uS1AR4ZLois58NjiEOBR27o7",
+          "command": "npm run test-esm",
+          "exit": 0,
+          "time": {
+            "start": 1789589802357,
+            "end": 1789589807511
+          }
+        },
+        {
+          "callID": "call_yK9V1gC5xTaGe9mZNFXAlDF2",
+          "command": "npm run rollup",
+          "exit": 0,
+          "time": {
+            "start": 1789589802360,
+            "end": 1789589807927
+          }
+        },
+        {
+          "callID": "call_Vi0ZjywmrQ1PSPVW7H79C7Ea",
+          "command": "/usr/local/bin/node /template/node_modules/typescript/lib/tsc.js --ignoreConfig --noEmit --strict --target es2020 --module commonjs --moduleResolution node --ignoreDeprecations 6.0 test/types.ts",
+          "exit": 0,
+          "time": {
+            "start": 1789589821707,
+            "end": 1789589822393
+          }
+        },
+        {
+          "callID": "call_N0E5HiSR0DXbRilFipmMcuXe",
+          "command": "node <<'NODE'\n'use strict';\nconst assert = require('assert');\nconst EventEmitter = require('./');\n\nconst emitter = new EventEmitter();\nconst context = {};\nconst calls = [];\nfunction listener() { calls.push(this); }\nemitter.on('event', listener, context);\nemitter.once('event', listener, context);\nconst unsubscribe = emitter.subscribe('event', listener, context);\nassert.deepStrictEqual(emitter.listeners('event'), [listener, listener, listener]);\nunsubscribe();\nunsubscribe();\nassert.strictEqual(emitter.listenerCount('event'), 2);\nemitter.emit('event');\nassert.deepStrictEqual(calls, [context, context]);\n\nconst stale = new EventEmitter();\nfunction stable() {}\nconst cancelStale = stale.subscribe('event', stable);\nstale.off('event', stable);\nstale.on('event', stable);\ncancelStale();\nassert.deepStrictEqual(stale.listeners('event'), [stable]);\nstale.removeAllListeners('event');\nconst cancelRemoved = stale.subscribe('event', stable);\nstale.removeAllListeners('event');\nstale.subscribe('event', stable);\ncancelRemoved();\nassert.deepStrictEqual(stale.listeners('event'), [stable]);\n\nconst forwarded = new EventEmitter();\nlet received;\nforwarded.subscribe('event', function () {\n  received = [this, Array.from(arguments)];\n}, context);\nforwarded.emit('event', 0, 1, 2, 3, 4, 5, 6, 7, 8);\nassert.deepStrictEqual(received, [context, [0, 1, 2, 3, 4, 5, 6, 7, 8]]);\n\nconst symbolEmitter = new EventEmitter();\nconst symbol = Symbol('event');\nconst cancelSymbol = symbolEmitter.subscribe(symbol, function () {});\nassert.deepStrictEqual(symbolEmitter.eventNames(), [symbol]);\ncancelSymbol();\nassert.deepStrictEqual(symbolEmitter.eventNames(), []);\n\nconst invalid = new EventEmitter();\ninvalid.on('event', listener);\nassert.throws(() => invalid.subscribe('event', null));\nassert.deepStrictEqual(invalid.listeners('event'), [listener]);\n\nconst dispatch = new EventEmitter();\nconst dispatchCalls = [];\nlet cancelSecond;\ndispatch.subscribe('event', () => {\n  dispatchCalls.push('first');\n  cancelSecond();\n});\ncancelSecond = dispatch.subscribe('event', () => dispatchCalls.push('second'));\ndispatch.emit('event');\ndispatch.emit('event');\nassert.deepStrictEqual(dispatchCalls, ['first', 'second', 'first']);\n\nconst recursive = new EventEmitter();\nlet recursiveCalls = 0;\nlet cancelRecursive;\ncancelRecursive = recursive.subscribe('event', () => {\n  recursiveCalls++;\n  cancelRecursive();\n  recursive.emit('event');\n});\nrecursive.emit('event');\nassert.strictEqual(recursiveCalls, 1);\nassert.strictEqual(recursive.emit('event'), false);\nNODE",
+          "exit": 0,
+          "time": {
+            "start": 1789589837183,
+            "end": 1789589837257
+          }
+        },
+        {
+          "callID": "call_voIBpPONO6PRZNYT0X1jWoOm",
+          "command": "npm test",
+          "exit": 0,
+          "time": {
+            "start": 1789589841724,
+            "end": 1789589842003
+          }
+        },
+        {
+          "callID": "call_JfvGz7GTQwJb4nX4vaJrQe0U",
+          "command": "npm run test-esm",
+          "exit": 0,
+          "time": {
+            "start": 1789589841729,
+            "end": 1789589842175
+          }
+        },
+        {
+          "callID": "call_sdPQzJUIGSutpoiKgH91G4DO",
+          "command": "npm run rollup",
+          "exit": 0,
+          "time": {
+            "start": 1789589841733,
+            "end": 1789589842585
+          }
+        },
+        {
+          "callID": "call_CQdcWauRRFnOeKfF4Oy5a3rQ",
+          "command": "git status --short",
+          "exit": 0,
+          "time": {
+            "start": 1789589847653,
+            "end": 1789589847704
+          }
+        },
+        {
+          "callID": "call_75DkMKTj3XsChRroDnD98Ypg",
+          "command": "git diff --check && git diff --stat && git diff -- index.js index.d.ts index.mjs README.md test/test.js test/test.mjs test/types.ts",
+          "exit": 0,
+          "time": {
+            "start": 1789589847958,
+            "end": 1789589848009
+          }
+        },
+        {
+          "callID": "call_Um4aDAm6pQWslWiuHYaBVoDD",
+          "command": "/usr/local/bin/node /template/node_modules/typescript/lib/tsc.js --ignoreConfig --noEmit --strict --target es2020 --module commonjs --moduleResolution node --ignoreDeprecations 6.0 test/types.ts",
+          "exit": 0,
+          "time": {
+            "start": 1789589880006,
+            "end": 1789589880710
+          }
+        },
+        {
+          "callID": "call_9m75os0S1awfri3Hc4CJZzfo",
+          "command": "npx mocha test/test.js --grep 'EventEmitter#subscribe'",
+          "exit": 0,
+          "time": {
+            "start": 1789589880011,
+            "end": 1789589880935
+          }
+        },
+        {
+          "callID": "call_W8fhkVkH5dIb3Oq2fB40oG55",
+          "command": "npm test",
+          "exit": 0,
+          "time": {
+            "start": 1789589884944,
+            "end": 1789589885224
+          }
+        },
+        {
+          "callID": "call_FoRxtvordce4pr1l16muIs5W",
+          "command": "npm run test-esm",
+          "exit": 0,
+          "time": {
+            "start": 1789589884950,
+            "end": 1789589885401
+          }
+        },
+        {
+          "callID": "call_kvPrsB9v497KvMESTc1G35ZY",
+          "command": "npm run rollup",
+          "exit": 0,
+          "time": {
+            "start": 1789589884953,
+            "end": 1789589885821
+          }
+        },
+        {
+          "callID": "call_rVR8QA59mZFTQvYYtSGoUsE7",
+          "command": "git diff --check && git status --short",
+          "exit": 0,
+          "time": {
+            "start": 1789589902279,
+            "end": 1789589902361
+          }
+        },
+        {
+          "callID": "call_yKbhdw1RklY8A623WPuXbyAE",
+          "command": "git diff --stat && git diff -- index.js index.d.ts README.md test/test.js test/test.mjs && git diff --no-index /dev/null test/types.ts || true",
+          "exit": 0,
+          "time": {
+            "start": 1789589902283,
+            "end": 1789589902443
+          }
+        }
+      ],
+      "finalDeclaration": {
+        "path": "declarations/A-r2-ON-final.d.ts",
+        "sha256": "2f66eda5624691dbf2049b499150b1ecc7a130cba4ef71161af54fa75e3530cd",
+        "surfaceHash": "09cfbeadadc65f55c0afe74d7b3c82029d53378bf35dbd46629859b27c271adc"
+      },
+      "terminalSnapshot": "68a10f3c0c21078c371ab73beee1f6ce054dbba0f1da148ee406991eba527f52",
+      "current": false,
+      "finalLimitation": "Observation belongs to an older snapshot; no late or third run",
+      "thirdAuthorAnalysis": false,
+      "externalFinalAcceptance": {
+        "id": "n02",
+        "task": "A",
+        "applicable": true,
+        "changed": "M\tREADME.md\nM\tindex.d.ts\nM\tindex.js\nM\ttest/test.js\nM\ttest/test.mjs\nA\ttest/types.ts\n",
+        "checksPassed": true,
+        "commands": [
+          {
+            "name": "apply",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "changed",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-0",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-1",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "project-2",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "new-runtime",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "evaluation-types",
+            "status": 0,
+            "error": null
+          },
+          {
+            "name": "legacy-types",
+            "status": 0,
+            "error": null
+          }
+        ]
+      },
+      "attribution": "One listeners returned-callable defect with three consumers. Contextual subscribe typing existed before the warning; it is retained, not credited as created by TYPE_COMPAT. Later non-declaration edits make the stored snapshot stale; final acceptance is independent. No claim that this ON would necessarily fail without the observation."
+    }
+  ],
+  "deliveryDifferenceOnlyExternalInterruption": false,
+  "mechanism": "Both new ON runs repaired an introduced listeners receiver narrowing after the next-request compiler receipt and retained the complete task."
+}

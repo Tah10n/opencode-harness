@@ -1,0 +1,138 @@
+{
+  "preservedFirstSlotAndPublishedResultsFiles": 18,
+  "preservedFirstSlotUnchanged": true,
+  "deliveries": [
+    {
+      "label": "J3",
+      "slot": 2,
+      "task": "legacy-runtime-reload",
+      "arm": "H",
+      "patchSha256": "89c7c137cb1e27ed175c10af24d89492b891eda2a07463cfa839a72d01f08748",
+      "reappliedBytesAndModesMatch": true,
+      "terminationVerified": true,
+      "actualContainerInputVerified": {
+        "matched": true,
+        "files": 220,
+        "providerRequestsBeforeStart": 0
+      },
+      "originalHCheckoutUnchanged": true,
+      "patchWhitespaceCheck": {
+        "code": 0,
+        "diagnostic": ""
+      },
+      "stopFacts": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      }
+    },
+    {
+      "label": "N8",
+      "slot": 3,
+      "task": "reconnect-revoked",
+      "arm": "H",
+      "patchSha256": "bf54a6bb9c0adba2fdce3eee5bc3e0e3722c83c72c0ff515b7efd5cfebf4ccee",
+      "reappliedBytesAndModesMatch": true,
+      "terminationVerified": true,
+      "actualContainerInputVerified": {
+        "matched": true,
+        "files": 224,
+        "providerRequestsBeforeStart": 0
+      },
+      "originalHCheckoutUnchanged": true,
+      "patchWhitespaceCheck": {
+        "code": 0,
+        "diagnostic": ""
+      },
+      "stopFacts": {
+        "ownTaskDeadlineTriggered": true,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": true
+      }
+    },
+    {
+      "label": "T2",
+      "slot": 4,
+      "task": "reconnect-revoked",
+      "arm": "P",
+      "patchSha256": "fc4b5d8ca9cbbc408b19650272ee98d0c76efe80e3aaf4ef8d0b97f78309bbc9",
+      "reappliedBytesAndModesMatch": true,
+      "terminationVerified": true,
+      "actualContainerInputVerified": {
+        "matched": true,
+        "files": 224,
+        "providerRequestsBeforeStart": 0
+      },
+      "originalHCheckoutUnchanged": null,
+      "patchWhitespaceCheck": {
+        "code": 0,
+        "diagnostic": ""
+      },
+      "stopFacts": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      }
+    }
+  ],
+  "newContainers": [
+    {
+      "container": "template-dev-246c9613-6d91-4186-bb3b-56980ebc6fbd",
+      "absent": true,
+      "record": "runs/legacy-runtime-reload-H/session/container.json"
+    },
+    {
+      "container": "template-dev-9af438ab-d20d-415b-960f-b710abdccf69",
+      "absent": true,
+      "record": "packets/J3/evaluation-final/session/container.json"
+    },
+    {
+      "container": "template-dev-8ea39622-a04f-4391-be33-e279beca65ee",
+      "absent": true,
+      "record": "runs/reconnect-revoked-H/session/container.json"
+    },
+    {
+      "container": "template-dev-67ee84a2-a6d1-4e97-a5bf-2361d537a940",
+      "absent": true,
+      "record": "packets/N8/evaluation-final/session/container.json"
+    },
+    {
+      "container": "template-dev-a1e7fff7-6c6e-40d7-8daf-26fea33c3097",
+      "absent": true,
+      "record": "packets/N8/evaluation-D0/session/container.json"
+    },
+    {
+      "container": "template-dev-580070a1-f0ea-4e07-8250-a80c639b21b5",
+      "absent": true,
+      "record": "packets/N8/evaluation-D1/session/container.json"
+    },
+    {
+      "container": "template-dev-5ee9a24c-a0e0-4588-b09c-57bd7ca02df7",
+      "absent": true,
+      "record": "runs/reconnect-revoked-P/session/container.json"
+    },
+    {
+      "container": "template-dev-ae88f9a2-3139-47da-9df2-c5174a4ba118",
+      "absent": true,
+      "record": "packets/T2/evaluation-final/session/container.json"
+    },
+    {
+      "container": "template-dev-7b582a04-4fad-4354-91e4-897891dfec1e",
+      "absent": true,
+      "record": "supplemental-remaining/final/session/container.json"
+    }
+  ],
+  "historicalFullAuditRepeated": false
+}

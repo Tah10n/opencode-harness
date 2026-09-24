@@ -1,0 +1,340 @@
+{
+  "slot": 11,
+  "task": "request-module-extraction",
+  "arm": "C",
+  "exitCode": 0,
+  "timedOut": false,
+  "elapsedMs": 296820,
+  "phaseCount": 1,
+  "continuationApplied": false,
+  "requests": 29,
+  "requestsWithoutUsage": 0,
+  "workflowStatus": "incomplete",
+  "repairs": 0,
+  "toolCalls": 37,
+  "sessions": 3,
+  "usage": {
+    "input_tokens": 1241516,
+    "cached_tokens": 297984,
+    "output_tokens": 10352,
+    "reasoning_tokens": 1663,
+    "total_tokens": 1251868
+  },
+  "requestEfforts": {
+    "none": 1,
+    "low": 28
+  },
+  "httpStatuses": {
+    "200": 29
+  },
+  "terminationVerified": true,
+  "stages": [
+    {
+      "label": "implementation",
+      "role": "author",
+      "elapsedMs": 222920
+    },
+    {
+      "label": "review-0",
+      "role": "reviewer",
+      "elapsedMs": 21094
+    },
+    {
+      "label": "reproduce-1",
+      "role": "author",
+      "elapsedMs": 24869
+    },
+    {
+      "label": "disposition-review-1",
+      "role": "reviewer",
+      "elapsedMs": 20499
+    }
+  ],
+  "packet": "F2",
+  "delivery": {
+    "patchApplies": true,
+    "changedFiles": [
+      "packages/connector/README.md",
+      "packages/connector/bin/viberacing.mjs",
+      "packages/connector/lib/config.mjs",
+      "packages/connector/lib/http.mjs",
+      "packages/connector/test/config.test.mjs",
+      "packages/connector/test/http.test.mjs"
+    ],
+    "patchSha256": "96bf60a7465793412caddcae83d7c74fd82c27ff82fcdf368a3138fb017dbb27"
+  },
+  "sourceReview": {
+    "packet": "F2",
+    "sourceReview": {
+      "implementation": "Active HTTP/retry behavior is moved into lib/http.mjs; CLI eagerly imports it and packaging copies it. Transport logic preserves original semantics. The original 68-line implementation remains in a block comment in the CLI, an avoidable maintenance/cleanup defect, not a second executable implementation.",
+      "tests": "New observable retry/Retry-After test and installed module presence assertion. Existing installed --version eagerly loads ESM transport dependency; unchanged CLI consumer tests cover behavior. A transport-backed installed operation is stronger coverage but is not the only admissible proof of the requested loading path. No existing assertions removed.",
+      "documentation": "Explains transport/protocol responsibility and installed copying.",
+      "staticDefects": [],
+      "maintenanceNotes": [
+        "Old request/retry implementation retained as dead commented code in the CLI. Functional extraction is present; do not label this an observed runtime regression."
+      ],
+      "D0ToFinal": "File bytes unchanged; patch text differs only in diff ordering and hash abbreviation."
+    },
+    "harnessObservation": {
+      "review0Selected": 3,
+      "review0Resolved": 0,
+      "dispositionSelected": 5,
+      "dispositionResolved": 0,
+      "note": "Reviewer shortened scoped references to bare E numbers; host correctly rejected them. Reviewer requested a stronger installed transport test; no patch change resulted."
+    },
+    "behaviorVerdict": "All executed independent checks passed, including installed CLI and original consumers",
+    "completenessVerdict": "requirements delivered within targeted scope; maintenance debt: original implementation retained in a dead block comment"
+  },
+  "grading": {
+    "final": {
+      "packet": "F2",
+      "phase": "final",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 15,
+            "pass": 15,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 15,
+            "pass": 15,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    },
+    "D0": {
+      "packet": "F2",
+      "phase": "D0",
+      "checks": {
+        "ordinary": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 25,
+            "pass": 24,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 15,
+            "pass": 15,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "preservation": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 24,
+            "pass": 23,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 1
+          }
+        },
+        "preserved-consumers": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 15,
+            "pass": 15,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        },
+        "acceptance": {
+          "code": 0,
+          "timedOut": false,
+          "counts": {
+            "tests": 1,
+            "pass": 1,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          }
+        }
+      },
+      "passed": true,
+      "cleanup": 0
+    }
+  },
+  "evidenceSelections": [
+    {
+      "review": "review-0-bindings.json",
+      "selections": [
+        {
+          "selected": "E30",
+          "ref": null,
+          "scope": null,
+          "eventIndex": null,
+          "callID": null,
+          "state": null,
+          "exit": null,
+          "before": null,
+          "after": null,
+          "snapshotSha256": null,
+          "current": null,
+          "resolved": false
+        },
+        {
+          "selected": "E31",
+          "ref": null,
+          "scope": null,
+          "eventIndex": null,
+          "callID": null,
+          "state": null,
+          "exit": null,
+          "before": null,
+          "after": null,
+          "snapshotSha256": null,
+          "current": null,
+          "resolved": false
+        },
+        {
+          "selected": "E21",
+          "ref": null,
+          "scope": null,
+          "eventIndex": null,
+          "callID": null,
+          "state": null,
+          "exit": null,
+          "before": null,
+          "after": null,
+          "snapshotSha256": null,
+          "current": null,
+          "resolved": false
+        }
+      ]
+    },
+    {
+      "review": "disposition-review-1-bindings.json",
+      "selections": [
+        {
+          "selected": "E30",
+          "ref": null,
+          "scope": null,
+          "eventIndex": null,
+          "callID": null,
+          "state": null,
+          "exit": null,
+          "before": null,
+          "after": null,
+          "snapshotSha256": null,
+          "current": null,
+          "resolved": false
+        },
+        {
+          "selected": "E31",
+          "ref": null,
+          "scope": null,
+          "eventIndex": null,
+          "callID": null,
+          "state": null,
+          "exit": null,
+          "before": null,
+          "after": null,
+          "snapshotSha256": null,
+          "current": null,
+          "resolved": false
+        },
+        {
+          "selected": "E33",
+          "ref": null,
+          "scope": null,
+          "eventIndex": null,
+          "callID": null,
+          "state": null,
+          "exit": null,
+          "before": null,
+          "after": null,
+          "snapshotSha256": null,
+          "current": null,
+          "resolved": false
+        },
+        {
+          "selected": "E34",
+          "ref": null,
+          "scope": null,
+          "eventIndex": null,
+          "callID": null,
+          "state": null,
+          "exit": null,
+          "before": null,
+          "after": null,
+          "snapshotSha256": null,
+          "current": null,
+          "resolved": false
+        },
+        {
+          "selected": "E21",
+          "ref": null,
+          "scope": null,
+          "eventIndex": null,
+          "callID": null,
+          "state": null,
+          "exit": null,
+          "before": null,
+          "after": null,
+          "snapshotSha256": null,
+          "current": null,
+          "resolved": false
+        }
+      ]
+    }
+  ]
+}

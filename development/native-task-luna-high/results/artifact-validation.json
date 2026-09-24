@@ -1,0 +1,147 @@
+{
+  "frozenFilesUnchanged": 8223,
+  "historicalFilesUnchanged": 78,
+  "deliveries": [
+    {
+      "label": "F6",
+      "slot": 1,
+      "task": "legacy-runtime-reload",
+      "arm": "P",
+      "patchSha256": "7a2b57f983e3ae626fe2795948fa0029fbbda4b278218dcd0133c80e5ae57efb",
+      "reappliedBytesAndModesMatch": true,
+      "terminationVerified": true,
+      "actualContainerInputVerified": {
+        "matched": true,
+        "files": 220,
+        "providerRequestsBeforeStart": 0
+      },
+      "originalHCheckoutUnchanged": null,
+      "patchWhitespaceCheck": {
+        "code": 0,
+        "diagnostic": ""
+      }
+    }
+  ],
+  "containers": [
+    {
+      "container": "template-dev-98355341-0b86-4300-a39c-a678ca80f496",
+      "absent": true,
+      "record": "effort-preflight-verified-P/container.json"
+    },
+    {
+      "container": "template-dev-5cd37f90-a24c-4054-a51e-95d40f6a4f0f",
+      "absent": true,
+      "record": "effort-preflight-final-P/container.json"
+    },
+    {
+      "container": "template-dev-732d89e9-53dd-4c52-a932-147471100732",
+      "absent": true,
+      "record": "container-input-verification/reconnect-revoked-H/container.json"
+    },
+    {
+      "container": "template-dev-a90cd896-e862-4620-9b92-d1966e7640ff",
+      "absent": true,
+      "record": "container-input-verification/legacy-runtime-reload-H/container.json"
+    },
+    {
+      "container": "template-dev-5587a28c-361f-4738-bd61-6e56f83926e8",
+      "absent": true,
+      "record": "container-input-verification/reconnect-revoked-P/container.json"
+    },
+    {
+      "container": "template-dev-e84e40fb-6728-4c55-a6c5-60d2ce596ff9",
+      "absent": true,
+      "record": "container-input-verification/legacy-runtime-reload-P/container.json"
+    },
+    {
+      "container": "template-dev-19b8294e-8696-49a0-b268-d8f93f3608d2",
+      "absent": true,
+      "record": "control-results-final/reconnect-swallowed-removal/session/container.json"
+    },
+    {
+      "container": "template-dev-fb89f72b-be78-428f-a8ef-df6be8314942",
+      "absent": true,
+      "record": "control-results-final/reconnect-stale-pending/session/container.json"
+    },
+    {
+      "container": "template-dev-86587cf1-310f-4a92-971c-07fd26cf9b7c",
+      "absent": true,
+      "record": "control-results-final/reconnect-correct/session/container.json"
+    },
+    {
+      "container": "template-dev-7dc5b8eb-efc4-47df-b80c-4640294b65c3",
+      "absent": true,
+      "record": "control-results-final/reconnect-skipped-disconnected/session/container.json"
+    },
+    {
+      "container": "template-dev-5bfea52f-935d-416b-8f19-daa0a4bf3770",
+      "absent": true,
+      "record": "control-results-final/runtime-correct/session/container.json"
+    },
+    {
+      "container": "template-dev-91c97703-9929-48d4-89b4-a037712366a7",
+      "absent": true,
+      "record": "control-results-final/runtime-directory-link-bug/session/container.json"
+    },
+    {
+      "container": "template-dev-cd71858e-7b86-4d2f-a159-a7919533c347",
+      "absent": true,
+      "record": "supplemental-old-launcher/session/container.json"
+    },
+    {
+      "container": "template-dev-db85f85b-6f35-45d0-ac17-7bbd09b08eb6",
+      "absent": true,
+      "record": "effort-preflight-final-H/container.json"
+    },
+    {
+      "container": "template-dev-4c817be0-ca07-4308-9156-baed53ea29d0",
+      "absent": true,
+      "record": "effort-preflight-verified-H/container.json"
+    },
+    {
+      "container": "template-dev-fba39369-7afc-4275-a926-6d7ab3eef5e0",
+      "absent": true,
+      "record": "effort-preflight-P/container.json"
+    },
+    {
+      "container": "template-dev-88a8c4e8-21e1-479b-ad37-4c248e8cdc72",
+      "absent": true,
+      "record": "packets/F6/evaluation-final/session/container.json"
+    },
+    {
+      "container": "template-dev-811505e5-285e-451e-b48c-eb5a2ab10749",
+      "absent": true,
+      "record": "control-results/reconnect-swallowed-removal/session/container.json"
+    },
+    {
+      "container": "template-dev-d699b35f-ceb1-49a2-8cc5-33bc67258696",
+      "absent": true,
+      "record": "control-results/reconnect-stale-pending/session/container.json"
+    },
+    {
+      "container": "template-dev-14da1d8e-ca2b-4496-aeef-e27708d9c324",
+      "absent": true,
+      "record": "control-results/reconnect-correct/session/container.json"
+    },
+    {
+      "container": "template-dev-e36c5cd3-37c8-46b7-8973-573106e49f4c",
+      "absent": true,
+      "record": "control-results/reconnect-skipped-disconnected/session/container.json"
+    },
+    {
+      "container": "template-dev-073ecd3e-19b5-408e-9dfe-ce5a5d389e80",
+      "absent": true,
+      "record": "control-results/runtime-correct/session/container.json"
+    },
+    {
+      "container": "template-dev-2ab7b1a1-a2c1-471b-9c2b-f009e3aa797d",
+      "absent": true,
+      "record": "control-results/runtime-directory-link-bug/session/container.json"
+    },
+    {
+      "container": "template-dev-2631ddc3-bf9d-431e-bc97-5b88d54c1a28",
+      "absent": true,
+      "record": "runs/legacy-runtime-reload-P/session/container.json"
+    }
+  ]
+}

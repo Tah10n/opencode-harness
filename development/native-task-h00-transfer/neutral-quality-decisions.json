@@ -1,0 +1,1320 @@
+{
+  "at": "2026-09-13T21:40:06.826479+00:00",
+  "stage": "quality decisions saved before arm-label unblinding",
+  "blindingLimit": "One assessor also monitored aggregate/slot operational state; neutral patch labels and withheld mapping/final author reports reduce bias but are not an independent double-blind review. Artifact differences can provide clues.",
+  "rows": [
+    {
+      "id": "0d6ee00e6ab4",
+      "task": "quick-lru-computed",
+      "project": "quick-lru",
+      "Q": 1,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "patchApplicable": true,
+      "sourcePatchSha256": "7ce01ea9f0bfdfc98a11d7cf031d0273a4fc2957820dc7b4e95a1575a2cfd784",
+      "decision": "Full required delivery verified.",
+      "findings": [],
+      "contentReview": {
+        "id": "0d6ee00e6ab4",
+        "task": "quick-lru-computed",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete",
+        "retainedTestsReview": "Existing test scenarios remain unchanged.",
+        "contentFindings": [],
+        "Q": null,
+        "pending": [
+          "ordinary project checks including tsd/lint",
+          "independent runtime checks",
+          "ordinary patch applicability"
+        ],
+        "behaviorReview": "Checks current/old entry expiry without conflating stored undefined with absence; promotes old hits through existing moveToRecent and inserts computed value via ordinary set default TTL. Expiry delete removes both copies, so subsequent old-cache check does not resurrect stale value. Runtime confirmation pending.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Undefined hit does not call factory. After hitting an old-generation undefined key, explicit evict(1) must remove the other oldest entry and retain the hit; this distinguishes missing recency promotion without requiring the reference test arrangement."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Expired current entry is awaited past TTL, factory called exactly once, exact single eviction recorded, positive remaining TTL bounded by cache default."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Factory throws exact reason with absent key and single call; successful factory receives same object key, repeat hit does not invoke factory, second cache computes independently."
+          }
+        ],
+        "typesReview": "tsd checks string key inference, numeric return and invalid string factory result rejection.",
+        "docsReview": "Declaration and README document sync factory/misses, default TTL, stored undefined hit and recency."
+      },
+      "applicability": {
+        "id": "0d6ee00e6ab4",
+        "task": "quick-lru-computed",
+        "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "7ce01ea9f0bfdfc98a11d7cf031d0273a4fc2957820dc7b4e95a1575a2cfd784",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    },
+    {
+      "id": "26ece8019a92",
+      "task": "fastq-on-idle",
+      "project": "fastq",
+      "Q": 0,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "patchApplicable": true,
+      "sourcePatchSha256": "b520cc5bde2ef64720361891538272ae95861d9a4e3d1160713768435cdcc588",
+      "decision": "Full delivery does not satisfy the frozen rubric.",
+      "findings": [
+        {
+          "category": "behavior-defect",
+          "reason": "A subscribed waiter misses the real idle transition caused by kill if unrelated work starts before nextTick; the public-path probe fails while alternative and both controls pass."
+        },
+        {
+          "category": "required-coverage-loss",
+          "reason": "Underlying delivered runtime tests pass with early resolution after kill/killAndDrain while workers remain active. Both control suites fail the same mutation."
+        }
+      ],
+      "contentReview": {
+        "id": "26ece8019a92",
+        "task": "fastq-on-idle",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete",
+        "retainedTestsReview": "Existing regression cases remain unchanged.",
+        "Q": null,
+        "pending": [
+          "ordinary project checks",
+          "independent runtime checks",
+          "ordinary patch applicability",
+          "focused async test sensitivity"
+        ],
+        "behaviorReview": "Resolvers are independent and drain identity is retained; resolveIdle checks idle then defers and rechecks on process.nextTick. Potential contract issue: a waiter can miss an actual idle transition if unrelated new work is queued before nextTick; the frozen wording says resolve once queue reaches idle. Needs isolated public-path confirmation, not a new runtime-grader edit.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": "pending sensitivity",
+            "evidence": "Callback tests check subscriber flags synchronously after worker completion, then finish remaining work in same stack. Promise variant awaits immediate but never asserts the original subscribers are still pending. These observations may not distinguish early resolution."
+          },
+          {
+            "scenario": 2,
+            "covered": "pending sensitivity",
+            "evidence": "Drain identity/count and reentrant running work asserted, but resolved flag checked synchronously and second worker finished before yielding to Promise reactions."
+          },
+          {
+            "scenario": 3,
+            "covered": "partial",
+            "evidence": "Kill waits checked synchronously before immediately finishing worker. killAndDrain clears paused-only work then new unrelated work is started before its deferred check. Abort with active work gets an actual setImmediate gap. No isolated already-idle abort or active killAndDrain pending observation."
+          }
+        ],
+        "typesReview": "onIdle(): Promise<void> in shared interface; existing consumer calls callback method and awaits promise-queue method.",
+        "docsReview": "README covers independent subscriptions, empty and paused states.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "requirement": "Waiters must remain pending while running work exists after kill/killAndDrain.",
+            "evidence": "Test checks settled synchronously and completes running worker before Promise callbacks could run.",
+            "confirmationPending": "Independent targeted early-resolution test sensitivity, applied equally to all onIdle patches."
+          },
+          {
+            "category": "behavior-candidate",
+            "requirement": "Every subscription resolves once queue reaches idle after synchronous callbacks.",
+            "evidence": "resolveIdle process.nextTick recheck can postpone a waiter past an actual idle transition; test explicitly starts later work before this recheck.",
+            "confirmationPending": "Public sequence: paused pending task, subscribe, kill reaches idle, start separate blocked work, give event loop a turn and observe first waiter without completing new work."
+          }
+        ]
+      },
+      "applicability": {
+        "id": "26ece8019a92",
+        "task": "fastq-on-idle",
+        "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "b520cc5bde2ef64720361891538272ae95861d9a4e3d1160713768435cdcc588",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    },
+    {
+      "id": "2c3146b61f69",
+      "task": "eventemitter-prepend",
+      "project": "eventemitter3",
+      "Q": 1,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "patchApplicable": true,
+      "sourcePatchSha256": "4883a10142af5078d4d250afcf58d73de6dd1dfeb6d215f38ce3b9f4626e7206",
+      "decision": "Full required delivery verified.",
+      "findings": [],
+      "contentReview": {
+        "id": "2c3146b61f69",
+        "reviewBlindedToArmAndWorkflow": true,
+        "task": "eventemitter-prepend",
+        "contentReview": "complete",
+        "behaviorReview": "The existing addListener helper receives a prepend flag and preserves validation/context construction. Existing emit and removal paths are unchanged. Runtime confirmation pending.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "test/test.js: five mixed registrations with distinct receivers are emitted with two arguments; exact call order/receiver/arguments asserted."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "test/test.js: prependOnce recursively emits; exact call list proves once removed before recursion; regular prepend is subsequently removed and next emission excludes it."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Symbol registration/listener enumeration asserted; both ESM prepend APIs return emitter and register listeners; invalid normal and once prepend leave existing list intact."
+          }
+        ],
+        "typesReview": "index.d.ts preserves event-specific generic signatures. test/types.ts exercises tuple payload inference, symbol event, context, chaining, and an expected invalid numeric payload. Must compile standalone fixture with the same independent compiler used in calibration.",
+        "docsReview": "README removes obsolete unsupported-method claim and documents both methods, ordering, return and custom context with an example.",
+        "retainedTestsReview": "Patch adds scenarios without deleting or changing existing regression cases.",
+        "contentFindings": [],
+        "Q": null,
+        "pending": [
+          "ordinary project checks",
+          "independent runtime checks",
+          "standalone delivered type fixture compilation",
+          "ordinary patch applicability"
+        ]
+      },
+      "applicability": {
+        "id": "2c3146b61f69",
+        "task": "eventemitter-prepend",
+        "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "4883a10142af5078d4d250afcf58d73de6dd1dfeb6d215f38ce3b9f4626e7206",
+        "excludedPreparationArtifacts": [],
+        "types": {
+          "compiler": "6.0.3",
+          "exit": 0,
+          "output": "",
+          "fixture": "test/types.ts",
+          "scope": "Delivered standalone consumer checked with the same host compiler as calibration; ordinary runtime checks run separately on Linux arm64."
+        }
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    },
+    {
+      "id": "3375af3c39c5",
+      "task": "fastq-running-tasks",
+      "project": "fastq",
+      "Q": 0,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 1,
+      "interpretedIndependentExit": 1,
+      "patchApplicable": true,
+      "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "decision": "Full delivery does not satisfy the frozen rubric.",
+      "findings": [
+        {
+          "category": "missing-delivery",
+          "reason": "Empty source patch; requested runningTasks API and full delivery are absent."
+        }
+      ],
+      "contentReview": {
+        "id": "3375af3c39c5",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete",
+        "retainedTestsReview": "Existing regression cases remain unchanged.",
+        "Q": null,
+        "pending": [
+          "ordinary project checks",
+          "independent runtime checks",
+          "ordinary patch applicability"
+        ],
+        "task": "fastq-running-tasks",
+        "behaviorReview": "Captured source patch is empty; the requested API, regression scenarios, type API and docs are absent.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": false,
+            "evidence": "No changed or added source/test files."
+          },
+          {
+            "scenario": 2,
+            "covered": false,
+            "evidence": "No changed or added source/test files."
+          },
+          {
+            "scenario": 3,
+            "covered": false,
+            "evidence": "No changed or added source/test files."
+          }
+        ],
+        "typesReview": "No requested API or type consumer changes.",
+        "docsReview": "No requested API documentation.",
+        "contentFindings": [
+          {
+            "category": "missing-delivery",
+            "requirement": "Deliver runningTasks API and tests/types/docs.",
+            "evidence": "delivery.json changed/deleted lists are empty and source.patch has zero bytes.",
+            "impact": "The requested feature was not delivered."
+          }
+        ]
+      },
+      "applicability": {
+        "id": "3375af3c39c5",
+        "task": "fastq-running-tasks",
+        "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    },
+    {
+      "id": "3ef12ae73600",
+      "task": "quick-lru-prune",
+      "project": "quick-lru",
+      "Q": 1,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "patchApplicable": true,
+      "sourcePatchSha256": "1921707c4a0839e865a41513187f07dbedc9937a9645bbb6790f65e6fb423206",
+      "decision": "Full required delivery verified.",
+      "findings": [],
+      "contentReview": {
+        "id": "3ef12ae73600",
+        "task": "quick-lru-prune",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete",
+        "retainedTestsReview": "Existing regression cases remain unchanged.",
+        "Q": null,
+        "pending": [
+          "ordinary project checks including tsd/lint",
+          "original independent checks",
+          "uniform callback-order interpretation check",
+          "ordinary patch applicability"
+        ],
+        "behaviorReview": "Iterates old entries only if not shadowed by current, then current entries; existing expiry helper deletes both copies and maintains size. No live promotion or reorder. Runtime confirmation pending.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Expired old/current entries are inspected without lazy deletion, then exact count, callbacks, unchanged live order, size and repeated zero are asserted."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Live current shadows already-expired old with zero callback; separate non-expiring old shadow is removed with expired current, asserting old storage absence and has false."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Zero per-entry maxAge exercises immediate-expiry case, infinite TTL survives, expired undefined notifies exact value, repeated prune returns zero; deleting final live entry empties cache before reuse with undefined. Boundary timing uses real Date.now rather than mocked time; retain as a timing sensitivity note, not a requirement for a particular test mechanism."
+          }
+        ],
+        "typesReview": "Public number return and tsd expectType<number>(pruneExpired()).",
+        "docsReview": "API docs define removal/count/live recency preservation and expiration callbacks.",
+        "contentFindings": []
+      },
+      "applicability": {
+        "id": "3ef12ae73600",
+        "task": "quick-lru-prune",
+        "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "1921707c4a0839e865a41513187f07dbedc9937a9645bbb6790f65e6fb423206",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    },
+    {
+      "id": "4b726527599f",
+      "task": "fastq-on-idle",
+      "project": "fastq",
+      "Q": 0,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "patchApplicable": true,
+      "sourcePatchSha256": "c434634eba396336d39829dbb67acebee865d145f169c4ae67798766bee561f9",
+      "decision": "Full delivery does not satisfy the frozen rubric.",
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "Delivered tests pass when kill/killAndDrain prematurely resolve onIdle while workers remain active. Both control suites detect the same specified error."
+        }
+      ],
+      "contentReview": {
+        "id": "4b726527599f",
+        "task": "fastq-on-idle",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete",
+        "retainedTestsReview": "Existing regression cases remain unchanged.",
+        "Q": null,
+        "pending": [
+          "ordinary project checks",
+          "independent runtime checks",
+          "ordinary patch applicability",
+          "focused async test sensitivity"
+        ],
+        "behaviorReview": "Independent resolver list plus suppression during drain/abort callbacks; resolveIdle occurs after callbacks and uses actual idle state, without replacing user drain. Existing release/abort behavior retained apart from added notification. Runtime confirmation pending.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": "pending sensitivity",
+            "evidence": "Active-work subscriber flags are checked only synchronously; paused check uses process.nextTick, whose ordering versus Promise reactions must be verified before crediting it as a pending-state test."
+          },
+          {
+            "scenario": 2,
+            "covered": "pending sensitivity",
+            "evidence": "Drain reference/count and reentrant work are checked. Workers finish via nextTick and pending flag is asserted inside the drain callback; potential premature promise settlement may remain invisible before microtask reactions."
+          },
+          {
+            "scenario": 3,
+            "covered": "partial",
+            "evidence": "Idle kill/killAndDrain and active kill/killAndDrain have exact state assertions, but active subscriber flag is checked synchronously and workers are immediately completed. Promise abort test does await immediate while worker is blocked and therefore meaningfully distinguishes premature abort resolution."
+          }
+        ],
+        "typesReview": "Public Promise<void> signature and existing consumer calls/awaits onIdle.",
+        "docsReview": "README explains independent subscribers, both queue variants, idle definition and synchronous drain work.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "requirement": "Kill/killAndDrain waiters stay pending until running work finishes.",
+            "evidence": "Flag assertions occur before a Promise reaction can execute; both workers are finished before waiting for subscription reactions.",
+            "confirmationPending": "Run the same narrow early-kill-resolution mutation on independent copies of all onIdle patches and controls."
+          }
+        ]
+      },
+      "applicability": {
+        "id": "4b726527599f",
+        "task": "fastq-on-idle",
+        "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "c434634eba396336d39829dbb67acebee865d145f169c4ae67798766bee561f9",
+        "excludedPreparationArtifacts": [
+          "package-lock.json"
+        ],
+        "types": null
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    },
+    {
+      "id": "53a657cf6ab8",
+      "task": "eventemitter-remove-context",
+      "project": "eventemitter3",
+      "Q": 0,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "patchApplicable": true,
+      "sourcePatchSha256": "c2fffc456d3318a863f36425539aead7b054788f890600c15c920633c5690dfc",
+      "decision": "Full delivery does not satisfy the frozen rubric.",
+      "findings": [
+        {
+          "category": "required-type-test-loss",
+          "reason": "Public declaration supplied, but the explicitly required TypeScript consumer/type regression is absent."
+        }
+      ],
+      "contentReview": {
+        "id": "53a657cf6ab8",
+        "task": "eventemitter-remove-context",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete",
+        "typesReview": "Public declaration is added, but no TypeScript consumer or type regression is supplied. The frozen task explicitly requires applicable type tests.",
+        "retainedTestsReview": "Existing regression cases are retained.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "requirement": "Deliver applicable public TypeScript declarations/type tests.",
+            "evidence": "Changed files contain only README, declaration, runtime, CJS and ESM runtime tests. No type-use fixture is supplied.",
+            "impact": "The new public method has no delivered type regression."
+          }
+        ],
+        "Q": null,
+        "pending": [
+          "ordinary project checks",
+          "independent runtime checks",
+          "ordinary patch applicability"
+        ],
+        "behaviorReview": "Enumerates string own properties and symbols, filters by stored context with strict equality, uses clearEvent and compacts listener representation without changing existing emit behavior. Runtime confirmation pending.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Same function with two distinct contexts across string/symbol events, duplicate and once registrations; removal count 4 and surviving listener counts asserted."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Distinct first/middle survivors on foo preserve order; empty string/symbol event names disappear; repeated removal, empty emitter, reuse and emit asserted."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Omitted/null/false/zero/empty-string contexts are checked normalized to emitter; removal by undefined returns 0 and by emitter removes all five."
+          }
+        ],
+        "docsReview": "README documents count, strict stored context matching and normalized falsy registration contexts."
+      },
+      "applicability": {
+        "id": "53a657cf6ab8",
+        "task": "eventemitter-remove-context",
+        "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "c2fffc456d3318a863f36425539aead7b054788f890600c15c920633c5690dfc",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    },
+    {
+      "id": "65f9ded470ca",
+      "task": "eventemitter-prepend",
+      "project": "eventemitter3",
+      "Q": 0,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "patchApplicable": true,
+      "sourcePatchSha256": "8f79f0c9ddf49d9fd516f024344e34bf10ec5c5bc03ceeed3e13a4a5b6ece0f5",
+      "decision": "Full delivery does not satisfy the frozen rubric.",
+      "findings": [
+        {
+          "category": "required-type-test-loss",
+          "reason": "Public declarations supplied, but no required event-specific TypeScript consumer/type regression is delivered."
+        }
+      ],
+      "contentReview": {
+        "id": "65f9ded470ca",
+        "reviewBlindedToArmAndWorkflow": true,
+        "task": "eventemitter-prepend",
+        "contentReview": "complete",
+        "behaviorReview": "Uses the existing helper with a prepend flag. Validation/context construction and existing emit/removal paths are retained. Runtime confirmation pending.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "test/test.js: appended regular/once plus two prepended registrations are emitted twice; exact receiver/payload/call order asserted."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Recursive prependOnce call list, remaining regular listener, removal, and empty subsequent emit are asserted."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Symbol registration order asserted; invalid prependOnce must throw and preserve registrations; ESM consumer emits twice and asserts order/once removal."
+          }
+        ],
+        "typesReview": "Public generic declarations are added, but no delivered TypeScript consumer/type regression exists in the patch. Both TASK.md and rubric require applicable type tests. Existing source has no such scenario.",
+        "docsReview": "README corrects unsupported-method list and documents prepend behavior and context with examples.",
+        "retainedTestsReview": "Existing regression scenarios are retained.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "requirement": "Deliver applicable public TypeScript declarations/type tests.",
+            "evidence": "Changed files are README.md, index.d.ts, index.js, test/test.js, test/test.mjs; no type-use regression is delivered.",
+            "impact": "New event-specific payload inference and rejection have no delivered regression; declarations alone do not satisfy full delivery."
+          }
+        ],
+        "Q": null,
+        "pending": [
+          "ordinary project checks",
+          "independent runtime checks",
+          "ordinary patch applicability"
+        ]
+      },
+      "applicability": {
+        "id": "65f9ded470ca",
+        "task": "eventemitter-prepend",
+        "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "8f79f0c9ddf49d9fd516f024344e34bf10ec5c5bc03ceeed3e13a4a5b6ece0f5",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    },
+    {
+      "id": "6960a8f1de8a",
+      "task": "eventemitter-remove-context",
+      "project": "eventemitter3",
+      "Q": 0,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "patchApplicable": true,
+      "sourcePatchSha256": "c056666eb18ade814a16c13bb7ea57ec80443d2d2a26f15508701d5b02e04f55",
+      "decision": "Full delivery does not satisfy the frozen rubric.",
+      "findings": [
+        {
+          "category": "required-type-test-loss",
+          "reason": "Public declaration supplied, but no required TypeScript consumer/type regression is delivered."
+        }
+      ],
+      "contentReview": {
+        "id": "6960a8f1de8a",
+        "task": "eventemitter-remove-context",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete",
+        "typesReview": "Public declaration is added, but no TypeScript consumer or type regression is supplied. The frozen task explicitly requires applicable type tests.",
+        "retainedTestsReview": "Existing regression cases are retained.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "requirement": "Deliver applicable public TypeScript declarations/type tests.",
+            "evidence": "Changed files contain only README, declaration, runtime, CJS and ESM runtime tests. No type-use fixture is supplied.",
+            "impact": "The new public method has no delivered type regression."
+          }
+        ],
+        "Q": null,
+        "pending": [
+          "ordinary project checks",
+          "independent runtime checks",
+          "ordinary patch applicability"
+        ],
+        "behaviorReview": "Snapshots string and symbol event keys, filters by strict stored context, updates clearEvent counts and singleton representation; no existing emit or registration path changes. Runtime confirmation pending.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Same callback registered under two contexts on string and symbol events, including once/duplicate cases; counts and surviving registrations asserted."
+          },
+          {
+            "scenario": 2,
+            "covered": "partial",
+            "evidence": "Empty names, repeated removal and reuse are tested. Distinguishable survivor ordering within one event is not tested: surviving lists contain a single callback or repeated identical shared function."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Omitted/undefined/null/false/zero/empty/explicit emitter contexts are removed by emitter, with exact count and repeated zero."
+          }
+        ],
+        "docsReview": "README documents counts, duplicates/once, strict context identity and removal of normalized contexts by emitter."
+      },
+      "applicability": {
+        "id": "6960a8f1de8a",
+        "task": "eventemitter-remove-context",
+        "sourceCommit": "b0144e940ace8add8f335a8adfbed9284eb419f3",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "c056666eb18ade814a16c13bb7ea57ec80443d2d2a26f15508701d5b02e04f55",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    },
+    {
+      "id": "7379be605902",
+      "task": "ufo-query-sort",
+      "project": "ufo",
+      "Q": 1,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "patchApplicable": true,
+      "sourcePatchSha256": "737e3fa241641e6d3d9f3dd75bd73227c3d326176cb1096886e0c0e24a26235b",
+      "decision": "Full required delivery verified.",
+      "findings": [],
+      "contentReview": {
+        "id": "7379be605902",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete",
+        "retainedTestsReview": "Existing regression cases remain unchanged.",
+        "Q": null,
+        "pending": [
+          "ordinary project checks",
+          "independent runtime checks",
+          "ordinary patch applicability"
+        ],
+        "task": "ufo-query-sort",
+        "behaviorReview": "Sorts a fresh Object.keys array only when requested, retains existing encoding/filter chain, passes public options through withQuery after ordinary parse/merge and before URL reconstruction. Public exports already re-export query module.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Default/false/true string orders with Unicode asserted; withQuery merges decoded existing Unicode key and overrides supplied z before sorting."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Repeated array values in input order plus zero/false/empty/null/undefined/object serialization; deep equality checks preserve input object/arrays. Separate withQuery caller-copy assertion."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Absolute host/path/fragment and relative path/fragment asserted; public imports include QueryOptions and type test verifies exact optional boolean shape. Pollution defenses are directly asserted."
+          }
+        ],
+        "typesReview": "Exported QueryOptions interface plus public imported type shape/consumer calls; generated declarations built by ordinary command. Exact interface name is not prescribed and need not match reference.",
+        "docsReview": "README and JSDoc cover options on both APIs, string key order, array value order and post-merge behavior.",
+        "contentFindings": []
+      },
+      "applicability": {
+        "id": "7379be605902",
+        "task": "ufo-query-sort",
+        "sourceCommit": "f06c800d0c59f2a4a1b9ba65eb6cb61a84419be6",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "737e3fa241641e6d3d9f3dd75bd73227c3d326176cb1096886e0c0e24a26235b",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    },
+    {
+      "id": "80e5601c914d",
+      "task": "quick-lru-prune",
+      "project": "quick-lru",
+      "Q": 0,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 1,
+      "interpretedIndependentExit": 0,
+      "patchApplicable": true,
+      "sourcePatchSha256": "a3aeda324e57f1a9d191ea72343e30eb1ac196e4abdd328bae0b44ab6db6a9c6",
+      "decision": "Full delivery does not satisfy the frozen rubric.",
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "Delivered prune tests retain a live key in every exercised cache and never exercise the required reuse after an emptied cache. The expired-current test also starts with an old value that expires at the same time, leaving live-old resurrection untested. Callback ordering is NOT counted as a behavior failure."
+        }
+      ],
+      "contentReview": {
+        "id": "80e5601c914d",
+        "task": "quick-lru-prune",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete",
+        "retainedTestsReview": "Existing regression cases remain unchanged.",
+        "Q": null,
+        "pending": [
+          "ordinary project checks including tsd/lint",
+          "original independent checks",
+          "uniform callback-order interpretation check",
+          "ordinary patch applicability"
+        ],
+        "behaviorReview": "Current-generation-first traversal removes visible expired keys through delete helper (including both shadow copies), then skips old keys still shadowed by live current. Callback order differs from frozen evaluator but is not specified by TASK.md; preserve raw outcome and use uniform documented interpretation.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Controlled exact clock, expired old/current entries and live shadow, exact count and callbacks plus unchanged live iteration order and repeated zero."
+          },
+          {
+            "scenario": 2,
+            "covered": "partial",
+            "evidence": "First scenario establishes live-current/expired-old shadow. Separate current-expiry test uses an old value that expires at the same time, so it does not directly establish that an expired current entry cannot reveal a still-live old entry."
+          },
+          {
+            "scenario": 3,
+            "covered": "partial",
+            "evidence": "Controlled exact-boundary expiry, infinite TTL and undefined/repeated prune are tested. Every cache retains a live other/infinite key after pruning; no transition to empty followed by reuse is exercised."
+          }
+        ],
+        "typesReview": "Public number return and tsd numeric-return test.",
+        "docsReview": "README describes logical keys, visible current shadow, callbacks and live iteration order.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "requirement": "Expired current entry must not reveal a live shadowed old entry; reuse after an empty cache.",
+            "evidence": "Shadowed old entry has maxAge10 at now1000 and current expiry checked at1010; both expired. No delivered prune scenario ever reaches empty cache before reuse.",
+            "confirmationPending": "Inspect corresponding source/test behavior mechanically; do not count unspecified callback order as a behavior defect."
+          }
+        ]
+      },
+      "applicability": {
+        "id": "80e5601c914d",
+        "task": "quick-lru-prune",
+        "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "a3aeda324e57f1a9d191ea72343e30eb1ac196e4abdd328bae0b44ab6db6a9c6",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    },
+    {
+      "id": "8113f808eacc",
+      "task": "denque-remove-where",
+      "project": "denque",
+      "Q": 0,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "patchApplicable": true,
+      "sourcePatchSha256": "4a8b5239943fae318fb44ed4bdbe6bd84ac9dafc7fac404bbbedc9a5735c309e",
+      "decision": "Full delivery does not satisfy the frozen rubric.",
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "Delivered suite passes with configured capacity removed after filtering; only backing length/mask and below-capacity reuse are tested. Both control suites detect the capacity-loss mutation."
+        }
+      ],
+      "contentReview": {
+        "id": "8113f808eacc",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete",
+        "retainedTestsReview": "Existing regression cases remain unchanged.",
+        "Q": null,
+        "pending": [
+          "ordinary project checks",
+          "independent runtime checks",
+          "ordinary patch applicability"
+        ],
+        "task": "denque-remove-where",
+        "behaviorReview": "Copies original values, evaluates predicates without mutation, then clears occupied slots and writes survivors at same head/mask. Preserves original references, error identity and configured capacity by inspection. Runtime confirmation pending.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Exact original value/index visit list plus mixed/none/all counts and survivor orders are asserted."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "A true first match precedes thrown exact Error at index 1; original sequence and each reference survive. Nonfunctions throw for empty and populated queues."
+          },
+          {
+            "scenario": 3,
+            "covered": "partial",
+            "evidence": "Actual wrapped capacity-5 filter sees [null,0,false,first,last]; initial duplicate zeros no longer both remain at filtering. Tests storage length/mask and below-capacity reuse only; configured capacity preservation is not distinguished from losing the cap."
+          }
+        ],
+        "typesReview": "Typed predicate uses value.length and numeric index in existing consumer fixture; declaration returns number.",
+        "docsReview": "README and API documentation explain truthy removal, original indexes, atomic error propagation and return count.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "requirement": "Wrapped/capacity queues with duplicates/falsy values stay usable and preserve capacity after filtering.",
+            "evidence": "Initial duplicates are removed by setup shift/overflow before removeWhere. Subsequent length reaches only 4 with configured capacity 5; no configured-capacity assertion or overflow check.",
+            "impact": "Duplicate processing and loss of configured capacity are not distinguished by the delivered new scenario.",
+            "confirmationPending": "Narrow test-sensitivity variant that clears configured capacity after successful filtering; independent copy only."
+          }
+        ]
+      },
+      "applicability": {
+        "id": "8113f808eacc",
+        "task": "denque-remove-where",
+        "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "4a8b5239943fae318fb44ed4bdbe6bd84ac9dafc7fac404bbbedc9a5735c309e",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    },
+    {
+      "id": "8fb8b5e52a97",
+      "task": "denque-rotate",
+      "project": "denque",
+      "Q": 0,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "patchApplicable": true,
+      "sourcePatchSha256": "6952239353c00a3be16c77d3caa555a46578e4e5a013b88b3ddb1e8e0297cde0",
+      "decision": "Full delivery does not satisfy the frozen rubric.",
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "Delivered suite passes with object cloning on nontrivial rotations; object assertions concern invalid/no-op rotations. The paired neutral alternative detects identity loss. Original reference and alternative controls also miss this case, a disclosed pre-start calibration gap."
+        }
+      ],
+      "contentReview": {
+        "id": "8fb8b5e52a97",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete",
+        "retainedTestsReview": "Existing independent regression cases are not removed or changed.",
+        "Q": null,
+        "pending": [
+          "ordinary project checks",
+          "independent runtime checks",
+          "ordinary patch applicability"
+        ],
+        "task": "denque-rotate",
+        "behaviorReview": "Validates before state changes, reduces modulo size, rebuilds the logical order with original references and preserves storage capacity/mask. Runtime confirmation pending.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "test/denque.js explicitly asserts return identity and exact order for default, negative, zero, positive/negative counts larger than size and MAX_SAFE_INTEGER."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Capacity-5 queue is pushed ten times and asserts head > tail before rotate; verifies order, capacity fields, subsequent overflowing push/unshift, pop/shift/peek/remove and reuse to empty."
+          },
+          {
+            "scenario": 3,
+            "covered": "partial",
+            "evidence": "Invalid cases preserve object references and state. Empty/singleton reuse is tested. Actual nontrivial rotations use only numbers; object identity is checked only on failed rotations or singleton no-ops."
+          }
+        ],
+        "typesReview": "Optional numeric argument and polymorphic this declaration; ordinary type fixture adds no-argument/negative calls and assigns result to typeof queue.",
+        "docsReview": "README and API docs explain direction, default, modulo and finite integer requirement.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "requirement": "Required delivered regression: object identity survives rotation.",
+            "evidence": "Every successful rotation with size greater than one uses numeric values. Object cases are invalid requests or singleton no-ops.",
+            "impact": "Cloning object elements only during an actual nontrivial rotation would be invisible to the added regressions.",
+            "confirmationPending": "Run narrowly targeted test-sensitivity variant in an independent copy after scored execution; never change author patch."
+          }
+        ]
+      },
+      "applicability": {
+        "id": "8fb8b5e52a97",
+        "task": "denque-rotate",
+        "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "6952239353c00a3be16c77d3caa555a46578e4e5a013b88b3ddb1e8e0297cde0",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    },
+    {
+      "id": "9e4f9df7cdda",
+      "task": "ufo-query-sort",
+      "project": "ufo",
+      "Q": 0,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 1,
+      "interpretedIndependentExit": 1,
+      "patchApplicable": true,
+      "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "decision": "Full delivery does not satisfy the frozen rubric.",
+      "findings": [
+        {
+          "category": "missing-delivery",
+          "reason": "Empty source patch; requested query sorting options and associated delivery are absent."
+        }
+      ],
+      "contentReview": {
+        "id": "9e4f9df7cdda",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete",
+        "retainedTestsReview": "Existing regression cases remain unchanged.",
+        "Q": null,
+        "pending": [
+          "ordinary project checks",
+          "independent runtime checks",
+          "ordinary patch applicability"
+        ],
+        "task": "ufo-query-sort",
+        "behaviorReview": "Retained source patch is empty. Requested option, API integration, tests/types/docs are absent.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": false,
+            "evidence": "No changed or added source files."
+          },
+          {
+            "scenario": 2,
+            "covered": false,
+            "evidence": "No changed or added source files."
+          },
+          {
+            "scenario": 3,
+            "covered": false,
+            "evidence": "No changed or added source files."
+          }
+        ],
+        "typesReview": "No requested options type or consumer changes.",
+        "docsReview": "No new API documentation.",
+        "contentFindings": [
+          {
+            "category": "missing-delivery",
+            "requirement": "Deliver sort options and associated tests/types/docs.",
+            "evidence": "delivery changed/deleted are empty and source.patch is zero bytes.",
+            "impact": "Requested behavior is not delivered."
+          }
+        ]
+      },
+      "applicability": {
+        "id": "9e4f9df7cdda",
+        "task": "ufo-query-sort",
+        "sourceCommit": "f06c800d0c59f2a4a1b9ba65eb6cb61a84419be6",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    },
+    {
+      "id": "b60c3368673e",
+      "task": "denque-remove-where",
+      "project": "denque",
+      "Q": 0,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "patchApplicable": true,
+      "sourcePatchSha256": "0f1165236f206a77143b9592e84fd3131285139b29b17cf22f4222ce47cf0832",
+      "decision": "Full delivery does not satisfy the frozen rubric.",
+      "findings": [
+        {
+          "category": "required-coverage-loss",
+          "reason": "Delivered suite passes with configured capacity removed after filtering. Both control suites detect this specified error."
+        }
+      ],
+      "contentReview": {
+        "id": "b60c3368673e",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete",
+        "retainedTestsReview": "Existing regression cases remain unchanged.",
+        "Q": null,
+        "pending": [
+          "ordinary project checks",
+          "independent runtime checks",
+          "ordinary patch applicability"
+        ],
+        "task": "denque-remove-where",
+        "behaviorReview": "Evaluates predicates over original logical slots, then compacts only after successful evaluation. Logical forward compaction is safe with wrapped physical indexes. Error identity, references and capacity are retained by inspection. Runtime confirmation pending.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Exact original values/indexes plus mixed/none/all removal counts and survivor arrays."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "First predicate returns true and later throws same Error, with unchanged original sequence; invalid predicate rejected on empty."
+          },
+          {
+            "scenario": 3,
+            "covered": "partial",
+            "evidence": "Wrapped queue explicitly asserts [null,0,false,0,marker] before filtering, count 4 and strict marker identity after. Storage length/mask checked, then unshift/push to length 3; configured capacity 5 is never exercised after filtering."
+          }
+        ],
+        "typesReview": "Public predicate signature with generic T, index and truthy result, plus existing type fixture using string.length and index.",
+        "docsReview": "API docs cover original traversal, atomic error handling, truthy removal and count. README example is brief.",
+        "contentFindings": [
+          {
+            "category": "required-coverage-loss",
+            "requirement": "Preserve configured capacity after filtering in required delivered regression.",
+            "evidence": "Checks backing list length and mask, but not configured cap; all post-filter operations stay below capacity 5.",
+            "impact": "Clearing configured capacity during removeWhere would leave this scenario passing.",
+            "confirmationPending": "Narrow test-sensitivity check in independent copy after scored execution."
+          }
+        ]
+      },
+      "applicability": {
+        "id": "b60c3368673e",
+        "task": "denque-remove-where",
+        "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "0f1165236f206a77143b9592e84fd3131285139b29b17cf22f4222ce47cf0832",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    },
+    {
+      "id": "cf57afd4f2c6",
+      "task": "fastq-running-tasks",
+      "project": "fastq",
+      "Q": 1,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "patchApplicable": true,
+      "sourcePatchSha256": "8a5b5d8984c03d40cb4d7d91f96ac92aec5366878385450d82b19092cbc20491",
+      "decision": "Full required delivery verified.",
+      "findings": [],
+      "contentReview": {
+        "id": "cf57afd4f2c6",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete",
+        "retainedTestsReview": "Existing regression cases remain unchanged.",
+        "Q": null,
+        "pending": [
+          "ordinary project checks",
+          "independent runtime checks",
+          "ordinary patch applicability"
+        ],
+        "task": "fastq-running-tasks",
+        "behaviorReview": "Maintains a doubly linked active list separate from pending/pool links. All direct push/unshift and queue promotion worker starts use start(). worked() removes active entry before clearing value and before error handler/user callback. Snapshots copy values to a fresh array. Existing abort calls queued callbacks directly and does not invoke the new active-list removal. Runtime confirmation pending.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Blocked callback workers, queued values and getQueue differ; returned array pop/push cannot affect active list."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Two undefined tasks, callbacks checking removal-before-callback, promoted queued work, reuse, and a preserved prior snapshot are asserted; separate concurrency test completes the middle worker first and checks exact survivors."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Paused queued unshift/push, resume, concurrency increases including while paused, and promise resolve/reject paths all assert actual running snapshots and results."
+          }
+        ],
+        "typesReview": "Public runningTasks(): T[] inherited by promise queue; existing callback consumer fixture calls method. Signature and consumer compilation require mechanical confirmation.",
+        "docsReview": "README API index and section define fresh values, start order, duplicate/undefined retention, exclusion of queued/paused work.",
+        "contentFindings": [],
+        "extractionNote": "Raw capture diff includes deletion of generated ignored package-lock.json absent from pinned upstream commit. Original raw diff preserved; source.patch excludes only this environment artifact deletion under an arm-independent rule. Not counted as an authored source change or dependency failure."
+      },
+      "applicability": {
+        "id": "cf57afd4f2c6",
+        "task": "fastq-running-tasks",
+        "sourceCommit": "fe2d23196a005810dfcbc4103b3c746cc5542430",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "8a5b5d8984c03d40cb4d7d91f96ac92aec5366878385450d82b19092cbc20491",
+        "excludedPreparationArtifacts": [
+          "package-lock.json"
+        ],
+        "types": null
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    },
+    {
+      "id": "e01efb782e8c",
+      "task": "denque-rotate",
+      "project": "denque",
+      "Q": 1,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "patchApplicable": true,
+      "sourcePatchSha256": "ef746782f725c4977bdaf00a0de93d059a9849d1486f7b2526ece5f281d015a2",
+      "decision": "Full required delivery verified.",
+      "findings": [],
+      "contentReview": {
+        "id": "e01efb782e8c",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete",
+        "retainedTestsReview": "Existing independent regression cases are not removed or changed.",
+        "Q": null,
+        "pending": [
+          "ordinary project checks",
+          "independent runtime checks",
+          "ordinary patch applicability"
+        ],
+        "task": "denque-rotate",
+        "behaviorReview": "Validates first, normalizes modulo length, snapshots referenced values using wrapped indexes then writes same logical slots; storage/positions/capacity unchanged. Runtime confirmation pending.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Exact orders and this are asserted for default, zero, positive/negative steps, beyond-length counts, and MAX_VALUE without per-step looping."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Capacity-3 queue with three object values shifts then pushes to wrap; rotates, checks all peeks and storage/capacity, then shift/pop/push/unshift/remove reuse with exact order."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Invalid nonnumber/noninteger/nonfinite cases leave sequence and storage intact. Successful wrapped rotation checks reference identities using strict peek assertions. Empty/singleton queues are rotated and reused."
+          }
+        ],
+        "typesReview": "rotate(steps?: number): this plus existing consumer fixture invoking default/negative and assigning return to Denque<string>.",
+        "docsReview": "README and API docs cover direction, default, normalized counts, no-ops and atomic validation.",
+        "contentFindings": []
+      },
+      "applicability": {
+        "id": "e01efb782e8c",
+        "task": "denque-rotate",
+        "sourceCommit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "ef746782f725c4977bdaf00a0de93d059a9849d1486f7b2526ece5f281d015a2",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    },
+    {
+      "id": "f4d825ced509",
+      "task": "quick-lru-computed",
+      "project": "quick-lru",
+      "Q": 1,
+      "ordinaryProjectExit": 0,
+      "originalIndependentExit": 0,
+      "interpretedIndependentExit": 0,
+      "patchApplicable": true,
+      "sourcePatchSha256": "bb4805eb1ff89ae2e1fa0a0ab2bdd9d24c34b92df122513d530f00fd5958914d",
+      "decision": "Full required delivery verified.",
+      "findings": [],
+      "contentReview": {
+        "id": "f4d825ced509",
+        "task": "quick-lru-computed",
+        "reviewBlindedToArmAndWorkflow": true,
+        "contentReview": "complete",
+        "retainedTestsReview": "Existing test scenarios remain unchanged.",
+        "contentFindings": [],
+        "Q": null,
+        "pending": [
+          "ordinary project checks including tsd/lint",
+          "independent runtime checks",
+          "ordinary patch applicability"
+        ],
+        "behaviorReview": "Checks current entries, otherwise old entries, preserves undefined hits, uses existing expiry and promotion helpers, and set supplies default TTL. Runtime confirmation pending.",
+        "requiredRegressionReview": [
+          {
+            "scenario": 1,
+            "covered": true,
+            "evidence": "Undefined old-generation hit records zero factory calls, proves key removed from old generation and still present via has. Existing public test getter used; no demand for reference test structure."
+          },
+          {
+            "scenario": 2,
+            "covered": true,
+            "evidence": "Old-generation entry with short explicit TTL expires, factory called once with key, exactly one eviction, refreshed entry has default TTL >500 and <=1000 and reads fresh value."
+          },
+          {
+            "scenario": 3,
+            "covered": true,
+            "evidence": "Exact thrown reason/one factory call/absent key/empty size; original and distinct object keys in same cache plus same key in separate cache retain independent values."
+          }
+        ],
+        "typesReview": "tsd checks generic key/value inference, invalid factory return rejection and object key/value inference.",
+        "docsReview": "README and declarations explain sync computation on miss/expiry, one call when needed and default maxAge."
+      },
+      "applicability": {
+        "id": "f4d825ced509",
+        "task": "quick-lru-computed",
+        "sourceCommit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+        "ordinaryGitCopy": true,
+        "administrativeHarnessWorktreeRequired": false,
+        "patchAppliedCleanly": true,
+        "authorSourceBytesAndModesVerified": true,
+        "reconstructedPatchByteIdentical": true,
+        "sourcePatchSha256": "bb4805eb1ff89ae2e1fa0a0ab2bdd9d24c34b92df122513d530f00fd5958914d",
+        "excludedPreparationArtifacts": [],
+        "types": null
+      },
+      "verificationNotes": {
+        "qualityAssignedBeforeArmMappingRead": true,
+        "normalNativeAndFinalAuthorResponseNotUsedForQ": true
+      }
+    }
+  ]
+}

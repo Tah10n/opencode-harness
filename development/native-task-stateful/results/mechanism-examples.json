@@ -1,0 +1,17 @@
+{
+  "editor-cancel-H1": {
+    "file": "test/editor.test.mjs",
+    "startLine": 27,
+    "code": "test('cancels an existing staged replacement without removing its publication', () => {\n const s = drafts();\n s.stage('x', 'original');\n assert.deepEqual(s.read(), {staged: {x: 'original'}, published: {}});\n assert.deepEqual(apply(s, [{type: 'publish', id: 'x'}]), [true]);\n s.stage('x', 'replacement');\n assert.deepEqual(s.read(), {staged: {x: 'replacement'}, published: {x: 'original'}});\n\n assert.deepEqual(apply(s, [{type: 'cancel', id: 'x'}]), [true]);\n assert.deepEqual(s.read(), {staged: {}, published: {x: 'original'}});\n});"
+  },
+  "invite-single-use-H1": {
+    "file": "test/invite.test.mjs",
+    "startLine": 4,
+    "code": "test('a valid invitation is single-use and preserves unrelated invitations', () => {\n  const b = ledger([\n    {token: 't', team: 'red', email: 'a@b', expiresAt: 50},\n    {token: 'other', team: 'blue', email: 'c@d', expiresAt: 50},\n  ]);\n  let clockCalls = 0;\n  const clock = () => {\n    clockCalls++;\n    return 1;\n  };\n\n  assert.deepEqual(b.peek('t'), {token: 't', team: 'red', email: 'a@b', expiresAt: 50});\n  assert.deepEqual(accept(b, {token: 't'}, clock), {status: 'joined', team: 'red'});\n  assert.equal(clockCalls, 1);\n  assert.equal(b.peek('t'), undefined);\n  assert.deepEqual(b.list(), [{token: 'other', team: 'blue', email: 'c@d', expiresAt: 50}]);\n  assert.deepEqual(b.members(), [{team: 'red', email: 'a@b'}]);\n\n  assert.equal(b.peek('t'), undefined);\n  assert.deepEqual(accept(b, {token: 't'}, clock), {status: 'missing'});\n  assert.equal(clockCalls, 2);\n  assert.deepEqual(b.list(), [{token: 'other', team: 'blue', email: 'c@d', expiresAt: 50}]);\n  assert.deepEqual(b.members(), [{team: 'red', email: 'a@b'}]);\n});"
+  },
+  "invite-single-use-H0": {
+    "file": "test/invite.test.mjs",
+    "startLine": 12,
+    "code": "test('a separately removed invitation remains missing',()=>{const b=ledger([{token:'removed',team:'red',email:'removed@example.test',expiresAt:20}]);assert.equal(b.remove('removed'),true);assert.equal(b.peek('removed'),undefined);assert.deepEqual(accept(b,{token:'removed'},()=>10),{status:'missing'});assert.deepEqual(b.members(),[]);});"
+  }
+}

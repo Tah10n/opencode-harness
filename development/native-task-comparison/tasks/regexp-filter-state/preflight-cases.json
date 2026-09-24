@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/filter.mjs": "export function filterNames(names,filter){\n let matches;\n if(typeof filter==='string')matches=name=>name.indexOf(filter)>=0;\n else if(filter instanceof RegExp)matches=name=>new RegExp(filter.source,filter.flags).test(name);\n else throw new TypeError('filter');\n const result=[];for(const name of names)if(matches(name))result.push(name);return result;\n}\n"
+  },
+  "mutants": [
+    {
+      "name": "leaks-global-state",
+      "file": "src/filter.mjs",
+      "replacement": "export function filterNames(names,filter){\n if(typeof filter==='string')return names.filter(name=>name.includes(filter));\n if(!(filter instanceof RegExp))throw new TypeError('filter');\n const copy=new RegExp(filter.source,filter.flags);\n return names.filter(name=>{return copy.test(name);});\n}\n"
+    },
+    {
+      "name": "drops-sticky-flag",
+      "file": "src/filter.mjs",
+      "replacement": "export function filterNames(names,filter){\n if(typeof filter==='string')return names.filter(name=>name.includes(filter));\n if(!(filter instanceof RegExp))throw new TypeError('filter');\n const copy=new RegExp(filter.source,filter.flags.replace('y',''));\n return names.filter(name=>{copy.lastIndex=0;return copy.test(name);});\n}\n"
+    }
+  ]
+}

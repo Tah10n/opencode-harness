@@ -1,0 +1,1 @@
+import {checkout} from './checkout.mjs';export function purchase(stock,lines,prices){const result=checkout(stock,lines);return {...result,totalCents:lines.reduce((n,x)=>n+prices[x.sku]*x.qty,0)};}

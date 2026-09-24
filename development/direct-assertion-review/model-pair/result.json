@@ -1,0 +1,799 @@
+{
+  "freezeCommit": "184b41e43ea013f19a8ec1f97b7e4746a6152b26",
+  "outcome": {
+    "status": "finished",
+    "pause": null
+  },
+  "rows": [
+    {
+      "slot": 1,
+      "arm": "AR0",
+      "status": "completed",
+      "nativeOutcome": {
+        "slot": 1,
+        "task": "account-switch-ledger",
+        "arm": "AR0",
+        "project": "Tah10n/viberacing",
+        "source": "/Users/tahion/dev/opencode-harness/.worktrees/native-task-workflow/local/direct-assertion-review-model-pair/AR0-input",
+        "exitCode": 0,
+        "signal": null,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "timedOut": false,
+        "stopReason": null,
+        "researchBoundary": "not-reached",
+        "completedAt": 1790068600860,
+        "executionElapsedMs": 1657252,
+        "cleanupElapsedMs": 55,
+        "elapsedMs": 1657307,
+        "parseErrors": 0,
+        "phaseCount": 1,
+        "continuationApplied": false,
+        "nativeCompleted": true,
+        "requests": 98,
+        "requestsWithoutUsage": 0,
+        "workflowStatus": "incomplete",
+        "repairs": 0,
+        "toolCalls": 138,
+        "sessions": 2,
+        "delivery": "/work/repo/.git/harness-task/d6deb21a-3ef2-4fe6-8421-a77e3bdc2f5e/worktree",
+        "ownTaskDeadlineTriggered": false
+      },
+      "workflowStatus": "incomplete",
+      "Q": false,
+      "T": true,
+      "D": false,
+      "providerRequests": 98,
+      "requestsByKind": {
+        "title": 1,
+        "work": 97
+      },
+      "unknownServerCompletion": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 16554131,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 41721,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 11769344,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 23059,
+          "unknown_requests": 0
+        },
+        "subsetNote": "Cached is included in input, reasoning in output; never add subsets again."
+      },
+      "termination": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "terminalPatchEqualsCapture": true,
+      "receipts": [
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR0/started.json",
+          "bytes": 269,
+          "sha256": "17a4dd949df3814c58d35df2c623f165a69f8f4ff488fb7d6aa0280420fff71e"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR0/completed.json",
+          "bytes": 300,
+          "sha256": "b9051894a9ae9097673eda360de8cd15efabd882f45dc5cb5f4f4d3727032437"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR0/result.json",
+          "bytes": 898,
+          "sha256": "b5a056e26f16453b087a1ac4029190eb8fc5c779f41bd031dd260697851f5a0d"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR0/stop-verification.json",
+          "bytes": 225,
+          "sha256": "52fe5323a7721048db9c6f77a774173b862430ddd3637f53737e02cb3d350d1d"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR0/provider-metadata.json",
+          "bytes": 117532,
+          "sha256": "b8277fa17dbaed68bf26693f8b99d86402c31a1eaa069365f6de325901a178b8"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR0/native-evidence.json",
+          "bytes": 1951268,
+          "sha256": "59f9f64e2bd73b8960ae44bada1ed316df18d2197b66b5f38ffc767506716e9d"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR0/patch-capture.json",
+          "bytes": 176,
+          "sha256": "e29232a2e3da95ba4a90672ae42ca085fc57db3b9a1d0d1d57dfa88805623b6f"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR0/evidence-capture.json",
+          "bytes": 105,
+          "sha256": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR0/native-output/manifest.json",
+          "bytes": 472,
+          "sha256": "376acbd65471b8069f82ecf3230b7e11c741b01f5463a9535021e92e43d2b44c"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR0/session/finished.json",
+          "bytes": 326,
+          "sha256": "5a4ba80ffc4d32af09b088c9d0640f4e7e06c1395f32177f99b9937a5c872eba"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR0/session/cleanup.json",
+          "bytes": 58,
+          "sha256": "a1b289a69f5bd9c40924b5395e29df6870f9fab8b04e38f1cedc106eff144916"
+        }
+      ],
+      "requestsByRole": {
+        "title": 1,
+        "parent": 2,
+        "author": 95
+      },
+      "usageByRole": {
+        "author": {
+          "input_tokens": 16540412,
+          "output_tokens": 41466,
+          "cached_tokens": 11769344,
+          "reasoning_tokens": 22930
+        },
+        "parent": {
+          "input_tokens": 13142,
+          "output_tokens": 203,
+          "cached_tokens": 0,
+          "reasoning_tokens": 88
+        },
+        "title": {
+          "input_tokens": 577,
+          "output_tokens": 52,
+          "cached_tokens": 0,
+          "reasoning_tokens": 41
+        }
+      },
+      "nativeTools": 138,
+      "toolsByKind": {
+        "harness_task": 1,
+        "todowrite": 3,
+        "glob": 3,
+        "grep": 14,
+        "bash": 39,
+        "read": 44,
+        "apply_patch": 34
+      },
+      "nativeSessions": 2,
+      "toolsBySessionRole": {
+        "parent": 1,
+        "author": 137
+      },
+      "bashDurationMs": 123207,
+      "bashTimeByPurpose": {
+        "otherBash": {
+          "calls": 13,
+          "durationMs": 3377
+        },
+        "syntax": {
+          "calls": 3,
+          "durationMs": 670
+        },
+        "tests": {
+          "calls": 21,
+          "durationMs": 118816
+        },
+        "projectVerify": {
+          "calls": 2,
+          "durationMs": 344
+        }
+      },
+      "slotElapsedMs": 1660554,
+      "patch": {
+        "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR0/model.patch",
+        "bytes": 36612,
+        "sha256": "407c5dabac36c1272d494fd48d812129ccd1d11c556e3d8e7731c47cdfa54fc8"
+      },
+      "evaluation": {
+        "patchSha256": "407c5dabac36c1272d494fd48d812129ccd1d11c556e3d8e7731c47cdfa54fc8",
+        "delivery_apply": true,
+        "applyReceipt": {
+          "file": "local/direct-assertion-review-model-pair/evaluation-AR0/apply.json",
+          "sha256": "d837befda3e13ee104e36a19cd121dbb5927dc6ca63ec1043e933878bcdcc94c",
+          "exitCode": 0,
+          "counts": {
+            "tests": null,
+            "pass": null,
+            "fail": null,
+            "skipped": null
+          },
+          "durationMs": 21
+        },
+        "assessment_integrity": "verified",
+        "F": [
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR0/F-readers.json",
+            "sha256": "7a35eddf10eb71ad0b960b3ab54e1b69c6a4976f658967a73f6382ad72538b4e",
+            "exitCode": 0,
+            "counts": {
+              "tests": 90,
+              "pass": 90,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 530
+          },
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR0/F-config.json",
+            "sha256": "31cf1b4bfe559fdf6cc61d66fd85cebffd65c65145389985dc2fe72f6042962e",
+            "exitCode": 0,
+            "counts": {
+              "tests": 103,
+              "pass": 103,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 36290
+          },
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR0/F-protocol.json",
+            "sha256": "951771c6269812d44ff7e25e1e1ac5e4af19f5174e1c78b4e3cf8b4a06e74589",
+            "exitCode": 0,
+            "counts": {
+              "tests": 14,
+              "pass": 14,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 251
+          }
+        ],
+        "E": [
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR0/E-account-switch-ledger.json",
+            "sha256": "24c172fbebce0f6dc30e4468e051b1ff584dd33854f57e1211dc6e5b94118ce9",
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 238
+          },
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR0/E-ledger-lifecycle.json",
+            "sha256": "c3ad339fd8c7475783f57ea597920ae6220225d57538f1c6264132a23050be8b",
+            "exitCode": 0,
+            "counts": {
+              "tests": 5,
+              "pass": 5,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 300
+          },
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR0/E-legacy-input.json",
+            "sha256": "ad6315e9ac919669bc5a54ed0502e94e0eb0912b7a0654844c97c31be7c82634",
+            "exitCode": 0,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 295
+          },
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR0/E-kimi-migration.json",
+            "sha256": "6066aaae4860c50cb7866b47dc6d0cb5e5be73898a23b2008097290eaf02f03f",
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 264
+          },
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR0/E-migration-contract.json",
+            "sha256": "dd88edd56d8f98c0fd2d95ba1c4e98342d20f509bdfe575c16b44a3b66e45110",
+            "exitCode": 1,
+            "counts": {
+              "tests": 8,
+              "pass": 5,
+              "fail": 3,
+              "skipped": 0
+            },
+            "durationMs": 273
+          },
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR0/E-cli-persistence.json",
+            "sha256": "41ba46eb363961ca1063f557b5efbf4fb1f04996b097a83be8bfecb36ceacbe0",
+            "exitCode": 0,
+            "counts": {
+              "tests": 6,
+              "pass": 6,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 2122
+          }
+        ],
+        "projectVerify": {
+          "file": "local/direct-assertion-review-model-pair/evaluation-AR0/F-project-verify.json",
+          "sha256": "6803fa58044819da978131eda34952e1d7c213587725ee20f7e5a4f66f8bf4cf",
+          "exitCode": 1,
+          "counts": {
+            "tests": null,
+            "pass": null,
+            "fail": null,
+            "skipped": null
+          },
+          "durationMs": 291
+        },
+        "implementationTreeSha256": "8cb050e764cc81eb7995c6b87db71d4d5569378d3dbbe4db238a616f50c3dcfe",
+        "unchangedImplementationCopies": true,
+        "baselineInputSha256": "ea549fcc30d8facef77af8ebebc280910a24537e44ad8c6cfcbdc4888b5dcab1",
+        "Q": null,
+        "contractTests": {
+          "tests": 23,
+          "pass": 20,
+          "fail": 3,
+          "skipped": 0
+        },
+        "completeBehavioralInventory": true,
+        "supplemental": [
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR0/E-diagnose.json",
+            "sha256": "9734af7353c4c5d0bd538da02be3c2cc6fb628911bc0ea2a66e3cbddece70083",
+            "exitCode": 0,
+            "counts": {
+              "tests": null,
+              "pass": null,
+              "fail": null,
+              "skipped": null
+            },
+            "durationMs": 217
+          },
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR0/E-privacy-observation.json",
+            "sha256": "19ed0b673274d7ab57878caa8a1693c06d93096fb301676c8ec8c11a203f746a",
+            "exitCode": 0,
+            "counts": {
+              "tests": null,
+              "pass": null,
+              "fail": null,
+              "skipped": null
+            },
+            "durationMs": 199
+          }
+        ],
+        "additionalF": [
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR0/F-additional-affected-tests.json",
+            "sha256": "636175aef18592090558c741334d4f3639eaa26260e510bc0f915cdfd0665769",
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 226
+          }
+        ],
+        "frozenEvaluatorSha256": "c9ce97281f011d61ba8b9372940f05a2aba5141af6109ff65f23a72c72473169",
+        "procedureUnchanged": true,
+        "evaluationElapsedMs": 42061
+      }
+    },
+    {
+      "slot": 2,
+      "arm": "AR1",
+      "status": "completed",
+      "nativeOutcome": {
+        "slot": 2,
+        "task": "account-switch-ledger",
+        "arm": "AR1",
+        "project": "Tah10n/viberacing",
+        "source": "/Users/tahion/dev/opencode-harness/.worktrees/native-task-workflow/local/direct-assertion-review-model-pair/AR1-input",
+        "exitCode": 0,
+        "signal": null,
+        "termination": {
+          "terminationVerified": true,
+          "killed": []
+        },
+        "timedOut": false,
+        "stopReason": null,
+        "researchBoundary": "not-reached",
+        "completedAt": 1790070107302,
+        "executionElapsedMs": 1502435,
+        "cleanupElapsedMs": 58,
+        "elapsedMs": 1502493,
+        "parseErrors": 0,
+        "phaseCount": 1,
+        "continuationApplied": false,
+        "nativeCompleted": true,
+        "requests": 88,
+        "requestsWithoutUsage": 0,
+        "workflowStatus": "incomplete",
+        "repairs": 0,
+        "toolCalls": 136,
+        "sessions": 2,
+        "delivery": "/work/repo/.git/harness-task/d4c23d13-53f7-4de0-90ac-85190f1f1225/worktree",
+        "ownTaskDeadlineTriggered": false
+      },
+      "workflowStatus": "incomplete",
+      "Q": false,
+      "T": true,
+      "D": false,
+      "providerRequests": 88,
+      "requestsByKind": {
+        "title": 1,
+        "work": 87
+      },
+      "unknownServerCompletion": 0,
+      "usage": {
+        "input_tokens": {
+          "observed": 16766077,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 35666,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 11984384,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 19542,
+          "unknown_requests": 0
+        },
+        "subsetNote": "Cached is included in input, reasoning in output; never add subsets again."
+      },
+      "termination": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "terminalPatchEqualsCapture": true,
+      "receipts": [
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR1/started.json",
+          "bytes": 269,
+          "sha256": "b6bc22b1c4e541f086e0df9111cb0e595ad560a44bd0a26ed70d1152685163a5"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR1/completed.json",
+          "bytes": 300,
+          "sha256": "999359ec43ba3afb2b434f35273254971505fc7699e17619fdb414a3466b9ae1"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR1/result.json",
+          "bytes": 898,
+          "sha256": "bd66b3251d8796b2d9c571ecc9d51b3692226db3807062290598d0c7b61fc5d8"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR1/stop-verification.json",
+          "bytes": 225,
+          "sha256": "52fe5323a7721048db9c6f77a774173b862430ddd3637f53737e02cb3d350d1d"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR1/provider-metadata.json",
+          "bytes": 105611,
+          "sha256": "c9be6714c7c9e013b21bb7fb90dfb6a1c484a41f30c89ddc62f78353fad674cd"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR1/native-evidence.json",
+          "bytes": 2192219,
+          "sha256": "a0c9cf129aba35dcce7b8b6a5643f2f45d0a0764f9f28ab77472b5252284cc4b"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR1/patch-capture.json",
+          "bytes": 176,
+          "sha256": "d48a45933f47b91ca2b90f29c204a372a3fc1edcd1d6c198b961065c0e909391"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR1/evidence-capture.json",
+          "bytes": 105,
+          "sha256": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR1/native-output/manifest.json",
+          "bytes": 472,
+          "sha256": "572e1a899013c22052eb2ac3472eb0bc5c2722e6108096b9e1b408eb001bfd03"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR1/session/finished.json",
+          "bytes": 326,
+          "sha256": "25d1a33a590c69801300b428312013ac6d96a484757b3e00901db2343b3adef6"
+        },
+        {
+          "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR1/session/cleanup.json",
+          "bytes": 58,
+          "sha256": "a1b289a69f5bd9c40924b5395e29df6870f9fab8b04e38f1cedc106eff144916"
+        }
+      ],
+      "requestsByRole": {
+        "title": 1,
+        "parent": 2,
+        "author": 85
+      },
+      "usageByRole": {
+        "author": {
+          "input_tokens": 16752359,
+          "output_tokens": 35358,
+          "cached_tokens": 11984384,
+          "reasoning_tokens": 19364
+        },
+        "parent": {
+          "input_tokens": 13141,
+          "output_tokens": 212,
+          "cached_tokens": 0,
+          "reasoning_tokens": 94
+        },
+        "title": {
+          "input_tokens": 577,
+          "output_tokens": 96,
+          "cached_tokens": 0,
+          "reasoning_tokens": 84
+        }
+      },
+      "nativeTools": 136,
+      "toolsByKind": {
+        "harness_task": 1,
+        "todowrite": 3,
+        "glob": 3,
+        "grep": 19,
+        "read": 49,
+        "bash": 32,
+        "apply_patch": 29
+      },
+      "nativeSessions": 2,
+      "toolsBySessionRole": {
+        "parent": 1,
+        "author": 135
+      },
+      "bashDurationMs": 193210,
+      "bashTimeByPurpose": {
+        "otherBash": {
+          "calls": 8,
+          "durationMs": 1990
+        },
+        "syntax": {
+          "calls": 1,
+          "durationMs": 710
+        },
+        "tests": {
+          "calls": 21,
+          "durationMs": 190183
+        },
+        "projectVerify": {
+          "calls": 2,
+          "durationMs": 327
+        }
+      },
+      "slotElapsedMs": 1504967,
+      "patch": {
+        "path": "local/direct-assertion-review-model-pair/batch/runs/account-switch-ledger-AR1/model.patch",
+        "bytes": 35229,
+        "sha256": "b938a36c989e498d483028be6801a59a30e8977b84806c216975e573f7188faf"
+      },
+      "evaluation": {
+        "patchSha256": "b938a36c989e498d483028be6801a59a30e8977b84806c216975e573f7188faf",
+        "delivery_apply": true,
+        "applyReceipt": {
+          "file": "local/direct-assertion-review-model-pair/evaluation-AR1/apply.json",
+          "sha256": "d37a0dac42beb5377b7f7151122b8fa7284380d171a432db7519eba1488387e3",
+          "exitCode": 0,
+          "counts": {
+            "tests": null,
+            "pass": null,
+            "fail": null,
+            "skipped": null
+          },
+          "durationMs": 22
+        },
+        "assessment_integrity": "verified",
+        "F": [
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR1/F-readers.json",
+            "sha256": "f46a731a3338e430a439b4e7fc6c1819b4e4844a78d50d9ef249e26c637823af",
+            "exitCode": 0,
+            "counts": {
+              "tests": 89,
+              "pass": 89,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 517
+          },
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR1/F-config.json",
+            "sha256": "f8b151016014e6a99bb0399be4c379fa9f8b434a0c9708efaa3410552bff05cc",
+            "exitCode": 0,
+            "counts": {
+              "tests": 103,
+              "pass": 103,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 36211
+          },
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR1/F-protocol.json",
+            "sha256": "f87f0c51c2d4d29c899adb1b03e92cc2db358c38da8cd781221cc8abda21112a",
+            "exitCode": 0,
+            "counts": {
+              "tests": 14,
+              "pass": 14,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 239
+          }
+        ],
+        "E": [
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR1/E-account-switch-ledger.json",
+            "sha256": "0291fec5236f6ba67047cb5888501ee776fdf0b59acfe7da20c9d1380841bf07",
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 243
+          },
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR1/E-ledger-lifecycle.json",
+            "sha256": "1a85faebcdb90135b197aebb0a7db6f71f0fa06e3eb9d4d906f9bbd317dd80ac",
+            "exitCode": 0,
+            "counts": {
+              "tests": 5,
+              "pass": 5,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 288
+          },
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR1/E-legacy-input.json",
+            "sha256": "73c60371dc5ab4d803480a8df7265224aa9ac7506ab002f4c35df70308f3c0b3",
+            "exitCode": 0,
+            "counts": {
+              "tests": 2,
+              "pass": 2,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 244
+          },
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR1/E-kimi-migration.json",
+            "sha256": "a5961933325cc2d7dc76fb1740e891dafea731d7b17389f7a5e3bea899dbb15b",
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 254
+          },
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR1/E-migration-contract.json",
+            "sha256": "a119a3326945b10a99ab929e89801cd23374f26701b188e9dd95b49fec8d33fa",
+            "exitCode": 1,
+            "counts": {
+              "tests": 8,
+              "pass": 2,
+              "fail": 6,
+              "skipped": 0
+            },
+            "durationMs": 291
+          },
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR1/E-cli-persistence.json",
+            "sha256": "4084c675a0a1fdf3855d83a5c8eedc5a5bd8e14d7f21d1c35575fa8c3a7f67ce",
+            "exitCode": 0,
+            "counts": {
+              "tests": 6,
+              "pass": 6,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 2124
+          }
+        ],
+        "projectVerify": {
+          "file": "local/direct-assertion-review-model-pair/evaluation-AR1/F-project-verify.json",
+          "sha256": "9db9f7d828c9e5555ca3cbb88dfd196194b50e0dc5b23cc5594e6707b5e44179",
+          "exitCode": 1,
+          "counts": {
+            "tests": null,
+            "pass": null,
+            "fail": null,
+            "skipped": null
+          },
+          "durationMs": 269
+        },
+        "implementationTreeSha256": "94240a16c6cc10a045308edf3aedbade3523cbea1f01aad9cfcb8c5f7a1ee355",
+        "unchangedImplementationCopies": true,
+        "baselineInputSha256": "ea549fcc30d8facef77af8ebebc280910a24537e44ad8c6cfcbdc4888b5dcab1",
+        "Q": null,
+        "contractTests": {
+          "tests": 23,
+          "pass": 17,
+          "fail": 6,
+          "skipped": 0
+        },
+        "completeBehavioralInventory": true,
+        "supplemental": [
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR1/E-diagnose.json",
+            "sha256": "4a43d7d866d31598da0c6e6beb1c6e4f4e89655af7eac8ad6dd40fe4f9c2d003",
+            "exitCode": 0,
+            "counts": {
+              "tests": null,
+              "pass": null,
+              "fail": null,
+              "skipped": null
+            },
+            "durationMs": 221
+          },
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR1/E-privacy-observation.json",
+            "sha256": "5cf5c4134a99a1008490ea5e4fb569b22a722fd60898d2ff4832b977da35bc6c",
+            "exitCode": 0,
+            "counts": {
+              "tests": null,
+              "pass": null,
+              "fail": null,
+              "skipped": null
+            },
+            "durationMs": 200
+          }
+        ],
+        "additionalF": [
+          {
+            "file": "local/direct-assertion-review-model-pair/evaluation-AR1/F-additional-affected-tests.json",
+            "sha256": "5785799e25d763f0cc570d4aa75591294a6cdea86108b8fd6d31fee7c9ab262a",
+            "exitCode": 0,
+            "counts": {
+              "tests": 1,
+              "pass": 1,
+              "fail": 0,
+              "skipped": 0
+            },
+            "durationMs": 227
+          }
+        ],
+        "frozenEvaluatorSha256": "c9ce97281f011d61ba8b9372940f05a2aba5141af6109ff65f23a72c72473169",
+        "procedureUnchanged": true,
+        "evaluationElapsedMs": 41866
+      }
+    }
+  ],
+  "rawProviderSSE": "Not saved for this new experiment kind: response recording allowlist was not extended. Terminal provider metadata, outgoing request histories, native evidence and linked full tool outputs remain the evidence sources; no raw SSE reconstruction.",
+  "monetaryCost": null,
+  "monetaryCostReason": "No billing record; no dollar estimate.",
+  "separateAccounting": "Scripted/preparation/evaluator/developing-agent work is excluded from Luna totals; developing-agent token and billing totals unavailable."
+}

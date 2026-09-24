@@ -1,0 +1,318 @@
+diff --git a/README.md b/README.md
+index e45aa101e2de2e403423cefd05f1d5d16796a61a..a3e7d2f94e6de146688f68d60cd324c311fe0b0d 100644
+--- a/README.md
++++ b/README.md
+@@ -72,6 +72,18 @@ EE.on('another-event', emitted, context);
+ EE.removeListener('another-event', emitted, context);
+ ```
+ 
++### Collecting listener results
++
++`EventEmitter.emitCollect` synchronously invokes the listeners registered for
++an event and returns a new array containing each listener's return value in
++registration order. It forwards arguments and uses the same listener context
++as `emit`; promises are returned as-is and are not awaited.
++
++```js
++var results = EE.emitCollect('event-name', 'payload');
++// results contains the exact values returned by the listeners.
++```
++
+ ### Tests and benchmarks
+ 
+ To run tests run `npm test`. To run the benchmarks run `npm run benchmark`.
+diff --git a/index.d.ts b/index.d.ts
+index fab37fd606a62cd2dc81ff0b8007a26447916438..2238419a6e7dfc38ee03279c379d155b56894726 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -34,6 +34,15 @@ declare class EventEmitter<
+     ...args: EventEmitter.EventArgs<EventTypes, T>
+   ): boolean;
+ 
++  /**
++   * Calls each of the listeners registered for a given event and returns their
++   * results.
++   */
++  emitCollect<T extends EventEmitter.EventNames<EventTypes>>(
++    event: T,
++    ...args: EventEmitter.EventArgs<EventTypes, T>
++  ): unknown[];
++
+   /**
+    * Add a listener for a given event.
+    */
+diff --git a/index.js b/index.js
+index 6ea485c40a694deb72801fcd0048a3c44de95403..1840a435ae1d489f857b90069b2bf9c3f7270032 100644
+--- a/index.js
++++ b/index.js
+@@ -82,6 +82,35 @@ function clearEvent(emitter, evt) {
+   else delete emitter._events[evt];
+ }
+ 
++/**
++ * Remove one exact listener registration.
++ *
++ * @param {EventEmitter} emitter Reference to the `EventEmitter` instance.
++ * @param {(String|Symbol)} event The event name.
++ * @param {EE} listener The listener registration.
++ * @private
++ */
++function removeListenerInstance(emitter, event, listener) {
++  var evt = prefix ? prefix + event : event
++    , listeners = emitter._events[evt]
++    , remaining;
++
++  if (!listeners) return;
++  if (listeners === listener) {
++    clearEvent(emitter, evt);
++    return;
++  }
++  if (listeners.fn) return;
++
++  remaining = [];
++  for (var i = 0, length = listeners.length; i < length; i++) {
++    if (listeners[i] !== listener) remaining.push(listeners[i]);
++  }
++
++  if (remaining.length) emitter._events[evt] = remaining.length === 1 ? remaining[0] : remaining;
++  else clearEvent(emitter, evt);
++}
++
+ /**
+  * Minimal `EventEmitter` interface that is molded against the Node.js
+  * `EventEmitter` interface.
+@@ -215,6 +244,37 @@ EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+   return true;
+ };
+ 
++/**
++ * Calls each of the listeners registered for a given event and returns their
++ * results.
++ *
++ * @param {(String|Symbol)} event The event name.
++ * @returns {Array} The results returned by the listeners.
++ * @public
++ */
++EventEmitter.prototype.emitCollect = function emitCollect(event) {
++  var evt = prefix ? prefix + event : event
++    , listeners = this._events[evt]
++    , snapshot
++    , args
++    , results
++    , i;
++
++  if (!listeners) return [];
++
++  snapshot = listeners.fn ? [listeners] : listeners.slice();
++  args = new Array(arguments.length - 1);
++  for (i = 1; i < arguments.length; i++) args[i - 1] = arguments[i];
++
++  results = new Array(snapshot.length);
++  for (i = 0; i < snapshot.length; i++) {
++    if (snapshot[i].once) removeListenerInstance(this, event, snapshot[i]);
++    results[i] = snapshot[i].fn.apply(snapshot[i].context, args);
++  }
++
++  return results;
++};
++
+ /**
+  * Add a listener for a given event.
+  *
+diff --git a/test/test.js b/test/test.js
+index e5f8aaad6a7fd7f706a807882b7a4a80d076120c..629abf4d76a688152050b1cc5e56a5a7a71f5e69 100644
+--- a/test/test.js
++++ b/test/test.js
+@@ -257,6 +257,142 @@ describe('EventEmitter', function tests() {
+     ]);
+   });
+ 
++  describe('EventEmitter#emitCollect', function () {
++    it('collects ordered values with contexts, arguments, and identities', function () {
++      var e = new EventEmitter()
++        , firstContext = {}
++        , secondContext = {}
++        , object = {}
++        , promise = Promise.resolve(object)
++        , contexts = []
++        , received;
++
++      e.on('foo', function () {
++        contexts.push(this);
++        received = Array.prototype.slice.call(arguments);
++        return object;
++      }, firstContext);
++
++      e.on('foo', function () {
++        contexts.push(this);
++        return promise;
++      }, secondContext);
++
++      e.on('foo', function () {
++        contexts.push(this);
++      });
++
++      var results = e.emitCollect('foo', 1, 2, 3, 4, 5, 6, 7);
++
++      assume(results.length).equals(3);
++      assume(results[0]).equals(object);
++      assume(results[1]).equals(promise);
++      assume(results[2]).equals(undefined);
++      assume(contexts[0]).equals(firstContext);
++      assume(contexts[1]).equals(secondContext);
++      assume(contexts[2]).equals(e);
++      assume(received).eql([1, 2, 3, 4, 5, 6, 7]);
++    });
++
++    it('supports zero arguments and symbols', function () {
++      var e = new EventEmitter()
++        , value = {}
++        , event = 'foo';
++
++      e.on(event, function () {
++        assume(arguments.length).equals(0);
++        return value;
++      });
++
++      assume(e.emitCollect(event)[0]).equals(value);
++
++      if ('undefined' !== typeof Symbol) {
++        event = Symbol('foo');
++        e.on(event, function () {
++          return value;
++        });
++
++        assume(e.emitCollect(event)[0]).equals(value);
++      }
++    });
++
++    it('returns a fresh empty array when there are no listeners', function () {
++      var e = new EventEmitter()
++        , first = e.emitCollect('missing')
++        , second = e.emitCollect('missing');
++
++      assume(first).eql([]);
++      assume(second).eql([]);
++      assume(first === second).equals(false);
++    });
++
++    it('removes once listeners before invoking them for reentrancy', function () {
++      var e = new EventEmitter()
++        , calls = 0
++        , nested;
++
++      e.once('foo', function () {
++        calls++;
++        nested = e.emitCollect('foo');
++        return 'outer';
++      });
++
++      assume(e.emitCollect('foo')).eql(['outer']);
++      assume(nested).eql([]);
++      assume(e.emitCollect('foo')).eql([]);
++      assume(calls).equals(1);
++    });
++
++    it('uses a registration snapshot when listeners are added or removed', function () {
++      var e = new EventEmitter()
++        , changed = false
++        , second = function () { return 'second'; }
++        , third = function () { return 'third'; };
++
++      e.on('foo', function () {
++        if (!changed) {
++          changed = true;
++          e.on('foo', third);
++          e.removeListener('foo', second);
++        }
++
++        return 'first';
++      });
++      e.on('foo', second);
++
++      assume(e.emitCollect('foo')).eql(['first', 'second']);
++      assume(e.emitCollect('foo')).eql(['first', 'third']);
++    });
++
++    it('propagates thrown values and preserves subsequent state', function () {
++      var e = new EventEmitter()
++        , thrown = {}
++        , calls = 0
++        , after = 0;
++
++      e.once('foo', function () {
++        calls++;
++        throw thrown;
++      });
++      e.on('foo', function () {
++        after++;
++        return 'after';
++      });
++
++      try {
++        e.emitCollect('foo');
++      } catch (error) {
++        assume(error).equals(thrown);
++      }
++
++      assume(calls).equals(1);
++      assume(after).equals(0);
++      assume(e.listenerCount('foo')).equals(1);
++      assume(e.emitCollect('foo')).eql(['after']);
++      assume(after).equals(1);
++    });
++  });
++
+   describe('EventEmitter#listeners', function () {
+     it('returns an empty array if no listeners are specified', function () {
+       var e = new EventEmitter();
+diff --git a/test/test.mjs b/test/test.mjs
+index 7b50c82d131d027f65a0b7568f670a38cbb92ae6..3b1d23fa3b9fa11f47f14c109b69019826e95752 100644
+--- a/test/test.mjs
++++ b/test/test.mjs
+@@ -1,3 +1,4 @@
++import assert from 'node:assert/strict';
+ import EventEmitterDefault, { EventEmitter } from '../index.mjs';
+ 
+ it('exports `EventEmitter` as default export', () => {
+@@ -7,3 +8,15 @@ it('exports `EventEmitter` as default export', () => {
+ it('exports `EventEmitter` as a named export', () => {
+   new EventEmitter();
+ })
++
++it('supports `emitCollect` from both ESM exports', () => {
++  const value = {};
++  const defaultEmitter = new EventEmitterDefault();
++  const namedEmitter = new EventEmitter();
++
++  defaultEmitter.on('event', () => value);
++  namedEmitter.on('event', () => value);
++
++  assert.deepEqual(defaultEmitter.emitCollect('event'), [value]);
++  assert.deepEqual(namedEmitter.emitCollect('event'), [value]);
++})
+diff --git a/test/types.ts b/test/types.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..e0944860554ca7ff353de546af82566f8fa89ae5
+--- /dev/null
++++ b/test/types.ts
+@@ -0,0 +1,19 @@
++import EventEmitter from '../index';
++
++interface Events {
++  data: [string, number];
++  done: [];
++}
++
++const emitter = new EventEmitter<Events>();
++const dataResults: unknown[] = emitter.emitCollect('data', 'value', 1);
++const doneResults: unknown[] = emitter.emitCollect('done');
++
++void dataResults;
++void doneResults;
++
++// @ts-expect-error Event arguments remain checked for emitCollect.
++emitter.emitCollect('data', 'value');
++
++// @ts-expect-error Event names remain checked for emitCollect.
++emitter.emitCollect('missing');

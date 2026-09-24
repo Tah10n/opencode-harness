@@ -1,0 +1,266 @@
+diff --git a/README.md b/README.md
+index e45aa10..dca79a8 100644
+--- a/README.md
++++ b/README.md
+@@ -54,7 +54,8 @@ http://nodejs.org/api/events.html
+ ### Contextual emits
+ 
+ We've upgraded the API of the `EventEmitter.on`, `EventEmitter.once` and
+-`EventEmitter.removeListener` to accept an extra argument which is the `context`
++`EventEmitter.removeListener` and `EventEmitter.removeListenersByContext` to
++accept an extra argument which is the `context`
+ or `this` value that should be set for the emitted events. This means you no
+ longer have the overhead of an event that required `fn.bind` in order to get a
+ custom `this` value.
+@@ -70,8 +71,15 @@ function emitted() {
+ EE.once('event-name', emitted, context);
+ EE.on('another-event', emitted, context);
+ EE.removeListener('another-event', emitted, context);
++EE.removeListenersByContext(context); // returns the number of registrations removed
+ ```
+ 
++`removeListenersByContext` removes every registration across all event names
++whose stored context is strictly equal to the supplied value. Duplicate and
++one-time registrations are counted separately. As with `on` and `once`, an
++omitted or falsy context is normalized to the emitter itself, so those
++listeners can be removed with `EE.removeListenersByContext(EE)`.
++
+ ### Tests and benchmarks
+ 
+ To run tests run `npm test`. To run the benchmarks run `npm run benchmark`.
+diff --git a/index.d.ts b/index.d.ts
+index fab37fd..d80c217 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -73,6 +73,11 @@ declare class EventEmitter<
+     once?: boolean
+   ): this;
+ 
++  /**
++   * Remove all listeners that use the given invocation context.
++   */
++  removeListenersByContext(context: Context | this): number;
++
+   /**
+    * Remove all listeners, or those of the specified event.
+    */
+diff --git a/index.js b/index.js
+index 6ea485c..5d637bb 100644
+--- a/index.js
++++ b/index.js
+@@ -82,6 +82,46 @@ function clearEvent(emitter, evt) {
+   else delete emitter._events[evt];
+ }
+ 
++/**
++ * Remove listeners for a given event whose context matches exactly.
++ *
++ * @param {EventEmitter} emitter Reference to the `EventEmitter` instance.
++ * @param {(String|Symbol)} evt The event name.
++ * @param {*} context The context to match.
++ * @returns {Number} The number of listeners removed.
++ * @private
++ */
++function removeListenersForContext(emitter, evt, context) {
++  var listeners = emitter._events[evt]
++    , remaining
++    , i;
++
++  if (!listeners) return 0;
++
++  if (listeners.fn) {
++    if (listeners.context === context) {
++      clearEvent(emitter, evt);
++      return 1;
++    }
++
++    return 0;
++  }
++
++  remaining = [];
++  for (i = 0; i < listeners.length; i++) {
++    if (listeners[i].context === context) continue;
++    remaining.push(listeners[i]);
++  }
++
++  if (remaining.length) {
++    emitter._events[evt] = remaining.length === 1 ? remaining[0] : remaining;
++  } else {
++    clearEvent(emitter, evt);
++  }
++
++  return listeners.length - remaining.length;
++}
++
+ /**
+  * Minimal `EventEmitter` interface that is molded against the Node.js
+  * `EventEmitter` interface.
+@@ -291,6 +331,32 @@ EventEmitter.prototype.removeListener = function removeListener(event, fn, conte
+   return this;
+ };
+ 
++/**
++ * Remove all listeners that use the given invocation context.
++ *
++ * @param {*} context The context to match exactly.
++ * @returns {Number} The number of listeners removed.
++ * @public
++ */
++EventEmitter.prototype.removeListenersByContext = function removeListenersByContext(context) {
++  var events = this._events
++    , count = 0
++    , evt;
++
++  for (evt in events) {
++    if (has.call(events, evt)) count += removeListenersForContext(this, evt, context);
++  }
++
++  if (Object.getOwnPropertySymbols) {
++    var symbols = Object.getOwnPropertySymbols(events);
++    for (var i = 0; i < symbols.length; i++) {
++      count += removeListenersForContext(this, symbols[i], context);
++    }
++  }
++
++  return count;
++};
++
+ /**
+  * Remove all listeners, or those of the specified event.
+  *
+diff --git a/test/test.js b/test/test.js
+index e5f8aaa..0f3e538 100644
+--- a/test/test.js
++++ b/test/test.js
+@@ -523,6 +523,108 @@ describe('EventEmitter', function tests() {
+     });
+   });
+ 
++  describe('EventEmitter#removeListenersByContext', function () {
++    if ('undefined' !== typeof Symbol) it('distinguishes shared callbacks by context across event types', function () {
++      var e = new EventEmitter()
++        , event = Symbol('event')
++        , first = {}
++        , second = {}
++        , listener = function () {};
++
++      e.on('message', listener, first);
++      e.on('message', listener, first);
++      e.once(event, listener, first);
++      e.on('message', listener, second);
++      e.once(event, listener, second);
++
++      assume(e.listenerCount('message')).equals(3);
++      assume(e.listenerCount(event)).equals(2);
++      assume(e.removeListenersByContext(first)).equals(3);
++      assume(e.listeners('message')).eql([listener]);
++      assume(e.listeners(event)).eql([listener]);
++      assume(e.listenerCount('message')).equals(1);
++      assume(e.listenerCount(event)).equals(1);
++
++      assume(e.removeListenersByContext(second)).equals(2);
++      assume(e.eventNames()).eql([]);
++      assume(e.listenerCount('message')).equals(0);
++      assume(e.listenerCount(event)).equals(0);
++    });
++
++    it('removes empty event names, preserves order, and supports reuse', function () {
++      var e = new EventEmitter()
++        , event = 'undefined' !== typeof Symbol ? Symbol('event') : 'symbol-event'
++        , target = {}
++        , other = {}
++        , first = function () {}
++        , second = function () {}
++        , third = function () {}
++        , fourth = function () {};
++
++      e.on('alpha', first, target);
++      e.on('alpha', second, other);
++      e.once('alpha', third, target);
++      e.on('alpha', fourth, other);
++      e.once('beta', first, target);
++      e.on(event, second, target);
++      e.on('omega', third, other);
++
++      assume(e.listenerCount('alpha')).equals(4);
++      assume(e.listenerCount('beta')).equals(1);
++      assume(e.listenerCount(event)).equals(1);
++      assume(e.eventNames()).eql(['alpha', 'beta', 'omega', event]);
++
++      assume(e.removeListenersByContext(target)).equals(4);
++      assume(e.listeners('alpha')).eql([second, fourth]);
++      assume(e.eventNames()).eql(['alpha', 'omega']);
++      assume(e.listenerCount('beta')).equals(0);
++      assume(e.listenerCount(event)).equals(0);
++      assume(e._eventsCount).equals(2);
++      assume(e.removeListenersByContext(target)).equals(0);
++
++      var reusable = new EventEmitter()
++        , calls = 0;
++      reusable.on('event', first, target);
++      if ('undefined' !== typeof Symbol) reusable.once(event, second, target);
++
++      assume(reusable.listenerCount('event')).equals(1);
++      assume(reusable.listenerCount(event)).equals('undefined' !== typeof Symbol ? 1 : 0);
++      assume(reusable.eventNames().length).equals('undefined' !== typeof Symbol ? 2 : 1);
++      assume(reusable.removeListenersByContext(target)).equals('undefined' !== typeof Symbol ? 2 : 1);
++      assume(reusable.eventNames()).eql([]);
++      assume(reusable._eventsCount).equals(0);
++
++      reusable.on('reused', function () { calls++; });
++      assume(reusable.emit('reused')).equals(true);
++      assume(calls).equals(1);
++    });
++
++    it('uses the emitter for omitted and falsy registration contexts', function () {
++      var e = new EventEmitter()
++        , omitted = function () {}
++        , zero = function () {}
++        , nullContext = function () {}
++        , falseContext = function () {}
++        , prefix = EventEmitter.prefixed || '';
++
++      e.on('omitted', omitted);
++      e.once('zero', zero, 0);
++      e.on('null', nullContext, null);
++      e.on('false', falseContext, false);
++
++      assume(e._events[prefix + 'omitted'].context).equals(e);
++      assume(e._events[prefix + 'zero'].context).equals(e);
++      assume(e._events[prefix + 'null'].context).equals(e);
++      assume(e._events[prefix + 'false'].context).equals(e);
++      assume(e.removeListenersByContext(0)).equals(0);
++      assume(e.listenerCount('zero')).equals(1);
++
++      assume(e.removeListenersByContext(e)).equals(4);
++      assume(e.eventNames()).eql([]);
++      assume(e._eventsCount).equals(0);
++    });
++  });
++
+   describe('EventEmitter#removeAllListeners', function () {
+     it('removes all events for the specified events', function () {
+       var e = new EventEmitter();
+diff --git a/test/test.mjs b/test/test.mjs
+index 7b50c82..1e6be9f 100644
+--- a/test/test.mjs
++++ b/test/test.mjs
+@@ -1,4 +1,5 @@
+ import EventEmitterDefault, { EventEmitter } from '../index.mjs';
++import assert from 'node:assert/strict';
+ 
+ it('exports `EventEmitter` as default export', () => {
+   new EventEmitterDefault();
+@@ -7,3 +8,12 @@ it('exports `EventEmitter` as default export', () => {
+ it('exports `EventEmitter` as a named export', () => {
+   new EventEmitter();
+ })
++
++it('exposes `removeListenersByContext` from the ESM entry point', () => {
++  const emitter = new EventEmitterDefault();
++  const context = {};
++  const listener = () => {};
++
++  emitter.on('event', listener, context);
++  assert(emitter.removeListenersByContext(context) === 1);
++})

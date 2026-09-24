@@ -1,0 +1,458 @@
+{
+  "runtimeSha": "e18db1fe10223db52dcc05b3e769bca140367c2b",
+  "image": "sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6",
+  "node": "v24.19.0",
+  "compilerSha256": "569177652966bd528c319171c7dd22860dbf72bde116cbc4f644f1d02bb12e39",
+  "modules": {
+    "native-type-compat.mjs": "96f85cbc7ee01f3aeedc31cea51c0dd5c452afe220b4683df1b2d5fd987d9007",
+    "native-type-compat-worker.mjs": "c9cc1ff4922488ba1058d11af9f609a3fc5cef4a98aed7941ef5e8fe2f3eafc2",
+    "native-type-compat-generator.mjs": "321eff1892c9a5327e7f6e38f23a986c1be3fbaf26da5662b99cd27cac50cc68"
+  },
+  "profile": "returned-callable-strict-v1",
+  "baselineOnly": true,
+  "realProviderRequests": 0,
+  "results": [
+    {
+      "name": "quick-lru",
+      "commit": "f2fe88e2932603c038c61ca29de6ad5286148e1b",
+      "remote": "https://github.com/sindresorhus/quick-lru.git",
+      "archiveSha256": "5264a90e047bccde14f6b5705630d7aaf5ade2fa2987f985d517aee1dd5cfc6a",
+      "version": "7.3.0",
+      "publicEntry": "./index.d.ts",
+      "packageSha256": "06e41716adc7f8701625b3e37ff9b57489d17743a6449991eff7622e7401962d",
+      "projectScripts": {
+        "test": "xo && nyc ava && tsd"
+      },
+      "status": "unsupported",
+      "reason": "Conditional/multiple exports unsupported; not selecting an entry",
+      "admissibleConsumers": 0
+    },
+    {
+      "name": "denque",
+      "commit": "539105bb57854e997dd469221cdc52a0ad80e0a2",
+      "remote": "https://github.com/invertase/denque.git",
+      "archiveSha256": "14fa9752d9c01f312f26c8c234b99fd47a32a5583d9fcb230861f2457dc5d1a9",
+      "version": "2.1.0",
+      "publicEntry": "index.d.ts",
+      "packageSha256": "b84d3e7e26500d9a9ebbe103b627bda007049fa7f0672ceae96533992cc2fc9c",
+      "projectScripts": {
+        "test": "istanbul cover --report lcov _mocha && npm run typescript",
+        "coveralls": "cat ./coverage/lcov.info | coveralls",
+        "typescript": "tsc --project ./test/type/tsconfig.json",
+        "benchmark_thousand": "node benchmark/thousand",
+        "benchmark_2mil": "node benchmark/two_million",
+        "benchmark_splice": "node benchmark/splice",
+        "benchmark_remove": "node benchmark/remove",
+        "benchmark_removeOne": "node benchmark/removeOne",
+        "benchmark_growth": "node benchmark/growth",
+        "benchmark_toArray": "node benchmark/toArray",
+        "benchmark_fromArray": "node benchmark/fromArray"
+      },
+      "surfaceHash": "ca3fd80efb403aad3cc6b4ba1bc5f7a7a297052cdae455f79ea06cf6366881f7",
+      "declarations": [
+        {
+          "name": "index.d.ts",
+          "sha256": "ed849d616865076f44a41c87f27698f7cdf230290c44bafc71d7c2bc6919b202"
+        }
+      ],
+      "comparison": {
+        "status": "preparation-error",
+        "options": {
+          "noEmit": true,
+          "strict": true,
+          "target": 7,
+          "module": 1,
+          "moduleResolution": 2,
+          "ignoreDeprecations": "6.0",
+          "types": [],
+          "skipLibCheck": false,
+          "noUncheckedIndexedAccess": false
+        },
+        "compilations": [
+          {
+            "phase": "baseline/preparation",
+            "elapsedMs": 656.639,
+            "diagnostics": [
+              {
+                "code": 2497,
+                "category": 1,
+                "file": "/project/__consumer__.ts",
+                "start": 25,
+                "message": "This module can only be referenced with ECMAScript imports/exports by turning on the 'esModuleInterop' flag and referencing its default export."
+              }
+            ],
+            "consumerSha256": "08d07856fd42e3e591aa83b44ccf0da1cd096ad4bb4b0d9c739fdceee2a73861"
+          },
+          {
+            "phase": "candidate/preparation",
+            "elapsedMs": 455.261667,
+            "diagnostics": [
+              {
+                "code": 2497,
+                "category": 1,
+                "file": "/project/__consumer__.ts",
+                "start": 25,
+                "message": "This module can only be referenced with ECMAScript imports/exports by turning on the 'esModuleInterop' flag and referencing its default export."
+              }
+            ],
+            "consumerSha256": "08d07856fd42e3e591aa83b44ccf0da1cd096ad4bb4b0d9c739fdceee2a73861"
+          }
+        ],
+        "consumers": [],
+        "skipped": [],
+        "process": {
+          "exit": 0,
+          "signal": null,
+          "terminationVerified": true
+        },
+        "cost": {
+          "elapsedMs": 1293,
+          "transferredInputBytes": 12241931,
+          "outputBytes": 1016,
+          "compilations": 2
+        }
+      },
+      "status": "preparation-error",
+      "reason": null,
+      "admissibleConsumers": 0
+    },
+    {
+      "name": "async-mutex",
+      "commit": "b0bb4c5aa0e42eb5ffc8d9342e56bb6de1b95554",
+      "remote": "https://github.com/DirtyHairy/async-mutex.git",
+      "archiveSha256": "9bafaa723582e5ba716be47f76bde544a2d4679a8489cfd7be7f91ad48ac0fec",
+      "version": "0.5.0",
+      "publicEntry": "lib/index.d.ts",
+      "packageSha256": "9a58fc391344b2f9618b99fe230c92ca14e833101b50e066481df6fa88db3701",
+      "projectScripts": {
+        "lint": "eslint src/**/*.ts test/**/*.ts",
+        "build": "tsc && tsc -p tsconfig.es6.json && tsc -p tsconfig.mjs.json && rollup -o index.mjs mjs/index.js",
+        "prepublishOnly": "yarn test && yarn build",
+        "test": "yarn lint && nyc --reporter=text --reporter=html --reporter=lcov mocha test/*.ts",
+        "coveralls": "cat ./coverage/lcov.info | coveralls"
+      },
+      "status": "preparation-error",
+      "reason": "Missing input <selection>/baselines/async-mutex/lib/index.d.ts: ENOENT",
+      "admissibleConsumers": 0
+    },
+    {
+      "name": "emittery",
+      "commit": "147a8591045e00d0fe8088e2393e3eefea3aa4a5",
+      "remote": "https://github.com/sindresorhus/emittery.git",
+      "archiveSha256": "b650e76fc6fb9b6dc3ed45c5456b3226f1c05e3cf06e376f47d8b647a92ae138",
+      "version": "2.0.0",
+      "publicEntry": "./index.d.ts",
+      "packageSha256": "0c4b477a6dcc48435ba69f7de9ce443f4e40c00872d45042603aed8054e3ca48",
+      "projectScripts": {
+        "test": "xo && ava && tsd"
+      },
+      "status": "unsupported",
+      "reason": "Conditional/multiple exports unsupported; not selecting an entry",
+      "admissibleConsumers": 0
+    },
+    {
+      "name": "eventemitter2",
+      "commit": "39313aa1399e8c477aa7cc324676384c3757bbee",
+      "remote": "https://github.com/EventEmitter2/EventEmitter2.git",
+      "archiveSha256": "8c3be94d7431c748c20c4928cada2acb3ffdc78384dab8d4d043598658610e91",
+      "version": "6.4.9",
+      "publicEntry": "./eventemitter2.d.ts",
+      "packageSha256": "a1aca8ef93c7888a56d37c14a451686558954e818f8e686db5b9949b8f014c18",
+      "projectScripts": {
+        "test": "mocha ./test/loader.js --exit --timeout=3000",
+        "test:legacy": "nodeunit test/simple/ test/wildcardEvents/",
+        "test:coverage": "nyc --check-coverage npm run test",
+        "coverage:report": "nyc report --reporter=html --reporter=text",
+        "coveralls": "nyc report --reporter=text-lcov | coveralls",
+        "benchmark": "node test/perf/benchmark.js",
+        "prepublishOnly": "npm run test:coverage",
+        "postversion": "git push && git push --tags"
+      },
+      "surfaceHash": "5a3c9fdda7df266bafdf6b2edd923b7bfb2e3399e56e18d3db05b31b2a9d95a5",
+      "declarations": [
+        {
+          "name": "eventemitter2.d.ts",
+          "sha256": "452234c0b8169349b658a4b5e2b271608879b3914fcc325735ed21b9cb88d58d"
+        }
+      ],
+      "comparison": {
+        "status": "no-difference-in-checked-scope",
+        "options": {
+          "noEmit": true,
+          "strict": true,
+          "target": 7,
+          "module": 1,
+          "moduleResolution": 2,
+          "ignoreDeprecations": "6.0",
+          "types": [],
+          "skipLibCheck": false,
+          "noUncheckedIndexedAccess": false
+        },
+        "compilations": [
+          {
+            "phase": "baseline/preparation",
+            "elapsedMs": 642.995667,
+            "diagnostics": [],
+            "consumerSha256": "686fd757253944bb5fecc5fcb73626eaba4f4f027988948b1796a4ff0e919355"
+          },
+          {
+            "phase": "candidate/preparation",
+            "elapsedMs": 435.5530000000001,
+            "diagnostics": [],
+            "consumerSha256": "686fd757253944bb5fecc5fcb73626eaba4f4f027988948b1796a4ff0e919355"
+          },
+          {
+            "phase": "generation/exports",
+            "elapsedMs": 295.6587920000002,
+            "diagnostics": [],
+            "consumerSha256": "686fd757253944bb5fecc5fcb73626eaba4f4f027988948b1796a4ff0e919355"
+          },
+          {
+            "phase": "generation/roots",
+            "elapsedMs": 277.77199999999993,
+            "diagnostics": [],
+            "consumerSha256": "96958396561ea09125d7e70f9a1a49071e9739d1fb3c58c415c0eb5db4eb60ad"
+          },
+          {
+            "phase": "generation/returns",
+            "elapsedMs": 363.894084,
+            "diagnostics": [],
+            "consumerSha256": "ac9a8590ebbabb34818727d1dc1ef672b51dd0d1890863d9f95472e58a0d9bc9"
+          },
+          {
+            "phase": "baseline/0",
+            "elapsedMs": 263.34283300000016,
+            "diagnostics": [],
+            "consumerSha256": "d7b66a057e09a20cdf89409ac9f1941d482af70873f7b85869c56e760c8e41cc"
+          },
+          {
+            "phase": "candidate/0",
+            "elapsedMs": 261.1264159999996,
+            "diagnostics": [],
+            "consumerSha256": "d7b66a057e09a20cdf89409ac9f1941d482af70873f7b85869c56e760c8e41cc"
+          },
+          {
+            "phase": "baseline/1",
+            "elapsedMs": 346.4384590000004,
+            "diagnostics": [],
+            "consumerSha256": "03c6ba4e2cba00b2d6a34b478eae4657d5b1bc7afb9e5629b331deb85a4a4fd8"
+          },
+          {
+            "phase": "candidate/1",
+            "elapsedMs": 288.2111249999998,
+            "diagnostics": [],
+            "consumerSha256": "03c6ba4e2cba00b2d6a34b478eae4657d5b1bc7afb9e5629b331deb85a4a4fd8"
+          }
+        ],
+        "consumers": [
+          {
+            "id": 0,
+            "provenance": "generated from baseline only",
+            "export": "EventEmitter2",
+            "typeArguments": "",
+            "method": "stopListeningTo",
+            "route": "EventEmitter2.stopListeningTo() -> returned[\"valueOf\"]",
+            "arguments": "",
+            "callbackArguments": "",
+            "baselineThis": null,
+            "text": "import { EventEmitter2 as API0 } from \"./eventemitter2\";\ndeclare const subject0: API0;\nconst returned = subject0[\"stopListeningTo\"]();\nconst callable = returned[\"valueOf\"];\ncallable();\n",
+            "sha256": "d7b66a057e09a20cdf89409ac9f1941d482af70873f7b85869c56e760c8e41cc",
+            "status": "no-difference-in-checked-scope",
+            "baseline": [],
+            "candidate": []
+          },
+          {
+            "id": 1,
+            "provenance": "generated from baseline only",
+            "export": "EventEmitter2",
+            "typeArguments": "",
+            "method": "hasListeners",
+            "route": "EventEmitter2.hasListeners() -> returned[\"valueOf\"]",
+            "arguments": "",
+            "callbackArguments": "",
+            "baselineThis": null,
+            "text": "import { EventEmitter2 as API0 } from \"./eventemitter2\";\ndeclare const subject0: API0;\nconst returned = subject0[\"hasListeners\"]();\nconst callable = returned[\"valueOf\"];\ncallable();\n",
+            "sha256": "03c6ba4e2cba00b2d6a34b478eae4657d5b1bc7afb9e5629b331deb85a4a4fd8",
+            "status": "no-difference-in-checked-scope",
+            "baseline": [],
+            "candidate": []
+          }
+        ],
+        "skipped": [
+          {
+            "path": "event",
+            "reason": "unsupported export (only exported classes)"
+          },
+          {
+            "path": "eventNS",
+            "reason": "unsupported export (only exported classes)"
+          },
+          {
+            "path": "ConstructorOptions",
+            "reason": "unsupported export (only exported classes)"
+          },
+          {
+            "path": "ListenerFn",
+            "reason": "unsupported export (only exported classes)"
+          },
+          {
+            "path": "EventAndListener",
+            "reason": "unsupported export (only exported classes)"
+          },
+          {
+            "path": "WaitForFilter",
+            "reason": "unsupported export (only exported classes)"
+          },
+          {
+            "path": "WaitForOptions",
+            "reason": "unsupported export (only exported classes)"
+          },
+          {
+            "path": "CancelablePromise",
+            "reason": "unsupported export (only exported classes)"
+          },
+          {
+            "path": "OnceOptions",
+            "reason": "unsupported export (only exported classes)"
+          },
+          {
+            "path": "ListenToOptions",
+            "reason": "unsupported export (only exported classes)"
+          },
+          {
+            "path": "GeneralEventEmitter",
+            "reason": "unsupported export (only exported classes)"
+          },
+          {
+            "path": "OnOptions",
+            "reason": "unsupported export (only exported classes)"
+          },
+          {
+            "path": "Listener",
+            "reason": "unsupported export (only exported classes)"
+          },
+          {
+            "path": "EventEmitter2.emit",
+            "reason": "non-concrete rest tuple"
+          },
+          {
+            "path": "EventEmitter2.emitAsync",
+            "reason": "non-concrete rest tuple"
+          },
+          {
+            "path": "EventEmitter2.addListener",
+            "reason": "unsupported argument shape"
+          },
+          {
+            "path": "EventEmitter2.on",
+            "reason": "unsupported argument shape"
+          },
+          {
+            "path": "EventEmitter2.prependListener",
+            "reason": "unsupported argument shape"
+          },
+          {
+            "path": "EventEmitter2.once",
+            "reason": "unsupported argument shape"
+          },
+          {
+            "path": "EventEmitter2.prependOnceListener",
+            "reason": "unsupported argument shape"
+          },
+          {
+            "path": "EventEmitter2.many",
+            "reason": "unsupported argument shape"
+          },
+          {
+            "path": "EventEmitter2.prependMany",
+            "reason": "unsupported argument shape"
+          },
+          {
+            "path": "EventEmitter2.onAny",
+            "reason": "unsupported argument shape"
+          },
+          {
+            "path": "EventEmitter2.prependAny",
+            "reason": "unsupported argument shape"
+          },
+          {
+            "path": "EventEmitter2.offAny",
+            "reason": "unsupported argument shape"
+          },
+          {
+            "path": "EventEmitter2.removeListener",
+            "reason": "unsupported argument shape"
+          },
+          {
+            "path": "EventEmitter2.off",
+            "reason": "unsupported argument shape"
+          },
+          {
+            "path": "EventEmitter2.waitFor",
+            "reason": "unsupported overloads"
+          },
+          {
+            "path": "EventEmitter2.listenTo",
+            "reason": "unsupported overloads"
+          },
+          {
+            "path": "EventEmitter2.removeAllListeners",
+            "reason": "class-return recursion not traversed"
+          },
+          {
+            "path": "EventEmitter2.eventNames",
+            "reason": "unsupported return union/intersection"
+          },
+          {
+            "path": "EventEmitter2.listenersreturned[0]",
+            "reason": "non-concrete rest tuple"
+          },
+          {
+            "path": "EventEmitter2.listenersAnyreturned[0]",
+            "reason": "non-concrete rest tuple"
+          }
+        ],
+        "limits": {
+          "genericParameters": 2,
+          "rootSeeds": 18,
+          "methods": 60,
+          "depth": 3,
+          "nodes": 160,
+          "consumers": 24
+        },
+        "process": {
+          "exit": 0,
+          "signal": null,
+          "terminationVerified": true
+        },
+        "cost": {
+          "elapsedMs": 3360,
+          "transferredInputBytes": 12251331,
+          "outputBytes": 5475,
+          "compilations": 9
+        }
+      },
+      "status": "no-difference-in-checked-scope",
+      "reason": null,
+      "admissibleConsumers": 2
+    },
+    {
+      "name": "zen-observable",
+      "commit": "8406a7e3a3a3faa080ec228b9a743f48021fba8b",
+      "remote": "https://github.com/zenparsing/zen-observable.git",
+      "archiveSha256": "a673a22963bbeae3241c164ca5bc6f4f5704402bc053441cf6db90245dc059c2",
+      "version": "0.10.0",
+      "publicEntry": null,
+      "packageSha256": "6a90745c933e6b4508dc99c52d9e5742a728017756076f815302b7d1d8855866",
+      "projectScripts": {
+        "test": "mocha --recursive --require ./scripts/mocha-require",
+        "lint": "eslint src/*",
+        "build": "git clean -dfX ./lib && node ./scripts/build",
+        "prepublishOnly": "npm run lint && npm test && npm run build"
+      },
+      "status": "unsupported",
+      "reason": "One explicit public .d.ts entry (types/typings or user path) required",
+      "admissibleConsumers": 0
+    }
+  ]
+}

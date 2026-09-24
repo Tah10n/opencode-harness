@@ -1,0 +1,528 @@
+{
+  "actualRecordedRequestsVerified": true,
+  "comparison": "Exact strings in actual input fields, including JSON-escaped snapshot task strings; no whitespace normalization or substring truncation of the expected input",
+  "requests": [
+    {
+      "stage": "R",
+      "index": 1,
+      "role": "title",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": null
+    },
+    {
+      "stage": "R",
+      "index": 2,
+      "role": "reviewer",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": null
+    },
+    {
+      "stage": "R",
+      "index": 3,
+      "role": "reviewer",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": null
+    },
+    {
+      "stage": "R",
+      "index": 4,
+      "role": "reviewer",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": null
+    },
+    {
+      "stage": "R",
+      "index": 5,
+      "role": "reviewer",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": null
+    },
+    {
+      "stage": "R",
+      "index": 6,
+      "role": "reviewer",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": null
+    },
+    {
+      "stage": "R",
+      "index": 7,
+      "role": "reviewer",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": null
+    },
+    {
+      "stage": "R",
+      "index": 8,
+      "role": "reviewer",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": null
+    },
+    {
+      "stage": "R",
+      "index": 9,
+      "role": "reviewer",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": null
+    },
+    {
+      "stage": "R",
+      "index": 10,
+      "role": "reviewer",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": null
+    },
+    {
+      "stage": "R",
+      "index": 11,
+      "role": "reviewer",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": null
+    },
+    {
+      "stage": "R",
+      "index": 12,
+      "role": "reviewer",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": null
+    },
+    {
+      "stage": "R",
+      "index": 13,
+      "role": "reviewer",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": null
+    },
+    {
+      "stage": "R",
+      "index": 14,
+      "role": "reviewer",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": null
+    },
+    {
+      "stage": "R",
+      "index": 15,
+      "role": "reviewer",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": null
+    },
+    {
+      "stage": "R",
+      "index": 16,
+      "role": "reviewer",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": null
+    },
+    {
+      "stage": "F",
+      "index": 1,
+      "role": "title",
+      "fullOriginalTask": false,
+      "fullEnvironment": false,
+      "verbatimReview": null
+    },
+    {
+      "stage": "F",
+      "index": 2,
+      "role": "parent",
+      "fullOriginalTask": false,
+      "fullEnvironment": false,
+      "verbatimReview": null
+    },
+    {
+      "stage": "F",
+      "index": 3,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 4,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 5,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 6,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 7,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 8,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 9,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 10,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 11,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 12,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 13,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 14,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 15,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 16,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 17,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 18,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 19,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 20,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 21,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 22,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 23,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 24,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 25,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 26,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 27,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 28,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 29,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 30,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 31,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 32,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 33,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 34,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 35,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 36,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 37,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 38,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 39,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 40,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 41,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 42,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 43,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 44,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 45,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 46,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 47,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 48,
+      "role": "author",
+      "fullOriginalTask": true,
+      "fullEnvironment": true,
+      "verbatimReview": true
+    },
+    {
+      "stage": "F",
+      "index": 49,
+      "role": "parent",
+      "fullOriginalTask": false,
+      "fullEnvironment": false,
+      "verbatimReview": null
+    }
+  ],
+  "reviewSha256": "7cb1c20598f903e40bbf7b90714dbb89f8278055ce71f6e050a1247fe1996fba",
+  "fullReportsAutomaticallyAssumedModelContext": false
+}

@@ -1,0 +1,95 @@
+# Focused test investigation in direct (experimental)
+
+An optional `harness_investigate` tool lets the main author request one concrete
+public-API investigation from a separate session of the same model. The child
+works on a copy of the current implementation and delivers a project test patch
+or explains why no assertion is justified. The author checks the expectation
+against the complete original task, accepts or declines the patch, then finishes
+the full implementation, consumers, types, docs and final checks.
+
+With Node 24 and OpenCode 1.18.26, create a new configuration directory, then
+prepare the plugin and sensitivity dependencies before launching a task:
+
+```sh
+node scripts/profile-materialize.mjs --native --profile core --task \
+  --output /absolute/task-config
+npm install --prefix /absolute/task-config --ignore-scripts
+npm ci --prefix /absolute/task-config/sensitivity --ignore-scripts
+```
+
+From the project with its dependencies already installed, run one command with
+the original complete request in a file:
+
+```sh
+HARNESS_TASK_FILE=/absolute/original-task.txt \
+HARNESS_TASK_STRATEGY=direct \
+HARNESS_TASK_INVESTIGATION=1 \
+HARNESS_TASK_SENSITIVITY=1 \
+HARNESS_TASK_TIMEOUT_MS=900000 \
+OPENCODE_CONFIG_DIR=/absolute/task-config \
+opencode run --agent build --model openai/gpt-5.6-luna --variant high \
+  --command harness-task
+```
+
+Investigation and sensitivity are independent opt-ins. Without the investigation
+flag, the new tool and its instruction are absent. Defaults remain unchanged.
+The author decides whether there is a useful question; an unused capability is
+an ordinary outcome. No operator supplies a mutation or counterexample. The
+request has `action: investigate`, `question`, `location`, and `reason`. The host
+adds the unchanged original task, current files, current diff and remaining time.
+No long author transcript or evaluator is passed to the child.
+
+The author waits during the child session. Both use the selected model, effort,
+project instructions and native permission boundaries. The child cannot delegate
+again. It may edit JS/TS project tests; production/config/docs are checked for
+preservation, as are installed package bytes, modes and links (ordinary `.cache`
+writes remain permitted). Unsupported source layouts are reported explicitly.
+The bounded snapshot copier preserves ordinary binary project assets as opaque
+bytes outside the model prompt and protects them from child edits. It rejects
+deleted baseline files, binary JS/TS source, symlinked project source, missing
+read permission and oversized snapshots. The bounds are 1,500 files, 8 MiB of
+text (512 KiB per file), and 8 MiB of opaque assets (2 MiB per file).
+Changed or new opaque assets are unsupported at delegation because the author
+diff is sent to the child; no binary patch bytes enter its model request.
+
+`action: investigate` returns a bounded receipt: status, proposed patch hash,
+size and test paths, author snapshot, a short child claim and selected observed
+check exits. The patch is deliberately absent from the author worktree until
+acceptance. Use `action: inspect` with `section: patch`, `explanation`, `checks`,
+or `output` (with a `callID` from `checks`). The paged `checks` list retains
+saved child commands and marks recognized check candidates; other runners keep
+their actual exits and can be inspected without inferred failure counts. Pass
+`nextCursor` as `cursor` until
+`complete` is true. Each page identifies the saved result, snapshot, whether
+that snapshot is still current, and content hash; the patch pages reconstruct
+the exact saved diff. `output` belongs to the child investigation snapshot,
+not a current author check. A missing or changed
+artifact is reported instead of serving replacement content. Inspect works only
+while the same author run is active and does not start another child or change
+the decision. The full saved artifacts remain available to the host.
+
+After checking the proposed assertion against the original task, use
+`action: accept` with the author's contract `rationale`, or `action: decline`.
+Acceptance requires the exact captured author snapshot and
+successful ordinary Git patch preflight; later user bytes are never overwritten
+by an automatic three-way merge. A passing child test is not proof of the expected
+value. The original task still determines whether production needs correction.
+
+A maximum of one child may start per task. New delegation requires at least 120
+seconds remaining, with no intermediate cutoff after it starts. The existing
+whole-task deadline and cancellation apply to every native session and diagnostic
+process. Sensitivity shares one 180-second task budget between author and child;
+child-local mutation references are obtained freshly rather than copied from the
+author session. A child error retains the author's existing patch; real denial,
+cancellation and uncertain execution retain the existing terminal behavior.
+
+The retained task artifacts include `before-investigation.patch`,
+`investigation-tests.patch`, `investigation-result.json`, child native messages
+and tool events, and the final `terminal.patch`. The host records acceptance or
+rejection and command facts; it does not certify semantic task completeness.
+These artifacts can contain private project content and are not published by
+runtime. Development evaluators and calibration answers are excluded from the
+installed bundle. [The fixed comparison plan](../../development/native-task-investigation/PLAN.md)
+describes the separate P/R/H development experiment. R's internal
+`HARNESS_TASK_EXTRA_ATTENTION=1` control adds one general same-session pass and
+is not required for the focused investigation path.

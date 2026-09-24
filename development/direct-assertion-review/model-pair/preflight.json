@@ -1,0 +1,75 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "arm": "AR0",
+      "nativeStop": true,
+      "nodeAndGitAvailable": true,
+      "originalTestsPassed": true,
+      "gitDiff": true
+    },
+    {
+      "arm": "AR1",
+      "nativeStop": true,
+      "nodeAndGitAvailable": true,
+      "originalTestsPassed": true,
+      "gitDiff": true
+    }
+  ],
+  "realProviderRequests": 0,
+  "evidence": [
+    {
+      "arm": "AR0",
+      "scriptedRequests": 9,
+      "authorSession": "ses_f37b570a8ffekgMIi6fyLrQuUo",
+      "delivery": "/work/repo/.git/harness-task/06960d34-4599-4492-b05d-5e2ae23bcf24/worktree",
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "initialRequestFullTask": true,
+      "correctInstruction": true,
+      "patchSha256": "0e74fc96afafa984fde1987ce7d532b4645a2d1a4d3a31aef49d768590a299c1",
+      "patchEqualsNativeTerminal": true,
+      "outputManifestSha256": "531a81654d96df1f5be327b925ff9c356c9358151217813f5513e10231248f2a",
+      "rawResultSha256": "cb31936de3facdbd0b1d2152f888434116d24b26264611bc0fd32bd6c34d6358"
+    },
+    {
+      "arm": "AR1",
+      "scriptedRequests": 9,
+      "authorSession": "ses_f37b5591fffeAbap47cK4ZWZtI",
+      "delivery": "/work/repo/.git/harness-task/befea7e5-6098-469f-832f-7a2adcbd080d/worktree",
+      "stop": {
+        "ownTaskDeadlineTriggered": false,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "initialRequestFullTask": true,
+      "correctInstruction": true,
+      "patchSha256": "0e74fc96afafa984fde1987ce7d532b4645a2d1a4d3a31aef49d768590a299c1",
+      "patchEqualsNativeTerminal": true,
+      "outputManifestSha256": "dd95ecb59d33304c6b310663f9dacae68d8b7fe337fc7ff60b8453af056865bd",
+      "rawResultSha256": "58c86581127b17ffefaa428edcfaa7b6013a34d342f3ac80998027b1411232f1"
+    }
+  ],
+  "scriptedRequests": 18,
+  "preparationFailures": [
+    {
+      "directory": "preflight",
+      "reason": "Scripted fixture expected edit but Luna inventory provides apply_patch"
+    },
+    {
+      "directory": "preflight-final",
+      "reason": "Observer read executionDirectory from internal report instead of native receipt"
+    }
+  ]
+}

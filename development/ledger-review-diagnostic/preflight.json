@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "scriptedSessions": 1,
+  "scriptedRequests": 3,
+  "realProviderRequests": 0,
+  "elapsedMs": 7313,
+  "fullTask": true,
+  "explicitBase": true,
+  "trackedAndUntrackedSnapshot": true,
+  "nativeRead": true,
+  "forbiddenToolsAbsent": true,
+  "implementationStages": 0,
+  "recording": "research-full-v1",
+  "rawStreamsVerified": true,
+  "integrity": {
+    "snapshotUnchanged": true,
+    "snapshotSha256": "4dc44cee17a681ef9e7002964ce41e042df78a520c2b34fea394e9a01aade87e",
+    "taskSha256": "2ec27555dff1d4f32c95395b26053305c233dabbb7e5dd1aea07c79c2ad0aaf8",
+    "base": "1b549ecf20fd8e5074ecfb99b3c4d4ba3035ba45",
+    "head": "f5d2db81d29404f465a904838b4ee5befc26bc08",
+    "implementationStages": 0,
+    "nativeReads": 1,
+    "tools": [
+      "read"
+    ],
+    "sessions": 1
+  },
+  "stop": {
+    "ownTaskDeadlineTriggered": false,
+    "terminationVerified": true,
+    "captureSaved": true,
+    "forwardingClosed": true,
+    "relayRemoved": true,
+    "activeProviderHandlers": 0,
+    "providerServerStateMayRemainUnknown": false
+  },
+  "resultSha256": "55b4963074af03dde5060c4e492cb2c752cacc1d5afc0ea8549ec17793482573"
+}

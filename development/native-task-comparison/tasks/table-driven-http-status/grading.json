@@ -1,0 +1,19 @@
+{
+  "category": "refactoring",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Assert known labels/retry/auth flags through classifier and legacy helpers.",
+    "Assert unlisted5xx, invalid inputs without coercion and returned-object isolation."
+  ],
+  "docDelivery": [
+    "Document the fixed project table/flags and range categories.",
+    "Explain unknown/default policy, no broad retry inference, delegation and fresh outputs."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Fixed project status labels/flags; range category only for integer100..599, no coercion and fresh classifier outputs.",
+  "manualBehavior": [
+    "Verify a single known-status data table drives classifier labels/flags and every legacy helper delegates to classifier; no duplicate status policy remains in helpers."
+  ],
+  "independence": "Replace scattered status classifications with one reusable classifier preserving known and unknown status behavior."
+}

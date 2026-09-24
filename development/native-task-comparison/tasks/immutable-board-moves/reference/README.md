@@ -1,0 +1,3 @@
+# immutable-board-moves
+
+movedBoard is pure: coordinates [row,col], null empty; invalid coordinate RangeError('coordinate') before source checks, empty source Error('empty source'), different occupied target Error('occupied target'). Same occupied square copies unchanged contents. Every result row and outer array is fresh, while non-null payload identities stay intact; frozen sources/coordinates accepted. Rectangular dense1..50 board with distinct rows; arbitrary non-null cells. moveInPlace delegates policy, then commits to original writable rows/board and returns original; all validation failures are atomic. No accessors/proxies in mutating arrays. Run npm test.

@@ -1,0 +1,1 @@
+import {request,HttpError} from './http.mjs';export async function findUser(fetcher,base,id,options={}){try{return await request(fetcher,base+'/users/'+encodeURIComponent(id),options);}catch(e){if(e instanceof HttpError&&e.status===404)return null;throw e;}}

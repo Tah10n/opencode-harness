@@ -1,0 +1,23 @@
+{
+  "status": "real_pilot_stopped_after_A_capture_wrapper_error",
+  "freezeCommit": "4eab8635117d306a2c3fbeeefcf3de59aecb1fed",
+  "stages": {
+    "A": "native_completed; evidence recovered after capture wrapper failure",
+    "R": "not_started",
+    "F": "not_started"
+  },
+  "realProviderRequests": 76,
+  "scriptedPreflightRequests": 27,
+  "scriptedPreflightAttempts": 3,
+  "realRetries": 0,
+  "continuation": false,
+  "admissionClosed": true,
+  "nativeObserver": "incomplete",
+  "delivery_apply": true,
+  "assessment_integrity": "verified",
+  "Q": false,
+  "T": false,
+  "D": false,
+  "finalQ": null,
+  "decision": "Interrupted path; partial implementation, no demonstrated review-to-delivery benefit."
+}

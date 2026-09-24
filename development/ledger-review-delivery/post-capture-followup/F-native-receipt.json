@@ -1,0 +1,17 @@
+{
+  "revision": "direct",
+  "status": "incomplete",
+  "repairs": 0,
+  "artifacts": "/work/repo/.git/harness-task/2ef7bc1c-a0c5-4fb8-8d68-14f0cf8cc9ff",
+  "executionDirectory": "/work/repo/.git/harness-task/2ef7bc1c-a0c5-4fb8-8d68-14f0cf8cc9ff/worktree",
+  "sessions": {
+    "author": "ses_f31c58705ffe0CbJbovNhZA3pq"
+  },
+  "terminalPatch": "/work/repo/.git/harness-task/2ef7bc1c-a0c5-4fb8-8d68-14f0cf8cc9ff/terminal.patch",
+  "terminationVerified": true,
+  "remainingCount": 0,
+  "limitationCount": 3,
+  "completedCommandCount": 6,
+  "detailOmitted": "Large report: inspect result.json for all checks, failures and remaining work.",
+  "notice": "Command exits are observations, not certification of task correctness. Full explanations, outputs and test diffs remain in result.json and tool-events.json under artifacts."
+}

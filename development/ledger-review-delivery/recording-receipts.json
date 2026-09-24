@@ -1,0 +1,1452 @@
+{
+  "profile": "research-full-v1",
+  "requests": [
+    {
+      "index": 1,
+      "kind": "title",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 577,
+        "output_tokens": 85,
+        "total_tokens": 662,
+        "cached_tokens": 0,
+        "reasoning_tokens": 74
+      },
+      "hashes": {
+        "response": "cb21c462501aa848b94d3087837c27d50d9a44162a223cf47a48d45c3280e7c8",
+        "clientRequest": "f5ea9a9860414a9736a0f8afb13542a53aca598442a1c0e4e9c22d232d080f7a",
+        "upstreamRequest": "f5ea9a9860414a9736a0f8afb13542a53aca598442a1c0e4e9c22d232d080f7a"
+      }
+    },
+    {
+      "index": 2,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 6429,
+        "output_tokens": 38,
+        "total_tokens": 6467,
+        "cached_tokens": 0,
+        "reasoning_tokens": 21
+      },
+      "hashes": {
+        "response": "38ed31479a71af4a4a0c3e8f387be453cfc765779198d236fa98ed99f507cc80",
+        "clientRequest": "f575ab5b0f5918757e6d40d7d201f08eb8a46bb64700551a79d015e7e2f8af18",
+        "upstreamRequest": "f575ab5b0f5918757e6d40d7d201f08eb8a46bb64700551a79d015e7e2f8af18"
+      }
+    },
+    {
+      "index": 3,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 6584,
+        "output_tokens": 210,
+        "total_tokens": 6794,
+        "cached_tokens": 0,
+        "reasoning_tokens": 28
+      },
+      "hashes": {
+        "response": "6c941a0771f4588a6d8a3879dcb00d5ff772ee164c23c7afef9cdf1cda2e37e8",
+        "clientRequest": "1eb743cd3795c7f0174344599a8120c0a2233d8c0aea850b74f87c764b2250ef",
+        "upstreamRequest": "1eb743cd3795c7f0174344599a8120c0a2233d8c0aea850b74f87c764b2250ef"
+      }
+    },
+    {
+      "index": 4,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 6975,
+        "output_tokens": 125,
+        "total_tokens": 7100,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "hashes": {
+        "response": "4b044d19c3f8b5ae0b3356985f22f553e4fe631df63ab889330d1baa2d4b05c0",
+        "clientRequest": "4ee779176becc94daee19ee569d002b146f765fd5b12b7b61b501883b6e81b62",
+        "upstreamRequest": "4ee779176becc94daee19ee569d002b146f765fd5b12b7b61b501883b6e81b62"
+      }
+    },
+    {
+      "index": 5,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 12598,
+        "output_tokens": 371,
+        "total_tokens": 12969,
+        "cached_tokens": 0,
+        "reasoning_tokens": 23
+      },
+      "hashes": {
+        "response": "e0771bd71f93bd42eff8cf26005ea32fa6bfda3553c7c0ab43c6827e461d7abe",
+        "clientRequest": "1e1fa208ba69fe9a2d07645f1a3fde2daa8d2a91ac3a816a898aecfa44a1eaa5",
+        "upstreamRequest": "1e1fa208ba69fe9a2d07645f1a3fde2daa8d2a91ac3a816a898aecfa44a1eaa5"
+      }
+    },
+    {
+      "index": 6,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 66797,
+        "output_tokens": 236,
+        "total_tokens": 67033,
+        "cached_tokens": 0,
+        "reasoning_tokens": 16
+      },
+      "hashes": {
+        "response": "383210bfe9e686ca1d6d1f8eafb6b50838bb0ea9161642f3091534716aa2f6db",
+        "clientRequest": "b706acf98ae6f334520fbf24ed3f40803a5cca79ea3730ac8468748b7ce5375d",
+        "upstreamRequest": "b706acf98ae6f334520fbf24ed3f40803a5cca79ea3730ac8468748b7ce5375d"
+      }
+    },
+    {
+      "index": 7,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 116743,
+        "output_tokens": 381,
+        "total_tokens": 117124,
+        "cached_tokens": 0,
+        "reasoning_tokens": 148
+      },
+      "hashes": {
+        "response": "44c80a3719eb521c9d380dd46ccb35eaf7d0a8b1dfacd2a3e98935df6588f321",
+        "clientRequest": "1d7dfbb35be628071378c2a46ac7ad0a1fa396747c18ba922c2cba27a52dd6b8",
+        "upstreamRequest": "1d7dfbb35be628071378c2a46ac7ad0a1fa396747c18ba922c2cba27a52dd6b8"
+      }
+    },
+    {
+      "index": 8,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 126832,
+        "output_tokens": 219,
+        "total_tokens": 127051,
+        "cached_tokens": 0,
+        "reasoning_tokens": 16
+      },
+      "hashes": {
+        "response": "420ac836b8acd3ddcf0339a604ee13a81f54cc9d65b85fe20e713252b097f0ca",
+        "clientRequest": "82d9ed2e33dcf6b677a946b0b21f19a9c0e29c912022ce020ffadcee9b52e628",
+        "upstreamRequest": "82d9ed2e33dcf6b677a946b0b21f19a9c0e29c912022ce020ffadcee9b52e628"
+      }
+    },
+    {
+      "index": 9,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 149842,
+        "output_tokens": 43,
+        "total_tokens": 149885,
+        "cached_tokens": 116224,
+        "reasoning_tokens": 9
+      },
+      "hashes": {
+        "response": "61e3eab08133d06c02f7c5d3553aaa7e09f0f1f8f5777cf58b9b4945646ab8d9",
+        "clientRequest": "7b585b89b22a9a5ed07af18d1de2ec4c0e66726c53d89a10adf71cb063d06146",
+        "upstreamRequest": "7b585b89b22a9a5ed07af18d1de2ec4c0e66726c53d89a10adf71cb063d06146"
+      }
+    },
+    {
+      "index": 10,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 152709,
+        "output_tokens": 32,
+        "total_tokens": 152741,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "hashes": {
+        "response": "c1ae7d5e04ff1ca833c7ac641c0b8d1499b7772661f16b2ec67dd5be1813bc96",
+        "clientRequest": "0c4a67c3f3571e52aae18d9adeff820c74dfba758f630e274519724b362bac35",
+        "upstreamRequest": "0c4a67c3f3571e52aae18d9adeff820c74dfba758f630e274519724b362bac35"
+      }
+    },
+    {
+      "index": 11,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 154630,
+        "output_tokens": 997,
+        "total_tokens": 155627,
+        "cached_tokens": 0,
+        "reasoning_tokens": 939
+      },
+      "hashes": {
+        "response": "7d86936ad3a91cff5221a9982e7742d021032e4a64b88c6801ba25eeb61022a3",
+        "clientRequest": "b2f69a3ccd2a1b2554ec2fe910c5afb729820a9217b90ee292a2ff5fff5cf017",
+        "upstreamRequest": "b2f69a3ccd2a1b2554ec2fe910c5afb729820a9217b90ee292a2ff5fff5cf017"
+      }
+    },
+    {
+      "index": 12,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 155660,
+        "output_tokens": 352,
+        "total_tokens": 156012,
+        "cached_tokens": 0,
+        "reasoning_tokens": 58
+      },
+      "hashes": {
+        "response": "36130ce5c68f61d13064098de7e2a2d3d31b80412d7ea40d20e069dbc4785798",
+        "clientRequest": "f41e9b82e4b99a0c414357945d2388183ebed0202e81164a6e02e12aadbd0074",
+        "upstreamRequest": "f41e9b82e4b99a0c414357945d2388183ebed0202e81164a6e02e12aadbd0074"
+      }
+    },
+    {
+      "index": 13,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 163635,
+        "output_tokens": 2918,
+        "total_tokens": 166553,
+        "cached_tokens": 11776,
+        "reasoning_tokens": 2885
+      },
+      "hashes": {
+        "response": "ad64af73549e559ab61755cfff162d7da84bfdfe292bf069ebebc72e1473a5e6",
+        "clientRequest": "55ecf0fb2b1b030f994d4b96fd3987b006e70951da372e426cc57c2fc2af2abf",
+        "upstreamRequest": "55ecf0fb2b1b030f994d4b96fd3987b006e70951da372e426cc57c2fc2af2abf"
+      }
+    },
+    {
+      "index": 14,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 167163,
+        "output_tokens": 2280,
+        "total_tokens": 169443,
+        "cached_tokens": 0,
+        "reasoning_tokens": 2251
+      },
+      "hashes": {
+        "response": "b460374aaf1ed96e169ee10637a1691958d440881958a3443c68a6f5ca8f633b",
+        "clientRequest": "3382c313b913732f3a52313fa63382a3843e3b9e0c1157b2a158159726e99136",
+        "upstreamRequest": "3382c313b913732f3a52313fa63382a3843e3b9e0c1157b2a158159726e99136"
+      }
+    },
+    {
+      "index": 15,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 169671,
+        "output_tokens": 930,
+        "total_tokens": 170601,
+        "cached_tokens": 148992,
+        "reasoning_tokens": 794
+      },
+      "hashes": {
+        "response": "a6e5d86d2186a4d8f2619b814dad4b22ed481b91989af3416b7f50cf68e7aa8d",
+        "clientRequest": "2738c252c52f6aec2ddf3951bb649437a3f81380c107d1c02008525e3051c8f0",
+        "upstreamRequest": "2738c252c52f6aec2ddf3951bb649437a3f81380c107d1c02008525e3051c8f0"
+      }
+    },
+    {
+      "index": 16,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 170782,
+        "output_tokens": 1343,
+        "total_tokens": 172125,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "hashes": {
+        "response": "95f333c3c76905dccc547be5bc649f268faabea166097b4c1fbd495f8652484e",
+        "clientRequest": "3431b61f5029bdd4cc534eb6542f67d5d573cbdcb5fa308a7cd09b609803e9f3",
+        "upstreamRequest": "3431b61f5029bdd4cc534eb6542f67d5d573cbdcb5fa308a7cd09b609803e9f3"
+      }
+    },
+    {
+      "index": 17,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 172153,
+        "output_tokens": 292,
+        "total_tokens": 172445,
+        "cached_tokens": 0,
+        "reasoning_tokens": 75
+      },
+      "hashes": {
+        "response": "ffb15152ded60386bd53cfc5ecba2108edea273eb4161ebdf97314b6fadc844f",
+        "clientRequest": "abddf456584dfa81764b794b907fd24804e313c287cdd2602278e0c02c2780ea",
+        "upstreamRequest": "abddf456584dfa81764b794b907fd24804e313c287cdd2602278e0c02c2780ea"
+      }
+    },
+    {
+      "index": 18,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 172473,
+        "output_tokens": 481,
+        "total_tokens": 172954,
+        "cached_tokens": 6656,
+        "reasoning_tokens": 12
+      },
+      "hashes": {
+        "response": "b7ebb21ab8cf98bb9d7309d41d277f0e7fc70e3c8e125d9a3f34bd26910d9e26",
+        "clientRequest": "66110513b337ddcb4f46d2b238baf8015baa5c82bce86bec1c3ae3d7906b7e48",
+        "upstreamRequest": "66110513b337ddcb4f46d2b238baf8015baa5c82bce86bec1c3ae3d7906b7e48"
+      }
+    },
+    {
+      "index": 19,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 173010,
+        "output_tokens": 54,
+        "total_tokens": 173064,
+        "cached_tokens": 171520,
+        "reasoning_tokens": 16
+      },
+      "hashes": {
+        "response": "c42f375028e1b30e2f7f0aecec81cb8c8142a1fc122cf3f8912049fde3506710",
+        "clientRequest": "41ce0f40b4837f4a31af7c89a8de4c4432156e192771ab872161c781c86460fb",
+        "upstreamRequest": "41ce0f40b4837f4a31af7c89a8de4c4432156e192771ab872161c781c86460fb"
+      }
+    },
+    {
+      "index": 20,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 173854,
+        "output_tokens": 162,
+        "total_tokens": 174016,
+        "cached_tokens": 171520,
+        "reasoning_tokens": 18
+      },
+      "hashes": {
+        "response": "90ac6df666d28af2e76e6f783313eb3bb08de48a487eaab9c4e2446cc203b710",
+        "clientRequest": "7dffce553b748668134f54ea2cb10b876e4c6937150362a2f06c4bb733cdfdf6",
+        "upstreamRequest": "7dffce553b748668134f54ea2cb10b876e4c6937150362a2f06c4bb733cdfdf6"
+      }
+    },
+    {
+      "index": 21,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 174046,
+        "output_tokens": 55,
+        "total_tokens": 174101,
+        "cached_tokens": 170496,
+        "reasoning_tokens": 17
+      },
+      "hashes": {
+        "response": "0ec583eeafdf197984cc8a01ffd97fbd4a00f3531cfd7ce57e116d50e2a635fa",
+        "clientRequest": "908c7f4a8abaaa61e725cc640912c5e70e22415095b5df17776b7ae91a1351a8",
+        "upstreamRequest": "908c7f4a8abaaa61e725cc640912c5e70e22415095b5df17776b7ae91a1351a8"
+      }
+    },
+    {
+      "index": 22,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 174327,
+        "output_tokens": 710,
+        "total_tokens": 175037,
+        "cached_tokens": 154112,
+        "reasoning_tokens": 13
+      },
+      "hashes": {
+        "response": "6ca67c696e51a26f3b5d7e2fa7b219edea2363166935a8d93f92ae94944b654e",
+        "clientRequest": "0a7f4dfdc1cdcc89941611be601bf53be45904fe238d7600b890cdb5b4984aee",
+        "upstreamRequest": "0a7f4dfdc1cdcc89941611be601bf53be45904fe238d7600b890cdb5b4984aee"
+      }
+    },
+    {
+      "index": 23,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 175067,
+        "output_tokens": 54,
+        "total_tokens": 175121,
+        "cached_tokens": 163328,
+        "reasoning_tokens": 16
+      },
+      "hashes": {
+        "response": "9710566a401001b66917d97426295acd7b6e2619b3b43626409d3ddfd4e0c1cd",
+        "clientRequest": "97b729a5819030cc1435ca009e2efc9fb2d5ae19295e8734ec7686c5668b495d",
+        "upstreamRequest": "97b729a5819030cc1435ca009e2efc9fb2d5ae19295e8734ec7686c5668b495d"
+      }
+    },
+    {
+      "index": 24,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 177174,
+        "output_tokens": 323,
+        "total_tokens": 177497,
+        "cached_tokens": 174592,
+        "reasoning_tokens": 33
+      },
+      "hashes": {
+        "response": "e03ad84ebc416770cea6e33fd29c556823b5ab1e7ae9c4ee72a9cb9ae4fdc0ac",
+        "clientRequest": "4851af506ad97f7fcba903f3cdb74dfea2f4d55b8696917eb2123e5d031f2451",
+        "upstreamRequest": "4851af506ad97f7fcba903f3cdb74dfea2f4d55b8696917eb2123e5d031f2451"
+      }
+    },
+    {
+      "index": 25,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 177526,
+        "output_tokens": 330,
+        "total_tokens": 177856,
+        "cached_tokens": 173568,
+        "reasoning_tokens": 163
+      },
+      "hashes": {
+        "response": "ba2c827eebd381d40812782a05e1a501c34863eda051b10489033942023f60d8",
+        "clientRequest": "a2899afe01ee719b1ead16283bed3d2e396cd6a8469473ff8e8e5722c5cda180",
+        "upstreamRequest": "a2899afe01ee719b1ead16283bed3d2e396cd6a8469473ff8e8e5722c5cda180"
+      }
+    },
+    {
+      "index": 26,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 177885,
+        "output_tokens": 709,
+        "total_tokens": 178594,
+        "cached_tokens": 172544,
+        "reasoning_tokens": 41
+      },
+      "hashes": {
+        "response": "27489aaa7a3392a95f187ab1ac60d6d4bb85fffe248c4e4dfaefaa7cacec7e5f",
+        "clientRequest": "f11d6bca7b798bf71bb732305d2fa97070c8a7c6b9572c920d3f7ae53bfc558a",
+        "upstreamRequest": "f11d6bca7b798bf71bb732305d2fa97070c8a7c6b9572c920d3f7ae53bfc558a"
+      }
+    },
+    {
+      "index": 27,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 178623,
+        "output_tokens": 251,
+        "total_tokens": 178874,
+        "cached_tokens": 5632,
+        "reasoning_tokens": 107
+      },
+      "hashes": {
+        "response": "fe5f6557db7849fe1c1b3de41ca7bc488459244545df401b5b8bdf9a5f549f63",
+        "clientRequest": "1cb32b445c75506dfc914f8d1d940b8b47f5e62a744ed6699d2f4f1fa705736c",
+        "upstreamRequest": "1cb32b445c75506dfc914f8d1d940b8b47f5e62a744ed6699d2f4f1fa705736c"
+      }
+    },
+    {
+      "index": 28,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 178903,
+        "output_tokens": 169,
+        "total_tokens": 179072,
+        "cached_tokens": 169472,
+        "reasoning_tokens": 98
+      },
+      "hashes": {
+        "response": "79e501a9a00eb3bfccc59004df383bcc5df2479f3c78440761d39cfe739735c3",
+        "clientRequest": "72172113835f35fd6236b204e7c35033a87eb8c1d79238d3e4d779f739faefc7",
+        "upstreamRequest": "72172113835f35fd6236b204e7c35033a87eb8c1d79238d3e4d779f739faefc7"
+      }
+    },
+    {
+      "index": 29,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 179101,
+        "output_tokens": 373,
+        "total_tokens": 179474,
+        "cached_tokens": 176640,
+        "reasoning_tokens": 51
+      },
+      "hashes": {
+        "response": "996b5847008f322697cf5e4a582ad985a265cb1d2052d81f5b7376b347d08c6f",
+        "clientRequest": "d8c4c88d971e1346f6fda680c5b1327753d9a437ab8ff1fc10d33272446928d6",
+        "upstreamRequest": "d8c4c88d971e1346f6fda680c5b1327753d9a437ab8ff1fc10d33272446928d6"
+      }
+    },
+    {
+      "index": 30,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 179502,
+        "output_tokens": 909,
+        "total_tokens": 180411,
+        "cached_tokens": 173568,
+        "reasoning_tokens": 612
+      },
+      "hashes": {
+        "response": "ce1b5add5e99e3dff77c3fe39ee1b9f837f454707b625e56174a5d06b4934108",
+        "clientRequest": "91550ff891b687cc095183fe7a2ef815dd735d641cdca071fff71c301af36d67",
+        "upstreamRequest": "91550ff891b687cc095183fe7a2ef815dd735d641cdca071fff71c301af36d67"
+      }
+    },
+    {
+      "index": 31,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 180439,
+        "output_tokens": 282,
+        "total_tokens": 180721,
+        "cached_tokens": 173568,
+        "reasoning_tokens": 68
+      },
+      "hashes": {
+        "response": "d4d73e715663009b084ef5436ff012eb69c8ccbb0a217e0d9c8da346ec03049e",
+        "clientRequest": "9473be56568876de578895a6af7da4ef3e5fc5e05ac99e03db63df81547691e5",
+        "upstreamRequest": "9473be56568876de578895a6af7da4ef3e5fc5e05ac99e03db63df81547691e5"
+      }
+    },
+    {
+      "index": 32,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 180749,
+        "output_tokens": 249,
+        "total_tokens": 180998,
+        "cached_tokens": 176640,
+        "reasoning_tokens": 40
+      },
+      "hashes": {
+        "response": "df87133ba378fdbe1c3a503ff892c34a3fc2481908cd2fa53133bf76170a1532",
+        "clientRequest": "4230b7a6077154f4a5696a59a54ce9b86ab4c95e5d5a766b9a8f83b8bc165d87",
+        "upstreamRequest": "4230b7a6077154f4a5696a59a54ce9b86ab4c95e5d5a766b9a8f83b8bc165d87"
+      }
+    },
+    {
+      "index": 33,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 183543,
+        "output_tokens": 436,
+        "total_tokens": 183979,
+        "cached_tokens": 0,
+        "reasoning_tokens": 216
+      },
+      "hashes": {
+        "response": "5943b044f89f724e68f26e5a6a63a50036cd21ebe57e1213a67f86541c8fce7d",
+        "clientRequest": "50d5f53fb6d1d6912cf152243af3d10da00b977716b465797fb93f95bc72f6bc",
+        "upstreamRequest": "50d5f53fb6d1d6912cf152243af3d10da00b977716b465797fb93f95bc72f6bc"
+      }
+    },
+    {
+      "index": 34,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 184020,
+        "output_tokens": 63,
+        "total_tokens": 184083,
+        "cached_tokens": 179712,
+        "reasoning_tokens": 22
+      },
+      "hashes": {
+        "response": "90728148b3b382766fc3bd5636b1a25d3df4a15819889e0e2f07b0c54e6a381e",
+        "clientRequest": "d222d6fddebf9b85ad8f83be4626f676afca80325ea0c212e6b03bd664f596b3",
+        "upstreamRequest": "d222d6fddebf9b85ad8f83be4626f676afca80325ea0c212e6b03bd664f596b3"
+      }
+    },
+    {
+      "index": 35,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 186330,
+        "output_tokens": 492,
+        "total_tokens": 186822,
+        "cached_tokens": 152064,
+        "reasoning_tokens": 269
+      },
+      "hashes": {
+        "response": "1b424908f2ad36099d9848ccda28576e4f01cc2ae5023077d479a6e7120d6b55",
+        "clientRequest": "cce29f9d6016ebafc15497e21462c1e98288b49565b25fff7162a5d4d50d92bc",
+        "upstreamRequest": "cce29f9d6016ebafc15497e21462c1e98288b49565b25fff7162a5d4d50d92bc"
+      }
+    },
+    {
+      "index": 36,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 186850,
+        "output_tokens": 49,
+        "total_tokens": 186899,
+        "cached_tokens": 0,
+        "reasoning_tokens": 8
+      },
+      "hashes": {
+        "response": "3bd0fe5eebed22d4b2f9ea6a49d4d99fdb41da3779133525fcaf686f217c44fd",
+        "clientRequest": "c314180f875c6b11c2c2c841ef24930573827586f52e73c4a4e81a163b04df9b",
+        "upstreamRequest": "c314180f875c6b11c2c2c841ef24930573827586f52e73c4a4e81a163b04df9b"
+      }
+    },
+    {
+      "index": 37,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 189394,
+        "output_tokens": 292,
+        "total_tokens": 189686,
+        "cached_tokens": 178688,
+        "reasoning_tokens": 193
+      },
+      "hashes": {
+        "response": "cb657fdba6ceb29e21903985491dbb5bb703f258c06a165e06100bb77ce46792",
+        "clientRequest": "ece0a381b70d1d9d47079f7a6e2f43b0a2258d847c106123d22e9860e2b6c0b0",
+        "upstreamRequest": "ece0a381b70d1d9d47079f7a6e2f43b0a2258d847c106123d22e9860e2b6c0b0"
+      }
+    },
+    {
+      "index": 38,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 192220,
+        "output_tokens": 270,
+        "total_tokens": 192490,
+        "cached_tokens": 185856,
+        "reasoning_tokens": 143
+      },
+      "hashes": {
+        "response": "46f78cbfbc5b280047bea4b3e0905f9fd44f5ea91fe60af19edee39f2b0a5076",
+        "clientRequest": "22779dcc297c7aecb105334f344f79245372eed88cd5429a448eb301d33076f7",
+        "upstreamRequest": "22779dcc297c7aecb105334f344f79245372eed88cd5429a448eb301d33076f7"
+      }
+    },
+    {
+      "index": 39,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 192518,
+        "output_tokens": 303,
+        "total_tokens": 192821,
+        "cached_tokens": 183808,
+        "reasoning_tokens": 252
+      },
+      "hashes": {
+        "response": "d61eb90ed38613024fb9f9ed784b3abc52d712b68b1a04400b78744939fbb034",
+        "clientRequest": "6e3ea4eaacdceb9fc1db208c1c5f6101abfe03582ac7d88f49800d58761109c1",
+        "upstreamRequest": "6e3ea4eaacdceb9fc1db208c1c5f6101abfe03582ac7d88f49800d58761109c1"
+      }
+    },
+    {
+      "index": 40,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 194893,
+        "output_tokens": 645,
+        "total_tokens": 195538,
+        "cached_tokens": 178688,
+        "reasoning_tokens": 491
+      },
+      "hashes": {
+        "response": "5fb7cfbd0207df756964a61449cf97925aa06932688ff6bea38e0df863239e4a",
+        "clientRequest": "5567a26658724c5b7ac06f2f76c1d5fcb1da0a970598fedfc52ee265459c1e15",
+        "upstreamRequest": "5567a26658724c5b7ac06f2f76c1d5fcb1da0a970598fedfc52ee265459c1e15"
+      }
+    },
+    {
+      "index": 41,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 195567,
+        "output_tokens": 199,
+        "total_tokens": 195766,
+        "cached_tokens": 155136,
+        "reasoning_tokens": 96
+      },
+      "hashes": {
+        "response": "8140d037facac066e508fb77d4bba95a3e2a97fabeebb2d2c22e68c31d5958e1",
+        "clientRequest": "edb64a5f12dcedc795f523cb89ed8af75f51cef5be60f75668c6e12908701e8c",
+        "upstreamRequest": "edb64a5f12dcedc795f523cb89ed8af75f51cef5be60f75668c6e12908701e8c"
+      }
+    },
+    {
+      "index": 42,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 195795,
+        "output_tokens": 222,
+        "total_tokens": 196017,
+        "cached_tokens": 178688,
+        "reasoning_tokens": 85
+      },
+      "hashes": {
+        "response": "5685e6b08a1fcbcaca63919387bac4407c0ae90a1f3a7e34064413da2b208d83",
+        "clientRequest": "7747aa548a29fc0ad9cec69350068fc237f0df5baced22c1f08e236c7df83b62",
+        "upstreamRequest": "7747aa548a29fc0ad9cec69350068fc237f0df5baced22c1f08e236c7df83b62"
+      }
+    },
+    {
+      "index": 43,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 196045,
+        "output_tokens": 1192,
+        "total_tokens": 197237,
+        "cached_tokens": 185856,
+        "reasoning_tokens": 745
+      },
+      "hashes": {
+        "response": "0ca85ddbb10f2d3da731f91047205352c06b414a7500f35f14473649dd476bbe",
+        "clientRequest": "d010710d934350421ae4e19681372c20857c6918d88711640b31cf32e13b8804",
+        "upstreamRequest": "d010710d934350421ae4e19681372c20857c6918d88711640b31cf32e13b8804"
+      }
+    },
+    {
+      "index": 44,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 197278,
+        "output_tokens": 2114,
+        "total_tokens": 199392,
+        "cached_tokens": 194048,
+        "reasoning_tokens": 325
+      },
+      "hashes": {
+        "response": "56cd98da91d05266550edbfffcfe6431b94fbc9cdf1bcc4b3fb6268536733d68",
+        "clientRequest": "b7abda4408a9e486c65127d0b677c1b072b09c7bc437340fac9bcaaf09015132",
+        "upstreamRequest": "b7abda4408a9e486c65127d0b677c1b072b09c7bc437340fac9bcaaf09015132"
+      }
+    },
+    {
+      "index": 45,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 199479,
+        "output_tokens": 51,
+        "total_tokens": 199530,
+        "cached_tokens": 192000,
+        "reasoning_tokens": 14
+      },
+      "hashes": {
+        "response": "7d510954943e6946be1e71c2142ef55442ba60a9dd75cb907e07538693ed91ef",
+        "clientRequest": "03d23fce24954087462ff682a47f0008388f4ba6616fd2c07c4cad066918fc77",
+        "upstreamRequest": "03d23fce24954087462ff682a47f0008388f4ba6616fd2c07c4cad066918fc77"
+      }
+    },
+    {
+      "index": 46,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 200634,
+        "output_tokens": 74,
+        "total_tokens": 200708,
+        "cached_tokens": 0,
+        "reasoning_tokens": 14
+      },
+      "hashes": {
+        "response": "3a4fec6d16839ac7b84b435db5e4791e234c764bb5bb694783f70ac4b5ca67ac",
+        "clientRequest": "b793a0b11bc5e5cdba852a62eb2cfa0b6a149e775d6d4603ed84b7816abdc699",
+        "upstreamRequest": "b793a0b11bc5e5cdba852a62eb2cfa0b6a149e775d6d4603ed84b7816abdc699"
+      }
+    },
+    {
+      "index": 47,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 200736,
+        "output_tokens": 1771,
+        "total_tokens": 202507,
+        "cached_tokens": 0,
+        "reasoning_tokens": 17
+      },
+      "hashes": {
+        "response": "5656a54dcd9d371670dbe11b77a2d526556073154aa2fb8c7a0af3253dd4a057",
+        "clientRequest": "98f6332a459bfb3b04118457e9ef66e4b98a6c9dc2c8a7a1ba4cc762cf69b072",
+        "upstreamRequest": "98f6332a459bfb3b04118457e9ef66e4b98a6c9dc2c8a7a1ba4cc762cf69b072"
+      }
+    },
+    {
+      "index": 48,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 202535,
+        "output_tokens": 206,
+        "total_tokens": 202741,
+        "cached_tokens": 197120,
+        "reasoning_tokens": 57
+      },
+      "hashes": {
+        "response": "fe563e27fedbcbb54611c42ac35456c6b297535be7aaa403b94971d93fb31ef5",
+        "clientRequest": "fe363615376d0be0098a2443905aa6be8016f51477b65b7584457e3d5d5a7674",
+        "upstreamRequest": "fe363615376d0be0098a2443905aa6be8016f51477b65b7584457e3d5d5a7674"
+      }
+    },
+    {
+      "index": 49,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 202769,
+        "output_tokens": 74,
+        "total_tokens": 202843,
+        "cached_tokens": 182784,
+        "reasoning_tokens": 18
+      },
+      "hashes": {
+        "response": "4c15c9116364dcdf8530118456865b9d9f462b3e1e1d29cd5d3768501c30e620",
+        "clientRequest": "25949c4ff0c32ab3be9ceabf48084f2c7da97ccf144bdbb784f39686d126492f",
+        "upstreamRequest": "25949c4ff0c32ab3be9ceabf48084f2c7da97ccf144bdbb784f39686d126492f"
+      }
+    },
+    {
+      "index": 50,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 204999,
+        "output_tokens": 632,
+        "total_tokens": 205631,
+        "cached_tokens": 202240,
+        "reasoning_tokens": 270
+      },
+      "hashes": {
+        "response": "4599bd69bf37dc83a67026d5cec8782012047f682aade6d3a9f0c83b7bbbf6ef",
+        "clientRequest": "8a6dc6240e02a204334e0c7694f25df0088fb40bf437d1056bd1ab1cc3b9d9eb",
+        "upstreamRequest": "8a6dc6240e02a204334e0c7694f25df0088fb40bf437d1056bd1ab1cc3b9d9eb"
+      }
+    },
+    {
+      "index": 51,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 205660,
+        "output_tokens": 67,
+        "total_tokens": 205727,
+        "cached_tokens": 126464,
+        "reasoning_tokens": 15
+      },
+      "hashes": {
+        "response": "7854d20cb609e69ba1d0afb88cacd80148e7b1401f5ef6b3b32a16766a6657f8",
+        "clientRequest": "42505ea09d6618c8e0eb29d8a6a35c3926817be0a9b3f846fb9fef2de7fc87fa",
+        "upstreamRequest": "42505ea09d6618c8e0eb29d8a6a35c3926817be0a9b3f846fb9fef2de7fc87fa"
+      }
+    },
+    {
+      "index": 52,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 207522,
+        "output_tokens": 754,
+        "total_tokens": 208276,
+        "cached_tokens": 199168,
+        "reasoning_tokens": 709
+      },
+      "hashes": {
+        "response": "1890b912ec5821c9702e486a682de91af3935194a65208661f202c2a0d2b3bb7",
+        "clientRequest": "7226cf814b62f42d3c513097776e8bc16d7d7d6dc56eccbed6addc1b4c18c52e",
+        "upstreamRequest": "7226cf814b62f42d3c513097776e8bc16d7d7d6dc56eccbed6addc1b4c18c52e"
+      }
+    },
+    {
+      "index": 53,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 210216,
+        "output_tokens": 927,
+        "total_tokens": 211143,
+        "cached_tokens": 0,
+        "reasoning_tokens": 787
+      },
+      "hashes": {
+        "response": "b813aaacf451e42f3fbfad688e357a06a1f1c3b2bcc5cddd7f2360d285f03d4f",
+        "clientRequest": "bdfda37d9c3a25ef98e6125292fb947cce7388fb9ac6bfc49086083dc3cb6c91",
+        "upstreamRequest": "bdfda37d9c3a25ef98e6125292fb947cce7388fb9ac6bfc49086083dc3cb6c91"
+      }
+    },
+    {
+      "index": 54,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 212544,
+        "output_tokens": 70,
+        "total_tokens": 212614,
+        "cached_tokens": 166400,
+        "reasoning_tokens": 34
+      },
+      "hashes": {
+        "response": "49b296178e8d14b458c85c20bfafba5122c81189e89d2afc2a614590fc92b8fa",
+        "clientRequest": "11c364ba91e13a2b0e88db56e68e0d970c67933e3a1444097fa58845b0a0bdb7",
+        "upstreamRequest": "11c364ba91e13a2b0e88db56e68e0d970c67933e3a1444097fa58845b0a0bdb7"
+      }
+    },
+    {
+      "index": 55,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 214636,
+        "output_tokens": 817,
+        "total_tokens": 215453,
+        "cached_tokens": 205312,
+        "reasoning_tokens": 780
+      },
+      "hashes": {
+        "response": "ab27666e992ad84dfc268924f847a5f7755bce2d96945d83a727a3b4e2188ba2",
+        "clientRequest": "c6c037994dd7e37273def81ea29d72529c75bf1648c080994052c418e83721fb",
+        "upstreamRequest": "c6c037994dd7e37273def81ea29d72529c75bf1648c080994052c418e83721fb"
+      }
+    },
+    {
+      "index": 56,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 215538,
+        "output_tokens": 34,
+        "total_tokens": 215572,
+        "cached_tokens": 195072,
+        "reasoning_tokens": 0
+      },
+      "hashes": {
+        "response": "4c547a142cc4099a440ddc647c7f72a94e8d4bdd41fdaf8bd29b83a540d96a26",
+        "clientRequest": "e6f2b256e384e40aeabcd548f6e7504476deaf2a164de95c794e89c033e95e42",
+        "upstreamRequest": "e6f2b256e384e40aeabcd548f6e7504476deaf2a164de95c794e89c033e95e42"
+      }
+    },
+    {
+      "index": 57,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 216871,
+        "output_tokens": 34,
+        "total_tokens": 216905,
+        "cached_tokens": 177664,
+        "reasoning_tokens": 0
+      },
+      "hashes": {
+        "response": "60d57806ba0a62fb4cea74a4f7e77ec6d6874f76737969ea7aadf798778558ee",
+        "clientRequest": "9f1b00844efd756cb7e9839ae052f555be2d7c448cee2e1ad2d206b3f754f829",
+        "upstreamRequest": "9f1b00844efd756cb7e9839ae052f555be2d7c448cee2e1ad2d206b3f754f829"
+      }
+    },
+    {
+      "index": 58,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 217907,
+        "output_tokens": 325,
+        "total_tokens": 218232,
+        "cached_tokens": 200192,
+        "reasoning_tokens": 98
+      },
+      "hashes": {
+        "response": "06058ee7062a540f71757bee3d0de22821a047b2371de1141ae5c01266201658",
+        "clientRequest": "32ac62bc411592299a94df98561a4e2ec47b3a0d3c78d6ac0a261b251746f7f2",
+        "upstreamRequest": "32ac62bc411592299a94df98561a4e2ec47b3a0d3c78d6ac0a261b251746f7f2"
+      }
+    },
+    {
+      "index": 59,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 218337,
+        "output_tokens": 43,
+        "total_tokens": 218380,
+        "cached_tokens": 179712,
+        "reasoning_tokens": 7
+      },
+      "hashes": {
+        "response": "91002569f472c1171da2c38a4bd28fa70029ee34a03ae2e4a3f26091c93d485f",
+        "clientRequest": "90a44bb728382c27b279bd3c0e75509e70f18e58a1c53dbcff51678523928366",
+        "upstreamRequest": "90a44bb728382c27b279bd3c0e75509e70f18e58a1c53dbcff51678523928366"
+      }
+    },
+    {
+      "index": 60,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 218809,
+        "output_tokens": 217,
+        "total_tokens": 219026,
+        "cached_tokens": 195072,
+        "reasoning_tokens": 6
+      },
+      "hashes": {
+        "response": "89531cfe2bd9a52c0ce5cbf4ceea8e6834e1554a6a268476fcdf62cd8ad7f37e",
+        "clientRequest": "ed11e41fbbafecc7f6fc531bc81a54a64ec23b6f0639f62601ac9ac7169a6562",
+        "upstreamRequest": "ed11e41fbbafecc7f6fc531bc81a54a64ec23b6f0639f62601ac9ac7169a6562"
+      }
+    },
+    {
+      "index": 61,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 219054,
+        "output_tokens": 613,
+        "total_tokens": 219667,
+        "cached_tokens": 207360,
+        "reasoning_tokens": 436
+      },
+      "hashes": {
+        "response": "98b66680a771e168c083541bd8e28d671f6a62baaf8ad8c9465dbcee89e4ef12",
+        "clientRequest": "fbbfdadae00a1b4b33235c12347e616860b6f6bea2589f3829aea4b725ca1068",
+        "upstreamRequest": "fbbfdadae00a1b4b33235c12347e616860b6f6bea2589f3829aea4b725ca1068"
+      }
+    },
+    {
+      "index": 62,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 223956,
+        "output_tokens": 800,
+        "total_tokens": 224756,
+        "cached_tokens": 217600,
+        "reasoning_tokens": 262
+      },
+      "hashes": {
+        "response": "d639e584730d3acd5c0ee35c4f00c1b4c8f6bc2cd0c0364884a7c7f17772f585",
+        "clientRequest": "8b5872e8d41b4bcfd1bfaa3e73099d3915b083c98171bd83cbde8ec9bdd7574d",
+        "upstreamRequest": "8b5872e8d41b4bcfd1bfaa3e73099d3915b083c98171bd83cbde8ec9bdd7574d"
+      }
+    },
+    {
+      "index": 63,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 224809,
+        "output_tokens": 1186,
+        "total_tokens": 225995,
+        "cached_tokens": 214528,
+        "reasoning_tokens": 953
+      },
+      "hashes": {
+        "response": "f019c3f0597d76d17cf49cccc13e972593257f26d4611ff8db19466d4d073b5c",
+        "clientRequest": "a658707ad7c69dde6928dc6c93728871ddf1467a2104422bcaa3b258db370a2b",
+        "upstreamRequest": "a658707ad7c69dde6928dc6c93728871ddf1467a2104422bcaa3b258db370a2b"
+      }
+    },
+    {
+      "index": 64,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 226176,
+        "output_tokens": 122,
+        "total_tokens": 226298,
+        "cached_tokens": 218624,
+        "reasoning_tokens": 50
+      },
+      "hashes": {
+        "response": "e11fc99821906e102d8a3ebb5e909018b708e408d4d9d463bc0a4ecf5facd3e6",
+        "clientRequest": "790b2a6fb2c0f53d6bb5f1c9e4e731fd1a40202cb38ce7d8dd533b7ce201af7e",
+        "upstreamRequest": "790b2a6fb2c0f53d6bb5f1c9e4e731fd1a40202cb38ce7d8dd533b7ce201af7e"
+      }
+    },
+    {
+      "index": 65,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 226628,
+        "output_tokens": 694,
+        "total_tokens": 227322,
+        "cached_tokens": 0,
+        "reasoning_tokens": 357
+      },
+      "hashes": {
+        "response": "4379c61a7bcd00828ad0ed2f27a08f2bb7bc1f59875dcaa8245db72340a712ea",
+        "clientRequest": "11d204071e5995586044aa5b9349e5bea840073d79759cb6470286b25bb17fa1",
+        "upstreamRequest": "11d204071e5995586044aa5b9349e5bea840073d79759cb6470286b25bb17fa1"
+      }
+    },
+    {
+      "index": 66,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 228173,
+        "output_tokens": 242,
+        "total_tokens": 228415,
+        "cached_tokens": 211456,
+        "reasoning_tokens": 160
+      },
+      "hashes": {
+        "response": "c018d269e106c098266f388f2ade9611e08938bea95ab8498fd3b15245def0ac",
+        "clientRequest": "d76d9f1b4a37185f52a9388191a163f878af742618729e9b7761600d9fcbe749",
+        "upstreamRequest": "d76d9f1b4a37185f52a9388191a163f878af742618729e9b7761600d9fcbe749"
+      }
+    },
+    {
+      "index": 67,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 228445,
+        "output_tokens": 100,
+        "total_tokens": 228545,
+        "cached_tokens": 204288,
+        "reasoning_tokens": 28
+      },
+      "hashes": {
+        "response": "380653f0b2aacec8ba625ce15fcbcca39c14f1b2c6db27375ee560f2d26b889e",
+        "clientRequest": "47bf21ec0f88f95815b4bb8038c427bf6348cdae7f98382e220fe5f6b52abb4b",
+        "upstreamRequest": "47bf21ec0f88f95815b4bb8038c427bf6348cdae7f98382e220fe5f6b52abb4b"
+      }
+    },
+    {
+      "index": 68,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 228669,
+        "output_tokens": 146,
+        "total_tokens": 228815,
+        "cached_tokens": 223744,
+        "reasoning_tokens": 46
+      },
+      "hashes": {
+        "response": "76d1f7cf66ab6b890cbecd3331ca745c4def6b608deb1ffd67d64e7819410de1",
+        "clientRequest": "09e2a9e6fbff2f7ebe43d27386d96a15e43805d565d6f211fd83a713136c68f1",
+        "upstreamRequest": "09e2a9e6fbff2f7ebe43d27386d96a15e43805d565d6f211fd83a713136c68f1"
+      }
+    },
+    {
+      "index": 69,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 230611,
+        "output_tokens": 47,
+        "total_tokens": 230658,
+        "cached_tokens": 209408,
+        "reasoning_tokens": 7
+      },
+      "hashes": {
+        "response": "71f902025a95c30171f05b3f21ec6c74fea06da123f49927095b09bfa9cdf4be",
+        "clientRequest": "748bbf1664d59c3bca5add3d7eb709e8698f149d07fdcc3acbcf78fa00db6944",
+        "upstreamRequest": "748bbf1664d59c3bca5add3d7eb709e8698f149d07fdcc3acbcf78fa00db6944"
+      }
+    },
+    {
+      "index": 70,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 232730,
+        "output_tokens": 47,
+        "total_tokens": 232777,
+        "cached_tokens": 66048,
+        "reasoning_tokens": 6
+      },
+      "hashes": {
+        "response": "db9751b3dec818a5afcc824fdbaccbe1aaa45aa14b921cb6494848cfb523d855",
+        "clientRequest": "47b1dafb8f6519b60444c0594592ec6e7e5c18a56e71b95fc2b7051504db0ed7",
+        "upstreamRequest": "47b1dafb8f6519b60444c0594592ec6e7e5c18a56e71b95fc2b7051504db0ed7"
+      }
+    },
+    {
+      "index": 71,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 233101,
+        "output_tokens": 204,
+        "total_tokens": 233305,
+        "cached_tokens": 229888,
+        "reasoning_tokens": 92
+      },
+      "hashes": {
+        "response": "93139034aecf460529233d13d5e66ec0f3f61b376e3bc2df52c5f30044e1b6c5",
+        "clientRequest": "d98eaeffc2720e8593dc6c1a9c600febbd83217444af76d60b56a9289b61e64a",
+        "upstreamRequest": "d98eaeffc2720e8593dc6c1a9c600febbd83217444af76d60b56a9289b61e64a"
+      }
+    },
+    {
+      "index": 72,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 233694,
+        "output_tokens": 245,
+        "total_tokens": 233939,
+        "cached_tokens": 223744,
+        "reasoning_tokens": 42
+      },
+      "hashes": {
+        "response": "e2ff7ecd80481c3f35be2cdd5a7c23c2d708a1d72e701cdb660e034d0cd2bd1f",
+        "clientRequest": "eea1c23a7545a7e16e1d65aa902b506126154737bab9e6611abdc6a399736e8a",
+        "upstreamRequest": "eea1c23a7545a7e16e1d65aa902b506126154737bab9e6611abdc6a399736e8a"
+      }
+    },
+    {
+      "index": 73,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 242366,
+        "output_tokens": 699,
+        "total_tokens": 243065,
+        "cached_tokens": 227840,
+        "reasoning_tokens": 516
+      },
+      "hashes": {
+        "response": "74712ca7d34a787269bc2cec951bc5bacfca727873ca8c02bda3094c6e6dc74c",
+        "clientRequest": "3ee148be063caec5446fa507474905439be85ab107a0bc943f0922ede0801be3",
+        "upstreamRequest": "3ee148be063caec5446fa507474905439be85ab107a0bc943f0922ede0801be3"
+      }
+    },
+    {
+      "index": 74,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 243417,
+        "output_tokens": 144,
+        "total_tokens": 243561,
+        "cached_tokens": 242176,
+        "reasoning_tokens": 9
+      },
+      "hashes": {
+        "response": "14c3728684bcdda404397cfb963e37dd1a4dcf4ac10ea4b631def5d2bc3eb3e8",
+        "clientRequest": "71886df5fc4832c7062c5b7c720feaeb645ad816a04ee9f006fd1c5a69482931",
+        "upstreamRequest": "71886df5fc4832c7062c5b7c720feaeb645ad816a04ee9f006fd1c5a69482931"
+      }
+    },
+    {
+      "index": 75,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 243741,
+        "output_tokens": 202,
+        "total_tokens": 243943,
+        "cached_tokens": 231936,
+        "reasoning_tokens": 57
+      },
+      "hashes": {
+        "response": "8ebfc8c797f4a46623266c146854768ae3bea5644f48fa23b9d84f4e93480219",
+        "clientRequest": "6af23903ae40f321bfdad8954377f32d59ee7d30a10107531920f513f20cd6d4",
+        "upstreamRequest": "6af23903ae40f321bfdad8954377f32d59ee7d30a10107531920f513f20cd6d4"
+      }
+    },
+    {
+      "index": 76,
+      "kind": "work",
+      "status": 200,
+      "serverCompletion": "completed",
+      "evidenceComplete": true,
+      "usage": {
+        "input_tokens": 6707,
+        "output_tokens": 172,
+        "total_tokens": 6879,
+        "cached_tokens": 0,
+        "reasoning_tokens": 76
+      },
+      "hashes": {
+        "response": "496f403d5c07f81b2b7b223dc56cb3353ba6a9ab558e38910f974e31f5a0e192",
+        "clientRequest": "a7409bb6348a9699ee5ea9e492302fb78b0d1d1c8b74b2cd50b1a0ef87adb809",
+        "upstreamRequest": "a7409bb6348a9699ee5ea9e492302fb78b0d1d1c8b74b2cd50b1a0ef87adb809"
+      }
+    }
+  ],
+  "allHashesVerified": true,
+  "rawStreamsPrivate": true,
+  "nativeOutput": 0
+}

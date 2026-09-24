@@ -1,0 +1,45 @@
+// Offline npm layout contract: native nested worktree vs independent diagnostics.
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {spawnSync} from 'node:child_process';
+import {pathToFileURL} from 'node:url';
+import {materializeNativeTemplate} from '../lib/native-template.mjs';
+import {sensitivityPlan} from '../lib/native-sensitivity.mjs';
+const temp=fs.mkdtempSync(path.join(os.tmpdir(),'sense-deps-'));
+const root=path.resolve('.'), repo=path.join(temp,'repo'), bundle=path.join(temp,'bundle');
+const rules=[{permission:'*',pattern:'*',action:'allow'}];
+const put=(file,text)=>{fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,text);};
+const command=(cwd,exe,args)=>spawnSync(exe,args,{cwd,encoding:'utf8',timeout:30000});
+const git=(cwd,...args)=>{const r=command(cwd,'git',args);assert.equal(r.status,0,r.stderr);return r.stdout;};
+const packageAt=(dir,value)=>{put(dir+'/choice/package.json',JSON.stringify({name:'choice',main:'index.cjs'}));put(dir+'/choice/index.cjs',`module.exports=${value};\n`);};
+try {
+ fs.mkdirSync(repo);git(repo,'init','-q');
+ put(repo+'/.gitignore','node_modules/\n');
+ put(repo+'/package.json',JSON.stringify({type:'module',scripts:{pretest:'node -e "console.log(\'PRE\')"',test:'probe && node test.mjs',posttest:'node -e "console.log(\'POST\')"'}}));
+ put(repo+'/value.mjs','export const accepts = n => n > 2;\n');
+ put(repo+'/test.mjs',"import assert from 'node:assert/strict';import fs from 'node:fs';import {createRequire} from 'node:module';import {accepts} from './value.mjs';const require=createRequire(import.meta.url);assert.equal(require('choice'),1);assert.equal(accepts(3),true);assert.equal(accepts(1),false);fs.mkdirSync('node_modules/.cache',{recursive:true});fs.writeFileSync('node_modules/.cache/test','cache');\n");
+ git(repo,'add','.');git(repo,'-c','core.hooksPath=/dev/null','-c','user.name=Fixture','-c','user.email=fixture@localhost','commit','-qm','base');
+ const work=repo+'/.git/harness-task/fixture/worktree';git(repo,'worktree','add','--detach',work,'HEAD');
+ put(work+'/value.mjs','export const accepts = n => n >= 2;\n');
+ packageAt(repo+'/node_modules',1);
+ put(repo+'/node_modules/probe/bin.cjs',"#!/usr/bin/env node\nconst fs=require('node:fs');const p=__dirname+'/touched';if(fs.existsSync(p))throw Error('dependency reuse');fs.writeFileSync(p,'child');console.log('PROBE');\n");
+ fs.chmodSync(repo+'/node_modules/probe/bin.cjs',0o755);fs.mkdirSync(repo+'/node_modules/.bin');fs.symlinkSync('../probe/bin.cjs',repo+'/node_modules/.bin/probe');
+ materializeNativeTemplate({repositoryRoot:root,outputDirectory:bundle,task:true});fs.symlinkSync(root+'/profiles/native/sensitivity/node_modules',bundle+'/sensitivity/node_modules');
+ const {runSensitivity}=await import(pathToFileURL(bundle+'/native-sensitivity-runner.mjs'));
+ const run=async(label,extra=[])=>{const policy=[...rules,...extra],args={path:'value.mjs'};const p=sensitivityPlan({directory:work,rules:policy,args});const r=await runSensitivity({args,base:'HEAD',rules:policy,snapshot:p.snapshot,budgetMs:30000},{directory:work});assert.equal(r.terminationVerified,true);console.log(JSON.stringify({label,status:r.status,baseline:r.baseline,limits:r.limits}));return r;};
+ let r=await run('no local node_modules');assert.equal(r.baseline.status,'passed');assert.equal(fs.existsSync(repo+'/node_modules/probe/touched'),false);
+ const ordinary=command(work,'npm',['test']);assert.equal(ordinary.status,0,ordinary.stdout+ordinary.stderr);assert.ok(fs.existsSync(work+'/node_modules/.cache/test'));fs.unlinkSync(repo+'/node_modules/probe/touched');
+ r=await run('cache after ordinary suite');assert.equal(r.baseline.status,'passed');assert.match(r.baseline.output,/PRE[\s\S]*PROBE[\s\S]*POST/);assert.equal(r.engineExecuted,true);assert.ok(r.variants.some(v=>v.status==='passed'));
+ packageAt(work+'/node_modules',2);put(work+'/test.mjs',fs.readFileSync(work+'/test.mjs','utf8').replace("require('choice'),1","require('choice'),2"));
+ r=await run('local version shadows parent; inherited executable');assert.equal(r.baseline.status,'passed');
+ fs.cpSync(repo+'/node_modules/probe',work+'/node_modules/probe',{recursive:true});fs.mkdirSync(work+'/node_modules/.bin');fs.symlinkSync('../probe/bin.cjs',work+'/node_modules/.bin/probe');
+ r=await run('full local install');assert.equal(r.baseline.status,'passed');
+ const weak=fs.readFileSync(work+'/test.mjs','utf8');put(work+'/test.mjs',weak+'assert.equal(accepts(2),true);\n');r=await run('new regression');assert.equal(r.baseline.status,'passed');assert.ok(r.variants.some(v=>v.replacement==='n > 2'&&/AssertionError/.test(v.output)));
+ put(work+'/test.mjs',weak+"require('absent-package-fixture');\n");r=await run('missing package stays missing');assert.equal(r.baseline.status,'command-rejected');assert.match(r.baseline.output,/MODULE_NOT_FOUND/);put(work+'/test.mjs',weak);
+ r=await run('denied dependency',[{permission:'read',pattern:'*node_modules/choice*',action:'deny'}]);assert.equal(r.cost.commands,0);assert.match(r.limits.join(' '),/permission/);
+ fs.symlinkSync('/etc/hosts',work+'/node_modules/external');r=await run('external dependency link');assert.equal(r.cost.commands,0);assert.match(r.limits.join(' '),/External dependency symlink/);fs.unlinkSync(work+'/node_modules/external');
+ assert.equal(fs.existsSync(repo+'/node_modules/probe/touched'),false);assert.equal(fs.existsSync(work+'/node_modules/probe/touched'),false);
+ console.log('Dependency layout checks passed; real provider requests: 0');
+} finally {fs.rmSync(temp,{recursive:true,force:true});}

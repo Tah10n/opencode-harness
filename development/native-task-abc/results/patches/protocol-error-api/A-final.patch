@@ -1,0 +1,92 @@
+diff --git a/packages/connector/README.md b/packages/connector/README.md
+index 5a1e8c6..ec884c6 100644
+--- a/packages/connector/README.md
++++ b/packages/connector/README.md
+@@ -30,6 +30,12 @@ best-effort per source: one damaged settings file is reported without blocking h
+ initial sync. The final token/config swap is serialized behind any active sync, so an older request
+ cannot restore superseded authorization.
+ 
++The connector protocol parser validates the complete bounded JSON response before returning it. A
++validated non-success response rejects with an error containing its HTTP status and server error
++code; malformed, oversized, non-JSON, or unsafe responses reject as `invalid_server_response` and
++are never treated as trusted server errors. The CLI request path uses those errors for its existing
++authentication cleanup, 4xx handling, retryable 429/5xx backoff, and `Retry-After` behavior.
++
+ ## Commands
+ 
+ ```text
+diff --git a/packages/connector/bin/viberacing.mjs b/packages/connector/bin/viberacing.mjs
+index 5fde3a9..2fde848 100755
+--- a/packages/connector/bin/viberacing.mjs
++++ b/packages/connector/bin/viberacing.mjs
+@@ -189,25 +189,13 @@ async function request(origin, path, options = {}, attempts = 1, responseContext
+       try {
+         payload = await parseProtocolResponse(response, responseContext);
+       } catch (error) {
+-        if (
+-          error?.code === "invalid_server_response" &&
+-          (response.status >= 500 || response.status === 429)
+-        ) {
++        if (response.status >= 500 || response.status === 429) {
+           error.status = response.status;
+           error.retryAfterMs = retryAfterMilliseconds(response);
+         }
+         throw error;
+       }
+-      if (!response.ok) {
+-        const error = new Error(
+-          `Vibe Racing returned ${response.status}: ${payload.error ?? "request failed"}`,
+-        );
+-        error.status = response.status;
+-        error.code = payload.error;
+-        error.retryAfterMs = retryAfterMilliseconds(response);
+-        if (response.status < 500 && response.status !== 429) throw error;
+-        lastError = error;
+-      } else return payload;
++      return payload;
+     } catch (error) {
+       lastError = error;
+       if (
+diff --git a/packages/connector/lib/protocol.mjs b/packages/connector/lib/protocol.mjs
+index f1ceba9..87d9123 100644
+--- a/packages/connector/lib/protocol.mjs
++++ b/packages/connector/lib/protocol.mjs
+@@ -292,7 +292,10 @@ export async function parseProtocolResponse(response, context) {
+       !errorCodePattern.test(value.error)
+     )
+       throw invalid();
+-    return { error: value.error };
++    const error = new Error(`Vibe Racing returned ${response.status}: ${value.error}`);
++    error.status = response.status;
++    error.code = value.error;
++    throw error;
+   }
+   if (context.kind === "pairingStart") return parsePairingStart(value, context);
+   if (context.kind === "pairingPoll") return parsePairingPoll(value, context);
+diff --git a/packages/connector/test/protocol.test.mjs b/packages/connector/test/protocol.test.mjs
+index bfdb3e9..95dd233 100644
+--- a/packages/connector/test/protocol.test.mjs
++++ b/packages/connector/test/protocol.test.mjs
+@@ -90,13 +90,18 @@ test("rejects server attempts to add local paths, executables, or unknown mappin
+   );
+ });
+ 
+-test("protocol errors are snake_case and terminal output strips control characters", async () => {
+-  assert.deepEqual(
+-    await parseProtocolResponse(json({ error: "source_disconnected" }, 400), {
++test("protocol errors reject with validated status and code, and terminal output strips control characters", async () => {
++  await assert.rejects(
++    parseProtocolResponse(json({ error: "source_disconnected" }, 400), {
+       kind: "usage",
+       sourceIds: [sourceId],
+     }),
+-    { error: "source_disconnected" },
++    (error) => {
++      assert.equal(error.message, "Vibe Racing returned 400: source_disconnected");
++      assert.equal(error.status, 400);
++      assert.equal(error.code, "source_disconnected");
++      return true;
++    },
+   );
+   for (const error of ["InvalidRequest", "invalid-request", "invalid__request", "bad\ncode"]) {
+     await assert.rejects(

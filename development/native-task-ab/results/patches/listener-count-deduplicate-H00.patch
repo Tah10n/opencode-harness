@@ -1,0 +1,123 @@
+diff --git a/index.d.ts b/index.d.ts
+index 449f402..0c8ca90 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -727,7 +727,7 @@ export default class Emittery<
+ 	): UnsubscribeFunction;
+ 
+ 	/**
+-	The number of listeners for the `eventName` or all events if not specified.
++	The number of listeners for the `eventName` or all events if not specified. When an array is passed, duplicate event-name values are counted only once.
+ 
+ 	@example
+ 	```
+@@ -739,6 +739,7 @@ export default class Emittery<
+ 	emitter.on('🐶', listener);
+ 
+ 	emitter.listenerCount('🦄'); // 1
++	emitter.listenerCount(['🦄', '🦄']); // 1
+ 	emitter.listenerCount(); // 2
+ 	```
+ 	*/
+diff --git a/index.js b/index.js
+index 67a4de3..fee37fb 100644
+--- a/index.js
++++ b/index.js
+@@ -948,7 +948,7 @@ export default class Emittery {
+ 	}
+ 
+ 	listenerCount(eventNames) {
+-		eventNames = Array.isArray(eventNames) ? eventNames : [eventNames];
++		eventNames = Array.isArray(eventNames) ? [...new Set(eventNames)] : [eventNames];
+ 		let count = 0;
+ 
+ 		for (const eventName of eventNames) {
+diff --git a/index.test-d.ts b/index.test-d.ts
+index 6ec455e..5415a80 100644
+--- a/index.test-d.ts
++++ b/index.test-d.ts
+@@ -230,6 +230,17 @@ type AnyListener = (event: unknown) => void | Promise<void>;
+ 	});
+ }
+ 
++// Strict typing for listenerCount with multiple event names
++{
++	const ee = new Emittery<{
++		open: undefined;
++		close: string;
++	}>();
++	const eventNames: ReadonlyArray<'open' | 'close'> = ['open', 'close', 'open'];
++	expectType<number>(ee.listenerCount(['open', 'close', 'open']));
++	expectType<number>(ee.listenerCount(eventNames));
++}
++
+ // Strict typing for anyEvent iterator
+ {
+ 	const testAnyEvent = async () => {
+diff --git a/readme.md b/readme.md
+index 88805a2..0589e45 100644
+--- a/readme.md
++++ b/readme.md
+@@ -641,7 +641,7 @@ const emitter = new Emittery();
+ 
+ #### listenerCount(eventNames?)
+ 
+-The number of listeners for the `eventNames` or all events if not specified.
++The number of listeners for the `eventNames` or all events if not specified. When an array is passed, duplicate event-name values are counted only once. Symbols are deduplicated by identity, so different symbols with the same description remain distinct.
+ 
+ ```js
+ import Emittery from 'emittery';
+@@ -652,6 +652,7 @@ emitter.on('🦄', listener);
+ emitter.on('🐶', listener);
+ 
+ emitter.listenerCount('🦄'); // 1
++emitter.listenerCount(['🦄', '🦄']); // 1
+ emitter.listenerCount(); // 2
+ ```
+ 
+diff --git a/test/index.js b/test/index.js
+index f73b0fc..1b96be8 100644
+--- a/test/index.js
++++ b/test/index.js
+@@ -2248,6 +2248,41 @@ test('listenerCount() - multiple event names', t => {
+ 	t.is(emitter.listenerCount(), 5);
+ });
+ 
++test('listenerCount() - duplicate event names are counted once', async t => {
++	const emitter = new Emittery();
++	const symbol = Symbol('event');
++	const otherSymbol = Symbol('event');
++	const eventIterator = emitter.events('event');
++	const symbolIterator = emitter.events(symbol);
++	const anyIterator = emitter.anyEvent();
++
++	emitter.on('event', () => {});
++	emitter.on('event', () => {});
++	emitter.on(symbol, () => {});
++	emitter.on(otherSymbol, () => {});
++	emitter.onAny(() => {});
++	emitter.onAny(() => {});
++
++	// Check the stores used by listenerCount before checking the combined result.
++	t.is(emitter.listenerCount('event'), 6);
++	t.is(emitter.listenerCount(symbol), 5);
++	t.is(emitter.listenerCount(otherSymbol), 4);
++	t.is(emitter.listenerCount(['event', 'event', symbol, symbol, otherSymbol, otherSymbol]), 15);
++	t.is(emitter.listenerCount([]), 0);
++	t.is(emitter.listenerCount(), 9);
++	t.throws(() => emitter.listenerCount(['event', 'event', true]), {instanceOf: TypeError});
++
++	// Counting must not change listener or iterator state.
++	t.is(emitter.listenerCount('event'), 6);
++	t.is(emitter.listenerCount(), 9);
++
++	await Promise.all([
++		eventIterator.return(),
++		symbolIterator.return(),
++		anyIterator.return(),
++	]);
++});
++
+ test('listenerCount() - works with empty eventName strings', t => {
+ 	const emitter = new Emittery();
+ 	emitter.on('', () => {});

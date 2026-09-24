@@ -1,0 +1,307 @@
+{
+  "observations": [
+    {
+      "name": "bound-migration-antigravity",
+      "before": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "completeness": "complete"
+    },
+    {
+      "name": "unfinished-replay-antigravity",
+      "before": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "unfinished": [
+        [
+          "2026-08-10",
+          "30"
+        ]
+      ],
+      "expectedUnfinished": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "after": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "7"
+        ]
+      ],
+      "expectedAfter": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "7"
+        ]
+      ],
+      "completeness": "complete"
+    },
+    {
+      "name": "bound-migration-claude_code",
+      "before": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "completeness": "complete"
+    },
+    {
+      "name": "unfinished-replay-claude_code",
+      "before": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "unfinished": [
+        [
+          "2026-08-10",
+          "30"
+        ]
+      ],
+      "expectedUnfinished": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "after": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "7"
+        ]
+      ],
+      "expectedAfter": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "7"
+        ]
+      ],
+      "completeness": "complete"
+    },
+    {
+      "name": "bound-migration-gemini_cli",
+      "before": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "completeness": "complete"
+    },
+    {
+      "name": "bound-migration-qwen_code",
+      "before": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "completeness": "complete"
+    },
+    {
+      "name": "mixed-antigravity",
+      "actual": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "expectedCompleteness": "partial",
+      "completeness": "partial",
+      "diagnostics": [
+        {
+          "code": "local_store_schema_unsupported",
+          "phase": "collect"
+        }
+      ]
+    },
+    {
+      "name": "mixed-opencode",
+      "actual": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "expectedCompleteness": "partial",
+      "completeness": "partial",
+      "diagnostics": [
+        {
+          "code": "local_store_schema_unsupported",
+          "phase": "collect"
+        }
+      ]
+    },
+    {
+      "name": "conflict-consumer",
+      "before": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-10",
+          "22"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "22"
+        ]
+      ],
+      "expectedCompleteness": "partial",
+      "completeness": "partial",
+      "diagnostics": [
+        {
+          "code": "event_usage_conflict",
+          "phase": "collect"
+        }
+      ],
+      "consumerDiagnostics": []
+    },
+    {
+      "name": "privacy-hex-id",
+      "actual": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "rawIdPersisted": true,
+      "expectedRawIdPersisted": false
+    },
+    {
+      "name": "account-remap",
+      "before": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "completeness": "complete"
+    }
+  ]
+}

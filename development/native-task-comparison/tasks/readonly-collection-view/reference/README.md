@@ -1,0 +1,3 @@
+# readonly-collection-view
+
+viewMap returns a frozen live Map-like view with size/get/has/keys/values/entries/iteration/forEach. Native key equality, insertion order and live iterator behavior apply. Owner changes remain visible; set/delete/clear on the view throw TypeError. forEach uses the supplied receiver and passes (value,key,view), never the mutable source. Errors propagate and owner modifications during finite iteration follow native Map rules. Keys and values are shared identities: this is shallow read-only, not deep immutability. No extra API backreference exposes source; keys/values explicitly stored by the owner remain shared, even self references. Result prototype/instanceof Map is unspecified. Non-Map sources reject TypeError. Run npm test.

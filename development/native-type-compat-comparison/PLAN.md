@@ -1,0 +1,31 @@
+# TYPE_COMPAT development comparison
+
+Measure additional complete deliveries from TYPE_COMPAT versus the same direct author on candidate 8264ce42ef198580af834dcb09df996ac1274f1d. This is not a plain OpenCode comparison or a general lift estimate.
+
+A is the complete original EventEmitter3 subscribe development task, copied byte-for-byte from native-command-hints-comparison/tasks/B.md. It is known, not held out. B is waitFor with independent Promise settlement and AbortSignal cancellation. Both start at primus/eventemitter3 b0144e940ace8add8f335a8adfbed9284eb419f3, archived without history. Other prepared projects were screened: nanoevents/fastq expose functions, emittery uses an unsupported exports layout, denque and quick-lru do not supply supported returned-callable consumers for the fixed specimens. One-repository diversity is a limitation. Historical prepend and emitCollect tasks were rejected during preparation before freeze/provider work. No task was selected from a new OFF loss.
+
+Order: A/OFF, A/ON, B/ON, B/OFF. OpenCode 1.18.26, openai/gpt-5.6-luna, high, one fresh session/task-run per slot, 1800 seconds total. No probes, retry, reviewer, investigator or continuation. No heavy evaluator runs during measured slots.
+
+Both arms: direct; CONTEXT, CHECKS, SENSITIVITY, INVESTIGATION, COMMAND_HINTS, EXTRA_ATTENTION all 0. Only TYPE_COMPAT differs 0/1. Same prepared Node, TypeScript 6.0.3 (API SHA256 569177652966bd528c319171c7dd22860dbf72bde116cbc4f644f1d02bb12e39), dependencies and permissions. Explicit returned-callable-strict-v1; 2 analyses, 60 seconds each/120 total within task deadline. Compiler/profile is diagnostic, not the project's configuration. No hidden OFF analysis.
+
+## Frozen independent acceptance
+
+Q requires an unchanged applicable portable patch, correct new runtime and declarations, preserved old behavior, actual meaningful project runtime/ESM/type regressions and documentation, preservation of original assertions, and completed available ordinary checks. Helpers, declaration structure, file names and implementation strategy are not prescribed. Human review assesses tests/docs/integration and whether the final response accurately reports author checks. Evaluator-only checks never become author evidence. Independent consumers are compiled only, not executed.
+
+A: all contract clauses in tasks/A.md; independent evaluation/A.cjs covers identity and independent cancellation, old duplicate listeners, normal removal/re-registration, symbols, cleanup, invalid callbacks, argument arities, contexts, dispatch and recursion. A.types.ts independently requires typed event arguments AND contextual this with explicit/omitted context; legacy.types.ts preserves bare calls to callbacks returned by listeners and ordinary typed event calls. A new reference and alternative independently satisfy both type obligations; no historical reference is modified.
+
+B: all clauses in tasks/B.md; evaluation/B.cjs covers immediate independent waits, event and argument identity/arities, recursion, pre-abort, pending abort, exact reasons, first-settlement races, handler removal, old removal then new registration and legacy contexts. B.types.ts requires event-specific tuples, default/named imports and invalid-call rejection. Existing runtime/ESM suites cover old behavior; legacy.types.ts covers returned-callable compatibility. Pending promises must settle within evaluator timeout; no unresolved-promise process exit counts as a pass.
+
+Ordinary commands: npm test; npm run test-esm; npm run rollup. The source has no project tsconfig/type script. Independent types use prepared TS 6.0.3 with --ignoreConfig --noEmit --strict --target es2020 --module commonjs --moduleResolution node --ignoreDeprecations 6.0, for both baseline and candidate. Additional author tests run in their declared project configuration when applicable.
+
+Before paid work validate baseline, fresh reference, permitted alternative, and four controls per task: missing feature, erased/new-any declarations accepting erroneous calls, broken old valid consumer, substantive runtime defect. All independent artifacts stay outside model mounts and history. Full streams stay local in private directories; publish safe hashes/excerpts/accounting only.
+
+T requires native terminal step_finish stop, normal autonomous usable delivery and verified local termination/closed forwarding/container removal. D=Q AND T. Internal incomplete is reported separately. A recovered patch can have Q but not normal delivery; unstarted slots have unknown Q/T/D.
+
+Use existing launcher/materializer/container/scripted provider and capture. Capture binds real compiler block, callID, snapshots, actual next request, terminal events and usage before paid calls. Any necessary runtime or transport-policy change blocks this candidate. Preserve PROCESS_CONTAINMENT_UNAVAILABLE as separate aggregate-verifier limitation; this preflight is not full CI.
+
+Evaluate neutral patch IDs before explanatory traces where possible. ON attribution requires before snapshot, actual compiler result and delivered request, subsequent relevant author edit, repeat result/currentness and final feature completeness. Duplicated examples of one defect are not separate gains. No post-outcome rubric change; late diagnostics separate. No automatic third analysis or default change.
+
+Product decision: retain experimental status without another campaign unless these runs show an extra complete ON delivery, useful delivered-evidence-to-repair chain and no observed regression on B. A-only help is known-example success, not transfer. A tie is a completeness tie. Partial compatibility repair is not complete delivery. No statistical/general superiority claim from four runs.
+
+Refusal/quota/unknown submission/cancellation closes all further admission under existing launcher policy; retain partial output/patch and stop evidence; later rows not_started. Count every work/title request, known/unknown usage, native calls, task wall time and compiler costs separately. Cache/reasoning are subsets, not additive tokens. Preparation/evaluator time separate, no invented monetary cost. Ordinary push only to existing draft PR #25; preserve base/default; no runtime commits, manual Actions, merge, release or package publication.

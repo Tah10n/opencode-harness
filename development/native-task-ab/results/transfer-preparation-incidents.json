@@ -1,0 +1,22 @@
+[
+  {
+    "kind": "network sandbox",
+    "detail": "Initial git ls-remote requests could not resolve github.com. Authorized direct network calls obtained both public HEADs; no account or endpoint change."
+  },
+  {
+    "kind": "docker sandbox",
+    "detail": "Initial two baseline commands and calibration could not access Docker socket. Failed preparation directories retained. Explicit authorized Docker executions started new model-free directories; no model requests."
+  },
+  {
+    "kind": "control CLI preparation",
+    "detail": "p-debounce XO uses dist/cli.js; first full-control direct cli.js command failed MODULE_NOT_FOUND. Switched control runner to declared npm executable; retained failure."
+  },
+  {
+    "kind": "alternative formatting",
+    "detail": "p-throttle Reflect.apply alternative used a short-circuit expression rejected by XO. Replaced only that control expression with equivalent if; original failure retained, no acceptance change."
+  },
+  {
+    "kind": "existing timing tests",
+    "detail": "Formatted p-throttle alternative broad run failed two callback-free strict scheduling timing assertions. Baseline/reference broad passed; separate exact focused baseline and alternative comparison passed. Failed full result retained, execution paths reviewed unchanged, uniform grading rule recorded before transfer outcomes."
+  }
+]

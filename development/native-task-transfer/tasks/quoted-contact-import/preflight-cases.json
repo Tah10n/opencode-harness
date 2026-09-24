@@ -1,0 +1,17 @@
+{
+  "alternative": {
+    "src/contacts.mjs": "import {parseRows} from './csv.mjs';export function importContacts(text){const rows=parseRows(text);if(!rows.length)return [];const [head,...data]=rows;if(new Set(head).size!==head.length||!head.includes('name')||!head.includes('email'))throw new TypeError('Headers');return data.map(row=>{if(row.length!==head.length)throw new TypeError('Width');return {name:row[head.findIndex(x=>x==='name')],email:row[head.findIndex(x=>x==='email')]} ;});}\n"
+  },
+  "mutants": [
+    {
+      "name": "naive-parser",
+      "file": "src/csv.mjs",
+      "replacement": "export function parseRows(text){return text.trim().split(/\\r?\\n/).map(row=>row.split(','));}\n"
+    },
+    {
+      "name": "positional-consumer",
+      "file": "src/contacts.mjs",
+      "replacement": "import {parseRows} from './csv.mjs';export function importContacts(text){const [head,...rows]=parseRows(text);return rows.map(row=>({name:row[0],email:row[1]}));}\n"
+    }
+  ]
+}

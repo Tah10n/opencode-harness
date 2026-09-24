@@ -1,0 +1,447 @@
+{
+  "mode": "calibrate",
+  "provider_requests": 0,
+  "cases": [
+    {
+      "arm": "baseline",
+      "delivery_apply": true,
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "full_tree": "93d9566ea9fa00f4339b7fd092f83bc261fb7fa7",
+      "F": {
+        "instance_id": "mui__material-ui-18141",
+        "label": "baseline-F",
+        "world": "F",
+        "command": ". /usr/local/nvm/nvm.sh && nvm use 18.8.0 && yarn cross-env NODE_ENV=test NODE_PATH=/testbed/node_modules mocha packages/material-ui/src/TextField/TextField.test.js --reporter /tmp/custom-reporter.js --exit",
+        "timeout_seconds": 1200,
+        "acceptance_diag": null,
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 9768,
+          "differences": []
+        },
+        "source_inventory_sha256": "126acf51b0e94e9305715c9b0039f064c209ae64f94284f5c8b13bbabdc835bb",
+        "full_inventory_sha256": "126acf51b0e94e9305715c9b0039f064c209ae64f94284f5c8b13bbabdc835bb",
+        "import_targets": [
+          "/testbed/packages/material-ui/src/TextField/TextField.js",
+          "/testbed/packages/material-ui/src/Select/Select.js",
+          "/testbed/packages/material-ui/src/Select/SelectInput.js",
+          "/testbed/packages/material-ui/src/NativeSelect/NativeSelectInput.js",
+          "/testbed/packages/material-ui/src/InputBase/InputBase.js"
+        ],
+        "build_inputs_sha256": "a0393badd4d46a69d6398fe9db794ce046ae63a9cc5623a81ffc490afa191907",
+        "execution_overlay": {},
+        "exit_code": 0,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 10.228,
+        "output_sha256": "1da88e0588c3b1f6e13fe5b01804cdb49ad302f45b66ff64bea5cd3256f31f56",
+        "source_mutations": {},
+        "expectations_unchanged": true,
+        "build_outputs": {},
+        "resolved_modules": [
+          "/testbed/packages/material-ui/src/TextField/TextField.js",
+          "/testbed/packages/material-ui/src/Select/Select.js",
+          "/testbed/packages/material-ui/src/Select/SelectInput.js",
+          "/testbed/packages/material-ui/src/NativeSelect/NativeSelectInput.js",
+          "/testbed/packages/material-ui/src/InputBase/InputBase.js"
+        ],
+        "runner_stats": {
+          "suites": 9,
+          "tests": 18,
+          "passes": 18,
+          "pending": 0,
+          "failures": 0,
+          "start": "2026-09-21T16:35:51.905Z",
+          "end": "2026-09-21T16:35:52.698Z",
+          "duration": 793
+        },
+        "failure_details": [],
+        "passed": 18,
+        "failed": 0,
+        "failed_tests": [],
+        "delivered_checks": "passed",
+        "seconds": 49.001
+      },
+      "E": {
+        "instance_id": "mui__material-ui-18141",
+        "label": "baseline-E",
+        "world": "E",
+        "command": ". /usr/local/nvm/nvm.sh && nvm use 18.8.0 && yarn cross-env NODE_ENV=test NODE_PATH=/testbed/node_modules mocha packages/material-ui/src/TextField/TextField.test.js packages/material-ui/src/TextField/id-observation.test.js --reporter /tmp/custom-reporter.js --exit",
+        "timeout_seconds": 1200,
+        "acceptance_diag": {
+          "instance_id": "mui__material-ui-18141",
+          "patch_applied": true,
+          "generation": true,
+          "with_logs": true,
+          "all_f2p_passed": false,
+          "no_p2p_failed": true,
+          "resolved": false,
+          "passed_tests": [
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> Material-UI component API applies the className to the root component",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> Material-UI component API does spread props to the root component",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> Material-UI component API applies to root class to the root component if it has this class",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> Material-UI component API should render without errors in ReactTestRenderer",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> Material-UI component API ref attaches the ref",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> structure should have an input as the only child",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> structure should forward the multiline prop to Input",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> structure should forward the fullWidth prop to Input",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with a label label the input",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with a label should apply the className to the label",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with a helper text should apply the className to the FormHelperText",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with a helper text should add accessibility labels to the input",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with an outline should set outline props",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with an outline should set shrink prop on outline from label",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: InputProps should apply additional props to the Input component",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: select can render a <select /> when `native`",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: select renders a combobox with the appropriate accessible name",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: select creates an input[hidden] that has no accessible properties"
+          ],
+          "failed_tests": [
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: select associates the label with the <select /> when `native={true}` and `id`",
+            "packages/material-ui/src/TextField/id-observation.test.js->literal native select ID diagnostic preserves supplied id and label htmlFor on the actual select"
+          ]
+        },
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 9769,
+          "differences": [
+            "packages/material-ui/src/TextField/TextField.test.js",
+            "packages/material-ui/src/TextField/id-observation.test.js"
+          ]
+        },
+        "source_inventory_sha256": "99f9a4c51cad25368dbd6c6a5cb8c974623dc8d91d715adbad1f1218e83c02e5",
+        "full_inventory_sha256": "126acf51b0e94e9305715c9b0039f064c209ae64f94284f5c8b13bbabdc835bb",
+        "import_targets": [
+          "/testbed/packages/material-ui/src/TextField/TextField.js",
+          "/testbed/packages/material-ui/src/Select/Select.js",
+          "/testbed/packages/material-ui/src/Select/SelectInput.js",
+          "/testbed/packages/material-ui/src/NativeSelect/NativeSelectInput.js",
+          "/testbed/packages/material-ui/src/InputBase/InputBase.js"
+        ],
+        "build_inputs_sha256": "a0393badd4d46a69d6398fe9db794ce046ae63a9cc5623a81ffc490afa191907",
+        "execution_overlay": {},
+        "exit_code": 2,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 10.3,
+        "output_sha256": "89ba4ad9c9a6dd077940da5ec89808a82b1cf1f2da95322639668e74ef1e86b4",
+        "source_mutations": {},
+        "expectations_unchanged": true,
+        "build_outputs": {},
+        "resolved_modules": [
+          "/testbed/packages/material-ui/src/TextField/TextField.js",
+          "/testbed/packages/material-ui/src/Select/Select.js",
+          "/testbed/packages/material-ui/src/Select/SelectInput.js",
+          "/testbed/packages/material-ui/src/NativeSelect/NativeSelectInput.js",
+          "/testbed/packages/material-ui/src/InputBase/InputBase.js"
+        ],
+        "runner_stats": {
+          "suites": 10,
+          "tests": 20,
+          "passes": 18,
+          "pending": 0,
+          "failures": 2,
+          "start": "2026-09-21T16:36:38.177Z",
+          "end": "2026-09-21T16:36:38.979Z",
+          "duration": 802
+        },
+        "failure_details": [
+          {
+            "title": "associates the label with the <select /> when `native={true}` and `id`",
+            "file": "packages/material-ui/src/TextField/TextField.test.js",
+            "suite": "prop: select",
+            "fullTitle": "<TextField /> prop: select associates the label with the <select /> when `native={true}` and `id`",
+            "functionName": "anonymous",
+            "status": "failed",
+            "duration": 11,
+            "error": {
+              "message": "Found a label with the text of: Currency:, however no form control was found associated to that label. Make sure you're using the \"for\" attribute or \"aria-labelledby\" attribute correctly.\n\n\u001b[36m<body>\u001b[39m\n  \u001b[36m<div>\u001b[39m\n    \u001b[36m<div\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"MuiFormControl-root MuiTextField-root\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<label\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiFormLabel-filled\"\u001b[39m\n        \u001b[33mdata-shrink\u001b[39m=\u001b[32m\"true\"\u001b[39m\n        \u001b[33mfor\u001b[39m=\u001b[32m\"labelled-select\"\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\"labelled-select-label\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0mCurrency:\u001b[0m\n      \u001b[36m</label>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-formControl MuiInput-formControl\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<select\u001b[39m\n          \u001b[33maria-invalid\u001b[39m=\u001b[32m\"false\"\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"MuiSelect-root MuiSelect-select MuiInputBase-input MuiInput-input MuiInputBase-inputSelect\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<option\u001b[39m\n            \u001b[33mvalue\u001b[39m=\u001b[32m\"dollar\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0m$\u001b[0m\n          \u001b[36m</option>\u001b[39m\n        \u001b[36m</select>\u001b[39m\n        \u001b[36m<svg\u001b[39m\n          \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"MuiSvgIcon-root MuiSelect-icon\"\u001b[39m\n          \u001b[33mdata-mui-test\u001b[39m=\u001b[32m\"ArrowDropDownIcon\"\u001b[39m\n          \u001b[33mfocusable\u001b[39m=\u001b[32m\"false\"\u001b[39m\n          \u001b[33mrole\u001b[39m=\u001b[32m\"presentation\"\u001b[39m\n          \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<path\u001b[39m\n            \u001b[33md\u001b[39m=\u001b[32m\"M7 10l5 5 5-5z\"\u001b[39m\n          \u001b[36m/>\u001b[39m\n        \u001b[36m</svg>\u001b[39m\n      \u001b[36m</div>\u001b[39m\n    \u001b[36m</div>\u001b[39m\n  \u001b[36m</div>\u001b[39m\n\u001b[36m</body>\u001b[39m",
+              "stack": "Error: Found a label with the text of: Currency:, however no form control was found associated to that label. Make sure you're using the \"for\" attribute or \"aria-labelledby\" attribute correctly.\n\n\u001b[36m<body>\u001b[39m\n  \u001b[36m<div>\u001b[39m\n    \u001b[36m<div\u001b[39m\n      \u001b[33mclass\u001b[39m=\u001b[32m\"MuiFormControl-root MuiTextField-root\"\u001b[39m\n    \u001b[36m>\u001b[39m\n      \u001b[36m<label\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiFormLabel-filled\"\u001b[39m\n        \u001b[33mdata-shrink\u001b[39m=\u001b[32m\"true\"\u001b[39m\n        \u001b[33mfor\u001b[39m=\u001b[32m\"labelled-select\"\u001b[39m\n        \u001b[33mid\u001b[39m=\u001b[32m\"labelled-select-label\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[0mCurrency:\u001b[0m\n      \u001b[36m</label>\u001b[39m\n      \u001b[36m<div\u001b[39m\n        \u001b[33mclass\u001b[39m=\u001b[32m\"MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-formControl MuiInput-formControl\"\u001b[39m\n      \u001b[36m>\u001b[39m\n        \u001b[36m<select\u001b[39m\n          \u001b[33maria-invalid\u001b[39m=\u001b[32m\"false\"\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"MuiSelect-root MuiSelect-select MuiInputBase-input MuiInput-input MuiInputBase-inputSelect\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<option\u001b[39m\n            \u001b[33mvalue\u001b[39m=\u001b[32m\"dollar\"\u001b[39m\n          \u001b[36m>\u001b[39m\n            \u001b[0m$\u001b[0m\n          \u001b[36m</option>\u001b[39m\n        \u001b[36m</select>\u001b[39m\n        \u001b[36m<svg\u001b[39m\n          \u001b[33maria-hidden\u001b[39m=\u001b[32m\"true\"\u001b[39m\n          \u001b[33mclass\u001b[39m=\u001b[32m\"MuiSvgIcon-root MuiSelect-icon\"\u001b[39m\n          \u001b[33mdata-mui-test\u001b[39m=\u001b[32m\"ArrowDropDownIcon\"\u001b[39m\n          \u001b[33mfocusable\u001b[39m=\u001b[32m\"false\"\u001b[39m\n          \u001b[33mrole\u001b[39m=\u001b[32m\"presentation\"\u001b[39m\n          \u001b[33mviewBox\u001b[39m=\u001b[32m\"0 0 24 24\"\u001b[39m\n        \u001b[36m>\u001b[39m\n          \u001b[36m<path\u001b[39m\n            \u001b[33md\u001b[39m=\u001b[32m\"M7 10l5 5 5-5z\"\u001b[39m\n          \u001b[36m/>\u001b[39m\n        \u001b[36m</svg>\u001b[39m\n      \u001b[36m</div>\u001b[39m\n    \u001b[36m</div>\u001b[39m\n  \u001b[36m</div>\u001b[39m\n\u001b[36m</body>\u001b[39m\n    at getElementError (node_modules/@testing-library/dom/dist/query-helpers.js:22:10)\n    at getAllByLabelText (node_modules/@testing-library/dom/dist/queries/label-text.js:110:43)\n    at /testbed/node_modules/@testing-library/dom/dist/query-helpers.js:59:17\n    at Context.getByLabelText (packages/material-ui/src/TextField/TextField.test.js:151:14)\n    at processImmediate (node:internal/timers:471:21)"
+            }
+          },
+          {
+            "title": "preserves supplied id and label htmlFor on the actual select",
+            "file": "packages/material-ui/src/TextField/id-observation.test.js",
+            "suite": "literal native select ID diagnostic",
+            "fullTitle": "literal native select ID diagnostic preserves supplied id and label htmlFor on the actual select",
+            "functionName": "anonymous",
+            "status": "failed",
+            "duration": 6,
+            "error": {
+              "message": "expected '' to equal 'labelled-select'",
+              "stack": "AssertionError: expected '' to equal 'labelled-select'\n    at Context.equal (packages/material-ui/src/TextField/id-observation.test.js:20:26)\n    at processImmediate (node:internal/timers:471:21)"
+            }
+          }
+        ],
+        "passed": 18,
+        "failed": 2,
+        "failed_tests": [
+          "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: select associates the label with the <select /> when `native={true}` and `id`",
+          "packages/material-ui/src/TextField/id-observation.test.js->literal native select ID diagnostic preserves supplied id and label htmlFor on the actual select"
+        ],
+        "delivered_checks": "assertion_failure",
+        "missing_required_tests": [],
+        "seconds": 45.148
+      }
+    },
+    {
+      "arm": "gold",
+      "delivery_apply": true,
+      "patch_sha256": "ba0d927909713f9de184c8a03bfe6bf94fae07141dbe2e1b6509edb916c76aea",
+      "full_tree": "56a16b13a04508049cbd947fd0bec927a05ba0bb",
+      "F": {
+        "instance_id": "mui__material-ui-18141",
+        "label": "gold-F",
+        "world": "F",
+        "command": ". /usr/local/nvm/nvm.sh && nvm use 18.8.0 && yarn cross-env NODE_ENV=test NODE_PATH=/testbed/node_modules mocha packages/material-ui/src/TextField/TextField.test.js --reporter /tmp/custom-reporter.js --exit",
+        "timeout_seconds": 1200,
+        "acceptance_diag": null,
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 9768,
+          "differences": []
+        },
+        "source_inventory_sha256": "1371e3fc76ff090ca7e5cef65bb346ec80bf72ab8503fa9fefc45fd2a411a564",
+        "full_inventory_sha256": "1371e3fc76ff090ca7e5cef65bb346ec80bf72ab8503fa9fefc45fd2a411a564",
+        "import_targets": [
+          "/testbed/packages/material-ui/src/TextField/TextField.js",
+          "/testbed/packages/material-ui/src/Select/Select.js",
+          "/testbed/packages/material-ui/src/Select/SelectInput.js",
+          "/testbed/packages/material-ui/src/NativeSelect/NativeSelectInput.js",
+          "/testbed/packages/material-ui/src/InputBase/InputBase.js"
+        ],
+        "build_inputs_sha256": "e1ce55710b3c0676c75f6ce1cb2ea4704a109ea45ee9c49d827540998191c712",
+        "execution_overlay": {},
+        "exit_code": 0,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 10.411,
+        "output_sha256": "233399c0ac8f90a1cd742a52bb70de69fb59d490edd5f0ffcbfdfe0ec3b34208",
+        "source_mutations": {},
+        "expectations_unchanged": true,
+        "build_outputs": {},
+        "resolved_modules": [
+          "/testbed/packages/material-ui/src/TextField/TextField.js",
+          "/testbed/packages/material-ui/src/Select/Select.js",
+          "/testbed/packages/material-ui/src/Select/SelectInput.js",
+          "/testbed/packages/material-ui/src/NativeSelect/NativeSelectInput.js",
+          "/testbed/packages/material-ui/src/InputBase/InputBase.js"
+        ],
+        "runner_stats": {
+          "suites": 9,
+          "tests": 18,
+          "passes": 18,
+          "pending": 0,
+          "failures": 0,
+          "start": "2026-09-21T16:37:26.917Z",
+          "end": "2026-09-21T16:37:27.673Z",
+          "duration": 756
+        },
+        "failure_details": [],
+        "passed": 18,
+        "failed": 0,
+        "failed_tests": [],
+        "delivered_checks": "passed",
+        "seconds": 48.036
+      },
+      "E": {
+        "instance_id": "mui__material-ui-18141",
+        "label": "gold-E",
+        "world": "E",
+        "command": ". /usr/local/nvm/nvm.sh && nvm use 18.8.0 && yarn cross-env NODE_ENV=test NODE_PATH=/testbed/node_modules mocha packages/material-ui/src/TextField/TextField.test.js packages/material-ui/src/TextField/id-observation.test.js --reporter /tmp/custom-reporter.js --exit",
+        "timeout_seconds": 1200,
+        "acceptance_diag": {
+          "instance_id": "mui__material-ui-18141",
+          "patch_applied": true,
+          "generation": true,
+          "with_logs": true,
+          "all_f2p_passed": true,
+          "no_p2p_failed": true,
+          "resolved": true,
+          "passed_tests": [
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> Material-UI component API applies the className to the root component",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> Material-UI component API does spread props to the root component",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> Material-UI component API applies to root class to the root component if it has this class",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> Material-UI component API should render without errors in ReactTestRenderer",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> Material-UI component API ref attaches the ref",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> structure should have an input as the only child",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> structure should forward the multiline prop to Input",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> structure should forward the fullWidth prop to Input",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with a label label the input",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with a label should apply the className to the label",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with a helper text should apply the className to the FormHelperText",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with a helper text should add accessibility labels to the input",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with an outline should set outline props",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with an outline should set shrink prop on outline from label",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: InputProps should apply additional props to the Input component",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: select can render a <select /> when `native`",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: select associates the label with the <select /> when `native={true}` and `id`",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: select renders a combobox with the appropriate accessible name",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: select creates an input[hidden] that has no accessible properties",
+            "packages/material-ui/src/TextField/id-observation.test.js->literal native select ID diagnostic preserves supplied id and label htmlFor on the actual select"
+          ],
+          "failed_tests": []
+        },
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 9769,
+          "differences": [
+            "packages/material-ui/src/TextField/TextField.test.js",
+            "packages/material-ui/src/TextField/id-observation.test.js"
+          ]
+        },
+        "source_inventory_sha256": "2d55968d4ab874eb095d2852f64631849d576581fa7ab69e2f0b563279aed034",
+        "full_inventory_sha256": "1371e3fc76ff090ca7e5cef65bb346ec80bf72ab8503fa9fefc45fd2a411a564",
+        "import_targets": [
+          "/testbed/packages/material-ui/src/TextField/TextField.js",
+          "/testbed/packages/material-ui/src/Select/Select.js",
+          "/testbed/packages/material-ui/src/Select/SelectInput.js",
+          "/testbed/packages/material-ui/src/NativeSelect/NativeSelectInput.js",
+          "/testbed/packages/material-ui/src/InputBase/InputBase.js"
+        ],
+        "build_inputs_sha256": "e1ce55710b3c0676c75f6ce1cb2ea4704a109ea45ee9c49d827540998191c712",
+        "execution_overlay": {},
+        "exit_code": 0,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 11.161,
+        "output_sha256": "bca5c06e142faedfb471a77327140aaebed9a643918b215a493b00cdd202d543",
+        "source_mutations": {},
+        "expectations_unchanged": true,
+        "build_outputs": {},
+        "resolved_modules": [
+          "/testbed/packages/material-ui/src/TextField/TextField.js",
+          "/testbed/packages/material-ui/src/Select/Select.js",
+          "/testbed/packages/material-ui/src/Select/SelectInput.js",
+          "/testbed/packages/material-ui/src/NativeSelect/NativeSelectInput.js",
+          "/testbed/packages/material-ui/src/InputBase/InputBase.js"
+        ],
+        "runner_stats": {
+          "suites": 10,
+          "tests": 20,
+          "passes": 20,
+          "pending": 0,
+          "failures": 0,
+          "start": "2026-09-21T16:38:13.406Z",
+          "end": "2026-09-21T16:38:14.345Z",
+          "duration": 939
+        },
+        "failure_details": [],
+        "passed": 20,
+        "failed": 0,
+        "failed_tests": [],
+        "delivered_checks": "passed",
+        "missing_required_tests": [],
+        "seconds": 51.939
+      }
+    },
+    {
+      "arm": "gold-overlap",
+      "E": {
+        "instance_id": "mui__material-ui-18141",
+        "label": "gold-overlap-E",
+        "world": "E",
+        "command": ". /usr/local/nvm/nvm.sh && nvm use 18.8.0 && yarn cross-env NODE_ENV=test NODE_PATH=/testbed/node_modules mocha packages/material-ui/src/TextField/TextField.test.js packages/material-ui/src/TextField/id-observation.test.js --reporter /tmp/custom-reporter.js --exit",
+        "timeout_seconds": 1200,
+        "acceptance_diag": {
+          "instance_id": "mui__material-ui-18141",
+          "patch_applied": true,
+          "generation": true,
+          "with_logs": true,
+          "all_f2p_passed": true,
+          "no_p2p_failed": true,
+          "resolved": true,
+          "passed_tests": [
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> Material-UI component API applies the className to the root component",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> Material-UI component API does spread props to the root component",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> Material-UI component API applies to root class to the root component if it has this class",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> Material-UI component API should render without errors in ReactTestRenderer",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> Material-UI component API ref attaches the ref",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> structure should have an input as the only child",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> structure should forward the multiline prop to Input",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> structure should forward the fullWidth prop to Input",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with a label label the input",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with a label should apply the className to the label",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with a helper text should apply the className to the FormHelperText",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with a helper text should add accessibility labels to the input",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with an outline should set outline props",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> with an outline should set shrink prop on outline from label",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: InputProps should apply additional props to the Input component",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: select can render a <select /> when `native`",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: select associates the label with the <select /> when `native={true}` and `id`",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: select renders a combobox with the appropriate accessible name",
+            "packages/material-ui/src/TextField/TextField.test.js-><TextField /> prop: select creates an input[hidden] that has no accessible properties",
+            "packages/material-ui/src/TextField/id-observation.test.js->literal native select ID diagnostic preserves supplied id and label htmlFor on the actual select"
+          ],
+          "failed_tests": []
+        },
+        "assessment_integrity": "verified",
+        "integrity": {
+          "outside_surface_equal": true,
+          "compared_paths": 9769,
+          "differences": [
+            "packages/material-ui/src/TextField/TextField.test.js",
+            "packages/material-ui/src/TextField/id-observation.test.js"
+          ]
+        },
+        "source_inventory_sha256": "2d55968d4ab874eb095d2852f64631849d576581fa7ab69e2f0b563279aed034",
+        "full_inventory_sha256": "d70c4beabdf28f99107b85d187e6bb755816328e731897b9b36f7003fdfe6432",
+        "import_targets": [
+          "/testbed/packages/material-ui/src/TextField/TextField.js",
+          "/testbed/packages/material-ui/src/Select/Select.js",
+          "/testbed/packages/material-ui/src/Select/SelectInput.js",
+          "/testbed/packages/material-ui/src/NativeSelect/NativeSelectInput.js",
+          "/testbed/packages/material-ui/src/InputBase/InputBase.js"
+        ],
+        "build_inputs_sha256": "e1ce55710b3c0676c75f6ce1cb2ea4704a109ea45ee9c49d827540998191c712",
+        "execution_overlay": {},
+        "exit_code": 0,
+        "signal": null,
+        "timeout": false,
+        "test_seconds": 12.634,
+        "output_sha256": "918c7a4ac40c647926cdc592acde2cde1c44ff4ae514aab337d8ca85659fe9a6",
+        "source_mutations": {},
+        "expectations_unchanged": true,
+        "build_outputs": {},
+        "resolved_modules": [
+          "/testbed/packages/material-ui/src/TextField/TextField.js",
+          "/testbed/packages/material-ui/src/Select/Select.js",
+          "/testbed/packages/material-ui/src/Select/SelectInput.js",
+          "/testbed/packages/material-ui/src/NativeSelect/NativeSelectInput.js",
+          "/testbed/packages/material-ui/src/InputBase/InputBase.js"
+        ],
+        "runner_stats": {
+          "suites": 10,
+          "tests": 20,
+          "passes": 20,
+          "pending": 0,
+          "failures": 0,
+          "start": "2026-09-21T16:39:16.155Z",
+          "end": "2026-09-21T16:39:17.278Z",
+          "duration": 1123
+        },
+        "failure_details": [],
+        "passed": 20,
+        "failed": 0,
+        "failed_tests": [],
+        "delivered_checks": "passed",
+        "missing_required_tests": [],
+        "seconds": 56.468
+      }
+    }
+  ],
+  "driver_sha256": "9568e9dcab74f9b0d5841921fc995a9cf0ff5ed2612e7345f1f1bf9623a25a84",
+  "diagnostic_sha256": "08d32d4244db18f330c6e313e1935edaf997c4fee8f6994e10d30ecb4c62a89a",
+  "toolchain": [
+    "v18.8.0",
+    "8.18.0"
+  ],
+  "manifest_sha256": "7adb534e054b7b488d3d03c02f700fc03aa21fb1c3e3db5642d59759e28c8df9",
+  "calibration_passed": true,
+  "seconds": 257.818,
+  "historical_inputs_unchanged": true
+}

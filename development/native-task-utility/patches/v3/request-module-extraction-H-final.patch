@@ -1,0 +1,366 @@
+diff --git a/packages/connector/README.md b/packages/connector/README.md
+index 5a1e8c684bc8007a1c7ce110cb2114691c06d0af..478534a978b98c21f517684b46a4c988580be86a 100644
+--- a/packages/connector/README.md
++++ b/packages/connector/README.md
+@@ -30,6 +30,11 @@ best-effort per source: one damaged settings file is reported without blocking h
+ initial sync. The final token/config swap is serialized behind any active sync, so an older request
+ cannot restore superseded authorization.
+ 
++All connector HTTP operations use the installed runtime's `lib/http.mjs` transport. It keeps request
++construction and protocol parsing separate from retry policy, refuses redirects, enforces a 15-second
++timeout, retries only transient server or rate-limit failures, and bounds both `Retry-After` and
++exponential backoff delays.
++
+ ## Commands
+ 
+ ```text
+diff --git a/packages/connector/bin/viberacing.mjs b/packages/connector/bin/viberacing.mjs
+index 5fde3a9b656377e0266fbde7eda922c752933bdf..392a838136a73bda99f8ebacc70c28e6171b4cf9 100755
+--- a/packages/connector/bin/viberacing.mjs
++++ b/packages/connector/bin/viberacing.mjs
+@@ -7,7 +7,7 @@ import { createInterface } from "node:readline";
+ import { setTimeout as delay } from "node:timers/promises";
+ import { fileURLToPath } from "node:url";
+ import { connectorVersion } from "../lib/version.mjs";
+-import { parseProtocolResponse } from "../lib/protocol.mjs";
++import { request } from "../lib/http.mjs";
+ import { normalizeOrigin } from "../lib/origin.mjs";
+ import {
+   adapters,
+@@ -158,74 +158,6 @@ async function readConnectedConfig() {
+   }
+ }
+ 
+-function retryAfterMilliseconds(response) {
+-  const value = response.headers.get("retry-after")?.trim();
+-  if (!value) return null;
+-  let milliseconds;
+-  if (/^\d+$/.test(value)) milliseconds = Number(value) * 1_000;
+-  else {
+-    const date = Date.parse(value);
+-    if (Number.isNaN(date)) return null;
+-    milliseconds = Math.max(0, date - Date.now());
+-  }
+-  const maximum =
+-    process.env.NODE_ENV === "test" &&
+-    /^\d+$/.test(process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS ?? "")
+-      ? Number(process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS)
+-      : 300_000;
+-  return Math.min(maximum, milliseconds);
+-}
+-
+-async function request(origin, path, options = {}, attempts = 1, responseContext) {
+-  let lastError;
+-  for (let attempt = 0; attempt < attempts; attempt += 1) {
+-    try {
+-      const response = await fetch(`${origin}${path}`, {
+-        ...options,
+-        signal: AbortSignal.timeout(15_000),
+-        redirect: "error",
+-      });
+-      let payload;
+-      try {
+-        payload = await parseProtocolResponse(response, responseContext);
+-      } catch (error) {
+-        if (
+-          error?.code === "invalid_server_response" &&
+-          (response.status >= 500 || response.status === 429)
+-        ) {
+-          error.status = response.status;
+-          error.retryAfterMs = retryAfterMilliseconds(response);
+-        }
+-        throw error;
+-      }
+-      if (!response.ok) {
+-        const error = new Error(
+-          `Vibe Racing returned ${response.status}: ${payload.error ?? "request failed"}`,
+-        );
+-        error.status = response.status;
+-        error.code = payload.error;
+-        error.retryAfterMs = retryAfterMilliseconds(response);
+-        if (response.status < 500 && response.status !== 429) throw error;
+-        lastError = error;
+-      } else return payload;
+-    } catch (error) {
+-      lastError = error;
+-      if (
+-        error?.code === "invalid_server_response" &&
+-        !(error?.status >= 500 || error?.status === 429)
+-      )
+-        throw error;
+-      if (error?.status && error.status < 500 && error.status !== 429) throw error;
+-    }
+-    if (attempt + 1 < attempts) {
+-      const retryAfter = Number.isFinite(lastError?.retryAfterMs) ? lastError.retryAfterMs : 0;
+-      const backoff = Math.min(8_000, 500 * 2 ** attempt) + Math.floor(Math.random() * 250);
+-      await delay(Math.max(retryAfter, backoff));
+-    }
+-  }
+-  throw lastError;
+-}
+-
+ async function cancelPairingAttempt(attempt) {
+   if (
+     attempt === null ||
+diff --git a/packages/connector/lib/config.mjs b/packages/connector/lib/config.mjs
+index bf11763987281875d4086fdf96132da14e39f080..bff36fd13ca5c3f167e80b3bb54805c79cbc5ab0 100644
+--- a/packages/connector/lib/config.mjs
++++ b/packages/connector/lib/config.mjs
+@@ -1238,6 +1238,7 @@ const installedRuntimeFiles = [
+   "connection-lifecycle.mjs",
+   "config.mjs",
+   "executables.mjs",
++  "http.mjs",
+   "owned-lock.mjs",
+   "origin.mjs",
+   "readers.mjs",
+diff --git a/packages/connector/test/config.test.mjs b/packages/connector/test/config.test.mjs
+index 20f2a6f98d1c565539340c4dc77c80c0fdd0a348..13bf753e312303ebf948ad1902573dae1b6e8152 100644
+--- a/packages/connector/test/config.test.mjs
++++ b/packages/connector/test/config.test.mjs
+@@ -263,6 +263,7 @@ test("installs a runnable connector copy and additive, owned hooks", async () =>
+       "connection-lifecycle.mjs",
+       "config.mjs",
+       "executables.mjs",
++      "http.mjs",
+       "owned-lock.mjs",
+       "readers.mjs",
+       "registry.mjs",
+diff --git a/packages/connector/lib/http.mjs b/packages/connector/lib/http.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..daf3171be6473d1e7b1ae5b789f91454a96748f3
+--- /dev/null
++++ b/packages/connector/lib/http.mjs
+@@ -0,0 +1,70 @@
++import { setTimeout as delay } from "node:timers/promises";
++import { parseProtocolResponse } from "./protocol.mjs";
++
++export function retryAfterMilliseconds(response) {
++  const value = response.headers.get("retry-after")?.trim();
++  if (!value) return null;
++  let milliseconds;
++  if (/^\d+$/.test(value)) milliseconds = Number(value) * 1_000;
++  else {
++    const date = Date.parse(value);
++    if (Number.isNaN(date)) return null;
++    milliseconds = Math.max(0, date - Date.now());
++  }
++  const maximum =
++    process.env.NODE_ENV === "test" &&
++    /^\d+$/.test(process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS ?? "")
++      ? Number(process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS)
++      : 300_000;
++  return Math.min(maximum, milliseconds);
++}
++
++export async function request(origin, path, options = {}, attempts = 1, responseContext) {
++  let lastError;
++  for (let attempt = 0; attempt < attempts; attempt += 1) {
++    try {
++      const response = await fetch(`${origin}${path}`, {
++        ...options,
++        signal: AbortSignal.timeout(15_000),
++        redirect: "error",
++      });
++      let payload;
++      try {
++        payload = await parseProtocolResponse(response, responseContext);
++      } catch (error) {
++        if (
++          error?.code === "invalid_server_response" &&
++          (response.status >= 500 || response.status === 429)
++        ) {
++          error.status = response.status;
++          error.retryAfterMs = retryAfterMilliseconds(response);
++        }
++        throw error;
++      }
++      if (!response.ok) {
++        const error = new Error(
++          `Vibe Racing returned ${response.status}: ${payload.error ?? "request failed"}`,
++        );
++        error.status = response.status;
++        error.code = payload.error;
++        error.retryAfterMs = retryAfterMilliseconds(response);
++        if (response.status < 500 && response.status !== 429) throw error;
++        lastError = error;
++      } else return payload;
++    } catch (error) {
++      lastError = error;
++      if (
++        error?.code === "invalid_server_response" &&
++        !(error?.status >= 500 || error?.status === 429)
++      )
++        throw error;
++      if (error?.status && error.status < 500 && error.status !== 429) throw error;
++    }
++    if (attempt + 1 < attempts) {
++      const retryAfter = Number.isFinite(lastError?.retryAfterMs) ? lastError.retryAfterMs : 0;
++      const backoff = Math.min(8_000, 500 * 2 ** attempt) + Math.floor(Math.random() * 250);
++      await delay(Math.max(retryAfter, backoff));
++    }
++  }
++  throw lastError;
++}
+diff --git a/packages/connector/test/http.test.mjs b/packages/connector/test/http.test.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..80222b989fe515d07a01360131c9884a635f8b29
+--- /dev/null
++++ b/packages/connector/test/http.test.mjs
+@@ -0,0 +1,156 @@
++import test from "node:test";
++import assert from "node:assert/strict";
++import { once } from "node:events";
++import { createServer } from "node:http";
++import { request, retryAfterMilliseconds } from "../lib/http.mjs";
++
++const usageResponse = {
++  acceptedEntries: 0,
++  acceptedSnapshots: 0,
++  acceptedSourceErrors: 0,
++  staleSnapshots: 0,
++  sourceSequences: [],
++};
++
++async function startServer(handler) {
++  const server = createServer(handler);
++  server.listen(0, "127.0.0.1");
++  await once(server, "listening");
++  const address = server.address();
++  assert.equal(typeof address, "object");
++  return { server, origin: `http://127.0.0.1:${address.port}` };
++}
++
++test("HTTP transport preserves request shape and parsed return values", async (context) => {
++  let received;
++  const fixture = await startServer(async (incoming, response) => {
++    const chunks = [];
++    for await (const chunk of incoming) chunks.push(chunk);
++    received = {
++      method: incoming.method,
++      url: incoming.url,
++      authorization: incoming.headers.authorization,
++      contentType: incoming.headers["content-type"],
++      body: Buffer.concat(chunks).toString("utf8"),
++    };
++    response.writeHead(200, { "content-type": "application/json" });
++    response.end(JSON.stringify(usageResponse));
++  });
++  context.after(() => fixture.server.close());
++
++  const body = JSON.stringify({ sourceIds: ["source"] });
++  const result = await request(
++    fixture.origin,
++    "/api/usage",
++    {
++      method: "POST",
++      headers: {
++        Authorization: "Bearer device-token",
++        "Content-Type": "application/json",
++      },
++      body,
++    },
++    1,
++    { kind: "usage", sourceIds: [] },
++  );
++
++  assert.deepEqual(result, usageResponse);
++  assert.deepEqual(received, {
++    method: "POST",
++    url: "/api/usage",
++    authorization: "Bearer device-token",
++    contentType: "application/json",
++    body,
++  });
++});
++
++test("HTTP transport keeps non-retryable errors and refuses redirects", async (context) => {
++  let requests = 0;
++  const target = await startServer((_request, response) => {
++    requests += 1;
++    response.writeHead(200, { "content-type": "application/json" });
++    response.end(JSON.stringify(usageResponse));
++  });
++  const redirect = await startServer((_request, response) => {
++    response.writeHead(302, { location: `${target.origin}/target` });
++    response.end();
++  });
++  context.after(() => target.server.close());
++  context.after(() => redirect.server.close());
++
++  await assert.rejects(
++    request(
++      redirect.origin,
++      "/redirect",
++      {},
++      1,
++      { kind: "usage", sourceIds: [] },
++    ),
++    (error) => {
++      assert.equal(error.name, "TypeError");
++      return true;
++    },
++  );
++  assert.equal(requests, 0);
++
++  const errorFixture = await startServer((_request, response) => {
++    requests += 1;
++    response.writeHead(400, { "content-type": "application/json" });
++    response.end(JSON.stringify({ error: "bad_request" }));
++  });
++  context.after(() => errorFixture.server.close());
++  await assert.rejects(
++    request(errorFixture.origin, "/api/usage", {}, 3, { kind: "usage", sourceIds: [] }),
++    (error) => {
++      assert.equal(error.message, "Vibe Racing returned 400: bad_request");
++      assert.equal(error.status, 400);
++      assert.equal(error.code, "bad_request");
++      return true;
++    },
++  );
++  assert.equal(requests, 1);
++});
++
++test("HTTP transport retries transient malformed responses", async (context) => {
++  let attempts = 0;
++  const fixture = await startServer((_request, response) => {
++    attempts += 1;
++    if (attempts === 1) {
++      response.writeHead(503, { "content-type": "text/html" });
++      response.end("temporary proxy failure");
++      return;
++    }
++    response.writeHead(200, { "content-type": "application/json" });
++    response.end(JSON.stringify(usageResponse));
++  });
++  context.after(() => fixture.server.close());
++
++  assert.deepEqual(
++    await request(fixture.origin, "/api/usage", {}, 2, { kind: "usage", sourceIds: [] }),
++    usageResponse,
++  );
++  assert.equal(attempts, 2);
++});
++
++test("Retry-After seconds are bounded by the existing test control", () => {
++  const previous = {
++    NODE_ENV: process.env.NODE_ENV,
++    VIBERACING_TEST_MAX_RETRY_AFTER_MS: process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS,
++  };
++  process.env.NODE_ENV = "test";
++  process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS = "1000";
++  try {
++    const response = new Response(null, { headers: { "retry-after": "99" } });
++    assert.equal(retryAfterMilliseconds(response), 1000);
++    assert.equal(
++      retryAfterMilliseconds(new Response(null, { headers: { "retry-after": "invalid" } })),
++      null,
++    );
++  } finally {
++    if (previous.NODE_ENV === undefined) delete process.env.NODE_ENV;
++    else process.env.NODE_ENV = previous.NODE_ENV;
++    if (previous.VIBERACING_TEST_MAX_RETRY_AFTER_MS === undefined)
++      delete process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS;
++    else process.env.VIBERACING_TEST_MAX_RETRY_AFTER_MS = previous.VIBERACING_TEST_MAX_RETRY_AFTER_MS;
++  }
++});

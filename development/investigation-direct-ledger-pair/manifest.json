@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "stage": "frozen_before_model_requests",
+  "runtimeSha": "1b8c7acbbe59db26462ae0818588274ae67ac683",
+  "baseline": "2b16b6a8ad75b6b852adc5e2189e6d4a8d93eabd",
+  "freezeSha256": "35d50e8ad3b8e816639819fc4fcb21e60604b76089832f08fb2039eebf4f6eb8",
+  "sourceManifestSha256": "15f4f3ce26468bad1afe37617a7e43da80abcf8e26ec24a5f99bafd0317ce1ea",
+  "originalTaskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+  "environmentSha256": "aa0afe37ca2ec1f3564642a02842d71472b72b88225069be22a4cbbe8fb114cc",
+  "promptSha256": "1873295e7730dd9688759dbd93f98480bbe7a5f9d991f8f4f2b99f1a57f54082",
+  "bundleManifestSha256": "ed5fb016caa3358563919e71341668f68ef89b7aaa828b898051e4202b75d9fb",
+  "preflightReceiptSha256": "6a2a7f84d8a7264cfcad8a6da6ad5adcf7f2c91ab9f458f6329734b3ee651ad1",
+  "installedResultSha256": "4ee485fb600b32bb0cdcf61adf162ac4763197c7284b17982f58b962ec2d36c3",
+  "installedInvestigationSha256": "f5a25eb9330e80f78f279c09d1cee00383f1c9ffec55f44983b40bcef6107680",
+  "preflight": "full baseline and scripted installed, zero real provider",
+  "slots": [
+    {
+      "slot": 1,
+      "arm": "I0",
+      "status": "not_started"
+    },
+    {
+      "slot": 2,
+      "arm": "I1",
+      "status": "not_started"
+    }
+  ],
+  "privacyTestSha256": "a98a4dc6027c46282f350d09a0cb80266b5bacbdfc7b417839ee342a62da31d5",
+  "legacyStateSha256": "239d717028f9efc7d1fcfbe2d3eee38217642d6925466480c2179fe144e6d5b1"
+}

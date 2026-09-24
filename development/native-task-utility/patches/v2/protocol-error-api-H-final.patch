@@ -1,0 +1,316 @@
+diff --git a/packages/connector/README.md b/packages/connector/README.md
+index 5a1e8c684bc8007a1c7ce110cb2114691c06d0af..27d3a101fc7780bd061e3f8548dea73f0332858a 100644
+--- a/packages/connector/README.md
++++ b/packages/connector/README.md
+@@ -23,6 +23,12 @@ local `sources.json`, so later processes do not require the variable again. Wind
+ is reported as a detection warning and never hides other healthy sources. Discovery never scans the
+ whole home directory or disk.
+ 
++The protocol module validates every server response before trusting it. A valid non-success response
++rejects with an `Error` whose `status` is the HTTP status and whose `code` is the server's validated
++snake_case error code. Oversized, malformed, non-JSON, or terminal-control-containing responses use
++`invalid_server_response` instead. The CLI consumes these errors for pairing, reconciliation, and
++usage sync while preserving non-retryable 4xx handling and retry delays for 429/5xx responses.
++
+ The browser approval maps every detected local source to a new or existing account. Re-running
+ `connect` keeps the stable installation identity, rotates device authorization, refreshes the
+ installed connector copy, and updates only Vibe Racing-owned hooks. Hook reconciliation is
+diff --git a/packages/connector/bin/viberacing.mjs b/packages/connector/bin/viberacing.mjs
+index 5fde3a9b656377e0266fbde7eda922c752933bdf..9ee5b793fbae274704276f0c5fb249cc08402bc5 100755
+--- a/packages/connector/bin/viberacing.mjs
++++ b/packages/connector/bin/viberacing.mjs
+@@ -190,7 +190,7 @@ async function request(origin, path, options = {}, attempts = 1, responseContext
+         payload = await parseProtocolResponse(response, responseContext);
+       } catch (error) {
+         if (
+-          error?.code === "invalid_server_response" &&
++          (error?.code === "invalid_server_response" || error?.status === response.status) &&
+           (response.status >= 500 || response.status === 429)
+         ) {
+           error.status = response.status;
+@@ -198,16 +198,7 @@ async function request(origin, path, options = {}, attempts = 1, responseContext
+         }
+         throw error;
+       }
+-      if (!response.ok) {
+-        const error = new Error(
+-          `Vibe Racing returned ${response.status}: ${payload.error ?? "request failed"}`,
+-        );
+-        error.status = response.status;
+-        error.code = payload.error;
+-        error.retryAfterMs = retryAfterMilliseconds(response);
+-        if (response.status < 500 && response.status !== 429) throw error;
+-        lastError = error;
+-      } else return payload;
++      return payload;
+     } catch (error) {
+       lastError = error;
+       if (
+diff --git a/packages/connector/lib/protocol.mjs b/packages/connector/lib/protocol.mjs
+index f1ceba9e22799e19036840d8e4b68db7e747c869..87d91231f60fc163498ab4b964aaf491f077cbda 100644
+--- a/packages/connector/lib/protocol.mjs
++++ b/packages/connector/lib/protocol.mjs
+@@ -292,7 +292,10 @@ export async function parseProtocolResponse(response, context) {
+       !errorCodePattern.test(value.error)
+     )
+       throw invalid();
+-    return { error: value.error };
++    const error = new Error(`Vibe Racing returned ${response.status}: ${value.error}`);
++    error.status = response.status;
++    error.code = value.error;
++    throw error;
+   }
+   if (context.kind === "pairingStart") return parsePairingStart(value, context);
+   if (context.kind === "pairingPoll") return parsePairingPoll(value, context);
+diff --git a/packages/connector/test/config.test.mjs b/packages/connector/test/config.test.mjs
+index 20f2a6f98d1c565539340c4dc77c80c0fdd0a348..b840179a18b286015dcb5c156286820d4de2535c 100644
+--- a/packages/connector/test/config.test.mjs
++++ b/packages/connector/test/config.test.mjs
+@@ -3044,6 +3044,56 @@ test("later disconnect defeats pending, active-polled, and interrupted connect a
+   assert.match(uncertainDisconnect.stderr, /remote revoke could not be confirmed/);
+ });
+ 
++test("connect surfaces a validated pairing error without committing connection state", async (context) => {
++  let requests = 0;
++  const server = createServer((request, response) => {
++    request.resume();
++    request.on("end", () => {
++      requests += 1;
++      response.writeHead(400, { "content-type": "application/json" });
++      response.end(JSON.stringify({ error: "pairing_denied" }));
++    });
++  });
++  server.listen(0, "127.0.0.1");
++  await once(server, "listening");
++  context.after(() => server.close());
++  const address = server.address();
++  assert.notEqual(address, null);
++  assert.equal(typeof address, "object");
++  const origin = `http://127.0.0.1:${address.port}`;
++  const home = await mkdtemp(join(tmpdir(), "viberacing-pairing-error-"));
++  context.after(() => rm(home, { recursive: true }));
++  const directory = join(home, ".viberacing");
++  const clientSourceId = "72727272-7272-4272-8272-727272727272";
++  await writeLocalSources(directory, [
++    {
++      clientSourceId,
++      agentId: "antigravity",
++      dataPath: join(directory, "captures", `${clientSourceId}.jsonl`),
++      collectionMethod: "antigravity_cli_capture",
++      supportedSurface: "cli",
++      suggestedLabel: "Pairing error",
++    },
++  ]);
++  const localSources = await readLocalSources(directory);
++  assert.deepEqual(localSources.map((source) => source.clientSourceId), [clientSourceId]);
++  await assert.rejects(access(join(directory, "config.json")));
++
++  let failure;
++  try {
++    await execFileAsync(process.execPath, [connectorPath, "connect", "--origin", origin], {
++      env: connectorEnvironment(home),
++    });
++  } catch (error) {
++    failure = error;
++  }
++  assert.equal(failure?.code, 1);
++  assert.match(failure?.stderr ?? "", /Vibe Racing returned 400: pairing_denied/);
++  assert.equal(requests, 1);
++  await assert.rejects(access(join(directory, "config.json")));
++  await assert.rejects(access(join(directory, "connect-attempt.json")));
++});
++
+ test("reconnect rejects omission and retains a temporarily unavailable source", async (context) => {
+   let pairingBody;
+   let omitRetained = true;
+@@ -4143,6 +4193,106 @@ test("doctor disables a revoked installation and recommends reconnecting", async
+   await assert.rejects(access(join(installation.directory, "dirty.json")));
+ });
+ 
++test("doctor cleans up a forbidden installation from a typed reconciliation error", async (context) => {
++  let requests = 0;
++  const server = createServer((_request, response) => {
++    requests += 1;
++    response.writeHead(403, { "content-type": "application/json" });
++    response.end(JSON.stringify({ error: "forbidden" }));
++  });
++  server.listen(0, "127.0.0.1");
++  await once(server, "listening");
++  context.after(() => server.close());
++  const address = server.address();
++  assert.notEqual(address, null);
++  assert.equal(typeof address, "object");
++  const origin = `http://127.0.0.1:${address.port}`;
++  const home = await mkdtemp(join(tmpdir(), "viberacing-doctor-forbidden-"));
++  context.after(() => rm(home, { recursive: true }));
++  const installation = await writeCaptureInstallation(home, origin);
++  const configBefore = JSON.parse(await readFile(join(installation.directory, "config.json"), "utf8"));
++  assert.equal(configBefore.origin, origin);
++  assert.notEqual((await readFile(installation.capture, "utf8")).trim(), "");
++  await writeFile(
++    join(installation.directory, "dirty.json"),
++    `${JSON.stringify({ dirtySince: new Date().toISOString(), lastEventAt: new Date().toISOString() })}\n`,
++  );
++
++  const result = await execFileAsync(process.execPath, [connectorPath, "doctor"], {
++    env: connectorEnvironment(home),
++  });
++  assert.equal(requests, 1);
++  assert.match(result.stdout, /authorization was revoked/i);
++  assert.match(result.stdout, /viberacing connect/i);
++  await assert.rejects(access(join(installation.directory, "config.json")));
++  await assert.rejects(access(join(installation.directory, "dirty.json")));
++});
++
++test("doctor denies reconciliation redirects instead of following them", async (context) => {
++  let requests = 0;
++  let redirectedRequests = 0;
++  const server = createServer((request, response) => {
++    if (request.url === "/redirected") redirectedRequests += 1;
++    requests += 1;
++    response.writeHead(302, { location: "/redirected" });
++    response.end();
++  });
++  server.listen(0, "127.0.0.1");
++  await once(server, "listening");
++  context.after(() => server.close());
++  const address = server.address();
++  assert.notEqual(address, null);
++  assert.equal(typeof address, "object");
++  const origin = `http://127.0.0.1:${address.port}`;
++  const home = await mkdtemp(join(tmpdir(), "viberacing-doctor-redirect-"));
++  context.after(() => rm(home, { recursive: true }));
++  const installation = await writeCaptureInstallation(home, origin);
++  assert.equal(
++    JSON.parse(await readFile(join(installation.directory, "config.json"), "utf8")).origin,
++    origin,
++  );
++  assert.notEqual((await readFile(installation.capture, "utf8")).trim(), "");
++
++  const result = await execFileAsync(process.execPath, [connectorPath, "doctor"], {
++    env: connectorEnvironment(home),
++  });
++  assert.equal(requests, 1);
++  assert.equal(redirectedRequests, 0);
++  assert.match(result.stdout, /Pairing status: error/);
++});
++
++test("doctor aborts an unresponsive reconciliation request", async (context) => {
++  let requests = 0;
++  const server = createServer((request) => {
++    requests += 1;
++    request.resume();
++  });
++  server.listen(0, "127.0.0.1");
++  await once(server, "listening");
++  context.after(() => server.close());
++  const address = server.address();
++  assert.notEqual(address, null);
++  assert.equal(typeof address, "object");
++  const origin = `http://127.0.0.1:${address.port}`;
++  const home = await mkdtemp(join(tmpdir(), "viberacing-doctor-timeout-"));
++  context.after(() => rm(home, { recursive: true }));
++  const installation = await writeCaptureInstallation(home, origin);
++  assert.equal(
++    JSON.parse(await readFile(join(installation.directory, "config.json"), "utf8")).origin,
++    origin,
++  );
++  assert.notEqual((await readFile(installation.capture, "utf8")).trim(), "");
++  const started = Date.now();
++
++  const result = await execFileAsync(process.execPath, [connectorPath, "doctor"], {
++    env: connectorEnvironment(home),
++    timeout: 20_000,
++  });
++  assert.ok(Date.now() - started >= 14_000);
++  assert.equal(requests, 1);
++  assert.match(result.stdout, /Pairing status: error/);
++});
++
+ test("doctor removes a hook after dashboard-side source disconnect", async (context) => {
+   const sourceId = "86868686-8686-4686-8686-868686868686";
+   const server = createServer((_request, response) => {
+@@ -4788,6 +4938,11 @@ test("quarantines a permanent 400 once without blocking the next corrected snaps
+   });
+   assert.equal(requests, 1);
+   assert.match(rejected.stderr, /payload quarantined/);
++  assert.equal(
++    JSON.parse(await readFile(join(installation.directory, "state.json"), "utf8"))
++      .quarantine[installation.sourceId],
++    "token_components_mismatch",
++  );
+   const quarantine = join(
+     installation.directory,
+     "pending",
+diff --git a/packages/connector/test/protocol.test.mjs b/packages/connector/test/protocol.test.mjs
+index bfdb3e923820e683a2f30c3947dd2136dda6cb63..811b5059cf5d5322ed67a4454018c83cc21d32af 100644
+--- a/packages/connector/test/protocol.test.mjs
++++ b/packages/connector/test/protocol.test.mjs
+@@ -90,13 +90,19 @@ test("rejects server attempts to add local paths, executables, or unknown mappin
+   );
+ });
+ 
+-test("protocol errors are snake_case and terminal output strips control characters", async () => {
+-  assert.deepEqual(
+-    await parseProtocolResponse(json({ error: "source_disconnected" }, 400), {
++test("validated protocol errors reject with status and code", async () => {
++  await assert.rejects(
++    parseProtocolResponse(json({ error: "source_disconnected" }, 400), {
+       kind: "usage",
+       sourceIds: [sourceId],
+     }),
+-    { error: "source_disconnected" },
++    (error) => {
++      assert.ok(error instanceof Error);
++      assert.equal(error.status, 400);
++      assert.equal(error.code, "source_disconnected");
++      assert.equal(error.message, "Vibe Racing returned 400: source_disconnected");
++      return true;
++    },
+   );
+   for (const error of ["InvalidRequest", "invalid-request", "invalid__request", "bad\ncode"]) {
+     await assert.rejects(
+@@ -110,6 +116,30 @@ test("protocol errors are snake_case and terminal output strips control characte
+   assert.equal(sanitizeTerminalText("safe\u001b[2J\r\nnext"), "safe�[2J��next");
+ });
+ 
++test("untrusted non-success response bodies remain invalid server responses", async () => {
++  const responses = [
++    new Response("{", {
++      status: 503,
++      headers: { "content-type": "application/json" },
++    }),
++    new Response("temporary failure", {
++      status: 503,
++      headers: { "content-type": "text/plain" },
++    }),
++    json({ error: "server\u001b[2Jerror" }, 503),
++  ];
++  for (const response of responses) {
++    await assert.rejects(
++      parseProtocolResponse(response, { kind: "usage", sourceIds: [sourceId] }),
++      (error) => {
++        assert.equal(error.code, "invalid_server_response");
++        assert.equal(error.status, undefined);
++        return true;
++      },
++    );
++  }
++});
++
+ test("rejects agent substitution and non-exact pairing source sets", async () => {
+   await assert.rejects(
+     parseProtocolResponse(json(activePoll([mapping({ agentId: "codex" })])), {
+@@ -169,7 +199,11 @@ test("rejects oversized, incomplete, and reconciliation responses without source
+       }),
+       { kind: "pairingPoll", localSources: [local] },
+     ),
+-    /too large/,
++    (error) => {
++      assert.equal(error.code, "invalid_server_response");
++      assert.match(error.message, /too large/);
++      return true;
++    },
+   );
+   await assert.rejects(
+     parseProtocolResponse(json({ status: "active" }), {

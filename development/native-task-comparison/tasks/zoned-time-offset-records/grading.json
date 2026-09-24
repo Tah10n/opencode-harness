@@ -1,0 +1,16 @@
+{
+  "category": "state",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Signed offset round trip and conversion across a local day preserve UTC instant.",
+    "Invalid calendar rejection and canonical zero offset."
+  ],
+  "docDelivery": [
+    "Fixed-offset grammar, valid calendar/time and normalization of zero.",
+    "Instant-preserving offset changes, record bounds, host-timezone independence and no DST support."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Local calendar years2000..2099, integer-second timestamps, fixed minute offsets -840..840. Explicit malformed timestamp/record cases rejected. No IANA zones/DST/leap seconds. Zero offset signs normalize to0/Z.",
+  "independence": "Implement timestamp/offset record normalization preserving instant and signed offset without host timezone dependence."
+}

@@ -1,0 +1,28 @@
+{
+  "replay": "passed",
+  "event": 91,
+  "beforeSnapshotEdits": 105,
+  "observedPasses": 4,
+  "zeroTestControl": "scope_or_origin_unknown",
+  "delivery": "offline attachment simulation only; historical author did not receive this advisory",
+  "state": {
+    "version": 1,
+    "status": "attached_to_receipt",
+    "baselineSnapshot": "c7eb45a371af5bc3419aff44b1a593009d2f621e27931a620086f7281a41855d",
+    "considered": 1,
+    "reasons": {},
+    "attachedBlocks": 1,
+    "addedBytes": 724,
+    "classificationMs": 10.161500000000046,
+    "candidate": {
+      "callID": "call_vG5rADJ8E8PPQ33e19xa0rT6",
+      "baselineSnapshot": "c7eb45a371af5bc3419aff44b1a593009d2f621e27931a620086f7281a41855d",
+      "snapshot": "6cda2ed0e7620d6cb8d60165d15a911f4a75fa73bb727052a43d412ca494261e",
+      "scope": "runtime: css-scoping-class (shared helpers); runtime: css-scoping-class (shared helpers , hydration); runtime: css-scoping-class (inline helpers); ssr: css-scoping-class"
+    }
+  },
+  "provenance": {
+    "toolEventsSha256": "81f9894383ffa6148b42f9efb62ad26efcef8ab7ff6beae3c5bb848135d38ef2",
+    "projection": "Exact unique-context replay of every native apply_patch through e91; only changed-file bytes reconstructed. No whole intermediate tree or ignored build hashes claimed."
+  }
+}

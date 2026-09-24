@@ -1,0 +1,16 @@
+{
+  "category": "integration",
+  "behavior": "All independent behavior checks, unchanged original tests, and final ordinary project suite pass.",
+  "testDelivery": [
+    "Valid reversal cancels its account while retaining zero balance, with another currency separate.",
+    "Double reversal rejection."
+  ],
+  "docDelivery": [
+    "Earlier original-only reversal references with exact account/currency/negation and one reversal limit.",
+    "Sorted per-currency totals, zero accounts and balance is never cross-currency."
+  ],
+  "coverage": "Preserve old assertions or equivalent exercised behavior; inspect delivered tests by actual meaningful assertions, never exact names or matching reference source.",
+  "complete": "Required behavior (including every explicit manualBehavior item, when present), preservation, ordinary suite, all listed tests and documentation must be delivered. Native status is separate.",
+  "domain": "Entries dense array {id,account,currency,delta,reverses?}; identifiers nonempty ASCII strings, currency three uppercase ASCII letters, delta signed integer (including 0, excluding -0), all intermediate sums safe. reverses string only when present. Invalid references/duplicates included.",
+  "independence": "Integrate signed integer ledger entries, reversal references and per-currency settlement conservation."
+}

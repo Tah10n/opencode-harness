@@ -1,0 +1,824 @@
+diff --git a/packages/connector/README.md b/packages/connector/README.md
+index 334fead786b77d251ee79a25abb85481e710e441..9eead0a8fc50f7903f0a15ee9bdb1f1839dd3c41 100644
+--- a/packages/connector/README.md
++++ b/packages/connector/README.md
+@@ -224,3 +224,9 @@ compact large files. Only Antigravity CLI sessions launched through the Vibe Rac
+ counted; earlier/direct sessions and Antigravity Desktop are not included. Detailed versions,
+ formulas, and limitations are in
+ [AGENT_SUPPORT.md](https://github.com/Tah10n/viberacing/blob/main/docs/AGENT_SUPPORT.md).
++
++Event-based collectors also keep a bounded local ledger of hashed event identities and exact
++aggregate usage tuples. The ledger contains no provider IDs or transcript content, survives source
++file replacement, truncation, moves, and deleted local history, and is retained when a stable local
++source is paired to a different account. A conflicting tuple keeps the first accepted value and
++marks the collection partial; unrelated valid events remain eligible for collection.
+diff --git a/packages/connector/bin/viberacing.mjs b/packages/connector/bin/viberacing.mjs
+index fdde4386ba859ab26d7e4ea6ee59f03619da0633..acba353c2983bfdfb1138bdd9569a7488d65dce7 100755
+--- a/packages/connector/bin/viberacing.mjs
++++ b/packages/connector/bin/viberacing.mjs
+@@ -677,6 +677,7 @@ async function connect() {
+           return nextConfig;
+         });
+         committed = true;
++        await preserveStableSourceState(previousConfig, config);
+         await refreshInstalledHandlerAttestation({ force: true });
+         output("Connected.");
+         const initial = await sync(config, { waitMs: automaticSyncLockWaitMs });
+@@ -805,13 +806,14 @@ function isLegacyPendingSourceError(payload) {
+   );
+ }
+ 
+-async function forgetSourceState(sourceIds) {
++async function forgetSourceState(sourceIds, clientSourceIds = []) {
+   const state = await readState();
+   state.sequences ??= {};
+   state.adapters ??= {};
+   state.fingerprints ??= {};
+   state.quarantine ??= {};
+   state.collectionWarnings ??= {};
++  state.eventLedgers ??= {};
+   for (const sourceId of sourceIds) {
+     delete state.sequences[sourceId];
+     delete state.adapters[sourceId];
+@@ -822,9 +824,29 @@ async function forgetSourceState(sourceIds) {
+     await removePendingForSource(sourceId);
+     await clearQuarantine(sourceId);
+   }
++  for (const clientSourceId of clientSourceIds) delete state.eventLedgers[clientSourceId];
+   await writeState(state);
+ }
+ 
++async function preserveStableSourceState(previousConfig, nextConfig) {
++  if (!previousConfig) return;
++  const state = await readState();
++  state.adapters ??= {};
++  state.eventLedgers ??= {};
++  let changed = false;
++  for (const source of nextConfig.sources ?? []) {
++    if (state.eventLedgers[source.clientSourceId] !== undefined) continue;
++    const previous = previousConfig.sources?.find(
++      (candidate) => candidate.clientSourceId === source.clientSourceId,
++    );
++    const previousState = previous ? state.adapters[previous.sourceId] : undefined;
++    if (previousState?.eventLedger === undefined) continue;
++    state.eventLedgers[source.clientSourceId] = previousState.eventLedger;
++    changed = true;
++  }
++  if (changed) await writeState(state);
++}
++
+ async function retireMappedSources(config, sourceIds, options = {}) {
+   if (!options.allowDuringLifecycle && (await lifecycleMutationActive()))
+     throw new Error("Source retirement stopped by a local lifecycle operation");
+@@ -1277,6 +1299,7 @@ async function sync(providedConfig, options = {}) {
+       state = await reconcileServerState(config, state);
+       const range = snapshotRange();
+       state.adapters ??= {};
++      state.eventLedgers ??= {};
+       state.fingerprints ??= {};
+       state.collectionWarnings ??= {};
+       const mappedSources = config.sources.filter((source) => typeof source.sourceId === "string");
+@@ -1317,7 +1340,12 @@ async function sync(providedConfig, options = {}) {
+           throw new Error(`Unsupported configured source ${source.agentId}`);
+         return {
+           source,
+-          result: await adapter.collect(source, range, state.adapters[source.sourceId] ?? {}),
++          result: await adapter.collect(source, range, {
++            ...(state.adapters[source.sourceId] ?? {}),
++            ...(state.eventLedgers[source.clientSourceId] === undefined
++              ? {}
++              : { eventLedger: state.eventLedgers[source.clientSourceId] }),
++          }),
+         };
+       });
+       const snapshots = [];
+@@ -1354,6 +1382,8 @@ async function sync(providedConfig, options = {}) {
+         successfullyChecked.push(source.clientSourceId);
+         successfullyCheckedSourceIds.push(source.sourceId);
+         state.adapters[source.sourceId] = outcome.value.result.nextState ?? {};
++        if (state.adapters[source.sourceId].eventLedger !== undefined)
++          state.eventLedgers[source.clientSourceId] = state.adapters[source.sourceId].eventLedger;
+         reconcileDiagnosticPhase(
+           state,
+           source.sourceId,
+@@ -2163,7 +2193,7 @@ async function sourceCommand() {
+       config.sources = config.sources.filter((source) => source.clientSourceId !== id);
+       await writeConfig(config);
+     }
+-    if (typeof mapping?.sourceId === "string") await forgetSourceState([mapping.sourceId]);
++    if (typeof mapping?.sourceId === "string") await forgetSourceState([mapping.sourceId], [id]);
+     await clearDirtyForSources([id]);
+     await removeSource(id);
+     output("Source disconnected and removed locally.");
+diff --git a/packages/connector/lib/adapters/antigravity.mjs b/packages/connector/lib/adapters/antigravity.mjs
+index ecc6bf51a427b96d94bf61d484ddb7a09923ec90..303b9acb02383d08f8c2755c018046e85a954c36 100644
+--- a/packages/connector/lib/adapters/antigravity.mjs
++++ b/packages/connector/lib/adapters/antigravity.mjs
+@@ -3,6 +3,7 @@ import {
+   componentEntry,
+   dayPattern,
+   diagnosePath,
++  eventLedgerHas,
+   mergeEntries,
+   parserResult,
+   previousJsonlEntries,
+@@ -74,9 +75,26 @@ export function parseAntigravityLines(lines) {
+ function captureEventKey(line) {
+   try {
+     const record = JSON.parse(line);
+-    return record?.usage && typeof record?.id === "string" && dayPattern.test(record?.date ?? "")
+-      ? { id: record.id, date: record.date }
++    const usage = record?.usage ?? record?.result?.usage;
++    const id = record?.id ?? record?.session_id;
++    const date = dayPattern.test(record?.date ?? "")
++      ? record.date
++      : utcDay(record.timestamp ?? record.time);
++    const entry = usage
++      ? componentEntry(
++          date,
++          {
++            inputTokens: usage.input_tokens ?? usage.inputTokens,
++            outputTokens: usage.output_tokens ?? usage.outputTokens,
++            cacheReadTokens: usage.cache_read_tokens ?? usage.cacheReadTokens,
++            cacheWriteTokens: usage.cache_write_tokens ?? usage.cacheWriteTokens,
++            reasoningTokens:
++              usage.reasoning_tokens ?? usage.thinking_tokens ?? usage.reasoningTokens,
++          },
++          usage.total_tokens ?? usage.totalTokens,
++        )
+       : null;
++    return typeof id === "string" && entry !== null ? { id, date: entry.date, entry } : null;
+   } catch {
+     return null;
+   }
+@@ -92,7 +110,8 @@ export const antigravityAdapter = Object.freeze({
+   defaultPaths: [],
+   detect: async () => [],
+   collect: async (source, range, state = {}) => {
+-    const stateCompatible = state.parserVersion === antigravityParserVersion;
++    const stateCompatible =
++      state.parserVersion === antigravityParserVersion && eventLedgerHas(state.eventLedger);
+     const result = await collectJsonl(
+       source,
+       analyzeAntigravityLines,
+diff --git a/packages/connector/lib/adapters/claude.mjs b/packages/connector/lib/adapters/claude.mjs
+index 33aa989b9041ee9426d5df2e0428be9fcc0392f9..7713f92b960d16011a17600587deba48328cc113 100644
+--- a/packages/connector/lib/adapters/claude.mjs
++++ b/packages/connector/lib/adapters/claude.mjs
+@@ -3,6 +3,11 @@ import { homedir } from "node:os";
+ import {
+   componentEntry,
+   diagnosePath,
++  eventIdentityHash,
++  eventLedger,
++  eventLedgerEntries,
++  eventLedgerHas,
++  observeEvent,
+   findFile,
+   jsonLinesChunk,
+   mergeEntries,
+@@ -80,8 +85,12 @@ export async function collectClaude(
+   state = {},
+   { maximumBytes = 100_000_000, readChunk = jsonLinesChunk, fingerprint = tailFingerprint } = {},
+ ) {
+-  const stateCompatible = state.parserVersion === claudeParserVersion;
++  const stateCompatible =
++    state.parserVersion === claudeParserVersion && eventLedgerHas(state.eventLedger);
+   const compatibleState = stateCompatible ? state : {};
++  const ledger = eventLedger(compatibleState.eventLedger);
++  let ledgerConflict = false;
++  let ledgerBounded = false;
+   const discovered = await walk(source.dataPath, [".jsonl"], 10_000);
+   const nextState = {
+     files: { ...(compatibleState.files ?? {}) },
+@@ -140,17 +149,27 @@ export async function collectClaude(
+         schemaUnsupported = true;
+         continue;
+       }
++      const accepted = [];
++      for (const value of analysis.records) {
++        const observed = observeEvent(ledger, value.id, value.entry);
++        if (observed.conflict) ledgerConflict = true;
++        if (observed.bounded) ledgerBounded = true;
++        if (observed.accepted) accepted.push(value);
++      }
+       if (hasUnterminatedTail) {
+         if (!previous || appended)
+-          for (const value of analysis.records)
+-            if (!ids.has(value.id)) provisionalMessages[value.id] = value.entry;
++          for (const value of accepted) {
++            const key = eventIdentityHash(value.id);
++            if (!ids.has(key)) provisionalMessages[key] = value.entry;
++          }
+         continue;
+       }
+       const messages = Object.create(null);
+-      for (const value of analysis.records) {
+-        if (!ids.has(value.id)) {
+-          messages[value.id] = value.entry;
+-          ids.add(value.id);
++      for (const value of accepted) {
++        const key = eventIdentityHash(value.id);
++        if (!ids.has(key)) {
++          messages[key] = value.entry;
++          ids.add(key);
+         }
+       }
+       const fileState = {
+@@ -198,15 +217,18 @@ export async function collectClaude(
+     };
+   }
+   return {
+-    entries: mergeEntries([
+-      ...Object.values(nextState.messages),
+-      ...Object.values(provisionalMessages),
+-    ]),
+-    completeness: partial ? "partial" : "complete",
+-    nextState: { ...nextState, parserVersion: claudeParserVersion },
++    entries: mergeEntries([...eventLedgerEntries(ledger, range), ...Object.values(provisionalMessages)]),
++    completeness: partial || ledgerConflict || ledgerBounded ? "partial" : "complete",
++    nextState: {
++      ...nextState,
++      parserVersion: claudeParserVersion,
++      eventLedger: partial ? compatibleState.eventLedger ?? eventLedger({}) : ledger,
++    },
+     warnings: [
+       ...(partial ? ["unreadable_or_unbounded_session_data"] : []),
+       ...(schemaUnsupported ? ["unsupported_usage_records"] : []),
++      ...(ledgerConflict ? ["conflicting_usage_records"] : []),
++      ...(ledgerBounded ? ["collector_limits_or_unreadable_files"] : []),
+     ],
+     diagnostics: [
+       ...(unreadable ? [{ code: "local_store_unreadable", phase: "collect" }] : []),
+diff --git a/packages/connector/lib/adapters/gemini.mjs b/packages/connector/lib/adapters/gemini.mjs
+index 9cc8a596d25668dfebf85def2628b5f07409f254..2fe0f32f4dd84bf931a6adf8a1378cf63606215b 100644
+--- a/packages/connector/lib/adapters/gemini.mjs
++++ b/packages/connector/lib/adapters/gemini.mjs
+@@ -4,6 +4,7 @@ import {
+   collectJsonl,
+   componentEntry,
+   diagnosePath,
++  eventLedgerHas,
+   findFile,
+   integer,
+   mergeEntries,
+@@ -116,9 +117,9 @@ function geminiEventKey(line) {
+     const id = record?.id ?? record?.messageId ?? record?.event_id;
+     const date = utcDay(record?.timestamp ?? record?.time ?? record?.startTime);
+     const usage = record?.usageMetadata ?? record?.usage ?? record?.tokenUsage ?? record?.tokens;
+-    return record?.type === "gemini" && usage && typeof id === "string" && date
+-      ? { id, date }
+-      : null;
++    if (!(record?.type === "gemini" && usage && typeof id === "string" && date)) return null;
++    const parsed = analyzeGeminiRecords([record]);
++    return parsed.entries.length === 1 ? { id, date, entry: parsed.entries[0] } : null;
+   } catch {
+     return null;
+   }
+@@ -157,7 +158,8 @@ export const geminiAdapter = Object.freeze({
+   defaultPaths: [defaultPath],
+   detect: detectGeminiSources,
+   collect: async (source, range, state = {}) => {
+-    const stateCompatible = state.parserVersion === geminiParserVersion;
++    const stateCompatible =
++      state.parserVersion === geminiParserVersion && eventLedgerHas(state.eventLedger);
+     const result = await collectJsonl(
+       source,
+       parseGeminiLines,
+diff --git a/packages/connector/lib/adapters/kimi.mjs b/packages/connector/lib/adapters/kimi.mjs
+index 1b831a1164d975ccb27efd6e0c96d058f365bbc6..aee5e755661ff9d280f05573e9ff79500aad8577 100644
+--- a/packages/connector/lib/adapters/kimi.mjs
++++ b/packages/connector/lib/adapters/kimi.mjs
+@@ -5,6 +5,7 @@ import {
+   collectJsonl,
+   componentEntry,
+   diagnosePath,
++  eventLedgerHas,
+   findFile,
+   mergeEntries,
+   previousJsonlEntries,
+@@ -130,7 +131,7 @@ export const parseKimiLines = parseKimiCurrentLines;
+ function eventKey(decoder) {
+   return (line) => {
+     const record = decoder(line);
+-    return record === null ? null : { id: record.id, date: record.date };
++    return record === null ? null : { id: record.id, date: record.date, entry: record.entry };
+   };
+ }
+ 
+@@ -195,7 +196,8 @@ export const kimiAdapter = Object.freeze({
+     const legacy =
+       source.collectionMethod === "kimi_legacy_wire_jsonl" ||
+       kimiCollectionMethodForPath(source.dataPath) === "kimi_legacy_wire_jsonl";
+-    const stateCompatible = state?.parserVersion === kimiParserVersion;
++    const stateCompatible =
++      state?.parserVersion === kimiParserVersion && eventLedgerHas(state?.eventLedger);
+     const decoder = legacy ? legacyRecord : currentRecord;
+     const parser = (lines) =>
+       parseRecords(
+diff --git a/packages/connector/lib/adapters/opencode.mjs b/packages/connector/lib/adapters/opencode.mjs
+index 8c6bee94054ca931c5b7fbff3059b5cd61c61a6c..363b294069fadff059058972fbb0deed5b421916 100644
+--- a/packages/connector/lib/adapters/opencode.mjs
++++ b/packages/connector/lib/adapters/opencode.mjs
+@@ -3,7 +3,16 @@ import { homedir } from "node:os";
+ import { readdir, stat } from "node:fs/promises";
+ import { isAbsolute, join, resolve } from "node:path";
+ import { diagnosticError } from "../diagnostics.mjs";
+-import { canonicalPathKey, componentEntry, diagnosePath, mergeEntries, utcDay } from "./shared.mjs";
++import {
++  canonicalPathKey,
++  componentEntry,
++  diagnosePath,
++  eventLedger,
++  eventLedgerEntries,
++  mergeEntries,
++  observeEvent,
++  utcDay,
++} from "./shared.mjs";
+ 
+ export const openCodeDatabasePattern = /^opencode(?:-[A-Za-z0-9._-]+)?\.db$/;
+ const maximumCutoverAliases = 65_536;
+@@ -54,7 +63,7 @@ function analyzeOpenCodeMessages(rows) {
+     parsedRecords += 1;
+     seen.add(row.id);
+     entries.push(entry);
+-    records.push({ id: row.id, date: entry.date });
++    records.push({ id: row.id, date: entry.date, entry });
+   }
+   return {
+     entries: mergeEntries(entries),
+@@ -82,20 +91,43 @@ async function collect(source, range, state = {}) {
+       );
+     const analysis = analyzeOpenCodeMessages(rows);
+     const unsupported = analysis.stats.unsupportedCandidates > 0;
++    const ledger = eventLedger(state.eventLedger);
++    let ledgerConflict = false;
++    let ledgerBounded = false;
++    for (const record of analysis.records) {
++      const observed = observeEvent(ledger, record.id, record.entry);
++      if (observed.conflict) ledgerConflict = true;
++      if (observed.bounded) ledgerBounded = true;
++    }
+     const aliases = Object.fromEntries(
+       analysis.records.map(({ id, date }) => [createHash("sha256").update(id).digest("hex"), date]),
+     );
+     const cutoverBounded =
+       Object.keys(aliases).length <= maximumCutoverAliases &&
+       Buffer.byteLength(JSON.stringify(aliases)) <= maximumCutoverAliasBytes;
++    if (ledgerConflict || ledgerBounded) {
++      return {
++        entries: eventLedgerEntries(ledger, range),
++        completeness: "partial",
++        nextState: { ...state, eventLedger: ledger },
++        warnings: [
++          ...(ledgerConflict ? ["conflicting_usage_records"] : []),
++          ...(ledgerBounded ? ["collector_limits_or_unreadable_files"] : []),
++        ],
++        diagnostics: ledgerBounded
++          ? [{ code: "local_store_scan_limit", phase: "collect" }]
++          : [],
++      };
++    }
+     return {
+-      entries: analysis.entries,
++      entries: eventLedgerEntries(ledger, range),
+       completeness: unsupported || !cutoverBounded ? "partial" : "complete",
+       nextState:
+         unsupported || !cutoverBounded
+           ? state
+           : {
+               ...state,
++              eventLedger: ledger,
+               cutoverCandidate: {
+                 version: 1,
+                 confirmedRangeEnd: range.rangeEnd,
+diff --git a/packages/connector/lib/adapters/qwen.mjs b/packages/connector/lib/adapters/qwen.mjs
+index ec1d50d05c301b1956c867a50fce6b18bf543626..db742a0cec0750f642959c6accd7a43d00ecc7f1 100644
+--- a/packages/connector/lib/adapters/qwen.mjs
++++ b/packages/connector/lib/adapters/qwen.mjs
+@@ -6,6 +6,7 @@ import {
+   collectJsonl,
+   componentEntry,
+   diagnosePath,
++  eventLedgerHas,
+   integer,
+   mergeEntries,
+   parserResult,
+@@ -100,9 +101,9 @@ function qwenEventKey(line) {
+   try {
+     const record = JSON.parse(line);
+     const date = utcDay(record?.timestamp);
+-    return record?.schemaVersion === 1 && typeof record?.id === "string" && date
+-      ? { id: record.id, date }
+-      : null;
++    if (!(record?.schemaVersion === 1 && typeof record?.id === "string" && date)) return null;
++    const parsed = analyzeQwenLines([line]);
++    return parsed.entries.length === 1 ? { id: record.id, date, entry: parsed.entries[0] } : null;
+   } catch {
+     return null;
+   }
+@@ -348,7 +349,7 @@ export const qwenAdapter = Object.freeze({
+       source,
+       analyzeQwenLines,
+       (path) => basename(path).startsWith("token-usage-"),
+-      state.parserVersion === qwenParserVersion ? state : {},
++      state.parserVersion === qwenParserVersion && eventLedgerHas(state.eventLedger) ? state : {},
+       range,
+       qwenEventKey,
+     );
+diff --git a/packages/connector/lib/adapters/shared.mjs b/packages/connector/lib/adapters/shared.mjs
+index b19a10bdd21d618d5fece37547288c278c60e788..459fbeda0b7d84bdb835a60fd6049bcce3b4e657 100644
+--- a/packages/connector/lib/adapters/shared.mjs
++++ b/packages/connector/lib/adapters/shared.mjs
+@@ -4,6 +4,19 @@ import { access, open, opendir, realpath, stat } from "node:fs/promises";
+ import { join, resolve } from "node:path";
+ 
+ export const dayPattern = /^\d{4}-\d{2}-\d{2}$/;
++export const eventLedgerVersion = 1;
++export const maximumEventLedgerEntries = 65_536;
++export const maximumEventLedgerBytes = 16 * 1_024 * 1_024;
++const usageTupleKeys = [
++  "date",
++  "totalTokens",
++  "inputTokens",
++  "outputTokens",
++  "cacheReadTokens",
++  "cacheWriteTokens",
++  "reasoningTokens",
++];
++const eventLedgerBytes = new WeakMap();
+ 
+ export function integer(value) {
+   if (typeof value === "bigint") return value >= 0n ? value : null;
+@@ -74,6 +87,107 @@ export function mergeEntries(entries) {
+     });
+ }
+ 
++function usageTuple(entry) {
++  if (!entry || !dayPattern.test(entry.date ?? "") || integer(entry.totalTokens) === null)
++    return null;
++  const tuple = usageTupleKeys.map((key, index) => {
++    if (index === 0) return entry.date;
++    if (entry[key] === undefined) return null;
++    const value = integer(entry[key]);
++    return value === null ? undefined : value.toString();
++  });
++  return tuple.some((value) => value === undefined) ? null : tuple;
++}
++
++function entryFromUsageTuple(tuple) {
++  if (!Array.isArray(tuple) || tuple.length !== usageTupleKeys.length) return null;
++  const entry = {};
++  for (const [index, key] of usageTupleKeys.entries()) {
++    if (index === 0) {
++      if (!dayPattern.test(tuple[index] ?? "")) return null;
++      entry[key] = tuple[index];
++    } else if (tuple[index] !== null) {
++      if (integer(tuple[index]) === null) return null;
++      entry[key] = tuple[index];
++    }
++  }
++  return entry;
++}
++
++export function eventLedger(state) {
++  const events = Object.create(null);
++  if (
++    state?.version !== eventLedgerVersion ||
++    state.events === null ||
++    typeof state.events !== "object" ||
++    Array.isArray(state.events)
++  ) {
++    const empty = { version: eventLedgerVersion, events };
++    eventLedgerBytes.set(empty, 0);
++    return empty;
++  }
++  for (const [key, value] of Object.entries(state.events)) {
++    if (!/^[0-9a-f]{64}$/.test(key)) continue;
++    const tuple = usageTuple(value?.tuple ? entryFromUsageTuple(value.tuple) : null);
++    if (tuple !== null) events[key] = { tuple };
++  }
++  const ledger = { version: eventLedgerVersion, events };
++  eventLedgerBytes.set(ledger, Buffer.byteLength(JSON.stringify(ledger)));
++  return ledger;
++}
++
++export function eventLedgerHas(state) {
++  return (
++    state?.version === eventLedgerVersion &&
++    state.events !== null &&
++    typeof state.events === "object" &&
++    !Array.isArray(state.events)
++  );
++}
++
++export function eventIdentityHash(id) {
++  return createHash("sha256").update(id).digest("hex");
++}
++
++export function observeEvent(ledger, id, entry) {
++  if (typeof id !== "string" || id.length < 1 || id.length > 256) return { accepted: false };
++  const tuple = usageTuple(entry);
++  if (tuple === null) return { accepted: false };
++  const key = eventIdentityHash(id);
++  const previous = ledger.events[key];
++  if (previous) {
++    return {
++      accepted: false,
++      duplicate: JSON.stringify(previous.tuple) === JSON.stringify(tuple),
++      conflict: JSON.stringify(previous.tuple) !== JSON.stringify(tuple),
++    };
++  }
++  if (
++    Object.keys(ledger.events).length >= maximumEventLedgerEntries ||
++    eventLedgerBytes.get(ledger) + Buffer.byteLength(JSON.stringify({ [key]: { tuple } })) + 1 >
++      maximumEventLedgerBytes
++  )
++    return { accepted: false, bounded: true };
++  ledger.events[key] = { tuple };
++  eventLedgerBytes.set(
++    ledger,
++    eventLedgerBytes.get(ledger) + Buffer.byteLength(JSON.stringify({ [key]: { tuple } })) + 1,
++  );
++  return { accepted: true };
++}
++
++export function eventLedgerEntries(ledger, range) {
++  return mergeEntries(
++    Object.values(ledger?.events ?? {})
++      .map((event) => entryFromUsageTuple(event.tuple))
++      .filter(
++        (entry) =>
++          entry !== null &&
++          (!range || (entry.date >= range.rangeStart && entry.date <= range.rangeEnd)),
++      ),
++  );
++}
++
+ export async function exists(path) {
+   try {
+     await access(path);
+@@ -262,6 +376,9 @@ export async function collectJsonl(
+   range,
+   eventKey,
+ ) {
++  const ledger = eventLedger(state.eventLedger);
++  let ledgerConflict = false;
++  let ledgerBounded = false;
+   const discovered = await walk(source.dataPath, [".jsonl"]);
+   const files = discovered.files.filter((file) => filter(file.path));
+   const nextState = { files: {} };
+@@ -334,7 +451,11 @@ export async function collectJsonl(
+           unseenLines.push(line);
+           continue;
+         }
+-        const key = createHash("sha256").update(event.id).digest("hex");
++        const observed = observeEvent(ledger, event.id, event.entry);
++        if (observed.conflict) ledgerConflict = true;
++        if (observed.bounded) ledgerBounded = true;
++        if (!observed.accepted) continue;
++        const key = eventIdentityHash(event.id);
+         if (eventDays[key] !== undefined) continue;
+         eventDays[key] = event.date;
+         unseenLines.push(line);
+@@ -402,10 +523,15 @@ export async function collectJsonl(
+   if (incomplete) warnings.push("collector_limits_or_unreadable_files");
+   if (oversized) warnings.push("oversized_jsonl_records");
+   if (schemaUnsupported) warnings.push("unsupported_usage_records");
++  if (ledgerConflict) warnings.push("conflicting_usage_records");
++  if (ledgerBounded) warnings.push("collector_limits_or_unreadable_files");
+   return {
+-    entries: mergeEntries(entries),
+-    completeness: incomplete ? "partial" : "complete",
+-    nextState,
++    entries: eventLedgerEntries(ledger, range),
++    completeness: incomplete || ledgerConflict || ledgerBounded ? "partial" : "complete",
++    nextState: {
++      ...nextState,
++      eventLedger: incomplete ? state.eventLedger ?? eventLedger({}) : ledger,
++    },
+     warnings,
+     diagnostics: [
+       ...(unreadable ? [{ code: "local_store_unreadable", phase: "collect" }] : []),
+diff --git a/packages/connector/test/claude-security.test.mjs b/packages/connector/test/claude-security.test.mjs
+index e9849b2f22b065b79829099440961a63ce2d6ab7..cdd1d79dbc751a2ce54140a4da68211616edd9bf 100644
+--- a/packages/connector/test/claude-security.test.mjs
++++ b/packages/connector/test/claude-security.test.mjs
+@@ -4,6 +4,7 @@ import { appendFile, mkdtemp, rm, writeFile } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+ import { collectClaude } from "../lib/adapters/claude.mjs";
++import { eventIdentityHash } from "../lib/adapters/shared.mjs";
+ 
+ function message(id, inputTokens) {
+   return JSON.stringify({
+@@ -24,20 +25,18 @@ test("Claude message ids cannot mutate collector prototypes", async (context) =>
+   const range = { rangeStart: "2026-08-01", rangeEnd: "2026-08-31" };
+   const first = await collectClaude({ dataPath: directory }, range);
+   assert.equal(Object.getPrototypeOf(first.nextState.messages), null);
+-  assert.deepEqual(Object.keys(first.nextState.messages).sort(), [
+-    "__proto__",
+-    "constructor",
+-    "prototype",
+-  ]);
++  assert.deepEqual(
++    Object.keys(first.nextState.messages).sort(),
++    ["__proto__", "constructor", "prototype"].map(eventIdentityHash).sort(),
++  );
++  assert.doesNotMatch(JSON.stringify(first.nextState.messages), /__proto__|constructor|prototype/);
+   assert.doesNotThrow(() => JSON.parse(JSON.stringify(first.nextState)));
+   await appendFile(path, `${message("__proto__", 100)}\n${message("ordinary", 4)}\n`);
+   const second = await collectClaude({ dataPath: directory }, range, first.nextState);
+   assert.equal(Object.getPrototypeOf(second.nextState.messages), null);
+-  assert.deepEqual(Object.keys(second.nextState.messages).sort(), [
+-    "__proto__",
+-    "constructor",
+-    "ordinary",
+-    "prototype",
+-  ]);
++  assert.deepEqual(
++    Object.keys(second.nextState.messages).sort(),
++    ["__proto__", "constructor", "ordinary", "prototype"].map(eventIdentityHash).sort(),
++  );
+   assert.equal(second.entries[0].totalTokens, "14");
+ });
+diff --git a/packages/connector/test/readers.test.mjs b/packages/connector/test/readers.test.mjs
+index e388d09ca7243fa23f0429ca49fa35a8077efc17..67aa4ced33b9d3d25834c5e4958e2cc7aa0767eb 100644
+--- a/packages/connector/test/readers.test.mjs
++++ b/packages/connector/test/readers.test.mjs
+@@ -2894,7 +2894,11 @@ test("keeps committed JSONL state across unterminated append and rewrite", async
+     await writeFile(path, item.rewritten);
+     const rewritten = await adapter.collect({ dataPath: directory }, range, first.nextState);
+     assert.equal(rewritten.completeness, "partial", `${item.agentId} rewrite`);
+-    assert.deepEqual(rewritten.entries, first.entries, `${item.agentId} rewrite entries`);
++    assert.deepEqual(
++      rewritten.entries.map((entry) => entry.totalTokens),
++      [first.entries[0].totalTokens, first.entries[0].totalTokens],
++      `${item.agentId} rewrite entries`,
++    );
+     assert.deepEqual(rewritten.nextState, first.nextState, `${item.agentId} rewrite state`);
+   }
+ });
+@@ -2914,6 +2918,43 @@ test("reads OpenCode assistant usage and avoids cache double-counting", async ()
+   ]);
+ });
+ 
++test("OpenCode ledger retains deleted messages without weakening exact-ID collection", async (context) => {
++  const directory = await mkdtemp(join(tmpdir(), "viberacing-opencode-event-ledger-"));
++  context.after(() => rm(directory, { force: true, recursive: true }));
++  const path = join(directory, "opencode.db");
++  const { DatabaseSync } = await import("node:sqlite");
++  const database = new DatabaseSync(path);
++  database.exec("CREATE TABLE message (id TEXT PRIMARY KEY, time_created INTEGER, data TEXT)");
++  const time = Date.parse("2026-08-10T00:00:00Z");
++  const insert = (id, input, output) =>
++    database
++      .prepare("INSERT INTO message (id, time_created, data) VALUES (?, ?, ?)")
++      .run(id, time, JSON.stringify({ role: "assistant", tokens: { input, output, total: input + output } }));
++  insert("old-message", 1, 1);
++  database.close();
++  const source = { dataPath: path };
++  const range = { rangeStart: "2026-07-15", rangeEnd: "2026-08-14" };
++  const first = await adapterFor("opencode").collect(source, range, {});
++  assert.equal(first.entries[0].totalTokens, "2");
++
++  const changed = new DatabaseSync(path);
++  changed.prepare("DELETE FROM message WHERE id = ?").run("old-message");
++  changed
++    .prepare("INSERT INTO message (id, time_created, data) VALUES (?, ?, ?)")
++    .run(
++      "new-message",
++      time,
++      JSON.stringify({ role: "assistant", tokens: { input: 2, output: 3, total: 5 } }),
++    );
++  changed.close();
++  const switched = await adapterFor("opencode").collect(source, range, first.nextState);
++  assert.equal(switched.entries[0].totalTokens, "7");
++
++  const retained = await adapterFor("opencode").collect(source, range, switched.nextState);
++  assert.equal(retained.entries[0].totalTokens, "7");
++  assert.equal(Object.keys(retained.nextState.eventLedger.events).length, 2);
++});
++
+ test("reads current Kimi usage records with millisecond UTC timestamps", async () => {
+   const lines = (await fixture("kimi.jsonl")).trim().split("\n");
+   assert.deepEqual(parseKimiLines([...lines, lines[1]]), [
+@@ -3562,10 +3603,115 @@ test("JSONL collectors reuse unchanged state and resume at the last complete byt
+ 
+   await writeFile(path, `${JSON.stringify(secondRecord)}\n`);
+   const truncated = await adapter.collect({ dataPath: path }, range, duplicate.nextState);
+-  assert.deepEqual(
+-    truncated.entries.map((entry) => entry.date),
+-    ["2026-08-11"],
++  assert.deepEqual(truncated.entries.map((entry) => entry.date), ["2026-08-10", "2026-08-11"]);
++});
++
++test("event ledgers survive account-file replacement, history deletion, and later events", async (context) => {
++  const range = { rangeStart: "2026-07-15", rangeEnd: "2026-08-14" };
++  const root = await mkdtemp(join(tmpdir(), "viberacing-event-ledger-switch-"));
++  context.after(() => rm(root, { force: true, recursive: true }));
++  const cases = [
++    {
++      agentId: "claude_code",
++      name: "session.jsonl",
++      records: (id, input, output) => ({
++        type: "assistant",
++        timestamp: "2026-08-10T00:00:00Z",
++        message: { id, role: "assistant", usage: { input_tokens: input, output_tokens: output } },
++      }),
++    },
++    {
++      agentId: "gemini_cli",
++      name: "session-switch.jsonl",
++      records: (id, input, output) => ({
++        id,
++        type: "gemini",
++        timestamp: "2026-08-10T00:00:00Z",
++        tokens: { input, output, cached: 0, thoughts: 0, total: input + output },
++      }),
++    },
++    {
++      agentId: "qwen_code",
++      name: "token-usage-switch.jsonl",
++      records: (id, input, output) => ({
++        schemaVersion: 1,
++        id,
++        timestamp: "2026-08-10T00:00:00Z",
++        inputTokens: input,
++        outputTokens: output,
++        cachedTokens: 0,
++        thoughtsTokens: 0,
++        totalTokens: input + output,
++      }),
++    },
++    {
++      agentId: "antigravity",
++      name: "capture.jsonl",
++      records: (id, input, output) => ({
++        id,
++        date: "2026-08-10",
++        usage: { input_tokens: input, output_tokens: output, total_tokens: input + output },
++      }),
++      direct: true,
++    },
++    {
++      agentId: "kimi_code",
++      name: "wire.jsonl",
++      records: (_id, input, output) => ({
++        type: "usage.record",
++        usage: { inputOther: input, output },
++        time: 1786363200000,
++      }),
++      direct: true,
++    },
++  ];
++  for (const item of cases) {
++    const directory = item.direct ? root : join(root, item.agentId);
++    await mkdir(directory, { recursive: true });
++    const path = join(directory, item.name);
++    const source = { dataPath: item.direct ? path : directory };
++    const adapter = adapterFor(item.agentId);
++    await writeFile(path, `${JSON.stringify(item.records("old", 1, 1))}\n`);
++    const first = await adapter.collect(source, range, {});
++    assert.equal(first.entries[0].totalTokens, "2", item.agentId);
++
++    await writeFile(path, `${JSON.stringify(item.records("new", 2, 3))}\n`);
++    const switched = await adapter.collect(source, range, first.nextState);
++    assert.equal(switched.entries[0].totalTokens, "7", `${item.agentId} switch`);
++
++    await writeFile(path, `${JSON.stringify(item.records("new", 2, 3))}\n`);
++    const historyDeleted = await adapter.collect(source, range, switched.nextState);
++    assert.equal(historyDeleted.entries[0].totalTokens, "7", `${item.agentId} deletion`);
++
++    await appendFile(path, `${JSON.stringify(item.records("later", 3, 4))}\n`);
++    const later = await adapter.collect(source, range, historyDeleted.nextState);
++    assert.equal(later.entries[0].totalTokens, "14", `${item.agentId} later event`);
++  }
++});
++
++test("event ledger conflicts keep the first tuple, mark partial, and accept unrelated events", async (context) => {
++  const directory = await mkdtemp(join(tmpdir(), "viberacing-event-ledger-conflict-"));
++  context.after(() => rm(directory, { force: true, recursive: true }));
++  const path = join(directory, "session.jsonl");
++  const record = (id, input) =>
++    JSON.stringify({
++      type: "assistant",
++      timestamp: "2026-08-10T00:00:00Z",
++      message: { id, role: "assistant", usage: { input_tokens: input, output_tokens: 0 } },
++    });
++  const range = { rangeStart: "2026-07-15", rangeEnd: "2026-08-14" };
++  await writeFile(path, `${record("same", 2)}\n`);
++  const first = await adapterFor("claude_code").collect({ dataPath: directory }, range, {});
++  await writeFile(path, `${record("same", 20)}\n${record("unrelated", 3)}\n`);
++  const conflicted = await adapterFor("claude_code").collect(
++    { dataPath: directory },
++    range,
++    first.nextState,
+   );
++  assert.equal(conflicted.completeness, "partial");
++  assert.deepEqual(conflicted.warnings, ["conflicting_usage_records"]);
++  assert.equal(conflicted.entries[0].totalTokens, "5");
++  assert.equal(Object.keys(conflicted.nextState.eventLedger.events).length, 2);
+ });
+ 
+ test("collector limits are explicit partial results with diagnostics", async () => {

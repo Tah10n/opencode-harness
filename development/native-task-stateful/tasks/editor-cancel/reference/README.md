@@ -1,0 +1,3 @@
+# editor-cancel
+A small Node library. Run npm test.
+Add cancel actions to apply(store, actions), alongside publish. Validate the entire actions array first: each action has type publish or cancel and a nonempty string id; invalid input throws TypeError without mutation. Then execute in input order and return booleans from the store operations. Cancel deletes only a staged revision, preserving any already published revision under the same id and every other staged draft. Repeated or missing cancellation returns false. Empty batch returns []. Preserve existing publish semantics. Deliver consumer regressions for cancel of an existing staged replacement, published/unrelated preservation, repeated cancellation, ordered mixed actions and invalid later action atomicity.
