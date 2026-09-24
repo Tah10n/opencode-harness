@@ -52,9 +52,25 @@ text (512 KiB per file), and 8 MiB of opaque assets (2 MiB per file).
 Changed or new opaque assets are unsupported at delegation because the author
 diff is sent to the child; no binary patch bytes enter its model request.
 
-The result includes a test patch, actual command/tool results, prose contract
-basis and limitations. Use `action: accept` with the author's contract `rationale`,
-or `action: decline`. Acceptance requires the exact captured author snapshot and
+`action: investigate` returns a bounded receipt: status, proposed patch hash,
+size and test paths, author snapshot, a short child claim and selected observed
+check exits. The patch is deliberately absent from the author worktree until
+acceptance. Use `action: inspect` with `section: patch`, `explanation`, `checks`,
+or `output` (with a `callID` from `checks`). The paged `checks` list retains
+saved child commands and marks recognized check candidates; other runners keep
+their actual exits and can be inspected without inferred failure counts. Pass
+`nextCursor` as `cursor` until
+`complete` is true. Each page identifies the saved result, snapshot, whether
+that snapshot is still current, and content hash; the patch pages reconstruct
+the exact saved diff. `output` belongs to the child investigation snapshot,
+not a current author check. A missing or changed
+artifact is reported instead of serving replacement content. Inspect works only
+while the same author run is active and does not start another child or change
+the decision. The full saved artifacts remain available to the host.
+
+After checking the proposed assertion against the original task, use
+`action: accept` with the author's contract `rationale`, or `action: decline`.
+Acceptance requires the exact captured author snapshot and
 successful ordinary Git patch preflight; later user bytes are never overwritten
 by an automatic three-way merge. A passing child test is not proof of the expected
 value. The original task still determines whether production needs correction.
