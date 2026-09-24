@@ -51,7 +51,7 @@ for(const arm of (attention?['R']:investigation?['H']:sensitivity?['H1']:process
     if(stage==='investigator') {
      assert.ok(content.includes(fs.readFileSync(path.join(source,'TASK.md'),'utf8')));
      const regression = "import {test} from 'node:test';import assert from 'node:assert/strict';import {legacy} from './index.mjs';test('public legacy contract',()=>assert.equal(legacy(),"+(investigationMode==='unjustified'?'8':'7')+"));";
-     const calls=[{name:'read',args:{filePath:'index.mjs'}},{name:'apply_patch',args:{patchText:'*** Begin Patch\n*** Add File: legacy.test.mjs\n+'+regression+'\n*** End Patch'}},{name:'bash',args:{command:'npm test',workdir:'.',description:'Project regression check'}},{name:'harness_sense',args:{path:'value.mjs',check:'npm test'}}];
+     const calls=[{name:'read',args:{filePath:'index.mjs'}},{name:'apply_patch',args:{patchText:'*** Begin Patch\n*** Add File: legacy.test.mjs\n+'+regression+'\n*** End Patch'}},{name:'bash',args:{command:'npm test',workdir:'.',description:'Project regression check'}},...(sensitivity?[{name:'harness_sense',args:{path:'value.mjs',check:'npm test'}}]:[])];
      if(investigationMode==='allowed') calls.splice(1,1);
      if(investigationMode==='cancel') calls.splice(1,calls.length,{name:'apply_patch',args:{patchText:'*** Begin Patch\n*** Add File: sleeper.test.mjs\n+import fs from \'node:fs\';fs.writeFileSync(\'sleeper.pid\',String(process.pid));setInterval(()=>{},1000);\n*** End Patch'}},{name:'harness_sense',args:{path:'value.mjs',check:'npm test'}});
      if(investigationMode==='recursive') calls.splice(1,calls.length,{name:'harness_investigate',args:{action:'investigate',question:'Another child',location:'value.mjs',reason:'forbidden recursion'}});
@@ -71,10 +71,10 @@ for(const arm of (attention?['R']:investigation?['H']:sensitivity?['H1']:process
       assert.ok(body.tools.some(t=>t.name==='harness_investigate'),'Installed author must receive native investigation schema');
       const investigate={name:'harness_investigate',args:{action:'investigate',question:'Does the existing exported legacy API still return 7 through the public module after the value change? Add a justified public regression if needed.',location:'index.mjs and value.mjs',reason:'The original task explicitly preserves legacy() = 7.'}};
       const disposition={name:'harness_investigate',args:{action:investigationMode==='unjustified'?'decline':'accept',rationale:investigationMode==='unjustified'?'The original contract says 7; an expectation of 8 is unjustified.':'The original task explicitly preserves legacy() = 7 and the new test imports the public entry point.'}};
-      calls.splice(6,2,{name:'harness_sense',args:{path:'value.mjs',check:'npm test'}},investigate,disposition,check);
-      if(investigationMode==='unused') calls.splice(6,3);
-      if(n===8&&!['unused','production','recursive','cancel'].includes(investigationMode))assert.ok(toolOutputs.includes('remainingDiagnosticMs'));
-      if(n===9&&investigationMode==='accept')assert.ok(toolOutputs.includes('"accepted":true'));
+      calls.splice(6,2,...(sensitivity?[{name:'harness_sense',args:{path:'value.mjs',check:'npm test'}}]:[]),investigate,disposition,check);
+      if(investigationMode==='unused') calls.splice(6,sensitivity?3:2);
+      if(n===(sensitivity?8:7)&&!['unused','production','recursive','cancel'].includes(investigationMode))assert.ok(toolOutputs.includes('remainingDiagnosticMs'));
+      if(n===(sensitivity?9:8)&&investigationMode==='accept')assert.ok(toolOutputs.includes('"accepted":true'));
      }else if(quickReplay){
       assert.ok(body.tools.some(t=>t.name==='harness_sense'));
       const reports=inputs.filter(x=>x.type==='function_call_output').flatMap(x=>{const text=String(x.output),start=text.indexOf('{"kind":"sensitivity"');return start<0?[]:[JSON.parse(text.slice(start).split('\nSensitivity state:')[0])];});
@@ -148,7 +148,7 @@ for(const arm of (attention?['R']:investigation?['H']:sensitivity?['H1']:process
   if(investigation){const e=session.exec(['node','-e',"const fs=require('fs'),p='/work/repo/.git/harness-task',a=p+'/'+fs.readdirSync(p)[0];console.log(JSON.stringify({result:fs.existsSync(a+'/investigation-result.json')?JSON.parse(fs.readFileSync(a+'/investigation-result.json')):null,diagnostics:fs.existsSync(a+'/sensitivity-events.json')?JSON.parse(fs.readFileSync(a+'/sensitivity-events.json')):[],patch:fs.readFileSync(a+'/terminal.patch','utf8')}));"]);assert.equal(e.status,0,e.stderr);const evidence=JSON.parse(e.stdout);
     if(investigationMode==='unused')assert.equal(evidence.result,null);
     else {assert.equal(evidence.result.disposition,investigationMode==='unjustified'?'declined':'accepted');assert.equal(evidence.result.usable,true);}
-    if(investigationMode==='accept'){assert.match(evidence.patch,/legacy.test.mjs/);const authorMs=evidence.diagnostics.reduce((n,e)=>n+e.elapsedMs,0),childMs=evidence.result.commands.filter(e=>e.sensitivity).reduce((n,e)=>n+e.sensitivity.elapsedMs,0);assert.ok(authorMs>0&&childMs>0);assert.equal(evidence.result.remainingDiagnosticMs,180000-authorMs-childMs);}
+    if(investigationMode==='accept'){assert.match(evidence.patch,/legacy.test.mjs/);const authorMs=evidence.diagnostics.reduce((n,e)=>n+e.elapsedMs,0),childMs=evidence.result.commands.filter(e=>e.sensitivity).reduce((n,e)=>n+e.sensitivity.elapsedMs,0);if(sensitivity)assert.ok(authorMs>0&&childMs>0);else assert.equal(authorMs+childMs,0);assert.equal(evidence.result.remainingDiagnosticMs,180000-authorMs-childMs);}
     else assert.doesNotMatch(evidence.patch,/legacy.test.mjs/);
     fs.writeFileSync(path.join(root,runName+'-investigation.json'),e.stdout);
     const applied=session.exec(['node','-e',`const fs=require('fs'),{spawnSync}=require('child_process');fs.cpSync('/input','/work/ordinary',{recursive:true,verbatimSymlinks:true});for(const args of [['apply','--check','-'],['apply','-']]){const r=spawnSync('git',args,{cwd:'/work/ordinary',input:${JSON.stringify(evidence.patch)},encoding:'utf8'});if(r.status!==0)throw Error(r.stderr);}const r=spawnSync('npm',['test'],{cwd:'/work/ordinary',encoding:'utf8'});if(r.status!==0)throw Error(r.stdout+r.stderr);`]);assert.equal(applied.status,0,applied.stderr);}

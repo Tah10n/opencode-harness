@@ -44,8 +44,13 @@ project instructions and native permission boundaries. The child cannot delegate
 again. It may edit JS/TS project tests; production/config/docs are checked for
 preservation, as are installed package bytes, modes and links (ordinary `.cache`
 writes remain permitted). Unsupported source layouts are reported explicitly.
-The current bounded snapshot copier rejects deleted baseline files, binary files,
-symlinked project source, missing read permission and oversized snapshots.
+The bounded snapshot copier preserves ordinary binary project assets as opaque
+bytes outside the model prompt and protects them from child edits. It rejects
+deleted baseline files, binary JS/TS source, symlinked project source, missing
+read permission and oversized snapshots. The bounds are 1,500 files, 8 MiB of
+text (512 KiB per file), and 8 MiB of opaque assets (2 MiB per file).
+Changed or new opaque assets are unsupported at delegation because the author
+diff is sent to the child; no binary patch bytes enter its model request.
 
 The result includes a test patch, actual command/tool results, prose contract
 basis and limitations. Use `action: accept` with the author's contract `rationale`,
