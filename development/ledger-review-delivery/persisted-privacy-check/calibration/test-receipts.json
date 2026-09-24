@@ -1,0 +1,73 @@
+{
+  "finalSuite": {
+    "cliDiagnostics": [
+      "first sync: CLI exit 0; loopback accepted 2 entries and source sequence; Claude collector call 1; accepted 2026-09-22=15, 2026-09-23=11; state.json 3285 bytes (changed from installation state)",
+      "new-process reload: CLI exit 0; loopback accepted 2 entries and source sequence; Claude collector call 2; accepted 2026-09-22=15, 2026-09-23=11; state.json 3285 bytes",
+      "new-process retention after source deletion: CLI exit 0; loopback accepted 2 entries and source sequence; Claude collector call 3; accepted 2026-09-22=15, 2026-09-23=11; state.json 1655 bytes"
+    ],
+    "exitCode": 0,
+    "rawOutputSha256": "5fc613953fc8e11b1fdcc4fa917b9283bf1c722d7c7ce5acc9c82ad3a87b0728",
+    "summary": {
+      "cancelled": 0,
+      "durationMs": 34673.407724,
+      "fail": 0,
+      "pass": 213,
+      "skipped": 0,
+      "tests": 213,
+      "todo": 0
+    }
+  },
+  "mutant": {
+    "cliDiagnostics": [
+      "first sync: CLI exit 0; loopback accepted 2 entries and source sequence; Claude collector call 1; accepted 2026-09-22=15, 2026-09-23=11; state.json 3517 bytes (changed from installation state)"
+    ],
+    "exitCode": 1,
+    "privacyFailure": "AssertionError [ERR_ASSERTION]: first sync: raw synthetic provider ID synthetic-claude-provider-message-a at $.adapters.{key#0}.files.{key#0}.rawIds[0]; raw synthetic provider ID e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9e9 at $.adapters.{key#0}.files.{key#0}.rawIds[1]",
+    "rawOutputSha256": "ae921f9a34cf31ecd63658d30c89bbe1c6296ea715084b1b99424352df5ced99",
+    "summary": {
+      "cancelled": 0,
+      "durationMs": 161.733667,
+      "fail": 1,
+      "pass": 2,
+      "skipped": 0,
+      "tests": 3,
+      "todo": 0
+    }
+  },
+  "otherIds": {
+    "cliDiagnostics": [
+      "first sync: CLI exit 0; loopback accepted 2 entries and source sequence; Claude collector call 1; accepted 2026-09-22=15, 2026-09-23=11; state.json 3285 bytes (changed from installation state)",
+      "new-process reload: CLI exit 0; loopback accepted 2 entries and source sequence; Claude collector call 2; accepted 2026-09-22=15, 2026-09-23=11; state.json 3285 bytes",
+      "new-process retention after source deletion: CLI exit 0; loopback accepted 2 entries and source sequence; Claude collector call 3; accepted 2026-09-22=15, 2026-09-23=11; state.json 1655 bytes"
+    ],
+    "exitCode": 0,
+    "rawOutputSha256": "93d762b8bcd1aee82fea7416740f00ae55310cd7072d2280de0e66f68cc99ba2",
+    "summary": {
+      "cancelled": 0,
+      "durationMs": 362.252834,
+      "fail": 0,
+      "pass": 3,
+      "skipped": 0,
+      "tests": 3,
+      "todo": 0
+    }
+  },
+  "portability": {
+    "cliDiagnostics": [
+      "first sync: CLI exit 0; loopback accepted 2 entries and source sequence; Claude collector call 1; accepted 2026-09-22=15, 2026-09-23=11; state.json 3285 bytes (changed from installation state)",
+      "new-process reload: CLI exit 0; loopback accepted 2 entries and source sequence; Claude collector call 2; accepted 2026-09-22=15, 2026-09-23=11; state.json 3285 bytes",
+      "new-process retention after source deletion: CLI exit 0; loopback accepted 2 entries and source sequence; Claude collector call 3; accepted 2026-09-22=15, 2026-09-23=11; state.json 1655 bytes"
+    ],
+    "exitCode": 0,
+    "rawOutputSha256": "113f71003ee93b0e4914d651ded0914ee5f984faf486bbd4192184ab3ddec030",
+    "summary": {
+      "cancelled": 0,
+      "durationMs": 363.521917,
+      "fail": 0,
+      "pass": 3,
+      "skipped": 0,
+      "tests": 3,
+      "todo": 0
+    }
+  }
+}
