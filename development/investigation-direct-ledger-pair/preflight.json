@@ -1,0 +1,36 @@
+{
+  "before": {
+    "baseline": "2b16b6a8ad75b6b852adc5e2189e6d4a8d93eabd",
+    "files": 258,
+    "error": "Investigation requires a complete readable project snapshot",
+    "cause": "projectScope(allFiles=true) omitted 769479-byte docs/assets/social-preview.png before preparation"
+  },
+  "after": {
+    "baseline": "2b16b6a8ad75b6b852adc5e2189e6d4a8d93eabd",
+    "pinnedContainer": "sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6",
+    "files": 258,
+    "bytes": 3428502,
+    "binaryAssets": 8,
+    "pathsBytesModesMatched": true,
+    "childCapture": "captured",
+    "childCwdChecks": {
+      "readers": {"passed": 86, "failed": 0},
+      "config": {"passed": 103, "failed": 0},
+      "protocol": {"passed": 14, "failed": 0}
+    }
+  },
+  "installedScripted": {
+    "candidateInvestigationModuleSha256": "67017b6c57380a8f42327a0a40b8089c16c7b3c1f3a9908b2e064fa610de64eb",
+    "finalResultSha256": "4ee485fb600b32bb0cdcf61adf162ac4763197c7284b17982f58b962ec2d36c3",
+    "finalInvestigationSha256": "f5a25eb9330e80f78f279c09d1cee00383f1c9ffec55f44983b40bcef6107680",
+    "requests": 17,
+    "realProviderRequests": 0,
+    "childTest": "npm test",
+    "childTestExit": 0,
+    "disposition": "accepted",
+    "terminalPatchAppliedToCleanGit": true,
+    "nativeCompleted": true,
+    "terminationVerified": true
+  },
+  "hostLimit": "config.test.mjs could not bind 127.0.0.1 in host sandbox (listen EPERM); the pinned offline container check passed 103/103"
+}

@@ -4,7 +4,7 @@ import {spawn} from 'node:child_process';
 import {runNativePhase} from '../native-task-abc/native-run.mjs';
 
 export async function runTask(session, options) {
-  const flags={P:'00',R:'00',H:'00',H00:'00',H10:'10',H01:'01',H11:'11',H0:'00',H1:'00',S0:'00',S1:'00'}[options.arm];
+  const flags={P:'00',R:'00',H:'00',H00:'00',H10:'10',H01:'01',H11:'11',H0:'00',H1:'00',S0:'00',S1:'00',I0:'00',I1:'00'}[options.arm];
   if(!flags)throw Error('Unknown factorial arm');
   const result=await runNativePhase(session,{...options,strategy:'direct'},{spawnProcess:(command,args,settings)=>{
     if(options.enabled){
@@ -17,6 +17,11 @@ export async function runTask(session, options) {
       if (['R','H'].includes(options.arm)) {
         const pos=args.indexOf(session.name);
         args=[...args.slice(0,pos),'--env','HARNESS_TASK_INVESTIGATION='+(options.arm==='H'?'1':'0'),'--env','HARNESS_TASK_EXTRA_ATTENTION='+(options.arm==='R'?'1':'0'),...args.slice(pos)];
+      }
+      if (['I0','I1'].includes(options.arm)) {
+        const pos=args.indexOf(session.name);
+        const settings=['TYPE_COMPAT','COMMAND_HINTS','PRESERVATION_NUDGE','EXTRA_ATTENTION','SENSITIVITY','INVESTIGATION'];
+        args=[...args.slice(0,pos),...settings.flatMap(name=>['--env',`HARNESS_TASK_${name}=${name==='INVESTIGATION'&&options.arm==='I1'?'1':'0'}`]),...args.slice(pos)];
       }
     }
     return spawn(command,args,settings);
