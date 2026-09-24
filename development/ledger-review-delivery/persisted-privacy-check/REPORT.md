@@ -98,3 +98,7 @@ application, controls 2/2, D0/final expected-failure reproductions, scoped
 whitespace, and a content review of the test-only patch. Full controller,
 installed matrix, ledger probes, platform CI and positive full CLI control
 were not run. These local results are not CI or a repaired VibeRacing product.
+
+The later, separately sourced [calibration](calibration/REPORT.md) repairs a
+disposable final copy and completes a new RED → GREEN → RED check. The
+test-only result above remains historical; it is not retroactively a PASS.
