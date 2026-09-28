@@ -93,3 +93,28 @@ installed bundle. [The fixed comparison plan](../../development/native-task-inve
 describes the separate P/R/H development experiment. R's internal
 `HARNESS_TASK_EXTRA_ATTENTION=1` control adds one general same-session pass and
 is not required for the focused investigation path.
+
+The compact receipt always includes this canonical first call:
+
+```json
+{"action":"inspect","section":"patch"}
+```
+
+Omit `cursor` on the first page. Copy the returned `nextCursor` exactly to
+continue; it is opaque, not a page number or a byte count. Exactly the string
+`"0"` also requests the first page for compatibility. Other numbers, malformed,
+stale, foreign-run and foreign-section tokens remain errors. An invalid cursor
+returns `status: "invalid-cursor"`, a short explanation and `firstInspect` for
+an explicit corrected call; it never silently serves a different page.
+
+`callID` is required only for `section: "output"`, and must identify a saved
+check of this investigation. For patch, explanation and checks it is ignored,
+including in page identity. Missing or inconsistent saved artifacts remain
+artifact errors. Inspection neither delegates again nor accepts a patch, changes
+the snapshot or grants more time. Accept still requires rationale, the exact
+author snapshot and ordinary Git preflight; decline remains valid.
+
+Development launchers propagate their original deadline through bootstrap and
+child work. Duration records use monotonic time; wall timestamps remain available
+for event correlation and the original wall deadline also closes admission after
+resume. A local abort does not prove that remote provider computation stopped.

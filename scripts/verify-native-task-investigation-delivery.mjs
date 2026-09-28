@@ -61,11 +61,34 @@ try {
   assert.equal(collect(delivery, 'output', 'unknown-runner').text, 'runner exit 2; failure count unknown');
   assert.equal(collect(delivery, 'output', 'check-2').text, bigOutput);
   const first = inspect(delivery, 'patch');
+  assert.deepEqual(inspect(delivery, 'patch', 'check-1', '0'), first, 'Historical cursor=0 with irrelevant callID');
+  assert.deepEqual(receipt.firstInspect, {action: 'inspect', section: 'patch'});
+  assert.deepEqual(inspect(delivery, 'patch', 'check-1', first.nextCursor), inspect(delivery, 'patch', undefined, first.nextCursor));
+  for (const cursor of ['bad', '-1', '1', '00', '', 0, null]) {
+    const error = inspect(delivery, 'patch', 'check-1', cursor);
+    assert.equal(error.status, 'invalid-cursor');
+    assert.deepEqual(error.firstInspect, receipt.firstInspect);
+    assert.match(error.reason, /nextCursor/);
+  }
+  for (const section of ['explanation', 'checks'])
+    assert.deepEqual(inspect(delivery, section, 'check-1', '0'), inspect(delivery, section));
+  assert.deepEqual(inspect(delivery, 'output', 'check-1', '0'), inspect(delivery, 'output', 'check-1'));
+
   assert.equal(inspectInvestigation({delivery, artifacts: root, section: 'patch', currentSnapshot: 'changed'}).snapshotCurrent, false);
   assert.equal(inspectInvestigation({delivery, artifacts: root, section: 'patch', currentSnapshot: delivery.authorSnapshot}).snapshotCurrent, true);
   assert.equal(inspect(delivery, 'explanation', undefined, first.nextCursor).status, 'invalid-cursor');
   assert.equal(inspect(delivery, 'output', 'other-run').status, 'unavailable');
   assert.equal(inspect(delivery, 'patch', undefined, 'bad').status, 'invalid-cursor');
+  const foreign = path.join(root, 'other-run'); fs.mkdirSync(foreign);
+  fs.copyFileSync(path.join(root, 'investigation-result.json'), path.join(foreign, 'investigation-result.json'));
+  fs.copyFileSync(path.join(root, 'investigation-tests.patch'), path.join(foreign, 'investigation-tests.patch'));
+  assert.equal(inspectInvestigation({delivery, artifacts: foreign, section: 'patch', cursor: first.nextCursor}).status, 'invalid-cursor');
+  const stale = {...delivery, explanation: 'New immutable result'};
+  save('investigation-result.json', JSON.stringify(stale));
+  assert.equal(inspect(stale, 'patch', undefined, first.nextCursor).status, 'invalid-cursor');
+  save('investigation-result.json', '{broken');
+  assert.equal(inspect(delivery, 'patch', undefined, 'bad').status, 'artifact-unavailable');
+  save('investigation-result.json', JSON.stringify(delivery));
   const declined = {...delivery, disposition: 'declined'};
   assert.equal(inspect(declined, 'patch').status, 'page');
   const noPatch = {...delivery, usable: false, patch: '', limitation: 'Child check interrupted'};
