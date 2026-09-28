@@ -106,3 +106,14 @@ provider calls. Eight fixture containers were removed after independent artifact
 capture. Failed fixture expectations/injections and setup attempts remain recorded.
 Developing-agent work is not added to historical Luna usage. Historical AR0/AR1
 scores, patches, costs and missing SSE remain unchanged.
+
+## Single inspect ledger development slot
+
+The separately assigned `investigation-inspect-full-task` slot selects
+`research-full-inspect-ledger-1g-v1` in its host freeze: 1,073,741,824 total bytes,
+with the same 16 MiB request, 64 MiB response, 1024 request and 30,000 ms storage
+limits. The prior `research-full-v1` remains the default at 256 MiB. Both profiles
+retain both request representations and raw response bytes for every role under
+one slot counter. The runner rejects the larger profile for other campaigns;
+models and provider responses cannot select it. See the
+[single-slot plan](../investigation-direct-ledger-pair/inspect-full-task/PLAN.md).

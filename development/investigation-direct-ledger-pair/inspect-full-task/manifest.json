@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "stage": "frozen_before_model_requests",
+  "runtimeSha": "f7ab1f8bf0689a2485d0abbfd340769064c4b4aa",
+  "baseline": "2b16b6a8ad75b6b852adc5e2189e6d4a8d93eabd",
+  "freezeSha256": "5d570a6a39a62255bef6697417bcdd4d1c2e918e4833ce8384dd78a589164944",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "high",
+  "budgetMs": 3600000,
+  "image": "sha256:0ed6cee0b095ecf1e1e780418cb373d462f1b99643bb86db0a8de7dd58fc83a6",
+  "recordingProfile": "research-full-inspect-ledger-1g-v1",
+  "recordingBounds": {
+    "name": "research-full-inspect-ledger-1g-v1",
+    "requestBytes": 16777216,
+    "responseBytes": 67108864,
+    "totalBytes": 1073741824,
+    "requests": 1024,
+    "storageMs": 30000
+  },
+  "sourceManifestSha256": "15f4f3ce26468bad1afe37617a7e43da80abcf8e26ec24a5f99bafd0317ce1ea",
+  "bundleManifestSha256": "dcc3e073909bf21884842314b7cce558ab657cc425dd7db00c28f49763af0b0c",
+  "originalTaskSha256": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+  "environmentSha256": "aa0afe37ca2ec1f3564642a02842d71472b72b88225069be22a4cbbe8fb114cc",
+  "promptSha256": "1873295e7730dd9688759dbd93f98480bbe7a5f9d991f8f4f2b99f1a57f54082",
+  "privacyTestSha256": "a98a4dc6027c46282f350d09a0cb80266b5bacbdfc7b417839ee342a62da31d5",
+  "slots": [
+    {
+      "slot": 1,
+      "arm": "I1",
+      "status": "not_started"
+    }
+  ],
+  "preflightReceiptSha256": "5dbceaa8e18c0756793cf5dd7ba192b8930e84f9598fd755bcb877ffdf43c050",
+  "acceptance": "Unchanged parent PLAN; same suites, 23 probes, isolated calibrated CLI privacy test and contract observations",
+  "storagePreflight": {
+    "availableBytes": 552960000000,
+    "recordingBytes": 1073741824,
+    "nativeOutputReserveBytes": 268435456,
+    "recoveryReserveBytes": 1610612736,
+    "requiredBytes": 2952790016,
+    "passed": true
+  }
+}

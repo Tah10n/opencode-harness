@@ -5,19 +5,25 @@ import {createHash} from 'node:crypto';
 import {performance} from 'node:perf_hooks';
 import {privateJSON,hashFile} from '../native-output-retention/output-files.mjs';
 export const recordingProfile=Object.freeze({name:'research-full-v1',requestBytes:16*1024*1024,responseBytes:64*1024*1024,totalBytes:256*1024*1024,requests:1024,storageMs:30000});
+export const inspectFullTaskRecordingProfile=Object.freeze({...recordingProfile,name:'research-full-inspect-ledger-1g-v1',totalBytes:1073741824});
+export function selectRecordingProfile(name=recordingProfile.name){
+ const selected=[recordingProfile,inspectFullTaskRecordingProfile].find(profile=>profile.name===name);
+ if(!selected)throw Error('Unknown recording profile');return selected;
+}
 const sha=b=>createHash('sha256').update(b).digest('hex');
-export function prepareRecording(directory,identity,{bounds=recordingProfile}={}) {
- for(const key of ['requestBytes','responseBytes','totalBytes','requests','storageMs'])if(!Number.isSafeInteger(bounds[key])||bounds[key]<=0||bounds[key]>recordingProfile[key])throw Error('Invalid recording bound');
+export function prepareRecording(directory,identity,{profile=recordingProfile.name,bounds=selectRecordingProfile(profile)}={}) {
+ const selected=selectRecordingProfile(profile);
+ for(const key of ['requestBytes','responseBytes','totalBytes','requests','storageMs'])if(!Number.isSafeInteger(bounds[key])||bounds[key]<=0||bounds[key]>selected[key])throw Error('Invalid recording bound');
  const stat=fs.lstatSync(directory),target=fs.realpathSync(directory);
  if(!stat.isDirectory()||stat.isSymbolicLink()||(stat.mode&0o077))throw Error('Unsafe private recording directory');
  // Canonicalize the trusted host directory (including platform temp aliases).
- privateJSON(path.join(target,'recording-config.json'),{...identity,profile:recordingProfile.name,bounds,clientBody:'JSON serialization of native relay object; original HTTP bytes unavailable',upstreamBody:'exact UTF-8 fetch body; transport adds store:false',responseBody:'bytes read from fetch response.body, not network packets',forwardedBody:'size/hash of chunks accepted by relay send; not client acknowledgement'});
+ privateJSON(path.join(target,'recording-config.json'),{...identity,profile:selected.name,bounds,clientBody:'JSON serialization of native relay object; original HTTP bytes unavailable',upstreamBody:'exact UTF-8 fetch body; transport adds store:false',responseBody:'bytes read from fetch response.body, not network packets',forwardedBody:'size/hash of chunks accepted by relay send; not client acknowledgement'});
  let total=0,count=0,storageMs=0;
  const timed=fn=>{const start=performance.now();try{if(storageMs>=bounds.storageMs)throw Error('Recording storage time limit');return fn();}finally{storageMs+=performance.now()-start;}};
  return {begin(record,clientBody,upstreamBody){
   const index=record.requestIndex;
   if(!Number.isSafeInteger(index)||index<1||++count>bounds.requests)throw Error('Recording request limit');
-  const state={profile:recordingProfile.name,...identity,requestIndex:index,relayRequestId:record.relayRequestId,requestKind:record.requestKind,status:'not_started',evidenceComplete:false,response:{file:`response-${index}.sse`,size:0,sha256:sha(Buffer.alloc(0)),eof:false,status:'not_started'},forwarded:{size:0,sha256:null}};
+  const state={profile:selected.name,...identity,requestIndex:index,relayRequestId:record.relayRequestId,requestKind:record.requestKind,status:'not_started',evidenceComplete:false,response:{file:`response-${index}.sse`,size:0,sha256:sha(Buffer.alloc(0)),eof:false,status:'not_started'},forwarded:{size:0,sha256:null}};
   record.recording=state;
   const statusFile=path.join(target,`recording-${index}.json`),responseFile=path.join(target,state.response.file);
   let fd,closed=false,hash=createHash('sha256'),forwardHash=createHash('sha256');

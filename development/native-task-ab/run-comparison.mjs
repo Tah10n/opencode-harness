@@ -2,7 +2,7 @@
 // A/B do not add a phase or an intermediate model deadline.
 import fs from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';
 import {runTask} from './native-run.mjs';
-import {prepareRecording,recordingProfile} from './provider-recording.mjs';
+import {prepareRecording,recordingProfile,inspectFullTaskRecordingProfile,selectRecordingProfile} from './provider-recording.mjs';
 import {privateJSON} from '../native-output-retention/output-files.mjs';
 import {recheckSavedAvailability} from '../native-task-investigation/availability-probe.mjs';
 import {execFileSync} from 'node:child_process';
@@ -47,6 +47,9 @@ export function knownResponseTerminal(record){return !!record.terminalResponse&&
 export async function runComparison({root,startContainer,captureCandidate,stopWorkload,readAuth,fetchImpl=fetch,runTaskImplementation=runTask,continuationFile=null,verifyQuiescence=verifyHistoricalContainers,beforeTasks=null}) {
 const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
+const inspectFullTask=f.experimentKind==='investigation-inspect-full-task';
+const selectedRecording=selectRecordingProfile(f.recordingProfile??recordingProfile.name);
+if(!inspectFullTask&&selectedRecording!==recordingProfile)throw Error('Recording profile not assigned to this experiment');
 const amendment=continuationFile?JSON.parse(fs.readFileSync(continuationFile)):null;
 const repeatedContinuation=!!amendment&&f.experimentKind==='integrated-repeats';
 const integrationContinuation=!!amendment&&f.experimentKind==='targeted-integration';
@@ -82,7 +85,7 @@ if(amendment){
 }
 
 function verify(){
- if(f.experimentKind!==undefined&&!['investigation-direct-ledger-pair','ledger-review-diagnostic','ledger-review-diagnostic-preflight','assertion-review-pair','assertion-review-pair-preflight','plain-ledger-native-high','plain-ledger-native-high-preflight','plain-mui-18141','plain-mui-18141-preflight','preservation-pair','preservation-pair-preflight','polybench-pilot','polybench-pilot-preflight','subscribe-offline','type-compat','command-hints','transfer','h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration','integrated-repeats'].includes(f.experimentKind))throw Error('Unknown development experiment');
+ if(f.experimentKind!==undefined&&!['investigation-inspect-full-task','investigation-direct-ledger-pair','ledger-review-diagnostic','ledger-review-diagnostic-preflight','assertion-review-pair','assertion-review-pair-preflight','plain-ledger-native-high','plain-ledger-native-high-preflight','plain-mui-18141','plain-mui-18141-preflight','preservation-pair','preservation-pair-preflight','polybench-pilot','polybench-pilot-preflight','subscribe-offline','type-compat','command-hints','transfer','h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration','integrated-repeats'].includes(f.experimentKind))throw Error('Unknown development experiment');
  const directInvestigationPair=f.experimentKind==='investigation-direct-ledger-pair';
  const diagnosticReview=['ledger-review-diagnostic','ledger-review-diagnostic-preflight'].includes(f.experimentKind);
  const diagnosticFixture=f.experimentKind==='ledger-review-diagnostic-preflight';
@@ -92,11 +95,13 @@ function verify(){
  const preservationPair=['preservation-pair','preservation-pair-preflight'].includes(f.experimentKind);
  const polybench=f.experimentKind==='polybench-pilot', polybenchPreflight=f.experimentKind==='polybench-pilot-preflight';
  const subscribeRepeatability=f.experimentKind==='subscribe-offline'&&f.repeatability===true, subscribeOffline=f.experimentKind==='subscribe-offline', typeCompat=f.experimentKind==='type-compat', commandHints=f.experimentKind==='command-hints', transfer=f.experimentKind==='transfer', h00=f.experimentKind==='h00-transfer', sensitivity=f.experimentKind==='sensitivity', usage=f.experimentKind==='sensitivity-usage', replay=f.experimentKind==='sensitivity-replay', targeted=f.experimentKind==='sensitivity-targeted', integration=f.experimentKind==='targeted-integration';
- if(f.attempts.length!==(diagnosticReview?(diagnosticFixture?1:2):(plainMui||plainLedger)?1:(directInvestigationPair||preservationPair||assertionPair)?2:polybenchPreflight?3:subscribeOffline?(subscribeRepeatability?4:2):(commandHints||typeCompat)?4:repeatedContinuation?12:integration?9:targeted?3:replay?4:usage?2:h00?48:transfer||sensitivity?8:30)||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==(directInvestigationPair?3600000:diagnosticReview?600000:(plainMui||plainLedger||preservationPair||assertionPair||polybench||polybenchPreflight||subscribeOffline||commandHints||typeCompat||repeatedContinuation)?1800000:900000)||!f.preflightPassed)throw Error('Invalid development configuration');
+ if(f.attempts.length!==(inspectFullTask?1:diagnosticReview?(diagnosticFixture?1:2):(plainMui||plainLedger)?1:(directInvestigationPair||preservationPair||assertionPair)?2:polybenchPreflight?3:subscribeOffline?(subscribeRepeatability?4:2):(commandHints||typeCompat)?4:repeatedContinuation?12:integration?9:targeted?3:replay?4:usage?2:h00?48:transfer||sensitivity?8:30)||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==((directInvestigationPair||inspectFullTask)?3600000:diagnosticReview?600000:(plainMui||plainLedger||preservationPair||assertionPair||polybench||polybenchPreflight||subscribeOffline||commandHints||typeCompat||repeatedContinuation)?1800000:900000)||!f.preflightPassed)throw Error('Invalid development configuration');
  for(const [file,digest] of Object.entries(f.files))if(sha(fs.readFileSync(file))!==(amendment?.launcherFiles[file]?.after??digest))throw Error('Frozen file changed: '+file);
  for(const [directory,expected]of Object.entries(f.runtimeManifests??{})){const seen=new Set();const visit=(dir,prefix='')=>{for(const entry of fs.readdirSync(dir,{withFileTypes:true})){if(repeatedContinuation&&entry.name==='.git')continue;const file=path.join(dir,entry.name),name=prefix+entry.name,stat=fs.lstatSync(file);if(stat.isDirectory()){visit(file,name+'/');continue;}const got=stat.isSymbolicLink()?{symlink:fs.readlinkSync(file)}:{sha256:sha(fs.readFileSync(file)),executable:!!(stat.mode&0o111)};if(JSON.stringify(got)!==JSON.stringify(expected[name]))throw Error('Installed runtime changed: '+name);seen.add(name);}};visit(directory);if(seen.size!==Object.keys(expected).length)throw Error('Installed runtime missing files');}
  const groups=new Map();for(const a of f.attempts){const group=groups.get(a.task)??[];group.push(a.arm);groups.set(a.task,group);}
- if(directInvestigationPair){
+ if(inspectFullTask){
+  if(amendment||f.runtimeSha!=='f7ab1f8bf0689a2485d0abbfd340769064c4b4aa'||f.candidateSha!==f.runtimeSha||f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.map(a=>a.task+':'+a.arm).join(',')!=='account-switch-ledger:I1'||f.attempts[0].project!=='Tah10n/viberacing'||!f.template||selectedRecording!==inspectFullTaskRecordingProfile||JSON.stringify(f.recordingBounds)!==JSON.stringify(selectedRecording))throw Error('Invalid inspect full-task slot');
+ }else if(directInvestigationPair){
   if(amendment||f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.map(a=>a.task+':'+a.arm).join(',')!=='account-switch-ledger:I0,account-switch-ledger:I1'||f.attempts.some(a=>a.project!=='Tah10n/viberacing')||new Set(f.attempts.map(a=>a.source)).size!==2||!f.template||f.runtimeSha!==f.candidateSha)throw Error('Invalid direct investigator pair');
  }else if(diagnosticReview){
   if(amendment||f.runtimeSha!=='ab7e6e1d153b996c577d96708c1e1fb84f57cbd3'||f.strategy!=='diagnostic-review'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.map(a=>a.task+':'+a.arm).join(',')!==(diagnosticFixture?'neutral-review:candidate-A':'account-switch-ledger:candidate-A,account-switch-ledger:candidate-B')||f.attempts.some(a=>a.project!==(diagnosticFixture?'local/neutral-review':'Tah10n/viberacing'))||new Set(f.attempts.map(a=>a.source)).size!==f.attempts.length)throw Error('Invalid two-slot diagnostic review assignment');
@@ -196,14 +201,14 @@ for(const attempt of f.attempts.filter(a=>!amendment||(a.slot>=firstSlot&&a.slot
  try{
   // One full profile for this research-only entry point, fixed before native requests.
   // Admission above remains independent; ordinary native sessions never call here.
-  try{recording=prepareRecording(out,{run:path.basename(path.resolve(root)),slot:attempt.slot,profile:recordingProfile.name});}
+  try{recording=prepareRecording(out,{run:path.basename(path.resolve(root)),slot:attempt.slot},{profile:selectedRecording.name});}
   catch(error){pauseScheduling('evidence_incomplete',attempt.slot,{phase:'recording_preparation',message:error.message});throw error;}
   session=await startContainer({source:attempt.source,toolchain:f.toolchain,template:['assertion-review-pair','assertion-review-pair-preflight'].includes(f.experimentKind)?f.templates[attempt.arm]:attempt.arm==='S0'?f.baselineTemplate:attempt.arm!=='P'?f.template:f.dependencies,output:path.join(out,'session'),onRequest:(frame,rawSend,signal)=>{
    const send=message=>{if(forwardingOpen)rawSend(message);};
    const pending=(async()=>{
     const requestKind=frame.body?.tools?.length?'work':'title';
     let requestSignal;
-    const record={requestIndex:requests.length+1,relayRequestId:frame.id??null,requestKind,at:new Date().toISOString(),path:frame.path,model:frame.body?.model,effort:frame.body?.reasoning?.effort??null,forwarded:false,usage:null,recording:{profile:recordingProfile.name,status:'not_started',evidenceComplete:false}};requests.push(record);save();
+    const record={requestIndex:requests.length+1,relayRequestId:frame.id??null,requestKind,at:new Date().toISOString(),path:frame.path,model:frame.body?.model,effort:frame.body?.reasoning?.effort??null,forwarded:false,usage:null,recording:{profile:selectedRecording.name,status:'not_started',evidenceComplete:false}};requests.push(record);save();
     let recorder,recordingEnd='not_started';
     const recordingFailed=()=>{record.evidenceIncomplete=true;pauseScheduling('evidence_incomplete',attempt.slot,{requestIndex:record.requestIndex,reason:record.recording?.error??recordingPersistenceError??'Partial provider evidence'});};
     const blocked=()=>{
