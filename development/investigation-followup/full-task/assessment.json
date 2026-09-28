@@ -1,0 +1,397 @@
+{
+  "arm": "I1",
+  "patchSha256": "cdf0ea249bfe0acc58881b0470e9c96f28e4a7b357c4c7065b152b31718eb532",
+  "patchBytes": 40460,
+  "delivery_apply": true,
+  "apply": {
+    "exitCode": 0,
+    "counts": {
+      "tests": null,
+      "pass": null,
+      "fail": null,
+      "skipped": null
+    },
+    "receipt": "local/investigation-followup-full-task/assessment/I1/apply.json",
+    "sha256": "0b4c0f13801fd4fd720d50dd6db11d7ab56de669fb4a062031771700cf1aa779"
+  },
+  "assessment_integrity": {
+    "appliedMMatchesActualDelivery": {
+      "actualDeliveryTreeMatchesAppliedM": true,
+      "files": 258,
+      "treeSha256": "40ee0cdfc016ac635602fcdeb6f1541bf4795499165acb33fa8827dd0503087f",
+      "patchSha256": "cdf0ea249bfe0acc58881b0470e9c96f28e4a7b357c4c7065b152b31718eb532",
+      "injectedTaskUnchangedAndExcluded": true
+    },
+    "FAndECopiesUnchanged": true,
+    "privacyBytesOriginalAndIsolated": true,
+    "raw23ProbeScoringUnchanged": true,
+    "probeApplicabilityLimits": "Two OpenCode probes inject serverBaseline, absent from the actual candidate/baseline producer and consumer. Their failures remain in 19/23 but are not alone proof of a real CLI regression. The conflict probe requires an exact diagnostic spelling; totals and partial status passed.",
+    "frozenAdditionalObservationError": "diagnose.mjs tried assigning parserVersion on numeric ledger.version and exited 1; retained separately, not a product failure",
+    "representationAdaptation": "Supplementary observation changes only the corruption target to the version of the implementation-created ledger. No new requirement or 23-case assertion is introduced; frozen evaluator source is unchanged."
+  },
+  "projectVerify": {
+    "exitCode": 1,
+    "counts": {
+      "tests": null,
+      "pass": null,
+      "fail": null,
+      "skipped": null
+    },
+    "receipt": "local/investigation-followup-full-task/assessment/I1/F-project-verify.json",
+    "sha256": "0642ed4a7130ef3e220efa81b4f076dffb71c8cdd18fe48e357799aef286cf44",
+    "classification": "unavailable offline: pnpm 11.7.0 not cached; exit 1 is not PASS"
+  },
+  "privacy": {
+    "exitCode": 0,
+    "counts": {
+      "tests": 3,
+      "pass": 3,
+      "fail": 0,
+      "skipped": 0
+    },
+    "receipt": "local/investigation-followup-full-task/assessment/I1/privacy.json",
+    "sha256": "88871a118e949c0c7f88a086a2e7848ce79e328c8c6359489e1bfc354662dbd1"
+  },
+  "implementationTreeSha256": "40ee0cdfc016ac635602fcdeb6f1541bf4795499165acb33fa8827dd0503087f",
+  "behavioralCounts": {
+    "tests": 23,
+    "pass": 19,
+    "fail": 4,
+    "skipped": 0
+  },
+  "F_checks": {
+    "readers": {
+      "exitCode": 0,
+      "counts": {
+        "tests": 88,
+        "pass": 88,
+        "fail": 0,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-followup-full-task/assessment/I1/F-readers.json",
+      "sha256": "1f25086287fb673d76c82308264d08b9b273f939008c120304b7ced77ee7154d"
+    },
+    "config": {
+      "exitCode": 0,
+      "counts": {
+        "tests": 103,
+        "pass": 103,
+        "fail": 0,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-followup-full-task/assessment/I1/F-config.json",
+      "sha256": "a6504c96307ede4ff87340caf24beeedd3fe0076c1c0d7472535d9416f366e80"
+    },
+    "protocol": {
+      "exitCode": 0,
+      "counts": {
+        "tests": 14,
+        "pass": 14,
+        "fail": 0,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-followup-full-task/assessment/I1/F-protocol.json",
+      "sha256": "c730e41773c13797e8a8f25fa0c3dcc36d190353ab9d3793fb15b61a225f9599"
+    }
+  },
+  "behavioralProbes": {
+    "account-switch-ledger": {
+      "exitCode": 0,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-followup-full-task/assessment/I1/E-account-switch-ledger.json",
+      "sha256": "3fac6c17c7260993c188445f17dadccd655ddbe4218247cef0786dc609bcc820"
+    },
+    "ledger-lifecycle": {
+      "exitCode": 0,
+      "counts": {
+        "tests": 5,
+        "pass": 5,
+        "fail": 0,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-followup-full-task/assessment/I1/E-ledger-lifecycle.json",
+      "sha256": "b1a589aab41e8e1421cde3b1c688e63e89b290556333e65c248fb0cbc7ddac25"
+    },
+    "legacy-input": {
+      "exitCode": 0,
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-followup-full-task/assessment/I1/E-legacy-input.json",
+      "sha256": "76eeb58bd3ba4ffc80618275405e3028f1bbfa99f97ea14d891309c2af9ec98a"
+    },
+    "kimi-migration": {
+      "exitCode": 1,
+      "counts": {
+        "tests": 1,
+        "pass": 0,
+        "fail": 1,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-followup-full-task/assessment/I1/E-kimi-migration.json",
+      "sha256": "b0b49a1bbcef26abfbbbaa1256cf8b794512d99c495f9d4f0a4b18adda24e46c"
+    },
+    "migration-contract": {
+      "exitCode": 1,
+      "counts": {
+        "tests": 8,
+        "pass": 5,
+        "fail": 3,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-followup-full-task/assessment/I1/E-migration-contract.json",
+      "sha256": "c722979e83b4c3af83c8ea6434d72ebc386abdf03e6b7197420405786c0237ae"
+    },
+    "cli-persistence": {
+      "exitCode": 0,
+      "counts": {
+        "tests": 6,
+        "pass": 6,
+        "fail": 0,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-followup-full-task/assessment/I1/E-cli-persistence.json",
+      "sha256": "cd6e2ff60112f7fbebabd7564a9af3ec26b1b148f93f6751f71799770ae70d91"
+    }
+  },
+  "contract_results": [
+    {
+      "contract": "Fresh event adapters, replay, deletion, move, truncation, new events, range and components",
+      "result": "pass on frozen cases",
+      "evidence": "account-switch-ledger, five ledger-lifecycle cases, six CLI persistence cases; 205 project tests"
+    },
+    {
+      "contract": "Kimi historical 0.4.3 migration with copy and JSON reload",
+      "result": "fail",
+      "evidence": "After initial migration and append pass, copying the existing session doubles the accepted 2026-08-10 total from 20 to 40. No architecture-specific assertion is involved."
+    },
+    {
+      "contract": "Other legacy inputs and migrations",
+      "result": "pass on tested cases",
+      "evidence": "Both legacy-input cases, four baseline-generated migrations and Kimi legacy StatusUpdate case; supplementary bound-source migrations"
+    },
+    {
+      "contract": "OpenCode exact-ID cutover and accepted history",
+      "result": "mixed evidence; no blanket pass",
+      "evidence": "Actual CLI config regression passes rejection/pending-before-acceptance, confirmed alias state and old 9 plus new 9 equals 18. Two serverBaseline-injection probes fail but do not use a state produced by this implementation; do not impose that experimental representation."
+    },
+    {
+      "contract": "First tuple, unrelated valid events and diagnostics consumers",
+      "result": "totals/partial pass; structured diagnostic absent",
+      "evidence": "Conflict retains 15 plus unrelated 7 and partial. Adapter and normalizeAdapterDiagnostics return []; CLI retains/displays conflicting_usage_records through its separate warnings path. Exact diagnostic spelling is not treated as a semantic failure."
+    },
+    {
+      "contract": "Corrupt implementation-created persisted state",
+      "result": "fail",
+      "evidence": "After collecting 15, JSON reload and ledger.version=-1, deleting the source database rows returns [] with complete status and no rejection. This is the implementation own state, not calibration data."
+    },
+    {
+      "contract": "Account/source boundaries and state propagation",
+      "result": "pass on tested cases",
+      "evidence": "Six actual CLI persistence cases and same-event account-remap observation; project config persistence checks"
+    },
+    {
+      "contract": "Privacy",
+      "result": "pass on tested cases",
+      "evidence": "Isolated unchanged CLI privacy 3/3 with real nonzero usage and persisted state, 64-hex provider-ID observation, affected Claude security 1/1"
+    },
+    {
+      "contract": "Bounded scans/storage and retention",
+      "result": "finite bounds present; exhaustive saturation not tested",
+      "evidence": "65,536 event cap and 16 MiB event/legacy bounds in shared collector; existing bounded scans; range tests pass. Invalid loaded entries can be skipped; corruption failure is separately recorded."
+    },
+    {
+      "contract": "Public parser APIs, tests and unrelated scope",
+      "result": "preserved on covered paths",
+      "evidence": "Legacy parser cases and 205/205 suites; 11 connector adapter/test/README files only, no server/account-discovery/version changes"
+    }
+  ],
+  "supplementalObservations": [
+    {
+      "case": "bound-source-legacy-migration",
+      "agentId": "claude_code",
+      "old": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "completeness": "complete"
+    },
+    {
+      "case": "bound-source-legacy-migration",
+      "agentId": "gemini_cli",
+      "old": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "completeness": "complete"
+    },
+    {
+      "case": "bound-source-legacy-migration",
+      "agentId": "qwen_code",
+      "old": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "completeness": "complete"
+    },
+    {
+      "case": "bound-source-legacy-migration",
+      "agentId": "antigravity",
+      "old": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "completeness": "complete"
+    },
+    {
+      "case": "same-observed-event-after-account-remap",
+      "expected": [
+        [
+          "2026-08-10",
+          "10"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-10",
+          "10"
+        ]
+      ],
+      "completeness": "complete"
+    },
+    {
+      "case": "conflict-diagnostic-consumer",
+      "expectedTotals": [
+        [
+          "2026-08-10",
+          "22"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-10",
+          "22"
+        ]
+      ],
+      "completeness": "partial",
+      "adapterDiagnostics": [],
+      "normalizedDiagnostics": []
+    },
+    {
+      "case": "missing-exact-cutover",
+      "expected": "fail closed",
+      "actual": [],
+      "completeness": "complete",
+      "rejected": false
+    },
+    {
+      "case": "corrupt-reloaded-state",
+      "expected": "fail closed",
+      "actual": [],
+      "completeness": "complete",
+      "rejected": false
+    }
+  ],
+  "Q": false,
+  "T": true,
+  "D": false,
+  "internalDirectStatus": "incomplete",
+  "noRepairApplied": true,
+  "legacyExperimentalSavedState": "not required: incompatible internal representation; use actual generated-state and 0.4.3 fixtures"
+}

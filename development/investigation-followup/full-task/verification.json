@@ -1,24 +1,47 @@
 {
-  "syntax": "pass (compile without bytecode writes)",
-  "wiringPredicateRegression": "reproduced from candidate bytes",
-  "ordinaryGitApply": "both patches apply and reproduce identical tree",
-  "manifestHashes": "pass",
-  "requestArithmetic": "pass",
-  "singleSlot": "not_started",
-  "scopedWhitespace": "pass",
-  "finalDiffReview": "Only new bounded pre-model evidence and offline reproducer; no existing tracked file modified",
-  "notRun": [
-    "new OpenCode task",
-    "new investigator",
-    "new task acceptance",
-    "runtime/controller/transport/retention matrices",
-    "remote CI"
+  "passed": true,
+  "syntax": [
+    "verify-final.py",
+    "verify-recording.mjs",
+    "run.mjs",
+    "verify-wiring.py",
+    "verify-delivery.py",
+    "finalize-evidence.py",
+    "summarize.py",
+    "verify-assignment.mjs",
+    "assess.py",
+    "diagnose-current-state.mjs",
+    "verify-capture.py",
+    "freeze.mjs",
+    "prepare.mjs"
   ],
-  "cleanup": {
-    "temporaryRepositoriesRemoved": true,
-    "newContainers": 0,
-    "newSourceOrDependencyCopiesRetained": 0,
-    "newRunDirectoryCreated": false,
-    "originalArchivePreserved": true
-  }
+  "frozenExecutionCommitHashes": "pass",
+  "fixedRuntimeAndInfrastructureHashes": "pass",
+  "historicalFilesUnchanged": true,
+  "evaluatorScoringUnchanged": true,
+  "recordingFilesHashVerified": 405,
+  "arithmetic": "pass",
+  "MUnmodified": true,
+  "actualDeliveryTreeBound": true,
+  "scopedWhitespace": "PASS excluding only preserved M.patch and child-test.patch from outer Git diff check; both patches independently pass git apply --check --whitespace=error-all on clean baseline",
+  "scopedCredentialPatterns": "no matches; gitleaks unavailable on PATH",
+  "finalDiffReview": "Capture semantics correction and single exact admission only; result artifacts separate native delivery from full-task quality and preserve evaluator limits",
+  "notRun": [
+    "repeated technical matrices",
+    "new model repair or retry",
+    "full platform matrix",
+    "remote CI validation"
+  ],
+  "fullProjectVerify": "attempted once in offline evaluator; unavailable, not PASS",
+  "postCleanupArtifactAudit": {
+    "syntax": "pass",
+    "scopedWhitespace": "pass",
+    "relativeMarkdownLinks": "pass",
+    "arithmetic": "pass",
+    "MHash": "pass",
+    "archiveAndIndexHashes": "pass",
+    "ownedRootAbsent": true,
+    "credentialPatterns": "no matches"
+  },
+  "embeddedPatchOuterDiffCheck": "Outer check exit 2 on literal context-line spaces inside patch artifacts; not stripped because immutable M/child bytes must be preserved"
 }

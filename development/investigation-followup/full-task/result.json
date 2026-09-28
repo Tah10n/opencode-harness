@@ -1,15 +1,32 @@
 {
   "assignment": "investigation-followup-full-task",
-  "status": "preparation_blocked",
-  "attemptStarted": false,
-  "delivery_apply": "not_run",
-  "F_checks": "not_run",
-  "assessment_integrity": "not_run",
-  "contract_results": "not_run",
-  "Q": null,
-  "T": null,
-  "D": null,
-  "investigatorDisposition": "not_started",
-  "M": null,
-  "reason": "Pre-model wiring predicate fails on equivalent saved installed patches; no runtime/capture repair authorized in this stage"
+  "slot": 1,
+  "attemptStarted": true,
+  "status": "finished_with_incomplete_task",
+  "delivery_apply": true,
+  "F_checks": {
+    "pass": 205,
+    "tests": 205
+  },
+  "behavioralProbes": {
+    "pass": 19,
+    "tests": 23
+  },
+  "privacy": {
+    "pass": 3,
+    "tests": 3
+  },
+  "assessment_integrity": "verified with explicit probe/observation limitations",
+  "contract_results": "assessment.json",
+  "Q": false,
+  "T": true,
+  "D": false,
+  "investigatorDisposition": "no formal accept/decline; inspected and manually reused in part",
+  "M": {
+    "file": "M.patch",
+    "bytes": 40460,
+    "sha256": "cdf0ea249bfe0acc58881b0470e9c96f28e4a7b357c4c7065b152b31718eb532"
+  },
+  "interpretation": "Real receipt/inspect/recovery and host delivery work; partial manual test reuse, incomplete whole task, no full-flow win or causal lift",
+  "furtherModelRuns": 0
 }

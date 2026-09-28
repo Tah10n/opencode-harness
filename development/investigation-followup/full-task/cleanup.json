@@ -1,0 +1,31 @@
+{
+  "completed": true,
+  "archive": {
+    "path": "local/investigation-followup-full-task-evidence.tar.gz",
+    "bytes": 80627307,
+    "sha256": "ef5b2d43045193e5564f21fb1f01dcd80ed09e8b53f6ba7190ba5466f5f02b37",
+    "filesVerified": 1306
+  },
+  "index": {
+    "path": "local/investigation-followup-full-task-evidence-index.json",
+    "sha256": "146c690e04b09967a71d69de63aac0f18ad22d91d3d97c2d20a0b0f9d2f90fb4"
+  },
+  "allocatedBytesRemoved": 457465856,
+  "allocatedBytesRetained": 84455424,
+  "netAllocatedBytesReleased": 373010432,
+  "excludedReproducible": [
+    "candidate",
+    "bundle",
+    "source",
+    "candidate.tar",
+    "assessment/I1/F",
+    "assessment/I1/E",
+    "assessment/I1/privacy"
+  ],
+  "removedOwnedRoot": "local/investigation-followup-full-task",
+  "rootVerifiedAbsent": true,
+  "ownedTaskContainerVerifiedAbsent": "template-dev-17fa43e0-960b-4caa-8d2e-457b1dbd9e6f",
+  "evaluationContainers": "Commands completed with --rm; no retained evaluator resource",
+  "preserved": "All raw request/response files, metadata, native artifacts/outputs, freeze/input inventories and evaluator logs; original historical archives, pinned image, toolchains and shared dependencies unchanged",
+  "globalPrune": false
+}

@@ -1,0 +1,87 @@
+{
+  "executionFreezeCommit": "237dbbd5434286e69053c5d857b3f1b53db056dc",
+  "runtimeCandidate": "d59a527d120e4cd256ded6d8270154fbbcff5d36",
+  "input": {
+    "matched": true,
+    "files": 259,
+    "providerRequestsBeforeStart": 0
+  },
+  "capture": {
+    "status": 0,
+    "kind": "evidence_complete",
+    "patchStatus": 0,
+    "outputStatus": 0,
+    "errors": []
+  },
+  "resolver": {
+    "run": "8309d74f-483c-49c9-b59a-24f80231bbff",
+    "parentSession": "ses_f16e545c1ffeD46vLND4vFX7vx",
+    "sessions": {
+      "author": "ses_f16e53730ffeNbtC7LAiqIfgqu",
+      "investigator": "ses_f16e42be6ffeCtn2SlZjfUW30N"
+    },
+    "compact": true,
+    "resultSha256": "ab5719fd2d2aea7a3d0396d4bd5d5fe548956c114338c8ffaab98d19625c7513",
+    "snapshotSha256": "588f5fdcf48a4680fc12b521de9de5093dd4564b46c73818743875fd01509081",
+    "patchSha256": "cdf0ea249bfe0acc58881b0470e9c96f28e4a7b357c4c7065b152b31718eb532"
+  },
+  "trees": {
+    "terminal": "629727e5e064026b682608eff240c78dab9b92d0",
+    "collector": "629727e5e064026b682608eff240c78dab9b92d0",
+    "delivery": "629727e5e064026b682608eff240c78dab9b92d0"
+  },
+  "stop": {
+    "timing": {
+      "taskStarted": {
+        "at": "2026-09-28T17:40:37.333Z",
+        "monotonicMs": 2592.003833
+      },
+      "deadlineAt": "2026-09-28T18:40:37.332Z",
+      "forwardingClosed": {
+        "at": "2026-09-28T18:11:42.419Z",
+        "monotonicMs": 1867676.731083
+      },
+      "handlersSettled": {
+        "at": "2026-09-28T18:11:42.420Z",
+        "monotonicMs": 1867677.10225
+      },
+      "captureStarted": {
+        "at": "2026-09-28T18:11:42.520Z",
+        "monotonicMs": 1867777.532167
+      },
+      "captureFinished": {
+        "at": "2026-09-28T18:11:43.440Z",
+        "monotonicMs": 1868697.608792
+      },
+      "cleanupStarted": {
+        "at": "2026-09-28T18:11:43.447Z",
+        "monotonicMs": 1868704.74025
+      },
+      "cleanupFinished": {
+        "at": "2026-09-28T18:11:43.553Z",
+        "monotonicMs": 1868810.582458
+      }
+    },
+    "ownTaskDeadlineTriggered": false,
+    "terminationVerified": true,
+    "captureSaved": true,
+    "forwardingClosed": true,
+    "relayRemoved": true,
+    "activeProviderHandlers": 0,
+    "providerServerStateMayRemainUnknown": false
+  },
+  "nativeOutputRetention": {
+    "evidenceComplete": true,
+    "externalOutputFiles": 0,
+    "bytes": 0,
+    "note": "No external output files were produced; native tool/check texts remain in task artifacts and request recording."
+  },
+  "requests": 135,
+  "knownCompleted": 135,
+  "knownUsage": 135,
+  "unknownUsage": 0,
+  "investigatorSessions": 1,
+  "originalTaskAndEnvironmentInAuthorAndChildRequests": true,
+  "childFullPatchActuallyDelivered": true,
+  "noOperatorMessages": true
+}

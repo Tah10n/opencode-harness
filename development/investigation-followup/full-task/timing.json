@@ -1,0 +1,84 @@
+{
+  "clockContract": "Wall timestamps for correlation; paired performance.now values for elapsed measurements. No deadline expired.",
+  "scheduler": {
+    "taskStarted": {
+      "at": "2026-09-28T17:40:37.333Z",
+      "monotonicMs": 2592.003833
+    },
+    "deadlineAt": "2026-09-28T18:40:37.332Z",
+    "forwardingClosed": {
+      "at": "2026-09-28T18:11:42.419Z",
+      "monotonicMs": 1867676.731083
+    },
+    "handlersSettled": {
+      "at": "2026-09-28T18:11:42.420Z",
+      "monotonicMs": 1867677.10225
+    },
+    "captureStarted": {
+      "at": "2026-09-28T18:11:42.520Z",
+      "monotonicMs": 1867777.532167
+    },
+    "captureFinished": {
+      "at": "2026-09-28T18:11:43.440Z",
+      "monotonicMs": 1868697.608792
+    },
+    "cleanupStarted": {
+      "at": "2026-09-28T18:11:43.447Z",
+      "monotonicMs": 1868704.74025
+    },
+    "cleanupFinished": {
+      "at": "2026-09-28T18:11:43.553Z",
+      "monotonicMs": 1868810.582458
+    }
+  },
+  "native": {
+    "startedAt": "2026-09-28T17:40:37.334Z",
+    "budgetMs": 3599998,
+    "deadlineAt": "2026-09-28T18:40:37.332Z",
+    "hostClosed": {
+      "at": "2026-09-28T18:11:42.361Z",
+      "elapsedMs": 1865025.037333
+    },
+    "workloadStopRequested": {
+      "at": "2026-09-28T18:11:42.361Z",
+      "elapsedMs": 1865025.265042
+    },
+    "workloadStopSettled": {
+      "at": "2026-09-28T18:11:42.418Z",
+      "elapsedMs": 1865082.243917
+    }
+  },
+  "independentStop": {
+    "trigger": "normal_cleanup",
+    "deadlineAt": "2026-09-28T18:40:37.332Z",
+    "deadlineMono": 3602590.960125,
+    "cancellationStarted": {
+      "at": "2026-09-28T18:11:42.362Z",
+      "monotonicMs": 1867619.879042
+    },
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "stopSettled": {
+      "at": "2026-09-28T18:11:42.417Z",
+      "monotonicMs": 1867674.207083
+    }
+  },
+  "executionElapsedMs": 1865025.161458,
+  "runnerCleanupElapsedMs": 58.4402499999851,
+  "runnerElapsedMs": 1865083.60425,
+  "childElapsedMsIncluded": 467869.06583800004,
+  "lastDispatch": {
+    "at": "2026-09-28T18:11:37.701Z",
+    "remainingMs": 1739633,
+    "request": 135
+  },
+  "normalCompletionBeforeDeadline": true,
+  "deadlineTriggered": false,
+  "stopMechanism": "normal_cleanup; confirmed no owned workload to kill",
+  "independentStopElapsedMs": 54.328041000058874,
+  "captureElapsedMs": 920.076624999987,
+  "containerCleanupElapsedMs": 105.84220799989998,
+  "historical4087SecondsUnchanged": true
+}
