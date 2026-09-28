@@ -2,7 +2,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {startContainer} from '../native-task-ab/container-session.mjs';
+import {startContainer as originalStart} from '../native-task-ab/container-session.mjs';
+import {startContainer as retainedStart} from '../native-task-integrated/container-session.mjs';
+import {captureCandidate} from '../polybench-pilot/capture.mjs';
+const followup = process.env.PREFLIGHT_FOLLOWUP === '1';
+const startContainer = followup ? retainedStart : originalStart;
 import {stopWorkload} from '../native-task-utility/container/stop-workload.mjs';
 import {runTask} from '../native-task-ab/native-run.mjs';
 
@@ -37,13 +41,15 @@ if(denqueReplay||quickReplay){
  for(const name of fs.readdirSync(source))fs.unlinkSync(path.join(source,name));
  fs.cpSync(path.resolve(quickReplay?'local/native-sensitivity/targeted-20260914/inputs/case-b':'local/native-sensitivity/usage-20260914/inputs/case-1'),source,{recursive:true,verbatimSymlinks:true});
 }
+if(followup)fs.writeFileSync(source+'/preserved.txt','baseline note\n');
 let seq=0;const results=[];
 for(const arm of (attention?['R']:investigation?['H']:sensitivity?['H1']:process.env.PREFLIGHT_H00_ONLY==='1'?['P','H00']:['P','H00','H10','H01','H11'])){
  const enabled=arm!=='P',A=['H10','H11'].includes(arm),B=['H01','H11'].includes(arm),counts=new Map(),requests=[],failures=[];
  let deliveryPhase='receipt',deliverySection='patch',deliveryCursor,deliveryReceipt,deliveryInspectCalls=0,deliveryReceiptBytes=0;
  const deliveryPageBytes=[];
  const deliveryContents={patch:'',explanation:'',output:''};
- let session;
+ let session,originalState;
+ const userState=()=>session.exec(['node','-e',"const fs=require('fs'),c=require('crypto'),{spawnSync}=require('child_process');console.log(JSON.stringify({index:c.createHash('sha256').update(fs.readFileSync('/work/repo/.git/index')).digest('hex'),note:fs.readFileSync('/work/repo/preserved.txt','utf8'),untracked:fs.readFileSync('/work/repo/local-note.txt','utf8'),status:spawnSync('git',['status','--porcelain'],{encoding:'utf8',env:{...process.env,GIT_OPTIONAL_LOCKS:'0'}}).stdout}));"]);
  try{
   session=await startContainer({source,toolchain,workMemoryMb:1536,memoryMb:3072,template:path.join(root,enabled?(process.env.PREFLIGHT_BUNDLE??'bundle'):(process.env.PREFLIGHT_PLAIN_BUNDLE??'plain-dependencies')),output:path.join(root,runName+'-'+arm),onRequest:async(frame,send)=>{
    try{
@@ -98,8 +104,24 @@ for(const arm of (attention?['R']:investigation?['H']:sensitivity?['H1']:process
          assert.doesNotMatch(lastOutput,/bytes truncated/);
          deliveryReceipt=JSON.parse(lastOutput);assert.equal(deliveryReceipt.proposedTestPatch,true);
          assert.ok(deliveryReceiptBytes<12000);
-         next={name:'harness_investigate',args:{action:'inspect',section:'patch'}};deliveryPhase='inspect';deliveryInspectCalls++;
+         if(followup){
+          assert.deepEqual(deliveryReceipt.firstInspect,{action:'inspect',section:'patch'});
+          const schema=body.tools.find(t=>t.name==='harness_investigate').parameters.properties;
+          assert.match(schema.cursor.description,/Omit.*first/);assert.match(schema.callID.description,/only.*output/);
+         }
+         next={name:'harness_investigate',args:followup?{action:'inspect',section:'patch',cursor:'0',callID:deliveryReceipt.observedChecks.at(-1).callID}:{action:'inspect',section:'patch'}};deliveryPhase=followup?'zero':'inspect';deliveryInspectCalls++;
+
         }
+       }else if(deliveryPhase==='zero'){
+        const page=JSON.parse(lastOutput);assert.equal(page.status,'page');deliveryContents.zero=lastOutput;
+        next={name:'harness_investigate',args:deliveryReceipt.firstInspect};deliveryPhase='canonical';deliveryInspectCalls++;
+       }else if(deliveryPhase==='canonical'){
+        assert.equal(lastOutput,deliveryContents.zero);
+        next={name:'harness_investigate',args:{action:'inspect',section:'patch',cursor:'bad'}};deliveryPhase='bad';deliveryInspectCalls++;
+       }else if(deliveryPhase==='bad'){
+        const error=JSON.parse(lastOutput);assert.equal(error.status,'invalid-cursor');assert.match(error.reason,/nextCursor/);
+        assert.deepEqual(error.firstInspect,deliveryReceipt.firstInspect);
+        next={name:'harness_investigate',args:error.firstInspect};deliveryPhase='inspect';deliveryInspectCalls++;
        }else if(deliveryPhase==='old-read'){
         next={name:'harness_investigate',args:{action:'decline',rationale:'Direct native read of the truncation link was tested in this separate control.'}};
         deliveryPhase='done';
@@ -183,6 +205,9 @@ for(const arm of (attention?['R']:investigation?['H']:sensitivity?['H1']:process
     send({type:'headers',status:200,contentType:'text/event-stream'});send({type:'chunk',data:Buffer.from(events.map(e=>'data: '+JSON.stringify(e)+'\n\n').join('')).toString('base64')});send({type:'end'});
    }catch(error){failures.push(error.message);send({type:'headers',status:403,contentType:'text/plain'});send({type:'end'});}
   }});
+  if(followup){
+    const seed=session.exec(['node','-e',"const fs=require('fs'),{spawnSync}=require('child_process');fs.writeFileSync('preserved.txt','staged note\\n');if(spawnSync('git',['add','preserved.txt']).status!==0)throw Error('stage failed');fs.appendFileSync('preserved.txt','unstaged note\\n');fs.writeFileSync('local-note.txt','untracked note\\n');"]);assert.equal(seed.status,0,seed.stderr);originalState=userState();assert.equal(originalState.status,0);
+    session.baseline=session.exec(['git','rev-parse','HEAD']).stdout.trim();session.arm=arm;session.evidenceRequired=true;session.evidenceBaseline=session.baseline;}
   if(denqueReplay||quickReplay){const seed=fs.readFileSync(quickReplay?'development/native-task-sensitivity/targeted-20260914/inputs/case-b/input.patch':'development/native-task-h00-transfer/continuation-20260914/patches/27-denque-remove-where-r2-P.patch','utf8');const applied=session.exec(['node','-e',`const r=require('child_process').spawnSync('git',['apply','-'],{input:${JSON.stringify(seed)},encoding:'utf8'});if(r.status!==0)throw Error(r.stderr);`]);assert.equal(applied.status,0,applied.stderr);}
   const setup=session.exec(['node','-e',"const fs=require('fs');fs.mkdirSync('/work/bin');fs.copyFileSync('/template/rg','/work/bin/rg');fs.chmodSync('/work/bin/rg',0o755);fs.mkdirSync('/work/config/opencode',{recursive:true});for(const n of ['node_modules','package.json','package-lock.json'])fs.cpSync('/template/'+n,'/work/config/opencode/'+n,{recursive:true,verbatimSymlinks:true});"]);assert.equal(setup.status,0,setup.stderr);
   assert.equal(session.exec(['/opt/opencode','--version']).stdout.trim(),'1.18.26');
@@ -229,6 +254,13 @@ for(const arm of (attention?['R']:investigation?['H']:sensitivity?['H1']:process
     }
    }
   const check=(denqueReplay||quickReplay)?session.exec(['node','-e',"const fs=require('fs'),assert=require('assert/strict');const root='/work/repo/.git/harness-task',a=root+'/'+fs.readdirSync(root)[0],r=JSON.parse(fs.readFileSync(a+'/result.json'));assert.equal(r.termination.verified,true);assert.equal(r.repairs,0);assert.ok(fs.existsSync(a+'/terminal.patch'));console.log(JSON.stringify({verified:true,knownOfflineCounterexample:true,artifacts:a}));"]):session.exec(['node','-e',`const fs=require('fs'),assert=require('assert/strict');let dir='/work/repo',artifacts;if(${enabled}){artifacts=dir+'/.git/harness-task/'+fs.readdirSync(dir+'/.git/harness-task')[0];const r=JSON.parse(fs.readFileSync(artifacts+'/result.json'));assert.equal(r.termination.verified,true);assert.equal(r.repairs,0);dir=artifacts+'/worktree';assert.equal(fs.existsSync(artifacts+'/component-context.json'),${A});assert.equal(fs.existsSync(artifacts+'/component-checks.json'),${B});assert.ok(fs.readFileSync('/work/repo/value.mjs','utf8').includes('value = 1'));}assert.ok(fs.readFileSync(dir+'/value.mjs','utf8').includes('value = 2'));assert.ok(fs.readFileSync(dir+'/consumer.test.mjs','utf8').includes('value,2'));console.log(JSON.stringify({verified:true,artifacts:artifacts??null}));`]);assert.equal(check.status,0,check.stderr);
+  if(followup){
+    assert.equal(userState().stdout,originalState.stdout,'Original checkout/index and user changes preserved');
+    fs.writeFileSync(session.output+'/user-state-preserved.json',JSON.stringify({preserved:true,state:JSON.parse(originalState.stdout)},null,2));
+    const native=session.exec(['node','-e',"const {DatabaseSync}=require('node:sqlite'),db=new DatabaseSync('/work/data/opencode/opencode.db',{readOnly:true});console.log(JSON.stringify({sessions:db.prepare('SELECT id,parent_id,directory FROM session').all(),messages:db.prepare('SELECT id,session_id,data FROM message').all().map(x=>({...x,data:JSON.parse(x.data)})),tools:db.prepare('SELECT id,message_id,session_id,data FROM part').all().map(x=>({...x,data:JSON.parse(x.data)})).filter(x=>x.data.type==='tool')}));db.close();"]);
+    assert.equal(native.status,0,native.stderr);fs.writeFileSync(session.output+'/native-evidence.json',native.stdout);
+    assert.equal(captureCandidate(session,session.output).status,0);
+  }
   results.push({arm,...result,requests,verified:JSON.parse(check.stdout),...(deliveryMode?{delivery:{receiptBytes:deliveryReceiptBytes,pageBytes:deliveryPageBytes,inspectCalls:deliveryInspectCalls,patchBytes:Buffer.byteLength(deliveryContents.patch)}}:{}),realProviderRequests:0});console.log(JSON.stringify({arm,nativeCompleted:result.nativeCompleted,requests:requests.length,realProviderRequests:0}));
  }finally{if(session)assert.equal(session.close(),0);}
 }
