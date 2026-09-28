@@ -2,6 +2,7 @@
 // A/B preparation: preserve npm relative symlinks in the independent copy.
 // Benchmark transport only. No credentials, external network or custom tools.
 import http from 'node:http';
+import {performance} from 'node:perf_hooks';
 import fs from 'node:fs';
 import readline from 'node:readline';
 import { spawnSync } from 'node:child_process';
@@ -20,16 +21,19 @@ if(fs.existsSync('/template/core.md')) {
   fs.copyFileSync('/template/core.md','/work/template/core.md');
   fs.writeFileSync('/work/template/opencode.json',JSON.stringify({$schema:'https://opencode.ai/config.json',instructions:['/work/template/core.md']}));
 }
-let nextId=0,taskDeadline=null;
+let nextId=0,taskDeadline=null,taskDeadlineMono=null;
+const remaining=()=>taskDeadline===null?180000:Math.min(taskDeadline-Date.now(),taskDeadlineMono-performance.now());
 const pending=new Map();
 const emit=value=>process.stdout.write(JSON.stringify(value)+'\n');
 const server=http.createServer(async(req,res)=>{
+  if(remaining()<=0){res.writeHead(409).end();return;}
   if(req.method!=='POST'||!['/v1/responses','/v1/chat/completions'].includes(req.url)||pending.size>=4){res.writeHead(403).end();return;}
   const id=String(++nextId);let size=0;const chunks=[];
   try {
     for await(const chunk of req){size+=chunk.length;if(size>16*1024*1024)throw Error('request too large');chunks.push(chunk);}
+    if(remaining()<=0){res.writeHead(409).end();return;}
     const body=JSON.parse(Buffer.concat(chunks));
-    const timeout=setTimeout(()=>{res.destroy();pending.delete(id);emit({type:'cancel',id});},taskDeadline===null?180000:Math.max(1,taskDeadline-Date.now()));
+    const timeout=setTimeout(()=>{res.destroy();pending.delete(id);emit({type:'cancel',id});},Math.max(1,remaining()));
     pending.set(id,{res,timeout,bytes:0});
     res.once('close',()=>{clearTimeout(timeout);pending.delete(id);if(!res.writableEnded)emit({type:'cancel',id});});
     emit({type:'request',id,path:req.url,body});
@@ -38,7 +42,7 @@ const server=http.createServer(async(req,res)=>{
 const input=readline.createInterface({input:process.stdin});
 input.on('line',line=>{
   try {
-    const frame=JSON.parse(line);if(frame.type==='task-budget'){if(taskDeadline!==null||!Number.isFinite(frame.milliseconds)||frame.milliseconds<=0||frame.milliseconds>3600000)throw Error('Invalid task budget');taskDeadline=Date.now()+frame.milliseconds;return;}const item=pending.get(frame.id);if(!item)return;
+    const frame=JSON.parse(line);if(frame.type==='task-budget'){if(taskDeadline!==null||!Number.isFinite(frame.milliseconds)||frame.milliseconds<=0||frame.milliseconds>3600000)throw Error('Invalid task budget');if(frame.deadline!==undefined&&!Number.isFinite(frame.deadline))throw Error('Invalid task deadline');taskDeadline=Math.min(Date.now()+frame.milliseconds,frame.deadline??Infinity);taskDeadlineMono=performance.now()+Math.max(0,taskDeadline-Date.now());return;}const item=pending.get(frame.id);if(!item)return;
     if(frame.type==='headers')item.res.writeHead(frame.status,{'content-type':frame.contentType});
     else if(frame.type==='chunk'){
       const bytes=Buffer.from(frame.data,'base64');item.bytes+=bytes.length;

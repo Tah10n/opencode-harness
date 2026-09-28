@@ -1,0 +1,5 @@
+// Baseline counterexample: a timer in the launcher cannot run during sync work.
+import fs from 'node:fs';import os from 'node:os';import path from 'node:path';import {spawn} from 'node:child_process';import {performance} from 'node:perf_hooks';import assert from 'node:assert/strict';
+import {runNativePhase} from '../native-task-abc/native-run.mjs';
+const root=fs.mkdtempSync(path.join(os.tmpdir(),'deadline-loop-'));let stopped;
+try{const start=performance.now();await runNativePhase({output:root,name:'scripted'},{config:{},limitMs:200,stopWorkload:()=>{stopped=performance.now();return{terminationVerified:true};}},{spawnProcess:()=>{const p=spawn(process.execPath,['-e','setInterval(()=>{},1000)']);setTimeout(()=>Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,700),50);return p;}});const late=stopped-start-200;console.log(JSON.stringify({reproduced:late>250,lateMs:late,scope:'launcher event-loop dependency; no claim about historical cause'}));assert.ok(late>250);}finally{fs.rmSync(root,{recursive:true,force:true});}
