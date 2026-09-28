@@ -1,0 +1,29 @@
+{
+  "candidate": "d59a527d120e4cd256ded6d8270154fbbcff5d36",
+  "scope": "Exact capture-wrapper predicate on saved final installed scripted patches; no full matrix rerun",
+  "wrapper": "development/investigation-direct-ledger-pair/inspect-full-task/session.mjs",
+  "wrapperSha256": "4e2958d8d83111ef4a244158c1306fd4f3175d1cfc48dd3eace1bf27887bc8b3",
+  "predicate": "assert.equal(resolved.patch.toString(),fs.readFileSync(out+'/model.patch','utf8'));",
+  "archiveSha256": "10eed6e5cef028ada2d798a65628137e485fcd85c9a2919fbc04873e6753c5dd",
+  "restoredBaselineFiles": 7,
+  "terminalPatchSha256": "d62c48d115b78fc05271a78196837c270f03eff89eb63535c324a612e350bcd8",
+  "collectorPatchSha256": "b6e07f02499f75b59a8d8ec80791beb276eec060411088d1d77e3ceb1afe8283",
+  "patchBytesEqual": false,
+  "ordinaryGitApplyBothPassed": true,
+  "appliedTrees": [
+    "d001dd713ab514b3d2a2b0c1f85ff30b95c06fdf",
+    "d001dd713ab514b3d2a2b0c1f85ff30b95c06fdf"
+  ],
+  "appliedTreesEqual": true,
+  "wrapperPredicateExitCode": 3,
+  "wrapperError": {
+    "code": "ERR_ASSERTION",
+    "operator": "strictEqual"
+  },
+  "boundary": "Resolver can succeed; the full-task wrapper then classifies equivalent delivery as evidence_incomplete",
+  "result": "preparation_blocked",
+  "realProviderCalls": 0,
+  "newScriptedRequests": 0,
+  "newTaskRuns": 0,
+  "temporaryDirectoryRemoved": true
+}

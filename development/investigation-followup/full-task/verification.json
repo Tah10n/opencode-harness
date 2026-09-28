@@ -1,0 +1,24 @@
+{
+  "syntax": "pass (compile without bytecode writes)",
+  "wiringPredicateRegression": "reproduced from candidate bytes",
+  "ordinaryGitApply": "both patches apply and reproduce identical tree",
+  "manifestHashes": "pass",
+  "requestArithmetic": "pass",
+  "singleSlot": "not_started",
+  "scopedWhitespace": "pass",
+  "finalDiffReview": "Only new bounded pre-model evidence and offline reproducer; no existing tracked file modified",
+  "notRun": [
+    "new OpenCode task",
+    "new investigator",
+    "new task acceptance",
+    "runtime/controller/transport/retention matrices",
+    "remote CI"
+  ],
+  "cleanup": {
+    "temporaryRepositoriesRemoved": true,
+    "newContainers": 0,
+    "newSourceOrDependencyCopiesRetained": 0,
+    "newRunDirectoryCreated": false,
+    "originalArchivePreserved": true
+  }
+}
