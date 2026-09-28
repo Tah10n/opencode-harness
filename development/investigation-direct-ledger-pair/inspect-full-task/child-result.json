@@ -1,0 +1,313 @@
+{
+  "request": {
+    "action": "investigate",
+    "question": "What is the smallest contract-correct design for the requested bounded content-free event ledger in this connector? Identify existing 0.4.3 persisted state shapes, all event-based adapters that must use it, expected migration semantics, and focused public regressions. Please inspect the original code and deliver a proposed patch/tests only, not assumptions based on hidden tests.",
+    "location": "packages/connector/lib/adapters/shared.mjs; packages/connector/lib/adapters/{claude,gemini,kimi,qwen,antigravity,opencode}.mjs; packages/connector/lib/runtime.mjs; packages/connector/bin/viberacing.mjs",
+    "reason": "The task requires cross-adapter stateful deduplication and conservative migration, but the baseline has several distinct collector state formats and an OpenCode-specific cutover protocol. A focused independent contract investigation can identify the intended shared ledger boundary before I edit production code."
+  },
+  "authorSnapshot": "a20b75227b7f90ef981040f7f79ef41aab1a79cf0b3661aab0a05f4ad7986a7a",
+  "beforeInvestigationPatchBytes": 0,
+  "model": {
+    "providerID": "openai",
+    "modelID": "gpt-5.6-luna",
+    "variant": "high"
+  },
+  "variant": "high",
+  "startedAt": 1790595857778,
+  "elapsedMs": 878288,
+  "remainingTaskMs": 2627167,
+  "remainingDiagnosticMs": 180000,
+  "usable": true,
+  "finish": "stop",
+  "disposition": "declined",
+  "rationale": "",
+  "patchSha256": "96e0a793b68abd6bda0f1d25b7dc5233f6bca3fb783a0c0cd78b4b7d1064809f",
+  "patchBytes": 15710,
+  "commands": [
+    {
+      "callID": "call_P85KlmLx9uDykH6g7x7QS59Q",
+      "command": "git log --oneline -12",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1790595941818,
+      "completedAt": 1790595942040,
+      "outputBytes": 36,
+      "outputSha256": "4a18381d289b2bc7d289f724df0c38b12f93a691b01534fef5bb004fca7faa1e"
+    },
+    {
+      "callID": "call_sfAx7K3ZriqFvFw5AxTY172F",
+      "command": "git status --short && git diff --stat",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1790595942209,
+      "completedAt": 1790595942285,
+      "outputBytes": 11,
+      "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+    },
+    {
+      "callID": "call_TKRl4j0Jtu8oqIR6wQMlsqs1",
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1790596018932,
+      "completedAt": 1790596019384,
+      "outputBytes": 7476,
+      "outputSha256": "1d24f3738a4531ce11145351270e91f33218a5f3d43e1e0c2f4bea552a53570b"
+    },
+    {
+      "callID": "call_FVoV0pjxhSkXMxwxwflxlA5b",
+      "command": "node --test packages/connector/test/config.test.mjs",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1790596019429,
+      "completedAt": 1790596054837,
+      "outputBytes": 9443,
+      "outputSha256": "a94d6ee89b692fbe4a8faaae95cd22b3d33f8df5612d2ae87e9da01964b68f56"
+    },
+    {
+      "callID": "call_8DHP5SPzELnPQyv5oT1TW2eS",
+      "command": "node --test packages/connector/test/protocol.test.mjs",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1790596054882,
+      "completedAt": 1790596055013,
+      "outputBytes": 1362,
+      "outputSha256": "d29902f083d1ca271fb1fa0458223d80589f1ef985bd24610c11e04373b4c44b"
+    },
+    {
+      "callID": "call_LysnlniX8AoNHqPdbbgLRAeP",
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "state": "completed",
+      "exit": 1,
+      "startedAt": 1790596217177,
+      "completedAt": 1790596217579,
+      "outputBytes": 10544,
+      "outputSha256": "219e7d45994ee5a4d3658a88274682aa2615163a5faa59d0d1613e986b3cf5bf"
+    },
+    {
+      "callID": "call_9L99WwCU4knEy8fPi4kPCRgO",
+      "command": "node --test --test-name-pattern=\"persists event accounting\" packages/connector/test/config.test.mjs",
+      "state": "completed",
+      "exit": 1,
+      "startedAt": 1790596266141,
+      "completedAt": 1790596266455,
+      "outputBytes": 1297,
+      "outputSha256": "75dc765bba377fd43a215624dbea6abb389f6651462c7a565bf8702cbe2126f5"
+    },
+    {
+      "callID": "call_fNvTLNh821VeUL24voMCDhBv",
+      "command": "node --test --test-name-pattern=\"event collectors retain|conflicting event tuples|OpenCode retains exact\" packages/connector/test/readers.test.mjs",
+      "state": "completed",
+      "exit": 1,
+      "startedAt": 1790596315010,
+      "completedAt": 1790596315211,
+      "outputBytes": 3278,
+      "outputSha256": "dca6dd4cc0be16caf6dc68d60821d3fb160bf3fda9a8de45f813e6a3cd2a04ee"
+    },
+    {
+      "callID": "call_kQXjN2F4yC60wCNgESoOkWAl",
+      "command": "git diff --check",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1790596345317,
+      "completedAt": 1790596345396,
+      "outputBytes": 11,
+      "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+    },
+    {
+      "callID": "call_I8qzJbWIjC1apITZlDNK9tOu",
+      "command": "git diff --stat && git diff -- packages/connector/test/claude-security.test.mjs packages/connector/test/readers.test.mjs packages/connector/test/config.test.mjs",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1790596345508,
+      "completedAt": 1790596345590,
+      "outputBytes": 17150,
+      "outputSha256": "71c731b2c0e708bb0cca1fcf39632a172a5be376cf56beb9f4a0efbd308a496b"
+    },
+    {
+      "callID": "call_TOy7ieWS1aV1zhUevSu4YD75",
+      "command": "node --test packages/connector/test/claude-security.test.mjs",
+      "state": "completed",
+      "exit": 1,
+      "startedAt": 1790596345641,
+      "completedAt": 1790596345766,
+      "outputBytes": 2656,
+      "outputSha256": "52649528321b94bd03a556e33e0cc0c2951fc65d06c7a9bcf35cafdea86d2eeb"
+    },
+    {
+      "callID": "call_jpcB88QJxFuR0RGoLALewtvr",
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "state": "completed",
+      "exit": 1,
+      "startedAt": 1790596437460,
+      "completedAt": 1790596437946,
+      "outputBytes": 10524,
+      "outputSha256": "24ac0fe68e440e9a87c7ed6710eca3fc6d3423a5375d588cc02238ef4c371a57"
+    },
+    {
+      "callID": "call_UT7zpZxZY4X4gTcmZfH8YB1P",
+      "command": "node --test packages/connector/test/config.test.mjs",
+      "state": "completed",
+      "exit": 1,
+      "startedAt": 1790596438003,
+      "completedAt": 1790596473271,
+      "outputBytes": 10627,
+      "outputSha256": "7b489a0334e84e9d5a5faa1859b95d5f5bc259404268d460b09b4b072997687b"
+    },
+    {
+      "callID": "call_3g7OsNcxrmsgOuFljKGLW3iw",
+      "command": "node --test packages/connector/test/protocol.test.mjs",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1790596473324,
+      "completedAt": 1790596473474,
+      "outputBytes": 1364,
+      "outputSha256": "06e2388b925e051ce2ffc65b3350d09e0a81806748967f5c1fc15e93d7dbc866"
+    },
+    {
+      "callID": "call_8KpgDeof674ftOLgGsjC2Khc",
+      "command": "git status --short && git diff --check",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1790596498056,
+      "completedAt": 1790596498125,
+      "outputBytes": 139,
+      "outputSha256": "dddc2929fb454dfa27ada105199688a61b57aff6025b0b312c944fac7189387b"
+    },
+    {
+      "callID": "call_k3OjBvpjYQixKwPMaI7Bq6BC",
+      "command": "corepack pnpm verify",
+      "state": "completed",
+      "exit": 1,
+      "startedAt": 1790596505977,
+      "completedAt": 1790596506105,
+      "outputBytes": 1378,
+      "outputSha256": "857861be9c0e598773b7c4a5ae0adff90b131ba670c00941fe670b5e77c23ce8"
+    },
+    {
+      "callID": "call_vwHpPfIsQJYTFRjy8iioAehL",
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "state": "completed",
+      "exit": 1,
+      "startedAt": 1790596529427,
+      "completedAt": 1790596529882,
+      "outputBytes": 10528,
+      "outputSha256": "a5318c18dfde14cf2493e6b892672f9b19595aeeae952048a715ac722ecbb3dc"
+    },
+    {
+      "callID": "call_C9GAnHhZamaUeCPY8hLRVnPp",
+      "command": "node --test packages/connector/test/config.test.mjs",
+      "state": "completed",
+      "exit": 1,
+      "startedAt": 1790596529943,
+      "completedAt": 1790596566820,
+      "outputBytes": 10630,
+      "outputSha256": "d66ca426dba9510744c3078f1f8cdee204823c3e6e20e0705635647c2e41aff9"
+    },
+    {
+      "callID": "call_UFLVXw30EwRVIVjQH9Wuw5CD",
+      "command": "node --test packages/connector/test/protocol.test.mjs",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1790596566885,
+      "completedAt": 1790596567047,
+      "outputBytes": 1363,
+      "outputSha256": "7bbf6cf812ae2cefad15fe0fa9c69aaba7e90428965c24d4369bfeb5796984b9"
+    },
+    {
+      "callID": "call_hSfYyPiFV1hnJBHRxOPP7v2P",
+      "command": "git diff --check",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1790596567104,
+      "completedAt": 1790596567180,
+      "outputBytes": 11,
+      "outputSha256": "efefc15c24ee8645a3f5f6958389db729c1577eb6b32aeac4caab2a86d90daa3"
+    },
+    {
+      "callID": "call_ODVAwmaLDA4Ehx7SkfEI2jYq",
+      "command": "git status --short && git diff --stat",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1790596582904,
+      "completedAt": 1790596582996,
+      "outputBytes": 393,
+      "outputSha256": "aa1fce3081b221f36d4ad610d801f9ef65d0a916bc8fca3b6fa898547c2bdb67"
+    },
+    {
+      "callID": "call_28YTb6GxAvjqwMEkS5tzTJQp",
+      "command": "git diff --check && git diff --numstat",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1790596583061,
+      "completedAt": 1790596583146,
+      "outputBytes": 146,
+      "outputSha256": "bdfbd987f30ee514c2556a4e11bdebd14f91f7fde51edac35425a5bb2f91abda"
+    },
+    {
+      "callID": "call_uBfwNbloLwOWdg7LdG9yemGd",
+      "command": "node --test --test-name-pattern=\"event collectors retain usage|conflicting event tuples|OpenCode retains exact\" packages/connector/test/readers.test.mjs",
+      "state": "completed",
+      "exit": 1,
+      "startedAt": 1790596658802,
+      "completedAt": 1790596659005,
+      "outputBytes": 3163,
+      "outputSha256": "b642be9502bd579dcf44871e42017d24d13b6bebe5e250ccca35564772a0ba59"
+    },
+    {
+      "callID": "call_UDhc6Cq5LE74D14OLOCzekTU",
+      "command": "git diff --check && git diff --stat",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1790596659085,
+      "completedAt": 1790596659206,
+      "outputBytes": 255,
+      "outputSha256": "784655da2830c461ddec91c497fdc21bf839353377447d341683e706836b33f2"
+    },
+    {
+      "callID": "call_QYUyPHDLIUDbf9D2TvNYHE99",
+      "command": "node --test packages/connector/test/readers.test.mjs",
+      "state": "completed",
+      "exit": 1,
+      "startedAt": 1790596668995,
+      "completedAt": 1790596669641,
+      "outputBytes": 10510,
+      "outputSha256": "3a16e81a86671dd3b40f545dd10afc79f763aa8ef91cad8bb973de6ddb8c072e"
+    },
+    {
+      "callID": "call_lp4dkx2jF9tJjNSaEcCDM8za",
+      "command": "node --test packages/connector/test/config.test.mjs",
+      "state": "completed",
+      "exit": 1,
+      "startedAt": 1790596669704,
+      "completedAt": 1790596707021,
+      "outputBytes": 10636,
+      "outputSha256": "694fb3d92b8c17b990a3b5d0c633291c4ee587b6b7f7c6e135a64e3b08de7e61"
+    },
+    {
+      "callID": "call_kXTFLOStimRJnP9qyEtlVwsG",
+      "command": "node --test packages/connector/test/protocol.test.mjs",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1790596707086,
+      "completedAt": 1790596707282,
+      "outputBytes": 1360,
+      "outputSha256": "50ff1ad7bd5afde34cea2910f676218a5c2179bfa323eae5a76c11983a542db5"
+    },
+    {
+      "callID": "call_FRl8MOazjGy9T8dAaNUe0P4j",
+      "command": "git diff --check && git status --short && git diff --stat",
+      "state": "completed",
+      "exit": 0,
+      "startedAt": 1790596717864,
+      "completedAt": 1790596717995,
+      "outputBytes": 394,
+      "outputSha256": "10f3cd8ba28e39d789d10f44f2b46020c5c852e9cb5820c56596b7e176337297"
+    }
+  ],
+  "explanationSha256": "16cce1d84d5bc11a62698f241f4df9cdea58241b4e9ccc71ad9084c9495a0c1f",
+  "claimIsNotIndependentCorrectness": true,
+  "pagesDelivered": 0,
+  "inspectCalls": 1,
+  "inspectError": "invalid-cursor"
+}

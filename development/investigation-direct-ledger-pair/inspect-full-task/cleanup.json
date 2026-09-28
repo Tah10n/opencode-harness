@@ -1,0 +1,25 @@
+{
+  "completed": true,
+  "containersVerifiedAbsent": [
+    "template-dev-7dfb6661-6b80-4011-96c4-3d772bd42afa",
+    "template-dev-a9a17cdb-ff51-4485-abe4-6805b88424e0"
+  ],
+  "archive": {
+    "path": "local/investigation-inspect-full-task-evidence.tar.gz",
+    "sha256": "3f309b747ece5391aa93fa6f8a93330b47c6bb242a9d79f04f14e44cf550f284",
+    "bytes": 77486237,
+    "entriesVerified": 1615
+  },
+  "index": {
+    "path": "local/investigation-inspect-full-task-evidence-index.json",
+    "sha256": "55957a9b64afd7d7de0159715aa60fa70004befaeabbd054afae5bd7f8ce576d"
+  },
+  "allocatedBytesRemoved": 457756672,
+  "allocatedBytesRetained": 84713472,
+  "netAllocatedBytesReleased": 373043200,
+  "removed": [
+    "local/investigation-inspect-full-task"
+  ],
+  "preserved": "all unique private request/response/native/child evidence and assessment receipts in verified archive; public partial M and child patch; shared baseline, caches, image and historical runs untouched",
+  "globalPrune": false
+}

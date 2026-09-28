@@ -1,0 +1,447 @@
+{
+  "slot": 1,
+  "kind": "partial M after deadline/unknown_submission",
+  "patchSha256": "d858cb133acab8da5ca68ddbb64547d70bde9a57f3d5d1a21e70df13f1766cf5",
+  "delivery_apply": true,
+  "F_checks": {
+    "readers": {
+      "exitCode": 0,
+      "counts": {
+        "tests": 90,
+        "pass": 90,
+        "fail": 0,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-inspect-full-task/assessment/I1/F-readers.json",
+      "sha256": "05c62a5895822a6718b81d338040fbc78a8db5621ede78254c5ef39260fcb9fb"
+    },
+    "config": {
+      "exitCode": 0,
+      "counts": {
+        "tests": 104,
+        "pass": 104,
+        "fail": 0,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-inspect-full-task/assessment/I1/F-config.json",
+      "sha256": "4f516394be8daa7e85bbedf210ad53927182dae06972cb6f3b19913305c004ef"
+    },
+    "protocol": {
+      "exitCode": 0,
+      "counts": {
+        "tests": 14,
+        "pass": 14,
+        "fail": 0,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-inspect-full-task/assessment/I1/F-protocol.json",
+      "sha256": "445c98e775657e08bf50b8b2aa9de3b8c40564ed3f7f3323d437084aeef2e027"
+    }
+  },
+  "affectedSecurity": {
+    "exitCode": 0,
+    "tests": 10,
+    "pass": 10,
+    "receiptSha256": "236d4e6035f45b740798c9ccd0bd704d9387fb9d2883a073453dbeb5036dda32"
+  },
+  "projectVerify": {
+    "exitCode": 1,
+    "counts": {
+      "tests": null,
+      "pass": null,
+      "fail": null,
+      "skipped": null
+    },
+    "receipt": "local/investigation-inspect-full-task/assessment/I1/F-project-verify.json",
+    "sha256": "22d63a73a0b7de9aa2dcaf927b4d50ed2a89b1b34398f3502014c617a5af1d71",
+    "classification": "unavailable offline; pnpm 11.7.0 not cached; no dependencies installed"
+  },
+  "behavioralProbes": {
+    "account-switch-ledger": {
+      "exitCode": 0,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-inspect-full-task/assessment/I1/E-account-switch-ledger.json",
+      "sha256": "a74982edd428ac73e206ee6aa512e44694ee28e7d69490b4e95375a1a8a03d09"
+    },
+    "ledger-lifecycle": {
+      "exitCode": 0,
+      "counts": {
+        "tests": 5,
+        "pass": 5,
+        "fail": 0,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-inspect-full-task/assessment/I1/E-ledger-lifecycle.json",
+      "sha256": "c8616c36b71fe3dbfce545252120af51651f2cbdbde4e71c2f09a9b402237c6c"
+    },
+    "legacy-input": {
+      "exitCode": 1,
+      "counts": {
+        "tests": 2,
+        "pass": 0,
+        "fail": 2,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-inspect-full-task/assessment/I1/E-legacy-input.json",
+      "sha256": "7f6fa70f840f5dc063eb4307437e2d8040a6f68e7b4b9d760ed69e4574cd7d6b"
+    },
+    "kimi-migration": {
+      "exitCode": 0,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-inspect-full-task/assessment/I1/E-kimi-migration.json",
+      "sha256": "423115eb65269d93c5b80c053da2e626cb0c50f24f910d6a31dc8f070513deab"
+    },
+    "migration-contract": {
+      "exitCode": 1,
+      "counts": {
+        "tests": 8,
+        "pass": 6,
+        "fail": 2,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-inspect-full-task/assessment/I1/E-migration-contract.json",
+      "sha256": "ed1d4e5220fce7d46412c8a7908c44d6cd7c011b92d1fd6107df6db8ce05a4be"
+    },
+    "cli-persistence": {
+      "exitCode": 0,
+      "counts": {
+        "tests": 6,
+        "pass": 6,
+        "fail": 0,
+        "skipped": 0
+      },
+      "receipt": "local/investigation-inspect-full-task/assessment/I1/E-cli-persistence.json",
+      "sha256": "77bae4983b1accb9626b7f9a27906bf99b5072b0aec2a4aacded967c95790771"
+    }
+  },
+  "behavioralCounts": {
+    "tests": 23,
+    "pass": 19,
+    "fail": 4,
+    "skipped": 0
+  },
+  "privacy": {
+    "exitCode": 0,
+    "counts": {
+      "tests": 3,
+      "pass": 3,
+      "fail": 0,
+      "skipped": 0
+    },
+    "receipt": "local/investigation-inspect-full-task/assessment/I1/privacy.json",
+    "sha256": "696f418d4b08915323b100a767e037a6b1deef964680dd2ac1294e029a476c6b"
+  },
+  "assessment_integrity": {
+    "evaluationCopyBytesUnchanged": "verified",
+    "actualDeliveryTree": {
+      "actualDeliveryTreeMatchesAppliedM": true,
+      "files": 258,
+      "treeSha256": "cf16b2e5eb85a9ce98f532c3ed15f8472be32223c33dbeab6b24bb7b1d44e5f1",
+      "patchSha256": "d858cb133acab8da5ca68ddbb64547d70bde9a57f3d5d1a21e70df13f1766cf5",
+      "injectedTaskUnchangedAndExcluded": true
+    },
+    "frozenEvaluatorUnchanged": true,
+    "privacyIsolatedOriginalBytes": true,
+    "legacyResolver": "refused: native harness_task running; no ordinary terminal result"
+  },
+  "contract_results": [
+    {
+      "contract": "six adapters: replay, deletion, new events, JSON reload and CLI source isolation",
+      "result": "pass on frozen cases",
+      "evidence": "account-switch-ledger, ledger-lifecycle and six real CLI persistence cases; separate account remap observation"
+    },
+    {
+      "contract": "baseline-generated 0.4.3 state and Kimi historical migration",
+      "result": "pass on tested cases",
+      "evidence": "four baseline-generated migrations, Kimi legacy and confirmed OpenCode cutover cases"
+    },
+    {
+      "contract": "preserved supported Antigravity input shapes",
+      "result": "fail",
+      "evidence": "both legacy-input cases return [] while original public parser yields 15 tokens"
+    },
+    {
+      "contract": "missing exact-ID OpenCode cutover",
+      "result": "fail",
+      "evidence": "required rejection absent; supplementary collector returns empty complete state"
+    },
+    {
+      "contract": "first tuple and unrelated new events",
+      "result": "pass on tested totals",
+      "evidence": "OpenCode conflict produces 22 tokens and partial status"
+    },
+    {
+      "contract": "diagnostic consumer propagation",
+      "result": "fail",
+      "evidence": "adapter local_store_event_conflict becomes [] in normalizeAdapterDiagnostics; this is lost delivery, not code spelling alone"
+    },
+    {
+      "contract": "corrupt JSON-reloaded ledger fail-closed",
+      "result": "fail",
+      "evidence": "corrupted own eventLedger.version returns [] with complete status after accepted data deletion"
+    },
+    {
+      "contract": "CLI persisted-state/upload privacy and nonzero retention",
+      "result": "pass on frozen cases",
+      "evidence": "isolated unchanged three-case CLI test plus valid-64-hex collector observation"
+    },
+    {
+      "contract": "bounded scans/storage",
+      "result": "finite limits present; preservation not fully proven",
+      "evidence": "source review: existing scan bounds, 65,536 ledger keys and 16 MiB limit; loader silently drops invalid/overflow entries; no added saturation probe"
+    },
+    {
+      "contract": "parser exports/ranges/components and existing coverage",
+      "result": "partial",
+      "evidence": "208/208 project checks; range/lifecycle cases pass, but two Antigravity public collector inputs regress"
+    },
+    {
+      "contract": "unrelated identity discovery/server/release scope",
+      "result": "preserved in patch",
+      "evidence": "11 connector adapter/test/README files; no package version or server changes"
+    }
+  ],
+  "supplementalObservations": [
+    {
+      "case": "bound-source-legacy-migration",
+      "agentId": "claude_code",
+      "old": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "completeness": "complete"
+    },
+    {
+      "case": "bound-source-legacy-migration",
+      "agentId": "gemini_cli",
+      "old": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "completeness": "complete"
+    },
+    {
+      "case": "bound-source-legacy-migration",
+      "agentId": "qwen_code",
+      "old": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "completeness": "complete"
+    },
+    {
+      "case": "bound-source-legacy-migration",
+      "agentId": "antigravity",
+      "old": [
+        [
+          "2026-08-10",
+          "15"
+        ]
+      ],
+      "expected": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-10",
+          "15"
+        ],
+        [
+          "2026-08-11",
+          "15"
+        ]
+      ],
+      "completeness": "complete"
+    },
+    {
+      "case": "same-observed-event-after-account-remap",
+      "expected": [
+        [
+          "2026-08-10",
+          "10"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-10",
+          "10"
+        ]
+      ],
+      "completeness": "complete"
+    },
+    {
+      "case": "conflict-diagnostic-consumer",
+      "expectedTotals": [
+        [
+          "2026-08-10",
+          "22"
+        ]
+      ],
+      "actual": [
+        [
+          "2026-08-10",
+          "22"
+        ]
+      ],
+      "completeness": "partial",
+      "adapterDiagnostics": [
+        {
+          "code": "local_store_event_conflict",
+          "phase": "collect"
+        }
+      ],
+      "normalizedDiagnostics": []
+    },
+    {
+      "case": "missing-exact-cutover",
+      "expected": "fail closed",
+      "actual": [],
+      "completeness": "complete",
+      "rejected": false
+    },
+    {
+      "case": "corrupt-reloaded-state",
+      "expected": "fail closed",
+      "actual": [],
+      "completeness": "complete",
+      "rejected": false
+    }
+  ],
+  "legacyExperimentalSavedState": "not applicable as required legacy format; unchanged baseline-generated and historical 0.4.3 probes used",
+  "Q": false,
+  "T": false,
+  "D": false,
+  "nativeOutcome": {
+    "slot": 1,
+    "task": "account-switch-ledger",
+    "arm": "I1",
+    "project": "Tah10n/viberacing",
+    "source": "/Users/tahion/dev/opencode-harness/.worktrees/native-task-workflow/local/investigation-inspect-full-task/source",
+    "exitCode": null,
+    "signal": "SIGKILL",
+    "termination": {
+      "terminationVerified": true,
+      "killed": []
+    },
+    "timedOut": true,
+    "stopReason": {
+      "kind": "hard_deadline"
+    },
+    "researchBoundary": "not-reached",
+    "completedAt": 1790599849143,
+    "executionElapsedMs": 4087145,
+    "cleanupElapsedMs": 51,
+    "elapsedMs": 4087196,
+    "parseErrors": 0,
+    "phaseCount": 1,
+    "firstSessionID": "ses_f182cf560ffeu0pkOQDfIffrfv",
+    "continuationApplied": false,
+    "nativeCompleted": false,
+    "requests": 130,
+    "requestsWithoutUsage": 1,
+    "workflowStatus": null,
+    "repairs": null,
+    "toolCalls": 217,
+    "sessions": 3,
+    "delivery": null,
+    "ownTaskDeadlineTriggered": true
+  },
+  "internalDirect": {
+    "revision": "direct",
+    "status": "incomplete",
+    "stages": [],
+    "patches": [
+      {
+        "label": "initial",
+        "snapshotSha256": "a20b75227b7f90ef981040f7f79ef41aab1a79cf0b3661aab0a05f4ad7986a7a"
+      }
+    ],
+    "repairs": 0,
+    "remaining": [],
+    "limits": []
+  },
+  "noRepairApplied": true
+}

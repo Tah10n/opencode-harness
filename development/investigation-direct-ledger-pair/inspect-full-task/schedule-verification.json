@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "realProviderRequests": 0,
+  "controls": [
+    {
+      "name": "second-slot",
+      "rejectedBeforeNative": true
+    },
+    {
+      "name": "wrong-runtime",
+      "rejectedBeforeNative": true
+    },
+    {
+      "name": "extra-time",
+      "rejectedBeforeNative": true
+    },
+    {
+      "name": "wrong-arm",
+      "rejectedBeforeNative": true
+    },
+    {
+      "name": "old-profile",
+      "rejectedBeforeNative": true
+    },
+    {
+      "name": "wrong-bound",
+      "rejectedBeforeNative": true
+    },
+    {
+      "name": "foreign-campaign",
+      "rejectedBeforeNative": true
+    },
+    {
+      "name": "arbitrary-profile",
+      "rejectedBeforeNative": true
+    }
+  ]
+}

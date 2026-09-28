@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "frozenFiles": 37,
+  "historicalFiles": 9,
+  "productRuntimeUnchanged": true,
+  "evaluatorProcedureUnchangedExceptRouting": true,
+  "archiveAnd390RecordingFileBindings": true,
+  "fullPartialMTreeBound": true,
+  "allRoleArithmetic": true,
+  "oneInvalidInspectNoPages": true,
+  "partialNativeOutcomePreserved": true,
+  "syntax": true,
+  "scopedWhitespace": true,
+  "patchesByteIdentical": true,
+  "cleanupVerified": true,
+  "fullControllerInstalledRetentionMatrix": "not repeated",
+  "remoteCI": "separate; not claimed"
+}
