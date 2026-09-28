@@ -1,0 +1,21 @@
+{
+  "newTaskRuns": 0,
+  "realProviderRequests": 0,
+  "newScriptedRequests": 0,
+  "authorRequests": 0,
+  "childRequests": 0,
+  "parentRequests": 0,
+  "titleRequests": 0,
+  "modelTools": 0,
+  "inputTokens": 0,
+  "outputTokens": 0,
+  "cachedInputTokens": 0,
+  "reasoningOutputTokens": 0,
+  "unknownUsageRequests": 0,
+  "taskElapsedMs": null,
+  "evaluator": "not_run",
+  "preparation": "Offline archive read, exact wrapper predicate, two clean Git applications; no OpenCode process",
+  "developingAgent": "Separate Codex conversation usage; not included in model-task counts",
+  "monetaryCost": "not_estimated",
+  "historicalUsage": "unchanged"
+}

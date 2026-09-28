@@ -48,7 +48,8 @@ export function knownResponseTerminal(record){return !!record.terminalResponse&&
 export async function runComparison({root,startContainer,captureCandidate,stopWorkload,readAuth,fetchImpl=fetch,runTaskImplementation=runTask,continuationFile=null,verifyQuiescence=verifyHistoricalContainers,beforeTasks=null}) {
 const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
-const inspectFullTask=f.experimentKind==='investigation-inspect-full-task';
+const followupFullTask=f.experimentKind==='investigation-followup-full-task';
+const inspectFullTask=followupFullTask||f.experimentKind==='investigation-inspect-full-task';
 const selectedRecording=selectRecordingProfile(f.recordingProfile??recordingProfile.name);
 if(!inspectFullTask&&selectedRecording!==recordingProfile)throw Error('Recording profile not assigned to this experiment');
 const amendment=continuationFile?JSON.parse(fs.readFileSync(continuationFile)):null;
@@ -86,7 +87,7 @@ if(amendment){
 }
 
 function verify(){
- if(f.experimentKind!==undefined&&!['investigation-inspect-full-task','investigation-direct-ledger-pair','ledger-review-diagnostic','ledger-review-diagnostic-preflight','assertion-review-pair','assertion-review-pair-preflight','plain-ledger-native-high','plain-ledger-native-high-preflight','plain-mui-18141','plain-mui-18141-preflight','preservation-pair','preservation-pair-preflight','polybench-pilot','polybench-pilot-preflight','subscribe-offline','type-compat','command-hints','transfer','h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration','integrated-repeats'].includes(f.experimentKind))throw Error('Unknown development experiment');
+ if(f.experimentKind!==undefined&&!['investigation-followup-full-task','investigation-inspect-full-task','investigation-direct-ledger-pair','ledger-review-diagnostic','ledger-review-diagnostic-preflight','assertion-review-pair','assertion-review-pair-preflight','plain-ledger-native-high','plain-ledger-native-high-preflight','plain-mui-18141','plain-mui-18141-preflight','preservation-pair','preservation-pair-preflight','polybench-pilot','polybench-pilot-preflight','subscribe-offline','type-compat','command-hints','transfer','h00-transfer','sensitivity','sensitivity-usage','sensitivity-replay','sensitivity-targeted','targeted-integration','integrated-repeats'].includes(f.experimentKind))throw Error('Unknown development experiment');
  const directInvestigationPair=f.experimentKind==='investigation-direct-ledger-pair';
  const diagnosticReview=['ledger-review-diagnostic','ledger-review-diagnostic-preflight'].includes(f.experimentKind);
  const diagnosticFixture=f.experimentKind==='ledger-review-diagnostic-preflight';
@@ -101,7 +102,7 @@ function verify(){
  for(const [directory,expected]of Object.entries(f.runtimeManifests??{})){const seen=new Set();const visit=(dir,prefix='')=>{for(const entry of fs.readdirSync(dir,{withFileTypes:true})){if(repeatedContinuation&&entry.name==='.git')continue;const file=path.join(dir,entry.name),name=prefix+entry.name,stat=fs.lstatSync(file);if(stat.isDirectory()){visit(file,name+'/');continue;}const got=stat.isSymbolicLink()?{symlink:fs.readlinkSync(file)}:{sha256:sha(fs.readFileSync(file)),executable:!!(stat.mode&0o111)};if(JSON.stringify(got)!==JSON.stringify(expected[name]))throw Error('Installed runtime changed: '+name);seen.add(name);}};visit(directory);if(seen.size!==Object.keys(expected).length)throw Error('Installed runtime missing files');}
  const groups=new Map();for(const a of f.attempts){const group=groups.get(a.task)??[];group.push(a.arm);groups.set(a.task,group);}
  if(inspectFullTask){
-  if(amendment||f.runtimeSha!=='f7ab1f8bf0689a2485d0abbfd340769064c4b4aa'||f.candidateSha!==f.runtimeSha||f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.map(a=>a.task+':'+a.arm).join(',')!=='account-switch-ledger:I1'||f.attempts[0].project!=='Tah10n/viberacing'||!f.template||selectedRecording!==inspectFullTaskRecordingProfile||JSON.stringify(f.recordingBounds)!==JSON.stringify(selectedRecording))throw Error('Invalid inspect full-task slot');
+  if(amendment||f.runtimeSha!==(followupFullTask?'d59a527d120e4cd256ded6d8270154fbbcff5d36':'f7ab1f8bf0689a2485d0abbfd340769064c4b4aa')||f.candidateSha!==f.runtimeSha||f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.map(a=>a.task+':'+a.arm).join(',')!=='account-switch-ledger:I1'||f.attempts[0].project!=='Tah10n/viberacing'||!f.template||selectedRecording!==inspectFullTaskRecordingProfile||JSON.stringify(f.recordingBounds)!==JSON.stringify(selectedRecording))throw Error('Invalid inspect full-task slot');
  }else if(directInvestigationPair){
   if(amendment||f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.map(a=>a.task+':'+a.arm).join(',')!=='account-switch-ledger:I0,account-switch-ledger:I1'||f.attempts.some(a=>a.project!=='Tah10n/viberacing')||new Set(f.attempts.map(a=>a.source)).size!==2||!f.template||f.runtimeSha!==f.candidateSha)throw Error('Invalid direct investigator pair');
  }else if(diagnosticReview){

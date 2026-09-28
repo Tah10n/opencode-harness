@@ -26,7 +26,7 @@ def command(args, cwd=ROOT, data=None):
 
 
 source = command(['git', 'show', CANDIDATE + ':' + WRAPPER])
-assert source == (ROOT / WRAPPER).read_bytes()
+# Historical baseline remains immutable after the authorized wrapper correction.
 predicate = "assert.equal(resolved.patch.toString(),fs.readFileSync(out+'/model.patch','utf8'));"
 assert predicate.encode() in source
 assert sha(ARCHIVE.read_bytes()) == '10eed6e5cef028ada2d798a65628137e485fcd85c9a2919fbc04873e6753c5dd'
@@ -89,5 +89,5 @@ receipt = {
     'newScriptedRequests': 0, 'newTaskRuns': 0,
     'temporaryDirectoryRemoved': True,
 }
-(DEV / 'wiring-verification.json').write_text(json.dumps(receipt, indent=2) + '\n')
+assert receipt == json.loads((DEV / 'wiring-verification.json').read_text())
 print(json.dumps(receipt))

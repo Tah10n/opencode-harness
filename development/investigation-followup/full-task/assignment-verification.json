@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "negativeAdmissionCases": [
+    "second-slot",
+    "wrong-runtime",
+    "extra-time",
+    "wrong-arm",
+    "old-profile",
+    "wrong-bound",
+    "foreign-campaign"
+  ],
+  "validAssignmentReachedNativeBoundaryOnce": true,
+  "nativeStarted": false,
+  "realProviderCalls": 0,
+  "unchangedCandidateFiles": {
+    "development/native-task-ab/native-run.mjs": "3d90692f83de0615b3b0e90ce78c04b09558cd6c19857aa6fc846c8c053481c1",
+    "development/native-task-abc/native-run.mjs": "1f6ebb6f0cc459523b91dbb20cc3c1083f37b0bbb5a73ef84d080a1de94f3d55",
+    "development/native-task-abc/deadline-stop.mjs": "b463693e5d67478016f46f1b701717bf942bec6df26465c18675d547210776fe",
+    "development/native-task-integrated/container-session.mjs": "387b55e780a13f15fa75fe3ea93d89e95cd99b79114af845689104df345c977d",
+    "development/native-task-integrated/container-relay.mjs": "6d2a0615e863e2921cbd7693a03ffa66c6a5d9ccc52601c15d470ebb7948dfb0",
+    "development/native-task-ab/provider-recording.mjs": "a9d3c54c312fd72ec5e925ccdf687d9dc8ad4e73f99e0eb4c86956c20d316ba3",
+    "development/native-task-utility/container/stop-workload.mjs": "b21c23f5a334dc54af340e2773e3e56427aa27a946231769d36df249ea54a69e",
+    "development/ledger-review-delivery/resolve-native-result.mjs": "0897812764d1b3f5ed250a11d5911332be411e3f9fd2b42d9c0e2bb9ea2e4492",
+    "development/polybench-pilot/capture.mjs": "8ce3f0344bf45f8e25ef0317c914c21a566db717357e2d490803bc4dc2e3c7bc",
+    "development/native-output-retention/output-files.mjs": "bcc90984aa4e3ddc4048fc674f7762c245d5c0fb25ad8d053aae17a598ce0477"
+  },
+  "deadline": "Unmodified fixed runTask/runNativePhase/worker/relay imported by parameterized scheduler",
+  "capture": "Corrected wrapper calls actual delivery inventory and Git tree equivalence",
+  "temporaryControlsRemoved": true
+}

@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "stage": "preparation_blocked_before_freeze_and_model",
+  "assignment": "investigation-followup-full-task",
+  "candidate": "d59a527d120e4cd256ded6d8270154fbbcff5d36",
+  "baseline": "2b16b6a8ad75b6b852adc5e2189e6d4a8d93eabd",
+  "slots": [
+    {
+      "slot": 1,
+      "task": "account-switch-ledger",
+      "arm": "I1",
+      "status": "not_started"
+    }
+  ],
+  "model": "openai/gpt-5.6-luna",
+  "variant": "high",
+  "budgetMs": 3600000,
+  "recordingProfile": "research-full-inspect-ledger-1g-v1",
+  "recordingPrepared": false,
+  "runtimeMaterialized": false,
+  "taskStart": null,
+  "deadline": null,
+  "inputAndAcceptanceSha256": {
+    "development/plain-ledger-native-high/original-task.txt": "c855e75f5b4705f703f5c4c39e01d05c73505854c32a4ff97dd5d564e82573eb",
+    "development/plain-ledger-native-high/environment.txt": "aa0afe37ca2ec1f3564642a02842d71472b72b88225069be22a4cbbe8fb114cc",
+    "development/investigation-direct-ledger-pair/inspect-full-task/PLAN.md": "eb363e00de2a2c6e6345ad44e771a3147e2e03517e021f95e6628d9f48d58bc0",
+    "development/investigation-direct-ledger-pair/inspect-full-task/assess.py": "5f512401b8f3c57b32888879f75f1c818ecd9851cec96b380b92c9b6e1cc613e",
+    "development/investigation-direct-ledger-pair/inspect-full-task/verify-delivery.py": "27d3a94926bd22777774a86281b0ac9cb434ce8cf8d2996d6109fc40493f34c0"
+  },
+  "wiringReceiptSha256": "b15845389d376f7c3ffb556c2ee1f0255e4dabef4aa13115c258eaefe5488084",
+  "blocker": "Existing full-task capture wrapper rejects equivalent patches by byte ordering",
+  "realProviderCalls": 0,
+  "modelTaskRuns": 0,
+  "investigatorStarts": 0
+}
