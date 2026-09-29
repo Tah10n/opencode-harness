@@ -16,7 +16,9 @@ for(const dir of ['bundle','plain-dependencies']){
 }
 const cfg=JSON.parse(fs.readFileSync(local+'/bundle/opencode.json'));cfg.instructions=['/template/core.md'];cfg.plugin=['file:///template/native-task-plugin.mjs'];fs.writeFileSync(local+'/bundle/opencode.json',JSON.stringify(cfg,null,2));
 const toolchain=local+'/toolchain';fs.mkdirSync(toolchain);
-const packed=JSON.parse(execFileSync('npm',['pack','opencode-linux-arm64@1.18.26','--ignore-scripts','--json','--pack-destination',toolchain],{encoding:'utf8'}))[0];
+const packedResult=JSON.parse(execFileSync('npm',['pack','opencode-linux-arm64@1.18.26','--ignore-scripts','--json','--pack-destination',toolchain],{encoding:'utf8'}));
+const packed=Array.isArray(packedResult)?packedResult[0]:packedResult['opencode-linux-arm64'];
+if(packed?.filename!=='opencode-linux-arm64-1.18.26.tgz')throw Error('Unexpected pinned npm pack result');
 execFileSync('tar',['-xzf',toolchain+'/'+packed.filename,'-C',toolchain]);fs.unlinkSync(toolchain+'/'+packed.filename);
 const name=model.slice('openai/'.length);
 const config={

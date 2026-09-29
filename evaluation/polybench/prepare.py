@@ -1,5 +1,5 @@
 """Reproduce official acquisition and initial two-language model-free controls.
-No provider access. Invoke using an existing Python >=3.10.
+No provider access. Invoke using an existing Python >=3.12.
 """
 import argparse, csv, hashlib, json, os, subprocess, sys, time, urllib.request
 from pathlib import Path
@@ -15,6 +15,7 @@ def main():
     parser=argparse.ArgumentParser();parser.add_argument('--controls',action='store_true');parser.add_argument('--full',action='store_true');parser.add_argument('--plan',action='store_true');args=parser.parse_args()
     if args.plan:
         print(json.dumps({'dataset_revision':DATA_SHA,'evaluator_revision':EVAL_SHA,'selected_tasks':len(json.loads((DEV/'selection.json').read_text())['selected']),'model':os.environ.get('POLYBENCH_MODEL'),'variant':os.environ.get('POLYBENCH_VARIANT'),'provider_requests':0,'full_preparation':'Linux ARM64 Docker, Python >=3.12, explicit model/variant; installs public pinned tools; author isolation and official controls before freeze'}));return
+    if sys.version_info < (3,12): raise RuntimeError('Preparation requires Python >=3.12')
     if (LOCAL/"batch").exists(): raise RuntimeError("Preparation cannot mutate a frozen batch")
     LOCAL.mkdir(parents=True,exist_ok=True)
     evaluator=LOCAL/'evaluator'
