@@ -1,4 +1,4 @@
-﻿node_modules/
+node_modules/
 dist/
 .cache/
 .qwen/
@@ -17,3 +17,6 @@ traces/
 benchmarks/v3/*.bundle
 benchmarks/v3/*.bundle.part-*
 .benchmark-v3-provenance/
+
+__pycache__/
+.benchmark-v3-epoch2-private/

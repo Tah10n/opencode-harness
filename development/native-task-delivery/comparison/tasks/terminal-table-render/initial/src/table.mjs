@@ -1,1 +1,0 @@
-export function render(rows){return rows.map(r=>r.join(' | ')).join('\n');}

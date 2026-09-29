@@ -1,1 +1,0 @@
-import {validDigits} from './luhn.mjs';export function describe(text){return {valid:validDigits(text),masked:'*'.repeat(Math.max(0,text.length-4))+text.slice(-4)};}

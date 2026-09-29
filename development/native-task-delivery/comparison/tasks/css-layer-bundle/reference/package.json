@@ -1,8 +1,0 @@
-{
-  "name": "css-layer-bundle",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "test": "node --test test/*.test.mjs"
-  }
-}

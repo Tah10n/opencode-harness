@@ -1,1 +1,0 @@
-export function kitCapacity(stock,parts){return 0;}

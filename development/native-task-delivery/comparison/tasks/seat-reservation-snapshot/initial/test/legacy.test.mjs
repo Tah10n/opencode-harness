@@ -1,2 +1,0 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';
-import {createSeats} from '../src/seats.mjs';test('one reservation',()=>{const s=createSeats();assert.equal(s.reserve([1]),true);assert.deepEqual(s.snapshot(),[1]);});

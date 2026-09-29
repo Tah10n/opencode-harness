@@ -1,1 +1,0 @@
-Read-only copies of the saved function-receiver-wrapper B candidate, task, finding and tests. The installed replay uses these in a temporary project only; it does not revise historical outcomes. The saved test file contains the prior three tests and the added sensitive fourth test. Scripted repair is fixture behavior, not a model-quality result.

@@ -1,1 +1,0 @@
-import {geometry} from './geometry.mjs';export function transform(image,operations){let size={width:image.width,height:image.height};for(const op of operations)size=geometry(size,op);return {...image,...size};}

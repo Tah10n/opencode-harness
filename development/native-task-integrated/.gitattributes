@@ -1,3 +1,0 @@
-# Preserve immutable patch artifact bytes, including calibration line endings.
-patches/*.patch -text
-calibration/*.patch -text

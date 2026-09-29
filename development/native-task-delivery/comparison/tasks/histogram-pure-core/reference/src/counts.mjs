@@ -1,1 +1,0 @@
-export function counts(values){const m=new Map();for(const x of values)m.set(x,(m.get(x)??0)+1);return [...m].map(([value,count])=>({value,count}));}

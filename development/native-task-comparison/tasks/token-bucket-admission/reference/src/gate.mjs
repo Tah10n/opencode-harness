@@ -1,1 +1,0 @@
-import {createBucket} from './bucket.mjs';export function createGate(capacity,rate,now,handler){const b=createBucket(capacity,rate,now);return (value,cost=1)=>{const r=b.take(cost);return r.allowed?{...r,value:handler(value)}:r;};}

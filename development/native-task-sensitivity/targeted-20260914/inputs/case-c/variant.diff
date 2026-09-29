@@ -1,5 +1,0 @@
---- a/index.js
-+++ b/index.js
-@@ 211:20 @@
--'predicate must be a function'
-+""

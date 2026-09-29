@@ -1,8 +1,0 @@
-{
-  "name": "reservoir-sample-resume",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "test": "node --test test/*.test.mjs"
-  }
-}

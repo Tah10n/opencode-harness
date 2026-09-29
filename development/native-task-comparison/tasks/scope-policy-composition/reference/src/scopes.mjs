@@ -1,1 +1,0 @@
-export function matches(pattern,resource){const p=pattern.split('/'),r=resource.split('/');if(p.at(-1)==='**'){p.pop();if(r.length<p.length)return false;}else if(p.length!==r.length)return false;return p.every((s,i)=>s==='*'||s===r[i]);}

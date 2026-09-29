@@ -1,1 +1,0 @@
-import {matches} from './scopes.mjs';export function authorize(roles,action,resource){for(const role of roles)if(role.rules.some(r=>r.effect==='allow'&&r.action===action&&matches(r.resource,resource)))return {allowed:true,reason:'grant',roles:[role.name]};return {allowed:false,reason:'no-grant',roles:[]};}

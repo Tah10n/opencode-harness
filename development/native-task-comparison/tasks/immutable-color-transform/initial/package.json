@@ -1,8 +1,0 @@
-{
-  "name": "immutable-color-transform",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "test": "node --test test/*.test.mjs"
-  }
-}

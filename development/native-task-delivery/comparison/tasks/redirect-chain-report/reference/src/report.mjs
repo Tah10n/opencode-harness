@@ -1,1 +1,0 @@
-import {follow} from './follow.mjs';export function report(starts,links){return starts.map(s=>{const r=follow(s,links);return r.chain.join(' -> ')+(r.cycle?' -> [cycle:'+r.terminal+']':'');}).join('\n');}

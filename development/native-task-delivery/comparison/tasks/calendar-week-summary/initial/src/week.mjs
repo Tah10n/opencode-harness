@@ -1,1 +1,0 @@
-export function weekStart(day){return day;}

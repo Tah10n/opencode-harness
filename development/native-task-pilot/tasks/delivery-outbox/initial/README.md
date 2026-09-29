@@ -1,3 +1,0 @@
-# delivery-outbox
-
-Run `npm test` with Node.js 24.

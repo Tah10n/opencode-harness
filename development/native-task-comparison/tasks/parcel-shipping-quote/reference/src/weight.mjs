@@ -1,1 +1,0 @@
-export function billable(parcel,divisor){const dimensional=Math.ceil(parcel.length*parcel.width*parcel.height/divisor);return Math.max(parcel.grams,dimensional);}export function oversize(p,maxSide){return [p.length,p.width,p.height].some(n=>n>maxSide);}

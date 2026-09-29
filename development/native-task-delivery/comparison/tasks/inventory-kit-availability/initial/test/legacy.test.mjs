@@ -1,2 +1,0 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';
-import {quote} from '../src/quote.mjs';test('empty kit',()=>assert.deepEqual(quote({},[{id:'x',parts:[]}]),[{id:'x',available:0}]));

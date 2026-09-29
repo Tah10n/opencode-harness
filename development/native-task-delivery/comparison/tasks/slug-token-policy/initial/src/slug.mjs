@@ -1,1 +1,0 @@
-export function slug(text,max=40){const s=text.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean).join('-').slice(0,max).replace(/-+$/,'');return s||'untitled';}

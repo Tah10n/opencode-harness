@@ -5,7 +5,7 @@ import path from 'node:path';
 import http from 'node:http';
 import {spawn,spawnSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
-import {longCommand} from '../development/native-output-retention/scripted.mjs';
+import {longCommand} from '../evaluation/support/scripted.mjs';
 import {DatabaseSync} from 'node:sqlite';
 import {materializeNativeTemplate} from '../lib/native-template.mjs';
 const root='/repo', hash=x=>createHash('sha256').update(x).digest('hex');
@@ -16,7 +16,7 @@ const listen=s=>new Promise(r=>s.listen(0,'127.0.0.1',r));
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 const results=[];
 fs.mkdirSync('/work/runner-deps',{recursive:true});
-run('tar',['-xf',root+'/local/polybench-pilot/author-inputs/sveltejs__svelte-1190/dependencies.tar','-C','/work/runner-deps'],root);
+run('tar',['-xf',root+'/local/polybench/author-inputs/sveltejs__svelte-1190/dependencies.tar','-C','/work/runner-deps'],root);
 const privateDir='/work/evidence';fs.mkdirSync(privateDir,{recursive:true});
 for(const mode of (process.env.PRESERVATION_MODES?.split(',')??['mocha','parcel','off','irrelevant'])) {
   const base='/work/'+mode, project=base+'/project', bundle=base+'/bundle', task=base+'/task.txt';
@@ -44,7 +44,7 @@ for(const mode of (process.env.PRESERVATION_MODES?.split(',')??['mocha','parcel'
   const originalDiff=git('diff'),originalStatus=git('status','--porcelain'),originalIndex=hash(fs.readFileSync(project+'/.git/index'));
   const taskText=`Add ${featureName}(n), returning twice n, to the public module. Preserve ${oldName}(n), returning n plus one. Keep existing assertions and user draft. Extend the existing public arithmetic case and run npm test after the final production change.`;
   write(task,taskText);materializeNativeTemplate({repositoryRoot:root,outputDirectory:bundle,task:true});
-  const dependencies=root+'/local/native-task-integrated/plain-dependencies';
+  const dependencies=root+'/local/polybench/plain-dependencies';
   for(const n of ['node_modules','package-lock.json'])fs.cpSync(dependencies+'/'+n,bundle+'/'+n,{recursive:true,verbatimSymlinks:true});
   fs.mkdirSync(base+'/config/opencode',{recursive:true});
   for(const n of ['node_modules','package.json','package-lock.json'])fs.cpSync(dependencies+'/'+n,base+'/config/opencode/'+n,{recursive:true,verbatimSymlinks:true});

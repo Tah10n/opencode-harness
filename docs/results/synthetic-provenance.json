@@ -1,0 +1,59 @@
+[
+  {
+    "run_id": "synthetic-merged-run-dbd0ee31-bae7-4c44-ab3e-cab3a2423fbc",
+    "source_report_sha256": "8197a5cae48eccf9bbf4302a14d4aec1144d91c833afa28d9853804c3652b4c6",
+    "source_archive": "worktrees/0 ignored evidence: evals/reports/synthetic/runs/synthetic-merged-run-dbd0ee31-bae7-4c44-ab3e-cab3a2423fbc/report.json",
+    "identity": {
+      "schema_version": 5,
+      "suite": {
+        "id": "full",
+        "manifest_fingerprint": "sha256:9d12608151ccb5521b09a7d094e72829a4fe98a3783b6b25f8ff140c5f065ee9",
+        "template_set_fingerprint": "sha256:017d0a752756630b70db92c74c045337edea10480b6bfc1ee401b34e89dbabaa",
+        "comparison_policy_fingerprint": "sha256:5a467e0c24c73dfaaf6579ce6979a113c963b9e64d3c2ef3efad3bfa72b90ea4",
+        "profile_inventory_fingerprint": "sha256:38f5d402ece21fb1a411efe4b9e00dce058c9a29b8b8cf3740e43144e3b93319",
+        "seed": "luna-low-full-20260812",
+        "semantic_variants": 5,
+        "trajectory_repetitions": 2,
+        "declared_pair_count": 160
+      }
+    }
+  },
+  {
+    "run_id": "synthetic-merged-run-561d2675-9732-4fc0-8c1a-18b3399887e0",
+    "source_report_sha256": "52bfaec6888aa513fd2dba33d612583935b561fb0d6f39fc8afb5477a8f433cb",
+    "source_archive": "worktrees/0 ignored evidence: evals/reports/synthetic/runs/synthetic-merged-run-561d2675-9732-4fc0-8c1a-18b3399887e0/report.json",
+    "identity": {
+      "schema_version": 5,
+      "suite": {
+        "id": "full",
+        "manifest_fingerprint": "sha256:9d12608151ccb5521b09a7d094e72829a4fe98a3783b6b25f8ff140c5f065ee9",
+        "template_set_fingerprint": "sha256:017d0a752756630b70db92c74c045337edea10480b6bfc1ee401b34e89dbabaa",
+        "comparison_policy_fingerprint": "sha256:5a467e0c24c73dfaaf6579ce6979a113c963b9e64d3c2ef3efad3bfa72b90ea4",
+        "profile_inventory_fingerprint": "sha256:38f5d402ece21fb1a411efe4b9e00dce058c9a29b8b8cf3740e43144e3b93319",
+        "seed": "luna-low-full-20260812",
+        "semantic_variants": 5,
+        "trajectory_repetitions": 2,
+        "declared_pair_count": 160
+      }
+    }
+  },
+  {
+    "run_id": "synthetic-run-1bed8664-ad2e-41f0-9c20-1ce702d9bcf5",
+    "source_report_sha256": "54dc8bc345f98e71f4719745eea1d97485a43c80439932a1749784206e93c150",
+    "source_archive": "worktrees/0 ignored evidence: evals/reports/synthetic/runs/synthetic-run-1bed8664-ad2e-41f0-9c20-1ce702d9bcf5/report.json",
+    "identity": {
+      "schema_version": 5,
+      "suite": {
+        "id": "micro",
+        "manifest_fingerprint": "sha256:9d12608151ccb5521b09a7d094e72829a4fe98a3783b6b25f8ff140c5f065ee9",
+        "template_set_fingerprint": "sha256:017d0a752756630b70db92c74c045337edea10480b6bfc1ee401b34e89dbabaa",
+        "comparison_policy_fingerprint": "sha256:5a467e0c24c73dfaaf6579ce6979a113c963b9e64d3c2ef3efad3bfa72b90ea4",
+        "profile_inventory_fingerprint": "sha256:38f5d402ece21fb1a411efe4b9e00dce058c9a29b8b8cf3740e43144e3b93319",
+        "seed": "20260811",
+        "semantic_variants": 1,
+        "trajectory_repetitions": 1,
+        "declared_pair_count": 4
+      }
+    }
+  }
+]

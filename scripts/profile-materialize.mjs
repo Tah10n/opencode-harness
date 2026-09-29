@@ -42,19 +42,10 @@ try {
   if (options.native && (options.profile !== 'core' || options.force || options.allowDirty)) {
     throw argumentError('--native supports core only, without --force or --allow-dirty');
   }
-  const result = options.native ? (await import("../lib/native-template.mjs")).materializeNativeTemplate({
-    repositoryRoot: root,
-    outputDirectory: options.output,
-    dryRun: options.dryRun,
-    review: options.review,
-    task: options.task,
-  }) : (await import("../lib/profile-v3.mjs")).materializeProfileBundleV3({
-    repositoryRoot: root,
-    bundleId: options.profile,
-    outputDirectory: options.output,
-    dryRun: options.dryRun,
-    overwrite: options.force,
-    allowDirty: options.allowDirty,
+  if (!options.native) throw argumentError('Legacy profiles are retired; use --native --profile core (see docs/ARCHIVE.md)');
+  const result = (await import("../lib/native-template.mjs")).materializeNativeTemplate({
+    repositoryRoot: root, outputDirectory: options.output, dryRun: options.dryRun,
+    review: options.review, task: options.task,
   });
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
 } catch (error) {

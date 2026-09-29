@@ -1,1 +1,0 @@
-export function createSeats(initial=[]){let used=[...initial];return {reserve(seats){used.push(...seats);return true;},release(seats){used=used.filter(s=>!seats.includes(s));},snapshot(){return [...used];}};}

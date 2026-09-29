@@ -1,1 +1,0 @@
-export const work = (q, send) => {const item=q.take();if(item===undefined)return {sent:[],retried:[]};if(send(item)){q.ack(item.id);return {sent:[item.id],retried:[]};}q.retry(item.id);return {sent:[],retried:[item.id]};};

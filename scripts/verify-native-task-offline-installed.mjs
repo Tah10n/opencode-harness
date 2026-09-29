@@ -16,7 +16,7 @@ const run = (bin, args, cwd, env) => {
 const write = (p, s) => {fs.mkdirSync(path.dirname(p), {recursive:true});fs.writeFileSync(p,s);};
 const listen = s => new Promise(r => s.listen(0,'127.0.0.1',r));
 const sleep = ms => new Promise(r => setTimeout(r,ms));
-const override=JSON.parse(fs.readFileSync(root+'/development/native-task-offline/build.json'));
+const override=JSON.parse(fs.readFileSync(root+'/fixtures/native-offline/build.json'));
 async function scenario(mode, offline) {
   const base='/work/'+mode, project=base+'/project', bundle=base+'/bundle';
   for(const n of ['home','config','data','cache','state','tmp','project','bin'])fs.mkdirSync(base+'/'+n,{recursive:true});
@@ -29,7 +29,7 @@ async function scenario(mode, offline) {
   git('init','-q');git('add','.');git('-c','core.hooksPath=/dev/null','-c','user.name=Fixture','-c','user.email=fixture@localhost','commit','-qm','baseline');
   const index=hash(fs.readFileSync(project+'/.git/index'));
   materializeNativeTemplate({repositoryRoot:root,outputDirectory:bundle,task:true});
-  const deps=root+'/local/native-task-integrated/plain-dependencies';
+  const deps=root+'/local/polybench/plain-dependencies';
   for(const n of ['node_modules','package-lock.json'])fs.cpSync(deps+'/'+n,bundle+'/'+n,{recursive:true,verbatimSymlinks:true});
   for(const n of ['node_modules','package.json','package-lock.json'])fs.cpSync(deps+'/'+n,base+'/config/opencode/'+n,{recursive:true,verbatimSymlinks:true});
   fs.copyFileSync(deps+'/rg',base+'/bin/rg');fs.chmodSync(base+'/bin/rg',0o755);

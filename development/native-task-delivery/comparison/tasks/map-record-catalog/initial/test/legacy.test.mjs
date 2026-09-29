@@ -1,2 +1,0 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';
-import {rows,total} from '../src/catalog.mjs';test('record',()=>{assert.deepEqual(rows({a:2}),[{key:'a',price:2}]);assert.equal(total({a:2}),2);});

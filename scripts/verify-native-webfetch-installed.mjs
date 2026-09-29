@@ -31,7 +31,7 @@ for (const mode of (process.env.WEBFETCH_MODES?.split(',') ?? modes)) {
   git('init','-q');git('add','.');git('-c','core.hooksPath=/dev/null','-c','user.name=Fixture','-c','user.email=fixture@localhost','commit','-qm','baseline');
   const index=hash(fs.readFileSync(project+'/.git/index'));
   materializeNativeTemplate({repositoryRoot:root,outputDirectory:bundle,task:true});
-  const deps=root+'/local/native-task-integrated/plain-dependencies';
+  const deps=root+'/local/polybench/plain-dependencies';
   for(const n of ['node_modules','package-lock.json'])fs.cpSync(deps+'/'+n,bundle+'/'+n,{recursive:true,verbatimSymlinks:true});
   for(const n of ['node_modules','package.json','package-lock.json'])fs.cpSync(deps+'/'+n,base+'/config/opencode/'+n,{recursive:true,verbatimSymlinks:true});
   fs.copyFileSync(deps+'/rg',base+'/bin/rg');fs.chmodSync(base+'/bin/rg',0o755);

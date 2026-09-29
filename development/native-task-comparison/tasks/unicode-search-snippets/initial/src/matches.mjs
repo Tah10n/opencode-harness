@@ -1,1 +1,0 @@
-export function findMatches(text,query){if(!query)throw new TypeError('empty query');const out=[];for(let i=0;(i=text.indexOf(query,i))!==-1;i+=query.length)out.push({start:i,end:i+query.length});return out;}

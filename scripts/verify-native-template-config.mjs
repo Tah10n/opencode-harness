@@ -8,6 +8,7 @@ import {fileURLToPath} from 'node:url';
 import {materializeNativeTemplate} from '../lib/native-template.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'native-config-'));
+try {
 for(const name of ['home','config','data','cache','state','project'])fs.mkdirSync(path.join(temp,name));
 const review=process.argv.includes('--review');
 const offline=process.argv.includes('--offline');
@@ -22,7 +23,7 @@ if(offline){
   // A global-only deny is insufficient when the selected native agent allows it.
   const before=debug('agent','build');
   assert.equal(before.permission.filter(p=>['*','webfetch'].includes(p.permission)).at(-1).action,'allow');
-  env.OPENCODE_CONFIG_CONTENT=fs.readFileSync(path.join(root,'development/native-task-offline/build.json'),'utf8');
+  env.OPENCODE_CONFIG_CONTENT=fs.readFileSync(path.join(root,'fixtures/native-offline/build.json'),'utf8');
 }
 const config=debug('config');
 assert.deepEqual(config.instructions,[path.join(bundle,'core.md')]);
@@ -56,3 +57,5 @@ if(review){
 }
 console.log(JSON.stringify({passed:true,checks:['resolved instruction path and exact bytes','native build tools','project denial retained','no plugins',...(offline?['global-only denial overridden by agent','agent-scoped denial','other deny/ask rules retained','repeat application stable','ordinary resolution restored']:[])],providerRequests:0,
   limit:'Does not exercise model prompt delivery or instruction compliance.'}));
+
+} finally { fs.rmSync(temp,{recursive:true,force:true}); }

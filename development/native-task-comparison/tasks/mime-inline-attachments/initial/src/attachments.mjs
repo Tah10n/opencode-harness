@@ -1,1 +1,0 @@
-export function inlineIds(html){return [...html.matchAll(/cid:([A-Za-z0-9_.-]+)/g)].map(m=>m[1]);}export function attachmentMap(items){return new Map(items.map(a=>[a.cid,{cid:a.cid,type:a.type,base64:Buffer.from(a.bytes.buffer).toString('base64')} ]));}

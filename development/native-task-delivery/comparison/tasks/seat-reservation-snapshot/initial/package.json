@@ -1,8 +1,0 @@
-{
-  "name": "seat-reservation-snapshot",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "test": "node --test test/*.test.mjs"
-  }
-}

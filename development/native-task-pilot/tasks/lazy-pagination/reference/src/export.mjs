@@ -1,1 +1,0 @@
-import {listItems} from './client.mjs';export async function exportNames(fetchPage,options){const items=await listItems(fetchPage,options);return items.length?items.map(x=>x.name).join('\n')+'\n':'';}

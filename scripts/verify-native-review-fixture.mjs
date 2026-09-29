@@ -114,4 +114,5 @@ try{
 }finally{
  await stop();
  await new Promise(r=>fixture.close(r));
+ fs.rmSync(temp,{recursive:true,force:true});
 }

@@ -79,10 +79,10 @@ test('new inspect and existing lookup', () => {const p = new Parcel(); assert.eq
   write(task, emitter ? 'Add typed subscribe(event, callback, context) returning independent idempotent cancellation. Infer contextual this and typed event arguments. Preserve existing listener types and runtime behavior. Add project type/runtime tests and run npm test.' :
     'Add Parcel.inspect(): number returning 7. Preserve lookup runtime behavior. Add type/runtime tests and run npm test.' + (mode === 'allowed-break' ? ' Intentionally require {owner: string} as this for callbacks returned by lookup; this breaking type change is authorized.' : ' Preserve existing callback types.'));
   materializeNativeTemplate({repositoryRoot: root, outputDirectory: bundle, task: true});
-  for (const [from, to] of [[root + '/local/native-task-integrated/plain-dependencies/node_modules', bundle + '/node_modules'], [root + '/local/native-task-integrated/plain-dependencies/package-lock.json', bundle + '/package-lock.json']]) fs.cpSync(from, to, {recursive: true, verbatimSymlinks: true});
+  for (const [from, to] of [[root + '/local/polybench/plain-dependencies/node_modules', bundle + '/node_modules'], [root + '/local/polybench/plain-dependencies/package-lock.json', bundle + '/package-lock.json']]) fs.cpSync(from, to, {recursive: true, verbatimSymlinks: true});
   fs.mkdirSync(base + '/config/opencode', {recursive: true});
-  for (const name of ['node_modules', 'package.json', 'package-lock.json']) fs.cpSync(root + '/local/native-task-integrated/plain-dependencies/' + name, base + '/config/opencode/' + name, {recursive: true, verbatimSymlinks: true});
-  fs.copyFileSync(root + '/local/native-task-integrated/plain-dependencies/rg', base + '/bin/rg'); fs.chmodSync(base + '/bin/rg', 0o755);
+  for (const name of ['node_modules', 'package.json', 'package-lock.json']) fs.cpSync(root + '/local/polybench/plain-dependencies/' + name, base + '/config/opencode/' + name, {recursive: true, verbatimSymlinks: true});
+  fs.copyFileSync(root + '/local/polybench/plain-dependencies/rg', base + '/bin/rg'); fs.chmodSync(base + '/bin/rg', 0o755);
   write(base + '/bin/tsc', '#!/bin/sh\nexec /usr/local/bin/node ' + compilerRoot + '/bin/tsc "$@"\n'); fs.chmodSync(base + '/bin/tsc', 0o755);
   const installed = {};
   for (const name of ['native-task-plugin.mjs', 'native-type-compat.mjs', 'native-type-compat-worker.mjs', 'native-type-compat-generator.mjs']) {

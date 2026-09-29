@@ -1,5 +1,0 @@
---- a/index.js
-+++ b/index.js
-@@ 214:31 @@
--false
-+true
