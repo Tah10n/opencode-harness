@@ -28,12 +28,12 @@ def main():
     row=next(r for r in rows if r['instance_id']==a.instance_id)
     image=json.loads((LOCAL/'images.json').read_text())['polybench_'+row['language'].lower()+'_'+a.instance_id.lower()]
     out=LOCAL/'author-inputs'/a.instance_id;out.mkdir(parents=True,exist_ok=False)
-    name='polybench-pilot-prep-'+uuid.uuid4().hex
-    command=['docker','run','--name',name,'--platform','linux/amd64','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--memory','1g','--pids-limit','128','--cpus','2',image['digest']]
+    container_name='polybench-pilot-prep-'+uuid.uuid4().hex
+    command=['docker','run','--name',container_name,'--platform','linux/amd64','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--memory','1g','--pids-limit','128','--cpus','2',image['digest']]
     def run(args,target):
         with target.open('wb') as f:
             subprocess.run(command+args,stdout=f,check=True)
-        subprocess.run(['docker','rm',name],check=True,stdout=subprocess.DEVNULL)
+        subprocess.run(['docker','rm',container_name],check=True,stdout=subprocess.DEVNULL)
     try:
         run(['git','-c','filter.lfs.required=false','-c','filter.lfs.smudge=','-c','filter.lfs.process=','archive','--format=tar',row['base_commit']],out/'base.tar')
         run(['git','ls-tree','-r',row['base_commit']],out/'tree.txt')
@@ -91,6 +91,6 @@ def main():
             if any('MISSING '+name not in stdout.splitlines() for name in broken):raise RuntimeError('Preparation broke an original dependency link')
         (out/'audit.json').write_text(json.dumps({'instance_id':a.instance_id,'base_commit':row['base_commit'],'image':image,'archives':{name:hashlib.sha256((out/name).read_bytes()).hexdigest() for name in ['base.tar','dependencies.tar']},'submodules':submodules,'prepared_extra':extra_metadata,'dependency_directories':dependency_paths,'dependency_links':links,'future_git_objects_present':False,'task_input_added':False},indent=2))
     finally:
-        present=subprocess.run(['docker','inspect',name],capture_output=True)
-        if present.returncode==0: subprocess.run(['docker','rm','-f',name],check=True,stdout=subprocess.DEVNULL)
+        present=subprocess.run(['docker','inspect',container_name],capture_output=True)
+        if present.returncode==0: subprocess.run(['docker','rm','-f',container_name],check=True,stdout=subprocess.DEVNULL)
 if __name__=='__main__':main()

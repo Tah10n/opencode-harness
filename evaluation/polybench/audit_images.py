@@ -13,7 +13,7 @@ for row in json.loads(SELECTION.read_text())['selected']:
  if not env_receipt.exists():
   inspected=json.loads(subprocess.check_output(['docker','image','inspect',image]))[0]
   environment=inspected['Config'].get('Env',[])
-  allowed={'PATH','TZ','NVM_DIR','NODE_VERSION','NODE_PATH','HOME','LANG','LC_ALL','TERM','DISPLAY','DEBIAN_FRONTEND','CI','NPM_CONFIG_LOGLEVEL','VSCODECRASHDIR','CHROME_BIN','FIREFOX_BIN'}
+  allowed={'PATH','TZ','NVM_DIR','NODE_VERSION','YARN_VERSION','NODE_PATH','HOME','LANG','LC_ALL','TERM','DISPLAY','DEBIAN_FRONTEND','CI','NPM_CONFIG_LOGLEVEL','VSCODECRASHDIR','CHROME_BIN','FIREFOX_BIN'}
   unexpected=[item.split('=',1)[0] for item in environment if item.split('=',1)[0] not in allowed]
   env_receipt.write_text(json.dumps({'image':image,'environment':environment,'unexpected_keys':unexpected,'passed':not unexpected},indent=2)+'\n')
  if not json.loads(env_receipt.read_text())['passed']:raise RuntimeError('Author image environment requires inspection: '+str(env_receipt))
