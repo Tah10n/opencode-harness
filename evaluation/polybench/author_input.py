@@ -52,8 +52,10 @@ def main():
         if not dependency_paths or any(p.startswith('/') or '..' in Path(p).parts for p in dependency_paths): raise RuntimeError('Invalid dependency inventory')
         if row['repo']=='coder/code-server':
             # Prepared vendored packages live outside node_modules; include the
-            # whole dependency root, not only their transitive node_modules.
-            dependency_paths=[p for p in dependency_paths if not p.startswith('vendor/modules/')]+['vendor/modules']
+            # whole dependency root where this version actually has one.
+            run(['sh','-c','if test -d /testbed/vendor/modules; then printf present; else printf absent; fi'],out/'vendored-root.txt')
+            if (out/'vendored-root.txt').read_text()=='present':
+                dependency_paths=[p for p in dependency_paths if not p.startswith('vendor/modules/')]+['vendor/modules']
         run(['tar','-C','/testbed','-cf','-',*dependency_paths],out/'dependencies.tar')
         source=out/'source';source.mkdir()
         for archive in ['base.tar','dependencies.tar']:
