@@ -2,8 +2,9 @@
 import argparse, csv, hashlib, importlib, json, os, runpy, subprocess, sys, uuid
 from pathlib import Path
 
+from campaign import LOCAL as CAMPAIGN_LOCAL, SELECTION
 ROOT = Path(__file__).resolve().parents[2]
-LOCAL = ROOT / 'local/polybench'
+LOCAL = CAMPAIGN_LOCAL
 EVALUATOR_SHA = '9c836c5d7f3cb991934132b77d29e6941d912a07'
 
 def install_boundary(images):
@@ -69,6 +70,9 @@ def main():
     p.add_argument('--predictions',type=Path)
     args=p.parse_args()
     evaluator=LOCAL/'evaluator'
+    from evaluator_integrity import verify
+    verify(evaluator)
+    sys.dont_write_bytecode = True
     assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=evaluator,text=True).strip()==EVALUATOR_SHA
     assert not subprocess.check_output(['git','diff','HEAD','--','src'],cwd=evaluator,text=True).strip()
     csv.field_size_limit(10000000)
@@ -88,6 +92,7 @@ def main():
     sys.path.insert(0,str(evaluator/'src'))
     Manager=install_boundary(images)
     provenance={'evaluator':EVALUATOR_SHA,'mode':args.mode,'instances':ids,
+                'predictions_sha256':hashlib.sha256(args.predictions.read_bytes()).hexdigest() if args.predictions else None,
                 'subset_sha256':hashlib.sha256(args.subset.read_bytes()).hexdigest(),
                 'images':{k:v for k,v in images.items() if any(k.endswith(i.lower()) for i in ids)},
                 'prepared_dependencies':{r['instance_id']:json.loads((LOCAL/'extra'/r['instance_id']/'manifest.json').read_text()) for r in rows if (LOCAL/'extra'/r['instance_id']/'manifest.json').exists()},

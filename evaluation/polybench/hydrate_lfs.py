@@ -1,7 +1,8 @@
 """Preserve baseline LFS assets only when their bytes match committed OIDs."""
 import argparse,hashlib,json,re,subprocess,tarfile
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[2];LOCAL=ROOT/'local/polybench'
+from campaign import LOCAL as CAMPAIGN_LOCAL, SELECTION
+ROOT=Path(__file__).resolve().parents[2];LOCAL=CAMPAIGN_LOCAL
 p=argparse.ArgumentParser();p.add_argument('instance_id');args=p.parse_args();folder=LOCAL/'author-inputs'/args.instance_id
 record=folder/'lfs-audit.json'
 if record.exists():raise RuntimeError('Existing LFS audit must be inspected, not overwritten')

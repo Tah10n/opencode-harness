@@ -3,11 +3,28 @@ This does not accept gold/test patches or inspect evaluation results.
 """
 import argparse, hashlib, io, json, os, subprocess, tarfile, uuid
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[2]; LOCAL=ROOT/'local/polybench'
+from campaign import LOCAL as CAMPAIGN_LOCAL, SELECTION
+ROOT=Path(__file__).resolve().parents[2]; LOCAL=CAMPAIGN_LOCAL
+
+def verify_base_archive(source, archive):
+    """Prepared dependency/build trees must not overwrite baseline source."""
+    checked=0
+    with tarfile.open(archive) as tar:
+        for member in tar:
+            target=source/member.name
+            if member.isfile():
+                if target.is_symlink() or not target.is_file() or target.read_bytes()!=tar.extractfile(member).read():
+                    raise RuntimeError('Prepared dependencies overwrite baseline source: '+member.name)
+                if bool(target.stat().st_mode & 0o111)!=bool(member.mode & 0o111):
+                    raise RuntimeError('Prepared dependencies change baseline mode: '+member.name)
+                checked+=1
+            elif member.issym() and (not target.is_symlink() or os.readlink(target)!=member.linkname):
+                raise RuntimeError('Prepared dependencies change baseline symlink: '+member.name)
+    return {'passed':True,'files_checked':checked,'scope':'Tracked base archive before separately verified LFS hydration; dependencies cannot overwrite source/build outputs'}
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('instance_id');a=p.parse_args()
-    rows=json.loads((ROOT/'evaluation/polybench/selection.json').read_text())['selected']
+    rows=json.loads(SELECTION.read_text())['selected']
     row=next(r for r in rows if r['instance_id']==a.instance_id)
     image=json.loads((LOCAL/'images.json').read_text())['polybench_'+row['language'].lower()+'_'+a.instance_id.lower()]
     out=LOCAL/'author-inputs'/a.instance_id;out.mkdir(parents=True,exist_ok=False)
@@ -54,6 +71,8 @@ def main():
             dependency_paths.extend(extra_metadata['directories'])
         git_nodes=list(source.rglob('.git'))
         if git_nodes: raise RuntimeError('Unexpected Git metadata in extracted dependency tree')
+        baseline_preserved=verify_base_archive(source,out/'base.tar')
+        (out/'base-preservation.json').write_text(json.dumps(baseline_preserved,indent=2)+'\n')
         # All dependency links must resolve to this same clean input, including workspaces.
         links=[]
         for directory, dirs, files in os.walk(source):

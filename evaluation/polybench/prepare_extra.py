@@ -3,7 +3,8 @@ No source fixes, tests, evaluator inputs or provider access. No host installatio
 """
 import hashlib,json,subprocess,tarfile,uuid
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[2];LOCAL=ROOT/'local/polybench'
+from campaign import LOCAL as CAMPAIGN_LOCAL, SELECTION
+ROOT=Path(__file__).resolve().parents[2];LOCAL=CAMPAIGN_LOCAL
 def prepare(row):
  if row['repo']!='microsoft/vscode':return
  folder=LOCAL/'extra'/row['instance_id']
@@ -25,4 +26,4 @@ def prepare(row):
   inspected=subprocess.run(['docker','inspect',name],capture_output=True)
   if inspected.returncode==0:subprocess.run(['docker','rm','-f',name],check=True)
 if __name__=='__main__':
- for row in json.loads((ROOT/'evaluation/polybench/selection.json').read_text())['selected']:prepare(row)
+ for row in json.loads(SELECTION.read_text())['selected']:prepare(row)

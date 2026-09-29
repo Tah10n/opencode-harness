@@ -1,18 +1,34 @@
 // Public pinned installation only. No credentials or inference.
 import fs from 'node:fs';import path from 'node:path';import {execFileSync} from 'node:child_process';
-import {materializeNativeTemplate} from '../../lib/native-template.mjs';
-const local=path.resolve('local/polybench'), candidate=process.cwd();
+import {pathToFileURL} from 'node:url';
+import {local,campaign} from './campaign.mjs';
+const candidate=campaign?local+'/product':process.cwd();
+if(campaign){
+ fs.mkdirSync(candidate,{recursive:true});
+ if(fs.readdirSync(candidate).length)throw Error('Product extraction already exists');
+ const archive=execFileSync('git',['archive',campaign.product_sha],{maxBuffer:32*1024*1024});
+ execFileSync('tar',['-xf','-','-C',candidate],{input:archive});
+}
+const {materializeNativeTemplate}=await import(pathToFileURL(candidate+'/lib/native-template.mjs'));
 const model=process.env.POLYBENCH_MODEL,variant=process.env.POLYBENCH_VARIANT;
 if(!/^openai\/[^/\s]+$/.test(model??'')||!variant)throw Error('Set POLYBENCH_MODEL and POLYBENCH_VARIANT explicitly');
-const runtimeSha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
-const assertClean=()=>{if(execFileSync('git',['status','--porcelain','--untracked-files=no'],{encoding:'utf8'}).trim()||execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()!==runtimeSha)throw Error('Runtime source must remain at a clean fixed HEAD');};
-assertClean();
+const adapterSha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+const runtimeSha=campaign?.product_sha??adapterSha;
+const assertClean=()=>{if(execFileSync('git',['status','--porcelain','--untracked-files=no'],{encoding:'utf8'}).trim()||execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()!==adapterSha)throw Error('Runtime source must remain at a clean fixed HEAD');};
+if(!campaign)assertClean();
 fs.mkdirSync(local,{recursive:true});
-for(const dir of ['bundle','plain-dependencies']){
+for(const dir of (campaign?['bundle','core-bundle','plain-dependencies']:['bundle','plain-dependencies'])){
  const target=local+'/'+dir;if(fs.existsSync(target))throw Error('Preserve existing preparation: '+target);
- if(dir==='bundle')materializeNativeTemplate({repositoryRoot:candidate,outputDirectory:target,task:true});
+ if(dir==='bundle'||dir==='core-bundle')materializeNativeTemplate({repositoryRoot:candidate,outputDirectory:target,task:dir==='bundle'});
  else {fs.mkdirSync(target);fs.writeFileSync(target+'/package.json',JSON.stringify({private:true,dependencies:{'@opencode-ai/plugin':'1.18.26',typescript:'6.0.3'}}));}
+ if(dir==='core-bundle')continue;
  execFileSync('npm',['install','--ignore-scripts','--no-audit','--no-fund','--prefix',target],{stdio:'inherit'});
+}
+if(campaign){
+ // OpenCode normally creates this startup file; pre-create it for a read-only mount.
+ fs.copyFileSync(local+'/bundle/.gitignore',local+'/core-bundle/.gitignore');
+ const core=JSON.parse(fs.readFileSync(local+'/core-bundle/opencode.json'));core.instructions=['/template/core.md'];fs.writeFileSync(local+'/core-bundle/opencode.json',JSON.stringify(core,null,2));
+ for(const name of ['node_modules','package.json','package-lock.json'])fs.cpSync(local+'/plain-dependencies/'+name,local+'/core-bundle/'+name,{recursive:true,verbatimSymlinks:true});
 }
 const cfg=JSON.parse(fs.readFileSync(local+'/bundle/opencode.json'));cfg.instructions=['/template/core.md'];cfg.plugin=['file:///template/native-task-plugin.mjs'];fs.writeFileSync(local+'/bundle/opencode.json',JSON.stringify(cfg,null,2));
 const toolchain=local+'/toolchain';fs.mkdirSync(toolchain);
@@ -27,6 +43,6 @@ const config={
  permission:{external_directory:{'*':'deny','/template/node_modules/typescript/lib/*':'allow','/diagnostic/*':'allow'},webfetch:'deny'},
 };
 fs.writeFileSync(local+'/experiment-config.json',JSON.stringify(config,null,2));
-assertClean();
-fs.writeFileSync(local+'/runtime.json',JSON.stringify({sha:runtimeSha,model,variant,opencode:'1.18.26'},null,2));
+if(!campaign)assertClean();
+fs.writeFileSync(local+'/runtime.json',JSON.stringify({sha:runtimeSha,adapterSha,model,variant,opencode:'1.18.26'},null,2));
 console.log('Current native bundle and pinned Linux ARM64 tools prepared; provider requests: 0');

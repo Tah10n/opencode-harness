@@ -78,7 +78,13 @@ and fixtures. Its patch order, commands, parser and resolved criterion stand.
 No synthetic empty patch when capture is missing. Empty delivered patch is distinct.
 Per slot: R (official resolved), T (autonomous delivery with verified stop),
 D = R and T, terminal/partial artifact kind, provider outcome, evidence status,
-usage completeness. R_partial is separate from delivered success.
+usage completeness. T is an operational delivery measure: all native sessions end,
+no tools remain pending, local stop/capture/cleanup are verified and the complete
+captured patch applies to its base. T additionally requires a captured task
+terminal record for the task arm. Product `workflow_status` (including missing
+project checks) is reported separately, since ordinary P/C have no corresponding
+product self-assessment. Neither T nor a captured terminal record certifies
+correctness. R_partial is separate from delivered success.
 
 Primary comparison T versus P. Secondary C versus P and descriptive T versus C.
 Report complete paired counts, wins/losses/ties, paired percentage-point delta

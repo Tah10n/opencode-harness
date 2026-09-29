@@ -53,3 +53,112 @@ with tempfile.TemporaryDirectory() as tmp:
  prediction=json.loads((Path(tmp)/'export/P/predictions.jsonl').read_bytes().decode())
  assert prediction['model_patch'].encode()==patch.encode()
 print('CRLF patch bytes survive prediction JSONL export')
+
+# New campaign selection is metadata-only, deterministic and preserves pilot.
+config=json.loads((root/'evaluation/polybench/campaigns/consolidated-v1/campaign.json').read_text())
+new_saved=json.loads((root/'evaluation/polybench/campaigns/consolidated-v1/selection.json').read_text())
+# Metadata fixture preserves the full pool distribution without private rows.
+fixture=[]
+for lang, counts in new_saved['pool_categories'].items():
+ for cat, count in counts.items():
+  existing=[x for x in new_saved['selected'] if x['language']==lang and x['task_category']==cat]
+  fixture.extend(existing)
+  fixture.extend(dict(instance_id=f'fixture-{lang}-{cat}-{i}',language=lang,task_category=cat,repo=f'fixture-repo-{i%10}') for i in range(count-len(existing)))
+for seed in [0,1,17]:
+ shuffled=list(fixture);random.Random(seed).shuffle(shuffled)
+ pool,chosen,quotas,counts=m.select_campaign(shuffled,config)
+ assert len(chosen)==20
+ assert collections.Counter(x['language'] for x in chosen)=={'JavaScript':10,'TypeScript':10}
+ assert max(collections.Counter(x['repo'] for x in chosen).values())<=4
+ assert quotas==new_saved['quotas']
+ assert not set(x['instance_id'] for x in chosen)&set(config['excluded_instance_ids'])
+ if seed==0: expected=[x['instance_id'] for x in chosen]
+ else: assert [x['instance_id'] for x in chosen]==expected
+assert len(new_saved['slots'])==60
+for i,row in enumerate(new_saved['selected']):
+ assert [s['arm'] for s in new_saved['slots'][3*i:3*i+3]]==config['arms'][i%3:]+config['arms'][:i%3]
+# A cap cannot be silently relaxed to fill a language.
+try:m.select_campaign([{**x,'repo':'only-repository'} for x in fixture],config)
+except ValueError:pass
+else:raise AssertionError('Infeasible repository cap accepted')
+if '--consolidated-dataset' in __import__('sys').argv:
+ with (root/config['local_directory']/'verified.csv').open(newline='') as f: full=list(csv.DictReader(f))
+ _,chosen,quotas,counts=m.select_campaign(full,config)
+ assert [x['instance_id'] for x in chosen]==[x['instance_id'] for x in new_saved['selected']]
+ assert quotas==new_saved['quotas'] and counts==new_saved['pool_categories']
+ with (root/config['local_directory']/'selected.csv').open(newline='') as f: assert list(csv.DictReader(f))==chosen
+print('Consolidated selection: quotas, exclusions, global cap, cyclic slots and input-order independence passed')
+
+# Evaluator imports must not see extra Python modules (including ignored files).
+import subprocess
+spec=importlib.util.spec_from_file_location('evaluator_integrity',Path(__file__).with_name('evaluator_integrity.py'))
+integrity=importlib.util.module_from_spec(spec);spec.loader.exec_module(integrity)
+with tempfile.TemporaryDirectory() as tmp:
+ repo=Path(tmp)
+ def git(*args):return subprocess.check_output(['git',*args],cwd=repo,stderr=subprocess.DEVNULL,text=True).strip()
+ git('init','--quiet');(repo/'source.py').write_text('value = 1\n');(repo/'.gitignore').write_text('ignored.py\n')
+ git('add','.');git('-c','user.name=fixture','-c','user.email=fixture@example.invalid','-c','commit.gpgsign=false','commit','-qm','fixture')
+ integrity.SHA=git('rev-parse','HEAD');integrity.verify(repo)
+ for name in ['extra.py','ignored.py']:
+  (repo/name).write_text('raise RuntimeError("not imported")\n')
+  try:integrity.verify(repo)
+  except RuntimeError:pass
+  else:raise AssertionError('Extra evaluator source accepted')
+  (repo/name).unlink()
+ (repo/'source.py').write_text('value = 2\n')
+ try:integrity.verify(repo)
+ except RuntimeError:pass
+ else:raise AssertionError('Modified evaluator source accepted')
+print('Evaluator tracked and extra/ignored source integrity checks passed')
+# Known paired outcomes exercise the prespecified analysis, including missing pairs.
+six=[{'instance_id':str(i),'arm':arm,'R':arm=='T'} for i in range(6) for arm in ['P','T']]
+stat=r.paired_statistics(six,'T','P','R',formal=True)
+assert stat['wins']==6 and stat['losses']==0 and stat['delta_pp']==100 and stat['ci95_pp']==[100,100]
+assert stat['exact_mcnemar_p']==0.03125
+missing=r.paired_statistics([{'instance_id':'missing','arm':'P','R':None}],'T','P','R',formal=True)
+assert missing['paired_tasks']==0 and missing['unknown']==1 and missing['delta_pp'] is None and missing['exact_mcnemar_p'] is None
+assert r.paired_statistics(six,'T','P','R')['exact_mcnemar_p'] is None
+print('Paired task statistics and missing-data accounting passed')
+checked=subprocess.run(['node',str(root/'evaluation/polybench/verify-campaign.mjs')],capture_output=True,text=True)
+if checked.returncode:raise RuntimeError(checked.stdout+checked.stderr)
+print(checked.stdout.splitlines()[-1])
+# Reader contract: official partial-patch quality is independent of delivery and
+# unknown provider usage; missing capture is never exported as an empty patch.
+spec=importlib.util.spec_from_file_location('campaign_collect',Path(__file__).with_name('collect.py'))
+collector=importlib.util.module_from_spec(spec);spec.loader.exec_module(collector)
+import contextlib,io,hashlib
+with tempfile.TemporaryDirectory() as tmp:
+ base=Path(tmp);batch=base/'batch';batch.mkdir();task='fixture-task'
+ slots=[{'slot':i+1,'instance_id':task,'arm':arm,'status':'not_started'} for i,arm in enumerate(['P','C','T'])]
+ selected={'instance_id':task,'repo':'fixture/repo','language':'JavaScript','task_category':'Bug Fix','base_commit':'0'*40}
+ (base/'selection.json').write_text(json.dumps({'selected':[selected],'slots':slots}))
+ (batch/'freeze.json').write_text(json.dumps({'preparation':{task:{'status':'ready'}}}))
+ source=base/'author-inputs'/task/'source';source.mkdir(parents=True);(source/'a.txt').write_text('old\n')
+ patch='diff --git a/a.txt b/a.txt\n--- a/a.txt\n+++ b/a.txt\n@@ -1 +1 @@\n-old\n+new\n'
+ records={}
+ for slot in slots:
+  arm=slot['arm'];folder=batch/'runs'/(task+'-'+arm);folder.mkdir(parents=True)
+  def put(name,data):(folder/name).write_text(json.dumps(data))
+  put('provider-metadata.json',[{'forwarded':True,'serverCompletion':'unknown' if arm=='T' else 'completed','usage':None if arm=='T' else {'input_tokens':10,'output_tokens':2,'cached_tokens':0,'reasoning_tokens':0},'recording':{'evidenceComplete':True}}])
+  put('result.json',{'nativeCompleted':arm=='P'})
+  put('stop-verification.json',{'terminationVerified':True,'captureSaved':arm!='C','relayRemoved':True,'forwardingClosed':True})
+  put('native-evidence.json',{'tools':[],'messages':[{'session_id':'s','data':{'role':'assistant','finish':'stop','time':{'created':2}}},{'session_id':'s','data':{'role':'assistant','finish':'tool-calls','time':{'created':1}}}]})
+  put('evidence-capture.json',{'kind':'evidence_complete' if arm!='C' else 'evidence_incomplete'})
+  if arm!='C':(folder/'model.patch').write_text(patch)
+  records[slot['slot']]={'started':True,**({'patch':patch} if arm!='C' else {})}
+ with (base/'selected.csv').open('w',newline='') as f:
+  w=csv.DictWriter(f,fieldnames=list(selected));w.writeheader();w.writerow(selected)
+ r.export_started(slots,records,[selected],batch/'export')
+ for arm in ['P','T']:
+  evaluation=base/'evaluations'/arm;out=evaluation/'results';out.mkdir(parents=True)
+  (out/(task+'_result.json')).write_text(json.dumps({'resolved':True,'passed_tests':['public-fixture'],'failed_tests':[],'patch_applied':True}))
+  (evaluation/'provenance.json').write_text(json.dumps({'evaluator':'9c836c5d7f3cb991934132b77d29e6941d912a07','predictions_sha256':hashlib.sha256((batch/'export'/arm/'predictions.jsonl').read_bytes()).hexdigest()}))
+ collector.LOCAL=base;collector.SELECTION=base/'selection.json';collector.CONFIG={'name':'fixture'};collector.ARMS=['P','C','T']
+ with contextlib.redirect_stdout(io.StringIO()):collector.main()
+ data=json.loads((batch/'accounting.json').read_text());by={x['arm']:x for x in data['slots']}
+ assert by['P']['R'] is True and by['P']['T'] is True and by['P']['D'] is True and by['P']['artifact_kind']=='terminal'
+ assert by['C']['R'] is None and by['C']['D'] is None and by['C']['artifact_kind'] is None
+ assert by['T']['R'] is True and by['T']['T'] is False and by['T']['D'] is False and by['T']['artifact_kind']=='partial'
+ assert by['T']['provider_outcome']=='unknown_submission' and by['T']['usage_complete'] is False
+ assert (batch/'export/C/predictions.jsonl').read_text()==''
+print('Campaign reader preserves partial R, autonomous T/D, missing capture and unknown usage independently')

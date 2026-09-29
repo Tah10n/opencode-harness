@@ -3,8 +3,9 @@ No provider access. Invoke using an existing Python >=3.12.
 """
 import argparse, csv, hashlib, json, os, subprocess, sys, time, urllib.request
 from pathlib import Path
+from campaign import LOCAL, SELECTION, CONFIG
 ROOT=Path(__file__).resolve().parents[2]
-DEV=ROOT/'evaluation/polybench'; LOCAL=ROOT/'local/polybench'
+DEV=ROOT/'evaluation/polybench'
 EVAL_SHA='9c836c5d7f3cb991934132b77d29e6941d912a07'
 DATA_SHA='b3fca77b637379f0c01ad86d18753a7ac1998b53'
 
@@ -14,7 +15,7 @@ def command(args, **kwargs):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--controls',action='store_true');parser.add_argument('--full',action='store_true');parser.add_argument('--plan',action='store_true');args=parser.parse_args()
     if args.plan:
-        print(json.dumps({'dataset_revision':DATA_SHA,'evaluator_revision':EVAL_SHA,'selected_tasks':len(json.loads((DEV/'selection.json').read_text())['selected']),'model':os.environ.get('POLYBENCH_MODEL'),'variant':os.environ.get('POLYBENCH_VARIANT'),'provider_requests':0,'full_preparation':'Linux ARM64 Docker, Python >=3.12, explicit model/variant; installs public pinned tools; author isolation and official controls before freeze'}));return
+        print(json.dumps({'dataset_revision':DATA_SHA,'evaluator_revision':EVAL_SHA,'selected_tasks':len(json.loads(SELECTION.read_text())['selected']),'model':os.environ.get('POLYBENCH_MODEL'),'variant':os.environ.get('POLYBENCH_VARIANT'),'provider_requests':0,'full_preparation':'Linux ARM64 Docker, Python >=3.12, explicit model/variant; installs public pinned tools; author isolation and official controls before freeze'}));return
     if sys.version_info < (3,12): raise RuntimeError('Preparation requires Python >=3.12')
     if (LOCAL/"batch").exists(): raise RuntimeError("Preparation cannot mutate a frozen batch")
     LOCAL.mkdir(parents=True,exist_ok=True)
@@ -27,17 +28,28 @@ def main():
     dataset=LOCAL/'verified.csv'
     if not dataset.exists():
         urllib.request.urlretrieve('https://huggingface.co/datasets/AmazonScience/SWE-PolyBench_Verified/resolve/'+DATA_SHA+'/test.csv',dataset)
-    if (DEV/'selection.json').exists():
-        expected=json.loads((DEV/'selection.json').read_text())['dataset_sha256']
+    if SELECTION.exists():
+        expected=json.loads(SELECTION.read_text())['dataset_sha256']
         assert hashlib.sha256(dataset.read_bytes()).hexdigest()==expected
-    command([sys.executable,DEV/'selection.py'])
+    if not CONFIG:
+        command([sys.executable,DEV/'selection.py'])
     python=LOCAL/'venv/bin/python'
     if not python.exists():
         command([sys.executable,'-m','venv',LOCAL/'venv'])
         command([python,'-m','pip','install','-r',DEV/'requirements.lock'])
-    command([sys.executable,DEV/'verify.py','--dataset'])
+    command([sys.executable,DEV/'verify.py','--consolidated-dataset' if CONFIG else '--dataset'])
     if not (args.controls or args.full): return
-    selection=json.loads((DEV/'selection.json').read_text())
+    if CONFIG:
+        command([python,DEV/'remaining_controls.py'])
+        if not args.full:return
+        if not (LOCAL/'runtime.json').exists():command(['node',DEV/'runtime.mjs'])
+        command([python,DEV/'prepare_diagnostic.py'])
+        command([python,DEV/'prepare_authors.py'])
+        command([python,DEV/'environments.py'])
+        command([python,DEV/'audit_images.py'])
+        command([python,DEV/'preflight_ready.py'])
+        return
+    selection=json.loads(SELECTION.read_text())
     first=[next(r for r in selection['selected'] if r['language']==lang) for lang in ['JavaScript','TypeScript']]
     csv.field_size_limit(10000000)
     with dataset.open(newline='') as f: reader=csv.DictReader(f);rows=list(reader);fields=reader.fieldnames

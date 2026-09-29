@@ -1,9 +1,10 @@
 """Create a source-free author base without changing the benchmark toolchain."""
 import argparse,json,subprocess
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[2];LOCAL=ROOT/'local/polybench'
+from campaign import LOCAL as CAMPAIGN_LOCAL, SELECTION
+ROOT=Path(__file__).resolve().parents[2];LOCAL=CAMPAIGN_LOCAL
 p=argparse.ArgumentParser();p.add_argument('instance_id');a=p.parse_args()
-row=next(r for r in json.loads((ROOT/'evaluation/polybench/selection.json').read_text())['selected'] if r['instance_id']==a.instance_id)
+row=next(r for r in json.loads(SELECTION.read_text())['selected'] if r['instance_id']==a.instance_id)
 image=json.loads((LOCAL/'images.json').read_text())['polybench_'+row['language'].lower()+'_'+a.instance_id.lower()]
 context=LOCAL/'diagnostic';dockerfile=context/(a.instance_id+'.Dockerfile')
 # Only preparation material in the original image is removed. The author gets

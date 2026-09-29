@@ -1,11 +1,14 @@
 """Verify toolchain startup, then append only public environment facts to tasks."""
 import csv,json,re,subprocess
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[2];LOCAL=ROOT/'local/polybench'
+import sys
+from campaign import LOCAL as CAMPAIGN_LOCAL, SELECTION
+ROOT=Path(__file__).resolve().parents[2];LOCAL=CAMPAIGN_LOCAL
 csv.field_size_limit(10000000)
 with (LOCAL/'selected.csv').open(newline='') as f:rows=list(csv.DictReader(f))
 p=LOCAL/'environments.json';environments=json.loads(p.read_text()) if p.exists() else {}
 for row in rows:
+ if len(sys.argv)>1 and row['instance_id']!=sys.argv[1]:continue
  id=row['instance_id'];folder=LOCAL/'author-inputs'/id
  if not (folder/'image.json').exists():continue
  source=folder/'source'
