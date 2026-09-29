@@ -1,6 +1,0 @@
-{
-  "schema_version": 3,
-  "inventory_path": "profiles/inventory.v3.json",
-  "bundle_id": "deep",
-  "view": "adoption_bundles.deep"
-}

@@ -1,5 +1,0 @@
-agent: researcher
-permission:
-  edit: deny
-  websearch: allow
-  webfetch: allow

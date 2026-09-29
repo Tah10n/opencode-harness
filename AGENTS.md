@@ -1,11 +1,13 @@
 # OpenCode Harness Rules
 
-These rules apply to every profile. Profile-specific detail lives in the
-selected agent or skill and is loaded only when needed.
+The maintained product is the native materializer and runtime. Use the current
+README and docs/USAGE.md; archived profile generations are not supported modes.
+Keep changes in a short branch from main, verify the PR, merge and delete its
+branch. Research results belong in the results index, not permanent branches.
 
 ## Default operating loop
 
-Use `core` for ordinary development:
+For ordinary development:
 
 1. Read the user goal and project-local `WORKFLOW.md`, `AGENTS.md`, or relevant
    skills.
@@ -22,22 +24,20 @@ Small local tasks stay single-agent. Use an independent reviewer only when it
 can find defects that deterministic checks cannot. Review-only requests remain
 read-only unless the user explicitly asks for fixes.
 
-## Select heavier profiles deliberately
+## Verification and broader investigations
 
-- `deep` is optional for broad audits, large diffs, multi-module
-  investigations, long logs, and tasks that do not fit bounded local context.
-  It may use focused read-only exploration and at most three independent
-  read-only children. The primary agent remains the integrator.
-- `assurance` is a deprecated research-only compatibility profile. Do not
-  recommend it for product work. A project-local `WORKFLOW.md` may still name
-  it for historical reproduction, but that does not establish release evidence.
-- `lab` is not a runtime profile. It contains benchmark, evaluation, replay,
-  trace, fixture, and experimental infrastructure.
+Run `npm ci --ignore-scripts`, install the pinned sensitivity dependencies with
+`npm ci --ignore-scripts --prefix profiles/native/sensitivity`, then `npm run verify`.
+`OPENCODE_BIN=/absolute/path/to/opencode npm run verify:installed` exercises
+OpenCode 1.18.26 with a local provider. CI also tests actual container boundaries.
+These checks do not authorize real model calls. Full evaluation is separately
+explicit and follows evaluation/polybench/README.md.
 
-Core or deep must not start or recommend legacy assurance. For high-risk work,
-follow the project's own required controls or report that no promoted harness
-mode currently covers the risk. Missing optional context tools never block an ordinary task;
-fall back to bounded read/search and state the coverage gap.
+For broad audits, at most three focused read-only children may help inspect
+independent surfaces; the primary agent remains the integrator. Archived
+assurance, quality and verified-change generations must not be recommended as
+current product modes. Missing optional context tools do not block ordinary
+work: use bounded read/search and state the coverage gap.
 
 ## Engineering and verification
 

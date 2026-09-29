@@ -1,4 +1,0 @@
-agent: improver
-permission:
-  edit: deny
-  "oc_learning_*": ask

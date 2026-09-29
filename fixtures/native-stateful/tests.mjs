@@ -1,0 +1,10 @@
+export const imports = "import assert from 'node:assert/strict';\nimport { test } from 'node:test';\nimport { store, read, clear, consume } from './example.mjs';\n";
+const setup = "store.set('item', { id: 'item', active: true });";
+const action = "consume('item', id => read(id));";
+const before = "assert.deepEqual(read('item'), { id: 'item', active: true });";
+const after = "assert.equal(read('item'), undefined);";
+const empty = "test('empty idempotency', () => { clear(); assert.equal(store.size, 0); consume('item', id => read(id)); assert.equal(store.size, 0); });\n";
+export const stale = imports + `test('independent transitions', () => { clear(); assert.equal(store.size, 0); ${action} ${after} });\n` + empty;
+export const guarded = stale.replace(action, before + ' ' + action);
+export const repaired = guarded.replace(before, setup + ' ' + before);
+export const beforeOnly = repaired.replace(after, '');

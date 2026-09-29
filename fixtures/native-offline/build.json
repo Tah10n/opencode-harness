@@ -1,0 +1,12 @@
+{
+  "permission": {
+    "webfetch": "deny"
+  },
+  "agent": {
+    "build": {
+      "permission": {
+        "webfetch": "deny"
+      }
+    }
+  }
+}

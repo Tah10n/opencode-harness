@@ -1,35 +1,20 @@
 # Security Policy
 
-## Supported Versions
+The maintained `main` branch receives security fixes. Historical releases and
+archived runtime generations do not establish current native security coverage.
 
-The latest release tag and the `main` branch receive security fixes.
+Report vulnerabilities through GitHub private vulnerability reporting when
+available, or open a minimal issue without exploitable details. Never include
+credentials, private keys, environment values, personal data or raw private logs.
 
-## Reporting a Vulnerability
+Security-sensitive changes include effective OpenCode permissions, checkout and
+index preservation, worktree/patch ownership, deadline and cancellation, artifact
+provenance, unknown outcomes, generated expectations and evaluation containment.
 
-Please report vulnerabilities through GitHub private vulnerability reporting
-when available, or open a minimal issue that does not include secrets, tokens,
-private logs, or exploitable details.
-
-Do not paste credentials, private keys, `.env` values, raw production logs, or
-machine-specific private data into public issues.
-
-## Scope
-
-This repository is a behavior profile for OpenCode. Security-sensitive changes
-usually involve:
-
-- command permissions;
-- read/write tool exposure;
-- trusted toolchain identity and host-owned configuration;
-- Windows, Linux, and macOS process-containment boundaries;
-- host adapter and runtime-hook verification;
-- same-run receipt provenance and aggregate status derivation;
-- self-improvement boundaries;
-- memory persistence rules;
-- examples that could encourage unsafe configuration.
-
-Before merging such changes, run `npm run verify`, inspect the effective
-OpenCode config with `npm run verify:runtime`, and require the cross-platform
-`Milestone 2 receipt aggregation` check when containment or receipt provenance
-is affected. Redact credentials, private paths, PII, and raw production output
-from review comments and durable evidence.
+Run `npm run verify` and `npm run verify:installed` for affected native boundaries.
+Evaluation containment also requires the actual container check in CI. The
+required `Harness verification` gate depends on both executed jobs. Historical
+cross-platform quality-runtime checks do not validate the current native product.
+Preserve code-owner review and the configured branch protection; do not bypass
+required checks or reviews. Technical fixtures do not certify arbitrary hostile
+host-process containment or model correctness.

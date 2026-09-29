@@ -1,6 +1,0 @@
-{
-  "schema_version": 2,
-  "schema_path": "benchmarks/synthetic/schemas/family-registry.v2.schema.json",
-  "inventory_path": "profiles/inventory.v2.json",
-  "view": "benchmark.families"
-}
