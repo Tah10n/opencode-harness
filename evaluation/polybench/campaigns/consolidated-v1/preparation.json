@@ -1,0 +1,1204 @@
+{
+  "version": 1,
+  "stage": "prepared_not_frozen",
+  "observed_at": "2026-09-29T16:34:39.092249+00:00",
+  "product_sha": "39def2ed0b1476299b104b38f8c93747d828a87a",
+  "adapter_sha": "5c0e634c4327bcbe687d8da03058e54c45f28734",
+  "dataset_revision": "b3fca77b637379f0c01ad86d18753a7ac1998b53",
+  "dataset_sha256": "0c8138e73c34fa29a5276b675b146b72d78ce001fcc4560d76302c908b4808a5",
+  "evaluator_revision": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+  "selection_sha256": "fc63631c02baf256e0c726e217a25010bca2e0a2f3dc31613cfdd578f808f1fc",
+  "plan_sha256": "e11161737b699a5588a9962fd22003db0864b06046f4a6ca27af98403cb081aa",
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "opencode": "1.18.26",
+  "installed_bundle_hashes": {
+    "bundle": "434e1f98c533b73b5e188fd8ccc8ec5630f1c5122b99eb1e99d7354da5f6f58f",
+    "core-bundle": "74bf53f5b6599484c9bea30c9ffcd833a89b10dc76ae3f6f90ac4a7e4a0297bf",
+    "plain-dependencies": "8f127e4f53502e47188d350cfcff639844d7d17f847abb18e507079e42f19140"
+  },
+  "experiment_configuration_sha256": "d16c89f0390b081948d75ece875c1c10b64a74c809dfe30d916afca875e47cf5",
+  "recording_profile": "research-full-inspect-ledger-1g-v1",
+  "resources": {
+    "cpus": 2,
+    "memory_mib": 12288,
+    "work_tmpfs_mib": 8192,
+    "pids_limit": 512,
+    "network": "none"
+  },
+  "assigned_tasks": 20,
+  "prepared_tasks": 17,
+  "preparation_errors": 3,
+  "assigned_slots": 60,
+  "eligible_slots": 51,
+  "model_requests": 0,
+  "admission": "awaiting_budget_boundary_clarification",
+  "budget_evidence": {
+    "status": "awaiting_user_interpretation_before_freeze",
+    "mechanism_unchanged": true,
+    "observations": [
+      {
+        "arm": "P",
+        "slot_created_at": "2026-09-29T14:26:01.562Z",
+        "task_clock_started_at": "2026-09-29T14:26:10.846Z",
+        "excluded_preparation_seconds": 9.284,
+        "seconds_from_slot_creation_to_task_deadline": 1809.283,
+        "runtime_bootstrap_in_budget": true
+      },
+      {
+        "arm": "C",
+        "slot_created_at": "2026-09-29T14:28:21.943Z",
+        "task_clock_started_at": "2026-09-29T14:28:28.188Z",
+        "excluded_preparation_seconds": 6.245,
+        "seconds_from_slot_creation_to_task_deadline": 1806.245,
+        "runtime_bootstrap_in_budget": true
+      },
+      {
+        "arm": "T",
+        "slot_created_at": "2026-09-29T14:26:42.397Z",
+        "task_clock_started_at": "2026-09-29T14:26:49.065Z",
+        "excluded_preparation_seconds": 6.668,
+        "seconds_from_slot_creation_to_task_deadline": 1806.668,
+        "runtime_bootstrap_in_budget": true
+      }
+    ],
+    "question": "Does total task-run time include per-slot container preparation, or does bootstrap mean OpenCode startup after prepared-container verification?",
+    "real_model_requests": 0
+  },
+  "scripted_checks": {
+    "passed": true,
+    "checks": [
+      {
+        "arm": "P",
+        "source": "scripted-preflight",
+        "patch_sha256": "f115c00cc4fcf3e3241dd34505357a1a3f1aec4ceaa6cdef39323581a8087611",
+        "result_sha256": "cd6cfeab9b2a2970a02fd31a8ac12b56b65bde58533ee6504b96735353693703",
+        "delivery": "/work/repo",
+        "roundtripVerified": true,
+        "nativeStop": true,
+        "dependenciesAvailable": true,
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "arm": "C",
+        "source": "scripted-preflight-core",
+        "patch_sha256": "f115c00cc4fcf3e3241dd34505357a1a3f1aec4ceaa6cdef39323581a8087611",
+        "result_sha256": "bad06f00df9b85505a9c59ce8ae10ebe16560971fe8001c86b898f4af4eb94f7",
+        "delivery": "/work/repo",
+        "roundtripVerified": true,
+        "nativeStop": true,
+        "dependenciesAvailable": true,
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "arm": "T",
+        "source": "scripted-preflight",
+        "patch_sha256": "f115c00cc4fcf3e3241dd34505357a1a3f1aec4ceaa6cdef39323581a8087611",
+        "result_sha256": "f7129414fbfe47d19fe74d8beed7acf8e922bf0a65bc242cddc27240575cb385",
+        "delivery": "/work/repo/.git/harness-task/ce396f1a-1f65-4755-a78b-ec7a9c1e3add/worktree",
+        "roundtripVerified": true,
+        "nativeStop": true,
+        "dependenciesAvailable": true,
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      }
+    ],
+    "realProviderRequests": 0,
+    "initialCoreError": "OpenCode needed startup .gitignore before read-only mount; corrected in adapter preparation only; P/T not replayed",
+    "official_export_control": {
+      "patch_applied": true,
+      "checks": [
+        {
+          "arm": "P",
+          "result_sha256": "e1ed068731d94c48c316a40da88f3eb6dc653a018860e77a3b2c0af251570fca",
+          "patch_sha256": "f115c00cc4fcf3e3241dd34505357a1a3f1aec4ceaa6cdef39323581a8087611",
+          "patch_applied": true,
+          "resolved": false,
+          "representative_arm": "P"
+        },
+        {
+          "arm": "C",
+          "result_sha256": "e1ed068731d94c48c316a40da88f3eb6dc653a018860e77a3b2c0af251570fca",
+          "patch_sha256": "f115c00cc4fcf3e3241dd34505357a1a3f1aec4ceaa6cdef39323581a8087611",
+          "patch_applied": true,
+          "resolved": false,
+          "representative_arm": "P"
+        },
+        {
+          "arm": "T",
+          "result_sha256": "e1ed068731d94c48c316a40da88f3eb6dc653a018860e77a3b2c0af251570fca",
+          "patch_sha256": "f115c00cc4fcf3e3241dd34505357a1a3f1aec4ceaa6cdef39323581a8087611",
+          "patch_applied": true,
+          "resolved": false,
+          "representative_arm": "P"
+        }
+      ],
+      "unique_official_invocations": 1,
+      "note": "Identical scripted patches share one official control; not model quality results."
+    }
+  },
+  "tasks": [
+    {
+      "instance_id": "sveltejs__svelte-5850",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "9cc21e3c0998365cc295f3eb6af21ca69197c671",
+      "preparation": {
+        "status": "ready",
+        "phase": "prepared",
+        "elapsed_seconds": 0.05761599540710449
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 3184,
+          "failed": 1,
+          "result_sha256": "22915454e218bd85354045d8d6a2c90236d8f2e337d5774e3b79853f856fce40",
+          "provenance_sha256": "7af1fc427094afbf6e8014d431b449c493f09d63417d951c64e932e87ab628a4"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 3182,
+          "failed": 3,
+          "result_sha256": "e1ed068731d94c48c316a40da88f3eb6dc653a018860e77a3b2c0af251570fca",
+          "provenance_sha256": "2e1286c050d505d043bd6071df98273a0e1648c946efe1fd8c9a0d9d7edeb14c"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-5850:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-5850@sha256:9fd8f8de506bb7845656dd742b147513dccc328304a66464cbcccb5c9e8e66a7",
+        "id": "sha256:9fd8f8de506bb7845656dd742b147513dccc328304a66464cbcccb5c9e8e66a7",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 5841502484,
+        "workdir": "/testbed"
+      },
+      "receipt_sha256": {
+        "audit.json": "3e2cc6e1e1812fe425d35bc914857ff21934945573201c35524b56864f61fb96",
+        "base-preservation.json": "ca5bac052208f0dd77c823c55bdf0dfcdd54dad6c2c138e22d3ddff94904e791",
+        "lfs-audit.json": "10060f896a706f3cf849a5339aefdb1ec02014c7a9f003cec55085d45e4d3b1c",
+        "image.json": "fb152d96db09f673f042091f0d8f5b764174f85ff875fec51bfec117690f0ba3",
+        "image-isolation.json": "5232f4aefd811dde5737b58b50812ea651cea904b8f0df9e41fcc4751f2386bf",
+        "image-environment.json": "f54e68fcfc08aaabacdcdcbac9e7d04a0317fc453dc227128a2d416f8d779c30",
+        "accessible-build-locations.json": "63e1b31a0cf000bb43782af98a5d1a7078878ef5fd557735b6214aefa3a02aa3"
+      },
+      "author_image": "sha256:3203908b2afe1a31c0dce9375e2b1b33291fd018e61526fe56fe1f6fb38fe2f6",
+      "source_archives": {
+        "base.tar": "583ae7ae5972c10a5e89433b7ccfb3750e582095583faea115b9d6ef5b868df2",
+        "dependencies.tar": "6b967438f9162b12153d975516b89d1dddafd5b621b95d97e4552bf3d5bc28de"
+      }
+    },
+    {
+      "instance_id": "serverless__serverless-6869",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "18852ec34bbe1bdd9457c563e21e53cab3dc2fcd",
+      "preparation": {
+        "status": "ready",
+        "phase": "prepared",
+        "elapsed_seconds": 29.21929097175598
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 228,
+          "failed": 0,
+          "result_sha256": "38ce3403e4fc0befbb935ecf024a2be0dd1910fad95ffb5e505807e2d3bb6379",
+          "provenance_sha256": "3591d8cadbfa18aa20fc3779fa6d4ebf6ed6141db48ba633f9c26e68696b0314"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 213,
+          "failed": 15,
+          "result_sha256": "2c1d5baf173e2ec11115a3f4e5d824527bd3a845c50025b1f3d8c712870ba99a",
+          "provenance_sha256": "023a3da413d4359b6d7a0e0c405857799a4dfdd0b3dae2bbb16d77c07e684fa5"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6869:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-6869@sha256:cd452675f73ebc28b620fe00796fb53c430708bc2470ef95161b91fa989487f0",
+        "id": "sha256:cd452675f73ebc28b620fe00796fb53c430708bc2470ef95161b91fa989487f0",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 5445317113,
+        "workdir": "/testbed"
+      },
+      "receipt_sha256": {
+        "audit.json": "faef6b65e196b37d030beb2850620a978ec6811a6e9ed9beab8641d1b2b4c96d",
+        "base-preservation.json": "b5bf7f2bce17e39a585a2eb33473b061bc3b137e771eae504c99cce0bdc9ee15",
+        "lfs-audit.json": "f9e4439505e7ac43079a0b367fb7d636b5879bff420963910cf920beb89f2497",
+        "image.json": "bc6f23c3845b884b7f01b4584ac3b56cc6cafcd7a1209e755d8813c1a197b4a1",
+        "image-isolation.json": "266b80365b1a1eee08a774929954177122bcad4e0cf031d3383adc297f4d6a72",
+        "image-environment.json": "d8607ff019394f5bef032e881ed6443db1508dfebfcbea55bc8b5c64c1629929",
+        "accessible-build-locations.json": "bd8242703101c491279fed2723cbbb4799070c9ca7c40ac0fe7545789e7af80f"
+      },
+      "author_image": "sha256:08bf21d3469fa76a37e5dd83f5e60dcca5ebdd3f47e9d3d23be88008fa0bbecf",
+      "source_archives": {
+        "base.tar": "afcb5bb577e18d12d41df72d92ac1a5427f1b3e14586f97a7d5d094fefe26969",
+        "dependencies.tar": "ba58ce9c96429384abc35b2d4617acace743ea5991c1dd657d90689304b7868b"
+      }
+    },
+    {
+      "instance_id": "sveltejs__svelte-738",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Feature",
+      "base_commit": "ae060cfa3b228ff2d1646e60700e77aace1e4780",
+      "preparation": {
+        "status": "ready",
+        "phase": "prepared",
+        "elapsed_seconds": 17.185359239578247
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 1141,
+          "failed": 3,
+          "result_sha256": "8c32ede5371269622a77886a8d8444b88cbb1841961a0059489fbac698e64fb3",
+          "provenance_sha256": "d20d8953e96b69023d53f40b4082a20b22daa6e5fb840588b70e2d41ccca6264"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 1138,
+          "failed": 6,
+          "result_sha256": "d8d430b608d1d3bb907031d52117f5e0db4be344bd2c05341f280ba5318a1d9b",
+          "provenance_sha256": "6a3804411a249764d24e8c911b78d346836f17629d1230e5f685c245011bc9ce"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-738:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-738@sha256:8db46e6bb97c8ab09b94f6b6d9a863d80c33775cbfbe292c027591b432826b21",
+        "id": "sha256:8db46e6bb97c8ab09b94f6b6d9a863d80c33775cbfbe292c027591b432826b21",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 5094641506,
+        "workdir": "/testbed"
+      },
+      "receipt_sha256": {
+        "audit.json": "b268d18e31ffc4509248a56299b71220248e459b58959e31fff820fd5532ec2b",
+        "base-preservation.json": "dac57b9087d6cc3e08b594418c26f431ff8d5f665a7e6c011e1d2fb4989038a9",
+        "lfs-audit.json": "63398a617a7c67abbc2496b3e437852a48e603f9c6215d4cee93d090065d84ab",
+        "image.json": "71973c43116f1db97e74e4cfab2ff1c2a1d03e00c3d09f74bac5775fdda6f5d4",
+        "image-isolation.json": "9fb859d219a64ac360ef1fa5a852fa87bfdaa17c81a0a5fc077668376f45d6f7",
+        "image-environment.json": "1a7e8cb39300005ce7e50b5752af5b391616697b480064f2af8230c27e7a41d2",
+        "accessible-build-locations.json": "e7e493d587b0ddb1f8ce2b45c68160c0ddefacdb2bd836b91a25e59f65599fb3"
+      },
+      "author_image": "sha256:ecc6a6950b59be62ecf2977014ad72d22a360daf8f38ec73d410c45e34754608",
+      "source_archives": {
+        "base.tar": "5857a4408f8729d89afeb5830419c8f7ff3aef1d485c3d289845e09a06c2bccb",
+        "dependencies.tar": "6dd644514c3dd6971468a18b495aab66776d92eb427e2922cc70aecf9736e09d"
+      }
+    },
+    {
+      "instance_id": "microsoft__vscode-177084",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "384b03f26310fc3c4ea86156b7c6aefb431d594f",
+      "preparation": {
+        "status": "preparation_error",
+        "phase": "author_input",
+        "error_type": "CalledProcessError",
+        "reason": "tarfile.AbsoluteLinkError: remote/node_modules/spdlog/build/node_gyp_bins/python3 -> /usr/bin/python3",
+        "elapsed_seconds": 33.02024793624878,
+        "evidence": "author-inputs/microsoft__vscode-177084/failure.json"
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 306,
+          "failed": 0,
+          "result_sha256": "cba6f35607b3792e8bcde9d5de5639c47f17e8d04c364438e484bc13d7a6ba1f",
+          "provenance_sha256": "f48ebb3a811cb086caa63b68ed09995fe8c025eb223697ba6fb5b547e80d4b72"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 305,
+          "failed": 1,
+          "result_sha256": "d6e90e5ad808748a776dea2382b010633443249dfe78cd557cb7e414b454c1c1",
+          "provenance_sha256": "c359bcf433d7a609f53a65ad54ee0ea3c1177d9e41deb10f4c4eb9ebdff07fbe"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-177084:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-177084@sha256:498a1d50ce67aeb0a00be737b9b455db698a95fc8172e0ff25464c97bdbacc86",
+        "id": "sha256:498a1d50ce67aeb0a00be737b9b455db698a95fc8172e0ff25464c97bdbacc86",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 15822794722,
+        "workdir": "/testbed"
+      },
+      "failure_evidence_sha256": "5a8dff0d6929fcef475ebbbccbc254187cfbf30116b3fe7b17fa2603098cd6f8"
+    },
+    {
+      "instance_id": "mui__material-ui-38544",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "f22e9951931ecf68e8bce1c159d8e0384d92760c",
+      "preparation": {
+        "status": "ready",
+        "phase": "prepared",
+        "elapsed_seconds": 89.29177236557007,
+        "preparation_note": "Browser/crash environment fields inspected before freeze; no project artifacts in residual locations. See environment-inspection-resolution.json."
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 76,
+          "failed": 0,
+          "result_sha256": "8f2db59150824aa5410ec1a84200c9bb99d3613327cada663647cd2c91218e16",
+          "provenance_sha256": "b3dd18e2ceaf577ddb80c30d4505b7602e0c7ffa3e150d7147c95e8d24baf978"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 75,
+          "failed": 1,
+          "result_sha256": "a50036866f10620f234fb72076e0a9f8aa51a8a03ef83fdff8c1ebf78033cfc2",
+          "provenance_sha256": "68cb7226a7f41c042314ad19ead3b93bea3a535f82bbfd7e07015244ca54fe4f"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-38544:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-38544@sha256:fc92f40466ef98f0c420951e97d2b36da3c6956f26b5d058518142920ceab301",
+        "id": "sha256:fc92f40466ef98f0c420951e97d2b36da3c6956f26b5d058518142920ceab301",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 11691170025,
+        "workdir": "/testbed"
+      },
+      "receipt_sha256": {
+        "audit.json": "260085d71efd7f07e2466e5e8f6ce1f1beeaf643752991ea8d33b0997c71215d",
+        "base-preservation.json": "2141e9bc2c4b7f798983310f817f704fcbdd602ddcc1dfc760a4b499f089fca8",
+        "lfs-audit.json": "3a4ae31d5d354d2f407445a362a1fbb25980c6992980d5e6648c34ab5e1acfa4",
+        "image.json": "1eebcc7fa0ed73482a1ddcd3d7ed8b477e72ee50588e313676dffbd2a24e318e",
+        "image-isolation.json": "b01e161af9fdb44d45d17361a292894474be9a924d4c4a7e67ae23f925c5dee8",
+        "image-environment.json": "391966372af284d2c8204da321a2a4dad3392d5c673289589291df3ce2f8053f",
+        "accessible-build-locations.json": "b24f2e64fd326819539a8fe195b702fd9afcffdb28467a572a86300e8b3f5343"
+      },
+      "author_image": "sha256:7ee58b5f2159a275f98979b020db73c2425703bec38dea0ac14724d20beae0e7",
+      "source_archives": {
+        "base.tar": "e474fb996acc2f62ada041d3e6909b3f0c9c63acb87d34c17409a8fbf917908c",
+        "dependencies.tar": "8523375ef2e1a1c0c927342a7b19a614e8858e8d6886cab748826fd579eebd72"
+      }
+    },
+    {
+      "instance_id": "prettier__prettier-8777",
+      "repo": "prettier/prettier",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "d07267184278fcc3fa0fb57628653f9b6daed607",
+      "preparation": {
+        "status": "ready",
+        "phase": "prepared",
+        "elapsed_seconds": 23.88608717918396
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 3,
+          "failed": 0,
+          "result_sha256": "f045f6cd294bcc32aa2164b5d3a3d1568cad6fc5befeb482cc2e86f87361180d",
+          "provenance_sha256": "309c0f9a7f2cff7491c50d3b9f3c425c2f5edb892d80dd962a0d188048657df6"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 1,
+          "failed": 2,
+          "result_sha256": "52a297c4d62dd927c8d63e75186f7f887d814cffb86fbcda1449d85901763b4d",
+          "provenance_sha256": "25b4ef73d9bedcc3990d5ab407e1cabad781a73edce5f4806fdde68256643987"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.prettier__prettier-8777:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.prettier__prettier-8777@sha256:4365c15216a217d237729bc2b3364f02faafe3fb77c7fc37b91f3ef659588115",
+        "id": "sha256:4365c15216a217d237729bc2b3364f02faafe3fb77c7fc37b91f3ef659588115",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 5734313394,
+        "workdir": "/testbed"
+      },
+      "receipt_sha256": {
+        "audit.json": "414467c00d96b903d205b6569ae16c99bd47d6ee6e57da212e8dec4f3df93dd6",
+        "base-preservation.json": "46d73a7fcccd6339e27a8c6dbd4a5364f3ca2f00f16cb840b70aa109b735c5ae",
+        "lfs-audit.json": "8c5a1a4294f6d5d71ca6a4ff53f6cc0224efeca54024d4ea57f0608deec68b4a",
+        "image.json": "cd5ed37028eb15801ac1c22e635af539fff9bb6469e6a12af50cbd0394fb7665",
+        "image-isolation.json": "f446998691242866f43c8f50d95ff97fe75d6679578421cf1fcba3002965fe55",
+        "image-environment.json": "027e6eb3470bcf3cf5e8e82d5ceb78f68a05db4add5d13c8052ba8311b3354e5",
+        "accessible-build-locations.json": "999a96beadd28cfce160c6ea1689fa05513141915c56ad518f86e893d577c27a"
+      },
+      "author_image": "sha256:04dbaa85daeb78661e1af3d3bb4c03d84d01f65c42fe6498261d67c2c8765202",
+      "source_archives": {
+        "base.tar": "d7dc6f8fd854e960d2b222eb2d05dd32fdc9b1411194e9c844123cbefe672b40",
+        "dependencies.tar": "3d8b78d5daa82f8cf5b64785d1820c05655b4a64d81e2f2dd6d3473987d476df"
+      }
+    },
+    {
+      "instance_id": "sveltejs__svelte-6458",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "b662c7fd41b3b778ea1ae80b0a4d86c239ffcfe7",
+      "preparation": {
+        "status": "ready",
+        "phase": "prepared",
+        "elapsed_seconds": 26.391464948654175
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 4292,
+          "failed": 2,
+          "result_sha256": "b692a90ae8c7fe8cb6f7172b704472a831e23fe32b93d16082ff30a31d52f7ca",
+          "provenance_sha256": "11c99b17f4c8d5804f053680e5f4670730abac16b94e1dc607e9135527d4c902"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 4274,
+          "failed": 20,
+          "result_sha256": "576ff5c14fa2183f223dbdb1b06966b9bd5cff1edbfbfbd1a1d67c0c7063e831",
+          "provenance_sha256": "e7923351311f764c3cc66dc29d00414ea70a2bec7661a3a8bfa76a7d9fa84051"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6458:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6458@sha256:7d134cb5c9760285bb83ec92214727d8eb708b518f45d6f2764cbb1c1e786d5f",
+        "id": "sha256:7d134cb5c9760285bb83ec92214727d8eb708b518f45d6f2764cbb1c1e786d5f",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 5844044226,
+        "workdir": "/testbed"
+      },
+      "receipt_sha256": {
+        "audit.json": "389c63629cbfb6f66ccf79b0f83c03e2b14f5c9e8514623953a544b0626e7fa9",
+        "base-preservation.json": "8c0b8d7c4372e5f1e1933fbb35ca650490abf64f773d958410320e0fcfb96c22",
+        "lfs-audit.json": "be9bb94a826e174eede80d6c13db42a5798a7b2096d9bd5c1e45b7b419d2bede",
+        "image.json": "7f4f0ba01a835669bfed1b42836f0a9e2f6d5e847ba8238d4727828f09261076",
+        "image-isolation.json": "9b6d276870f43ac15f335117de49a11d93ed4697600e615c81d19ce3b990f872",
+        "image-environment.json": "f9fddd93891eaa3b0faece49f60d35a84c2674a9280bded06db481f9dd23c847",
+        "accessible-build-locations.json": "6cd303447eeae7097de84ee585ba3327f79675a63e7623fb5805f2e0c5788492"
+      },
+      "author_image": "sha256:13924d2461e9749872ba45471d44ece410b609af4445a4b2744850e37e1cc45b",
+      "source_archives": {
+        "base.tar": "57089a66b7a39c058ba5604bee249e6724bf958fe675987c1a9c69e94f8a4ad5",
+        "dependencies.tar": "93069189cc1e12e462dc65f9ca66f01cb10018fafb4db31da94f86d141274aa2"
+      }
+    },
+    {
+      "instance_id": "mui__material-ui-36971",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "be6b6e2bc479473853ea2ecd367cd1a46c728ad9",
+      "preparation": {
+        "status": "ready",
+        "phase": "prepared",
+        "elapsed_seconds": 89.16721677780151
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 156,
+          "failed": 0,
+          "result_sha256": "0e3173dac2e70e8d62611647050857d08d185f09ab10bce4e03cdf624b634df2",
+          "provenance_sha256": "aeabdd85d06e84402f574222952f0ed714215ba749ee78701424166e52ef2827"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 155,
+          "failed": 1,
+          "result_sha256": "6a31973d796e925a614ea580dcd5c3cfa0466f60e4e90e9ec4524192330c8959",
+          "provenance_sha256": "11298f9454780c82966c94b8363ebb4a05a2bdb4bc6c539f4e5032fbc81d8378"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-36971:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-36971@sha256:5ba35ee5335cd43c433c4b272bde29c06e65d5167aab8c170b2acb83308fdc03",
+        "id": "sha256:5ba35ee5335cd43c433c4b272bde29c06e65d5167aab8c170b2acb83308fdc03",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 11462488765,
+        "workdir": "/testbed"
+      },
+      "receipt_sha256": {
+        "audit.json": "a94e081030814bc0982c70575558c5ebf364fa10e8ca87d7f2869714c8bd4be6",
+        "base-preservation.json": "ec090f8ff12b6d111a8b9b5c6b78494f823a010884d77b53b43f0a067ef570ae",
+        "lfs-audit.json": "66372c9b8a54f10b702024baaf0d1def9b93f4947c7dbbc02fbdd30990c5f3a9",
+        "image.json": "1cb819d50c8a2858f8c62f92b3fdd88d0a6b45502872fffd36b594e057d8c49e",
+        "image-isolation.json": "973b91206ec77d2cd69c517c1439f33dc4120d3b2b31acfeb652116a7bf262de",
+        "image-environment.json": "a4035b4d95127b43e5b322dd08a5e0137cd16bdc7d1825e5c852d570e62c79c0",
+        "accessible-build-locations.json": "8a92ae6d308106d0d35476c4d21d961486c634dc7cb3c28fa4e450b8dcc648e7"
+      },
+      "author_image": "sha256:f564adbe2b4b984d40bfddd0dbbee1e069cc01f9349ceb6a0fb2853e0e09dc5e",
+      "source_archives": {
+        "base.tar": "53741b7df2f25e2c21bcf5dd2a2f7a94e12b15d4ea82f513df815faea6982753",
+        "dependencies.tar": "3c156a70c505cf634b8b682f21f9cba05ac8d743e3e6a6bc58fe8bd1dc860025"
+      }
+    },
+    {
+      "instance_id": "sveltejs__svelte-3151",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "f341befacb92d821424889dfefbdccedc881bfe5",
+      "preparation": {
+        "status": "ready",
+        "phase": "prepared",
+        "elapsed_seconds": 25.020791053771973
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 2197,
+          "failed": 2,
+          "result_sha256": "46efd9564bcd23cbdf823580d29a1116efffc68f43a64cc782f659ac361d37d9",
+          "provenance_sha256": "2cd788884eee957b4513a069c37933f56155f79ad3bfd03a8589360b9ce48786"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 2195,
+          "failed": 4,
+          "result_sha256": "3150e0185c88745b2557ba38e0674e8704551506a0ec83c7ebfe776d5936e2de",
+          "provenance_sha256": "a6050ed5533bbc3db763cd2c28877206095501f92facf7773616a6e04e51ef2a"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-3151:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-3151@sha256:be85223913e062e60514b9b83e9aa5f62c221970ccf0759ea12c0c2f945d9570",
+        "id": "sha256:be85223913e062e60514b9b83e9aa5f62c221970ccf0759ea12c0c2f945d9570",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 5812793772,
+        "workdir": "/testbed"
+      },
+      "receipt_sha256": {
+        "audit.json": "42830295a4c20ee564b89ce5d7a474f040dd9978cb57677cc3fadb0cf275f590",
+        "base-preservation.json": "c4d5adc2039458236d79fdd4a56a006ebde12fe6e588e4c1fbbf4303094159f3",
+        "lfs-audit.json": "7818832ce3c770b66a72aaff56b1fb271daff78dee667968b8379d09c0d1d78d",
+        "image.json": "f14e1b455d4ca1e50db0fda2c07f758a2fc7052557e68bd5d708eb65eb084256",
+        "image-isolation.json": "8c947d601b4bcdf0dd1ec4dc168b73dd463909cf951a4d9070ecc4aebbef6213",
+        "image-environment.json": "03eed3fb79d0740e3e23f1b1c21fc3d9232e9a8a037ad1ccc99b79956292736d",
+        "accessible-build-locations.json": "b6c1e1fbcd96a4155a521745c2a26ce88a5ad23642d7da84d7adcd1c3a9ea555"
+      },
+      "author_image": "sha256:c51071b7dc61d08629da913466046f831a5360f8707949a5f36f3f3e107bfe8e",
+      "source_archives": {
+        "base.tar": "92d4dfa3673200869baa456d13ac52b5d4b0d3edb78ff9ad0e399efb8621b914",
+        "dependencies.tar": "7977fbf4aac568b9286efc96e8d5fbf6ce244433f56653cc472d066d8db39ac9"
+      }
+    },
+    {
+      "instance_id": "prettier__prettier-5025",
+      "repo": "prettier/prettier",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "93e8b15311cc88d30eadf8a34acbc062d0965f2b",
+      "preparation": {
+        "status": "ready",
+        "phase": "prepared",
+        "elapsed_seconds": 24.4865300655365
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 12,
+          "failed": 0,
+          "result_sha256": "9906f4b7c8fede4e9892698025a8c343b12dbe3c4bf5df0f2bbda6861574464b",
+          "provenance_sha256": "4ce5a653b79b955df076b1c7093f5cdaa8134d68db1d50610776846ee04a1c81"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 10,
+          "failed": 2,
+          "result_sha256": "7de6d8a7515f59df20d6335db16bbca575da66dfda7a48ac6fa60845ba9d00e9",
+          "provenance_sha256": "a880c5766d8837f225949a8b35983c0033701110d5e5797aec5c4ec53b8e8085"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.prettier__prettier-5025:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.prettier__prettier-5025@sha256:f6679fa86c9bffcb2e6fb591f0b8d9a21e130178739ebc38536cca4d0fbd2dd5",
+        "id": "sha256:f6679fa86c9bffcb2e6fb591f0b8d9a21e130178739ebc38536cca4d0fbd2dd5",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 5601151070,
+        "workdir": "/testbed"
+      },
+      "receipt_sha256": {
+        "audit.json": "ca384730de40d10b88c9ed53f982b0f361fe105ace6daed0d74e3cd816b3665c",
+        "base-preservation.json": "1257632ffbb21f4fd04ce3136d9c805d8b14a62464161e8d546cfdccdfe1b64f",
+        "lfs-audit.json": "c497b34b5c14819d0c0f37520336dc33442660ea6742d881f1df03778a5ae5ad",
+        "image.json": "8f014bab15fbb88ef7de4faa2b820f6a61d76c85ba00f2ebe4dc78c191034a15",
+        "image-isolation.json": "a23d4c756e18759dec8f4e955ad694b8834b9b9585c4b3c3a59184c96bd79f4f",
+        "image-environment.json": "d6e34c44be6d9f33cf1d68643ff0752d545e401e48c4e67f8475db3114d4283d",
+        "accessible-build-locations.json": "9351acd46e5393e9e461f0b1aef9cb0bc75543ef1055771debd7eabf0c72b1e2"
+      },
+      "author_image": "sha256:a73cfc0942058f163ff0a7c3aa7344ac408a7110967346f51bf074efa13c9c99",
+      "source_archives": {
+        "base.tar": "e19d8379a73db8430a7965887ab3f7ab0a5c4e836ef33553f761780aa40fff25",
+        "dependencies.tar": "4fb44933c58d3595de2e2c55665ee5e0f6f5229bcb80f3b3f5973990fd296a40"
+      }
+    },
+    {
+      "instance_id": "mui__material-ui-42412",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "b8a28e13dc0821314700f1aefc9f8e1134cf9034",
+      "preparation": {
+        "status": "ready",
+        "phase": "prepared",
+        "elapsed_seconds": 131.16225504875183,
+        "preparation_note": "Adapter container-name collision corrected before freeze; 86 original broken links preserved. Yarn version independently inspected. Prior failures retained privately."
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 4,
+          "failed": 0,
+          "result_sha256": "b73d7d7af8154ca5376ac639eb9bd1c4067241053a2e8076226b0998e1dd4020",
+          "provenance_sha256": "8c89c467f07772660612e0c1df7a9e0e9f8ed37bcbeb0a7a79b6901bbba329df"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 3,
+          "failed": 1,
+          "result_sha256": "acdaa40957a27e1ee8039e59b674d843dea811f78f7811c50f03cc315dd79890",
+          "provenance_sha256": "bdc4d1c6e82aa2f4c1050182fb234838d34fc35448850bbf2b4ecd4be3eff41b"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-42412:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-42412@sha256:aeaa51c590fab5a5711ae1ca2e1c2bd35e0976bb328b3651f97a69d265ad4658",
+        "id": "sha256:aeaa51c590fab5a5711ae1ca2e1c2bd35e0976bb328b3651f97a69d265ad4658",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 14184124558,
+        "workdir": "/testbed"
+      },
+      "receipt_sha256": {
+        "audit.json": "4b92bca985a3efbfc8160091c21389dbb9ab928831a797ae9378a81820dee800",
+        "base-preservation.json": "77857276746af047978be15abf7002de9383d70308f1d362474a9aa00aba87d1",
+        "lfs-audit.json": "c361b88db79a36366743bfc338aa26993b341f7a2a67a148347f191bdf3e1ba5",
+        "image.json": "06e4d78729a97bb87f9f24b6c6cfdef5515c4ed3edde19a0e1b5d0bc4660bee9",
+        "image-isolation.json": "7229a6c0f1f33d100215db6193de29a1ed45c0efd1a5ffb368ce0e8136a129c2",
+        "image-environment.json": "1fae18e625d1fa58c02578fa75b77bcd837473472b7acba329e26d9f75fcc8a6",
+        "accessible-build-locations.json": "9f77637429c28755838251a4e109fdcbef25dfbd767d6749db3e1f9cd7ae1d65"
+      },
+      "author_image": "sha256:ddb89e11c7ea9dce53e2ccfa0d9278bcbfd5bc92bc9c300f9b2095032f18e62a",
+      "source_archives": {
+        "base.tar": "6c37b14102abf94b2d0d0091e018457cb0fce0e01872271deeef6d2381379218",
+        "dependencies.tar": "a479ab37e7c996422d28833c40117436baf04ae845494430371ec78c9011299c"
+      }
+    },
+    {
+      "instance_id": "mui__material-ui-18683",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "dfe2779b8b6499ccd1922990ac9178d84e02f8b6",
+      "preparation": {
+        "status": "ready",
+        "phase": "prepared",
+        "elapsed_seconds": 44.721867084503174
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 25,
+          "failed": 0,
+          "result_sha256": "69314f2f27503d24d15427f127a64d36b7f9a30a8a723cb48477c58a88a6a2e2",
+          "provenance_sha256": "6daec9ac6c364c8f395230a479237ae37ef427212a05aebbc4a5aefd3c61b84a"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 20,
+          "failed": 5,
+          "result_sha256": "972cd3dc82f2cf1d432187d08e9a99c0b363cb384272c09d8138a5453efaf234",
+          "provenance_sha256": "adce400b6ba1663d363e32dd63e98a5f2c756efe57ba630ee0a537e45ff4797d"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-18683:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-18683@sha256:4080f04c5ba9c212a34c158caca31960f325608b0c6755497602be4f2a9ff4e0",
+        "id": "sha256:4080f04c5ba9c212a34c158caca31960f325608b0c6755497602be4f2a9ff4e0",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 8886690794,
+        "workdir": "/testbed"
+      },
+      "receipt_sha256": {
+        "audit.json": "a5d53074b15d1f3271fd34149bcc86269cabf32c43fe23aa1c01695484dacabf",
+        "base-preservation.json": "2419bdbbd281de7e8b4d5b74178bce237bfc26a677394c0358c504c4ede54751",
+        "lfs-audit.json": "eb0c45a79f61ec4e58017c67316fd9b2f12d0a98b515142907b3882c53511a6c",
+        "image.json": "e4ba72211558a6c06b8641fee41d9235079d81c179307194aeb4a83b5ed09315",
+        "image-isolation.json": "998a42665a781fcf74a8d3ae9fa3e4c90a28f2a525b96be41e65fc4e72f4e37d",
+        "image-environment.json": "e53f9f5004bca8f458c16037f7cb086f7ee99c440d34537ef1949062e68a138c",
+        "accessible-build-locations.json": "3f93152e981612a944940e302d7b79cc51807e0fedeb6f13d1805ac6acb9d8b8"
+      },
+      "author_image": "sha256:cb5a48b080522fcc791da434ffdf8418659cdf03126ecc9852136479dddec050",
+      "source_archives": {
+        "base.tar": "54f5039b64aa8f0ba58830fc8e28bca5d9d0f5608fcfd056b32647c9b111b3e5",
+        "dependencies.tar": "f33ce81ac3b41e5d65befce8381a9ae6e0d034555f8aead430f9924ad84e94b2"
+      }
+    },
+    {
+      "instance_id": "microsoft__vscode-135805",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "7d8f55ebb1b7ccb084f7e6969b6926519c5c80c3",
+      "preparation": {
+        "status": "ready",
+        "phase": "prepared",
+        "elapsed_seconds": 52.643203020095825
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 20,
+          "failed": 0,
+          "result_sha256": "67f9978137218be47136be6bc1a9a061080c432c5b20ed22182ef0f87791eb14",
+          "provenance_sha256": "1827a9ddd0a48fdc80ae028f4da67ddacfcc79178abfb6a0ad33580fdf77aa38"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 18,
+          "failed": 2,
+          "result_sha256": "e4c120412e459f0e84a94d7ee53f288f07fd61362eae8fe64b51e85e669fc582",
+          "provenance_sha256": "c0ffab41fdbcedf56fb5653479cb54527d943da4d08765a6741f501cfdcb0f9f"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-135805:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-135805@sha256:cde0971bc27970b586820216010344845a68b8694c9a3eaa2225d12c575188da",
+        "id": "sha256:cde0971bc27970b586820216010344845a68b8694c9a3eaa2225d12c575188da",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 9618823009,
+        "workdir": "/testbed"
+      },
+      "receipt_sha256": {
+        "audit.json": "75d1fc6445dbe4625792da900608905c9566289df2ef9b0bbfe5cbd4070d1ccb",
+        "base-preservation.json": "694f9358c5ed820724cd951475ac07acb88afa1f5d1697cf5b8a491a25b8feb7",
+        "lfs-audit.json": "82bfafad0aa26dad88e96ebaf6deb569ee1c3332b6dd6a2364e8eacbe30f0f9f",
+        "image.json": "be780a3d5d1ef388fc019025d03f401d226eefb028f1bf1d3078064ee156fd0a",
+        "image-isolation.json": "0e6389c5fbdd20855546f3b4db244df2f76f454aae718f6ede572114593e22c4",
+        "image-environment.json": "774699754b036a0fc0943ba898eebeadaa3ae498511df42983310536fa7f6e16",
+        "accessible-build-locations.json": "8bf7558bcbce03730ce7c9f670b419c13451b529f2bfe64917979cb6ebc9ee28"
+      },
+      "author_image": "sha256:ce5b3b90fc38d438afee830ac497bf06b43cf54995fc839d6f75b3565f26a5a5",
+      "source_archives": {
+        "base.tar": "b09dc905600956aa24a6c4315736f848bbaab9c10b6801156ce488aaac3ec6f0",
+        "dependencies.tar": "ce5fbaf8c1f6bf1931ad930eac64121afa95fe4a84cf2d39454a7d7818eff1ef"
+      }
+    },
+    {
+      "instance_id": "serverless__serverless-2945",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "5a3e0c2bcaff15d77c925995693379967da42d80",
+      "preparation": {
+        "status": "ready",
+        "phase": "prepared",
+        "elapsed_seconds": 15.289798974990845
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 18,
+          "failed": 0,
+          "result_sha256": "dbdc8c6c44a01b6030847f28f6270433a42774975513b616d7bdafc844e9cfe2",
+          "provenance_sha256": "8dc07c06449d25d246d114699fd79ff8283b131c3fa3c73747993f7a6d10cf09"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 13,
+          "failed": 5,
+          "result_sha256": "8930e46e58bc66887328bcb37c595fb1e39c95a2e41fd0385a1c3e2c4c97553d",
+          "provenance_sha256": "d1a8dca3c00f2947b61289636695ab2bfedd53da1c1a0cb21c73d87b2c4b03bc"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-2945:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-2945@sha256:64ee522ced6e5e741216194922b19b751a4f89f48891b0983366a5dd848e0662",
+        "id": "sha256:64ee522ced6e5e741216194922b19b751a4f89f48891b0983366a5dd848e0662",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 5142847572,
+        "workdir": "/testbed"
+      },
+      "receipt_sha256": {
+        "audit.json": "4107f12c4d959ca7c1b43b361c739e43d458be0d72f7ad90abc8ae6b1152598d",
+        "base-preservation.json": "c8fe76b7163eed9d647ecb7c0087dd53180366629957773fdc1f2157932ebc1f",
+        "lfs-audit.json": "9015f86bcde61b4c4c51102f08f3dd63a3de4b3037c411c1dfec1c3a5a1631c7",
+        "image.json": "dbb3ae098ad3a6e25a730298d4d9dc3c8e01b90b871884ed007d9223cf43e346",
+        "image-isolation.json": "65e5c690a9dd6882dda165c8aa06be9720d9d078bc94b012fe30e1718c4e8f7d",
+        "image-environment.json": "9f2ed2e7f29aae7750e65eea8bf546f18a59f0288a0c5e91433c020bdb3992c6",
+        "accessible-build-locations.json": "e94c6dcc3d53fa19be1e79844fbdd809c01904f83d6403a345520c53e346aefe"
+      },
+      "author_image": "sha256:4f68922d1019051fc2b498a5a172321ed5f74af0d8c8bc8fd78f1fe4a4fe310b",
+      "source_archives": {
+        "base.tar": "a73496ffadfaa406aa9f085084ffcf3efb30aaf70486c1c79c5f8b79965d845a",
+        "dependencies.tar": "bd81ed97d6968776d1aa996ceea5ffaa5044f3337a8e84e92dfc34287203167d"
+      }
+    },
+    {
+      "instance_id": "mrdoob__three.js-24461",
+      "repo": "mrdoob/three.js",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "9e5512f067e3a0de8d4069217d20903c1725edf7",
+      "preparation": {
+        "status": "ready",
+        "phase": "prepared",
+        "elapsed_seconds": 41.428340911865234
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 718,
+          "failed": 897,
+          "result_sha256": "538c7a78acd09947f2a13394b35ce3175b0da36f14c622c7a2ec4c0c71ce805c",
+          "provenance_sha256": "08e26fcab1afba023c859b0401e7092d3974a34138a7177f7dd9587bbf0c4a20"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 716,
+          "failed": 899,
+          "result_sha256": "731d4a9bda748278844d97ce153a744721c8e2c05eb751f90e683bd7942275e8",
+          "provenance_sha256": "908d4bb0b6bd44d5f4de026ddc4f91b497b3fb406c64748408492257a476e406"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mrdoob__three.js-24461:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mrdoob__three.js-24461@sha256:471c97480b9ca2880b65cc450a439a44a12cd18fc0ce7d5efec815f2100549fe",
+        "id": "sha256:471c97480b9ca2880b65cc450a439a44a12cd18fc0ce7d5efec815f2100549fe",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 11811409092,
+        "workdir": "/testbed"
+      },
+      "receipt_sha256": {
+        "audit.json": "1a61c380f7f403c08c110005f04971cd95557c6bc29b604529d207b520e95f44",
+        "base-preservation.json": "35f861dc41711265af2c1a4a6b6c0fd69fea833ebe3b6d15318726a97932fdb5",
+        "lfs-audit.json": "e75fe4f599cf01a2e230695a47dd0f85555363a0dffcc7c147723def1db6721b",
+        "image.json": "24c76fd4f6898d96b4abd275bf80ffb504d0a08052e5ef068a4e3f073fed12b3",
+        "image-isolation.json": "2c51545068272f69788a1274d2b0526cd6be925169ff38b51b1548bb167824e4",
+        "image-environment.json": "f0dda0e5f63b0319a719fc0eb6dc8d1a13ab16b0127ee5065b674fcf1e19cf5e",
+        "accessible-build-locations.json": "26485d8d2d02bd6badd67aef398b0fbbc353b68bc5e6b06c12d3a3ad027bab0d"
+      },
+      "author_image": "sha256:6067142dd9bff3ba19901d90b8862c00a9df3382dc49e2b1fbd74a41968f4692",
+      "source_archives": {
+        "base.tar": "1b1c8feb275a75377bbebdff6caf175ebff19e5af51a59c1440e09a5949f966a",
+        "dependencies.tar": "7a55185724f6dddad4da06b4fc9a1570af8c2f8b225eb0b53c87b90db2c85054"
+      }
+    },
+    {
+      "instance_id": "serverless__serverless-8159",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Feature",
+      "base_commit": "56aa5aa15abed64db6758aecd8c27719928b5a14",
+      "preparation": {
+        "status": "ready",
+        "phase": "prepared",
+        "elapsed_seconds": 30.2379469871521
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 52,
+          "failed": 0,
+          "result_sha256": "de69f5d01b9601a164cda6b20ebf984ef1a6a367e351457a75e192cb6013d8c6",
+          "provenance_sha256": "f551dc5ea12d68874e9f7f2f86a29aeacadee69dc67fc0c6941666a1c83b721d"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 51,
+          "failed": 1,
+          "result_sha256": "cc0172f74e5944103f9bd7b38d5b0934962cd53b677349e255094b89593c4e27",
+          "provenance_sha256": "203900876846e3d4da1f17bfa4f7b95f2d6b863c3a4ca5df658690de5663597f"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-8159:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-8159@sha256:2dd61c66aa6d749677ce6e323e803cdc161305b6b3907b31c576e3cf2716006a",
+        "id": "sha256:2dd61c66aa6d749677ce6e323e803cdc161305b6b3907b31c576e3cf2716006a",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 5714075126,
+        "workdir": "/testbed"
+      },
+      "receipt_sha256": {
+        "audit.json": "695b221afcba427aa265c9a282d160a31d2bd190d687ae14b8d0eabf388c34d9",
+        "base-preservation.json": "2b8de3208df25ac1529853a3ae9174a804d9d14ef91afd021e599dd3437b1c19",
+        "lfs-audit.json": "c2b2148887d2baf3642353aad335a833c1cfb0f1ae954601774915c0f1c3742f",
+        "image.json": "3688ad195760461aa09415b7c2fc202d1f9b8dd6bec49c9cd2e5e1735014a2e8",
+        "image-isolation.json": "af052c20c2cc6b543f5282961df0f3bc05dac58390018e2604fd39ddeb5069dc",
+        "image-environment.json": "aa5436f707456b9baaee7385abf63bae72500e8809341a75d92c31c8c52b3531",
+        "accessible-build-locations.json": "f38a8f7aa64f8b99a016e83c82f7b996ab130778443128f879087f41832f2dee"
+      },
+      "author_image": "sha256:fc6c24037e3b36914455400f9e6b2cb4a0a352b88d10ff9225935dc3f39dc191",
+      "source_archives": {
+        "base.tar": "5b4e9a6aef5e147109cc75cf79bf0b4ba9af922c87abf4ba5af15f3ffdd71843",
+        "dependencies.tar": "e81f18552e0233e8ca63b23b23da608124d85d32c82d650a0f3f23534214210a"
+      }
+    },
+    {
+      "instance_id": "microsoft__vscode-108964",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "13b3c937dc5e3816c79bdd2cdf2cdf6f9c727b75",
+      "preparation": {
+        "status": "ready",
+        "phase": "prepared",
+        "elapsed_seconds": 79.80191397666931
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 34,
+          "failed": 0,
+          "result_sha256": "76e91f8e750de6414601924189acff44cbb41149b442e8df52dd4d724c0a762c",
+          "provenance_sha256": "649f03f56472084c173a50faf22cc570135f6313f5953b37ea74643b8fe09525"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 33,
+          "failed": 1,
+          "result_sha256": "fb2d94f90b7ac7a14a43fc1c214121ebcb32f63056db19a6373acaf001207d23",
+          "provenance_sha256": "6babe5cbf0f16243285dcb916f04f0f3434a41b1dabedfd22212d502d84f8916"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-108964:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-108964@sha256:736f9ebdd28a1fc778d148ef494c12ad6beed8513f267596761068c18c4e370f",
+        "id": "sha256:736f9ebdd28a1fc778d148ef494c12ad6beed8513f267596761068c18c4e370f",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 10579056817,
+        "workdir": "/testbed"
+      },
+      "receipt_sha256": {
+        "audit.json": "61ea893e99b8a1c4d5da34dde9911848babe5ff59423e74ae81d1f4ba87da133",
+        "base-preservation.json": "9401b605062af7a19646990e719594ee05799c93c2f7dd818b2448cf1d1707ea",
+        "lfs-audit.json": "680dc24f39b6c6b215c04e0a197049f6e2a474df01010fba953dbb6daf66876f",
+        "image.json": "2401a7ce3eddc160ca76d25a1c3735a87978f3f603066c0b0ae9317dcfe273e4",
+        "image-isolation.json": "e0f293f8b6d522e77ef12140c3add14af3cc7e459fa2eb17da79e92f30edf49b",
+        "image-environment.json": "6c36d4f28af98bcf9534c666d7689cfc28ecd2a12f16eb010e7c83c21dd419d4",
+        "accessible-build-locations.json": "d73197e80dec354650f87209a92ad01a4218db2dae239f9f0d58c47abe7a13fa"
+      },
+      "author_image": "sha256:9e23ff41a4ef8e6d981d0639e1a3505cff959e3856b926d74bba33110ab8812e",
+      "source_archives": {
+        "base.tar": "7bbfd7693b51453330644697d0d2f038c1252b6cca3d43986de0dae75e720900",
+        "dependencies.tar": "faec61265c5978625a87086ae5b831e635ce885d88ec3b6395bb5797deed1c5a"
+      }
+    },
+    {
+      "instance_id": "microsoft__vscode-189223",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "9a281018181dca942cc46c03f9795be00912e38d",
+      "preparation": {
+        "status": "preparation_error",
+        "phase": "author_input",
+        "error_type": "CalledProcessError",
+        "reason": "tarfile.AbsoluteLinkError: remote/node_modules/kerberos/build/node_gyp_bins/python3 -> /usr/bin/python3",
+        "elapsed_seconds": 31.01495909690857,
+        "evidence": "author-inputs/microsoft__vscode-189223/failure.json"
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 28,
+          "failed": 0,
+          "result_sha256": "a2655bb3eb768439e57799e9d681d2da494c5a421f2af3ec02680ec816c8df4d",
+          "provenance_sha256": "fe099af3abe4743b53cf4fe6cf3dcbde3e6daa5f119a8791eefbe45b2175d9d7"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 12,
+          "failed": 16,
+          "result_sha256": "dfbcc5b9ec5370a3aa76b4a678830ceb6a3f45b4031c16fb5f14658f8a882842",
+          "provenance_sha256": "e0b7b9cda8788a5ed56d611d8a9f4b8bea34be1c7bd7ee3e809e92c73d8b90ac"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-189223:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-189223@sha256:de7786d94231d6de4f1128751549a83f326d4aa202332ddc14799b3b58e30aaa",
+        "id": "sha256:de7786d94231d6de4f1128751549a83f326d4aa202332ddc14799b3b58e30aaa",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 19018265943,
+        "workdir": "/testbed"
+      },
+      "failure_evidence_sha256": "b94401f58199532d84cb5ee045c35c539a79c9a4a000f2e19f280dce436decb9"
+    },
+    {
+      "instance_id": "tailwindlabs__tailwindcss-550",
+      "repo": "tailwindlabs/tailwindcss",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "95f1d90b70c4bb318f35ea475b903d07aee01fb4",
+      "preparation": {
+        "status": "preparation_error",
+        "reason": "Official baseline execution exited 1 but official parser returned zero tests; required Jest closing marker absent from retained log",
+        "error_type": "RuntimeError",
+        "elapsed_seconds": 61.12259793281555,
+        "phase": "official_controls",
+        "evidence": "tailwind-baseline-failure.json"
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 101,
+          "failed": 0,
+          "result_sha256": "5a2b5192f1425137b5bf611bf9198227ffeb4e2a63f3edcb98769421a4afe0ea",
+          "provenance_sha256": "3b4f035dcb86c0f8c543baad6c31ffce5b7389218ecbe1ecf687bfb2d38d7fa5"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 0,
+          "failed": 0,
+          "result_sha256": "6a507055a7f2797c94a84c44e504201c084f269d0cc63ff71338dd52e41c58e8",
+          "provenance_sha256": "b4c1f07454eb8a6a3c61cada2c7c8f380b85c7284aa1ff458df2504fad8b0342"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.tailwindlabs__tailwindcss-550:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.tailwindlabs__tailwindcss-550@sha256:c3248ba6efd797d51038bb95079522d6fc8762f86b1fa159fa8c4736fcd51c4a",
+        "id": "sha256:c3248ba6efd797d51038bb95079522d6fc8762f86b1fa159fa8c4736fcd51c4a",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 5459764920,
+        "workdir": "/testbed"
+      },
+      "failure_evidence_sha256": "8f5abf81a9414a452668fcd2fa26321b7703ae93599af8d3abe9a262b0d2eecf"
+    },
+    {
+      "instance_id": "coder__code-server-3277",
+      "repo": "coder/code-server",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "f8d8ad38c166d74332fb71adbce5f08c14bfc7e3",
+      "preparation": {
+        "status": "ready",
+        "phase": "prepared",
+        "elapsed_seconds": 63.37847399711609,
+        "preparation_note": "Version-specific dependency layout inspected; absent vendor/modules is not an input. Original adapter failure retained; stock controls unchanged."
+      },
+      "controls": {
+        "gold": {
+          "resolved": true,
+          "patch_applied": true,
+          "passed": 94,
+          "failed": 0,
+          "result_sha256": "cfd98e93643d35d37097c355ac0219f6531e83e5ebbe740883a5b45032636458",
+          "provenance_sha256": "fa12e684199a684bd79993590893342b25de0389863c045a44eacd77e6c71b82"
+        },
+        "baseline": {
+          "resolved": false,
+          "patch_applied": true,
+          "passed": 53,
+          "failed": 1,
+          "result_sha256": "07d621115b58363f205a4a02cfa3b3a839640952a5565378cd85e8c774c1ce52",
+          "provenance_sha256": "616c420dbc0ce165faa8a8210d9915d969d134358bba2946fd0e423a1e23f26c"
+        }
+      },
+      "official_image": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.coder__code-server-3277:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.coder__code-server-3277@sha256:16f512cbbc875646673e2317f71ce41c5f84b38a14b8492462a38a52bd2ff9d7",
+        "id": "sha256:16f512cbbc875646673e2317f71ce41c5f84b38a14b8492462a38a52bd2ff9d7",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 7574841938,
+        "workdir": "/testbed"
+      },
+      "receipt_sha256": {
+        "audit.json": "81fcc964e07ce11a216d896ff36baa70a34ec9350023a61e1fd71e0f06db6d5b",
+        "base-preservation.json": "a0c35d18784a2ee8dedf575da5ca8984584e79a125821a92def10e7074ccd495",
+        "lfs-audit.json": "27236f2409508038abb19c8ba0cc7c2576833569a2a93203e22824b66b62567a",
+        "image.json": "d0f4f954b3e40aa5b1a80199b4d479bc757d8cfc9906720106fd611e862d1daf",
+        "image-isolation.json": "580d13c1bd022094024c6b2185553e51e8ea1bc6a8939683b104226056a6d6e9",
+        "image-environment.json": "808588c6277f4ad91982a611be58547b029aa03de921ba3db6355cc55c77c526",
+        "accessible-build-locations.json": "31d48dd5c73417883f2d18c11fd2c605ba372dec2ff3f1d0d2e9dc72055be55d"
+      },
+      "author_image": "sha256:8d5f050f4013196788a3cb5af515b270d3ebd4eba9792b486fecc2ebe24e18df",
+      "source_archives": {
+        "base.tar": "8b4522570d42739c548d19b9ba18d061a4fba36e47af38b00e89f451dfa89ed6",
+        "dependencies.tar": "c366ace1e28f6aea788dfe16d76dcd8928f56adc7eec545d0298fb3eef2afa6b"
+      }
+    }
+  ],
+  "local_verification": {
+    "adapter_sha": "5c0e634c4327bcbe687d8da03058e54c45f28734",
+    "command": "npm run verify",
+    "exit_code": 0,
+    "access": "loopback permitted",
+    "checks_passed": [
+      "scripts/verify-native-template.mjs",
+      "scripts/verify-native-review.mjs",
+      "scripts/verify-native-task.mjs",
+      "scripts/verify-native-command-hints.mjs",
+      "scripts/verify-native-project-feedback.mjs",
+      "scripts/verify-native-preservation-nudge.mjs",
+      "scripts/verify-native-preservation-hooks.mjs",
+      "scripts/verify-native-task-investigation.mjs",
+      "scripts/verify-native-task-investigation-delivery.mjs",
+      "scripts/verify-native-stateful.mjs",
+      "scripts/verify-native-sensitivity.mjs",
+      "scripts/verify-native-sensitivity-dependencies.mjs",
+      "scripts/verify-native-type-compat.mjs",
+      "scripts/verify-native-type-compat-hooks.mjs",
+      "scripts/verify-boundary.mjs",
+      "evaluation/support/verify-scheduler.mjs",
+      "evaluation/support/verify-recording.mjs",
+      "evaluation/polybench/verify.py"
+    ],
+    "log_sha256": "5c922a81428c081c89e9e0507197d1536ec85c461f4bf50098717e7d57ad7441"
+  }
+}

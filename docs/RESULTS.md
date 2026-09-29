@@ -3,9 +3,26 @@
 **No sustained harness quality advantage is established.** These are separate
 campaigns, with different runtimes, datasets and scoring contracts. Do not pool
 them into a project success rate or interpret technical fixtures as model lift.
-No model run was performed for consolidation.
+The consolidation commit itself had no model run. The new fixed-candidate
+comparison below has completed preparation but has not admitted a model attempt.
 
-## External benchmark: SWE-PolyBench Verified
+## Consolidated candidate: prepared, not measured
+
+The [new campaign report](../evaluation/polybench/campaigns/consolidated-v1/REPORT.md)
+and [machine-readable records](../evaluation/polybench/campaigns/consolidated-v1/results.json)
+cover candidate `39def2ed0b1476299b104b38f8c93747d828a87a`: twenty fixed JS/TS tasks,
+three modes (Plain, Native core, Task + investigator), sixty assigned slots.
+Seventeen tasks are ready; two VSCode author inputs violate the existing symlink
+boundary and one Tailwind baseline has no officially parsed tests. No replacements.
+
+All sixty slots are not started; official model evaluations and complete task
+pairs are zero. The pre-freeze hold is the unresolved interpretation of the
+1800-second budget: native bootstrap is inside the current clock, container
+preparation is outside, and changing the deadline implementation was forbidden.
+No quality difference, equivalence, token spend or monetary price is inferred.
+Preparation controls and scripted checks are not model benchmark scores.
+
+## Historical pilot: SWE-PolyBench Verified
 
 The [original report](https://github.com/Tah10n/opencode-harness/blob/030b4ee2b5df7af050ef49bb58098b096ef486d6/development/polybench-pilot/REPORT.md)
 and [frozen manifest](https://github.com/Tah10n/opencode-harness/blob/030b4ee2b5df7af050ef49bb58098b096ef486d6/development/polybench-pilot/frozen-manifest.json)

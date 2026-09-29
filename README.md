@@ -5,6 +5,35 @@ Git projects. The task workflow executes in an isolated worktree, preserves the
 user checkout and index, and delivers a patch with observed checks and explicit
 incomplete/unknown outcomes. It does not certify task correctness.
 
+## Consolidated candidate: measurement not started
+
+The fixed SWE-PolyBench Verified comparison is prepared for **17 of 20 selected
+JS/TS tasks**. Three tasks have preparation errors shared by all modes. All 60
+assigned slots remain not started: the boundary of the requested time budget
+needs clarification before the final freeze.
+
+| Mode | Resolved / evaluated | Rate | Autonomous deliveries | Inference time | Input / output tokens | Unknown / evaluator / infrastructure |
+| --- | --- | --- | --- | --- | --- | --- |
+| Plain | 0 / 0 (not run) | — | No attempts | 0 s | No requests | 20 unobserved; evaluator not run; 3 preparation errors |
+| Native core | 0 / 0 (not run) | — | No attempts | 0 s | No requests | 20 unobserved; evaluator not run; 3 preparation errors |
+| Task + investigator | 0 / 0 (not run) | — | No attempts | 0 s | No requests | 20 unobserved; evaluator not run; 3 preparation errors |
+
+Candidate: `39def2ed0b1476299b104b38f8c93747d828a87a`. Planned runtime:
+OpenCode 1.18.26, `openai/gpt-5.6-luna`, high. Dataset revision:
+`b3fca77b637379f0c01ad86d18753a7ac1998b53`; official evaluator revision:
+`9c836c5d7f3cb991934132b77d29e6941d912a07`. Selection: 10 JavaScript and 10
+TypeScript tasks, deterministic hash order, fixed category quotas, at most four
+per repository, excluding the ten historical pilot tasks. Requested ceiling:
+60 attempts × 1800 s = 30 hours of assigned task time; 51 slots are technically
+eligible. There have been no real model requests or monetary-cost estimates.
+
+**Quality remains unmeasured.** The current scheduler includes native bootstrap
+and parent/title/child work in its shared task clock, while container preparation
+precedes it. Whether that preparation must also fit inside 1800 seconds remains
+unresolved; changing the deadline mechanism was prohibited. See the
+[full report and per-task preparation results](evaluation/polybench/campaigns/consolidated-v1/REPORT.md).
+The historical pilot remains separate.
+
 ## Quick start
 
 Use Node.js 24+, Git, npm and OpenCode **1.18.26**. From a clean clone:

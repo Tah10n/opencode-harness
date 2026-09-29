@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "benchmark_inference": {
+    "real_requests": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "task_seconds": 0,
+    "money": null,
+    "reason": "No model submissions; no tariff or bill inferred"
+  },
+  "official_controls": {
+    "runs": 40,
+    "runs_with_duration_receipts": 39,
+    "recorded_process_seconds": 3703.988408088684,
+    "missing_duration_receipts": [
+      "sveltejs__svelte-5850-gold"
+    ],
+    "scope": "Official baseline/gold controls only; excludes the scripted export check and preparation"
+  },
+  "image_downloads": {
+    "images": 20,
+    "pulls_with_duration_receipts": 19,
+    "recorded_pull_seconds": 3704.6540760993958,
+    "scope": "Image download preparation; no inference"
+  },
+  "serial_preparation_controller": {
+    "task_records": 20,
+    "recorded_seconds": 7468.163451910019,
+    "scope": "Contains recorded pulls, dependency preparation and controls, so do not add it to the component times; excludes earlier initial setup"
+  },
+  "developer_agent": {
+    "source": "Codex get_goal meter",
+    "observed_at": "2026-09-29T16:38:10.000Z",
+    "goal_tokens_used": 855276,
+    "goal_time_used_seconds": 8868,
+    "input_output_split": null,
+    "monetary_charge": null,
+    "scope": "Development agent preparation checkpoint; not benchmark inference or a provider bill; excludes later publication and CI work"
+  },
+  "ci": {
+    "duration_seconds": null,
+    "money": null,
+    "scope": "Not included in this preparation checkpoint; see PR checks for actual execution"
+  },
+  "monetary_total": null
+}
