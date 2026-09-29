@@ -91,7 +91,7 @@ check out that recorded HEAD, apply `staged.patch` with `git apply --index`, the
 Ignored evidence is deduplicated in `ignored-content.tar`, with hashed chunks
 and per-worktree manifests. The archive includes `restore-ignored.py` and a
 verified sample restoration receipt. Bundle alone never preserves this evidence.
-One inaccessible root-owned receipt in the candidate-recovery worktree could not
+One inaccessible receipt owned by a different OS account in the candidate-recovery worktree could not
 be archived; its original worktree must remain until it can be read and verified.
 Dependency caches are reproducible and omitted. Restoration checks do not
 claim to back up private external archives or Git LFS payloads automatically.

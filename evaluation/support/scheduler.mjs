@@ -230,4 +230,3 @@ fs.writeFileSync(path.join(outputRoot,'outcome.json'),JSON.stringify({status:pau
 
 return {status:pause?'paused':'finished',pause};
 }
-

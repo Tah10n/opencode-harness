@@ -9,6 +9,7 @@ import {reviewContext as capture} from '../lib/native-review-context.mjs';
 const reviewContext = options => capture({permissionRules:[{permission:'read',pattern:'*',action:'allow'}],...options});
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'native-review-'));
+try {
 const repo=path.join(temp,'repo');fs.mkdirSync(repo);
 const git=(...args)=>{const r=spawnSync('git',args,{cwd:repo,encoding:'utf8'});assert.equal(r.status,0,r.stderr);return r.stdout.trim();};
 git('init','-q');fs.writeFileSync(path.join(repo,'tracked.txt'),'old\n');fs.writeFileSync(path.join(repo,'.gitignore'),'ignored.txt\n');
@@ -91,3 +92,5 @@ const cliBundle=path.join(temp,'cli-review');
 const installed=spawnSync(process.execPath,[script,'--native','--review','--profile','core','--output',cliBundle],{encoding:'utf8'});assert.equal(installed.status,0,installed.stderr);
 assert.equal(JSON.parse(fs.readFileSync(path.join(cliBundle,'opencode.json'))).command['harness-review'].agent,'harness-reviewer');
 console.log(JSON.stringify({passed:true,checks:['opt-in materialization','original role reused without legacy permissions','explicit base and task','tracked and new file diff','ignored files excluded','snapshot invalidated by edits','index/worktree unchanged','missing/oversized input incomplete','no model/default/plugin/repair','rename source/destination permissions','direct and symlink task permissions','README dirty suffix accepted; real dirty submodule refused'],providerRequests:0}));
+
+} finally { fs.rmSync(temp,{recursive:true,force:true}); }
