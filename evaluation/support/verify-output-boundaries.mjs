@@ -3,6 +3,9 @@ import os from 'node:os';import {execFileSync} from 'node:child_process';import 
 import {startContainer} from './container-session.mjs';import {stopWorkload} from './stop-workload.mjs';import {captureOutputs,hashFile} from './output-files.mjs';
 process.umask(0o077);const root=fs.mkdtempSync(path.join(os.tmpdir(),'polybench-boundaries-'));fs.mkdirSync(root,{recursive:true});fs.mkdirSync(root+'/source');fs.writeFileSync(root+'/source/sentinel','SOURCE CONTROL');
 const toolchain=root+'/toolchain';fs.mkdirSync(toolchain+'/package/bin',{recursive:true});if(!process.env.OPENCODE_LINUX_BIN)throw Error('OPENCODE_LINUX_BIN is required');fs.copyFileSync(process.env.OPENCODE_LINUX_BIN,toolchain+'/package/bin/opencode');
+// Only these synthetic public inputs must be readable by container UID 1000
+// on Linux bind mounts. Output and temporary parent remain owner-private.
+fs.chmodSync(root+'/source',0o755);fs.chmodSync(root+'/source/sentinel',0o644);fs.chmodSync(toolchain+'/package/bin/opencode',0o755);
 let session;const results=[];
 try{
  session=await startContainer({source:root+'/source',toolchain,template:null,output:root+'/session',onRequest:()=>{throw Error('No provider requests permitted');}});

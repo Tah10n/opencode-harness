@@ -85,6 +85,8 @@ try {
   pkg.scripts.typecheck = 'nonexistent-feedback-tool'; put('package.json', JSON.stringify(pkg));
   const environment = observe(selectProjectCheck(projectScope(root, rules), 'harness-check value.mjs typecheck'));
   assert.equal(environment.status, 'environment-or-resolution-error');
+  assert.equal(checkObservation(plan, 'sh: 1: nonexistent-feedback-tool: not found\n', {exit: 127}, 0).status, 'environment-or-resolution-error');
+  assert.equal(checkObservation(plan, 'AssertionError: item not found\n', {exit: 1}, 0).status, 'failed-or-unclassified');
   const assertionOutput = '✔ timeout validation in constructor\n✖ public API assertion\nAssertionError: expected 2, received 1\n';
   const assertionFailure = checkObservation(plan, assertionOutput, {exit: 1, output: assertionOutput}, 1);
   assert.equal(assertionFailure.status, 'failed-or-unclassified');
