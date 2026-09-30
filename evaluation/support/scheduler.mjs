@@ -7,6 +7,7 @@ import fs from 'node:fs';import path from 'node:path';import {createHash} from '
 import {prepareRecording,recordingProfile,inspectFullTaskRecordingProfile,selectRecordingProfile} from './provider-recording.mjs';
 import {privateJSON} from './output-files.mjs';
 import {execFileSync} from 'node:child_process';
+import {nativeCampaign,remainingAssignments} from '../polybench/campaign.mjs';
 // Per-request observer for the response lifecycle forms actually emitted by
 // the configured upstream. Transport/native completion remain separate facts.
 export function responseObserver(record, persist=()=>{}, closeAdmission=()=>{}, observeEvent=()=>{}) {
@@ -54,12 +55,16 @@ const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
  for(const [directory,expected]of Object.entries(f.runtimeManifests??{}))if(JSON.stringify(manifest(directory))!==JSON.stringify(expected))throw Error('Runtime/dependencies/input changed: '+directory);
  if(new Set(f.attempts.map(a=>a.slot)).size!==f.attempts.length||f.attempts.some((a,i)=>a.slot!==i+1)||!f.attempts.length)throw Error('Invalid slot identity');
  if(f.experimentKind!=='fixture'){
-  const consolidated=f.campaign==='consolidated-v1';
-  const count=f.experimentKind==='polybench'?(consolidated?20:10):1;
+  const consolidated=nativeCampaign(f.campaign),remaining=f.campaign==='consolidated-remaining-v1';
+  if(f.campaign&&!consolidated)throw Error('Unsupported PolyBench campaign');
+  const count=f.experimentKind==='polybench'?(remaining?8:consolidated?20:10):1;
   if(f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.length!==count*3)throw Error('Invalid PolyBench frozen schedule');
   const groups=new Map();for(const a of f.attempts){if(!groups.has(a.task))groups.set(a.task,[]);groups.get(a.task).push(a.arm);}
   if(groups.size!==count)throw Error('Invalid PolyBench allocation');
-  let index=0;for(const arms of groups.values())if(arms.join(',')!==(consolidated?['P,C,T','C,T,P','T,P,C']:['P,H0,H1','H0,H1,P','H1,P,H0'])[index++%3])throw Error('Invalid PolyBench cyclic order');
+  if(remaining&&f.experimentKind==='polybench'){
+   const slots=remainingAssignments();
+   if(f.attempts.some((a,i)=>a.task!==slots[i].instance_id||a.arm!==slots[i].arm||a.original_slot!==slots[i].original_slot))throw Error('Invalid remaining assignment');
+  }else{let index=0;for(const arms of groups.values())if(arms.join(',')!==(consolidated?['P,C,T','C,T,P','T,P,C']:['P,H0,H1','H0,H1,P','H1,P,H0'])[index++%3])throw Error('Invalid PolyBench cyclic order');}
   if(consolidated&&(!f.templates||Object.keys(f.templates).sort().join(',')!=='C,P,T'))throw Error('Missing consolidated arm bundles');
   if(consolidated&&f.experimentKind==='polybench'){
    if(f.attempts.some(a=>!['ready','preparation_error'].includes(a.preparationStatus)))throw Error('Missing preparation disposition');
@@ -75,11 +80,12 @@ const outputRoot=root;
 const verify=()=>verifyFrozenSchedule(f,runTaskImplementation,fetchImpl);
 verify();
 if(fs.existsSync(path.join(root,'scheduling-paused.json')))throw Error('Admission paused; no automatic resume');
+if(f.campaign==='consolidated-remaining-v1'&&fs.existsSync(path.join(root,'runs'))&&fs.readdirSync(path.join(root,'runs')).length)throw Error('Previously created remaining campaign attempts must never be retried');
 let pause=null;
 function pauseScheduling(kind,slot,details={}){if(pause)return;pause={kind,slot,...details};try{fs.writeFileSync(path.join(outputRoot,'scheduling-paused.json'),JSON.stringify(pause,null,2),{flag:'wx',mode:0o600});}catch(error){pause.persistenceError=error.message;}}
 for(const attempt of f.attempts){
  verify();if(pause)break;const out=path.join(outputRoot,'runs',attempt.task+(attempt.repetition?'-r'+attempt.repetition:'')+'-'+attempt.arm);
- if(f.campaign==='consolidated-v1'&&attempt.preparationStatus==='preparation_error')continue;
+ if(nativeCampaign(f.campaign)&&attempt.preparationStatus==='preparation_error')continue;
  if(fs.existsSync(out))throw Error('Previously created slot must never be retried: '+out);
  fs.mkdirSync(out,{recursive:true,mode:0o700});fs.writeFileSync(path.join(out,'started.json'),JSON.stringify({...attempt,at:new Date().toISOString()},null,2),{flag:'wx'});
  const requests=[],active=new Set(),abort=new AbortController();let session,deadline=null,deadlineMono=null,timer,result,terminationVerified=false,forwardingOpen=true,deadlineTriggered=false,captureSaved=false,relayRemoved=false,captureAttempted=false,recording,recordingPersistenceError=null;
@@ -94,7 +100,7 @@ for(const attempt of f.attempts){
   // Admission above remains independent; ordinary native sessions never call here.
   try{recording=prepareRecording(out,{run:path.basename(path.resolve(root)),slot:attempt.slot},{profile:selectedRecording.name});}
   catch(error){pauseScheduling('evidence_incomplete',attempt.slot,{phase:'recording_preparation',message:error.message});throw error;}
-  session=await startContainer({source:attempt.source,toolchain:f.toolchain,template:f.campaign==='consolidated-v1'?f.templates[attempt.arm]:attempt.arm!=='P'?f.template:f.dependencies,output:path.join(out,'session'),onRequest:(frame,rawSend,signal)=>{
+  session=await startContainer({source:attempt.source,toolchain:f.toolchain,template:nativeCampaign(f.campaign)?f.templates[attempt.arm]:attempt.arm!=='P'?f.template:f.dependencies,output:path.join(out,'session'),onRequest:(frame,rawSend,signal)=>{
    const send=message=>{if(forwardingOpen&&remaining()>0){rawSend(message);return true;}return false;};
    const pending=(async()=>{
     const requestKind=frame.body?.tools?.length?'work':'title';
@@ -197,7 +203,7 @@ for(const attempt of f.attempts){
   }});
   const setup=session.exec(['node','-e',"const fs=require('fs');fs.mkdirSync('/work/bin');fs.copyFileSync('/template/rg','/work/bin/rg');fs.chmodSync('/work/bin/rg',0o755);fs.mkdirSync('/work/config/opencode',{recursive:true});for(const n of ['node_modules','package.json','package-lock.json'])fs.cpSync('/template/'+n,'/work/config/opencode/'+n,{recursive:true,verbatimSymlinks:true});"]);if(setup.status!==0)throw Error('Dependency preparation failed: '+setup.stderr);
   const {manifest:got,receipt}=await readInput(session,out,{signal:abort.signal});
-  const expected=f.inputManifests[attempt.task+'-'+attempt.arm]??(f.campaign==='consolidated-v1'?f.runtimeManifests?.[attempt.source]:undefined);
+  const expected=f.inputManifests[attempt.task+'-'+attempt.arm]??(nativeCampaign(f.campaign)?f.runtimeManifests?.[attempt.source]:undefined);
   compareInputManifest(got,expected);
   privateJSON(path.join(out,'input-verification.json'),{matched:true,files:Object.keys(got).length,providerRequestsBeforeStart:requests.length,artifact:receipt});
   const version=session.exec(['/opt/opencode','--version']);if(version.status!==0||version.stdout.trim()!=='1.18.26')throw Error('Runtime mismatch');

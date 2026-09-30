@@ -9,6 +9,7 @@ import {runNativePhase} from '../support/native-run.mjs';
 import {stopWorkload} from '../support/stop-workload.mjs';
 import {captureCandidate} from './capture.mjs';
 import {verifyReadyInputs} from './input-preflight.mjs';
+import {nativeCampaign} from './campaign.mjs';
 export async function runTask(session,options){
  session.arm=options.arm;
  if(!['P','C','T','H0','H1'].includes(options.arm))throw Error('Unknown PolyBench arm');
@@ -39,8 +40,8 @@ export async function run(root,extra={}){
   if(freeze.controlsPassed!==true||freeze.authorIsolationPassed!==true)throw Error('Real admission requires controls and isolation');
   const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.json')));
   if(manifest.freezeSha256!==createHash('sha256').update(fs.readFileSync(path.join(root,'freeze.json'))).digest('hex'))throw Error('Local freeze differs from committed manifest');
-  if(freeze.campaign==='consolidated-v1'){
-   const published='evaluation/polybench/campaigns/consolidated-v1/frozen-manifest.json';
+  if(nativeCampaign(freeze.campaign)){
+   const published='evaluation/polybench/campaigns/'+freeze.campaign+'/frozen-manifest.json';
    const committed=execFileSync('git',['show','HEAD:'+published]);
    if(!committed.equals(fs.readFileSync(path.join(root,'manifest.json'))))throw Error('Campaign freeze must be committed before model admission');
    execFileSync('git',['merge-base','--is-ancestor',freeze.adapterSha,'HEAD']);

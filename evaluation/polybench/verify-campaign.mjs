@@ -6,6 +6,7 @@ import {spawnSync} from 'node:child_process';
 import {manifest} from '../support/manifest.mjs';
 import {runComparison} from '../support/scheduler.mjs';
 import {inputManifestScript} from '../support/input-manifest.mjs';
+import {remainingAssignments} from './campaign.mjs';
 const root=fs.mkdtempSync(path.join(os.tmpdir(),'consolidated-schedule-'));
 try{
  const source=root+'/source';fs.mkdirSync(source);fs.writeFileSync(source+'/TASK.md','Scripted scheduler contract only.');
@@ -42,4 +43,16 @@ try{
   await assert.rejects(execute(f,root+'/'+name,started));assert.deepEqual(started,[]);
  }
  console.log('Consolidated fixed schedule, equal exclusions and arm bundles passed; provider requests: 0');
+ const slots=remainingAssignments();assert.equal(slots.length,24);
+ assert.deepEqual(slots.map(s=>s.original_slot),[...Array.from({length:21},(_,i)=>i+31),58,59,60]);
+ assert.equal(new Set(slots.map(s=>s.instance_id+'-'+s.arm)).size,24);
+ const remaining={...compact,campaign:'consolidated-remaining-v1',attempts:slots.map(s=>({slot:s.slot,original_slot:s.original_slot,task:s.instance_id,arm:s.arm,source,preparationStatus:'ready'}))};
+ const remainingSeen=[];assert.equal((await execute(remaining,root+'/remaining',remainingSeen)).status,'finished');assert.deepEqual(remainingSeen,Array.from({length:24},(_,i)=>i+1));
+ for(const [name,mutate]of [['extra',f=>{f.attempts.push({...f.attempts[0],slot:25});}],['duplicate',f=>{f.attempts[1]={...f.attempts[0],slot:2};}],['wrong-origin',f=>{f.attempts[23].original_slot=54;}],['wrong-task',f=>{f.attempts[0].task='historical-evaluated-task';}],['historical-arms',f=>{f.attempts[0].arm='H0';}],['remaining-mixed-preparation',f=>{f.attempts[0].preparationStatus='preparation_error';}],['remaining-missing-bundle',f=>{delete f.templates.C;}]]){
+  const f=structuredClone(remaining);mutate(f);const started=[];await assert.rejects(execute(f,root+'/'+name,started));assert.deepEqual(started,[]);
+ }
+ // A pre-existing attempt anywhere closes the party before earlier slots run.
+ const used=root+'/used';fs.mkdirSync(used+'/runs/'+remaining.attempts[23].task+'-'+remaining.attempts[23].arm,{recursive:true});fs.writeFileSync(used+'/freeze.json',JSON.stringify(remaining));
+ await assert.rejects(runComparison({root:used,runTaskImplementation:async()=>{throw Error('Never execute');},fetchImpl:()=>{throw Error('Never forward');},startContainer:()=>{throw Error('Never prepare');}}),/never be retried/);
+ console.log('Remaining exact 24 assignments, original slots, P/C/T bundles and extra/duplicate/executed refusal passed; provider requests: 0');
 }finally{fs.rmSync(root,{recursive:true,force:true});}

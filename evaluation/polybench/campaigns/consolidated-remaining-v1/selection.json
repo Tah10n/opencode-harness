@@ -1,0 +1,341 @@
+{
+  "stage": "selected_before_technical_controls",
+  "campaign": "consolidated-remaining-v1",
+  "configuration_sha256": "8af04ca44e6145610cfcc1a38572dcbb7159d00101783c43de82c3ab97335ab4",
+  "dataset_revision": "b3fca77b637379f0c01ad86d18753a7ac1998b53",
+  "dataset_sha256": "0c8138e73c34fa29a5276b675b146b72d78ce001fcc4560d76302c908b4808a5",
+  "origin": {
+    "campaign": "consolidated-v1",
+    "selection_path": "evaluation/polybench/campaigns/consolidated-v1/selection.json",
+    "selection_sha256": "fc63631c02baf256e0c726e217a25010bca2e0a2f3dc31613cfdd578f808f1fc",
+    "results_path": "evaluation/polybench/campaigns/consolidated-v1/results.json",
+    "results_sha256": "dcd5cf80ee393ae285803777a743b61efa644a5300ea536d6dd3afcb0235b746",
+    "original_slots": [
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      58,
+      59,
+      60
+    ],
+    "slot31": "preexecution_adapter_error_closed_admission; zero model requests; old result unchanged"
+  },
+  "selected": [
+    {
+      "instance_id": "mui__material-ui-42412",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "b8a28e13dc0821314700f1aefc9f8e1134cf9034"
+    },
+    {
+      "instance_id": "mui__material-ui-18683",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "dfe2779b8b6499ccd1922990ac9178d84e02f8b6"
+    },
+    {
+      "instance_id": "microsoft__vscode-135805",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "7d8f55ebb1b7ccb084f7e6969b6926519c5c80c3"
+    },
+    {
+      "instance_id": "serverless__serverless-2945",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "5a3e0c2bcaff15d77c925995693379967da42d80"
+    },
+    {
+      "instance_id": "mrdoob__three.js-24461",
+      "repo": "mrdoob/three.js",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "9e5512f067e3a0de8d4069217d20903c1725edf7"
+    },
+    {
+      "instance_id": "serverless__serverless-8159",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Feature",
+      "base_commit": "56aa5aa15abed64db6758aecd8c27719928b5a14"
+    },
+    {
+      "instance_id": "microsoft__vscode-108964",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "13b3c937dc5e3816c79bdd2cdf2cdf6f9c727b75"
+    },
+    {
+      "instance_id": "coder__code-server-3277",
+      "repo": "coder/code-server",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "f8d8ad38c166d74332fb71adbce5f08c14bfc7e3"
+    }
+  ],
+  "slots": [
+    {
+      "slot": 1,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 31
+    },
+    {
+      "slot": 2,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 32
+    },
+    {
+      "slot": 3,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 33
+    },
+    {
+      "slot": 4,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 34
+    },
+    {
+      "slot": 5,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 35
+    },
+    {
+      "slot": 6,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 36
+    },
+    {
+      "slot": 7,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 37
+    },
+    {
+      "slot": 8,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 38
+    },
+    {
+      "slot": 9,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 39
+    },
+    {
+      "slot": 10,
+      "instance_id": "serverless__serverless-2945",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 40
+    },
+    {
+      "slot": 11,
+      "instance_id": "serverless__serverless-2945",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 41
+    },
+    {
+      "slot": 12,
+      "instance_id": "serverless__serverless-2945",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 42
+    },
+    {
+      "slot": 13,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 43
+    },
+    {
+      "slot": 14,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 44
+    },
+    {
+      "slot": 15,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 45
+    },
+    {
+      "slot": 16,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 46
+    },
+    {
+      "slot": 17,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 47
+    },
+    {
+      "slot": 18,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 48
+    },
+    {
+      "slot": 19,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 49
+    },
+    {
+      "slot": 20,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 50
+    },
+    {
+      "slot": 21,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 51
+    },
+    {
+      "slot": 22,
+      "instance_id": "coder__code-server-3277",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 58
+    },
+    {
+      "slot": 23,
+      "instance_id": "coder__code-server-3277",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 59
+    },
+    {
+      "slot": 24,
+      "instance_id": "coder__code-server-3277",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 60
+    }
+  ]
+}

@@ -82,12 +82,40 @@ try:m.select_campaign([{**x,'repo':'only-repository'} for x in fixture],config)
 except ValueError:pass
 else:raise AssertionError('Infeasible repository cap accepted')
 if '--consolidated-dataset' in __import__('sys').argv:
- with (root/config['local_directory']/'verified.csv').open(newline='') as f: full=list(csv.DictReader(f))
- _,chosen,quotas,counts=m.select_campaign(full,config)
- assert [x['instance_id'] for x in chosen]==[x['instance_id'] for x in new_saved['selected']]
- assert quotas==new_saved['quotas'] and counts==new_saved['pool_categories']
- with (root/config['local_directory']/'selected.csv').open(newline='') as f: assert list(csv.DictReader(f))==chosen
+ from campaign import CONFIG as active_config, SELECTION as active_selection
+ active_config=active_config or config
+ with (root/active_config['local_directory']/'verified.csv').open(newline='') as f: full=list(csv.DictReader(f))
+ if active_config['name']=='consolidated-remaining-v1':
+  selected,slots=m.remaining_assignment(active_config)
+  active_saved=json.loads(active_selection.read_text());assert active_saved['selected']==selected and active_saved['slots']==slots
+  by_id={x['instance_id']:x for x in full};chosen=[by_id[x['instance_id']] for x in selected]
+  assert all(all(row[k]==saved[k] for k in saved) for row,saved in zip(chosen,selected))
+ else:
+  _,chosen,quotas,counts=m.select_campaign(full,active_config)
+  assert [x['instance_id'] for x in chosen]==[x['instance_id'] for x in new_saved['selected']]
+  assert quotas==new_saved['quotas'] and counts==new_saved['pool_categories']
+ with (root/active_config['local_directory']/'selected.csv').open(newline='') as f: assert list(csv.DictReader(f))==chosen
 print('Consolidated selection: quotas, exclusions, global cap, cyclic slots and input-order independence passed')
+
+remaining_config=json.loads((root/'evaluation/polybench/campaigns/consolidated-remaining-v1/campaign.json').read_text())
+remaining_saved=json.loads((root/'evaluation/polybench/campaigns/consolidated-remaining-v1/selection.json').read_text())
+selected,remaining_slots=m.remaining_assignment(remaining_config)
+assert selected==remaining_saved['selected'] and remaining_slots==remaining_saved['slots']
+assert len({(s['instance_id'],s['arm']) for s in remaining_slots})==24
+for numbers in [remaining_config['origin']['original_slots']+[60],remaining_config['origin']['original_slots'][:-1],remaining_config['origin']['original_slots'][:-1]+[54]]:
+ bad=json.loads(json.dumps(remaining_config));bad['origin']['original_slots']=numbers
+ try:m.remaining_assignment(bad)
+ except ValueError:pass
+ else:raise AssertionError('Extra/duplicate/wrong historical assignment accepted')
+with tempfile.TemporaryDirectory() as tmp:
+ bad=json.loads(json.dumps(remaining_config));source=Path(bad['origin']['results_path']);data=json.loads(source.read_text())
+ next(s for s in data['slots'] if s['slot']==31)['usage']['requests']=1
+ changed=Path(tmp)/'already-executed.json';changed.write_text(json.dumps(data))
+ bad['origin']['results_path']=str(changed);bad['origin']['results_sha256']=__import__('hashlib').sha256(changed.read_bytes()).hexdigest()
+ try:m.remaining_assignment(bad)
+ except ValueError as error:assert 'already executed' in str(error)
+ else:raise AssertionError('Already executed historical attempt accepted')
+print('Remaining historical projection and already-executed refusal passed')
 
 # Evaluator imports must not see extra Python modules (including ignored files).
 import subprocess

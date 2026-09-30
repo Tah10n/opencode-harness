@@ -2,13 +2,14 @@
 import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';import {execFileSync} from 'node:child_process';
 import {manifest} from '../support/manifest.mjs';
-import {local,campaign,selectionPath,arms,configPath} from './campaign.mjs';
+import {local,campaign,selectionPath,arms,configPath,remainingAssignments} from './campaign.mjs';
 const dev=path.resolve('evaluation/polybench'),root=local+'/batch';
 assert.ok(!fs.existsSync(root),'Never replace a frozen or started batch');
 execFileSync('python3',[dev+'/verify.py',...(campaign?['--consolidated-dataset']:[])],{stdio:'inherit'});
 const get=file=>JSON.parse(fs.readFileSync(file)),hash=file=>createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 const selection=get(selectionPath),environments=get(local+'/environments.json'),images=get(local+'/images.json');
-assert.equal(selection.selected.length,campaign?20:10);assert.equal(selection.slots.length,campaign?60:30);
+assert.equal(selection.selected.length,campaign?.task_count??(campaign?20:10));assert.equal(selection.slots.length,campaign?.slot_count??(campaign?60:30));
+if(campaign?.name==='consolidated-remaining-v1')remainingAssignments();
 execFileSync('python3',['-B','-c','from evaluator_integrity import verify; verify('+JSON.stringify(local+'/evaluator')+')'],{cwd:dev,stdio:'inherit'});
 const preparation=campaign?get(local+'/preparation.json'):null;
 assert.equal(execFileSync('git',['rev-parse','HEAD'],{cwd:local+'/evaluator',encoding:'utf8'}).trim(),'9c836c5d7f3cb991934132b77d29e6941d912a07');
@@ -72,10 +73,11 @@ const files={};for(const name of ['run.mjs','capture.mjs','dependencies.mjs','ev
 for(const name of fs.readdirSync(path.resolve('evaluation/support')).filter(n=>n.endsWith('.mjs')||n.endsWith('.py'))){const file=path.resolve('evaluation/support',name);files[file]=hash(file);}
 files[path.resolve('fixtures/native-offline/build.json')]=hash('fixtures/native-offline/build.json');
 files[selectionPath]=hash(selectionPath);if(configPath)files[configPath]=hash(configPath);
+if(campaign?.origin)for(const kind of ['selection','results'])files[path.resolve(campaign.origin[kind+'_path'])]=campaign.origin[kind+'_sha256'];
 if(campaign)files[path.join(path.dirname(configPath),'PLAN.md')]=hash(path.join(path.dirname(configPath),'PLAN.md'));
 for(const name of fs.readdirSync(dev).filter(n=>/\.(mjs|py)$/.test(n)))files[dev+'/'+name]=hash(dev+'/'+name);
 const toolchain=local+'/toolchain';files[toolchain+'/package/bin/opencode']=hash(toolchain+'/package/bin/opencode');
-const attempts=selection.slots.map(s=>({slot:s.slot,task:s.instance_id,arm:s.arm,project:selection.selected.find(r=>r.instance_id===s.instance_id).repo,source:local+'/author-inputs/'+s.instance_id+'/source',...(campaign?{preparationStatus:preparation[s.instance_id].status}:{})}));
+const attempts=selection.slots.map(s=>({slot:s.slot,...(s.original_slot?{original_slot:s.original_slot}:{}),task:s.instance_id,arm:s.arm,project:selection.selected.find(r=>r.instance_id===s.instance_id).repo,source:local+'/author-inputs/'+s.instance_id+'/source',...(campaign?{preparationStatus:preparation[s.instance_id].status}:{})}));
 const frozen={version:1,experimentKind:'polybench',...(campaign?{campaign:campaign.name,preparation,templates:{P:local+'/plain-dependencies',C:local+'/core-bundle',T:local+'/bundle'},recordingProfile:campaign.recording_profile,adapterSha}:{}),runtimeSha:runtime.sha,model:runtime.model,variant:runtime.variant,budgetMs:1800000,strategy:'direct',preflightPassed:true,controlsPassed:true,authorIsolationPassed:true,streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,toolchain,template:local+'/bundle',dependencies:local+'/plain-dependencies',config:get(local+'/experiment-config.json'),attempts,environments,inputManifests,runtimeManifests,files};
 if(campaign)frozen.timeAccounting=campaign.time_accounting;
 fs.mkdirSync(root,{mode:0o700});fs.writeFileSync(root+'/freeze.json',JSON.stringify(frozen));
