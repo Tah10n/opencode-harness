@@ -3,11 +3,12 @@ import fs from 'node:fs';import path from 'node:path';import os from 'node:os';
 import {createHash} from 'node:crypto';
 import {execFileSync,spawn} from 'node:child_process';import {fileURLToPath} from 'node:url';
 import {prepareWorktreeDependencies} from './dependencies.mjs';
-import {runComparison} from '../support/scheduler.mjs';
+import {runComparison,verifyFrozenSchedule} from '../support/scheduler.mjs';
 import {startContainer} from '../support/container-session.mjs';
 import {runNativePhase} from '../support/native-run.mjs';
 import {stopWorkload} from '../support/stop-workload.mjs';
 import {captureCandidate} from './capture.mjs';
+import {verifyReadyInputs} from './input-preflight.mjs';
 export async function runTask(session,options){
  session.arm=options.arm;
  if(!['P','C','T','H0','H1'].includes(options.arm))throw Error('Unknown PolyBench arm');
@@ -45,6 +46,10 @@ export async function run(root,extra={}){
    execFileSync('git',['merge-base','--is-ancestor',freeze.adapterSha,'HEAD']);
   }
  }
+ if(fs.existsSync(path.join(root,'scheduling-paused.json')))throw Error('Admission paused; no automatic resume');
+ verifyFrozenSchedule(freeze,runTask,extra.fetchImpl);
+ // Complete every ready input before any slot can open provider admission.
+ await verifyReadyInputs(freeze,root);
  return runComparison({root,startContainer:async a=>{
   const preparedEnvironment=freeze.environments[a.source];if(!preparedEnvironment)throw Error('Unfrozen environment');
   const session=await startContainer({...a,preparedEnvironment,workMemoryMb:8192,memoryMb:12288});

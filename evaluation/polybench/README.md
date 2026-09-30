@@ -64,6 +64,54 @@ model-free checks validate the migrated configuration/export/reader; they do not
 prove a fresh full Docker preparation, official evaluation or new model quality.
 The full preparation and paid run require their own recorded validation later.
 
+## Input preparation bounds
+
+Before future model admission, every ready task's actual isolated `/work/repo`
+must pass a model-free manifest comparison and task Git capture. The shared
+Plain/Core/Task scripted demonstration alone does not establish input readiness.
+The launcher checks all ready inputs before the first slot; each slot still
+rechecks its actual container immediately before starting the native phase.
+Frozen runtime/dependency checks and the admission pause remain enforced.
+
+The actual manifest streams to an owned private file, with a small producer
+completion record bound to the immutable container ID, session, unique export
+and `/work/repo`. Completion, byte count, SHA-256, full JSON read and entry count
+must agree before comparison. All paths, hashes, executable modes and symlink
+targets are compared, including dependency directories. No model-supplied export
+path is accepted. The ordinary `session.exec` retains its 32 MiB stdout limit.
+
+An export is bounded to **128 MiB**, **500,000 entries** and **120 seconds**.
+Producer errors, partial/corrupt bytes, cancellation and exceeded bounds prevent
+model admission. Cancellation targets only the identified producer. These limits
+bound service artifacts; their sizes do not estimate model tokens.
+
+Synthetic regression commands (no provider calls, no benchmark tasks):
+
+```sh
+node scripts/verify-large-git.mjs --expect-original-failure
+node scripts/verify-large-git.mjs
+# EVALUATION_IMAGE must be an immutable fixture image built from
+# evaluation/support/Dockerfile, as in the existing container CI job.
+node evaluation/support/verify-large-input.mjs --expect-original-failure
+node evaluation/support/verify-large-input.mjs
+NATIVE_TASK_FIXTURE_LARGE_GIT=1 NATIVE_TASK_FIXTURE_DIRECT=1 \
+  NATIVE_TASK_FIXTURE_MODES=missing-read \
+  OPENCODE_BIN=/absolute/path/to/opencode node scripts/verify-native-task-fixture.mjs
+```
+
+The RED checks load only the original affected module bytes from commit
+`25a446eaa7d5cb5c5776ab30d45ca338eb9ad581`; that commit must exist locally.
+Fixtures are generated in owned temporary directories and removed afterward.
+The Git regressions cover 2,579,497 and 2,534,961 bytes, tail index flags and exact
+small patch export. The container regression covers 204,292 entries and a
+48,416,621-byte manifest, independently expected values, changed/deleted/added
+tail entries, executable/symlink changes, corruption, cancellation and bounds.
+The installed fixture applies the ordinary terminal patch to a Git clone and
+runs its project check while preserving user staged/unstaged/untracked state.
+These are technical results for the corrected product/adapter. The stopped
+consolidated-v1 scores, predictions, costs, freeze and pause remain historical
+and unchanged; no new model quality result is inferred.
+
 ## Sources
 
 [Official evaluator](https://github.com/amazon-science/SWE-PolyBench),

@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
 import {manifest} from '../support/manifest.mjs';
 import {runComparison} from '../support/scheduler.mjs';
+import {inputManifestScript} from '../support/input-manifest.mjs';
 const root=fs.mkdtempSync(path.join(os.tmpdir(),'consolidated-schedule-'));
 try{
  const source=root+'/source';fs.mkdirSync(source);fs.writeFileSync(source+'/TASK.md','Scripted scheduler contract only.');
@@ -17,6 +18,7 @@ try{
  const execute=async(f,folder,seen)=>{
   fs.mkdirSync(folder);fs.writeFileSync(folder+'/freeze.json',JSON.stringify(f));
   return runComparison({root:folder,fetchImpl:()=>{throw Error('No provider call allowed');},readAuth:()=>{throw Error('No auth read allowed');},
+   readInput:async()=>{actualInputScript=inputManifestScript({root:source,run:'fixture'});const r=spawnSync(process.execPath,['-e',actualInputScript],{encoding:'utf8'});assert.equal(r.status,0,r.stderr);return {manifest:JSON.parse(r.stdout),receipt:{fixture:true}};},
    startContainer:async options=>{
     const a=f.attempts.find(a=>options.output.endsWith('/'+a.task+'-'+a.arm+'/session'));assert.ok(a);assert.equal(options.template,f.templates[a.arm]);seen.push(a.slot);
     return {setTaskBudget(){},exec(argv){if(argv[2]?.includes("visit('/work/repo')")){actualInputScript=argv[2].replaceAll('/work/repo',source);return spawnSync(process.execPath,['-e',actualInputScript],{encoding:'utf8'});}return {status:0,stdout:argv[0]==='/opt/opencode'?'1.18.26':argv[2].includes('DatabaseSync')?' {"sessions":[],"messages":[],"tools":[]}':''};},close(){return 0;}};

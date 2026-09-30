@@ -4,20 +4,25 @@ from pathlib import Path
 from campaign import LOCAL as CAMPAIGN_LOCAL, SELECTION, CONFIG
 ROOT=Path(__file__).resolve().parents[2];LOCAL=CAMPAIGN_LOCAL;DEV=ROOT/'evaluation/polybench';PYTHON=LOCAL/'venv/bin/python'
 environments=json.loads((LOCAL/'environments.json').read_text())
+preparation=json.loads((LOCAL/'preparation.json').read_text()) if CONFIG else None
 for row in json.loads(SELECTION.read_text())['selected']:
  id=row['instance_id'];source=LOCAL/'author-inputs'/id/'source'
+ if CONFIG and preparation.get(id,{}).get('status')!='ready':continue
  if str(source) not in environments:continue
+ # Check every prepared input, including task Git capture, before the shared
+ # scripted arm demonstration. Plain success alone is not input readiness.
+ input_check=LOCAL/('input-preflight-'+id)/'verification.json'
+ if not input_check.exists():subprocess.run(['node',DEV/'input-preflight.mjs',id],cwd=ROOT,check=True)
+ if not json.loads(input_check.read_text()).get('passed'):raise RuntimeError('Incomplete input preflight: '+id)
  name='scripted-preflight-final' if CONFIG else 'preflight-final-'+id;out=LOCAL/name
  if out.exists():
   verification=out/'verification.json'
   if verification.exists() and json.loads(verification.read_text())['passed']:
-   if CONFIG:break
    continue
   raise RuntimeError('Preserve and inspect partial scripted preflight: '+str(out))
  with (LOCAL/(name+'-console.log')).open('x') as log:
   subprocess.run(['node',DEV/'preflight.mjs',name,id],cwd=ROOT,stdout=log,stderr=subprocess.STDOUT,check=True)
  print(id+' scripted arms passed',flush=True)
- if CONFIG:break
 
 if CONFIG:
  import csv,hashlib

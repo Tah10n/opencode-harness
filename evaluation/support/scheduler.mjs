@@ -1,4 +1,5 @@
 import {manifest} from './manifest.mjs';
+import {captureInputManifest,compareInputManifest} from './input-manifest.mjs';
 import {performance} from 'node:perf_hooks';
 // Frozen primary or conditional transfer comparison using the same managed-deadline scheduler.
 // A/B do not add a phase or an intermediate model deadline.
@@ -44,12 +45,8 @@ export function responseObserver(record, persist=()=>{}, closeAdmission=()=>{}, 
 }
 export function knownResponseTerminal(record){return !!record.terminalResponse&&!record.responseBindingError;}
 
-export async function runComparison({root,startContainer,captureCandidate,stopWorkload,readAuth,fetchImpl=fetch,runTaskImplementation}) {
-const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
+export function verifyFrozenSchedule(f,runTaskImplementation,fetchImpl=fetch){
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
-const selectedRecording=selectRecordingProfile(f.recordingProfile??recordingProfile.name);
-const outputRoot=root;
-function verify(){
  if(!['polybench','polybench-preflight','fixture'].includes(f.experimentKind))throw Error('Unsupported evaluation schedule; historical campaigns cannot resume');
  if(f.experimentKind==='fixture'&&fetchImpl===fetch)throw Error('Fixtures cannot access provider');
  if(typeof runTaskImplementation!=='function'||typeof f.model!=='string'||!/^openai\/[^/\s]+$/.test(f.model)||typeof f.variant!=='string'||!f.variant||!Number.isSafeInteger(f.budgetMs)||f.budgetMs<=0||f.budgetMs>3600000||!f.preflightPassed)throw Error('Invalid frozen configuration');
@@ -70,6 +67,12 @@ function verify(){
   }
  }
 }
+
+export async function runComparison({root,startContainer,captureCandidate,stopWorkload,readAuth,fetchImpl=fetch,runTaskImplementation,readInput=captureInputManifest}) {
+const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
+const selectedRecording=selectRecordingProfile(f.recordingProfile??recordingProfile.name);
+const outputRoot=root;
+const verify=()=>verifyFrozenSchedule(f,runTaskImplementation,fetchImpl);
 verify();
 if(fs.existsSync(path.join(root,'scheduling-paused.json')))throw Error('Admission paused; no automatic resume');
 let pause=null;
@@ -193,11 +196,10 @@ for(const attempt of f.attempts){
    })();active.add(pending);return pending.finally(()=>active.delete(pending));
   }});
   const setup=session.exec(['node','-e',"const fs=require('fs');fs.mkdirSync('/work/bin');fs.copyFileSync('/template/rg','/work/bin/rg');fs.chmodSync('/work/bin/rg',0o755);fs.mkdirSync('/work/config/opencode',{recursive:true});for(const n of ['node_modules','package.json','package-lock.json'])fs.cpSync('/template/'+n,'/work/config/opencode/'+n,{recursive:true,verbatimSymlinks:true});"]);if(setup.status!==0)throw Error('Dependency preparation failed: '+setup.stderr);
-  const inputRead=session.exec(['node','-e',`const fs=require('fs'),path=require('path'),{createHash}=require('crypto'),out={};function visit(d,p=''){for(const e of fs.readdirSync(d,{withFileTypes:true})){if(e.name==='.git')continue;const file=path.join(d,e.name),rel=p+e.name,st=fs.lstatSync(file);if(st.isSymbolicLink()){const target=fs.readlinkSync(file),resolved=path.resolve(path.dirname(file),target);if(resolved!=='/work/repo'&&!resolved.startsWith('/work/repo/'))throw Error('External dependency link');out[rel]={symlink:target};continue;}if(st.isDirectory())visit(file,rel+'/');else out[rel]={sha256:createHash('sha256').update(fs.readFileSync(file)).digest('hex'),executable:!!(st.mode&0o111)};}}visit('/work/repo');console.log(JSON.stringify(out));`]);
-  if(inputRead.status!==0)throw Error('Actual input read failed');
-  const got=JSON.parse(inputRead.stdout),expected=f.inputManifests[attempt.task+'-'+attempt.arm]??(f.campaign==='consolidated-v1'?f.runtimeManifests?.[attempt.source]:undefined);
-  if(Object.keys(got).length!==Object.keys(expected).length||Object.entries(expected).some(([k,v])=>JSON.stringify(got[k])!==JSON.stringify(v)))throw Error('Actual model container input mismatch');
-  fs.writeFileSync(path.join(out,'input-verification.json'),JSON.stringify({matched:true,files:Object.keys(got).length,providerRequestsBeforeStart:requests.length}));
+  const {manifest:got,receipt}=await readInput(session,out,{signal:abort.signal});
+  const expected=f.inputManifests[attempt.task+'-'+attempt.arm]??(f.campaign==='consolidated-v1'?f.runtimeManifests?.[attempt.source]:undefined);
+  compareInputManifest(got,expected);
+  privateJSON(path.join(out,'input-verification.json'),{matched:true,files:Object.keys(got).length,providerRequestsBeforeStart:requests.length,artifact:receipt});
   const version=session.exec(['/opt/opencode','--version']);if(version.status!==0||version.stdout.trim()!=='1.18.26')throw Error('Runtime mismatch');
   deadline=Date.now()+f.budgetMs;deadlineMono=performance.now()+f.budgetMs;if(f.streamLimit==='remaining-task-budget')session.setTaskBudget(f.budgetMs,deadline);mark('taskStarted');timing.deadlineAt=new Date(deadline).toISOString();timer=setTimeout(()=>{mark('deadlineTimerFired');deadlineTriggered=true;forwardingOpen=false;mark('forwardingClosed');mark('abortRequested');abort.abort(deadlineReason);},f.budgetMs);
   if(captureCandidate.requiresOutputRetention){session.evidenceRequired=true;session.evidenceBaseline=session.baseline;}

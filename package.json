@@ -23,7 +23,7 @@
     "profile:materialize": "node scripts/profile-materialize.mjs",
     "verify": "node scripts/verify-all.mjs",
     "verify:installed": "node scripts/verify-installed.mjs",
-    "verify:evaluation": "node evaluation/support/verify-scheduler.mjs && node evaluation/support/verify-recording.mjs && python3 evaluation/polybench/verify.py",
+    "verify:evaluation": "node evaluation/support/verify-input-admission.mjs && node evaluation/support/verify-scheduler.mjs && node evaluation/support/verify-recording.mjs && python3 evaluation/polybench/verify.py",
     "polybench:prepare": "python3 evaluation/polybench/prepare.py",
     "polybench:run": "node evaluation/polybench/run.mjs",
     "polybench:evaluate": "python3 evaluation/polybench/evaluate_predictions.py",
