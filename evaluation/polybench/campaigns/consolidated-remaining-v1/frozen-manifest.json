@@ -1,0 +1,761 @@
+{
+  "version": 1,
+  "stage": "frozen_before_model_requests",
+  "runtimeSha": "f83b101bd9050c81443acddf71c1e364c4c786c4",
+  "evaluatorSha": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+  "datasetRevision": "b3fca77b637379f0c01ad86d18753a7ac1998b53",
+  "datasetSha256": "0c8138e73c34fa29a5276b675b146b72d78ce001fcc4560d76302c908b4808a5",
+  "selectedCsvSha256": "7f52d7a1c45bac97f37513c422487bdddafd746859d3d881e99d7c5c9d105e21",
+  "freezeSha256": "63b372033408dd8eca3fe6503ee24bf43c6411149b448e3df79b3e99c983a877",
+  "model": "openai/gpt-5.6-luna",
+  "opencode": "1.18.26",
+  "reasoning": "high",
+  "budgetSeconds": 1800,
+  "flags": {
+    "STRATEGY": "direct",
+    "CONTEXT": 0,
+    "CHECKS": 0,
+    "TYPE_COMPAT": 0,
+    "SENSITIVITY": 0,
+    "INVESTIGATION": {
+      "P": "absent",
+      "C": "absent",
+      "T": 1
+    },
+    "COMMAND_HINTS": 0,
+    "EXTRA_ATTENTION": 0,
+    "PRESERVATION_NUDGE": 0
+  },
+  "tasks": [
+    {
+      "instance_id": "mui__material-ui-42412",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "b8a28e13dc0821314700f1aefc9f8e1134cf9034",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-42412:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-42412@sha256:aeaa51c590fab5a5711ae1ca2e1c2bd35e0976bb328b3651f97a69d265ad4658",
+        "id": "sha256:aeaa51c590fab5a5711ae1ca2e1c2bd35e0976bb328b3651f97a69d265ad4658",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 14184124558,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:5f328bb315a004a5e9adf5bde6538406c8f52cdcd85d6e6d2395612af171fe76",
+      "projectNode": "v18.20.8",
+      "npm": "10.8.2",
+      "promptSha256": "31b630fdc97c647c150efb6cc566fe7b3a835ef32869111c0fe9bd7ecc77ebb4",
+      "originalRowCsvSha256": "c109b5f09eb9a299df03a4ef7c8e0b85b785306c0dc0a6b63199325c46a42d38",
+      "lfsAuditSha256": "c361b88db79a36366743bfc338aa26993b341f7a2a67a148347f191bdf3e1ba5",
+      "archives": {
+        "base.tar": "6c37b14102abf94b2d0d0091e018457cb0fce0e01872271deeef6d2381379218",
+        "dependencies.tar": "a479ab37e7c996422d28833c40117436baf04ae845494430371ec78c9011299c"
+      },
+      "submodules": [],
+      "preparedExtra": null,
+      "controls": {
+        "gold": {
+          "resultSha256": "b73d7d7af8154ca5376ac639eb9bd1c4067241053a2e8076226b0998e1dd4020",
+          "resolved": true,
+          "passed": 4,
+          "failed": 0
+        },
+        "baseline": {
+          "resultSha256": "acdaa40957a27e1ee8039e59b674d843dea811f78f7811c50f03cc315dd79890",
+          "resolved": false,
+          "passed": 3,
+          "failed": 1
+        }
+      },
+      "scriptedPreflightSha256": "3f38bb8113c9752a35f4f32ac4ad5c683bb1855d7d7555746d2e5e0522f64488",
+      "isolationSha256": "515ecb0ac7bd52661d72877d4009899effb74644ec3c566c7c3000565f0d3082"
+    },
+    {
+      "instance_id": "mui__material-ui-18683",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "dfe2779b8b6499ccd1922990ac9178d84e02f8b6",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-18683:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-18683@sha256:4080f04c5ba9c212a34c158caca31960f325608b0c6755497602be4f2a9ff4e0",
+        "id": "sha256:4080f04c5ba9c212a34c158caca31960f325608b0c6755497602be4f2a9ff4e0",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 8886690794,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:eb6429417dd4d7adb45a7dd7b62f5b72d70217774c67230a5e94d253920e3f47",
+      "projectNode": "v18.8.0",
+      "npm": "8.18.0",
+      "promptSha256": "e96fecaa61812a00b3f880273235939ed35667385eab699a2a6162a0fb3e4566",
+      "originalRowCsvSha256": "e6aac23b45beebf0e375a855b25f8eefd4153f6719f62b004cbdbacdaa73dfb5",
+      "lfsAuditSha256": "eb0c45a79f61ec4e58017c67316fd9b2f12d0a98b515142907b3882c53511a6c",
+      "archives": {
+        "base.tar": "54f5039b64aa8f0ba58830fc8e28bca5d9d0f5608fcfd056b32647c9b111b3e5",
+        "dependencies.tar": "f33ce81ac3b41e5d65befce8381a9ae6e0d034555f8aead430f9924ad84e94b2"
+      },
+      "submodules": [],
+      "preparedExtra": null,
+      "controls": {
+        "gold": {
+          "resultSha256": "69314f2f27503d24d15427f127a64d36b7f9a30a8a723cb48477c58a88a6a2e2",
+          "resolved": true,
+          "passed": 25,
+          "failed": 0
+        },
+        "baseline": {
+          "resultSha256": "972cd3dc82f2cf1d432187d08e9a99c0b363cb384272c09d8138a5453efaf234",
+          "resolved": false,
+          "passed": 20,
+          "failed": 5
+        }
+      },
+      "scriptedPreflightSha256": "3f38bb8113c9752a35f4f32ac4ad5c683bb1855d7d7555746d2e5e0522f64488",
+      "isolationSha256": "2cbcb3a64a91515f3f132fc3a352bf945e5530231ffc6581dc4ffe1e103720dc"
+    },
+    {
+      "instance_id": "microsoft__vscode-135805",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "7d8f55ebb1b7ccb084f7e6969b6926519c5c80c3",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-135805:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-135805@sha256:cde0971bc27970b586820216010344845a68b8694c9a3eaa2225d12c575188da",
+        "id": "sha256:cde0971bc27970b586820216010344845a68b8694c9a3eaa2225d12c575188da",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 9618823009,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:ee3152816d1632e53f3e1565d9712c2178ab16e1c8c916c49fcbf793ccdf0254",
+      "projectNode": "v14.21.3",
+      "npm": "6.14.18",
+      "promptSha256": "5bfefc63aa4733ed23fbcc264729838f85fc37dcd3b12ee449c73c16c269fb94",
+      "originalRowCsvSha256": "1816872a87948133f8f5a714c8af9a054bc47a17643167f687cffe311326d2eb",
+      "lfsAuditSha256": "82bfafad0aa26dad88e96ebaf6deb569ee1c3332b6dd6a2364e8eacbe30f0f9f",
+      "archives": {
+        "base.tar": "b09dc905600956aa24a6c4315736f848bbaab9c10b6801156ce488aaac3ec6f0",
+        "dependencies.tar": "ce5fbaf8c1f6bf1931ad930eac64121afa95fe4a84cf2d39454a7d7818eff1ef"
+      },
+      "submodules": [],
+      "preparedExtra": {
+        "directories": [
+          ".build/electron"
+        ],
+        "sha256": "9977427f12f23a91aee5bcd73b9e61a07752892bf18b1a9d73e3d007da11ee30",
+        "version": "13.5.1",
+        "preparation": "node build/lib/electron",
+        "reason": "Published image lacks required Electron binary; downloaded by unchanged original project script before offline evaluation."
+      },
+      "controls": {
+        "gold": {
+          "resultSha256": "67f9978137218be47136be6bc1a9a061080c432c5b20ed22182ef0f87791eb14",
+          "resolved": true,
+          "passed": 20,
+          "failed": 0
+        },
+        "baseline": {
+          "resultSha256": "e4c120412e459f0e84a94d7ee53f288f07fd61362eae8fe64b51e85e669fc582",
+          "resolved": false,
+          "passed": 18,
+          "failed": 2
+        }
+      },
+      "scriptedPreflightSha256": "3f38bb8113c9752a35f4f32ac4ad5c683bb1855d7d7555746d2e5e0522f64488",
+      "isolationSha256": "65291a0d0e089e252d12d9895e7830c28606f005ab164663231c40c06b717ede"
+    },
+    {
+      "instance_id": "serverless__serverless-2945",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "5a3e0c2bcaff15d77c925995693379967da42d80",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-2945:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-2945@sha256:64ee522ced6e5e741216194922b19b751a4f89f48891b0983366a5dd848e0662",
+        "id": "sha256:64ee522ced6e5e741216194922b19b751a4f89f48891b0983366a5dd848e0662",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 5142847572,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:cd8b1b37bffea9457d573e4e822dfa1bc1c98789c27c6d00947fbfed14fa26bb",
+      "projectNode": "v16.20.2",
+      "npm": "8.19.4",
+      "promptSha256": "ea369bca0d41e6877bbf3e961c3a240908952f2afbe5cc6e246128fc2db49596",
+      "originalRowCsvSha256": "ade7266bf76f84731ef74370c87c62a54345741299a69c0af9ecc0122aa7f53a",
+      "lfsAuditSha256": "9015f86bcde61b4c4c51102f08f3dd63a3de4b3037c411c1dfec1c3a5a1631c7",
+      "archives": {
+        "base.tar": "a73496ffadfaa406aa9f085084ffcf3efb30aaf70486c1c79c5f8b79965d845a",
+        "dependencies.tar": "bd81ed97d6968776d1aa996ceea5ffaa5044f3337a8e84e92dfc34287203167d"
+      },
+      "submodules": [],
+      "preparedExtra": null,
+      "controls": {
+        "gold": {
+          "resultSha256": "dbdc8c6c44a01b6030847f28f6270433a42774975513b616d7bdafc844e9cfe2",
+          "resolved": true,
+          "passed": 18,
+          "failed": 0
+        },
+        "baseline": {
+          "resultSha256": "8930e46e58bc66887328bcb37c595fb1e39c95a2e41fd0385a1c3e2c4c97553d",
+          "resolved": false,
+          "passed": 13,
+          "failed": 5
+        }
+      },
+      "scriptedPreflightSha256": "3f38bb8113c9752a35f4f32ac4ad5c683bb1855d7d7555746d2e5e0522f64488",
+      "isolationSha256": "5e16115936b6fa5507781de03dd16dd97022e56aa3b4d1c9d66e14ee66d485d5"
+    },
+    {
+      "instance_id": "mrdoob__three.js-24461",
+      "repo": "mrdoob/three.js",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "9e5512f067e3a0de8d4069217d20903c1725edf7",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mrdoob__three.js-24461:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mrdoob__three.js-24461@sha256:471c97480b9ca2880b65cc450a439a44a12cd18fc0ce7d5efec815f2100549fe",
+        "id": "sha256:471c97480b9ca2880b65cc450a439a44a12cd18fc0ce7d5efec815f2100549fe",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 11811409092,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:720013086011ccce9a3fdee56a9df85fcdc0e763b01022cace9691a9130381ae",
+      "projectNode": "v16.20.2",
+      "npm": "8.19.4",
+      "promptSha256": "a8dc3eede682a14398525fb92ba4f32c24138ac7cbc35d72e5df96097b65cda9",
+      "originalRowCsvSha256": "50d61210a0add03247fe90f56a250da4444902b8e5e631867813c984f4510861",
+      "lfsAuditSha256": "e75fe4f599cf01a2e230695a47dd0f85555363a0dffcc7c147723def1db6721b",
+      "archives": {
+        "base.tar": "1b1c8feb275a75377bbebdff6caf175ebff19e5af51a59c1440e09a5949f966a",
+        "dependencies.tar": "7a55185724f6dddad4da06b4fc9a1570af8c2f8b225eb0b53c87b90db2c85054"
+      },
+      "submodules": [],
+      "preparedExtra": null,
+      "controls": {
+        "gold": {
+          "resultSha256": "538c7a78acd09947f2a13394b35ce3175b0da36f14c622c7a2ec4c0c71ce805c",
+          "resolved": true,
+          "passed": 718,
+          "failed": 897
+        },
+        "baseline": {
+          "resultSha256": "731d4a9bda748278844d97ce153a744721c8e2c05eb751f90e683bd7942275e8",
+          "resolved": false,
+          "passed": 716,
+          "failed": 899
+        }
+      },
+      "scriptedPreflightSha256": "3f38bb8113c9752a35f4f32ac4ad5c683bb1855d7d7555746d2e5e0522f64488",
+      "isolationSha256": "a6fdc7fed1c235225b653c4e7c40257ad5f0c720db3805321a26d47a8e36105c"
+    },
+    {
+      "instance_id": "serverless__serverless-8159",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Feature",
+      "base_commit": "56aa5aa15abed64db6758aecd8c27719928b5a14",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-8159:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-8159@sha256:2dd61c66aa6d749677ce6e323e803cdc161305b6b3907b31c576e3cf2716006a",
+        "id": "sha256:2dd61c66aa6d749677ce6e323e803cdc161305b6b3907b31c576e3cf2716006a",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 5714075126,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:8c916925892fc8212ff508fb84130f5e1ca193cdf18e4b64dc305c1cf3b52e16",
+      "projectNode": "v16.20.2",
+      "npm": "8.19.4",
+      "promptSha256": "0c2f5a295e857a0ec4423015d4079b52fcabdd32b25de89dabf30b3dcd332416",
+      "originalRowCsvSha256": "427795c3fdb948a42af74e7f710e8c18369c2833328080ccb0ed202f316c3f8c",
+      "lfsAuditSha256": "c2b2148887d2baf3642353aad335a833c1cfb0f1ae954601774915c0f1c3742f",
+      "archives": {
+        "base.tar": "5b4e9a6aef5e147109cc75cf79bf0b4ba9af922c87abf4ba5af15f3ffdd71843",
+        "dependencies.tar": "e81f18552e0233e8ca63b23b23da608124d85d32c82d650a0f3f23534214210a"
+      },
+      "submodules": [],
+      "preparedExtra": null,
+      "controls": {
+        "gold": {
+          "resultSha256": "de69f5d01b9601a164cda6b20ebf984ef1a6a367e351457a75e192cb6013d8c6",
+          "resolved": true,
+          "passed": 52,
+          "failed": 0
+        },
+        "baseline": {
+          "resultSha256": "cc0172f74e5944103f9bd7b38d5b0934962cd53b677349e255094b89593c4e27",
+          "resolved": false,
+          "passed": 51,
+          "failed": 1
+        }
+      },
+      "scriptedPreflightSha256": "3f38bb8113c9752a35f4f32ac4ad5c683bb1855d7d7555746d2e5e0522f64488",
+      "isolationSha256": "bda0ac43ea19257db2f3b9bc381dcac613a3cba692f98029c5b5c646ce6923fe"
+    },
+    {
+      "instance_id": "microsoft__vscode-108964",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "13b3c937dc5e3816c79bdd2cdf2cdf6f9c727b75",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-108964:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-108964@sha256:736f9ebdd28a1fc778d148ef494c12ad6beed8513f267596761068c18c4e370f",
+        "id": "sha256:736f9ebdd28a1fc778d148ef494c12ad6beed8513f267596761068c18c4e370f",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 10579056817,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:50a45b1774e6cca16f35b3759ea480c0bb3c22bbf7a7fc86a03c120d96028599",
+      "projectNode": "v12.22.12",
+      "npm": "6.14.16",
+      "promptSha256": "b02a68ed72f2048380ccf7d93badbc64d3ca3195dde1f79bd95faf92b2ca0ecf",
+      "originalRowCsvSha256": "58ed8e6ab4f195f8f5c1ab0d025a79561bba193fda5990c55dbdd224985d3c41",
+      "lfsAuditSha256": "680dc24f39b6c6b215c04e0a197049f6e2a474df01010fba953dbb6daf66876f",
+      "archives": {
+        "base.tar": "7bbfd7693b51453330644697d0d2f038c1252b6cca3d43986de0dae75e720900",
+        "dependencies.tar": "faec61265c5978625a87086ae5b831e635ce885d88ec3b6395bb5797deed1c5a"
+      },
+      "submodules": [],
+      "preparedExtra": {
+        "directories": [
+          ".build/electron"
+        ],
+        "sha256": "9818b94449181b698a5042db7a54c42fd4038c3c88448d5aa1f0c22f39a0e73d",
+        "version": "9.3.2",
+        "preparation": "node build/lib/electron",
+        "reason": "Published image lacks required Electron binary; downloaded by unchanged original project script before offline evaluation."
+      },
+      "controls": {
+        "gold": {
+          "resultSha256": "76e91f8e750de6414601924189acff44cbb41149b442e8df52dd4d724c0a762c",
+          "resolved": true,
+          "passed": 34,
+          "failed": 0
+        },
+        "baseline": {
+          "resultSha256": "fb2d94f90b7ac7a14a43fc1c214121ebcb32f63056db19a6373acaf001207d23",
+          "resolved": false,
+          "passed": 33,
+          "failed": 1
+        }
+      },
+      "scriptedPreflightSha256": "3f38bb8113c9752a35f4f32ac4ad5c683bb1855d7d7555746d2e5e0522f64488",
+      "isolationSha256": "e462ef66e8a59757936cd3b23f99896c9359ea8cd4f5ffc6bd924b5bcc42c77c"
+    },
+    {
+      "instance_id": "coder__code-server-3277",
+      "repo": "coder/code-server",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "f8d8ad38c166d74332fb71adbce5f08c14bfc7e3",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.coder__code-server-3277:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.coder__code-server-3277@sha256:16f512cbbc875646673e2317f71ce41c5f84b38a14b8492462a38a52bd2ff9d7",
+        "id": "sha256:16f512cbbc875646673e2317f71ce41c5f84b38a14b8492462a38a52bd2ff9d7",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 7574841938,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:4b8c79e0c5632ee9aa1c4bb5173ef900593cca9728110944829490cac79df074",
+      "projectNode": "v14.21.3",
+      "npm": "6.14.18",
+      "promptSha256": "c2c10dc96880e9a6bab617420dcfa14c0e06e7a291a3a4da23ea3f92e2840f6d",
+      "originalRowCsvSha256": "cfdb6d6fdb18285a2141df870191d5330d5cb0bddec20c4754dc37764a648c56",
+      "lfsAuditSha256": "27236f2409508038abb19c8ba0cc7c2576833569a2a93203e22824b66b62567a",
+      "archives": {
+        "base.tar": "8b4522570d42739c548d19b9ba18d061a4fba36e47af38b00e89f451dfa89ed6",
+        "dependencies.tar": "c366ace1e28f6aea788dfe16d76dcd8928f56adc7eec545d0298fb3eef2afa6b"
+      },
+      "submodules": [],
+      "preparedExtra": null,
+      "controls": {
+        "gold": {
+          "resultSha256": "9dc2e6f0ad21ae2ce8ffbc03b3484a6cecc025722d6ff9d516bdcdfb848af062",
+          "resolved": true,
+          "passed": 94,
+          "failed": 0
+        },
+        "baseline": {
+          "resultSha256": "004b6bb63ac85ef0e7b4afb3dd9006b1c685157459c069d3e417cb67d9e482d1",
+          "resolved": false,
+          "passed": 53,
+          "failed": 1
+        }
+      },
+      "scriptedPreflightSha256": "3f38bb8113c9752a35f4f32ac4ad5c683bb1855d7d7555746d2e5e0522f64488",
+      "isolationSha256": "77a6b582c51b2da66faf9e4ff205ee416535991df2eaa3a827a4b127fd26fd45"
+    }
+  ],
+  "slots": [
+    {
+      "slot": 1,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 31
+    },
+    {
+      "slot": 2,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 32
+    },
+    {
+      "slot": 3,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 33
+    },
+    {
+      "slot": 4,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 34
+    },
+    {
+      "slot": 5,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 35
+    },
+    {
+      "slot": 6,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 36
+    },
+    {
+      "slot": 7,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 37
+    },
+    {
+      "slot": 8,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 38
+    },
+    {
+      "slot": 9,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 39
+    },
+    {
+      "slot": 10,
+      "instance_id": "serverless__serverless-2945",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 40
+    },
+    {
+      "slot": 11,
+      "instance_id": "serverless__serverless-2945",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 41
+    },
+    {
+      "slot": 12,
+      "instance_id": "serverless__serverless-2945",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 42
+    },
+    {
+      "slot": 13,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 43
+    },
+    {
+      "slot": 14,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 44
+    },
+    {
+      "slot": 15,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 45
+    },
+    {
+      "slot": 16,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 46
+    },
+    {
+      "slot": 17,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 47
+    },
+    {
+      "slot": 18,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 48
+    },
+    {
+      "slot": 19,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 49
+    },
+    {
+      "slot": 20,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 50
+    },
+    {
+      "slot": 21,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 51
+    },
+    {
+      "slot": 22,
+      "instance_id": "coder__code-server-3277",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 58
+    },
+    {
+      "slot": 23,
+      "instance_id": "coder__code-server-3277",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 59
+    },
+    {
+      "slot": 24,
+      "instance_id": "coder__code-server-3277",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null,
+      "original_slot": 60
+    }
+  ],
+  "realProviderRequestsBeforeFreeze": 0,
+  "campaign": "consolidated-remaining-v1",
+  "productSha": "f83b101bd9050c81443acddf71c1e364c4c786c4",
+  "adapterSha": "047279449b88730f113017bb6035aebb9362e773",
+  "timeAccounting": {
+    "clarified_on": "2026-09-30",
+    "task_budget_seconds": 1800,
+    "timer_start": "existing taskStarted after preliminary host container/input preparation",
+    "preparation_excludes": [
+      "model requests",
+      "task solving",
+      "agent-selected actions"
+    ],
+    "execution_includes": [
+      "OpenCode startup",
+      "parent/title requests",
+      "author work",
+      "project commands",
+      "investigator and preparation",
+      "post-start worktree creation",
+      "inspect",
+      "integration",
+      "native delivery"
+    ],
+    "preliminary_preparation": "started.at -> timing.taskStarted.at",
+    "agent_execution": "timing.taskStarted -> timing.forwardingClosed",
+    "capture": "timing.captureStarted -> timing.captureFinished",
+    "cleanup": "timing.cleanupStarted -> timing.cleanupFinished",
+    "post_execution_overhead": "timing.forwardingClosed -> completed.at",
+    "full_slot": "started.at -> completed.at; missing completion is incomplete",
+    "unknown_boundaries": "null; never reconstruct or subtract post-start delays",
+    "deadline_mechanism": "unchanged",
+    "applies_to": [
+      "P",
+      "C",
+      "T"
+    ]
+  },
+  "planSha256": "0eeb00c9e85c8004f53e1370f304eecbfa52d4f1661e17e6a0277bc288f3ff20",
+  "recordingProfile": "research-full-inspect-ledger-1g-v1",
+  "installedHashes": {
+    "bundle": "06300611f3d6598f76a2916994f32b7aa30d10e2891fc5c5df3b6e15225c614d",
+    "core-bundle": "74bf53f5b6599484c9bea30c9ffcd833a89b10dc76ae3f6f90ac4a7e4a0297bf",
+    "plain-dependencies": "8f127e4f53502e47188d350cfcff639844d7d17f847abb18e507079e42f19140"
+  },
+  "configurationSha256": "d16c89f0390b081948d75ece875c1c10b64a74c809dfe30d916afca875e47cf5",
+  "preparation": {
+    "mui__material-ui-42412": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": null,
+      "input_preflight_sha256": "7b02e2c112238ed733d6440b35485f017b26164b8395198b61f7ca8950c492d4",
+      "controls_elapsed_seconds": 41.785362005233765,
+      "public_input_phase_elapsed_seconds": null,
+      "accounting_note": "Total task preparation was not timed as one interval. Known phase intervals remain separate; no fabricated total or model execution time."
+    },
+    "mui__material-ui-18683": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": null,
+      "input_preflight_sha256": "89b110f6b50d39d782effcae8efe2139ebd04779e9d12fc18c6aefd4faf3fb50",
+      "controls_elapsed_seconds": 39.29435396194458,
+      "public_input_phase_elapsed_seconds": null,
+      "accounting_note": "Total task preparation was not timed as one interval. Known phase intervals remain separate; no fabricated total or model execution time."
+    },
+    "microsoft__vscode-135805": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": null,
+      "input_preflight_sha256": "c31d9b2b52aaf5b223ce6ab80f6bb892b7615c0122b7c5bdf1620901ff4b1566",
+      "controls_elapsed_seconds": 837.7151548862457,
+      "public_input_phase_elapsed_seconds": 42.04175686836243,
+      "accounting_note": "Total task preparation was not timed as one interval. Known phase intervals remain separate; no fabricated total or model execution time."
+    },
+    "serverless__serverless-2945": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": null,
+      "input_preflight_sha256": "936eda31e5a11a9d83752b560e044b20a3e44c10d650ae31b280cd1a8954e875",
+      "controls_elapsed_seconds": 31.069252014160156,
+      "public_input_phase_elapsed_seconds": 22.573554754257202,
+      "accounting_note": "Total task preparation was not timed as one interval. Known phase intervals remain separate; no fabricated total or model execution time."
+    },
+    "mrdoob__three.js-24461": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": null,
+      "input_preflight_sha256": "63bee1602ec599dcf4ff6358acec36acdeaa6d92b1c935657a97a3357c5e7dd8",
+      "controls_elapsed_seconds": 40.36014413833618,
+      "public_input_phase_elapsed_seconds": 71.28432321548462,
+      "accounting_note": "Total task preparation was not timed as one interval. Known phase intervals remain separate; no fabricated total or model execution time."
+    },
+    "serverless__serverless-8159": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": null,
+      "input_preflight_sha256": "5ca29cd9b1b8ecf4031eefebeb08ae7fd9b12ad076fb115c99f94749d1605713",
+      "controls_elapsed_seconds": 30.81656813621521,
+      "public_input_phase_elapsed_seconds": 49.65473675727844,
+      "accounting_note": "Total task preparation was not timed as one interval. Known phase intervals remain separate; no fabricated total or model execution time."
+    },
+    "microsoft__vscode-108964": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": null,
+      "input_preflight_sha256": "c3d97760b79179d4dc44bfeb7af2a40e691362797eec931ab2b52b7ed720941e",
+      "controls_elapsed_seconds": 613.5034899711609,
+      "public_input_phase_elapsed_seconds": 124.27871608734131,
+      "accounting_note": "Total task preparation was not timed as one interval. Known phase intervals remain separate; no fabricated total or model execution time."
+    },
+    "coder__code-server-3277": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": null,
+      "input_preflight_sha256": "1dd3672712a06d0ea2521ea926417a69e89c04688ddbf2e90eadecf3399bd841",
+      "controls_elapsed_seconds": 112.37971091270447,
+      "public_input_phase_elapsed_seconds": 103.38829588890076,
+      "accounting_note": "Total task preparation was not timed as one interval. Known phase intervals remain separate; no fabricated total or model execution time."
+    }
+  }
+}
