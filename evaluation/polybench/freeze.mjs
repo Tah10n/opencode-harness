@@ -35,6 +35,8 @@ fs.mkdirSync(local+'/prompts',{recursive:true});
 for(const row of selection.selected){
  if(campaign){const prepared=preparation[row.instance_id];assert.ok(prepared&&['ready','preparation_error'].includes(prepared.status),'Every selected task needs preparation disposition');if(prepared.status==='preparation_error'){tasks.push({...row,preparation:prepared});continue;}}
  const id=row.instance_id,folder=local+'/author-inputs/'+id,source=folder+'/source',environment=environments[source];assert.ok(environment);
+ const inputPreflight=get(local+'/input-preflight-'+id+'/verification.json');
+ assert.equal(inputPreflight.passed,true);assert.equal(inputPreflight.source,source);assert.deepEqual(inputPreflight.environment,environment);
  const controls={};
  for(const mode of ['gold','baseline']){
   const base=local+'/controls/'+id+'-'+mode,provenance=get(base+'/provenance.json'),file=base+'/results/'+id+'_result.json',result=get(file);
@@ -56,7 +58,7 @@ for(const row of selection.selected){
  if(brokenLinks.length){const probe=get(folder+'/original-link-probe.json');assert.equal(probe.exit,0);for(const link of brokenLinks)assert.ok(probe.stdout.split('\n').includes('MISSING '+link.path),'Preparation broke a dependency link');}
  const official=images['polybench_'+row.language.toLowerCase()+'_'+id.toLowerCase()];assert.ok(official.digest.includes('@sha256:'));
  const installed=JSON.parse(execFileSync('docker',['image','inspect',environment.image],{encoding:'utf8'}))[0];assert.equal(installed.Id,environment.image);
- const sourceManifest=manifest(source);if(!campaign)assert.deepEqual(get(local+'/preflight-final-'+id+'/freeze.json').inputManifests[id+'-P'],sourceManifest);runtimeManifests[source]=sourceManifest;
+ const sourceManifest=manifest(source);assert.deepEqual(get(local+'/input-preflight-'+id+'/actual-input-manifest.json'),sourceManifest);if(!campaign)assert.deepEqual(get(local+'/preflight-final-'+id+'/freeze.json').inputManifests[id+'-P'],sourceManifest);runtimeManifests[source]=sourceManifest;
  // Consolidated arms share exactly this runtime manifest; do not serialize it four times.
  if(!campaign)for(const arm of arms)inputManifests[id+'-'+arm]=sourceManifest;
  fs.copyFileSync(source+'/TASK.md',local+'/prompts/'+id+'.md');

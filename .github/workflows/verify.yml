@@ -37,6 +37,13 @@ jobs:
         env:
           OPENCODE_BIN: ${{ runner.temp }}/opencode/node_modules/opencode-linux-x64/bin/opencode
         run: npm run verify:installed
+      - name: Installed task delivery with large Git inventory
+        env:
+          OPENCODE_BIN: ${{ runner.temp }}/opencode/node_modules/opencode-linux-x64/bin/opencode
+          NATIVE_TASK_FIXTURE_LARGE_GIT: '1'
+          NATIVE_TASK_FIXTURE_DIRECT: '1'
+          NATIVE_TASK_FIXTURE_MODES: missing-read
+        run: node scripts/verify-native-task-fixture.mjs
   containment:
     name: Evaluation container boundary
     runs-on: ubuntu-24.04-arm
@@ -55,6 +62,8 @@ jobs:
         env:
           OPENCODE_LINUX_BIN: ${{ runner.temp }}/opencode/node_modules/opencode-linux-arm64/bin/opencode
         run: EVALUATION_IMAGE="$(cat "$RUNNER_TEMP/evaluation-image")" node evaluation/support/verify-output-boundaries.mjs
+      - name: Large input manifest, completeness and cancellation
+        run: EVALUATION_IMAGE="$(cat "$RUNNER_TEMP/evaluation-image")" node evaluation/support/verify-large-input.mjs
       - name: Remove owned fixture image
         if: always()
         run: |

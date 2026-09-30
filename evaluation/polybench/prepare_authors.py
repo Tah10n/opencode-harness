@@ -31,6 +31,8 @@ for row in json.loads(SELECTION.read_text())['selected']:
   if CONFIG:
    phase='environment';subprocess.run([PYTHON,DEV/'environments.py',id],cwd=ROOT,check=True)
    phase='image_isolation';subprocess.run([PYTHON,DEV/'audit_images.py',id],cwd=ROOT,check=True)
+   phase='input_preflight'
+   subprocess.run(['node',DEV/'input-preflight.mjs',id],cwd=ROOT,check=True)
   records[id]={'status':'ready','phase':'prepared','elapsed_seconds':time.time()-start}
  except Exception as error:
   if not CONFIG:raise
