@@ -69,14 +69,17 @@ const files={};for(const name of ['run.mjs','capture.mjs','dependencies.mjs','ev
 for(const name of fs.readdirSync(path.resolve('evaluation/support')).filter(n=>n.endsWith('.mjs')||n.endsWith('.py'))){const file=path.resolve('evaluation/support',name);files[file]=hash(file);}
 files[path.resolve('fixtures/native-offline/build.json')]=hash('fixtures/native-offline/build.json');
 files[selectionPath]=hash(selectionPath);if(configPath)files[configPath]=hash(configPath);
+if(campaign)files[path.join(path.dirname(configPath),'PLAN.md')]=hash(path.join(path.dirname(configPath),'PLAN.md'));
 for(const name of fs.readdirSync(dev).filter(n=>/\.(mjs|py)$/.test(n)))files[dev+'/'+name]=hash(dev+'/'+name);
 const toolchain=local+'/toolchain';files[toolchain+'/package/bin/opencode']=hash(toolchain+'/package/bin/opencode');
 const attempts=selection.slots.map(s=>({slot:s.slot,task:s.instance_id,arm:s.arm,project:selection.selected.find(r=>r.instance_id===s.instance_id).repo,source:local+'/author-inputs/'+s.instance_id+'/source',...(campaign?{preparationStatus:preparation[s.instance_id].status}:{})}));
 const frozen={version:1,experimentKind:'polybench',...(campaign?{campaign:campaign.name,preparation,templates:{P:local+'/plain-dependencies',C:local+'/core-bundle',T:local+'/bundle'},recordingProfile:campaign.recording_profile,adapterSha}:{}),runtimeSha:runtime.sha,model:runtime.model,variant:runtime.variant,budgetMs:1800000,strategy:'direct',preflightPassed:true,controlsPassed:true,authorIsolationPassed:true,streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,toolchain,template:local+'/bundle',dependencies:local+'/plain-dependencies',config:get(local+'/experiment-config.json'),attempts,environments,inputManifests,runtimeManifests,files};
+if(campaign)frozen.timeAccounting=campaign.time_accounting;
 fs.mkdirSync(root,{mode:0o700});fs.writeFileSync(root+'/freeze.json',JSON.stringify(frozen));
 const published={version:1,stage:'frozen_before_model_requests',runtimeSha:frozen.runtimeSha,evaluatorSha:'9c836c5d7f3cb991934132b77d29e6941d912a07',datasetRevision:selection.dataset_revision,datasetSha256:selection.dataset_sha256,selectedCsvSha256:hash(local+'/selected.csv'),freezeSha256:hash(root+'/freeze.json'),model:frozen.model,opencode:'1.18.26',reasoning:runtime.variant,budgetSeconds:1800,flags:{STRATEGY:'direct',CONTEXT:0,CHECKS:0,SENSITIVITY:0,INVESTIGATION:0,COMMAND_HINTS:0,EXTRA_ATTENTION:0,TYPE_COMPAT:{P:'absent',H0:0,H1:1}},compiler:{version:'6.0.3',profile:'returned-callable-strict-v1',maxAnalyses:2,maxSecondsPerAnalysis:60,maxTotalSeconds:120},tasks,slots:selection.slots,realProviderRequestsBeforeFreeze:0};
 if(campaign){
  published.campaign=campaign.name;published.productSha=runtime.sha;published.adapterSha=adapterSha;
+ published.timeAccounting=campaign.time_accounting;published.planSha256=hash(path.join(path.dirname(configPath),'PLAN.md'));
  published.flags={STRATEGY:'direct',CONTEXT:0,CHECKS:0,TYPE_COMPAT:0,SENSITIVITY:0,INVESTIGATION:{P:'absent',C:'absent',T:1},COMMAND_HINTS:0,EXTRA_ATTENTION:0,PRESERVATION_NUDGE:0};delete published.compiler;
  published.recordingProfile=campaign.recording_profile;
  published.installedHashes=Object.fromEntries(['bundle','core-bundle','plain-dependencies'].map(dir=>[dir,createHash('sha256').update(JSON.stringify(manifest(local+'/'+dir))).digest('hex')]));

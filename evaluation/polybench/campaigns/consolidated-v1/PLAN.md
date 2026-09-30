@@ -41,10 +41,31 @@ All use OpenCode 1.18.26, `openai/gpt-5.6-luna`, high; the existing OAuth route
 `https://chatgpt.com/backend-api/codex/responses`. No paid probes/smokes.
 Outgoing model/effort must match before forwarding. One attempt per assigned
 slot; cyclic P-C-T, C-T-P, T-P-C in saved task order, serial execution.
-1800 seconds total per task-run, including bootstrap, title/parent/child work,
-commands, inspect, integration and delivery. Children have no independent budget.
+1800 seconds per task-run from the existing timer start after preliminary host
+container/input preparation (user clarification, 2026-09-30). This preliminary
+preparation has no model requests, task solving or agent-selected actions.
+The budget includes OpenCode bootstrap, title/parent requests, all author work,
+project commands, investigator and its preparation, additional worktrees created
+after task start, inspect, integration and native delivery. Children have no
+independent budget. No post-start delay is deducted retrospectively. This boundary
+is identical for P/C/T; the deadline implementation and stop rules are unchanged.
 At most 60 task-runs, 108000 seconds / 30 hours total assigned wall-clock budget.
+The three preparation exclusions keep nine slots not_started; the remaining
+seventeen tasks admit at most 51 attempts. Exclusions are not model failures.
 No independent monetary limit or price is inferred from this wall-clock limit.
+
+Report timing from existing receipts, without new runtime telemetry:
+- Preliminary preparation: `started.json.at` to `timing.taskStarted.at`.
+- Agent execution: taskStarted to forwardingClosed; include all post-start
+  overhead and investigator work. Also retain native execution/cleanup fields.
+- Capture and cleanup: existing captureStarted/captureFinished and
+  cleanupStarted/cleanupFinished marks, separately; retain the entire interval
+  after execution as post-execution overhead so gaps are not silently removed.
+- Full slot processing: started.json.at to completed.json.at, or the last verified
+  receipt when completion is missing (explicitly incomplete, not a full duration).
+Use monotonic differences within timing records and wall timestamps across
+receipts. Missing boundaries remain unknown. Report all modes' overhead,
+including T; these components must not be double-counted in total slot time.
 
 Use the same public source tree, problem statement, environment facts, resources,
 network and native permission policy. Preserve project AGENTS/README. Remove

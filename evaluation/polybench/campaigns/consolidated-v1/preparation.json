@@ -8,7 +8,7 @@
   "dataset_sha256": "0c8138e73c34fa29a5276b675b146b72d78ce001fcc4560d76302c908b4808a5",
   "evaluator_revision": "9c836c5d7f3cb991934132b77d29e6941d912a07",
   "selection_sha256": "fc63631c02baf256e0c726e217a25010bca2e0a2f3dc31613cfdd578f808f1fc",
-  "plan_sha256": "e11161737b699a5588a9962fd22003db0864b06046f4a6ca27af98403cb081aa",
+  "plan_sha256": "cdb9b444b3edb41bebd559dfa87638f95d13b2f9f7d728a2f52a101d4a8898f3",
   "model": "openai/gpt-5.6-luna",
   "effort": "high",
   "opencode": "1.18.26",
@@ -32,9 +32,9 @@
   "assigned_slots": 60,
   "eligible_slots": 51,
   "model_requests": 0,
-  "admission": "awaiting_budget_boundary_clarification",
+  "admission": "budget_clarified_awaiting_freeze",
   "budget_evidence": {
-    "status": "awaiting_user_interpretation_before_freeze",
+    "status": "resolved_by_user_before_freeze",
     "mechanism_unchanged": true,
     "observations": [
       {
@@ -63,7 +63,8 @@
       }
     ],
     "question": "Does total task-run time include per-slot container preparation, or does bootstrap mean OpenCode startup after prepared-container verification?",
-    "real_model_requests": 0
+    "real_model_requests": 0,
+    "resolution": "2026-09-30: preliminary host container/input preparation is separate; existing task timer includes all OpenCode and investigator work"
   },
   "scripted_checks": {
     "passed": true,

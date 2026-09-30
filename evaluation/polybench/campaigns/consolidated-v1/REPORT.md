@@ -16,30 +16,26 @@ each comparison has zero observed task pairs and twenty incomplete pairs.
 These rows are not zero quality scores and do not establish benefit, equality,
 or loss. The historical pilot is a separate campaign and is not pooled here.
 
-## Admission remains unresolved before freeze
+## Admission clarification before freeze
 
-The requested budget is 1800 seconds including bootstrap, and changing the
-existing deadline mechanism is prohibited. The existing scheduler starts the
-shared task clock after container creation, dependency copying, input integrity
-verification and the OpenCode version check. OpenCode startup, all native
-parent/title/child work, project commands and native delivery are inside it.
+On 2026-09-30 the user confirmed that preliminary host container/input preparation
+is separate from the 1800-second task budget. The unchanged timer starts after
+that preparation. OpenCode startup, parent/title requests, author work, all project
+commands, investigator and its preparation, post-start worktree creation, inspect,
+integration and native delivery consume the shared budget. No model request,
+solution work or agent-selected action belongs to preliminary preparation.
 
-The short scripted checks measured 9.284 s (P), 6.245 s (C), and 6.668 s (T)
-between slot creation and task-clock start. Their scheduled deadlines were
-therefore 1809.283, 1806.245 and 1806.668 seconds after slot creation. They finished
-early; these values describe deadline placement, not observed overruns.
+The earlier scripted observations measured 9.284 s (P), 6.245 s (C), and 6.668 s (T)
+before task-clock start. These were preparation durations, not observed overruns.
+[PLAN](PLAN.md) fixes separate accounting from existing timestamps for preliminary
+preparation, agent execution, capture, cleanup, post-execution overhead and full
+slot processing. Missing boundaries remain unknown; no post-start delays are
+deducted. The rule is identical across P/C/T.
 
-A clarification is pending: whether this container setup is separate technical
-preparation, or must itself consume the requested 1800 seconds. The latter
-cannot be reconciled with the unchanged scheduler without changing the forbidden
-deadline mechanism. No interpretation has been silently applied, no freeze has
-been created, and no real availability probe or paid smoke was sent. See the
-budget receipt embedded in [preparation.json](preparation.json).
-
-If container setup is accepted as separate preparation, the existing authorization
-covers one fixed batch after its final local freeze: up to 51 eligible attempts
-under the original sixty-slot assignment. This is a pre-freeze hold, not resumption
-of a stopped model batch. No new model permission is being requested here.
+The existing authorization covers one frozen batch of at most 51 eligible attempts
+under the original sixty-slot assignment. The nine preparation-excluded slots
+remain not_started. Draft/review gates apply to PR merge, not model admission.
+No stopped model batch is resumed and no availability probe is permitted.
 
 ## Fixed selection and technical outcomes
 
@@ -131,8 +127,7 @@ OpenCode 1.18.26; `openai/gpt-5.6-luna`, high; the existing Codex OAuth Response
 route. Each task receives cyclic P-C-T, C-T-P, T-P-C order. All real attempts are
 serial; at most sixty attempts are assigned, each with one 1800-second task clock.
 Parent/title/child traffic, native bootstrap, tools and delivery share that clock.
-Container-preparation timing is an unresolved pre-freeze interpretation recorded
-in the private budget-boundary receipt; do not describe the batch as admitted.
+Preliminary container preparation is separate under the user clarification above.
 
 The common recording profile is `research-full-inspect-ledger-1g-v1`, with a
 1 GiB slot cap and unchanged request/response limits. Unknown submission,
@@ -188,7 +183,7 @@ with 718 passed and 897 failed tests, while baseline did not resolve with
 716 passed and 899 failed tests. These raw outcomes are retained without parser,
 test-command or assertion changes. Control results are never returned to authors.
 
-## Scoring contract for a future admitted batch
+## Prespecified scoring contract
 
 R is the official `resolved` value for the exact complete captured patch. T is
 autonomous delivery with native completion, verified local stop, captured delivery
@@ -248,6 +243,6 @@ preparation or evaluator container remains.
 
 The private campaign directory currently occupies approximately 18 GiB, including
 prepared author inputs and toolchains. These inputs and pinned Docker images are
-still needed for the unresolved, not-yet-frozen campaign; raw evidence remains
-private. Their final cleanup is not declared complete while the run decision is
+still needed for the authorized campaign; raw evidence remains
+private. Their final cleanup is not declared complete while execution and evaluation are
 pending. Shared caches and unrelated Docker resources were not pruned.

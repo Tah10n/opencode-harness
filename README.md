@@ -9,8 +9,8 @@ incomplete/unknown outcomes. It does not certify task correctness.
 
 The fixed SWE-PolyBench Verified comparison is prepared for **17 of 20 selected
 JS/TS tasks**. Three tasks have preparation errors shared by all modes. All 60
-assigned slots remain not started: the boundary of the requested time budget
-needs clarification before the final freeze.
+assigned slots remain not started at this preparation checkpoint. The time-budget
+boundary was clarified on 2026-09-30; final freeze precedes model admission.
 
 | Mode | Resolved / evaluated | Rate | Autonomous deliveries | Inference time | Input / output tokens | Unknown / evaluator / infrastructure |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -29,8 +29,8 @@ eligible. There have been no real model requests or monetary-cost estimates.
 
 **Quality remains unmeasured.** The current scheduler includes native bootstrap
 and parent/title/child work in its shared task clock, while container preparation
-precedes it. Whether that preparation must also fit inside 1800 seconds remains
-unresolved; changing the deadline mechanism was prohibited. See the
+precedes it as separately accounted technical preparation, as confirmed by the
+user on 2026-09-30. The deadline mechanism is unchanged. See the
 [full report and per-task preparation results](evaluation/polybench/campaigns/consolidated-v1/REPORT.md).
 The historical pilot remains separate.
 

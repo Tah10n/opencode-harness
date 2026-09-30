@@ -84,5 +84,39 @@
   "effort": "high",
   "opencode": "1.18.26",
   "task_budget_seconds": 1800,
-  "recording_profile": "research-full-inspect-ledger-1g-v1"
+  "recording_profile": "research-full-inspect-ledger-1g-v1",
+  "time_accounting": {
+    "clarified_on": "2026-09-30",
+    "task_budget_seconds": 1800,
+    "timer_start": "existing taskStarted after preliminary host container/input preparation",
+    "preparation_excludes": [
+      "model requests",
+      "task solving",
+      "agent-selected actions"
+    ],
+    "execution_includes": [
+      "OpenCode startup",
+      "parent/title requests",
+      "author work",
+      "project commands",
+      "investigator and preparation",
+      "post-start worktree creation",
+      "inspect",
+      "integration",
+      "native delivery"
+    ],
+    "preliminary_preparation": "started.at -> timing.taskStarted.at",
+    "agent_execution": "timing.taskStarted -> timing.forwardingClosed",
+    "capture": "timing.captureStarted -> timing.captureFinished",
+    "cleanup": "timing.cleanupStarted -> timing.cleanupFinished",
+    "post_execution_overhead": "timing.forwardingClosed -> completed.at",
+    "full_slot": "started.at -> completed.at; missing completion is incomplete",
+    "unknown_boundaries": "null; never reconstruct or subtract post-start delays",
+    "deadline_mechanism": "unchanged",
+    "applies_to": [
+      "P",
+      "C",
+      "T"
+    ]
+  }
 }

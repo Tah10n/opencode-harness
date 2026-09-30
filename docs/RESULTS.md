@@ -16,9 +16,10 @@ Seventeen tasks are ready; two VSCode author inputs violate the existing symlink
 boundary and one Tailwind baseline has no officially parsed tests. No replacements.
 
 All sixty slots are not started; official model evaluations and complete task
-pairs are zero. The pre-freeze hold is the unresolved interpretation of the
-1800-second budget: native bootstrap is inside the current clock, container
-preparation is outside, and changing the deadline implementation was forbidden.
+pairs are zero at this preparation checkpoint. The user clarified the budget on
+2026-09-30: preliminary host container preparation is separate, while OpenCode
+startup and all parent/author/investigator work consume the unchanged 1800-second
+task clock. Final freeze precedes the authorized model batch.
 No quality difference, equivalence, token spend or monetary price is inferred.
 Preparation controls and scripted checks are not model benchmark scores.
 
