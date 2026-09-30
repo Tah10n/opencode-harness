@@ -53,6 +53,10 @@ Gold, test_patch, F2P/P2P, future objects, old solutions and evaluator are never
 author mounts or prompts. No real availability probe or smoke is allowed.
 A shared scripted P/C/T preflight checks the changed campaign wiring only;
 the complete PR #27 synthetic/installed matrix is not repeated.
+The shared scripted and container/export controls use the already verified
+Serverless-2945 input. The existing 2 GiB control tmpfs remains unchanged; the
+first MUI input exceeds it. All eight actual author inputs independently pass
+the full input/Git/isolation checks with the common author resource bounds.
 
 Commit this plan, eight-task selection, 24 assignments and public freeze before
 real admission. Freeze binds product/adapter/configuration/image hashes,
