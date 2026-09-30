@@ -57,11 +57,17 @@ function verify(){
  for(const [directory,expected]of Object.entries(f.runtimeManifests??{}))if(JSON.stringify(manifest(directory))!==JSON.stringify(expected))throw Error('Runtime/dependencies/input changed: '+directory);
  if(new Set(f.attempts.map(a=>a.slot)).size!==f.attempts.length||f.attempts.some((a,i)=>a.slot!==i+1)||!f.attempts.length)throw Error('Invalid slot identity');
  if(f.experimentKind!=='fixture'){
-  const count=f.experimentKind==='polybench'?10:1;
+  const consolidated=f.campaign==='consolidated-v1';
+  const count=f.experimentKind==='polybench'?(consolidated?20:10):1;
   if(f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.length!==count*3)throw Error('Invalid PolyBench frozen schedule');
   const groups=new Map();for(const a of f.attempts){if(!groups.has(a.task))groups.set(a.task,[]);groups.get(a.task).push(a.arm);}
   if(groups.size!==count)throw Error('Invalid PolyBench allocation');
-  let index=0;for(const arms of groups.values())if(arms.join(',')!==['P,H0,H1','H0,H1,P','H1,P,H0'][index++%3])throw Error('Invalid PolyBench cyclic order');
+  let index=0;for(const arms of groups.values())if(arms.join(',')!==(consolidated?['P,C,T','C,T,P','T,P,C']:['P,H0,H1','H0,H1,P','H1,P,H0'])[index++%3])throw Error('Invalid PolyBench cyclic order');
+  if(consolidated&&(!f.templates||Object.keys(f.templates).sort().join(',')!=='C,P,T'))throw Error('Missing consolidated arm bundles');
+  if(consolidated&&f.experimentKind==='polybench'){
+   if(f.attempts.some(a=>!['ready','preparation_error'].includes(a.preparationStatus)))throw Error('Missing preparation disposition');
+   for(const task of groups.keys())if(new Set(f.attempts.filter(a=>a.task===task).map(a=>a.preparationStatus)).size!==1)throw Error('Preparation must apply equally to every arm');
+  }
  }
 }
 verify();
@@ -70,6 +76,7 @@ let pause=null;
 function pauseScheduling(kind,slot,details={}){if(pause)return;pause={kind,slot,...details};try{fs.writeFileSync(path.join(outputRoot,'scheduling-paused.json'),JSON.stringify(pause,null,2),{flag:'wx',mode:0o600});}catch(error){pause.persistenceError=error.message;}}
 for(const attempt of f.attempts){
  verify();if(pause)break;const out=path.join(outputRoot,'runs',attempt.task+(attempt.repetition?'-r'+attempt.repetition:'')+'-'+attempt.arm);
+ if(f.campaign==='consolidated-v1'&&attempt.preparationStatus==='preparation_error')continue;
  if(fs.existsSync(out))throw Error('Previously created slot must never be retried: '+out);
  fs.mkdirSync(out,{recursive:true,mode:0o700});fs.writeFileSync(path.join(out,'started.json'),JSON.stringify({...attempt,at:new Date().toISOString()},null,2),{flag:'wx'});
  const requests=[],active=new Set(),abort=new AbortController();let session,deadline=null,deadlineMono=null,timer,result,terminationVerified=false,forwardingOpen=true,deadlineTriggered=false,captureSaved=false,relayRemoved=false,captureAttempted=false,recording,recordingPersistenceError=null;
@@ -84,7 +91,7 @@ for(const attempt of f.attempts){
   // Admission above remains independent; ordinary native sessions never call here.
   try{recording=prepareRecording(out,{run:path.basename(path.resolve(root)),slot:attempt.slot},{profile:selectedRecording.name});}
   catch(error){pauseScheduling('evidence_incomplete',attempt.slot,{phase:'recording_preparation',message:error.message});throw error;}
-  session=await startContainer({source:attempt.source,toolchain:f.toolchain,template:attempt.arm!=='P'?f.template:f.dependencies,output:path.join(out,'session'),onRequest:(frame,rawSend,signal)=>{
+  session=await startContainer({source:attempt.source,toolchain:f.toolchain,template:f.campaign==='consolidated-v1'?f.templates[attempt.arm]:attempt.arm!=='P'?f.template:f.dependencies,output:path.join(out,'session'),onRequest:(frame,rawSend,signal)=>{
    const send=message=>{if(forwardingOpen&&remaining()>0){rawSend(message);return true;}return false;};
    const pending=(async()=>{
     const requestKind=frame.body?.tools?.length?'work':'title';
@@ -186,9 +193,9 @@ for(const attempt of f.attempts){
    })();active.add(pending);return pending.finally(()=>active.delete(pending));
   }});
   const setup=session.exec(['node','-e',"const fs=require('fs');fs.mkdirSync('/work/bin');fs.copyFileSync('/template/rg','/work/bin/rg');fs.chmodSync('/work/bin/rg',0o755);fs.mkdirSync('/work/config/opencode',{recursive:true});for(const n of ['node_modules','package.json','package-lock.json'])fs.cpSync('/template/'+n,'/work/config/opencode/'+n,{recursive:true,verbatimSymlinks:true});"]);if(setup.status!==0)throw Error('Dependency preparation failed: '+setup.stderr);
-  const inputRead=session.exec(['node','-e',`const fs=require('fs'),path=require('path'),{createHash}=require('crypto'),out={};function visit(d,p=''){for(const e of fs.readdirSync(d,{withFileTypes:true})){if(e.name==='.git')continue;const file=path.join(d,e.name),rel=p+e.name,st=fs.lstatSync(file);if(st.isSymbolicLink()){const target=fs.readlinkSync(file),resolved=path.resolve(path.dirname(file),target);if(!resolved.startsWith('/work/repo/'))throw Error('External dependency link');out[rel]={symlink:target};continue;}if(st.isDirectory())visit(file,rel+'/');else out[rel]={sha256:createHash('sha256').update(fs.readFileSync(file)).digest('hex'),executable:!!(st.mode&0o111)};}}visit('/work/repo');console.log(JSON.stringify(out));`]);
+  const inputRead=session.exec(['node','-e',`const fs=require('fs'),path=require('path'),{createHash}=require('crypto'),out={};function visit(d,p=''){for(const e of fs.readdirSync(d,{withFileTypes:true})){if(e.name==='.git')continue;const file=path.join(d,e.name),rel=p+e.name,st=fs.lstatSync(file);if(st.isSymbolicLink()){const target=fs.readlinkSync(file),resolved=path.resolve(path.dirname(file),target);if(resolved!=='/work/repo'&&!resolved.startsWith('/work/repo/'))throw Error('External dependency link');out[rel]={symlink:target};continue;}if(st.isDirectory())visit(file,rel+'/');else out[rel]={sha256:createHash('sha256').update(fs.readFileSync(file)).digest('hex'),executable:!!(st.mode&0o111)};}}visit('/work/repo');console.log(JSON.stringify(out));`]);
   if(inputRead.status!==0)throw Error('Actual input read failed');
-  const got=JSON.parse(inputRead.stdout),expected=f.inputManifests[attempt.task+'-'+attempt.arm];
+  const got=JSON.parse(inputRead.stdout),expected=f.inputManifests[attempt.task+'-'+attempt.arm]??(f.campaign==='consolidated-v1'?f.runtimeManifests?.[attempt.source]:undefined);
   if(Object.keys(got).length!==Object.keys(expected).length||Object.entries(expected).some(([k,v])=>JSON.stringify(got[k])!==JSON.stringify(v)))throw Error('Actual model container input mismatch');
   fs.writeFileSync(path.join(out,'input-verification.json'),JSON.stringify({matched:true,files:Object.keys(got).length,providerRequestsBeforeStart:requests.length}));
   const version=session.exec(['/opt/opencode','--version']);if(version.status!==0||version.stdout.trim()!=='1.18.26')throw Error('Runtime mismatch');
@@ -205,7 +212,7 @@ for(const attempt of f.attempts){
   if(nativeError)throw nativeError;
   if(!captureSaved)throw Error('evidence_incomplete: '+(captured.errors?.join('; ')??'Candidate capture failed'));
   const evidence=JSON.parse(native.stdout);let workflow=null;try{workflow=JSON.parse(evidence.tools.find(t=>t.data.tool==='harness_task')?.data.state?.output);}catch{}
-  const summary={...attempt,...result,requests:requests.filter(r=>r.forwarded).length,requestsWithoutUsage:requests.filter(r=>r.forwarded&&!r.usage).length,workflowStatus:workflow?.status??null,repairs:workflow?.repairs??null,toolCalls:evidence.tools.length,sessions:evidence.sessions.length,delivery:attempt.arm!=='P'?workflow?.executionDirectory??null:'/work/repo',ownTaskDeadlineTriggered:deadlineTriggered};
+  const summary={...attempt,...result,requests:requests.filter(r=>r.forwarded).length,requestsWithoutUsage:requests.filter(r=>r.forwarded&&!r.usage).length,workflowStatus:workflow?.status??null,repairs:workflow?.repairs??null,toolCalls:evidence.tools.length,sessions:evidence.sessions.length,delivery:!['P','C'].includes(attempt.arm)?workflow?.executionDirectory??null:'/work/repo',ownTaskDeadlineTriggered:deadlineTriggered};
   fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(summary,null,2));console.log(JSON.stringify(summary));
  }catch(error){fs.writeFileSync(path.join(out,'error.json'),JSON.stringify({message:error.message},null,2));pauseScheduling('execution_or_capture_error',attempt.slot,{message:error.message});if(session&&!captureAttempted){try{terminationVerified=(await stopOwned()).terminationVerified===true;if(!terminationVerified)throw Error('Termination not verified');captureAttempted=true;captureSaved=captureCandidate(session,out).status===0;}catch(captureError){fs.writeFileSync(path.join(out,'capture-error.json'),JSON.stringify({kind:'evidence_incomplete',message:captureError.message,primaryError:error.message},null,2));}}}
  finally{

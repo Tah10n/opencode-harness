@@ -1,11 +1,37 @@
 # Results and limits
 
-**No sustained harness quality advantage is established.** These are separate
-campaigns, with different runtimes, datasets and scoring contracts. Do not pool
-them into a project success rate or interpret technical fixtures as model lift.
-No model run was performed for consolidation.
+**No sustained harness quality advantage is established.** These separate
+campaigns have different runtimes, datasets and scoring contracts; they must not
+be pooled into a project success rate. Technical fixtures are not model lift.
 
-## External benchmark: SWE-PolyBench Verified
+## Consolidated candidate: partial comparison, admission closed
+
+The [campaign report](../evaluation/polybench/campaigns/consolidated-v1/REPORT.md)
+and [60 slot records](../evaluation/polybench/campaigns/consolidated-v1/results.json)
+cover candidate `39def2ed0b1476299b104b38f8c93747d828a87a`. Of twenty fixed JS/TS
+tasks, seventeen passed preparation; nine actually ran in all three modes.
+Official resolved: **P 2/9, C 3/9, T 2/9**. Autonomous delivery: 9/9, 9/9, 7/9;
+delivered-and-resolved: 2/9, 3/9, 2/9. T includes two real empty partial captures
+following stock Git-context failures. Four other patches were officially rejected.
+All seven delivered T workflows reported `incomplete` project-check status.
+
+T/P: one win, one loss, seven ties; delta 0 pp, paired 95% interval −33.3 to
++33.3 pp, exact McNemar p=1.0. C/P: one win, zero losses, eight ties; +11.1 pp,
+interval 0 to +33.3 pp. The latter is descriptive, not a separately tested claim.
+Eleven pairs are unobserved, and the result does not establish equivalence.
+
+At slot 31, before any model request, the adapter's 32 MiB subprocess output
+buffer truncated a 43,229,958-byte input manifest. The batch closed admission.
+All 33 remaining assignments are not started: nine preparation exclusions and
+24 slots affected by the stop. The adapter was not repaired or the run replayed.
+
+Provider usage: 849 known requests; 44,081,043 input and 265,203 output tokens.
+T used 6425.786 s of agent execution versus P 4472.004 s and C 4240.290 s.
+Host preparation, capture/cleanup, full slot wall time, unallocated batch overhead
+and official evaluation are separately reported; no post-start time was deducted.
+Money is unknown. Earlier pilot results and costs remain separate below.
+
+## Historical pilot: SWE-PolyBench Verified
 
 The [original report](https://github.com/Tah10n/opencode-harness/blob/030b4ee2b5df7af050ef49bb58098b096ef486d6/development/polybench-pilot/REPORT.md)
 and [frozen manifest](https://github.com/Tah10n/opencode-harness/blob/030b4ee2b5df7af050ef49bb58098b096ef486d6/development/polybench-pilot/frozen-manifest.json)

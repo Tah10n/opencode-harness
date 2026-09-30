@@ -1,9 +1,10 @@
 """Inspect only explicitly pulled v1.1 images; never trust evaluator aliases."""
 import json, subprocess
 from pathlib import Path
+from campaign import LOCAL as CAMPAIGN_LOCAL, SELECTION
 root=Path(__file__).resolve().parents[2]
-local=root/'local/polybench'
-selection=json.loads((root/'evaluation/polybench/selection.json').read_text())
+local=CAMPAIGN_LOCAL
+selection=json.loads(SELECTION.read_text())
 images=json.loads((local/'images.json').read_text()) if (local/'images.json').exists() else {}
 for row in selection['selected']:
     tag='ghcr.io/timesler/swe-polybench.eval.x86_64.'+row['instance_id'].lower()+':v1.1'

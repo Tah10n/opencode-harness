@@ -1,12 +1,13 @@
 """Official evaluation of exactly the exported, actually-started subset per arm."""
 import hashlib,json,os,subprocess,time
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[2];LOCAL=ROOT/'local/polybench';DEV=ROOT/'evaluation/polybench';PYTHON=LOCAL/'venv/bin/python'
+from campaign import LOCAL, SELECTION, CONFIG, ARMS
+ROOT=Path(__file__).resolve().parents[2];DEV=ROOT/'evaluation/polybench';PYTHON=LOCAL/'venv/bin/python'
 freeze=json.loads((LOCAL/'batch/freeze.json').read_text())
 for filename,digest in freeze['files'].items():
  if hashlib.sha256(Path(filename).read_bytes()).hexdigest()!=digest:raise RuntimeError('Frozen implementation changed: '+filename)
 subprocess.run([PYTHON,DEV/'collect.py'],cwd=ROOT,check=True)
-for arm in ['P','H0','H1']:
+for arm in ARMS:
  folder=LOCAL/'batch/export'/arm;predictions=folder/'predictions.jsonl';subset=folder/'subset.csv'
  if not subset.exists():continue
  out=LOCAL/'evaluations'/arm

@@ -3,20 +3,37 @@ This does not accept gold/test patches or inspect evaluation results.
 """
 import argparse, hashlib, io, json, os, subprocess, tarfile, uuid
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[2]; LOCAL=ROOT/'local/polybench'
+from campaign import LOCAL as CAMPAIGN_LOCAL, SELECTION
+ROOT=Path(__file__).resolve().parents[2]; LOCAL=CAMPAIGN_LOCAL
+
+def verify_base_archive(source, archive):
+    """Prepared dependency/build trees must not overwrite baseline source."""
+    checked=0
+    with tarfile.open(archive) as tar:
+        for member in tar:
+            target=source/member.name
+            if member.isfile():
+                if target.is_symlink() or not target.is_file() or target.read_bytes()!=tar.extractfile(member).read():
+                    raise RuntimeError('Prepared dependencies overwrite baseline source: '+member.name)
+                if bool(target.stat().st_mode & 0o111)!=bool(member.mode & 0o111):
+                    raise RuntimeError('Prepared dependencies change baseline mode: '+member.name)
+                checked+=1
+            elif member.issym() and (not target.is_symlink() or os.readlink(target)!=member.linkname):
+                raise RuntimeError('Prepared dependencies change baseline symlink: '+member.name)
+    return {'passed':True,'files_checked':checked,'scope':'Tracked base archive before separately verified LFS hydration; dependencies cannot overwrite source/build outputs'}
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('instance_id');a=p.parse_args()
-    rows=json.loads((ROOT/'evaluation/polybench/selection.json').read_text())['selected']
+    rows=json.loads(SELECTION.read_text())['selected']
     row=next(r for r in rows if r['instance_id']==a.instance_id)
     image=json.loads((LOCAL/'images.json').read_text())['polybench_'+row['language'].lower()+'_'+a.instance_id.lower()]
     out=LOCAL/'author-inputs'/a.instance_id;out.mkdir(parents=True,exist_ok=False)
-    name='polybench-pilot-prep-'+uuid.uuid4().hex
-    command=['docker','run','--name',name,'--platform','linux/amd64','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--memory','1g','--pids-limit','128','--cpus','2',image['digest']]
+    container_name='polybench-pilot-prep-'+uuid.uuid4().hex
+    command=['docker','run','--name',container_name,'--platform','linux/amd64','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--memory','1g','--pids-limit','128','--cpus','2',image['digest']]
     def run(args,target):
         with target.open('wb') as f:
             subprocess.run(command+args,stdout=f,check=True)
-        subprocess.run(['docker','rm',name],check=True,stdout=subprocess.DEVNULL)
+        subprocess.run(['docker','rm',container_name],check=True,stdout=subprocess.DEVNULL)
     try:
         run(['git','-c','filter.lfs.required=false','-c','filter.lfs.smudge=','-c','filter.lfs.process=','archive','--format=tar',row['base_commit']],out/'base.tar')
         run(['git','ls-tree','-r',row['base_commit']],out/'tree.txt')
@@ -35,8 +52,10 @@ def main():
         if not dependency_paths or any(p.startswith('/') or '..' in Path(p).parts for p in dependency_paths): raise RuntimeError('Invalid dependency inventory')
         if row['repo']=='coder/code-server':
             # Prepared vendored packages live outside node_modules; include the
-            # whole dependency root, not only their transitive node_modules.
-            dependency_paths=[p for p in dependency_paths if not p.startswith('vendor/modules/')]+['vendor/modules']
+            # whole dependency root where this version actually has one.
+            run(['sh','-c','if test -d /testbed/vendor/modules; then printf present; else printf absent; fi'],out/'vendored-root.txt')
+            if (out/'vendored-root.txt').read_text()=='present':
+                dependency_paths=[p for p in dependency_paths if not p.startswith('vendor/modules/')]+['vendor/modules']
         run(['tar','-C','/testbed','-cf','-',*dependency_paths],out/'dependencies.tar')
         source=out/'source';source.mkdir()
         for archive in ['base.tar','dependencies.tar']:
@@ -54,6 +73,8 @@ def main():
             dependency_paths.extend(extra_metadata['directories'])
         git_nodes=list(source.rglob('.git'))
         if git_nodes: raise RuntimeError('Unexpected Git metadata in extracted dependency tree')
+        baseline_preserved=verify_base_archive(source,out/'base.tar')
+        (out/'base-preservation.json').write_text(json.dumps(baseline_preserved,indent=2)+'\n')
         # All dependency links must resolve to this same clean input, including workspaces.
         links=[]
         for directory, dirs, files in os.walk(source):
@@ -72,6 +93,6 @@ def main():
             if any('MISSING '+name not in stdout.splitlines() for name in broken):raise RuntimeError('Preparation broke an original dependency link')
         (out/'audit.json').write_text(json.dumps({'instance_id':a.instance_id,'base_commit':row['base_commit'],'image':image,'archives':{name:hashlib.sha256((out/name).read_bytes()).hexdigest() for name in ['base.tar','dependencies.tar']},'submodules':submodules,'prepared_extra':extra_metadata,'dependency_directories':dependency_paths,'dependency_links':links,'future_git_objects_present':False,'task_input_added':False},indent=2))
     finally:
-        present=subprocess.run(['docker','inspect',name],capture_output=True)
-        if present.returncode==0: subprocess.run(['docker','rm','-f',name],check=True,stdout=subprocess.DEVNULL)
+        present=subprocess.run(['docker','inspect',container_name],capture_output=True)
+        if present.returncode==0: subprocess.run(['docker','rm','-f',container_name],check=True,stdout=subprocess.DEVNULL)
 if __name__=='__main__':main()

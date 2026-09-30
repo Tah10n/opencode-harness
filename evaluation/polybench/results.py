@@ -15,7 +15,7 @@ def export_started(slots, records, original_rows, out):
     out=Path(out);out.mkdir(parents=True,exist_ok=False)
     by_id={r['instance_id']:r for r in original_rows}
     exported={}
-    for arm in ['P','H0','H1']:
+    for arm in dict.fromkeys(s['arm'] for s in slots):
         assigned=[s for s in slots if s['arm']==arm]
         started=[s for s in assigned if records.get(s['slot'],{}).get('started') is True]
         # Missing capture is an infrastructure error, not a manufactured empty patch.
@@ -48,4 +48,35 @@ def paired(rows, first, second, field):
         a=by.get((id,first),{}).get(field);b=by.get((id,second),{}).get(field)
         if type(a) is not bool or type(b) is not bool: result['unknown']+=1
         else: result['ties' if a==b else 'wins' if a else 'losses']+=1
+    return result
+
+
+def paired_statistics(rows, first, second, field, formal=False):
+    """Prespecified task-level paired bootstrap and primary-only exact McNemar."""
+    import math, random
+    counts = paired(rows, first, second, field)
+    by = {(r['instance_id'], r['arm']): r for r in rows}
+    differences = []
+    for instance in sorted({r['instance_id'] for r in rows}):
+        a = by.get((instance, first), {}).get(field)
+        b = by.get((instance, second), {}).get(field)
+        if type(a) is bool and type(b) is bool:
+            differences.append(int(a) - int(b))
+    n = len(differences)
+    result = {**counts, 'paired_tasks': n, 'delta_pp': None, 'ci95_pp': None,
+              'interval_method': 'paired percentile bootstrap; 100000 resamples; seed 20260929',
+              'exact_mcnemar_p': None}
+    if not n:
+        return result
+    result['delta_pp'] = 100 * sum(differences) / n
+    rng = random.Random(20260929)
+    distribution = sorted(100 * sum(differences[rng.randrange(n)] for _ in range(n)) / n for _ in range(100000))
+    def percentile(p):
+        x = (len(distribution) - 1) * p; low = math.floor(x); high = math.ceil(x)
+        return distribution[low] + (distribution[high] - distribution[low]) * (x - low)
+    result['ci95_pp'] = [percentile(.025), percentile(.975)]
+    result['interval_degenerate'] = len(set(differences)) == 1
+    if formal:
+        discordant = counts['wins'] + counts['losses']
+        result['exact_mcnemar_p'] = min(1., 2 * sum(math.comb(discordant, k) for k in range(min(counts['wins'], counts['losses']) + 1)) / 2**discordant) if discordant else 1.
     return result

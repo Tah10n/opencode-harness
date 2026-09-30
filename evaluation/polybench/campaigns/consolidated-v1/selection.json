@@ -1,0 +1,727 @@
+{
+  "stage": "selected_before_technical_controls",
+  "campaign": "consolidated-v1",
+  "configuration_sha256": "20a0f4b6ff399c4ea82e6f377d6256422c394e943b2044fa8b3873a4ac2e1050",
+  "dataset_revision": "b3fca77b637379f0c01ad86d18753a7ac1998b53",
+  "dataset_sha256": "0c8138e73c34fa29a5276b675b146b72d78ce001fcc4560d76302c908b4808a5",
+  "row_count": 382,
+  "eligible_count": 190,
+  "pool_categories": {
+    "JavaScript": {
+      "Bug Fix": 76,
+      "Feature": 17,
+      "Refactoring": 2
+    },
+    "TypeScript": {
+      "Bug Fix": 74,
+      "Feature": 21
+    }
+  },
+  "quotas": {
+    "JavaScript": {
+      "Bug Fix": 8,
+      "Feature": 2,
+      "Refactoring": 0
+    },
+    "TypeScript": {
+      "Bug Fix": 8,
+      "Feature": 2
+    }
+  },
+  "selected": [
+    {
+      "instance_id": "sveltejs__svelte-5850",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "9cc21e3c0998365cc295f3eb6af21ca69197c671"
+    },
+    {
+      "instance_id": "serverless__serverless-6869",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "18852ec34bbe1bdd9457c563e21e53cab3dc2fcd"
+    },
+    {
+      "instance_id": "sveltejs__svelte-738",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Feature",
+      "base_commit": "ae060cfa3b228ff2d1646e60700e77aace1e4780"
+    },
+    {
+      "instance_id": "microsoft__vscode-177084",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "384b03f26310fc3c4ea86156b7c6aefb431d594f"
+    },
+    {
+      "instance_id": "mui__material-ui-38544",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "f22e9951931ecf68e8bce1c159d8e0384d92760c"
+    },
+    {
+      "instance_id": "prettier__prettier-8777",
+      "repo": "prettier/prettier",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "d07267184278fcc3fa0fb57628653f9b6daed607"
+    },
+    {
+      "instance_id": "sveltejs__svelte-6458",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "b662c7fd41b3b778ea1ae80b0a4d86c239ffcfe7"
+    },
+    {
+      "instance_id": "mui__material-ui-36971",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "be6b6e2bc479473853ea2ecd367cd1a46c728ad9"
+    },
+    {
+      "instance_id": "sveltejs__svelte-3151",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "f341befacb92d821424889dfefbdccedc881bfe5"
+    },
+    {
+      "instance_id": "prettier__prettier-5025",
+      "repo": "prettier/prettier",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "93e8b15311cc88d30eadf8a34acbc062d0965f2b"
+    },
+    {
+      "instance_id": "mui__material-ui-42412",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "b8a28e13dc0821314700f1aefc9f8e1134cf9034"
+    },
+    {
+      "instance_id": "mui__material-ui-18683",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "dfe2779b8b6499ccd1922990ac9178d84e02f8b6"
+    },
+    {
+      "instance_id": "microsoft__vscode-135805",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "7d8f55ebb1b7ccb084f7e6969b6926519c5c80c3"
+    },
+    {
+      "instance_id": "serverless__serverless-2945",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "5a3e0c2bcaff15d77c925995693379967da42d80"
+    },
+    {
+      "instance_id": "mrdoob__three.js-24461",
+      "repo": "mrdoob/three.js",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "9e5512f067e3a0de8d4069217d20903c1725edf7"
+    },
+    {
+      "instance_id": "serverless__serverless-8159",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Feature",
+      "base_commit": "56aa5aa15abed64db6758aecd8c27719928b5a14"
+    },
+    {
+      "instance_id": "microsoft__vscode-108964",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "13b3c937dc5e3816c79bdd2cdf2cdf6f9c727b75"
+    },
+    {
+      "instance_id": "microsoft__vscode-189223",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "9a281018181dca942cc46c03f9795be00912e38d"
+    },
+    {
+      "instance_id": "tailwindlabs__tailwindcss-550",
+      "repo": "tailwindlabs/tailwindcss",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "95f1d90b70c4bb318f35ea475b903d07aee01fb4"
+    },
+    {
+      "instance_id": "coder__code-server-3277",
+      "repo": "coder/code-server",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "f8d8ad38c166d74332fb71adbce5f08c14bfc7e3"
+    }
+  ],
+  "exclusions": [
+    "serverless__serverless-2434",
+    "serverless__serverless-6534",
+    "serverless__serverless-6842",
+    "sveltejs__svelte-5452",
+    "mui__material-ui-20356",
+    "sveltejs__svelte-1190",
+    "mui__material-ui-18141",
+    "coder__code-server-4923",
+    "microsoft__vscode-136347",
+    "mui__material-ui-17301"
+  ],
+  "slots": [
+    {
+      "slot": 1,
+      "instance_id": "sveltejs__svelte-5850",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 2,
+      "instance_id": "sveltejs__svelte-5850",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 3,
+      "instance_id": "sveltejs__svelte-5850",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 4,
+      "instance_id": "serverless__serverless-6869",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 5,
+      "instance_id": "serverless__serverless-6869",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 6,
+      "instance_id": "serverless__serverless-6869",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 7,
+      "instance_id": "sveltejs__svelte-738",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 8,
+      "instance_id": "sveltejs__svelte-738",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 9,
+      "instance_id": "sveltejs__svelte-738",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 10,
+      "instance_id": "microsoft__vscode-177084",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 11,
+      "instance_id": "microsoft__vscode-177084",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 12,
+      "instance_id": "microsoft__vscode-177084",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 13,
+      "instance_id": "mui__material-ui-38544",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 14,
+      "instance_id": "mui__material-ui-38544",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 15,
+      "instance_id": "mui__material-ui-38544",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 16,
+      "instance_id": "prettier__prettier-8777",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 17,
+      "instance_id": "prettier__prettier-8777",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 18,
+      "instance_id": "prettier__prettier-8777",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 19,
+      "instance_id": "sveltejs__svelte-6458",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 20,
+      "instance_id": "sveltejs__svelte-6458",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 21,
+      "instance_id": "sveltejs__svelte-6458",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 22,
+      "instance_id": "mui__material-ui-36971",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 23,
+      "instance_id": "mui__material-ui-36971",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 24,
+      "instance_id": "mui__material-ui-36971",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 25,
+      "instance_id": "sveltejs__svelte-3151",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 26,
+      "instance_id": "sveltejs__svelte-3151",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 27,
+      "instance_id": "sveltejs__svelte-3151",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 28,
+      "instance_id": "prettier__prettier-5025",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 29,
+      "instance_id": "prettier__prettier-5025",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 30,
+      "instance_id": "prettier__prettier-5025",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 31,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 32,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 33,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 34,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 35,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 36,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 37,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 38,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 39,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 40,
+      "instance_id": "serverless__serverless-2945",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 41,
+      "instance_id": "serverless__serverless-2945",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 42,
+      "instance_id": "serverless__serverless-2945",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 43,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 44,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 45,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 46,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 47,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 48,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 49,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 50,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 51,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 52,
+      "instance_id": "microsoft__vscode-189223",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 53,
+      "instance_id": "microsoft__vscode-189223",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 54,
+      "instance_id": "microsoft__vscode-189223",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 55,
+      "instance_id": "tailwindlabs__tailwindcss-550",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 56,
+      "instance_id": "tailwindlabs__tailwindcss-550",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 57,
+      "instance_id": "tailwindlabs__tailwindcss-550",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 58,
+      "instance_id": "coder__code-server-3277",
+      "arm": "C",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 59,
+      "instance_id": "coder__code-server-3277",
+      "arm": "T",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    },
+    {
+      "slot": 60,
+      "instance_id": "coder__code-server-3277",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T": null,
+      "D": null
+    }
+  ]
+}

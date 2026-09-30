@@ -1,0 +1,379 @@
+{
+  "evaluator_revision": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+  "predictions": {
+    "P": {
+      "path": "predictions/P.jsonl",
+      "sha256": "d845aa2fceaa3a9cb521575efac1864f5dc6f2bfdef20b8d72c6af47f8c5fea4",
+      "bytes": 28402,
+      "instances": 9,
+      "provenance_sha256": "42b467852607504f204788ef1079febe67b512f263f0d58a8859d9e095e07eaa"
+    },
+    "C": {
+      "path": "predictions/C.jsonl",
+      "sha256": "a26c40da997b237b087f09d7ffa7b94504dc91cbf382a0c071fcd375c09aec17",
+      "bytes": 29928,
+      "instances": 9,
+      "provenance_sha256": "a0abe3b4ad8392396ca0ee8c5fafa0bac8709d2231440ebac7e047b31bc1c344"
+    },
+    "T": {
+      "path": "predictions/T.jsonl",
+      "sha256": "00368f774f40fc0978d7b6af823413ca3ec3940bbcb0329e238471543cbc614b",
+      "bytes": 24988,
+      "instances": 9,
+      "provenance_sha256": "ebc810eb374b22afeefb3801c2efcaadae036f631a77d882e0947073dc9268a3"
+    }
+  },
+  "official_results": [
+    {
+      "arm": "P",
+      "instance_id": "sveltejs__svelte-5850",
+      "sha256": "d602d22ed0b5d801f934aad92f1b8e7587b3e0bb4b985758eee665104f7e6811",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "P",
+      "instance_id": "serverless__serverless-6869",
+      "sha256": "2c1d5baf173e2ec11115a3f4e5d824527bd3a845c50025b1f3d8c712870ba99a",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "P",
+      "instance_id": "sveltejs__svelte-738",
+      "sha256": "5b18e849b715ac14eb4368af05add6b25a1c230007b50c1d142168681c1671d5",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "P",
+      "instance_id": "mui__material-ui-38544",
+      "sha256": "c84218a0e3e4cfbc1e75c5f8e9ccbd02f798473f1699f1294fae2ca24b863437",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      }
+    },
+    {
+      "arm": "P",
+      "instance_id": "prettier__prettier-8777",
+      "sha256": "52a297c4d62dd927c8d63e75186f7f887d814cffb86fbcda1449d85901763b4d",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "P",
+      "instance_id": "sveltejs__svelte-6458",
+      "sha256": "a95db369c5c207905329668e0b88db72c1b3be765bbc7306dda83eb4340a529e",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "P",
+      "instance_id": "mui__material-ui-36971",
+      "sha256": "2a8c60dfcc2975b008402841f6ddbc0e62fd03778b5310e3e83499c886b91836",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "P",
+      "instance_id": "sveltejs__svelte-3151",
+      "sha256": "4fc3eb68da6572ca5aae805ed38ca099852800b0e7ce2f08b8320005f2bd34b5",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      }
+    },
+    {
+      "arm": "P",
+      "instance_id": "prettier__prettier-5025",
+      "sha256": "b6645c47b79ff12e18567c3b4c4035c86409c605dac4c12b747138571ee76399",
+      "outcome": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "C",
+      "instance_id": "sveltejs__svelte-5850",
+      "sha256": "d1f9db4c49318687daa22e974dd1fa8b29de8a8834d64c21be6de8b321456b32",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      }
+    },
+    {
+      "arm": "C",
+      "instance_id": "serverless__serverless-6869",
+      "sha256": "2c1d5baf173e2ec11115a3f4e5d824527bd3a845c50025b1f3d8c712870ba99a",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "C",
+      "instance_id": "sveltejs__svelte-738",
+      "sha256": "0fdba7542294ff97f0e1f12e3c58eb53406a18f2796e5a062e5e49aa42ef4754",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "C",
+      "instance_id": "mui__material-ui-38544",
+      "sha256": "c84218a0e3e4cfbc1e75c5f8e9ccbd02f798473f1699f1294fae2ca24b863437",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      }
+    },
+    {
+      "arm": "C",
+      "instance_id": "prettier__prettier-8777",
+      "sha256": "52a297c4d62dd927c8d63e75186f7f887d814cffb86fbcda1449d85901763b4d",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "C",
+      "instance_id": "sveltejs__svelte-6458",
+      "sha256": "9488511120aa09b3448fe282b79c0a0c9152159e5a4c4880a609314836b50163",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "C",
+      "instance_id": "mui__material-ui-36971",
+      "sha256": "2a8c60dfcc2975b008402841f6ddbc0e62fd03778b5310e3e83499c886b91836",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "C",
+      "instance_id": "sveltejs__svelte-3151",
+      "sha256": "f352014126ce0691fc5d2c7cd369b71517f5eb5ab83c16186271c642992a0039",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      }
+    },
+    {
+      "arm": "C",
+      "instance_id": "prettier__prettier-5025",
+      "sha256": "b6645c47b79ff12e18567c3b4c4035c86409c605dac4c12b747138571ee76399",
+      "outcome": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "T",
+      "instance_id": "sveltejs__svelte-5850",
+      "sha256": "3e117ca9f71d77bd8b73cb1962bda72916d29e57132f1542bec9c92d76946c50",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      }
+    },
+    {
+      "arm": "T",
+      "instance_id": "serverless__serverless-6869",
+      "sha256": "2c1d5baf173e2ec11115a3f4e5d824527bd3a845c50025b1f3d8c712870ba99a",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "T",
+      "instance_id": "sveltejs__svelte-738",
+      "sha256": "0fdba7542294ff97f0e1f12e3c58eb53406a18f2796e5a062e5e49aa42ef4754",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "T",
+      "instance_id": "mui__material-ui-38544",
+      "sha256": "c822bed8bb8fe63b1db9c3a86b776c726bdcd4daa78d9cfb984e480d8b9354ff",
+      "outcome": {
+        "patch_applied": false,
+        "generation": false,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "T",
+      "instance_id": "prettier__prettier-8777",
+      "sha256": "52a297c4d62dd927c8d63e75186f7f887d814cffb86fbcda1449d85901763b4d",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "T",
+      "instance_id": "sveltejs__svelte-6458",
+      "sha256": "8951aecac9166546a8cc210a7a44dababf5f311e7dab048670c54434cd92598e",
+      "outcome": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "T",
+      "instance_id": "mui__material-ui-36971",
+      "sha256": "8df1d92a233c1e28cecef4b3d8a1a1d620ded56713056edc659cd2c4a0c6b03d",
+      "outcome": {
+        "patch_applied": false,
+        "generation": false,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "T",
+      "instance_id": "sveltejs__svelte-3151",
+      "sha256": "a2aa0bb604f5653838cfe0d3456bdb9b08aad7aebc097da946b46344197be7fd",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      }
+    },
+    {
+      "arm": "T",
+      "instance_id": "prettier__prettier-5025",
+      "sha256": "b6645c47b79ff12e18567c3b4c4035c86409c605dac4c12b747138571ee76399",
+      "outcome": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false
+      }
+    }
+  ]
+}

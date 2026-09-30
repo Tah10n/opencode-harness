@@ -73,3 +73,44 @@ evaluation of coding agents* (2025). Dataset card declares MIT. The original
 [license](UPSTREAM-LICENSE) is retained; upstream source headers also declare
 CC-BY-NC-4.0. The adapter does not alter upstream licensing or claim leaderboard
 submission status.
+
+## Consolidated candidate campaign
+
+The separate [plan](campaigns/consolidated-v1/PLAN.md) fixes 20 new JS/TS tasks,
+P/C/T allocation and analysis before technical preparation. It excludes the ten
+pilot selections and their indexed subsequent case studies. The historical
+`selection.json`, pilot results and stopped-batch state are not rewritten.
+
+The existing preparation scripts accept the campaign paths via an environment
+variable inherited by child processes:
+
+```sh
+export POLYBENCH_CAMPAIGN=evaluation/polybench/campaigns/consolidated-v1/campaign.json
+export POLYBENCH_MODEL=openai/gpt-5.6-luna
+export POLYBENCH_VARIANT=high
+python3 evaluation/polybench/prepare.py --plan
+# Use Python 3.12 for the pinned numpy/scikit-learn wheels.
+python3.12 evaluation/polybench/prepare.py --full
+```
+
+Private data goes to `local/polybench-consolidated/`. Selection is a separate,
+exclusive-create step (`selection.py --campaign "$POLYBENCH_CAMPAIGN"`) and must
+already be committed before preparation. Never recreate a selected list to
+replace an inconvenient instance. `remaining_controls.py` and
+`prepare_authors.py` retain per-instance failures; all three arms receive the
+same disposition. An uninspected partial preparation is an error, not a retry.
+
+P uses ordinary build with native tools. C mounts the materialized core
+instructions without task/review. T uses the materialized task command with
+direct strategy and investigator enabled; the other declared optional features
+are disabled. The product is extracted from the configured product commit,
+independently of the evaluation adapter commit. Preparing OpenCode startup
+files/dependencies for read-only mounts does not change product instructions.
+
+Before admission, complete the short scripted P/C/T check, official export
+control, container/capture checks and recorder check. Freeze verifies every
+selected task's preparation disposition, exact installed hashes and evaluator
+integrity including extra/ignored source files. Commit its public
+`frozen-manifest.json` byte-for-byte before the existing `run.mjs` accepts model
+admission. A new campaign name never authorizes resuming a stopped campaign.
+The run uses the existing scheduler, transport, recorder and stop rules.
