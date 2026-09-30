@@ -49,6 +49,14 @@ repair or approve a PR.
 
 ## Boundaries
 
+Task/review Git service inventories have a separate finite **64 MiB per command**
+buffer and a **15 second per command** deadline. This covers complete NUL-separated
+path lists, including hidden index flags, without adding them to model context.
+The complete exported diff and task remain limited to **1 MiB each**. Two captures
+must agree, including the inventory digest. Overflow, incomplete NUL output,
+non-UTF-8 paths, process failure or timeout leave the capture incomplete.
+These are finite I/O bounds, not support for repositories of any size.
+
 No installation or ordinary verification calls a paid provider. User-triggered
 native task/review commands use the user's selected model and can consume quota.
 Provider credentials are managed by OpenCode. The benchmark collector is

@@ -8,11 +8,13 @@ import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { stale, guarded, repaired } from '../fixtures/native-stateful/tests.mjs';
 import { materializeNativeTemplate } from '../lib/native-template.mjs';
+import {largeGitFixture} from './large-git-fixture.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const fixtureStarted=Date.now();
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'native-task-fixture-'));
 for (const name of ['home', 'config', 'data', 'cache', 'state', 'project', 'scratch']) fs.mkdirSync(path.join(temp, name));
 const project = path.join(temp, 'project'), bundle = path.join(temp, 'bundle'), task = path.join(temp, 'task.txt');
-const git = (...args) => { const r = spawnSync('git', args, { cwd: project, encoding: 'utf8' }); assert.equal(r.status, 0, r.stderr); return r.stdout.trim(); };
+const git = (...args) => { const r = spawnSync('git', args, { cwd: project, encoding: 'utf8',maxBuffer:64*1024*1024 }); assert.equal(r.status, 0, r.stderr); return r.stdout.trim(); };
 git('init', '-q');
 
 const source = 'export const value = 2; export const legacy = () => 7;\n';
@@ -28,6 +30,7 @@ if(process.env.NATIVE_TASK_FIXTURE_SENSITIVITY==='1'){
  fs.writeFileSync(path.join(dependency,'package.json'),JSON.stringify({name:'sensitivity-fixture-helper',type:'module',exports:'./index.mjs'}));
  fs.writeFileSync(path.join(dependency,'index.mjs'),'export const loaded = true;\n');
 }
+if(process.env.NATIVE_TASK_FIXTURE_LARGE_GIT==='1')largeGitFixture(project,2579497,11000);
 git('add','.');git('-c','core.hooksPath=/dev/null','-c','user.name=Fixture','-c','user.email=fixture@localhost','commit','-qm','base');
 materializeNativeTemplate({repositoryRoot:root,outputDirectory:bundle,task:true,review:true});
 if(process.env.NATIVE_TASK_FIXTURE_SENSITIVITY==='1')fs.symlinkSync(path.join(root,'profiles/native/sensitivity/node_modules'),path.join(bundle,'sensitivity/node_modules'));
@@ -241,13 +244,14 @@ if(process.env.NATIVE_TASK_FIXTURE_COMPONENTS){
  Object.assign(env,{HARNESS_TASK_STRATEGY:'direct',HARNESS_TASK_CONTEXT:flags[0],HARNESS_TASK_CHECKS:flags[1],HARNESS_TASK_TIMEOUT_MS:'60000'});
 }
 if(process.env.NATIVE_TASK_FIXTURE_DIRECT==='1')Object.assign(env,{HARNESS_TASK_STRATEGY:'direct'});
+if(process.env.NATIVE_TASK_FIXTURE_LARGE_GIT==='1')env.HARNESS_TASK_TIMEOUT_MS='120000';
 if(process.env.NATIVE_TASK_FIXTURE_MODES==='sensitivity-off')Object.assign(env,{HARNESS_TASK_STRATEGY:'direct',HARNESS_TASK_CONTEXT:'0',HARNESS_TASK_CHECKS:'0'});
 if(process.env.NATIVE_TASK_FIXTURE_SENSITIVITY==='1')Object.assign(env,{HARNESS_TASK_STRATEGY:'direct',HARNESS_TASK_CONTEXT:'0',HARNESS_TASK_CHECKS:'0',HARNESS_TASK_SENSITIVITY:'1',HARNESS_TASK_TIMEOUT_MS:'60000'});
 const version = spawnSync(process.env.OPENCODE_BIN ?? 'opencode', ['--version'], {env, encoding:'utf8'});
 assert.equal(version.status,0,version.stderr);
 const child = spawn(process.env.OPENCODE_BIN ?? 'opencode', ['serve', '--hostname', '127.0.0.1', '--port', String(port)], { cwd: project, env, stdio: ['ignore', 'pipe', 'pipe'] });
 let stderr = ''; child.stderr.on('data', x => { stderr += x; fs.writeFileSync(path.join(temp, 'server.log'), stderr); }); child.stdout.resume();
-const api = async (method, route, body) => { const r = await fetch(`http://127.0.0.1:${port}${route}`, { method, headers: { 'content-type': 'application/json' }, ...(body ? { body: JSON.stringify(body) } : {}), signal: AbortSignal.timeout(60000) }); if (!r.ok) throw Error(await r.text()); return r.json(); };
+const api = async (method, route, body) => { const r = await fetch(`http://127.0.0.1:${port}${route}`, { method, headers: { 'content-type': 'application/json' }, ...(body ? { body: JSON.stringify(body) } : {}), signal: AbortSignal.timeout(process.env.NATIVE_TASK_FIXTURE_LARGE_GIT==='1'?180000:60000) }); if (!r.ok) throw Error(await r.text()); return r.json(); };
 
 try {
  let ready=false;for(let n=0;n<150;n++){try{await api('GET','/global/health');ready=true;break;}catch{await new Promise(r=>setTimeout(r,100));}}assert.ok(ready,stderr);
@@ -263,6 +267,9 @@ try {
   if(['variant','both-required','narrow'].includes(mode))fs.appendFileSync(task,' Required: `node --test value.test.mjs`.'+(mode==='both-required'?' Also required: `node --test --test-concurrency=1 value.test.mjs`.':''));
   if(mode==='stateful'){fs.copyFileSync(path.join(root,'fixtures/native-stateful/example.mjs'),path.join(project,'example.mjs'));fs.writeFileSync(path.join(project,'example.test.mjs'),stale);fs.appendFileSync(task,' Preserve the clear scenario and test consumption of an existing item through consume plus empty idempotency.');}
   if(mode==='staged-work'){fs.writeFileSync(path.join(project,'value.mjs'),source+'// staged user bytes\n');git('add','value.mjs');fs.appendFileSync(path.join(project,'value.mjs'),'// unstaged user bytes\n');}
+  if(process.env.NATIVE_TASK_FIXTURE_LARGE_GIT==='1'){
+   fs.writeFileSync(path.join(project,'user-staged.txt'),'staged\n');git('add','user-staged.txt');fs.appendFileSync(path.join(project,'user-staged.txt'),'unstaged\n');fs.writeFileSync(path.join(project,'user-untracked.txt'),'untracked\n');
+  }
   if(mode==='components')fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Change value from 2 to 3 and update its public test expectation, preserving the independent legacy() = 7 scenario. Run node --test after the last edit.');
   if(mode.startsWith('sensitivity')&&mode!=='sensitivity-off'){
    fs.appendFileSync(path.join(project,'value.mjs'),"import 'sensitivity-fixture-helper';\nexport function accepts(n) {\n return n >= 2;\n}\n");
@@ -330,6 +337,18 @@ try {
   }
   assert.equal(part?.state.status,'completed',JSON.stringify({mode,part,result,temp}));const report=JSON.parse(part.state.output);
   assert.equal(git('ls-files','--stage','-z'),index);
+  if(process.env.NATIVE_TASK_FIXTURE_LARGE_GIT==='1'){
+   assert.equal(report.status,'checks_passed',JSON.stringify(report));
+   assert.equal(git('status','--porcelain=v1','--untracked-files=all'),userStatus);
+   assert.equal(fs.readFileSync(path.join(project,'user-staged.txt'),'utf8'),'staged\nunstaged\n');assert.equal(fs.readFileSync(path.join(project,'user-untracked.txt'),'utf8'),'untracked\n');
+   const portable=path.join(temp,'large-patch-copy');
+   const cloned=spawnSync('git',['clone','--quiet','--no-hardlinks',project,portable],{encoding:'utf8'});assert.equal(cloned.status,0,cloned.stderr);
+   const applicable=spawnSync('git',['apply','--check',report.terminalPatch],{cwd:portable,encoding:'utf8'});assert.equal(applicable.status,0,applicable.stderr);
+   const apply=spawnSync('git',['apply',report.terminalPatch],{cwd:portable,encoding:'utf8'});assert.equal(apply.status,0,apply.stderr);
+   const check=spawnSync('npm',['test'],{cwd:portable,encoding:'utf8'});assert.equal(check.status,0,check.stdout+check.stderr);
+   assert.equal(fs.readFileSync(path.join(portable,'value.mjs'),'utf8'),source.replace('value = 2','value = 3'));
+   console.log(JSON.stringify({largeGitBytes:Buffer.byteLength(git('ls-files','-v','-z')),installedOpenCode:version.stdout.trim(),portablePatch:true,userStatePreserved:true,elapsedMs:Date.now()-fixtureStarted}));
+  }
   assert.equal(fs.readFileSync(path.join(project,'value.mjs'),'utf8'),mode==='concurrent-save'?source+'// concurrent USER_SAVE\n':userBytes);
   const corrected=['stateful','both-required','narrow','defect','two-fixes','comment-only','late-check','final-stale','no-progress'].includes(mode);
   assert.equal(report.repairs,['two-fixes','comment-only','no-progress','unresolved'].includes(mode)?2:mode==='final-stale'?2:corrected?1:0,JSON.stringify(report));assert.deepEqual(Object.keys(report.sessions),['author']);
@@ -472,7 +491,7 @@ try {
     command('git',['apply',report.terminalPatch]);command('npm',['test']);command('git',['diff','--check']);
     assert.equal(fs.readFileSync(path.join(portable,'value.mjs'),'utf8'),source.replace('value = 2','value = 3'));
    }
-   const patch=path.join(report.artifacts,'final.patch');assert.match(fs.readFileSync(patch,'utf8'),/value = 3/);git('apply','--check',patch);
+   const patch=path.join(report.artifacts,'final.patch');assert.match(fs.readFileSync(patch,'utf8'),/value = 3/);if(process.env.NATIVE_TASK_FIXTURE_LARGE_GIT!=='1')git('apply','--check',patch);
   }
   if(mode==='unknown-error'){assert.equal(report.terminalReason.kind,'tool_error');assert.equal(report.termination.verified,true);assert.equal(events[0].execution,undefined);}
   if(['stdout-denial','runtime-error'].includes(mode)){
