@@ -1,0 +1,24 @@
+{
+  "private_archive": {
+    "sha256": "785518ca4bb4a4f4726f6af57f0e588c615e42124f4d2a6f14c9b2a3e6d60ee0",
+    "bytes": 233688405,
+    "verified_files": 34075,
+    "source_file_bytes": 926222409
+  },
+  "filesystem": {
+    "reproducible_bytes_removed": 19312095232,
+    "verified_duplicate_evidence_bytes_removed": 959774720,
+    "remaining_campaign_allocated_bytes_at_cleanup": 97140736,
+    "scope": "du allocation differences for exact campaign paths; archive is stored separately and not included in remaining directory size."
+  },
+  "docker": {
+    "removed_owned_image_ids": 38,
+    "all_owned_images_verified_absent": true,
+    "own_author_and_evaluation_containers_remaining": 0,
+    "owned_build_cache_records_removed": 231,
+    "owned_build_cache_records_remaining": 0,
+    "docker_reported_build_cache_reclaimed": "25.82GB",
+    "foreign_resources_targeted": false
+  },
+  "retention": "Private raw request/response, native/task/capture evidence, controls, freeze, official outcomes and error receipts remain in the verified archive. Small accounting and cleanup receipts remain available; the admission pause is preserved. No model continuation or product repair."
+}

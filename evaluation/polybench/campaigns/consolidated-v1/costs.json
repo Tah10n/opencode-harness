@@ -1,12 +1,181 @@
 {
-  "version": 1,
+  "version": 2,
   "benchmark_inference": {
-    "real_requests": 0,
-    "input_tokens": 0,
-    "output_tokens": 0,
-    "task_seconds": 0,
+    "real_requests": 849,
+    "per_arm": {
+      "P": {
+        "usage": {
+          "requests": 288,
+          "money": null,
+          "input_tokens": {
+            "observed": 13213483,
+            "unknown_requests": 0
+          },
+          "output_tokens": {
+            "observed": 92731,
+            "unknown_requests": 0
+          },
+          "cached_tokens": {
+            "observed": 6875648,
+            "unknown_requests": 0
+          },
+          "reasoning_tokens": {
+            "observed": 50241,
+            "unknown_requests": 0
+          }
+        },
+        "timing": {
+          "created_slots": 9,
+          "preliminary_preparation_ms": {
+            "observed_sum": 107901.0,
+            "observed_slots": 9,
+            "unknown_slots": 0
+          },
+          "agent_execution_ms": {
+            "observed_sum": 4472003.862875999,
+            "observed_slots": 9,
+            "unknown_slots": 0
+          },
+          "capture_ms": {
+            "observed_sum": 9442.695667999797,
+            "observed_slots": 9,
+            "unknown_slots": 0
+          },
+          "cleanup_ms": {
+            "observed_sum": 1663.866418002639,
+            "observed_slots": 9,
+            "unknown_slots": 0
+          },
+          "post_execution_overhead_ms": {
+            "observed_sum": 11694.0,
+            "observed_slots": 9,
+            "unknown_slots": 0
+          },
+          "full_observed_slot_ms": {
+            "observed_sum": 4591603.0,
+            "observed_slots": 9,
+            "unknown_slots": 0
+          }
+        }
+      },
+      "C": {
+        "usage": {
+          "requests": 268,
+          "money": null,
+          "input_tokens": {
+            "observed": 12497925,
+            "unknown_requests": 0
+          },
+          "output_tokens": {
+            "observed": 84682,
+            "unknown_requests": 0
+          },
+          "cached_tokens": {
+            "observed": 6068736,
+            "unknown_requests": 0
+          },
+          "reasoning_tokens": {
+            "observed": 44757,
+            "unknown_requests": 0
+          }
+        },
+        "timing": {
+          "created_slots": 10,
+          "preliminary_preparation_ms": {
+            "observed_sum": 117394.0,
+            "observed_slots": 9,
+            "unknown_slots": 1
+          },
+          "agent_execution_ms": {
+            "observed_sum": 4240290.179623006,
+            "observed_slots": 9,
+            "unknown_slots": 1
+          },
+          "capture_ms": {
+            "observed_sum": 9728.668667999096,
+            "observed_slots": 9,
+            "unknown_slots": 1
+          },
+          "cleanup_ms": {
+            "observed_sum": 1783.4077080043498,
+            "observed_slots": 10,
+            "unknown_slots": 0
+          },
+          "post_execution_overhead_ms": {
+            "observed_sum": 12018.0,
+            "observed_slots": 9,
+            "unknown_slots": 1
+          },
+          "full_observed_slot_ms": {
+            "observed_sum": 4426668.0,
+            "observed_slots": 10,
+            "unknown_slots": 0
+          }
+        }
+      },
+      "T": {
+        "usage": {
+          "requests": 293,
+          "money": null,
+          "input_tokens": {
+            "observed": 18369635,
+            "unknown_requests": 0
+          },
+          "output_tokens": {
+            "observed": 87790,
+            "unknown_requests": 0
+          },
+          "cached_tokens": {
+            "observed": 935936,
+            "unknown_requests": 0
+          },
+          "reasoning_tokens": {
+            "observed": 46786,
+            "unknown_requests": 0
+          }
+        },
+        "timing": {
+          "created_slots": 9,
+          "preliminary_preparation_ms": {
+            "observed_sum": 107108.0,
+            "observed_slots": 9,
+            "unknown_slots": 0
+          },
+          "agent_execution_ms": {
+            "observed_sum": 6425785.849374997,
+            "observed_slots": 9,
+            "unknown_slots": 0
+          },
+          "capture_ms": {
+            "observed_sum": 14186.563872006256,
+            "observed_slots": 9,
+            "unknown_slots": 0
+          },
+          "cleanup_ms": {
+            "observed_sum": 2015.8859569989145,
+            "observed_slots": 9,
+            "unknown_slots": 0
+          },
+          "post_execution_overhead_ms": {
+            "observed_sum": 16794.0,
+            "observed_slots": 9,
+            "unknown_slots": 0
+          },
+          "full_observed_slot_ms": {
+            "observed_sum": 6549697.0,
+            "observed_slots": 9,
+            "unknown_slots": 0
+          }
+        }
+      }
+    },
     "money": null,
-    "reason": "No model submissions; no tariff or bill inferred"
+    "coverage": "All 27 author/parent/title/investigator attempts. Cached input and reasoning output are included subsets; no reliable route-specific bill.",
+    "input_tokens": 44081043,
+    "output_tokens": 265203,
+    "cached_tokens": 13880320,
+    "reasoning_tokens": 141784,
+    "unknown_usage_requests": 0
   },
   "official_controls": {
     "runs": 40,
@@ -35,12 +204,50 @@
     "goal_time_used_seconds": 8868,
     "input_output_split": null,
     "monetary_charge": null,
-    "scope": "Development agent preparation checkpoint; not benchmark inference or a provider bill; excludes later publication and CI work"
+    "scope": "Historical preparation checkpoint only; the goal meter did not advance for the resumed execution/publication turn. Current development usage and total elapsed time are unmeasured.",
+    "later_stale_checkpoint": {
+      "goal_tokens_used": 966271,
+      "goal_time_used_seconds": 10189,
+      "meter_updated_at": "2026-09-29T17:00:12Z",
+      "observed_at": "2026-09-30T14:19:23Z",
+      "current_turn_included": false
+    }
   },
   "ci": {
     "duration_seconds": null,
     "money": null,
-    "scope": "Not included in this preparation checkpoint; see PR checks for actual execution"
+    "scope": "Separate from benchmark. Exact publication-head checks are linked in PR #26; final receipts reported separately."
   },
-  "monetary_total": null
+  "monetary_total": null,
+  "batch_processing": {
+    "status": "paused",
+    "stop": {
+      "kind": "execution_or_capture_error",
+      "slot": 31,
+      "message": "Unterminated string in JSON at position 33587195 (line 1 column 33587196)"
+    },
+    "started_at": "2026-09-30T08:42:24.986274+00:00",
+    "finished_at": "2026-09-30T14:04:41.955029+00:00",
+    "elapsed_seconds": 19336.954201792003,
+    "full_observed_slot_seconds": 15567.968,
+    "unallocated_between_slot_seconds": 3768.9862017920022
+  },
+  "official_model_evaluation": {
+    "per_arm": {
+      "P": {
+        "exit_code": 0,
+        "elapsed_seconds": 371.7514350414276
+      },
+      "C": {
+        "exit_code": 0,
+        "elapsed_seconds": 367.1473138332367
+      },
+      "T": {
+        "exit_code": 0,
+        "elapsed_seconds": 197.25955510139465
+      }
+    },
+    "recorded_process_seconds": 936.158303976059,
+    "scope": "One official invocation per arm, nine exact captured patches each; excludes model execution and preparation controls."
+  }
 }

@@ -1,41 +1,121 @@
-# Consolidated candidate: preparation complete, measurement not started
+# Consolidated candidate: partial results and terminal admission stop
 
-**No comparative quality result is available.** The fixed twenty-task selection
-has seventeen technically ready tasks and three preparation exclusions, shared
-by P/C/T. All sixty assigned slots remain **not_started**. No real provider
-request, model patch or model-result evaluation exists for this campaign.
+The single authorized batch ran on 2026-09-30, from 08:42:24.986 UTC to
+14:04:41.955 UTC. **27 model attempts completed across nine common tasks.**
+The coordinator then stopped at slot 31 before its first model request. This is
+a stopped partial campaign, not completion of all seventeen eligible tasks.
+The original twenty tasks and sixty assignments remain intact; 33 slots are
+not started and retain null R/T/D. Nine were excluded on preparation, and 24
+were prevented from starting by the admission stop. No replacements or retries.
 
-| Mode | Resolved / evaluated | Rate | Autonomous deliveries | Inference time | Input / output tokens | Unknown / evaluator / preparation |
+| Mode | Resolved / evaluated | Rate | Autonomous deliveries | Agent execution | Input / output tokens | Unknown / evaluator / infrastructure |
 | --- | --- | --- | --- | --- | --- | --- |
-| P — Plain | 0 / 0 (not run) | — | 0 attempts | 0 s | No requests | 20 unobserved; evaluator not run; 3 preparation errors |
-| C — Native core | 0 / 0 (not run) | — | 0 attempts | 0 s | No requests | 20 unobserved; evaluator not run; 3 preparation errors |
-| T — Task + investigator | 0 / 0 (not run) | — | 0 attempts | 0 s | No requests | 20 unobserved; evaluator not run; 3 preparation errors |
+| Plain (P) | 2 / 9 | 22.2% | 9 / 9 (100%) | 4472.004 s | 13,213,483 / 92,731 | 11 not started; 1 official patch rejection |
+| Native core (C) | 3 / 9 | 33.3% | 9 / 9 (100%) | 4240.290 s | 12,497,925 / 84,682 | 11 not started; 1 official patch rejection |
+| Task + investigator (T) | 2 / 9 | 22.2% | 7 / 9 (77.8%) | 6425.786 s | 18,369,635 / 87,790 | 11 not started; 2 official patch rejections; 2 captured empty partial artifacts |
 
-No differences, confidence intervals or hypothesis-test results are calculated:
-each comparison has zero observed task pairs and twenty incomplete pairs.
-These rows are not zero quality scores and do not establish benefit, equality,
-or loss. The historical pilot is a separate campaign and is not pooled here.
+R is the pinned evaluator's outcome for the complete exact captured patch.
+The operational delivery metric T (distinct from the arm name) is 9/9, 9/9 and
+7/9; D = R ∧ T is 2/9, 3/9 and 2/9. All started attempts have a known official
+quality outcome, known provider completion and complete usage. Four official
+patch rejections and two actual empty partial captures are retained in R=false;
+no missing capture or unstarted slot was turned into an empty prediction.
+All seven delivered task workflows independently reported `workflow_status=incomplete`.
 
-## Admission clarification before freeze
+## Comparison on the nine observed task pairs
 
-On 2026-09-30 the user confirmed that preliminary host container/input preparation
-is separate from the 1800-second task budget. The unchanged timer starts after
-that preparation. OpenCode startup, parent/title requests, author work, all project
-commands, investigator and its preparation, post-start worktree creation, inspect,
-integration and native delivery consume the shared budget. No model request,
-solution work or agent-selected action belongs to preliminary preparation.
+| Comparison | Wins / losses / ties | Unobserved pairs | R difference | Paired 95% interval | Formal test |
+| --- | --- | ---: | ---: | --- | --- |
+| T − P, primary | 1 / 1 / 7 | 11 | 0.0 pp | −33.3 to +33.3 pp | Exact McNemar p=1.0 |
+| C − P, secondary | 1 / 0 / 8 | 11 | +11.1 pp | 0.0 to +33.3 pp | Not separately tested |
+| T − C, descriptive | 0 / 1 / 8 | 11 | −11.1 pp | −33.3 to 0.0 pp | Not tested |
 
-The earlier scripted observations measured 9.284 s (P), 6.245 s (C), and 6.668 s (T)
-before task-clock start. These were preparation durations, not observed overruns.
-[PLAN](PLAN.md) fixes separate accounting from existing timestamps for preliminary
-preparation, agent execution, capture, cleanup, post-execution overhead and full
-slot processing. Missing boundaries remain unknown; no post-start delays are
-deducted. The rule is identical across P/C/T.
+The frozen paired percentile bootstrap uses 100000 resamples and seed 20260929.
+D comparisons have the same counts and intervals. Only the primary R comparison
+has a formal hypothesis test, so there is no post-hoc choice of a winning arm.
+C's observed gain is one task; it is not evidence of a general quality gain.
+T and P tie in count but solve different tasks. The primary result is inconclusive,
+not equivalence or proof of no advantage. No full-benchmark score is claimed.
 
-The existing authorization covers one frozen batch of at most 51 eligible attempts
-under the original sixty-slot assignment. The nine preparation-excluded slots
-remain not_started. Draft/review gates apply to PR merge, not model admission.
-No stopped model batch is resumed and no availability probe is permitted.
+Observed tasks come from four repositories: Svelte 4, MUI 2, Prettier 2 and
+Serverless 1 (seven JS, two TS). The original selection spans eight repositories
+and ten tasks per language. Eleven missing pairs narrow coverage substantially.
+Leaving Svelte out changes T/P to 0 wins / 1 loss / 4 ties (−20 pp); leaving MUI
+out gives 1 / 0 / 6 (+14.3 pp). Leaving Prettier or Serverless out retains one win
+and one loss. These repository-sensitive descriptions are in [results.json](results.json).
+
+| Observed task | P: R / delivery | C: R / delivery | T: R / delivery | Official exception |
+| --- | --- | --- | --- | --- |
+| `sveltejs__svelte-5850` | false / true | true / true | true / true | — |
+| `serverless__serverless-6869` | false / true | false / true | false / true | — |
+| `sveltejs__svelte-738` | false / true | false / true | false / true | — |
+| `mui__material-ui-38544` | true / true | true / true | false / false | T: empty_patch |
+| `prettier__prettier-8777` | false / true | false / true | false / true | — |
+| `sveltejs__svelte-6458` | false / true | false / true | false / true | T: patch_rejected |
+| `mui__material-ui-36971` | false / true | false / true | false / false | T: empty_patch |
+| `sveltejs__svelte-3151` | true / true | true / true | true / true | — |
+| `prettier__prettier-5025` | false / true | false / true | false / true | P: patch_rejected; C: patch_rejected; T: patch_rejected |
+
+## Exact stop and candidate limitations
+
+Slot 31 was `mui__material-ui-42412-C`. Existing input-manifest serialization
+produced 43,229,958 bytes for 204,292 entries; the adapter's subprocess buffer is
+33,554,432 bytes. JSON parsing failed with `Unterminated string in JSON at position
+33587195`. No task timer, OpenCode session or model request began. The persisted
+pause is `execution_or_capture_error`, slot 31. Its partial environment snapshot
+is excluded from predictions and is not a model failure. The initial slot receipt
+closed after 56.965 s; its original capture was incomplete because native data
+did not exist. Subsequent inspection verified the suspended relay and absence
+of author work, archived the evidence, removed the exact container, and verified
+all 28 created author containers absent. Recovery added 321.468 s of wall time
+beyond batch exit; it made zero model requests. The pause remains in force.
+
+The new adapter error was not fixed after freeze. No later assignment was sent,
+including the remaining 23 positions after slot 31. The candidate and evaluator
+were not edited in response to any observed result.
+
+Two T attempts, MUI-38544 and MUI-36971, stopped in stock `harness_task` with
+`Git context unavailable (ls-files)` before the author child session. Their base
+Git listings exceed the stock 2 MiB buffer (2,579,497 and 2,534,961 bytes).
+A model-free reproduction using the original MUI-38544 filenames produced the
+same buffer failure. Native parent completion does not supply a terminal task
+record: both are empty partial environment captures, with delivery=false and
+official resolved=false. Verified stop/capture/cleanup remains true.
+
+The official evaluator rejected the full model patch for Prettier-5025 in all
+three arms and Svelte-6458 in T (`patch_applied=false`, `generation=true`). Its
+retained console records patch-application errors; it does not expose a finer
+hunk diagnosis in the result. No tests, fixtures or snapshots were removed from
+predictions, and no alternate application order or manual score was substituted.
+All 27 strict base-checkout applications passed before official evaluation; this
+is a different check from the evaluator's full application sequence.
+
+Investigator use was chosen by the author:
+
+- Svelte-738/T ran one child investigation: 68 observed commands, usable=true,
+  finish=stop, empty test patch, no recorded disposition. Preparation plus child
+  work took 519.736 s, entirely inside the parent task clock. R remained false.
+- Svelte-3151/T invoked investigator preparation, which declined after 0.062 s
+  with `Investigation snapshot file limit exceeded`. No child model session ran.
+  The marker called `started` in the frozen collector denotes preparation; the
+  public presentation calls it `preparation_started` and records child commands
+  separately. The final task R=true is not attributed to a child that never ran.
+
+The stock advertised 180-second diagnostic budget is not an independently
+implemented investigator deadline: the candidate uses the enclosing task deadline
+and does not debit investigation elapsed time from the sensitivity counter.
+Svelte-738's 519.736 s is retained as observed, with no clamp or subtraction.
+The common 1800-second task mechanism was unchanged and no observed attempt
+exceeded it. This candidate limitation was not repaired during measurement.
+
+## Time boundary fixed before freeze
+
+Preliminary host container/input preparation contains no model request, solution
+work or agent-selected action. The unchanged task timer starts after it. OpenCode
+startup, parent/title requests, author work, all project commands, investigator
+and its preparation, post-start worktrees, inspect, integration and delivery are
+inside the same 1800 seconds for P/C/T. Nothing was deducted retroactively.
+[PLAN](PLAN.md) and the frozen manifest record this clarification before execution.
 
 ## Fixed selection and technical outcomes
 
@@ -81,7 +161,9 @@ Product candidate: `39def2ed0b1476299b104b38f8c93747d828a87a`.
 The product modules and core instructions were materialized from that commit
 and compared byte for byte. [Preparation metadata](preparation.json) records the
 installed bundle/configuration hashes separately from the product and adapter.
-Adapter commit: `5c0e634c4327bcbe687d8da03058e54c45f28734`. No product fix, prompt edit,
+Frozen adapter commit: `670f6e8f35ba1df60a337fbe6c04b16313cd9d67`.
+The earlier preparation metadata names its historical `5c0e634c` checkpoint;
+[frozen-manifest.json](frozen-manifest.json) binds the actual run adapter and inputs. No product fix, prompt edit,
 permission change or deadline change was made.
 
 Dataset: `AmazonScience/SWE-PolyBench_Verified`, revision
@@ -231,39 +313,115 @@ Preparation, official evaluator execution, CI and this development work are
 separate from benchmark inference. Historical pilot costs and results are not
 added to this campaign.
 
-## Observed costs and time coverage
+## Actual time and expense coverage
 
-[Machine-readable cost coverage](costs.json) keeps inference, preparation,
-official controls and development separate. There is no monetary estimate.
+All figures use the pre-existing receipts; no new telemetry was installed.
+Execution is taskStarted → forwardingClosed on the monotonic clock. Preliminary
+preparation is started.json.at → taskStarted.at. Capture and cleanup are subsets
+of forwardingClosed → completed.at, so they must not be added twice. Full slot
+wall time is started.json.at → completed.at. Per-slot values and missing boundaries
+are in [results.json](results.json); [costs.json](costs.json) separates activities.
 
-| Activity | Recorded observation | Coverage |
+| Arm | Preliminary preparation | Agent execution | Capture | Cleanup | Full observed slot wall |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| P, 9 started | 107.901 s | 4472.004 s | 9.443 s | 1.664 s | 4591.603 s |
+| C, 9 started + 1 pre-execution fault | 117.394 s known | 4240.290 s (9 runs) | 9.729 s known | 1.783 s | 4426.668 s |
+| T, 9 started | 107.108 s | 6425.786 s | 14.187 s | 2.016 s | 6549.697 s |
+
+C's fault has no task-start boundary: agent execution was NOT RUN; exact preparation
+and capture duration cannot be separated from its 56.965 s initial handling span.
+Its recorded cleanup attempt did not remove the retained container; verified
+recovery is a separate receipt, not a retroactive rewrite of that attempt.
+The recovery-inclusive wall interval is recorded on slot 31 and overlaps the
+batch interval; only its 321.468 s tail is outside that batch interval.
+
+Observed slots total 15,567.968 s, versus batch wall 19,336.954 s (5 h 22 min
+16.954 s). The additional **3768.986 s** includes existing frozen-input verification
+before per-slot started markers and other controller overhead; existing timestamps
+do not separate or fairly assign it to arms. It remains visible as unallocated
+batch overhead. These figures exclude earlier preparation and official evaluation.
+
+| Arm | Requests | Input | Output | Cached input, included | Reasoning output, included |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| P | 288 | 13,213,483 | 92,731 | 6,875,648 | 50,241 |
+| C | 268 | 12,497,925 | 84,682 | 6,068,736 | 44,757 |
+| T | 293 | 18,369,635 | 87,790 | 935,936 | 46,786 |
+| Total | 849 | 44,081,043 | 265,203 | 13,880,320 | 141,784 |
+
+Usage is known for all requests, including startup/title/parent/author/child work.
+Equal time ceilings do not imply equal compute: T used 43.7% more execution time
+and 39.0% more input than P, with much less cached input. No reliable bill or
+route-specific tariff was available, so money remains unknown rather than zero.
+
+| Separate activity | Recorded observation | Coverage |
 | --- | --- | --- |
-| Benchmark inference | 0 requests; 0 input/output tokens; 0 task seconds | No task-run was admitted |
-| Official baseline/gold execution | 3703.988 process seconds | Duration receipts for 39 of 40 controls; the first gold duration is missing; excludes scripted export control |
-| Official image downloads | 3704.654 seconds | Receipts for 19 of 20 pulls; excludes the initial download |
-| Serial preparation controller | 7468.163 seconds | All 20 task records; includes controls/downloads above, so these times must not be added together; earlier setup excluded |
-| Developing Codex agent | 855,276 goal-meter tokens; 8868 seconds | Checkpoint 2026-09-29T16:38:10.000Z; no input/output split or bill; later publication/CI work excluded |
-| CI | Not included in this preparation checkpoint | Actual execution is reported by the PR checks |
+| Official model evaluation | P 371.751 s; C 367.147 s; T 197.260 s; total 936.158 s | One pinned invocation per arm; all exited 0; 27 per-instance outcomes; no re-evaluation |
+| Baseline/gold controls | 3703.988 process seconds | 39 of 40 duration receipts; first Svelte-5850 gold duration missing; excludes scripted control |
+| Official image downloads | 3704.654 s | 19 of 20 pulls recorded; first download missing |
+| Serial preparation controller | 7468.163 s | Contains downloads and controls above; do not add them together; earlier setup excluded |
+| Developer agent | Historical 855,276 tokens / 8868 s; later stale meter 966,271 / 10,189 s | Both preparation-era checkpoints; current resumed work unmetered; not provider usage or bill |
+| CI | Separate PR check receipts | No inference; see publication status below |
 
-Goal-meter tokens are not the benchmark provider's token accounting. Unknown or
-unrecorded preparation/CI costs are not declared zero. The aggregate preparation
-wall time and monetary bill are not fully measured by these partial receipts.
+Overall campaign wall time and money are not fully measured by these partial
+receipts. Historical pilot costs are not added here. No successful earlier check
+was rerun merely because the budget wording changed.
 
-## Publication and retained evidence
+## Publication, verification and retained evidence
 
-The public artifact contains [PLAN](PLAN.md), [selection](selection.json),
-[preparation](preparation.json), [unstarted slot records](results.json) and this
-report. There is no frozen manifest, prediction file or model patch because no
-model attempt was admitted. Detailed controls and process logs remain private.
-Reproducible extraction archives are removed only after source/integrity checks
-and hash retention. All 34 redundant base/dependency archives for the seventeen
-ready tasks have been removed after hash verification (14,087,055,360 bytes).
-The two unsupported VSCode inputs and their Electron copies were also removed,
-while minimal reproducers and their original hashes were preserved. No campaign
-preparation or evaluator container remains.
+Public files include the unchanged [PLAN](PLAN.md), [selection](selection.json),
+[preparation](preparation.json), [frozen manifest](frozen-manifest.json), all sixty
+[slot records](results.json), [costs](costs.json), and the three exact prediction
+files [P](predictions/P.jsonl), [C](predictions/C.jsonl), [T](predictions/T.jsonl).
+[Artifact hashes and official outcome summaries](artifact-manifest.json) bind
+predictions to official provenance and original per-instance result hashes.
+Private raw logs, captures, hidden benchmark lists and host runtime data are not
+published. Public predictions contain complete model patches, including tests.
 
-The private campaign directory currently occupies approximately 18 GiB, including
-prepared author inputs and toolchains. These inputs and pinned Docker images are
-still needed for the authorized campaign; raw evidence remains
-private. Their final cleanup is not declared complete while execution and evaluation are
-pending. Shared caches and unrelated Docker resources were not pruned.
+Freeze was committed before the first request. The retained private freeze SHA-256
+is `111cd723b51489574bd5705bf0046d8b54ee5719b0ce9a12730287b96722fa72`.
+Real first-request receipts verified complete task bytes, actual model/effort and
+the intended P/C/T instructions and entry points. No availability probe ran.
+
+The last full local pre-freeze verification had 17 passing checks and one failure
+in the unchanged sensitivity cancellation fixture, whose exact child was later
+verified absent. This is not reported as an all-green aggregate. The later compact
+manifest change passed its model-free compatibility and input-refusal checks.
+SENSITIVITY stayed disabled in this campaign. Official evaluation, model quality,
+local fixtures and remote CI are separate evidence categories.
+
+Final `npm run verify:evaluation` passed with loopback access (zero provider
+requests). The first sandbox invocation failed at recorder `listen EPERM`; its
+fixture was archived and removed. Publication assertions independently compared
+all 27 prediction hashes to official provenance/results, checked all 60 unique
+assignments and null unstarted scores, verified R/T/D totals and stop facts, and
+checked changed Markdown links and whitespace. No evaluator or model run was
+repeated for these checks.
+
+The existing [PR #26](https://github.com/Tah10n/opencode-harness/pull/26) carries
+this result on `eval/polybench-consolidated`. Its current-head remote checks and
+review disposition are reported on the PR; earlier CI at `82ef535c` is historical,
+not final-head evidence. Merge requires both passing checks and a counting
+approval. No approval existed at publication preflight; protection is not bypassed.
+
+[Cleanup receipts](cleanup.json) record the verified private archive: 34,075 files,
+233,688,405 compressed bytes, SHA-256
+`785518ca4bb4a4f4726f6af57f0e588c615e42124f4d2a6f14c9b2a3e6d60ee0`.
+Every member was read back and checked against its source hash/link target.
+Raw evidence is preserved privately; it is not a new development archive in Git.
+
+Final cleanup removed 19,312,095,232 allocated bytes of prepared sources,
+dependencies, Electron copies, evaluator/toolchain installations and temporary
+caches, plus 959,774,720 bytes of verified duplicate evidence. The campaign
+working directory was 97,140,736 allocated bytes at that checkpoint; the separate
+archive is additional. These are local directory measurements, not a global disk
+usage claim. Earlier removal of 34 redundant extraction archives
+(14,087,055,360 bytes) is historical and not added to this final-cleanup figure.
+
+All 38 owned Docker images are verified absent, with no own author/evaluation
+container remaining. An exact allowlist removed 231 owned build-cache records;
+Docker reported 25.82 GB reclaimed, with zero owned records left. Image layers
+and cache storage can overlap, so image virtual sizes are not added to reclaimed
+cache bytes. Pre-existing images, unrelated containers and other build-cache IDs
+were not targeted. No global prune, branch deletion, model restart or pause
+removal occurred. Small receipts and the pause remain locally; the raw archive
+retains the original failed capture facts and later verified recovery separately.
