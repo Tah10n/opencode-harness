@@ -151,6 +151,12 @@ This is an export/control check, not a model benchmark observation.
 
 Intermediate preparation problems remain in private evidence:
 
+- Final-freeze serialization reached Node's maximum string length because each
+  shared source manifest was serialized once as a runtime input and again for
+  each of P/C/T. No freeze file or run existed. Consolidated slots now reference
+  the same already-verified runtime manifest; historical per-arm manifests remain
+  readable. Model-free checks cover both formats and refusal of changed inputs.
+  The failure log and the empty pre-freeze directory receipt are retained.
 - The first final-freeze validation rejected Three.js's existing relative
   `test/node_modules/three -> ../..` link, which resolves exactly to the allowed
   source root. Before any freeze or model request, the adapter's manifest and

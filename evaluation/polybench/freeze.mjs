@@ -57,7 +57,8 @@ for(const row of selection.selected){
  const official=images['polybench_'+row.language.toLowerCase()+'_'+id.toLowerCase()];assert.ok(official.digest.includes('@sha256:'));
  const installed=JSON.parse(execFileSync('docker',['image','inspect',environment.image],{encoding:'utf8'}))[0];assert.equal(installed.Id,environment.image);
  const sourceManifest=manifest(source);if(!campaign)assert.deepEqual(get(local+'/preflight-final-'+id+'/freeze.json').inputManifests[id+'-P'],sourceManifest);runtimeManifests[source]=sourceManifest;
- for(const arm of arms)inputManifests[id+'-'+arm]=sourceManifest;
+ // Consolidated arms share exactly this runtime manifest; do not serialize it four times.
+ if(!campaign)for(const arm of arms)inputManifests[id+'-'+arm]=sourceManifest;
  fs.copyFileSync(source+'/TASK.md',local+'/prompts/'+id+'.md');
  tasks.push({...row,officialImage:official,authorImage:environment.image,projectNode:environment.projectNode,npm:environment.npm,promptSha256:hash(source+'/TASK.md'),originalRowCsvSha256:hash(local+'/'+id+'.csv'),lfsAuditSha256:hash(folder+'/lfs-audit.json'),archives:audit.archives,submodules:audit.submodules,preparedExtra:audit.prepared_extra??null,controls,scriptedPreflightSha256:hash(preflight),isolationSha256:hash(folder+'/image-isolation.json')});
 }

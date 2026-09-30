@@ -24,6 +24,10 @@ try{
  };
  const seen=[];assert.equal((await execute(freeze,root+'/good',seen)).status,'finished');
  assert.deepEqual(seen,Array.from({length:57},(_,i)=>i+4));
+ const compact={...freeze,inputManifests:{},runtimeManifests:{[source]:input}};
+ const compactSeen=[];assert.equal((await execute(compact,root+'/compact',compactSeen)).status,'finished');assert.deepEqual(compactSeen,seen);
+ const changed={...compact,runtimeManifests:{[source]:{...input,'TASK.md':{...input['TASK.md'],sha256:'wrong'}}}};
+ const changedSeen=[];await assert.rejects(execute(changed,root+'/changed-input',changedSeen),/Runtime\/dependencies\/input changed/);assert.deepEqual(changedSeen,[]);
  for(const target of ['../outside','../source-sibling','/outside']){
   fs.symlinkSync(target,source+'/escape');
   assert.throws(()=>manifest(source),/External symlink/);
