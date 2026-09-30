@@ -8,7 +8,7 @@
   "dataset_sha256": "0c8138e73c34fa29a5276b675b146b72d78ce001fcc4560d76302c908b4808a5",
   "evaluator_revision": "9c836c5d7f3cb991934132b77d29e6941d912a07",
   "selection_sha256": "fc63631c02baf256e0c726e217a25010bca2e0a2f3dc31613cfdd578f808f1fc",
-  "plan_sha256": "cdb9b444b3edb41bebd559dfa87638f95d13b2f9f7d728a2f52a101d4a8898f3",
+  "plan_sha256": "47d6d9ab3a1f9aa26c4d8f18d9850b2997dff2bfbc3cd6c512aa8858db1f03d8",
   "model": "openai/gpt-5.6-luna",
   "effort": "high",
   "opencode": "1.18.26",

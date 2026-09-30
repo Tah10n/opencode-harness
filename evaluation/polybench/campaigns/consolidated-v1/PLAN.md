@@ -49,10 +49,10 @@ project commands, investigator and its preparation, additional worktrees created
 after task start, inspect, integration and native delivery. Children have no
 independent budget. No post-start delay is deducted retrospectively. This boundary
 is identical for P/C/T; the deadline implementation and stop rules are unchanged.
-At most 60 task-runs, 108000 seconds / 30 hours total assigned wall-clock budget.
+At most 60 task-runs, 108000 seconds / 30 hours of assigned task-clock budget.
 The three preparation exclusions keep nine slots not_started; the remaining
 seventeen tasks admit at most 51 attempts. Exclusions are not model failures.
-No independent monetary limit or price is inferred from this wall-clock limit.
+No independent monetary limit or price is inferred from this task-clock limit.
 
 Report timing from existing receipts, without new runtime telemetry:
 - Preliminary preparation: `started.json.at` to `timing.taskStarted.at`.

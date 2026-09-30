@@ -151,6 +151,14 @@ This is an export/control check, not a model benchmark observation.
 
 Intermediate preparation problems remain in private evidence:
 
+- The first final-freeze validation rejected Three.js's existing relative
+  `test/node_modules/three -> ../..` link, which resolves exactly to the allowed
+  source root. Before any freeze or model request, the adapter's manifest and
+  actual-container input predicates were aligned with the preparation boundary:
+  the root itself is inside the tree. A RED-to-GREEN fixture executes the actual
+  scheduler input-check script; outside and sibling targets remain rejected.
+  Source inputs, permissions, deadline behavior and the three exclusions did
+  not change. The unsuccessful pre-freeze validation log is retained.
 - C initially needed its startup `.gitignore` before mounting the template
   read-only. Adapter preparation supplied the normal file; only C was rechecked.
 - One Docker call was blocked by the local sandbox before extraction. Its empty
@@ -173,6 +181,13 @@ Intermediate preparation problems remain in private evidence:
   `127.0.0.1`; its diagnostic is retained. After the final adapter change, the
   complete `npm run verify` passed with local socket access, including all
   eighteen product/evaluation checks. No real provider calls were involved.
+- After the pre-freeze root-link adapter correction, the full local check run
+  passed the first ten checks but failed the unchanged sensitivity cancellation
+  fixture with `Diagnostic child termination unverified`. A subsequent process
+  inspection found that exact child PID absent; the retained fixture was archived
+  and removed. This later failure supersedes any claim that the latest aggregate
+  run passed. SENSITIVITY is disabled in every campaign arm; the product and its
+  test were not repaired or retried. Remaining checks are reported separately.
 
 All twenty preparation dispositions and source-bound control hashes are recorded
 in [preparation.json](preparation.json). The original selection is unchanged.
