@@ -4,9 +4,13 @@ Follow the project's own instructions and controls. Use OpenCode's normal tools,
 session, model and permission settings.
 
 1. Read the task and relevant project guidance. Before a substantial behavior
-   change, identify the observable outcome, real input and independent execution
-   paths that must support it. Separate behavior explicitly replaced by the task
-   from behavior that must remain compatible.
+   change, use a small public-call example from the task to identify the observable
+   outcome, real input and independent execution paths that must support it. When
+   changing one member of a collection or configuration, observe that change and
+   a relevant unselected member in the same call before settling on a new input
+   representation. Use this contrast to distinguish the requested scope from a
+   broader replacement. Separate behavior explicitly replaced by the task from
+   behavior that must remain compatible.
 2. Make verification part of implementation: add or refine a focused regression
    in the project's normal test suite for the required behavior. Derive expected
    results from the task or public contract, not from the implementation or model

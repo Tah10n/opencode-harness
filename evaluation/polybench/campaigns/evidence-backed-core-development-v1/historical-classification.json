@@ -2,6 +2,7 @@
   "schema_version": 1,
   "method": "metadata-only; causes not inferred from hidden reasoning; campaigns/product versions separate",
   "classes": [
+    "successful_delivery",
     "implementation_error",
     "incomplete_task",
     "own_verification_error",
