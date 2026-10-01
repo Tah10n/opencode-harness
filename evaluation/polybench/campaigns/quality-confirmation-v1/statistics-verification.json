@@ -1,0 +1,15 @@
+{
+  "before_real_model_results": true,
+  "real_requests": 0,
+  "reference": "scipy.stats.binomtest(...).proportion_ci(confidence_level=0.975, method=exact)",
+  "scipy_version": "1.17.1",
+  "cases": 527,
+  "n": [
+    1,
+    6,
+    30
+  ],
+  "max_interval_error_pp": 9.751488505571615e-11,
+  "exact_mcnemar_verified": true,
+  "source_sha256": "1f34148a641db8597d12d687edbab026ef7b82d3bc7af07f299857d271495f7f"
+}

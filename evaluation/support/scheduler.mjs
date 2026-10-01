@@ -7,7 +7,7 @@ import fs from 'node:fs';import path from 'node:path';import {createHash} from '
 import {prepareRecording,recordingProfile,inspectFullTaskRecordingProfile,selectRecordingProfile} from './provider-recording.mjs';
 import {privateJSON} from './output-files.mjs';
 import {execFileSync} from 'node:child_process';
-import {nativeCampaign,remainingAssignments} from '../polybench/campaign.mjs';
+import {nativeCampaign,remainingAssignments,qualityCampaign,qualitySpecification,qualityAssignments,qualityTemplates} from '../polybench/campaign.mjs';
 // Per-request observer for the response lifecycle forms actually emitted by
 // the configured upstream. Transport/native completion remain separate facts.
 export function responseObserver(record, persist=()=>{}, closeAdmission=()=>{}, observeEvent=()=>{}) {
@@ -55,17 +55,31 @@ const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
  for(const [directory,expected]of Object.entries(f.runtimeManifests??{}))if(JSON.stringify(manifest(directory))!==JSON.stringify(expected))throw Error('Runtime/dependencies/input changed: '+directory);
  if(new Set(f.attempts.map(a=>a.slot)).size!==f.attempts.length||f.attempts.some((a,i)=>a.slot!==i+1)||!f.attempts.length)throw Error('Invalid slot identity');
  if(f.experimentKind!=='fixture'){
-  const consolidated=nativeCampaign(f.campaign),remaining=f.campaign==='consolidated-remaining-v1';
+  const consolidated=nativeCampaign(f.campaign),remaining=f.campaign==='consolidated-remaining-v1',quality=qualityCampaign(f.campaign);
   if(f.campaign&&!consolidated)throw Error('Unsupported PolyBench campaign');
-  const count=f.experimentKind==='polybench'?(remaining?8:consolidated?20:10):1;
-  if(f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.length!==count*3)throw Error('Invalid PolyBench frozen schedule');
+  const spec=quality?qualitySpecification(f.campaign):null;
+  const count=f.experimentKind==='polybench'?(quality?spec.tasks:remaining?8:consolidated?20:10):1;
+  const armCount=quality?spec.arms.length:3;
+  if(f.strategy!=='direct'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.length!==count*armCount)throw Error('Invalid PolyBench frozen schedule');
   const groups=new Map();for(const a of f.attempts){if(!groups.has(a.task))groups.set(a.task,[]);groups.get(a.task).push(a.arm);}
   if(groups.size!==count)throw Error('Invalid PolyBench allocation');
-  if(remaining&&f.experimentKind==='polybench'){
+  if(quality){
+   if(f.budgetMs!==1800000||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high')throw Error('Quality stage model/effort/deadline changed');
+   if(Object.keys(f.templates??{}).sort().join(',')!==[...spec.arms].sort().join(','))throw Error('Missing quality arm bundles');
+   const modes=Object.fromEntries(spec.arms.map(arm=>[arm,arm==='P'?'plain':'core']));
+   if(Object.keys(f.armModes??{}).sort().join(',')!==Object.keys(modes).sort().join(',')||spec.arms.some(arm=>f.armModes[arm]!==modes[arm]))throw Error('Invalid quality arm modes');
+   if(f.experimentKind==='polybench'){
+    const assigned=qualityAssignments(f.campaign);
+    if(f.attempts.some((a,i)=>a.task!==assigned.slots[i].instance_id||a.arm!==assigned.slots[i].arm))throw Error('Invalid quality assignment');
+    if(f.runtimeSha!==assigned.config.product_sha)throw Error('Unselected product version');
+    if(spec.arms.some(arm=>f.armProducts?.[arm]!==assigned.config.arm_products[arm]))throw Error('Arm product provenance changed');
+    const expectedTemplates=qualityTemplates(assigned.config);if(spec.arms.some(arm=>f.templates[arm]!==expectedTemplates[arm]))throw Error('Arm bundle assignment changed');
+   }else if([...groups.values()].some(arms=>arms.join(',')!==spec.arms.join(',')))throw Error('Invalid quality preflight order');
+  }else if(remaining&&f.experimentKind==='polybench'){
    const slots=remainingAssignments();
    if(f.attempts.some((a,i)=>a.task!==slots[i].instance_id||a.arm!==slots[i].arm||a.original_slot!==slots[i].original_slot))throw Error('Invalid remaining assignment');
   }else{let index=0;for(const arms of groups.values())if(arms.join(',')!==(consolidated?['P,C,T','C,T,P','T,P,C']:['P,H0,H1','H0,H1,P','H1,P,H0'])[index++%3])throw Error('Invalid PolyBench cyclic order');}
-  if(consolidated&&(!f.templates||Object.keys(f.templates).sort().join(',')!=='C,P,T'))throw Error('Missing consolidated arm bundles');
+  if(consolidated&&!quality&&(!f.templates||Object.keys(f.templates).sort().join(',')!=='C,P,T'))throw Error('Missing consolidated arm bundles');
   if(consolidated&&f.experimentKind==='polybench'){
    if(f.attempts.some(a=>!['ready','preparation_error'].includes(a.preparationStatus)))throw Error('Missing preparation disposition');
    for(const task of groups.keys())if(new Set(f.attempts.filter(a=>a.task===task).map(a=>a.preparationStatus)).size!==1)throw Error('Preparation must apply equally to every arm');
@@ -75,12 +89,13 @@ const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 
 export async function runComparison({root,startContainer,captureCandidate,stopWorkload,readAuth,fetchImpl=fetch,runTaskImplementation,readInput=captureInputManifest}) {
 const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
+if(fetchImpl===fetch&&qualityCampaign(f.campaign)&&path.resolve(root)!==path.resolve(qualityAssignments(f.campaign).config.local_directory,'batch'))throw Error('Real quality admission requires the canonical batch root; copies cannot resume or repeat');
 const selectedRecording=selectRecordingProfile(f.recordingProfile??recordingProfile.name);
 const outputRoot=root;
 const verify=()=>verifyFrozenSchedule(f,runTaskImplementation,fetchImpl);
 verify();
 if(fs.existsSync(path.join(root,'scheduling-paused.json')))throw Error('Admission paused; no automatic resume');
-if(f.campaign==='consolidated-remaining-v1'&&fs.existsSync(path.join(root,'runs'))&&fs.readdirSync(path.join(root,'runs')).length)throw Error('Previously created remaining campaign attempts must never be retried');
+if((f.campaign==='consolidated-remaining-v1'||qualityCampaign(f.campaign))&&fs.existsSync(path.join(root,'runs'))&&fs.readdirSync(path.join(root,'runs')).length)throw Error('Previously created campaign attempts must never be retried');
 let pause=null;
 function pauseScheduling(kind,slot,details={}){if(pause)return;pause={kind,slot,...details};try{fs.writeFileSync(path.join(outputRoot,'scheduling-paused.json'),JSON.stringify(pause,null,2),{flag:'wx',mode:0o600});}catch(error){pause.persistenceError=error.message;}}
 for(const attempt of f.attempts){
@@ -209,7 +224,7 @@ for(const attempt of f.attempts){
   const version=session.exec(['/opt/opencode','--version']);if(version.status!==0||version.stdout.trim()!=='1.18.26')throw Error('Runtime mismatch');
   deadline=Date.now()+f.budgetMs;deadlineMono=performance.now()+f.budgetMs;if(f.streamLimit==='remaining-task-budget')session.setTaskBudget(f.budgetMs,deadline);mark('taskStarted');timing.deadlineAt=new Date(deadline).toISOString();timer=setTimeout(()=>{mark('deadlineTimerFired');deadlineTriggered=true;forwardingOpen=false;mark('forwardingClosed');mark('abortRequested');abort.abort(deadlineReason);},f.budgetMs);
   if(captureCandidate.requiresOutputRetention){session.evidenceRequired=true;session.evidenceBaseline=session.baseline;}
-  result=await runTaskImplementation(session,{config:f.config,task:fs.readFileSync(path.join(attempt.source,'TASK.md'),'utf8'),enabled:attempt.arm!=='P',arm:attempt.arm,model:f.model,variant:f.variant,limitMs:Math.max(0,remaining()),deadline,deadlineMono,signal:abort.signal,strategy:f.strategy,continuation:f.continuation,canContinue:()=>!pause&&!abort.signal.aborted,stopWorkload});
+  result=await runTaskImplementation(session,{config:f.config,task:fs.readFileSync(path.join(attempt.source,'TASK.md'),'utf8'),enabled:attempt.arm!=='P',arm:attempt.arm,armMode:f.armModes?.[attempt.arm],model:f.model,variant:f.variant,limitMs:Math.max(0,remaining()),deadline,deadlineMono,signal:abort.signal,strategy:f.strategy,continuation:f.continuation,canContinue:()=>!pause&&!abort.signal.aborted,stopWorkload});
   if(result.timedOut&&!deadlineTriggered)pauseScheduling('unattributed_timeout',attempt.slot);
   terminationVerified=result.termination?.terminationVerified===true;if(!terminationVerified)throw Error('Termination not verified');
   clearTimeout(timer);forwardingOpen=false;mark('forwardingClosed');abort.abort();await settleHandlers();mark('handlersSettled');save();
@@ -220,7 +235,7 @@ for(const attempt of f.attempts){
   if(nativeError)throw nativeError;
   if(!captureSaved)throw Error('evidence_incomplete: '+(captured.errors?.join('; ')??'Candidate capture failed'));
   const evidence=JSON.parse(native.stdout);let workflow=null;try{workflow=JSON.parse(evidence.tools.find(t=>t.data.tool==='harness_task')?.data.state?.output);}catch{}
-  const summary={...attempt,...result,requests:requests.filter(r=>r.forwarded).length,requestsWithoutUsage:requests.filter(r=>r.forwarded&&!r.usage).length,workflowStatus:workflow?.status??null,repairs:workflow?.repairs??null,toolCalls:evidence.tools.length,sessions:evidence.sessions.length,delivery:!['P','C'].includes(attempt.arm)?workflow?.executionDirectory??null:'/work/repo',ownTaskDeadlineTriggered:deadlineTriggered};
+  const summary={...attempt,...result,requests:requests.filter(r=>r.forwarded).length,requestsWithoutUsage:requests.filter(r=>r.forwarded&&!r.usage).length,workflowStatus:workflow?.status??null,repairs:workflow?.repairs??null,toolCalls:evidence.tools.length,sessions:evidence.sessions.length,delivery:(f.armModes?['plain','core'].includes(f.armModes[attempt.arm]):['P','C'].includes(attempt.arm))?'/work/repo':workflow?.executionDirectory??null,ownTaskDeadlineTriggered:deadlineTriggered};
   fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(summary,null,2));console.log(JSON.stringify(summary));
  }catch(error){fs.writeFileSync(path.join(out,'error.json'),JSON.stringify({message:error.message},null,2));pauseScheduling('execution_or_capture_error',attempt.slot,{message:error.message});if(session&&!captureAttempted){try{terminationVerified=(await stopOwned()).terminationVerified===true;if(!terminationVerified)throw Error('Termination not verified');captureAttempted=true;captureSaved=captureCandidate(session,out).status===0;}catch(captureError){fs.writeFileSync(path.join(out,'capture-error.json'),JSON.stringify({kind:'evidence_incomplete',message:captureError.message,primaryError:error.message},null,2));}}}
  finally{

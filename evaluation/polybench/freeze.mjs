@@ -2,7 +2,8 @@
 import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';import {execFileSync} from 'node:child_process';
 import {manifest} from '../support/manifest.mjs';
-import {local,campaign,selectionPath,arms,configPath,remainingAssignments} from './campaign.mjs';
+import {local,campaign,selectionPath,arms,configPath,remainingAssignments,qualityCampaign,qualityAssignments,qualityTemplates} from './campaign.mjs';
+const quality=qualityCampaign(campaign?.name);
 const dev=path.resolve('evaluation/polybench'),root=local+'/batch';
 assert.ok(!fs.existsSync(root),'Never replace a frozen or started batch');
 execFileSync('python3',[dev+'/verify.py',...(campaign?['--consolidated-dataset']:[])],{stdio:'inherit'});
@@ -10,21 +11,30 @@ const get=file=>JSON.parse(fs.readFileSync(file)),hash=file=>createHash('sha256'
 const selection=get(selectionPath),environments=get(local+'/environments.json'),images=get(local+'/images.json');
 assert.equal(selection.selected.length,campaign?.task_count??(campaign?20:10));assert.equal(selection.slots.length,campaign?.slot_count??(campaign?60:30));
 if(campaign?.name==='consolidated-remaining-v1')remainingAssignments();
+if(quality)qualityAssignments(campaign.name);
 execFileSync('python3',['-B','-c','from evaluator_integrity import verify; verify('+JSON.stringify(local+'/evaluator')+')'],{cwd:dev,stdio:'inherit'});
 const preparation=campaign?get(local+'/preparation.json'):null;
+if(campaign?.name==='quality-confirmation-v1')assert.ok(selection.selected.every(row=>preparation[row.instance_id]?.status==='ready'),'All 30 confirmation inputs must be ready before model admission');
 assert.equal(execFileSync('git',['rev-parse','HEAD'],{cwd:local+'/evaluator',encoding:'utf8'}).trim(),'9c836c5d7f3cb991934132b77d29e6941d912a07');
 assert.equal(execFileSync('git',['diff','HEAD','--','src'],{cwd:local+'/evaluator',encoding:'utf8'}).trim(),'');
 const runtime=get(local+'/runtime.json');
 if(campaign){assert.equal(runtime.model,campaign.model);assert.equal(runtime.variant,campaign.effort);assert.equal(runtime.opencode,campaign.opencode);}
 if(campaign){
- for(const bundle of ['bundle','core-bundle']){
-  const original=execFileSync('git',['show',runtime.sha+':profiles/native/core.md']);
+ const coreBundles=quality?runtime.bundleDirectories.filter(name=>name.endsWith('core-bundle')):['core-bundle'];
+ if(quality){assert.deepEqual(runtime.armModes,campaign.arm_modes);assert.deepEqual(runtime.armProducts,campaign.arm_products);assert.deepEqual(runtime.templates,qualityTemplates(campaign),'Arm labels must mount their measured bundle');}
+ for(const bundle of ['bundle',...coreBundles]){
+  const productSha=quality&&bundle==='core-bundle'?campaign.arm_products.C0:runtime.sha;
+  const original=execFileSync('git',['show',productSha+':profiles/native/core.md']);
   assert.ok(original.equals(fs.readFileSync(local+'/'+bundle+'/core.md')));
   for(const file of fs.readdirSync(local+'/'+bundle).filter(n=>n.endsWith('.mjs')))
-   assert.ok(execFileSync('git',['show',runtime.sha+':lib/'+file]).equals(fs.readFileSync(local+'/'+bundle+'/'+file)),'Product module changed: '+file);
+   assert.ok(execFileSync('git',['show',productSha+':lib/'+file]).equals(fs.readFileSync(local+'/'+bundle+'/'+file)),'Product module changed: '+file);
  }
- const core=get(local+'/core-bundle/opencode.json'),task=get(local+'/bundle/opencode.json');
- assert.equal(core.plugin,undefined);assert.equal(core.command,undefined);
+ for(const bundle of coreBundles){
+  const core=get(local+'/'+bundle+'/opencode.json');assert.deepEqual(Object.keys(core).sort(),['$schema','instructions']);assert.deepEqual(core.instructions,['/template/core.md']);
+  assert.equal(fs.readdirSync(local+'/'+bundle).filter(file=>file.endsWith('.mjs')).length,0,'Direct core must not mount harness runtime modules');
+  for(const name of ['package.json','package-lock.json'])assert.equal(hash(local+'/'+bundle+'/'+name),hash(local+'/plain-dependencies/'+name));
+ }
+ const task=get(local+'/bundle/opencode.json');
  assert.deepEqual(Object.keys(task.command),['harness-task']);
  assert.ok(!fs.existsSync(local+'/plain-dependencies/core.md')&&!fs.existsSync(local+'/plain-dependencies/opencode.json'));
 }
@@ -68,26 +78,33 @@ for(const row of selection.selected){
 assert.equal(get(local+'/recorder-fixture/result.json').passed,true);
 assert.equal(get(local+'/container-preflight-final/verification.json').passed,true);
 if(campaign){assert.equal(get(local+'/capture-shape-check/verification.json').passed,true);assert.equal(get(local+'/scripted-preflight-final/verification.json').official_export_control.patch_applied,true);}
-for(const dir of campaign?['bundle','core-bundle','plain-dependencies']:['bundle','plain-dependencies'])runtimeManifests[local+'/'+dir]=manifest(local+'/'+dir);
+const bundleDirectories=quality?runtime.bundleDirectories:campaign?['bundle','core-bundle','plain-dependencies']:['bundle','plain-dependencies'];
+for(const dir of bundleDirectories)runtimeManifests[local+'/'+dir]=manifest(local+'/'+dir);
 const files={};for(const name of ['run.mjs','capture.mjs','dependencies.mjs','evaluate.py','evaluate_predictions.py','collect.py','results.py','requirements.lock'])files[dev+'/'+name]=hash(dev+'/'+name);
 for(const name of fs.readdirSync(path.resolve('evaluation/support')).filter(n=>n.endsWith('.mjs')||n.endsWith('.py'))){const file=path.resolve('evaluation/support',name);files[file]=hash(file);}
 files[path.resolve('fixtures/native-offline/build.json')]=hash('fixtures/native-offline/build.json');
 files[selectionPath]=hash(selectionPath);if(configPath)files[configPath]=hash(configPath);
 if(campaign?.origin)for(const kind of ['selection','results'])files[path.resolve(campaign.origin[kind+'_path'])]=campaign.origin[kind+'_sha256'];
+if(quality){
+ for(const key of ['screening','fresh_controls'])if(campaign[key])files[path.resolve(campaign[key].path)]=campaign[key].sha256;
+ if(campaign.name==='quality-confirmation-v1')for(const name of ['selection.json','selection-protocol.json']){const file=path.join(path.dirname(configPath),name);files[file]=hash(file);}
+ for(const invalidity of selection.common_invalidities??[])files[path.resolve(invalidity.evidence.path)]=invalidity.evidence.sha256;
+}
 if(campaign)files[path.join(path.dirname(configPath),'PLAN.md')]=hash(path.join(path.dirname(configPath),'PLAN.md'));
 for(const name of fs.readdirSync(dev).filter(n=>/\.(mjs|py)$/.test(n)))files[dev+'/'+name]=hash(dev+'/'+name);
 const toolchain=local+'/toolchain';files[toolchain+'/package/bin/opencode']=hash(toolchain+'/package/bin/opencode');
 const attempts=selection.slots.map(s=>({slot:s.slot,...(s.original_slot?{original_slot:s.original_slot}:{}),task:s.instance_id,arm:s.arm,project:selection.selected.find(r=>r.instance_id===s.instance_id).repo,source:local+'/author-inputs/'+s.instance_id+'/source',...(campaign?{preparationStatus:preparation[s.instance_id].status}:{})}));
-const frozen={version:1,experimentKind:'polybench',...(campaign?{campaign:campaign.name,preparation,templates:{P:local+'/plain-dependencies',C:local+'/core-bundle',T:local+'/bundle'},recordingProfile:campaign.recording_profile,adapterSha}:{}),runtimeSha:runtime.sha,model:runtime.model,variant:runtime.variant,budgetMs:1800000,strategy:'direct',preflightPassed:true,controlsPassed:true,authorIsolationPassed:true,streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,toolchain,template:local+'/bundle',dependencies:local+'/plain-dependencies',config:get(local+'/experiment-config.json'),attempts,environments,inputManifests,runtimeManifests,files};
+const frozen={version:1,experimentKind:'polybench',...(campaign?{campaign:campaign.name,preparation,templates:quality?runtime.templates:{P:local+'/plain-dependencies',C:local+'/core-bundle',T:local+'/bundle'},...(quality?{armModes:runtime.armModes,armProducts:runtime.armProducts}:{}),recordingProfile:campaign.recording_profile,adapterSha}:{}),runtimeSha:runtime.sha,model:runtime.model,variant:runtime.variant,budgetMs:1800000,strategy:'direct',preflightPassed:true,controlsPassed:true,authorIsolationPassed:true,streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,toolchain,template:local+'/bundle',dependencies:local+'/plain-dependencies',config:get(local+'/experiment-config.json'),attempts,environments,inputManifests,runtimeManifests,files};
 if(campaign)frozen.timeAccounting=campaign.time_accounting;
 fs.mkdirSync(root,{mode:0o700});fs.writeFileSync(root+'/freeze.json',JSON.stringify(frozen));
 const published={version:1,stage:'frozen_before_model_requests',runtimeSha:frozen.runtimeSha,evaluatorSha:'9c836c5d7f3cb991934132b77d29e6941d912a07',datasetRevision:selection.dataset_revision,datasetSha256:selection.dataset_sha256,selectedCsvSha256:hash(local+'/selected.csv'),freezeSha256:hash(root+'/freeze.json'),model:frozen.model,opencode:'1.18.26',reasoning:runtime.variant,budgetSeconds:1800,flags:{STRATEGY:'direct',CONTEXT:0,CHECKS:0,SENSITIVITY:0,INVESTIGATION:0,COMMAND_HINTS:0,EXTRA_ATTENTION:0,TYPE_COMPAT:{P:'absent',H0:0,H1:1}},compiler:{version:'6.0.3',profile:'returned-callable-strict-v1',maxAnalyses:2,maxSecondsPerAnalysis:60,maxTotalSeconds:120},tasks,slots:selection.slots,realProviderRequestsBeforeFreeze:0};
 if(campaign){
  published.campaign=campaign.name;published.productSha=runtime.sha;published.adapterSha=adapterSha;
  published.timeAccounting=campaign.time_accounting;published.planSha256=hash(path.join(path.dirname(configPath),'PLAN.md'));
- published.flags={STRATEGY:'direct',CONTEXT:0,CHECKS:0,TYPE_COMPAT:0,SENSITIVITY:0,INVESTIGATION:{P:'absent',C:'absent',T:1},COMMAND_HINTS:0,EXTRA_ATTENTION:0,PRESERVATION_NUDGE:0};delete published.compiler;
+ published.flags={STRATEGY:'direct',CONTEXT:0,CHECKS:0,TYPE_COMPAT:0,SENSITIVITY:0,INVESTIGATION:quality?Object.fromEntries(arms.map(arm=>[arm,'absent'])):{P:'absent',C:'absent',T:1},COMMAND_HINTS:0,EXTRA_ATTENTION:0,PRESERVATION_NUDGE:0};delete published.compiler;
  published.recordingProfile=campaign.recording_profile;
- published.installedHashes=Object.fromEntries(['bundle','core-bundle','plain-dependencies'].map(dir=>[dir,createHash('sha256').update(JSON.stringify(manifest(local+'/'+dir))).digest('hex')]));
+ published.installedHashes=Object.fromEntries(bundleDirectories.map(dir=>[dir,createHash('sha256').update(JSON.stringify(manifest(local+'/'+dir))).digest('hex')]));
+ if(quality){published.armModes=runtime.armModes;published.armProducts=runtime.armProducts;published.armBundles=Object.fromEntries(arms.map(arm=>[arm,{directory:path.basename(runtime.templates[arm]),sha256:published.installedHashes[path.basename(runtime.templates[arm])],coreSha256:arm==='P'?null:hash(runtime.templates[arm]+'/core.md')} ]));}
  published.configurationSha256=hash(local+'/experiment-config.json');
  published.preparation=preparation;
 }

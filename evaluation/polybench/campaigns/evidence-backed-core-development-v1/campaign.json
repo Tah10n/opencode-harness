@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "dataset_revision": "b3fca77b637379f0c01ad86d18753a7ac1998b53",
+  "dataset_sha256": "0c8138e73c34fa29a5276b675b146b72d78ce001fcc4560d76302c908b4808a5",
+  "evaluator_revision": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "opencode": "1.18.26",
+  "task_budget_seconds": 1800,
+  "recording_profile": "research-full-inspect-ledger-1g-v1",
+  "name": "evidence-backed-core-development-v1",
+  "arms": [
+    "P",
+    "C0",
+    "H1"
+  ],
+  "arm_modes": {
+    "P": "plain",
+    "C0": "core",
+    "H1": "core"
+  },
+  "product_sha": "8253fa1c739b43917799f5c23ccffdf1dea618f6",
+  "arm_products": {
+    "P": null,
+    "C0": "358cb0a3fecce7f8b3af75d7ae6d6d4052257c04",
+    "H1": "8253fa1c739b43917799f5c23ccffdf1dea618f6"
+  },
+  "local_directory": "local/polybench-evidence-backed-core-development",
+  "task_count": 6,
+  "slot_count": 18,
+  "time_accounting": {
+    "clarified_on": "2026-10-02",
+    "task_budget_seconds": 1800,
+    "timer_start": "existing taskStarted after preliminary host container/input preparation",
+    "preparation_excludes": [
+      "model requests",
+      "task solving",
+      "agent-selected actions"
+    ],
+    "execution_includes": [
+      "OpenCode startup",
+      "parent/title requests",
+      "author work",
+      "project commands",
+      "ordinary native delegation if used",
+      "checks",
+      "final delivery"
+    ],
+    "preliminary_preparation": "started.at -> timing.taskStarted.at",
+    "agent_execution": "timing.taskStarted -> timing.forwardingClosed",
+    "capture": "timing.captureStarted -> timing.captureFinished",
+    "cleanup": "timing.cleanupStarted -> timing.cleanupFinished",
+    "post_execution_overhead": "timing.forwardingClosed -> completed.at",
+    "full_slot": "started.at -> completed.at; missing completion is incomplete",
+    "unknown_boundaries": "null; never reconstruct or subtract post-start delays",
+    "deadline_mechanism": "unchanged",
+    "applies_to": [
+      "P",
+      "C0",
+      "H1"
+    ]
+  }
+}
