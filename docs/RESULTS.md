@@ -4,6 +4,39 @@
 campaigns have different runtimes, datasets and scoring contracts; they must not
 be pooled into a project success rate. Technical fixtures are not model lift.
 
+## Remaining eight tasks: candidate f83b101b
+
+The [new report](../evaluation/polybench/campaigns/consolidated-remaining-v1/REPORT.md)
+and [24 slot records](../evaluation/polybench/campaigns/consolidated-remaining-v1/results.json)
+cover eight exact remaining assignments, each once in P/C/T, on product
+`f83b101bd9050c81443acddf71c1e364c4c786c4`. Adapter `04727944`; pre-model freeze
+`27786ad7`. All 24 started and were evaluated; no new admission stop or retry.
+Official R **P 3/8, C 2/8, T 3/8**; delivery 8/8, 8/8, 7/8;
+full correct delivery D 3/8, 2/8, 3/8. All captures/roundtrips/local stops verified;
+zero unknown quality or evaluator process errors. Full authored tests are retained.
+
+T/P: one win, one loss, six ties; delta 0 pp, paired 95% interval −37.5 to
++37.5 pp, exact McNemar p=1.0. C/P −12.5 pp; descriptive T/C +12.5 pp.
+Core did not improve resolved. T cost 133.4% more execution time and 41.0% more
+input tokens than P without more full correct deliveries. This small fixed
+remainder establishes neither general advantage nor equivalence.
+
+One real investigator produced one accepted nonempty test patch in one file.
+Two preparations exceeded existing bounds before a child ran. T's Three.js
+win had no investigator; Serverless-8159 was its loss. Code-server T reached
+the hard deadline with a real nonempty partial capture. Serverless-2945 T's
+official applied-M evaluation reported a duplicate-identifier test-command
+error with zero parsed tests; its unchanged official R=false remains. Seven delivered T workflows
+reported internal incomplete status; this alone did not negate delivery.
+
+[Expense receipts](../evaluation/polybench/campaigns/consolidated-remaining-v1/costs.json)
+record 703 known requests, 36,408,747 input / 205,140 output tokens, cached/reasoning
+subsets, preparation/agent/capture/cleanup/controller/evaluator boundaries and
+partial developing-agent metering. Money is unknown. Historical 849 requests
+are not added again. This new cohort uses 5 TS / 3 JS tasks in five repositories;
+17 original eligible tasks are covered across two versions, never pooled as
+f83b101b's score. Historical records and pause below remain byte-identical.
+
 ## Consolidated candidate: partial comparison, admission closed
 
 The [campaign report](../evaluation/polybench/campaigns/consolidated-v1/REPORT.md)

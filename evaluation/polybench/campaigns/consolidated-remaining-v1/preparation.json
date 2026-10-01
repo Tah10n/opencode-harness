@@ -1,0 +1,391 @@
+{
+  "campaign": "consolidated-remaining-v1",
+  "real_provider_requests_in_preflight": 0,
+  "tasks": [
+    {
+      "instance_id": "mui__material-ui-42412",
+      "status": "ready",
+      "input_preflight_sha256": "7b02e2c112238ed733d6440b35485f017b26164b8395198b61f7ca8950c492d4",
+      "actual_manifest": {
+        "type": "complete",
+        "bytes": 43229957,
+        "entries": 204292,
+        "sha256": "cf14528c2f0b10c8c30b378ad0c44cfd2105012b4a841d23648cdba0c51c2935",
+        "elapsedMs": 9882,
+        "limits": {
+          "bytes": 134217728,
+          "entries": 500000,
+          "milliseconds": 120000
+        }
+      },
+      "git_context": {
+        "status": "captured",
+        "snapshotSha256": "89b6a0c1b14b6de841a8d25709686f9fe5fe8e24179aba351208aed8fc7c8246",
+        "diffBytes": 0,
+        "taskBytes": 2086
+      },
+      "environment": {
+        "image": "sha256:5f328bb315a004a5e9adf5bde6538406c8f52cdcd85d6e6d2395612af171fe76",
+        "node": "/diagnostic/node",
+        "projectPath": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "projectNode": "v18.20.8",
+        "npm": "10.8.2"
+      },
+      "official_controls": {
+        "gold": {
+          "resolved": true,
+          "passed": 4,
+          "failed": 0,
+          "sha256": "b73d7d7af8154ca5376ac639eb9bd1c4067241053a2e8076226b0998e1dd4020"
+        },
+        "baseline": {
+          "resolved": false,
+          "passed": 3,
+          "failed": 1,
+          "sha256": "acdaa40957a27e1ee8039e59b674d843dea811f78f7811c50f03cc315dd79890"
+        }
+      }
+    },
+    {
+      "instance_id": "mui__material-ui-18683",
+      "status": "ready",
+      "input_preflight_sha256": "89b110f6b50d39d782effcae8efe2139ebd04779e9d12fc18c6aefd4faf3fb50",
+      "actual_manifest": {
+        "type": "complete",
+        "bytes": 8940509,
+        "entries": 59192,
+        "sha256": "12dbabe3e22ed96d4e7c932e5357939cf9ad60e0a8eff4c151738e4ff653774d",
+        "elapsedMs": 2348,
+        "limits": {
+          "bytes": 134217728,
+          "entries": 500000,
+          "milliseconds": 120000
+        }
+      },
+      "git_context": {
+        "status": "captured",
+        "snapshotSha256": "f3f1974b30bbca8f9591dd35eaa6819b957db4d18396288ed6d6d381274b63a7",
+        "diffBytes": 0,
+        "taskBytes": 1838
+      },
+      "environment": {
+        "image": "sha256:eb6429417dd4d7adb45a7dd7b62f5b72d70217774c67230a5e94d253920e3f47",
+        "node": "/diagnostic/node",
+        "projectPath": "/usr/local/nvm/versions/node/v18.8.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "projectNode": "v18.8.0",
+        "npm": "8.18.0"
+      },
+      "official_controls": {
+        "gold": {
+          "resolved": true,
+          "passed": 25,
+          "failed": 0,
+          "sha256": "69314f2f27503d24d15427f127a64d36b7f9a30a8a723cb48477c58a88a6a2e2"
+        },
+        "baseline": {
+          "resolved": false,
+          "passed": 20,
+          "failed": 5,
+          "sha256": "972cd3dc82f2cf1d432187d08e9a99c0b363cb384272c09d8138a5453efaf234"
+        }
+      }
+    },
+    {
+      "instance_id": "microsoft__vscode-135805",
+      "status": "ready",
+      "input_preflight_sha256": "c31d9b2b52aaf5b223ce6ab80f6bb892b7615c0122b7c5bdf1620901ff4b1566",
+      "actual_manifest": {
+        "type": "complete",
+        "bytes": 11039719,
+        "entries": 69444,
+        "sha256": "f4c263bc5ed46382131e0f40839f279fee1e59595c224a3868aa27ef1e072620",
+        "elapsedMs": 2512,
+        "limits": {
+          "bytes": 134217728,
+          "entries": 500000,
+          "milliseconds": 120000
+        }
+      },
+      "git_context": {
+        "status": "captured",
+        "snapshotSha256": "e6cfd6212f21d1c0190072c3638df9626d7c1260f3fd4d62228069ea5cf24fb3",
+        "diffBytes": 0,
+        "taskBytes": 1305
+      },
+      "environment": {
+        "image": "sha256:ee3152816d1632e53f3e1565d9712c2178ab16e1c8c916c49fcbf793ccdf0254",
+        "node": "/diagnostic/node",
+        "projectPath": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "projectNode": "v14.21.3",
+        "npm": "6.14.18"
+      },
+      "official_controls": {
+        "gold": {
+          "resolved": true,
+          "passed": 20,
+          "failed": 0,
+          "sha256": "67f9978137218be47136be6bc1a9a061080c432c5b20ed22182ef0f87791eb14"
+        },
+        "baseline": {
+          "resolved": false,
+          "passed": 18,
+          "failed": 2,
+          "sha256": "e4c120412e459f0e84a94d7ee53f288f07fd61362eae8fe64b51e85e669fc582"
+        }
+      }
+    },
+    {
+      "instance_id": "serverless__serverless-2945",
+      "status": "ready",
+      "input_preflight_sha256": "936eda31e5a11a9d83752b560e044b20a3e44c10d650ae31b280cd1a8954e875",
+      "actual_manifest": {
+        "type": "complete",
+        "bytes": 1808557,
+        "entries": 12538,
+        "sha256": "8754b49ad10ba0f3e36998ad71628838d6ab6f8c135b7e7afd19e64956b868b1",
+        "elapsedMs": 433,
+        "limits": {
+          "bytes": 134217728,
+          "entries": 500000,
+          "milliseconds": 120000
+        }
+      },
+      "git_context": {
+        "status": "captured",
+        "snapshotSha256": "71fcf9823f6e8f3f4c6099b995392c44475a9e0389f2e490392ec7d5dfbbaf38",
+        "diffBytes": 0,
+        "taskBytes": 2716
+      },
+      "environment": {
+        "image": "sha256:cd8b1b37bffea9457d573e4e822dfa1bc1c98789c27c6d00947fbfed14fa26bb",
+        "node": "/diagnostic/node",
+        "projectPath": "/usr/local/nvm/versions/node/v16.20.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "projectNode": "v16.20.2",
+        "npm": "8.19.4"
+      },
+      "official_controls": {
+        "gold": {
+          "resolved": true,
+          "passed": 18,
+          "failed": 0,
+          "sha256": "dbdc8c6c44a01b6030847f28f6270433a42774975513b616d7bdafc844e9cfe2"
+        },
+        "baseline": {
+          "resolved": false,
+          "passed": 13,
+          "failed": 5,
+          "sha256": "8930e46e58bc66887328bcb37c595fb1e39c95a2e41fd0385a1c3e2c4c97553d"
+        }
+      }
+    },
+    {
+      "instance_id": "mrdoob__three.js-24461",
+      "status": "ready",
+      "input_preflight_sha256": "63bee1602ec599dcf4ff6358acec36acdeaa6d92b1c935657a97a3357c5e7dd8",
+      "actual_manifest": {
+        "type": "complete",
+        "bytes": 4341644,
+        "entries": 29169,
+        "sha256": "07762a2447cd280d82672cb8fea58d234a30b4073365be903934a4997dcb1d7c",
+        "elapsedMs": 3684,
+        "limits": {
+          "bytes": 134217728,
+          "entries": 500000,
+          "milliseconds": 120000
+        }
+      },
+      "git_context": {
+        "status": "captured",
+        "snapshotSha256": "1aa3617d443ac5d4dcf3826da4921ebb0a486fa5b9de57fbd4f37dc855789f87",
+        "diffBytes": 0,
+        "taskBytes": 1046
+      },
+      "environment": {
+        "image": "sha256:720013086011ccce9a3fdee56a9df85fcdc0e763b01022cace9691a9130381ae",
+        "node": "/diagnostic/node",
+        "projectPath": "/usr/local/nvm/versions/node/v16.20.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "projectNode": "v16.20.2",
+        "npm": "8.19.4"
+      },
+      "official_controls": {
+        "gold": {
+          "resolved": true,
+          "passed": 718,
+          "failed": 897,
+          "sha256": "538c7a78acd09947f2a13394b35ce3175b0da36f14c622c7a2ec4c0c71ce805c"
+        },
+        "baseline": {
+          "resolved": false,
+          "passed": 716,
+          "failed": 899,
+          "sha256": "731d4a9bda748278844d97ce153a744721c8e2c05eb751f90e683bd7942275e8"
+        }
+      }
+    },
+    {
+      "instance_id": "serverless__serverless-8159",
+      "status": "ready",
+      "input_preflight_sha256": "5ca29cd9b1b8ecf4031eefebeb08ae7fd9b12ad076fb115c99f94749d1605713",
+      "actual_manifest": {
+        "type": "complete",
+        "bytes": 8011975,
+        "entries": 50954,
+        "sha256": "db132a403729b789e931dc56831bd44e96da023d8f0d5c470e0b979b7fd3717b",
+        "elapsedMs": 1513,
+        "limits": {
+          "bytes": 134217728,
+          "entries": 500000,
+          "milliseconds": 120000
+        }
+      },
+      "git_context": {
+        "status": "captured",
+        "snapshotSha256": "19bb1aec60c64ef9fe480e4ecd99528539f312a68391c487a4c3449c3711fe1f",
+        "diffBytes": 0,
+        "taskBytes": 1246
+      },
+      "environment": {
+        "image": "sha256:8c916925892fc8212ff508fb84130f5e1ca193cdf18e4b64dc305c1cf3b52e16",
+        "node": "/diagnostic/node",
+        "projectPath": "/usr/local/nvm/versions/node/v16.20.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "projectNode": "v16.20.2",
+        "npm": "8.19.4"
+      },
+      "official_controls": {
+        "gold": {
+          "resolved": true,
+          "passed": 52,
+          "failed": 0,
+          "sha256": "de69f5d01b9601a164cda6b20ebf984ef1a6a367e351457a75e192cb6013d8c6"
+        },
+        "baseline": {
+          "resolved": false,
+          "passed": 51,
+          "failed": 1,
+          "sha256": "cc0172f74e5944103f9bd7b38d5b0934962cd53b677349e255094b89593c4e27"
+        }
+      }
+    },
+    {
+      "instance_id": "microsoft__vscode-108964",
+      "status": "ready",
+      "input_preflight_sha256": "c3d97760b79179d4dc44bfeb7af2a40e691362797eec931ab2b52b7ed720941e",
+      "actual_manifest": {
+        "type": "complete",
+        "bytes": 19286285,
+        "entries": 117998,
+        "sha256": "3d27cd30017e4df1419328bcf189df8e0ebfd4c616aeae66a787d0e0f4136210",
+        "elapsedMs": 3585,
+        "limits": {
+          "bytes": 134217728,
+          "entries": 500000,
+          "milliseconds": 120000
+        }
+      },
+      "git_context": {
+        "status": "captured",
+        "snapshotSha256": "eabb42f84e98ab1c93166521a65784be8d8c5d6c5f7a75e1b0e4a195808e77ca",
+        "diffBytes": 0,
+        "taskBytes": 4939
+      },
+      "environment": {
+        "image": "sha256:50a45b1774e6cca16f35b3759ea480c0bb3c22bbf7a7fc86a03c120d96028599",
+        "node": "/diagnostic/node",
+        "projectPath": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "projectNode": "v12.22.12",
+        "npm": "6.14.16"
+      },
+      "official_controls": {
+        "gold": {
+          "resolved": true,
+          "passed": 34,
+          "failed": 0,
+          "sha256": "76e91f8e750de6414601924189acff44cbb41149b442e8df52dd4d724c0a762c"
+        },
+        "baseline": {
+          "resolved": false,
+          "passed": 33,
+          "failed": 1,
+          "sha256": "fb2d94f90b7ac7a14a43fc1c214121ebcb32f63056db19a6373acaf001207d23"
+        }
+      }
+    },
+    {
+      "instance_id": "coder__code-server-3277",
+      "status": "ready",
+      "input_preflight_sha256": "1dd3672712a06d0ea2521ea926417a69e89c04688ddbf2e90eadecf3399bd841",
+      "actual_manifest": {
+        "type": "complete",
+        "bytes": 16862167,
+        "entries": 101779,
+        "sha256": "e2df7419d168895fe75f039d6c589c73d067b783e73ccbf492ab950c8955453e",
+        "elapsedMs": 3217,
+        "limits": {
+          "bytes": 134217728,
+          "entries": 500000,
+          "milliseconds": 120000
+        }
+      },
+      "git_context": {
+        "status": "captured",
+        "snapshotSha256": "bea31861817669c3c49718ed12652acc1a06e23810ebfed19d9b593fd26800b0",
+        "diffBytes": 0,
+        "taskBytes": 2013
+      },
+      "environment": {
+        "image": "sha256:4b8c79e0c5632ee9aa1c4bb5173ef900593cca9728110944829490cac79df074",
+        "node": "/diagnostic/node",
+        "projectPath": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "projectNode": "v14.21.3",
+        "npm": "6.14.18"
+      },
+      "official_controls": {
+        "gold": {
+          "resolved": true,
+          "passed": 94,
+          "failed": 0,
+          "sha256": "9dc2e6f0ad21ae2ce8ffbc03b3484a6cecc025722d6ff9d516bdcdfb848af062"
+        },
+        "baseline": {
+          "resolved": false,
+          "passed": 53,
+          "failed": 1,
+          "sha256": "004b6bb63ac85ef0e7b4afb3dd9006b1c685157459c069d3e417cb67d9e482d1"
+        }
+      }
+    }
+  ],
+  "new_official_control_invocations": 16,
+  "historical_receipts_copied": 0,
+  "control_scope": "Technical calibration only: official gold resolved=true and baseline resolved=false, with observed tests. Total passing/failing test counts do not replace the unchanged official resolved criterion.",
+  "environment_scope": "Eight task images restored by their pinned immutable digests; public inputs and original project PATH/toolchains preserved. Diagnostic and author images rebuilt from pinned sources and recorded under new hashes; identical frozen conditions across this party's P/C/T. Diagnostic rebuild is not a claim that every OS dependency is byte-identical to the historical image.",
+  "pre_admission_checks": {
+    "recorder-fixture/result.json": {
+      "passed": true,
+      "sha256": "84ed55be5e732548aa71dc41b607e1ce5a31893007f9ae6efc36c3938dccd3d4"
+    },
+    "container-preflight-final/verification.json": {
+      "passed": true,
+      "sha256": "6215b75e691feaee7188d6dca7cc9a6bfe8ecf81e6db28646314dbeab048dd9e"
+    },
+    "capture-shape-check/verification.json": {
+      "passed": true,
+      "sha256": "d2b6dda7e9aaedf569962e2d562062309d7add8368a44e54c540cb98004644e9"
+    },
+    "scripted-preflight-final/verification.json": {
+      "passed": true,
+      "sha256": "3f38bb8113c9752a35f4f32ac4ad5c683bb1855d7d7555746d2e5e0522f64488"
+    },
+    "official_controls": {
+      "passed": true,
+      "tasks": 8,
+      "new_invocations": 16,
+      "historical_receipts_copied": 0
+    },
+    "actual_inputs": {
+      "passed": true,
+      "tasks": 8,
+      "full_manifest_and_git": true
+    }
+  }
+}

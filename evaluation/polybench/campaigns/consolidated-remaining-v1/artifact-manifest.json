@@ -1,0 +1,340 @@
+{
+  "evaluator_revision": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+  "predictions": {
+    "P": {
+      "path": "predictions/P.jsonl",
+      "sha256": "e1f53db5327f6b16d0c36ac0269429b79b246676fc41d16b2d79d86352982141",
+      "bytes": 26951,
+      "instances": 8,
+      "provenance_sha256": "e45553251c11bbbeefa3ec9df3647fd2798b5f8858dce3bfcb73d5e2c18e0437"
+    },
+    "C": {
+      "path": "predictions/C.jsonl",
+      "sha256": "336ad2d588011472c702ac6cc397f3c95f9a81f1bd7e0500833d332de851cd13",
+      "bytes": 24200,
+      "instances": 8,
+      "provenance_sha256": "6ed5e2722226982d312bb280d48cab8e4010fc4249bdfbc1dad05cb0a07596a8"
+    },
+    "T": {
+      "path": "predictions/T.jsonl",
+      "sha256": "ee5c8f0b0655debda05a8089d5ea8ff72e73be96cb705d33b30f1d154cc15e0c",
+      "bytes": 29797,
+      "instances": 8,
+      "provenance_sha256": "efde7ce75892cd5918f06a356f475573a48e455d3b63c6d398ccd89e5ea9a07f"
+    }
+  },
+  "official_results": [
+    {
+      "arm": "P",
+      "instance_id": "mui__material-ui-42412",
+      "sha256": "09715906761bf2547cb1aa2fbfa0813127a82ae13f9a7ede058f1fa87b1058db",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      }
+    },
+    {
+      "arm": "P",
+      "instance_id": "mui__material-ui-18683",
+      "sha256": "940579f56ecdf949a8ba2208512c85e21f85ed61089a1342358e16d01aa01210",
+      "outcome": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "P",
+      "instance_id": "microsoft__vscode-135805",
+      "sha256": "fd7674f32a22456cf1b8148825625f8bfdfcff80ebea90a044a22119c889d763",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "P",
+      "instance_id": "serverless__serverless-2945",
+      "sha256": "9b11620925c95cc955b77890f6cdff7495eca39e049560887df241994c445e0d",
+      "outcome": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "P",
+      "instance_id": "mrdoob__three.js-24461",
+      "sha256": "5a7ad72e86f0d06b05516225f0a83eeb92e58fdefe3e46debfb34c5d829bc8ee",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "P",
+      "instance_id": "serverless__serverless-8159",
+      "sha256": "e240948354cdbd5b05ce739c58d1e3a5e2536d79783c954e7b8922fe21cd0214",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      }
+    },
+    {
+      "arm": "P",
+      "instance_id": "microsoft__vscode-108964",
+      "sha256": "d567df5598b7495e11e43e89fbe80ea108496673003a98a0411d0fbd768b23ea",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      }
+    },
+    {
+      "arm": "P",
+      "instance_id": "coder__code-server-3277",
+      "sha256": "07d621115b58363f205a4a02cfa3b3a839640952a5565378cd85e8c774c1ce52",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "C",
+      "instance_id": "mui__material-ui-42412",
+      "sha256": "44c48d4ca4b9612c8af2070eba4b7293f171cd3f7cd8d4a082139cbe3393a16d",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      }
+    },
+    {
+      "arm": "C",
+      "instance_id": "mui__material-ui-18683",
+      "sha256": "940579f56ecdf949a8ba2208512c85e21f85ed61089a1342358e16d01aa01210",
+      "outcome": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "C",
+      "instance_id": "microsoft__vscode-135805",
+      "sha256": "769e5dbbdf264a892e9a41172835b5fdd5cf6266d1d6adffbc65df12c6d697cd",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "C",
+      "instance_id": "serverless__serverless-2945",
+      "sha256": "9b11620925c95cc955b77890f6cdff7495eca39e049560887df241994c445e0d",
+      "outcome": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "C",
+      "instance_id": "mrdoob__three.js-24461",
+      "sha256": "d311eb0d2b97f1c879b0bf4206c3d5d4093010bd77711ffc2f02240397b58f96",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "C",
+      "instance_id": "serverless__serverless-8159",
+      "sha256": "597b72da1430694f9e8f0efacee1b23450b725ab6b353a0dd887cbd65d0f78d1",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "C",
+      "instance_id": "microsoft__vscode-108964",
+      "sha256": "6426390f7110e0b06ebb399bd17e13179bc9dc01866b19b8921dcb616cd4214d",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      }
+    },
+    {
+      "arm": "C",
+      "instance_id": "coder__code-server-3277",
+      "sha256": "bab1c27b3d33df2a4725ad67dabb5df6e50e5065a9f0244fb6eb88208d1b38f4",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "T",
+      "instance_id": "mui__material-ui-42412",
+      "sha256": "44c48d4ca4b9612c8af2070eba4b7293f171cd3f7cd8d4a082139cbe3393a16d",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      }
+    },
+    {
+      "arm": "T",
+      "instance_id": "mui__material-ui-18683",
+      "sha256": "940579f56ecdf949a8ba2208512c85e21f85ed61089a1342358e16d01aa01210",
+      "outcome": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "T",
+      "instance_id": "microsoft__vscode-135805",
+      "sha256": "69fe0875e4fb2ea767d57edef829215fe21b418105551303391af2a456992e6a",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "T",
+      "instance_id": "serverless__serverless-2945",
+      "sha256": "dcb9c1560a6aa78f7b95be0974fb1dcdbc05e918787fb1a384ea2ae29dbb2a26",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "T",
+      "instance_id": "mrdoob__three.js-24461",
+      "sha256": "538c7a78acd09947f2a13394b35ce3175b0da36f14c622c7a2ec4c0c71ce805c",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      }
+    },
+    {
+      "arm": "T",
+      "instance_id": "serverless__serverless-8159",
+      "sha256": "709370e3bbbe2198fe71f24b7db9159e517b3fb1bb98e7f6a829272b972a8f03",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    },
+    {
+      "arm": "T",
+      "instance_id": "microsoft__vscode-108964",
+      "sha256": "6c725962d257297233a5f2911d0abd2eac477178d558c4ac3a71726e57a1218d",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      }
+    },
+    {
+      "arm": "T",
+      "instance_id": "coder__code-server-3277",
+      "sha256": "07d621115b58363f205a4a02cfa3b3a839640952a5565378cd85e8c774c1ce52",
+      "outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      }
+    }
+  ]
+}
