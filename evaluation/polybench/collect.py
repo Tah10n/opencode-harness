@@ -100,6 +100,7 @@ def main():
    if actual!=expected:raise RuntimeError('Export differs from immutable captured patches')
  output={'outcome':read(batch/'outcome.json'),'scheduling_pause':read(batch/'scheduling-paused.json'),'assigned':len(selection['slots']),'started':sum(r['status']=='started' for r in rows),'slots':rows}
  if CONFIG and CONFIG.get('name') in QUALITY_NAMES:
+  output['campaign']=CONFIG['name'];output['product_sha']=frozen.get('runtimeSha');output['adapter_sha']=frozen.get('adapterSha')
   comparison_rows=rows
   if CONFIG['name']=='evidence-backed-core-h2-v1':
    source=Path(CONFIG['fresh_controls']['path']);assert hashlib.sha256(source.read_bytes()).hexdigest()==CONFIG['fresh_controls']['sha256']

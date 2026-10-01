@@ -72,7 +72,7 @@ try{
   if(name!==development.config.name){
    const file=directory+'/screening.json';fs.writeFileSync(file,JSON.stringify({completed_eligible_batch:true,admission_stop:false,selected:name==='quality-confirmation-v1',product_sha:config.product_sha}));config.screening={path:file,sha256:sha(fs.readFileSync(file))};
   }
-  if(name==='evidence-backed-core-h2-v1'){const file=directory+'/controls.json';fs.writeFileSync(file,'{}');config.fresh_controls={path:file,sha256:sha(fs.readFileSync(file))};}
+  if(name==='evidence-backed-core-h2-v1'){const file=directory+'/controls.json';fs.writeFileSync(file,JSON.stringify({campaign:development.config.name,outcome:{status:'finished'},scheduling_pause:null,assigned:18,slots:development.slots}));config.fresh_controls={path:file,sha256:sha(fs.readFileSync(file))};}
   mutate(config,selected,directory);fs.writeFileSync(directory+'/campaign.json',JSON.stringify(config));selected.configuration_sha256=sha(fs.readFileSync(directory+'/campaign.json'));fs.writeFileSync(directory+'/'+(config.selection_file??'selection.json'),JSON.stringify(selected));
   return ()=>qualityAssignments(name,directory);
  };
@@ -83,6 +83,7 @@ try{
  assert.throws(qualityCase('quality-confirmation-v1',(c,s)=>s.selected[0].language='not-JS-or-TS'));
  assert.throws(qualityCase('quality-confirmation-v1',(c,s)=>s.selected.forEach(row=>row.repo='single/repository')));
  assert.throws(qualityCase('quality-confirmation-v1',(c,s,d)=>fs.writeFileSync(d+'/screening.json','{}')));
+ assert.throws(qualityCase('evidence-backed-core-h2-v1',(c,s,d)=>{const file=d+'/controls.json';fs.writeFileSync(file,'{}');c.fresh_controls.sha256=sha(fs.readFileSync(file));}));
  assert.throws(qualityCase('quality-confirmation-v1',(c,s)=>{const i=s.selected.findIndex(row=>row.repo==='mui/material-ui');s.selected[i]=s.reserve_order.find(row=>row.repo==='mui/material-ui');s.slots=s.selected.flatMap((row,i)=>(i%2?['H','P']:['P','H']).map((arm,j)=>({slot:i*2+j+1,instance_id:row.instance_id,arm})));}));
  assert.equal(qualityCase('quality-confirmation-v1',(c,s,d)=>{
   const i=s.selected.findIndex(row=>row.repo==='mui/material-ui'),original=s.selected[i],reserve=s.reserve_order[0];assert.equal(reserve.language,original.language);

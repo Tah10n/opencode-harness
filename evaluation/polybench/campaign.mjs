@@ -90,6 +90,9 @@ export function qualityAssignments(name,directory=path.resolve('evaluation/polyb
   if(name==='evidence-backed-core-h2-v1'){
    const controls=fs.readFileSync(config.fresh_controls.path);
    assert.equal(createHash('sha256').update(controls).digest('hex'),config.fresh_controls.sha256,'Fresh controls changed');
+   const measured=JSON.parse(controls);assert.equal(measured.campaign,'evidence-backed-core-development-v1');assert.equal(measured.outcome.status,'finished');assert.equal(measured.scheduling_pause,null);assert.equal(measured.assigned,18);
+   const originalArms=['P','C0','H1'],expectedControls=selected.selected.flatMap((row,i)=>originalArms.slice(i%3).concat(originalArms.slice(0,i%3)).map((arm,j)=>({slot:i*3+j+1,instance_id:row.instance_id,arm})));
+   assert.deepEqual(measured.slots.map(({slot,instance_id,arm})=>({slot,instance_id,arm})),expectedControls,'H2 must reuse the exact completed fresh control party');
   }
  }
  return {config,selected,slots:expected};
