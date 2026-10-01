@@ -1,0 +1,1077 @@
+{
+  "schema_version": 1,
+  "stage": "metadata_selected_before_development_results",
+  "campaign": "quality-confirmation-v1",
+  "dataset_revision": "b3fca77b637379f0c01ad86d18753a7ac1998b53",
+  "dataset_sha256": "0c8138e73c34fa29a5276b675b146b72d78ce001fcc4560d76302c908b4808a5",
+  "row_count": 382,
+  "eligible_count": 170,
+  "pool_categories": {
+    "JavaScript": {
+      "Bug Fix": 68,
+      "Feature": 15,
+      "Refactoring": 2
+    },
+    "TypeScript": {
+      "Bug Fix": 66,
+      "Feature": 19
+    }
+  },
+  "quotas": {
+    "JavaScript": {
+      "Bug Fix": 12,
+      "Feature": 3,
+      "Refactoring": 0
+    },
+    "TypeScript": {
+      "Bug Fix": 12,
+      "Feature": 3
+    }
+  },
+  "selected": [
+    {
+      "instance_id": "prettier__prettier-3436",
+      "repo": "prettier/prettier",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "69f6ee78296d96e264c195ad273fed99da8911c5"
+    },
+    {
+      "instance_id": "sveltejs__svelte-4558",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "ec3589e31425c54cda3c5f6a80b89eb3aaa7bd52"
+    },
+    {
+      "instance_id": "mui__material-ui-19121",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "c99bd0dbbfdc72e2e5e1805367cc9a42ff393e3c"
+    },
+    {
+      "instance_id": "sveltejs__svelte-4288",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "e4460e38ba58d5209514f0fa93dc61b6bb1ebb54"
+    },
+    {
+      "instance_id": "mui__material-ui-13534",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "20cd3e33ae60e4970653716b7732212e93bab38c"
+    },
+    {
+      "instance_id": "mui__material-ui-28186",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "f588d8fdf63b8558e26cfa288f20ff400140ed6c"
+    },
+    {
+      "instance_id": "sveltejs__svelte-477",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Feature",
+      "base_commit": "ec543cf9b6e234b1f7e77011fa7e62056e8d1dda"
+    },
+    {
+      "instance_id": "sveltejs__svelte-3749",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "8d7d0ff7dd7b248ca6d9b6b4cac098430c6e6ffa"
+    },
+    {
+      "instance_id": "sveltejs__svelte-5875",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "8180c5dd6c6278f88a5ac82aecc3a2d1a5572c51"
+    },
+    {
+      "instance_id": "serverless__serverless-6366",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "dfe6e071612bcb80b14a87f862c33f1620a62d0c"
+    },
+    {
+      "instance_id": "microsoft__vscode-148971",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "2dff5deef71fed71f039f8064e4e6deb818b1e3d"
+    },
+    {
+      "instance_id": "mui__material-ui-12406",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "cbc6828c93df70b897366f0c6d0b17da681d1b89"
+    },
+    {
+      "instance_id": "sveltejs__svelte-3435",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "63a7a37bb7c6820bda0a1716f52ec7eeb9b3711e"
+    },
+    {
+      "instance_id": "mui__material-ui-14496",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "9ecc8db8abbfb829111d3b5c0678267827984024"
+    },
+    {
+      "instance_id": "angular__angular-37561",
+      "repo": "angular/angular",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "f7997256fc23e202e08df39997afd360d202f9f1"
+    },
+    {
+      "instance_id": "mui__material-ui-28813",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "182d4dc7726f6d77f0ca3863ca6fcdf9eec23a23"
+    },
+    {
+      "instance_id": "serverless__serverless-3095",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "356a3d596653e3a37bbc81f054e899961b38bd58"
+    },
+    {
+      "instance_id": "microsoft__vscode-153121",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "1a599e2d1792630bc7c53232404d83214acb88f4"
+    },
+    {
+      "instance_id": "serverless__serverless-1910",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Feature",
+      "base_commit": "67644f72843e558d5d407a40480e3ca011a3a6ce"
+    },
+    {
+      "instance_id": "serverless__serverless-2842",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Feature",
+      "base_commit": "a949cd95c437a2de612a0b74b0074cd712e6d84b"
+    },
+    {
+      "instance_id": "microsoft__vscode-173585",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "fcafbd6df382036c665b63a2c08e6154bfbbd289"
+    },
+    {
+      "instance_id": "serverless__serverless-3799",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "fa6b32ce5e1258b656c6729ad024cd85d4a006d0"
+    },
+    {
+      "instance_id": "microsoft__vscode-168752",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "f63eaa61fb7e4599824574add2e29ae5e677cf77"
+    },
+    {
+      "instance_id": "prettier__prettier-12930",
+      "repo": "prettier/prettier",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "3147244f55e6e0aafd2cc6fa5875f7c8cfa8e4e3"
+    },
+    {
+      "instance_id": "serverless__serverless-7102",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "0618e0d899e80e56d7f22e9bfbcc6d512848db05"
+    },
+    {
+      "instance_id": "microsoft__vscode-113837",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "bd5c20448c598534e94e741c31e03775380db98a"
+    },
+    {
+      "instance_id": "prettier__prettier-459",
+      "repo": "prettier/prettier",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "6e68f7495fba705c4d1e58e63efb5a41dea2df7d"
+    },
+    {
+      "instance_id": "microsoft__vscode-123294",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "133ae5ecee8b5bdb1e6257a44c2e1b5368905669"
+    },
+    {
+      "instance_id": "coder__code-server-6278",
+      "repo": "coder/code-server",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "5d3c9edce436d11d51aa1e586c11eaa49d626dc2"
+    },
+    {
+      "instance_id": "tailwindlabs__tailwindcss-853",
+      "repo": "tailwindlabs/tailwindcss",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "daea6623fd691d52e6ff1ce440f6a7d29b9d3adb"
+    }
+  ],
+  "reserve_order": [
+    {
+      "instance_id": "mui__material-ui-19278",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "05c90044e2aca4b04d368a4948221c69810d7ead"
+    },
+    {
+      "instance_id": "sveltejs__svelte-1095",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "9cfa1747036607debd8502018681fa5697f1d5bf"
+    },
+    {
+      "instance_id": "sveltejs__svelte-1116",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "8057884cb64f6c2cdf837411bc3962daf69e2bb5"
+    },
+    {
+      "instance_id": "sveltejs__svelte-1231",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "0ac77019d0bbde3c626f5da36a8637cffa7788f9"
+    },
+    {
+      "instance_id": "mui__material-ui-34138",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "67073cc35a741e9f45aa0d54bc00918a9c05fdb4"
+    },
+    {
+      "instance_id": "mui__material-ui-24742",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "ee6dd6d2eedc5d74a945a94cff528ba4ab04611c"
+    },
+    {
+      "instance_id": "mui__material-ui-26170",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "215794b567669951a61183d748c0b2be6483c3ea"
+    },
+    {
+      "instance_id": "sveltejs__svelte-2185",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "ea88317f84adb780075b8a689cf664249b09b42c"
+    },
+    {
+      "instance_id": "mui__material-ui-15534",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "02f135da5f4e51838994ddeea2d9474894f3f67d"
+    },
+    {
+      "instance_id": "sveltejs__svelte-1310",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "b4ade9d4b2e32657bbc95b4cdbfcd2322a8bdbef"
+    }
+  ],
+  "exclusions": [
+    {
+      "instance_id": "coder__code-server-3277",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json",
+        "evaluation/polybench/campaigns/consolidated-remaining-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "coder__code-server-4923",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/selection.json"
+      ]
+    },
+    {
+      "instance_id": "microsoft__vscode-108964",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json",
+        "evaluation/polybench/campaigns/consolidated-remaining-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "microsoft__vscode-135805",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json",
+        "evaluation/polybench/campaigns/consolidated-remaining-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "microsoft__vscode-136347",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/selection.json"
+      ]
+    },
+    {
+      "instance_id": "microsoft__vscode-177084",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "microsoft__vscode-189223",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "mrdoob__three.js-24461",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json",
+        "evaluation/polybench/campaigns/consolidated-remaining-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "mui__material-ui-17301",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/selection.json"
+      ]
+    },
+    {
+      "instance_id": "mui__material-ui-18141",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/selection.json"
+      ]
+    },
+    {
+      "instance_id": "mui__material-ui-18683",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json",
+        "evaluation/polybench/campaigns/consolidated-remaining-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "mui__material-ui-20356",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/selection.json"
+      ]
+    },
+    {
+      "instance_id": "mui__material-ui-36971",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "mui__material-ui-38544",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "mui__material-ui-42412",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json",
+        "evaluation/polybench/campaigns/consolidated-remaining-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "prettier__prettier-5025",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "prettier__prettier-8777",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "serverless__serverless-2434",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/selection.json"
+      ]
+    },
+    {
+      "instance_id": "serverless__serverless-2945",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json",
+        "evaluation/polybench/campaigns/consolidated-remaining-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "serverless__serverless-6534",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/selection.json"
+      ]
+    },
+    {
+      "instance_id": "serverless__serverless-6842",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/selection.json"
+      ]
+    },
+    {
+      "instance_id": "serverless__serverless-6869",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "serverless__serverless-8159",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json",
+        "evaluation/polybench/campaigns/consolidated-remaining-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "sveltejs__svelte-1190",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/selection.json"
+      ]
+    },
+    {
+      "instance_id": "sveltejs__svelte-3151",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "sveltejs__svelte-5452",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/selection.json"
+      ]
+    },
+    {
+      "instance_id": "sveltejs__svelte-5850",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "sveltejs__svelte-6458",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "sveltejs__svelte-738",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json"
+      ]
+    },
+    {
+      "instance_id": "tailwindlabs__tailwindcss-550",
+      "reason": "historically selected, run, or analysed; conservatively includes preparation exclusions",
+      "sources": [
+        "evaluation/polybench/campaigns/consolidated-v1/selection.json"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "slot": 1,
+      "instance_id": "prettier__prettier-3436",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 2,
+      "instance_id": "prettier__prettier-3436",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 3,
+      "instance_id": "sveltejs__svelte-4558",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 4,
+      "instance_id": "sveltejs__svelte-4558",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 5,
+      "instance_id": "mui__material-ui-19121",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 6,
+      "instance_id": "mui__material-ui-19121",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 7,
+      "instance_id": "sveltejs__svelte-4288",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 8,
+      "instance_id": "sveltejs__svelte-4288",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 9,
+      "instance_id": "mui__material-ui-13534",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 10,
+      "instance_id": "mui__material-ui-13534",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 11,
+      "instance_id": "mui__material-ui-28186",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 12,
+      "instance_id": "mui__material-ui-28186",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 13,
+      "instance_id": "sveltejs__svelte-477",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 14,
+      "instance_id": "sveltejs__svelte-477",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 15,
+      "instance_id": "sveltejs__svelte-3749",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 16,
+      "instance_id": "sveltejs__svelte-3749",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 17,
+      "instance_id": "sveltejs__svelte-5875",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 18,
+      "instance_id": "sveltejs__svelte-5875",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 19,
+      "instance_id": "serverless__serverless-6366",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 20,
+      "instance_id": "serverless__serverless-6366",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 21,
+      "instance_id": "microsoft__vscode-148971",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 22,
+      "instance_id": "microsoft__vscode-148971",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 23,
+      "instance_id": "mui__material-ui-12406",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 24,
+      "instance_id": "mui__material-ui-12406",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 25,
+      "instance_id": "sveltejs__svelte-3435",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 26,
+      "instance_id": "sveltejs__svelte-3435",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 27,
+      "instance_id": "mui__material-ui-14496",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 28,
+      "instance_id": "mui__material-ui-14496",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 29,
+      "instance_id": "angular__angular-37561",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 30,
+      "instance_id": "angular__angular-37561",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 31,
+      "instance_id": "mui__material-ui-28813",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 32,
+      "instance_id": "mui__material-ui-28813",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 33,
+      "instance_id": "serverless__serverless-3095",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 34,
+      "instance_id": "serverless__serverless-3095",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 35,
+      "instance_id": "microsoft__vscode-153121",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 36,
+      "instance_id": "microsoft__vscode-153121",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 37,
+      "instance_id": "serverless__serverless-1910",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 38,
+      "instance_id": "serverless__serverless-1910",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 39,
+      "instance_id": "serverless__serverless-2842",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 40,
+      "instance_id": "serverless__serverless-2842",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 41,
+      "instance_id": "microsoft__vscode-173585",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 42,
+      "instance_id": "microsoft__vscode-173585",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 43,
+      "instance_id": "serverless__serverless-3799",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 44,
+      "instance_id": "serverless__serverless-3799",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 45,
+      "instance_id": "microsoft__vscode-168752",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 46,
+      "instance_id": "microsoft__vscode-168752",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 47,
+      "instance_id": "prettier__prettier-12930",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 48,
+      "instance_id": "prettier__prettier-12930",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 49,
+      "instance_id": "serverless__serverless-7102",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 50,
+      "instance_id": "serverless__serverless-7102",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 51,
+      "instance_id": "microsoft__vscode-113837",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 52,
+      "instance_id": "microsoft__vscode-113837",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 53,
+      "instance_id": "prettier__prettier-459",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 54,
+      "instance_id": "prettier__prettier-459",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 55,
+      "instance_id": "microsoft__vscode-123294",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 56,
+      "instance_id": "microsoft__vscode-123294",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 57,
+      "instance_id": "coder__code-server-6278",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 58,
+      "instance_id": "coder__code-server-6278",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 59,
+      "instance_id": "tailwindlabs__tailwindcss-853",
+      "arm": "H",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 60,
+      "instance_id": "tailwindlabs__tailwindcss-853",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    }
+  ]
+}
