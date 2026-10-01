@@ -1,0 +1,433 @@
+{
+  "version": 1,
+  "campaign": "consolidated-remaining-v1",
+  "benchmark_inference": {
+    "real_requests": 703,
+    "attempts_with_forwarded_requests": 24,
+    "per_arm": {
+      "P": {
+        "usage": {
+          "requests": 204,
+          "money": null,
+          "input_tokens": {
+            "observed": 10823226,
+            "unknown_requests": 0
+          },
+          "output_tokens": {
+            "observed": 58317,
+            "unknown_requests": 0
+          },
+          "cached_tokens": {
+            "observed": 6496768,
+            "unknown_requests": 0
+          },
+          "reasoning_tokens": {
+            "observed": 28132,
+            "unknown_requests": 0
+          }
+        },
+        "timing": {
+          "created_slots": 8,
+          "preliminary_preparation_ms": {
+            "observed_sum": 172997.0,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          },
+          "agent_execution_ms": {
+            "observed_sum": 3216568.1067080013,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          },
+          "capture_ms": {
+            "observed_sum": 10800.848164997296,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          },
+          "cleanup_ms": {
+            "observed_sum": 2242.9439180013724,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          },
+          "post_execution_overhead_ms": {
+            "observed_sum": 13566.0,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          },
+          "full_observed_slot_ms": {
+            "observed_sum": 3403135.0,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          }
+        }
+      },
+      "C": {
+        "usage": {
+          "requests": 220,
+          "money": null,
+          "input_tokens": {
+            "observed": 10321319,
+            "unknown_requests": 0
+          },
+          "output_tokens": {
+            "observed": 65412,
+            "unknown_requests": 0
+          },
+          "cached_tokens": {
+            "observed": 5817856,
+            "unknown_requests": 0
+          },
+          "reasoning_tokens": {
+            "observed": 32571,
+            "unknown_requests": 0
+          }
+        },
+        "timing": {
+          "created_slots": 8,
+          "preliminary_preparation_ms": {
+            "observed_sum": 173328.0,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          },
+          "agent_execution_ms": {
+            "observed_sum": 4220025.753706999,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          },
+          "capture_ms": {
+            "observed_sum": 10757.034457999049,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          },
+          "cleanup_ms": {
+            "observed_sum": 2303.0954999999376,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          },
+          "post_execution_overhead_ms": {
+            "observed_sum": 13591.0,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          },
+          "full_observed_slot_ms": {
+            "observed_sum": 4406949.0,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          }
+        }
+      },
+      "T": {
+        "usage": {
+          "requests": 279,
+          "money": null,
+          "input_tokens": {
+            "observed": 15264202,
+            "unknown_requests": 0
+          },
+          "output_tokens": {
+            "observed": 81411,
+            "unknown_requests": 0
+          },
+          "cached_tokens": {
+            "observed": 895488,
+            "unknown_requests": 0
+          },
+          "reasoning_tokens": {
+            "observed": 44983,
+            "unknown_requests": 0
+          }
+        },
+        "timing": {
+          "created_slots": 8,
+          "preliminary_preparation_ms": {
+            "observed_sum": 170330.0,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          },
+          "agent_execution_ms": {
+            "observed_sum": 7509009.381833002,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          },
+          "capture_ms": {
+            "observed_sum": 13486.337791999802,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          },
+          "cleanup_ms": {
+            "observed_sum": 3806.005126000615,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          },
+          "post_execution_overhead_ms": {
+            "observed_sum": 18281.0,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          },
+          "full_observed_slot_ms": {
+            "observed_sum": 7697625.0,
+            "observed_slots": 8,
+            "unknown_slots": 0
+          }
+        }
+      }
+    },
+    "requests_without_usage": 0,
+    "money": null,
+    "coverage": "Every forwarded author/parent/title/child request in this new party; no historical requests added. Cached input and reasoning output are included subsets, never extra totals. Observed totals are lower bounds when usage is missing.",
+    "input_tokens": {
+      "observed": 36408747,
+      "unknown_requests": 0
+    },
+    "output_tokens": {
+      "observed": 205140,
+      "unknown_requests": 0
+    },
+    "cached_tokens": {
+      "observed": 13210112,
+      "unknown_requests": 0
+    },
+    "reasoning_tokens": {
+      "observed": 105686,
+      "unknown_requests": 0
+    }
+  },
+  "official_controls": {
+    "new_invocations": 16,
+    "historical_receipts_copied": 0,
+    "per_invocation": [
+      {
+        "instance_id": "mui__material-ui-42412",
+        "mode": "gold",
+        "elapsed_seconds": 21.84203600883484,
+        "exit_code": 0
+      },
+      {
+        "instance_id": "mui__material-ui-42412",
+        "mode": "baseline",
+        "elapsed_seconds": 19.941534996032715,
+        "exit_code": 0
+      },
+      {
+        "instance_id": "mui__material-ui-18683",
+        "mode": "gold",
+        "elapsed_seconds": 20.30888819694519,
+        "exit_code": 0
+      },
+      {
+        "instance_id": "mui__material-ui-18683",
+        "mode": "baseline",
+        "elapsed_seconds": 18.983991146087646,
+        "exit_code": 0
+      },
+      {
+        "instance_id": "microsoft__vscode-135805",
+        "mode": "gold",
+        "elapsed_seconds": 450.860897064209,
+        "exit_code": 0
+      },
+      {
+        "instance_id": "microsoft__vscode-135805",
+        "mode": "baseline",
+        "elapsed_seconds": 386.75025725364685,
+        "exit_code": 0
+      },
+      {
+        "instance_id": "serverless__serverless-2945",
+        "mode": "gold",
+        "elapsed_seconds": 16.292975664138794,
+        "exit_code": 0
+      },
+      {
+        "instance_id": "serverless__serverless-2945",
+        "mode": "baseline",
+        "elapsed_seconds": 14.774525880813599,
+        "exit_code": 0
+      },
+      {
+        "instance_id": "mrdoob__three.js-24461",
+        "mode": "gold",
+        "elapsed_seconds": 20.973682165145874,
+        "exit_code": 0
+      },
+      {
+        "instance_id": "mrdoob__three.js-24461",
+        "mode": "baseline",
+        "elapsed_seconds": 19.383837938308716,
+        "exit_code": 0
+      },
+      {
+        "instance_id": "serverless__serverless-8159",
+        "mode": "gold",
+        "elapsed_seconds": 16.018617868423462,
+        "exit_code": 0
+      },
+      {
+        "instance_id": "serverless__serverless-8159",
+        "mode": "baseline",
+        "elapsed_seconds": 14.795950174331665,
+        "exit_code": 0
+      },
+      {
+        "instance_id": "microsoft__vscode-108964",
+        "mode": "gold",
+        "elapsed_seconds": 313.65504813194275,
+        "exit_code": 0
+      },
+      {
+        "instance_id": "microsoft__vscode-108964",
+        "mode": "baseline",
+        "elapsed_seconds": 299.7209401130676,
+        "exit_code": 0
+      },
+      {
+        "instance_id": "coder__code-server-3277",
+        "mode": "gold",
+        "elapsed_seconds": 56.06140398979187,
+        "exit_code": 0
+      },
+      {
+        "instance_id": "coder__code-server-3277",
+        "mode": "baseline",
+        "elapsed_seconds": 56.31492829322815,
+        "exit_code": 0
+      }
+    ],
+    "recorded_evaluator_seconds": 1746.6795148849487,
+    "scripted_export_unique_official_invocations": 1,
+    "scope": "Technical calibration and scripted export, not model quality. Already included in pre-admission wall interval; do not add twice."
+  },
+  "image_downloads": {
+    "restored_immutable_images": 8,
+    "observed_seconds": 728.188355922699,
+    "scope": "Pinned eight images only. Included in pre-admission wall interval."
+  },
+  "pre_admission_wall": {
+    "started_at": "2026-09-30T22:14:23.830641+00:00",
+    "completed_at": "2026-09-30T23:20:07.508889+00:00",
+    "elapsed_seconds": 3943.678248,
+    "scope": "Observed inventory through invocation start, including restoration, technical controls, scripted checks, freeze, development and approval wait. Not a pure CPU/runtime preparation timer. Overlaps developing-agent and component intervals."
+  },
+  "task_preparation": {
+    "mui__material-ui-42412": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": null,
+      "input_preflight_sha256": "7b02e2c112238ed733d6440b35485f017b26164b8395198b61f7ca8950c492d4",
+      "controls_elapsed_seconds": 41.785362005233765,
+      "public_input_phase_elapsed_seconds": null,
+      "accounting_note": "Total task preparation was not timed as one interval. Known phase intervals remain separate; no fabricated total or model execution time."
+    },
+    "mui__material-ui-18683": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": null,
+      "input_preflight_sha256": "89b110f6b50d39d782effcae8efe2139ebd04779e9d12fc18c6aefd4faf3fb50",
+      "controls_elapsed_seconds": 39.29435396194458,
+      "public_input_phase_elapsed_seconds": null,
+      "accounting_note": "Total task preparation was not timed as one interval. Known phase intervals remain separate; no fabricated total or model execution time."
+    },
+    "microsoft__vscode-135805": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": null,
+      "input_preflight_sha256": "c31d9b2b52aaf5b223ce6ab80f6bb892b7615c0122b7c5bdf1620901ff4b1566",
+      "controls_elapsed_seconds": 837.7151548862457,
+      "public_input_phase_elapsed_seconds": 42.04175686836243,
+      "accounting_note": "Total task preparation was not timed as one interval. Known phase intervals remain separate; no fabricated total or model execution time."
+    },
+    "serverless__serverless-2945": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": null,
+      "input_preflight_sha256": "936eda31e5a11a9d83752b560e044b20a3e44c10d650ae31b280cd1a8954e875",
+      "controls_elapsed_seconds": 31.069252014160156,
+      "public_input_phase_elapsed_seconds": 22.573554754257202,
+      "accounting_note": "Total task preparation was not timed as one interval. Known phase intervals remain separate; no fabricated total or model execution time."
+    },
+    "mrdoob__three.js-24461": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": null,
+      "input_preflight_sha256": "63bee1602ec599dcf4ff6358acec36acdeaa6d92b1c935657a97a3357c5e7dd8",
+      "controls_elapsed_seconds": 40.36014413833618,
+      "public_input_phase_elapsed_seconds": 71.28432321548462,
+      "accounting_note": "Total task preparation was not timed as one interval. Known phase intervals remain separate; no fabricated total or model execution time."
+    },
+    "serverless__serverless-8159": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": null,
+      "input_preflight_sha256": "5ca29cd9b1b8ecf4031eefebeb08ae7fd9b12ad076fb115c99f94749d1605713",
+      "controls_elapsed_seconds": 30.81656813621521,
+      "public_input_phase_elapsed_seconds": 49.65473675727844,
+      "accounting_note": "Total task preparation was not timed as one interval. Known phase intervals remain separate; no fabricated total or model execution time."
+    },
+    "microsoft__vscode-108964": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": null,
+      "input_preflight_sha256": "c3d97760b79179d4dc44bfeb7af2a40e691362797eec931ab2b52b7ed720941e",
+      "controls_elapsed_seconds": 613.5034899711609,
+      "public_input_phase_elapsed_seconds": 124.27871608734131,
+      "accounting_note": "Total task preparation was not timed as one interval. Known phase intervals remain separate; no fabricated total or model execution time."
+    },
+    "coder__code-server-3277": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": null,
+      "input_preflight_sha256": "1dd3672712a06d0ea2521ea926417a69e89c04688ddbf2e90eadecf3399bd841",
+      "controls_elapsed_seconds": 112.37971091270447,
+      "public_input_phase_elapsed_seconds": 103.38829588890076,
+      "accounting_note": "Total task preparation was not timed as one interval. Known phase intervals remain separate; no fabricated total or model execution time."
+    }
+  },
+  "batch_processing": {
+    "status": "finished",
+    "stop": null,
+    "started_at": "2026-09-30T23:20:07.508889+00:00",
+    "finished_at": "2026-10-01T04:09:00.725261+00:00",
+    "elapsed_seconds": 17333.204691542,
+    "full_observed_slot_seconds": 15507.709,
+    "unallocated_wall_seconds": 1825.495691541999,
+    "incomplete_created_slot_intervals": 0,
+    "controller_residual_seconds": 1825.495691541999,
+    "unallocated_scope": "Batch wall less complete observed slot intervals. Includes pre-slot verification and controller work; if a created slot lacks its completed receipt, also includes that slot's unmeasured interval. Only a residual, not an instrumented controller duration."
+  },
+  "official_model_evaluation": {
+    "per_arm": {
+      "P": {
+        "exit_code": 0,
+        "elapsed_seconds": 789.3397099971771
+      },
+      "C": {
+        "exit_code": 0,
+        "elapsed_seconds": 786.022531747818
+      },
+      "T": {
+        "exit_code": 0,
+        "elapsed_seconds": 788.7990601062775
+      }
+    },
+    "recorded_process_seconds": 2364.1613018512726,
+    "scope": "Official predictions evaluator only, separate from authors and calibration controls."
+  },
+  "developer_agent": {
+    "meter": {
+      "captured_at": "2026-10-01T04:49:38.069Z",
+      "status": "active",
+      "tokens_used": 1608222,
+      "time_used_seconds": 21817,
+      "goal_created_at_unix": 1790808318,
+      "goal_updated_at_unix": 1790830135,
+      "coverage": "Partial checkpoint: this goal was reset during preparation; later publication, CI and cleanup are outside this checkpoint. Full developing-agent cost and independent-child inclusion are unmeasured; this is not provider billing."
+    },
+    "money": null,
+    "scope": "Separate Codex work and independent review. Goal meter was reset during preparation; any preserved meter is partial and is not provider billing. Full developing-agent token/time cost is unmeasured. Wall intervals overlap benchmark waits and preparation; do not add them."
+  },
+  "ci": {
+    "scope": "Ordinary required CI is separate from benchmark; exact-head receipts are kept with PR checks and final private publication receipts.",
+    "elapsed_seconds": null
+  },
+  "monetary_total": null,
+  "money_reason": "No reliable route-specific bill; no monetary estimate or historical 849-request duplication."
+}

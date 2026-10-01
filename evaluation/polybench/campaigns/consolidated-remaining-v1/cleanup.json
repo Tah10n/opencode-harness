@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "campaign": "consolidated-remaining-v1",
+  "checked_at": "2026-10-01T05:24:13.451305+00:00",
+  "owned_resource_cleanup_complete": true,
+  "private_evidence_archive": {
+    "archive": "polybench-remaining-evidence-20261001T050450Z.tar.gz",
+    "sha256": "1c3c667ae5384161f4f91af18ee7a5a0ec9dfd65a345bf94fc365fb5c5a1a227",
+    "manifest_sha256": "7f94936029553881cf12baa9f2fe83a64558565db35e01cf1f9e505984496077",
+    "bytes": 336743158,
+    "verified_files": 14047,
+    "verification": "Every archive member read back and compared with source SHA-256 and file mode or symlink target; no extraction needed."
+  },
+  "filesystem": {
+    "reproducible_sources_dependencies_tools_freed_allocated_bytes": 23084793856,
+    "verified_raw_duplicate_copies_freed_allocated_bytes": 1222606848,
+    "total_freed_allocated_bytes": 24307400704,
+    "remaining_private_directory_allocated_bytes": 154472448,
+    "preserved_started_slots": 24
+  },
+  "docker": {
+    "owned_images_removed": 17,
+    "owned_images_verified_absent": true,
+    "owned_containers_remaining": 0,
+    "owned_image_declared_volume_count": 0,
+    "owned_build_history_records_removed": 9,
+    "owned_build_cache_records_removed": 128,
+    "owned_build_cache_records_remaining": 0,
+    "foreign_cache_records_removed": 0,
+    "build_cache_reported_reclaimed": "17.84GB",
+    "space_accounting": "Docker reports logical reclaimed build-cache size; it is not added to filesystem allocated-byte savings or claimed as total physical Docker disk reduction.",
+    "preexisting_image_ids_targeted": 0,
+    "preexisting_image_inventory_present_at_final_check": 26,
+    "preexisting_image_inventory_missing_at_final_check": 8,
+    "preexisting_inventory_note": "All deletion targets are disjoint from the 34 preexisting image IDs. Eight preexisting IDs were already absent at final readback; their continued presence is not claimed."
+  },
+  "preserved": {
+    "historical_campaign_public_files_unchanged": 13,
+    "historical_private_archives_unchanged": 2,
+    "historical_pause_unchanged": true,
+    "shared_project_dependency_caches": "preserved",
+    "foreign_or_in_use_resources": "not targeted",
+    "private_archive_and_audit_metadata": "Retained for full raw evidence recovery, evaluator/source binding, provenance and once-only admission guards.",
+    "working_branch": "Retained until qualifying GitHub review, required CI and protected merge; only eval/polybench-remaining is assigned for later deletion."
+  }
+}

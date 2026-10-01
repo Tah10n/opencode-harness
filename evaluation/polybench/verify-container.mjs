@@ -4,7 +4,7 @@ import {startContainer} from '../support/container-session.mjs';
 import {capturePatch} from './capture.mjs';
 import {local as root,campaign,selectionPath} from './campaign.mjs';
 const selected=JSON.parse(fs.readFileSync(selectionPath)).selected;
-const row=campaign?selected.find(r=>fs.existsSync(root+'/author-inputs/'+r.instance_id+'/image.json')):selected.find(r=>r.instance_id==='serverless__serverless-2434');assert.ok(row);
+const row=process.argv[3]?selected.find(r=>r.instance_id===process.argv[3]):campaign?selected.find(r=>fs.existsSync(root+'/author-inputs/'+r.instance_id+'/image.json')):selected.find(r=>r.instance_id==='serverless__serverless-2434');assert.ok(row,'Control requires an existing selected task');
 const source=root+'/author-inputs/'+row.instance_id+'/source';
 const output=root+'/'+(process.argv[2]??'container-preflight');
 const preparedEnvironment=JSON.parse(fs.readFileSync(root+'/environments.json'))[source];

@@ -79,6 +79,35 @@ def select_campaign(rows, config):
     return pool, [pool[i] for i in selected], {lang: {cat: quotas[lang, cat] for l, cat in groups if l == lang} for lang in config['languages']}, counts_by_language
 
 
+def remaining_assignment(config):
+    """Project the exact unrequested historical slots; never select replacements."""
+    if config['arms'] != ['P', 'C', 'T'] or config['task_count'] != 8 or config['slot_count'] != 24:
+        raise ValueError('Invalid remaining campaign composition')
+    origin = config['origin']
+    if origin['original_slots'] != list(range(31, 52)) + list(range(58, 61)):
+        raise ValueError('Invalid original slots')
+    sources = {}
+    for kind in ['selection', 'results']:
+        path = Path(origin[kind + '_path'])
+        if hashlib.sha256(path.read_bytes()).hexdigest() != origin[kind + '_sha256']:
+            raise ValueError('Historical source changed: ' + kind)
+        sources[kind] = json.loads(path.read_text())
+    slots = []
+    for number in origin['original_slots']:
+        assigned = next(x for x in sources['selection']['slots'] if x['slot'] == number)
+        outcome = next(x for x in sources['results']['slots'] if x['slot'] == number)
+        if any(assigned[k] != outcome[k] for k in ['instance_id', 'arm']):
+            raise ValueError('Historical assignment mismatch')
+        if outcome['status'] != 'not_started' or outcome['usage']['requests'] != 0 or outcome['provider_outcome'] != 'not_started' or outcome['prediction_exported']:
+            raise ValueError('Historical attempt already executed')
+        slots.append({**assigned, 'slot': len(slots) + 1, 'original_slot': number})
+    ids = list(dict.fromkeys(s['instance_id'] for s in slots))
+    selected = [next(x for x in sources['selection']['selected'] if x['instance_id'] == id) for id in ids]
+    if len(selected) != 8 or len({(s['instance_id'], s['arm']) for s in slots}) != 24:
+        raise ValueError('Invalid remaining assignment uniqueness')
+    return selected, slots
+
+
 def campaign_main(config_path):
     config_path = Path(config_path)
     config = json.loads(config_path.read_text())
@@ -90,9 +119,20 @@ def campaign_main(config_path):
         reader = csv.DictReader(f); rows = list(reader); fields = reader.fieldnames
     if len({r['instance_id'] for r in rows}) != len(rows):
         raise ValueError('Duplicate dataset IDs')
-    pool, chosen, quotas, counts = select_campaign(rows, config)
-    safe = lambda r: {k: r[k] for k in ('instance_id', 'repo', 'language', 'task_category', 'base_commit')}
-    result = {'stage': 'selected_before_technical_controls', 'campaign': config['name'],
+    if config['name'] == 'consolidated-remaining-v1':
+        selected, slots = remaining_assignment(config)
+        by_id = {r['instance_id']: r for r in rows}
+        chosen = [by_id[r['instance_id']] for r in selected]
+        if any(any(r[k] != saved[k] for k in saved) for r, saved in zip(chosen, selected)):
+            raise ValueError('Pinned dataset differs from original task metadata')
+        result = {'stage': 'selected_before_technical_controls', 'campaign': config['name'],
+                  'configuration_sha256': hashlib.sha256(config_path.read_bytes()).hexdigest(),
+                  'dataset_revision': config['dataset_revision'], 'dataset_sha256': digest,
+                  'origin': config['origin'], 'selected': selected, 'slots': slots}
+    else:
+        pool, chosen, quotas, counts = select_campaign(rows, config)
+        safe = lambda r: {k: r[k] for k in ('instance_id', 'repo', 'language', 'task_category', 'base_commit')}
+        result = {'stage': 'selected_before_technical_controls', 'campaign': config['name'],
               'configuration_sha256': hashlib.sha256(config_path.read_bytes()).hexdigest(),
               'dataset_revision': config['dataset_revision'], 'dataset_sha256': digest,
               'row_count': len(rows), 'eligible_count': len(pool), 'pool_categories': counts, 'quotas': quotas,
@@ -105,7 +145,7 @@ def campaign_main(config_path):
         f.write(json.dumps(result, indent=2) + '\n')
     with (source.parent / 'selected.csv').open('x', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=fields); writer.writeheader(); writer.writerows(chosen)
-    print(json.dumps({'selected': result['selected'], 'quotas': quotas}, indent=2))
+    print(json.dumps({'selected': result['selected'], 'slots': len(result['slots'])}, indent=2))
 
 
 if __name__ == '__main__':

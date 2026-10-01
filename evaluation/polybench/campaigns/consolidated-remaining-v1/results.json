@@ -1,0 +1,3747 @@
+{
+  "schema": "consolidated-remaining-v1-public-results",
+  "product_sha": "f83b101bd9050c81443acddf71c1e364c4c786c4",
+  "adapter_sha": "047279449b88730f113017bb6035aebb9362e773",
+  "assigned": 24,
+  "started": 24,
+  "timing_method": "Existing receipt differences, no post-start delay deductions.",
+  "timing_coverage": "Full observed slot starts at started.json and ends at completed.json. Frozen-input verification before slot creation is outside these receipts and remains unallocated; capture/cleanup are subsets of post-execution overhead.",
+  "arms": {
+    "P": {
+      "assigned": 8,
+      "started": 8,
+      "not_started": 0,
+      "evaluated": 8,
+      "resolved": 3,
+      "resolved_percent": 37.5,
+      "autonomous_deliveries": 8,
+      "delivered_resolved": 3,
+      "partial_artifacts": 0,
+      "unknown_quality_started": 0,
+      "evaluation_statuses": {
+        "official_result": 6,
+        "official_patch_rejected": 2
+      },
+      "provider_outcomes": {
+        "completed": 8
+      },
+      "workflow_statuses_started": {
+        "None": 8
+      },
+      "investigation_preparations_started": 0,
+      "investigation_child_commands_observed": 0,
+      "usage": {
+        "requests": 204,
+        "money": null,
+        "input_tokens": {
+          "observed": 10823226,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 58317,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 6496768,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 28132,
+          "unknown_requests": 0
+        }
+      },
+      "timing": {
+        "created_slots": 8,
+        "preliminary_preparation_ms": {
+          "observed_sum": 172997.0,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        },
+        "agent_execution_ms": {
+          "observed_sum": 3216568.1067080013,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        },
+        "capture_ms": {
+          "observed_sum": 10800.848164997296,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        },
+        "cleanup_ms": {
+          "observed_sum": 2242.9439180013724,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        },
+        "post_execution_overhead_ms": {
+          "observed_sum": 13566.0,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        },
+        "full_observed_slot_ms": {
+          "observed_sum": 3403135.0,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        }
+      },
+      "unknown_delivery_started": 0,
+      "unknown_D_started": 0,
+      "unknown_artifact_kind_started": 0,
+      "raw_collector_autonomous_deliveries": 8,
+      "investigation_child_sessions_created": {
+        "observed_sum": 0,
+        "unknown_slots": 0
+      },
+      "investigation_child_model_sessions_observed": {
+        "observed_sum": 0,
+        "unknown_slots": 0
+      },
+      "investigation_accepted_nonempty_test_patches": {
+        "observed_sum": 0,
+        "unknown_slots": 0
+      },
+      "investigation_accepted_changed_test_files": {
+        "observed_sum": 0,
+        "unknown_slots": 0
+      }
+    },
+    "C": {
+      "assigned": 8,
+      "started": 8,
+      "not_started": 0,
+      "evaluated": 8,
+      "resolved": 2,
+      "resolved_percent": 25.0,
+      "autonomous_deliveries": 8,
+      "delivered_resolved": 2,
+      "partial_artifacts": 0,
+      "unknown_quality_started": 0,
+      "evaluation_statuses": {
+        "official_result": 6,
+        "official_patch_rejected": 2
+      },
+      "provider_outcomes": {
+        "completed": 8
+      },
+      "workflow_statuses_started": {
+        "None": 8
+      },
+      "investigation_preparations_started": 0,
+      "investigation_child_commands_observed": 0,
+      "usage": {
+        "requests": 220,
+        "money": null,
+        "input_tokens": {
+          "observed": 10321319,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 65412,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 5817856,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 32571,
+          "unknown_requests": 0
+        }
+      },
+      "timing": {
+        "created_slots": 8,
+        "preliminary_preparation_ms": {
+          "observed_sum": 173328.0,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        },
+        "agent_execution_ms": {
+          "observed_sum": 4220025.753706999,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        },
+        "capture_ms": {
+          "observed_sum": 10757.034457999049,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        },
+        "cleanup_ms": {
+          "observed_sum": 2303.0954999999376,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        },
+        "post_execution_overhead_ms": {
+          "observed_sum": 13591.0,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        },
+        "full_observed_slot_ms": {
+          "observed_sum": 4406949.0,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        }
+      },
+      "unknown_delivery_started": 0,
+      "unknown_D_started": 0,
+      "unknown_artifact_kind_started": 0,
+      "raw_collector_autonomous_deliveries": 8,
+      "investigation_child_sessions_created": {
+        "observed_sum": 0,
+        "unknown_slots": 0
+      },
+      "investigation_child_model_sessions_observed": {
+        "observed_sum": 0,
+        "unknown_slots": 0
+      },
+      "investigation_accepted_nonempty_test_patches": {
+        "observed_sum": 0,
+        "unknown_slots": 0
+      },
+      "investigation_accepted_changed_test_files": {
+        "observed_sum": 0,
+        "unknown_slots": 0
+      }
+    },
+    "T": {
+      "assigned": 8,
+      "started": 8,
+      "not_started": 0,
+      "evaluated": 8,
+      "resolved": 3,
+      "resolved_percent": 37.5,
+      "autonomous_deliveries": 7,
+      "delivered_resolved": 3,
+      "partial_artifacts": 1,
+      "unknown_quality_started": 0,
+      "evaluation_statuses": {
+        "official_result": 6,
+        "official_patch_rejected": 1,
+        "official_result_no_tests": 1
+      },
+      "provider_outcomes": {
+        "completed": 8
+      },
+      "workflow_statuses_started": {
+        "incomplete": 7,
+        "None": 1
+      },
+      "investigation_preparations_started": 3,
+      "investigation_child_commands_observed": 1,
+      "usage": {
+        "requests": 279,
+        "money": null,
+        "input_tokens": {
+          "observed": 15264202,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 81411,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 895488,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 44983,
+          "unknown_requests": 0
+        }
+      },
+      "timing": {
+        "created_slots": 8,
+        "preliminary_preparation_ms": {
+          "observed_sum": 170330.0,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        },
+        "agent_execution_ms": {
+          "observed_sum": 7509009.381833002,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        },
+        "capture_ms": {
+          "observed_sum": 13486.337791999802,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        },
+        "cleanup_ms": {
+          "observed_sum": 3806.005126000615,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        },
+        "post_execution_overhead_ms": {
+          "observed_sum": 18281.0,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        },
+        "full_observed_slot_ms": {
+          "observed_sum": 7697625.0,
+          "observed_slots": 8,
+          "unknown_slots": 0
+        }
+      },
+      "unknown_delivery_started": 0,
+      "unknown_D_started": 0,
+      "unknown_artifact_kind_started": 0,
+      "raw_collector_autonomous_deliveries": 7,
+      "investigation_child_sessions_created": {
+        "observed_sum": 1,
+        "unknown_slots": 0
+      },
+      "investigation_child_model_sessions_observed": {
+        "observed_sum": 1,
+        "unknown_slots": 0
+      },
+      "investigation_accepted_nonempty_test_patches": {
+        "observed_sum": 1,
+        "unknown_slots": 0
+      },
+      "investigation_accepted_changed_test_files": {
+        "observed_sum": 1,
+        "unknown_slots": 0
+      }
+    }
+  },
+  "slots": [
+    {
+      "slot": 1,
+      "original_slot": 31,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "C",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "D": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "da89e37c2ad1bd5864b26ff303d46a57ebd10f8ddf38d0bd335c9c33f287565a",
+      "patch_bytes": 1645,
+      "workflow_status": null,
+      "usage": {
+        "requests": 20,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 382091,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 3359,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 117248,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 1211,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 20
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 5,
+      "evaluation_tests_unobserved": false,
+      "run_id": "f8d9837c-f21a-4534-96ac-abe0dfde4425",
+      "container_session": "template-dev-6048c9d3-46d1-4641-adee-071520afa25d",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 61438.0,
+        "agent_execution_ms": 243536.66004099994,
+        "capture_ms": 2291.0398750000168,
+        "cleanup_ms": 555.562082999968,
+        "post_execution_overhead_ms": 2908.0,
+        "full_observed_slot_ms": 307883.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 243163.643875,
+        "native_cleanup_ms": 292.05266699998174,
+        "native_elapsed_ms": 243455.699083,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      },
+      "official_result_sha256": "44c48d4ca4b9612c8af2070eba4b7293f171cd3f7cd8d4a082139cbe3393a16d",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": true,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 2,
+      "original_slot": 32,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "T",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "D": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "6c1db6894037a82a830db4311c800fc231aea85f921b63f2fc7c205e09eb51b0",
+      "patch_bytes": 1894,
+      "workflow_status": "incomplete",
+      "usage": {
+        "requests": 20,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 441203,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 4245,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 33280,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 2016,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 20
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 5,
+      "evaluation_tests_unobserved": false,
+      "run_id": "1d75727f-76ff-4a78-b7de-2bc929ace6c9",
+      "container_session": "template-dev-ae8ee98c-e457-4de3-8c0e-e1fbb202484a",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 63400.0,
+        "agent_execution_ms": 375838.60812500014,
+        "capture_ms": 2571.955209000036,
+        "cleanup_ms": 971.2536250001285,
+        "post_execution_overhead_ms": 3602.0,
+        "full_observed_slot_ms": 442841.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 375489.81587499985,
+        "native_cleanup_ms": 294.0114579999354,
+        "native_elapsed_ms": 375783.8294579999,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      },
+      "official_result_sha256": "44c48d4ca4b9612c8af2070eba4b7293f171cd3f7cd8d4a082139cbe3393a16d",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": true,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true,
+          "task_terminal_captured": true,
+          "task_tools_termination_verified": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 3,
+      "original_slot": 33,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "P",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "D": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "6118de2ea4a9772da638b63f217e3a1363c2620b28c47ddde83a4d999ad4f752",
+      "patch_bytes": 1576,
+      "workflow_status": null,
+      "usage": {
+        "requests": 14,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 232640,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 2714,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 72704,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 806,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 14
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 5,
+      "evaluation_tests_unobserved": false,
+      "run_id": "ae094f2a-5799-4454-930f-b8915a1aef86",
+      "container_session": "template-dev-57ae4a7a-1802-42ab-95c1-7f4646fcc96d",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 66001.0,
+        "agent_execution_ms": 209953.2227080001,
+        "capture_ms": 2223.184457999887,
+        "cleanup_ms": 519.5804590000771,
+        "post_execution_overhead_ms": 2803.0,
+        "full_observed_slot_ms": 278758.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 209637.22970799985,
+        "native_cleanup_ms": 266.6289579998702,
+        "native_elapsed_ms": 209903.86100000003,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      },
+      "official_result_sha256": "09715906761bf2547cb1aa2fbfa0813127a82ae13f9a7ede058f1fa87b1058db",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": true,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 4,
+      "original_slot": 34,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "T",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "D": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_patch_rejected",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "556a30ef7b778f14a7b56ba950b8951db47700f2007ede895faf10be3b2e0a1d",
+      "patch_bytes": 4437,
+      "workflow_status": "incomplete",
+      "usage": {
+        "requests": 22,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 634186,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 9240,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 59904,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 5597,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 22
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 0,
+      "evaluation_tests_unobserved": true,
+      "run_id": "8a2450f9-95c8-448c-9b75-12f643e443b2",
+      "container_session": "template-dev-8fb9b733-1a9d-412d-a40a-0187c9d3b1b3",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 16185.0,
+        "agent_execution_ms": 627424.987834,
+        "capture_ms": 1067.501042000018,
+        "cleanup_ms": 359.062334000133,
+        "post_execution_overhead_ms": 1492.0,
+        "full_observed_slot_ms": 645103.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 627096.7163750001,
+        "native_cleanup_ms": 272.0311670000665,
+        "native_elapsed_ms": 627368.7496249999,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false
+      },
+      "official_result_sha256": "940579f56ecdf949a8ba2208512c85e21f85ed61089a1342358e16d01aa01210",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": false,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true,
+          "task_terminal_captured": true,
+          "task_tools_termination_verified": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 5,
+      "original_slot": 35,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "P",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "D": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_patch_rejected",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "9b83e8fe05cddb84f4800df0740c26ba4107c219a6c326f828baebc4a4d69ce3",
+      "patch_bytes": 4148,
+      "workflow_status": null,
+      "usage": {
+        "requests": 21,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 604659,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 8302,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 207360,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 5216,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 21
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 0,
+      "evaluation_tests_unobserved": true,
+      "run_id": "79f5ec88-69d9-44d4-998d-8e9367587938",
+      "container_session": "template-dev-d52ccb27-1457-42b7-b775-6117cdeffdbf",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 11938.0,
+        "agent_execution_ms": 485458.8863329999,
+        "capture_ms": 918.4457499999553,
+        "cleanup_ms": 220.05224999971688,
+        "post_execution_overhead_ms": 1203.0,
+        "full_observed_slot_ms": 498601.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 485143.06729200017,
+        "native_cleanup_ms": 260.3495829999447,
+        "native_elapsed_ms": 485403.4188330001,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false
+      },
+      "official_result_sha256": "940579f56ecdf949a8ba2208512c85e21f85ed61089a1342358e16d01aa01210",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": false,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 6,
+      "original_slot": 36,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "C",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "D": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_patch_rejected",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "9d755233459573b8c708c2ef5971e21e0c52b23c78d44f00b04201af2b4f787d",
+      "patch_bytes": 4346,
+      "workflow_status": null,
+      "usage": {
+        "requests": 30,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 908751,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 12750,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 455680,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 6730,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 30
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 0,
+      "evaluation_tests_unobserved": true,
+      "run_id": "8f3d7e29-f072-48d1-a75b-d219a9473e1d",
+      "container_session": "template-dev-fe626fb2-0d94-4e0a-99c4-4a5d89055c35",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 11963.0,
+        "agent_execution_ms": 495281.80254099984,
+        "capture_ms": 920.3729169997387,
+        "cleanup_ms": 256.95120899984613,
+        "post_execution_overhead_ms": 1242.0,
+        "full_observed_slot_ms": 508488.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 494947.6985829999,
+        "native_cleanup_ms": 273.69570899987593,
+        "native_elapsed_ms": 495221.39645799994,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false
+      },
+      "official_result_sha256": "940579f56ecdf949a8ba2208512c85e21f85ed61089a1342358e16d01aa01210",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": false,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 7,
+      "original_slot": 37,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "P",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "D": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "6d018ee72551b8969bc399a9b5196797ec230dd7e7644bae2bee370dc1a45fb0",
+      "patch_bytes": 8270,
+      "workflow_status": null,
+      "usage": {
+        "requests": 51,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 4487229,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 12920,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 3018752,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 5937,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 51
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 22,
+      "evaluation_tests_unobserved": false,
+      "run_id": "c571cb7a-59b2-406d-8e57-0e09fa685efc",
+      "container_session": "template-dev-51234629-abc5-4e4a-866b-c5917f6c2bcf",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 18247.0,
+        "agent_execution_ms": 1020122.5304170004,
+        "capture_ms": 1082.6538329999894,
+        "cleanup_ms": 321.972624999471,
+        "post_execution_overhead_ms": 1481.0,
+        "full_observed_slot_ms": 1039851.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 1019795.3030839995,
+        "native_cleanup_ms": 270.51945799961686,
+        "native_elapsed_ms": 1020065.8244999996,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      },
+      "official_result_sha256": "fd7674f32a22456cf1b8148825625f8bfdfcff80ebea90a044a22119c889d763",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": false,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 8,
+      "original_slot": 38,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "C",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "D": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "2e3779da998a0d4b0a0e22b9f829d60633e14707ea8861e2c13779c0b9ebc6ac",
+      "patch_bytes": 1267,
+      "workflow_status": null,
+      "usage": {
+        "requests": 30,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 2162891,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 11473,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 1007104,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 7375,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 30
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 21,
+      "evaluation_tests_unobserved": false,
+      "run_id": "d85e4421-3073-4b2a-9663-53cddd15e565",
+      "container_session": "template-dev-b3841fcc-1ed8-42fa-b0f6-c14031509409",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 14051.0,
+        "agent_execution_ms": 884342.7731250003,
+        "capture_ms": 1002.7613750007004,
+        "cleanup_ms": 296.0526249995455,
+        "post_execution_overhead_ms": 1370.0,
+        "full_observed_slot_ms": 899765.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 884011.0197080001,
+        "native_cleanup_ms": 272.23037499934435,
+        "native_elapsed_ms": 884283.2520419993,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      },
+      "official_result_sha256": "769e5dbbdf264a892e9a41172835b5fdd5cf6266d1d6adffbc65df12c6d697cd",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": false,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 9,
+      "original_slot": 39,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "T",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "D": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "2e6c63d4806be465e12bb1b93578a9b492bc203b05a8868657ae89290e6dfbf6",
+      "patch_bytes": 2305,
+      "workflow_status": "incomplete",
+      "usage": {
+        "requests": 59,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 4477717,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 12272,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 198144,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 7071,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 59
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 2,
+        "actions": {
+          "investigate": 1,
+          "decline": 1
+        },
+        "result_present": true,
+        "usable": false,
+        "finish": null,
+        "disposition": "declined",
+        "elapsed_ms": 41.0245419999701,
+        "patch_bytes": 0,
+        "preparation_started": true,
+        "limitation": "Investigation snapshot file limit exceeded",
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 21,
+      "evaluation_tests_unobserved": false,
+      "run_id": "0494a163-95f3-4f9c-9c82-cda91851a2e4",
+      "container_session": "template-dev-44a1f680-a3d9-4cc3-8402-11631a1b066a",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 13842.0,
+        "agent_execution_ms": 1472965.822458,
+        "capture_ms": 1398.8242499995977,
+        "cleanup_ms": 484.0068330001086,
+        "post_execution_overhead_ms": 1953.0,
+        "full_observed_slot_ms": 1488761.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 1472639.6661670003,
+        "native_cleanup_ms": 270.2296660002321,
+        "native_elapsed_ms": 1472909.8970840005,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      },
+      "official_result_sha256": "69fe0875e4fb2ea767d57edef829215fe21b418105551303391af2a456992e6a",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": false,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true,
+          "task_terminal_captured": true,
+          "task_tools_termination_verified": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 10,
+      "original_slot": 40,
+      "instance_id": "serverless__serverless-2945",
+      "arm": "C",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "D": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_patch_rejected",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "481c8927c2f0ae3faaab578c68178d712d056cfa89ab5200adc47a1d6f84d9ba",
+      "patch_bytes": 2916,
+      "workflow_status": null,
+      "usage": {
+        "requests": 18,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 526422,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 5800,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 182272,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 2637,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 18
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 0,
+      "evaluation_tests_unobserved": true,
+      "run_id": "53e11c44-1fea-4638-a564-c5cb464535aa",
+      "container_session": "template-dev-38085bd5-570c-418e-bfa4-f4e452af4eab",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 4455.0,
+        "agent_execution_ms": 167148.6252500005,
+        "capture_ms": 680.2388749998063,
+        "cleanup_ms": 112.90708300005645,
+        "post_execution_overhead_ms": 861.0,
+        "full_observed_slot_ms": 172465.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 166819.0647499999,
+        "native_cleanup_ms": 261.34091699961573,
+        "native_elapsed_ms": 167080.40749999974,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false
+      },
+      "official_result_sha256": "9b11620925c95cc955b77890f6cdff7495eca39e049560887df241994c445e0d",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": false,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 11,
+      "original_slot": 41,
+      "instance_id": "serverless__serverless-2945",
+      "arm": "T",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "D": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result_no_tests",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "7cdf9035167dde55d7554dc2660dca89b77b46764008ff9e50a1ffff37220c02",
+      "patch_bytes": 4944,
+      "workflow_status": "incomplete",
+      "usage": {
+        "requests": 54,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 2153191,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 16630,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 134656,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 9330,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 54
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 8,
+        "actions": {
+          "investigate": 1,
+          "inspect": 6,
+          "accept": 1
+        },
+        "result_present": true,
+        "usable": true,
+        "finish": "stop",
+        "disposition": "accepted",
+        "elapsed_ms": 472633.136091,
+        "patch_bytes": 3961,
+        "preparation_started": true,
+        "limitation": null,
+        "child_commands_observed": true,
+        "child_sessions_created": 1,
+        "child_model_sessions_observed": 1,
+        "child_assistant_messages": 21,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": {
+          "accepted": true,
+          "changed": true,
+          "reason": null
+        },
+        "accepted_nonempty_test_patches": 1,
+        "accepted_changed_test_files": 1,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 0,
+      "evaluation_tests_unobserved": true,
+      "run_id": "abc27579-f8c7-4de1-b47f-d2b888d2b451",
+      "container_session": "template-dev-a48c5d8c-f804-4e1d-8edc-27df70352ea5",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 3550.0,
+        "agent_execution_ms": 963007.9831250003,
+        "capture_ms": 1057.5249999994412,
+        "cleanup_ms": 180.08537499979138,
+        "post_execution_overhead_ms": 1310.0,
+        "full_observed_slot_ms": 967869.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 962680.9704999998,
+        "native_cleanup_ms": 273.52412500046194,
+        "native_elapsed_ms": 962954.4967499999,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      },
+      "official_result_sha256": "dcb9c1560a6aa78f7b95be0974fb1dcdbc05e918787fb1a384ea2ae29dbb2a26",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": false,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true,
+          "task_terminal_captured": true,
+          "task_tools_termination_verified": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 12,
+      "original_slot": 42,
+      "instance_id": "serverless__serverless-2945",
+      "arm": "P",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "D": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_patch_rejected",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "5bedfbaf9c50a015d4b405f6844f90f78ce709eaf86b0dba34d3ec9f0639eddb",
+      "patch_bytes": 3315,
+      "workflow_status": null,
+      "usage": {
+        "requests": 21,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 707034,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 6571,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 284160,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 2592,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 21
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 0,
+      "evaluation_tests_unobserved": true,
+      "run_id": "62c1a1c2-2fc9-43e3-844f-794bad602f98",
+      "container_session": "template-dev-8e06d531-e4f6-4dbf-811f-03421c2a9b35",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 3560.0,
+        "agent_execution_ms": 194973.74175000004,
+        "capture_ms": 670.9249579999596,
+        "cleanup_ms": 112.4237500000745,
+        "post_execution_overhead_ms": 845.0,
+        "full_observed_slot_ms": 199379.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 194651.61670799926,
+        "native_cleanup_ms": 263.89012500084937,
+        "native_elapsed_ms": 194915.5087499991,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false
+      },
+      "official_result_sha256": "9b11620925c95cc955b77890f6cdff7495eca39e049560887df241994c445e0d",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": false,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 13,
+      "original_slot": 43,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "T",
+      "repo": "mrdoob/three.js",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "D": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "8e5bb94bc273ceb72a94bfc53c1c6a9647b262ef7ef35ef37a70bdb3e446ce43",
+      "patch_bytes": 1701,
+      "workflow_status": "incomplete",
+      "usage": {
+        "requests": 20,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 486285,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 4294,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 70144,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 2115,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 20
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 1615,
+      "evaluation_tests_unobserved": false,
+      "run_id": "25f0f1bb-c132-4010-90a1-b83f7383bef2",
+      "container_session": "template-dev-ea5224da-e09a-4a5f-a47b-1114854fdadd",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 24233.0,
+        "agent_execution_ms": 326162.4172910005,
+        "capture_ms": 2951.740040998906,
+        "cleanup_ms": 337.74716700054705,
+        "post_execution_overhead_ms": 3350.0,
+        "full_observed_slot_ms": 353745.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 325836.6283749994,
+        "native_cleanup_ms": 270.2350420001894,
+        "native_elapsed_ms": 326106.86504199915,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      },
+      "official_result_sha256": "538c7a78acd09947f2a13394b35ce3175b0da36f14c622c7a2ec4c0c71ce805c",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": true,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true,
+          "task_terminal_captured": true,
+          "task_tools_termination_verified": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 14,
+      "original_slot": 44,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "P",
+      "repo": "mrdoob/three.js",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "D": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "92b1fd248b312273f064c2db403e4950c1514f82b8cb1dcd1ff6c203e58ac9ad",
+      "patch_bytes": 1661,
+      "workflow_status": null,
+      "usage": {
+        "requests": 14,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 202597,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 2952,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 83968,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 1042,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 14
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 1616,
+      "evaluation_tests_unobserved": false,
+      "run_id": "86f686cc-aab2-44c5-bde5-87c4c5bd595a",
+      "container_session": "template-dev-b6c9ecfe-782a-48ac-94c8-f1cf594182ee",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 22257.0,
+        "agent_execution_ms": 117902.19649999961,
+        "capture_ms": 2863.7877079993486,
+        "cleanup_ms": 226.24616700038314,
+        "post_execution_overhead_ms": 3149.0,
+        "full_observed_slot_ms": 143308.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 117584.63399999961,
+        "native_cleanup_ms": 265.4805000014603,
+        "native_elapsed_ms": 117850.11612500064,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      },
+      "official_result_sha256": "5a7ad72e86f0d06b05516225f0a83eeb92e58fdefe3e46debfb34c5d829bc8ee",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": false,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 15,
+      "original_slot": 45,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "C",
+      "repo": "mrdoob/three.js",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "D": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "a5035db289dae912555a7a48cf709e03460d5e0570706f8d99be7f7ea1f2bf7f",
+      "patch_bytes": 1657,
+      "workflow_status": null,
+      "usage": {
+        "requests": 11,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 195650,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 2887,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 80896,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 989,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 11
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 1616,
+      "evaluation_tests_unobserved": false,
+      "run_id": "77918aa2-bfc9-4b90-9805-036a99c6f095",
+      "container_session": "template-dev-151255a9-532c-493a-80b8-474b672ab1ce",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 21846.0,
+        "agent_execution_ms": 101183.50558299944,
+        "capture_ms": 2884.1822919994593,
+        "cleanup_ms": 229.29220800101757,
+        "post_execution_overhead_ms": 3171.0,
+        "full_observed_slot_ms": 126201.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 100874.10820800066,
+        "native_cleanup_ms": 257.601499998942,
+        "native_elapsed_ms": 101131.71100000106,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      },
+      "official_result_sha256": "d311eb0d2b97f1c879b0bf4206c3d5d4093010bd77711ffc2f02240397b58f96",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": false,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 16,
+      "original_slot": 46,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "P",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Feature",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "D": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "3cb53d90e0856bc2f494f3670a29aac40fa83a3a17fb3f2a8e815116e52048c2",
+      "patch_bytes": 3742,
+      "workflow_status": null,
+      "usage": {
+        "requests": 18,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 527607,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 5624,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 245248,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 2393,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 18
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 53,
+      "evaluation_tests_unobserved": false,
+      "run_id": "c8428cb7-b550-4c18-a7e8-1d2be23a79c1",
+      "container_session": "template-dev-38f6fb0c-bc0b-4428-8bca-acf4da8dbc2e",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 11341.0,
+        "agent_execution_ms": 182888.4576670006,
+        "capture_ms": 740.5714999996126,
+        "cleanup_ms": 173.3089589998126,
+        "post_execution_overhead_ms": 980.0,
+        "full_observed_slot_ms": 195210.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 182560.35479199886,
+        "native_cleanup_ms": 271.3262910004705,
+        "native_elapsed_ms": 182831.68291699886,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      },
+      "official_result_sha256": "e240948354cdbd5b05ce739c58d1e3a5e2536d79783c954e7b8922fe21cd0214",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": true,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 17,
+      "original_slot": 47,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "C",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Feature",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "D": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "5fc1f9cbf7626ea68280c6c99ab8c72a19a2985821890ae1c563bf234e07177b",
+      "patch_bytes": 5767,
+      "workflow_status": null,
+      "usage": {
+        "requests": 27,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 994777,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 8811,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 550400,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 4252,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 27
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 53,
+      "evaluation_tests_unobserved": false,
+      "run_id": "4f4ba393-36de-40db-8415-d9029e8ab20b",
+      "container_session": "template-dev-33aa89e0-ae65-4a2e-9e2b-f8c5c6ad42fd",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 8493.0,
+        "agent_execution_ms": 259958.53962499835,
+        "capture_ms": 634.4644159991294,
+        "cleanup_ms": 177.7177090011537,
+        "post_execution_overhead_ms": 886.0,
+        "full_observed_slot_ms": 269337.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 259637.18016699888,
+        "native_cleanup_ms": 265.808083999902,
+        "native_elapsed_ms": 259902.98908299953,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      },
+      "official_result_sha256": "597b72da1430694f9e8f0efacee1b23450b725ab6b353a0dd887cbd65d0f78d1",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": false,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 18,
+      "original_slot": 48,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "T",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Feature",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "D": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "d8b53fdfd705350a359f6fdb3022ba50ef2648bcb84ab65a175c7e4b8f8d00f5",
+      "patch_bytes": 5250,
+      "workflow_status": "incomplete",
+      "usage": {
+        "requests": 22,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 813535,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 9227,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 78336,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 5383,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 22
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 1,
+        "actions": {
+          "investigate": 1
+        },
+        "result_present": true,
+        "usable": false,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": 60644.66761099998,
+        "patch_bytes": 0,
+        "preparation_started": true,
+        "limitation": "Dependency copy exceeds first-version bounds",
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 53,
+      "evaluation_tests_unobserved": false,
+      "run_id": "6210efd3-fb76-4450-98d8-050a22c364f3",
+      "container_session": "template-dev-6b481ac4-334a-44e4-b9bf-548ce10ac6d5",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 8461.0,
+        "agent_execution_ms": 485709.4387499988,
+        "capture_ms": 1399.8126670010388,
+        "cleanup_ms": 340.8826249986887,
+        "post_execution_overhead_ms": 1806.0,
+        "full_observed_slot_ms": 495976.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 485389.59449999966,
+        "native_cleanup_ms": 270.6353339999914,
+        "native_elapsed_ms": 485660.2314170003,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      },
+      "official_result_sha256": "709370e3bbbe2198fe71f24b7db9159e517b3fb1bb98e7f6a829272b972a8f03",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": false,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true,
+          "task_terminal_captured": true,
+          "task_tools_termination_verified": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 19,
+      "original_slot": 49,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "C",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "D": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "34fe98e2af3dcdc1eafe072943318fc82885cfa2a5f11a19c4180309463c0d6f",
+      "patch_bytes": 1888,
+      "workflow_status": null,
+      "usage": {
+        "requests": 41,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 3099125,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 9253,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 2104320,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 5033,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 41
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 35,
+      "evaluation_tests_unobserved": false,
+      "run_id": "dd5a0fc8-43be-4a86-b937-6bc39a2c0f8f",
+      "container_session": "template-dev-fa216535-d65a-4ffc-9fdc-3d850fa3fff5",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 28447.0,
+        "agent_execution_ms": 975586.2836250011,
+        "capture_ms": 1040.3908329997212,
+        "cleanup_ms": 361.7567919995636,
+        "post_execution_overhead_ms": 1472.0,
+        "full_observed_slot_ms": 1005506.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 975271.3469580002,
+        "native_cleanup_ms": 258.3068750016391,
+        "native_elapsed_ms": 975529.6549580004,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      },
+      "official_result_sha256": "6426390f7110e0b06ebb399bd17e13179bc9dc01866b19b8921dcb616cd4214d",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": true,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 20,
+      "original_slot": 50,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "T",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "D": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "8d55182d57bd8eb2bc3ab189a7397fb0897fd8db75435138f19d50456c974b62",
+      "patch_bytes": 1886,
+      "workflow_status": "incomplete",
+      "usage": {
+        "requests": 46,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 3828588,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 10267,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 172544,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 5132,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 46
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 35,
+      "evaluation_tests_unobserved": false,
+      "run_id": "8dc7dded-3a22-492a-8b58-dc839f88d27e",
+      "container_session": "template-dev-773da692-9556-413c-a82d-efe5a9c156a7",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 20748.0,
+        "agent_execution_ms": 1457898.7985840011,
+        "capture_ms": 1329.8032079990953,
+        "cleanup_ms": 616.0361250005662,
+        "post_execution_overhead_ms": 2015.0,
+        "full_observed_slot_ms": 1480663.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 1457582.3812080007,
+        "native_cleanup_ms": 259.5284160003066,
+        "native_elapsed_ms": 1457841.9111659992,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      },
+      "official_result_sha256": "6c725962d257297233a5f2911d0abd2eac477178d558c4ac3a71726e57a1218d",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": true,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true,
+          "task_terminal_captured": true,
+          "task_tools_termination_verified": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 21,
+      "original_slot": 51,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "P",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "D": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "11a108f0fda1d7fc030a4ce4235698624c2abad97e9c824d75805b2e1369f697",
+      "patch_bytes": 1899,
+      "workflow_status": null,
+      "usage": {
+        "requests": 44,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 3275563,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 12754,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 2245632,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 8019,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 44
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 35,
+      "evaluation_tests_unobserved": false,
+      "run_id": "8a3c25f0-406b-4002-8e92-681399743cb5",
+      "container_session": "template-dev-997f4593-6619-4f08-a374-176cd23d1f1c",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 20547.0,
+        "agent_execution_ms": 814420.0083749983,
+        "capture_ms": 1000.4640830010176,
+        "cleanup_ms": 360.29045799933374,
+        "post_execution_overhead_ms": 1430.0,
+        "full_observed_slot_ms": 836398.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 814105.7540410012,
+        "native_cleanup_ms": 259.98820799961686,
+        "native_elapsed_ms": 814365.7436250001,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      },
+      "official_result_sha256": "d567df5598b7495e11e43e89fbe80ea108496673003a98a0411d0fbd768b23ea",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": true,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 22,
+      "original_slot": 58,
+      "instance_id": "coder__code-server-3277",
+      "arm": "C",
+      "repo": "coder/code-server",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "D": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "0c68419c2c5b506bf4fcffebaea575d36f8da271a24e7b4325fedc67c79a8148",
+      "patch_bytes": 3337,
+      "workflow_status": null,
+      "usage": {
+        "requests": 43,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 2051612,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 11079,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 1319936,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 4344,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 43
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 55,
+      "evaluation_tests_unobserved": false,
+      "run_id": "a3d73bf4-7087-4f73-9bc6-01a714d502b5",
+      "container_session": "template-dev-b63eb020-bb35-4ede-8174-5544ce3c528a",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 22635.0,
+        "agent_execution_ms": 1092987.5639169998,
+        "capture_ms": 1303.5838750004768,
+        "cleanup_ms": 312.8557909987867,
+        "post_execution_overhead_ms": 1681.0,
+        "full_observed_slot_ms": 1117304.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 1092655.0308330003,
+        "native_cleanup_ms": 279.00570799969137,
+        "native_elapsed_ms": 1092934.0382910017,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      },
+      "official_result_sha256": "bab1c27b3d33df2a4725ad67dabb5df6e50e5065a9f0244fb6eb88208d1b38f4",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": false,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 23,
+      "original_slot": 59,
+      "instance_id": "coder__code-server-3277",
+      "arm": "T",
+      "repo": "coder/code-server",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": false,
+      "T": false,
+      "D": false,
+      "artifact_kind": "partial",
+      "evaluation_status": "official_result",
+      "native_completed": false,
+      "pending_tools": 2,
+      "strict_patch_applicable": true,
+      "patch_sha256": "18e470459b2fad78b8f25813b2d755e5705fb4666fb3098eee1fcd6c6a714aa9",
+      "patch_bytes": 5723,
+      "workflow_status": null,
+      "usage": {
+        "requests": 36,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 2429497,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 15236,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 148480,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 8339,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 36
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 54,
+      "evaluation_tests_unobserved": false,
+      "run_id": "6c62bf85-e02e-4009-8d2f-c9bbffc08951",
+      "container_session": "template-dev-da7c7010-14a2-40c7-b834-45e3dec5288f",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 19911.0,
+        "agent_execution_ms": 1800001.325666001,
+        "capture_ms": 1709.176375001669,
+        "cleanup_ms": 516.9310420006514,
+        "post_execution_overhead_ms": 2753.0,
+        "full_observed_slot_ms": 1822667.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 1799955.7325410005,
+        "native_cleanup_ms": 458.498041998595,
+        "native_elapsed_ms": 1800414.2321660016,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      },
+      "official_result_sha256": "07d621115b58363f205a4a02cfa3b3a839640952a5565378cd85e8c774c1ce52",
+      "raw_collector_verdict": {
+        "delivery": false,
+        "D": false,
+        "artifact_kind": "partial"
+      },
+      "delivery": false,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": false,
+          "main_sessions_normally_completed": null,
+          "main_tools_settled": null,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true,
+          "task_terminal_captured": null,
+          "task_tools_termination_verified": null
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    },
+    {
+      "slot": 24,
+      "original_slot": 60,
+      "instance_id": "coder__code-server-3277",
+      "arm": "P",
+      "repo": "coder/code-server",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "D": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "855cbc02b8a6969ae8ee825c2755885ce0f09a3ba36f4695f99713215fbc623c",
+      "patch_bytes": 764,
+      "workflow_status": null,
+      "usage": {
+        "requests": 21,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 785897,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 6480,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 338944,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 2127,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 21
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      },
+      "observed_tests": 54,
+      "evaluation_tests_unobserved": false,
+      "run_id": "448d0cbe-cc2d-4237-b83b-ba6e60470e5b",
+      "container_session": "template-dev-189115ad-4354-42c6-abb8-41dc8b77530c",
+      "patch_roundtrip_verified": true,
+      "timing": {
+        "slot_created": true,
+        "preliminary_preparation_ms": 19106.0,
+        "agent_execution_ms": 190849.0629580021,
+        "capture_ms": 1300.8158749975264,
+        "cleanup_ms": 309.0692500025034,
+        "post_execution_overhead_ms": 1675.0,
+        "full_observed_slot_ms": 211630.0,
+        "full_observed_slot_complete": true,
+        "native_execution_ms": 190514.19754099846,
+        "native_cleanup_ms": 278.7847499996424,
+        "native_elapsed_ms": 190792.98383300006,
+        "source": "started/completed.json and stop-verification.json timing; result.json native fields"
+      },
+      "preparation_status": "ready",
+      "preparation_exclusion_reason": null,
+      "not_started_cause": null,
+      "capture_origin": "model_execution",
+      "prediction_exported": true,
+      "task_workflow_errors": [],
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      },
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      },
+      "official_result_sha256": "07d621115b58363f205a4a02cfa3b3a839640952a5565378cd85e8c774c1ce52",
+      "raw_collector_verdict": {
+        "delivery": true,
+        "D": false,
+        "artifact_kind": "terminal"
+      },
+      "delivery": true,
+      "delivery_evidence": {
+        "checks": {
+          "native_main_completed": true,
+          "main_sessions_normally_completed": true,
+          "main_tools_settled": true,
+          "termination_verified": true,
+          "capture_saved": true,
+          "forwarding_closed": true,
+          "relay_removed": true,
+          "provider_handlers_settled": true,
+          "M_roundtrip_verified": true,
+          "M_strictly_applicable": true
+        },
+        "scope": "Parent and main author completion, applicable round-tripped M, native terminal delivery and verified shutdown. Investigator finish and internal workflow status are separate; missing required proof is unknown.",
+        "binding_conflicts": []
+      }
+    }
+  ],
+  "comparisons": {
+    "T-P": {
+      "R": {
+        "wins": 1,
+        "losses": 1,
+        "ties": 6,
+        "unknown": 0,
+        "paired_tasks": 8,
+        "delta_pp": 0.0,
+        "ci95_pp": [
+          -37.5,
+          37.5
+        ],
+        "interval_method": "paired percentile bootstrap; 100000 resamples; seed 20260929",
+        "exact_mcnemar_p": 1.0,
+        "interval_degenerate": false
+      },
+      "D_bench": {
+        "wins": 1,
+        "losses": 1,
+        "ties": 6,
+        "unknown": 0,
+        "paired_tasks": 8,
+        "delta_pp": 0.0,
+        "ci95_pp": [
+          -37.5,
+          37.5
+        ],
+        "interval_method": "paired percentile bootstrap; 100000 resamples; seed 20260929",
+        "exact_mcnemar_p": null,
+        "interval_degenerate": false
+      }
+    },
+    "C-P": {
+      "R": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 7,
+        "unknown": 0,
+        "paired_tasks": 8,
+        "delta_pp": -12.5,
+        "ci95_pp": [
+          -37.5,
+          0.0
+        ],
+        "interval_method": "paired percentile bootstrap; 100000 resamples; seed 20260929",
+        "exact_mcnemar_p": null,
+        "interval_degenerate": false
+      },
+      "D_bench": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 7,
+        "unknown": 0,
+        "paired_tasks": 8,
+        "delta_pp": -12.5,
+        "ci95_pp": [
+          -37.5,
+          0.0
+        ],
+        "interval_method": "paired percentile bootstrap; 100000 resamples; seed 20260929",
+        "exact_mcnemar_p": null,
+        "interval_degenerate": false
+      }
+    },
+    "T-C": {
+      "R": {
+        "wins": 1,
+        "losses": 0,
+        "ties": 7,
+        "unknown": 0,
+        "paired_tasks": 8,
+        "delta_pp": 12.5,
+        "ci95_pp": [
+          0.0,
+          37.5
+        ],
+        "interval_method": "paired percentile bootstrap; 100000 resamples; seed 20260929",
+        "exact_mcnemar_p": null,
+        "interval_degenerate": false
+      },
+      "D_bench": {
+        "wins": 1,
+        "losses": 0,
+        "ties": 7,
+        "unknown": 0,
+        "paired_tasks": 8,
+        "delta_pp": 12.5,
+        "ci95_pp": [
+          0.0,
+          37.5
+        ],
+        "interval_method": "paired percentile bootstrap; 100000 resamples; seed 20260929",
+        "exact_mcnemar_p": null,
+        "interval_degenerate": false
+      }
+    }
+  },
+  "leave_one_repository_out": {
+    "coder/code-server": {
+      "wins": 1,
+      "losses": 1,
+      "ties": 5,
+      "unknown": 0,
+      "paired_tasks": 7,
+      "delta_pp": 0.0,
+      "scope": "Descriptive primary T/P resolved sensitivity; unobserved pairs remain unknown."
+    },
+    "microsoft/vscode": {
+      "wins": 1,
+      "losses": 1,
+      "ties": 4,
+      "unknown": 0,
+      "paired_tasks": 6,
+      "delta_pp": 0.0,
+      "scope": "Descriptive primary T/P resolved sensitivity; unobserved pairs remain unknown."
+    },
+    "mrdoob/three.js": {
+      "wins": 0,
+      "losses": 1,
+      "ties": 6,
+      "unknown": 0,
+      "paired_tasks": 7,
+      "delta_pp": -14.285714285714286,
+      "scope": "Descriptive primary T/P resolved sensitivity; unobserved pairs remain unknown."
+    },
+    "mui/material-ui": {
+      "wins": 1,
+      "losses": 1,
+      "ties": 4,
+      "unknown": 0,
+      "paired_tasks": 6,
+      "delta_pp": 0.0,
+      "scope": "Descriptive primary T/P resolved sensitivity; unobserved pairs remain unknown."
+    },
+    "serverless/serverless": {
+      "wins": 1,
+      "losses": 0,
+      "ties": 5,
+      "unknown": 0,
+      "paired_tasks": 6,
+      "delta_pp": 16.666666666666668,
+      "scope": "Descriptive primary T/P resolved sensitivity; unobserved pairs remain unknown."
+    }
+  },
+  "batch": {
+    "status": "finished",
+    "stop": null,
+    "started_at": "2026-09-30T23:20:07.508889+00:00",
+    "finished_at": "2026-10-01T04:09:00.725261+00:00",
+    "elapsed_seconds": 17333.204691542,
+    "full_observed_slot_seconds": 15507.709,
+    "unallocated_wall_seconds": 1825.495691541999,
+    "incomplete_created_slot_intervals": 0,
+    "controller_residual_seconds": 1825.495691541999,
+    "unallocated_scope": "Batch wall less complete observed slot intervals. Includes pre-slot verification and controller work; if a created slot lacks its completed receipt, also includes that slot's unmeasured interval. Only a residual, not an instrumented controller duration."
+  },
+  "evaluation_processes": {
+    "P": {
+      "exit_code": 0,
+      "elapsed_seconds": 789.3397099971771
+    },
+    "C": {
+      "exit_code": 0,
+      "elapsed_seconds": 786.022531747818
+    },
+    "T": {
+      "exit_code": 0,
+      "elapsed_seconds": 788.7990601062775
+    }
+  },
+  "delivery_method": "Receipt-derived operational delivery; frozen collector verdict retained per slot. The collector demanded stop from all native sessions, including internal investigator; reporting binds parent/author instead, without changing R, M, runtime or statistical methods."
+}
