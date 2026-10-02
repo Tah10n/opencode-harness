@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "campaign": "evidence-backed-core-development-v1",
+  "checked_at": "2026-10-02T05:06:22.196294+00:00",
+  "owned_resource_cleanup_complete": true,
+  "private_evidence_archive": {
+    "archive": "polybench-evidence-backed-core-evidence-20261002T044558Z.tar.gz",
+    "sha256": "86d7321ae9ba2e26fa02e603638d749c24944242fb9beacecfdbfeee7abab9d0",
+    "bytes": 274436147,
+    "manifest_sha256": "ce33eab5ae1aa965c18c120b255dc3080ac8aa47d06fb3dce59436c3334eec25",
+    "verified_files": 3702,
+    "verification": "Every member read back and checked against file SHA256/mode or symlink target; independently restored incremental Git bundle at exact C0 prerequisite",
+    "git_head": "faa140efe4e1ab618e89f8180c2bc936b068b833",
+    "recovery_verified": true
+  },
+  "filesystem": {
+    "total_freed_target_allocated_bytes": 21029335040,
+    "deleted_targets_verified_absent": true,
+    "verified_archived_entries_before_deletion": 3167,
+    "remaining_private_directory_allocated_bytes": 130527232,
+    "preserved_started_slots": 18,
+    "meaning": "Verified target allocated blocks; do not add to Docker logical reclamation or claim all concurrent host free-space change"
+  },
+  "docker": {
+    "own_images_removed": 14,
+    "own_images_verified_absent": true,
+    "own_containers_remaining": 0,
+    "own_volumes_created": 0,
+    "own_build_history_removed": 8,
+    "own_build_cache_records_removed": 106,
+    "own_build_cache_records_remaining": 0,
+    "foreign_cache_ids_targeted": 0,
+    "preexisting_image_ids_targeted": 0,
+    "build_cache_logical_reclaimed": "15.92GB",
+    "space_accounting": "Docker logical reclaimed size is separate from filesystem allocated-block savings and is not physical host disk reduction",
+    "preexisting_images_present_at_final_check": 26,
+    "preexisting_images_absent_at_final_check": 3,
+    "preexisting_containers_present_at_final_check": 32,
+    "preexisting_volumes_present_at_final_check": 52,
+    "initial_resources_already_absent_before_assigned_cleanup": {
+      "images": 3,
+      "containers": 5,
+      "volumes": 1
+    },
+    "inventory_note": "Only14 new proven owned image IDs and106 new proven owned cache IDs were targeted. Initial inventories can change independently; continued presence is claimed only where verified. Three other new image IDs were preserved.",
+    "other_new_images_preserved": 3
+  },
+  "preserved": {
+    "historical_public_campaigns_unchanged": true,
+    "historical_private_archives": [
+      {
+        "archive": "polybench-consolidated-evidence-20260930.tar.gz",
+        "sha256": "785518ca4bb4a4f4726f6af57f0e588c615e42124f4d2a6f14c9b2a3e6d60ee0",
+        "unchanged": true
+      },
+      {
+        "archive": "polybench-remaining-evidence-20261001T050450Z.tar.gz",
+        "sha256": "1c3c667ae5384161f4f91af18ee7a5a0ec9dfd65a345bf94fc365fb5c5a1a227",
+        "unchanged": true
+      }
+    ],
+    "shared_root_and_sensitivity_node_modules": "preserved",
+    "foreign_or_in_use_resources": "not targeted",
+    "private_audit_and_admission_metadata": "Retained for raw archive recovery, provenance, complete native deadline/stop records and once-only refusal. Raw duplicate captures were removed; restore the private archive for re-collection.",
+    "working_branch": "Retained until required qualifying review, actual CI and protected merge; feat/evidence-backed-core is the sole branch assigned for later removal."
+  }
+}

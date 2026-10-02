@@ -29,6 +29,17 @@ costs are in [RESULTS](RESULTS.md); no independent quality confirmation ran.
 
 ## Verification of this consolidation
 
+The latest development closure has a [local verification receipt](../evaluation/polybench/campaigns/evidence-backed-core-development-v1/verification.json):
+all 20 model-free groups passed after H1 withdrawal; installed OpenCode 1.18.26
+passed 35 task scenarios with 268 scripted requests and zero real provider calls.
+The source tree and preserved byte-exact candidate diff received a bounded
+independent read-only semantic review. This is separate from the qualifying
+GitHub approval and required CI at the actual publication head.
+The [cleanup receipt](../evaluation/polybench/campaigns/evidence-backed-core-development-v1/cleanup.json)
+binds verified raw evidence recovery and removal of owned disposable resources.
+
+The following receipt describes the earlier consolidation, not this new head.
+
 The PR and its required **Harness verification** check are the version-bound
 technical receipt: [PR #25](https://github.com/Tah10n/opencode-harness/pull/25).
 A check is evidence only when its job actually executes and passes at the

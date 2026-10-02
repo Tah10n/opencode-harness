@@ -180,4 +180,15 @@ Required project checks, PR review/CI and integration are technical publication
 evidence, not quality confirmation. Private raw evidence is retained through
 verified recovery archival; cleanup removes only this assignment's disposable
 resources and preserves previous archives and preexisting resources. The
-cleanup receipt records actual retained artifacts and released space separately.
+[cleanup receipt](cleanup.json) records actual retained artifacts and released
+space separately. [Local verification](verification.json) reports all 20 passed
+model-free groups, installed OpenCode's 35 task scenarios, and the bounded
+semantic review. The private archive is 274,436,147 bytes, SHA-256
+`86d7321ae9ba2e26fa02e603638d749c24944242fb9beacecfdbfeee7abab9d0`;
+all 3,702 archived files were read back with byte/mode or symlink verification.
+An independent shallow C0 clone restored the incremental development Git bundle.
+Cleanup removed 21,029,335,040 allocated bytes of owned filesystem copies,
+14 owned images, eight build records and 106 cache records. Docker separately
+reported 15.92 GB logical cache reclamation; that is not added to filesystem
+savings or called physical host disk reduction. Earlier archives, shared project
+dependencies, foreign resources and all 18 once-only start/stop guards remain.
