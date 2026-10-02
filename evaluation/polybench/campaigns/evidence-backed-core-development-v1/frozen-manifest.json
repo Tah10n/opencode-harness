@@ -1,0 +1,579 @@
+{
+  "version": 1,
+  "stage": "frozen_before_model_requests",
+  "runtimeSha": "8253fa1c739b43917799f5c23ccffdf1dea618f6",
+  "evaluatorSha": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+  "datasetRevision": "b3fca77b637379f0c01ad86d18753a7ac1998b53",
+  "datasetSha256": "0c8138e73c34fa29a5276b675b146b72d78ce001fcc4560d76302c908b4808a5",
+  "selectedCsvSha256": "0b9e525cd1b74e428c78511ba4ce899492c6a7a631d374339b08e106b5b9ed03",
+  "freezeSha256": "fae2df856e7d4fff531f4fef8806191b8357063c4b16bb7e478f2980f8e5b706",
+  "model": "openai/gpt-5.6-luna",
+  "opencode": "1.18.26",
+  "reasoning": "high",
+  "budgetSeconds": 1800,
+  "flags": {
+    "STRATEGY": "direct",
+    "CONTEXT": 0,
+    "CHECKS": 0,
+    "TYPE_COMPAT": 0,
+    "SENSITIVITY": 0,
+    "INVESTIGATION": {
+      "P": "absent",
+      "C0": "absent",
+      "H1": "absent"
+    },
+    "COMMAND_HINTS": 0,
+    "EXTRA_ATTENTION": 0,
+    "PRESERVATION_NUDGE": 0
+  },
+  "tasks": [
+    {
+      "instance_id": "mrdoob__three.js-24461",
+      "repo": "mrdoob/three.js",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "9e5512f067e3a0de8d4069217d20903c1725edf7",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mrdoob__three.js-24461:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mrdoob__three.js-24461@sha256:471c97480b9ca2880b65cc450a439a44a12cd18fc0ce7d5efec815f2100549fe",
+        "id": "sha256:471c97480b9ca2880b65cc450a439a44a12cd18fc0ce7d5efec815f2100549fe",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 11811417284,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:bbe32fd3a7c4cb0f2b477458a48639593a1bf66ae2230dfa397f082a98881892",
+      "projectNode": "v16.20.2",
+      "npm": "8.19.4",
+      "promptSha256": "a8dc3eede682a14398525fb92ba4f32c24138ac7cbc35d72e5df96097b65cda9",
+      "originalRowCsvSha256": "50d61210a0add03247fe90f56a250da4444902b8e5e631867813c984f4510861",
+      "lfsAuditSha256": "e75fe4f599cf01a2e230695a47dd0f85555363a0dffcc7c147723def1db6721b",
+      "archives": {
+        "base.tar": "1b1c8feb275a75377bbebdff6caf175ebff19e5af51a59c1440e09a5949f966a",
+        "dependencies.tar": "7a55185724f6dddad4da06b4fc9a1570af8c2f8b225eb0b53c87b90db2c85054"
+      },
+      "submodules": [],
+      "preparedExtra": null,
+      "controls": {
+        "gold": {
+          "resultSha256": "538c7a78acd09947f2a13394b35ce3175b0da36f14c622c7a2ec4c0c71ce805c",
+          "resolved": true,
+          "passed": 718,
+          "failed": 897
+        },
+        "baseline": {
+          "resultSha256": "731d4a9bda748278844d97ce153a744721c8e2c05eb751f90e683bd7942275e8",
+          "resolved": false,
+          "passed": 716,
+          "failed": 899
+        }
+      },
+      "scriptedPreflightSha256": "13d669027f8f26bc6a7c4d5286101134af7e188c77b7396c474a4d11d6973fcd",
+      "isolationSha256": "baf9656ff6788d0d9f8db50422bb349e1b6ace3f8ad1c75eaf2a222e90607db9"
+    },
+    {
+      "instance_id": "serverless__serverless-8159",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Feature",
+      "base_commit": "56aa5aa15abed64db6758aecd8c27719928b5a14",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-8159:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.serverless__serverless-8159@sha256:2dd61c66aa6d749677ce6e323e803cdc161305b6b3907b31c576e3cf2716006a",
+        "id": "sha256:2dd61c66aa6d749677ce6e323e803cdc161305b6b3907b31c576e3cf2716006a",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 5714079222,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:b58b8cffeba0912d26d95f5efc615ef1ea885f1484095568551e0443c25c41d5",
+      "projectNode": "v16.20.2",
+      "npm": "8.19.4",
+      "promptSha256": "0c2f5a295e857a0ec4423015d4079b52fcabdd32b25de89dabf30b3dcd332416",
+      "originalRowCsvSha256": "427795c3fdb948a42af74e7f710e8c18369c2833328080ccb0ed202f316c3f8c",
+      "lfsAuditSha256": "c2b2148887d2baf3642353aad335a833c1cfb0f1ae954601774915c0f1c3742f",
+      "archives": {
+        "base.tar": "5b4e9a6aef5e147109cc75cf79bf0b4ba9af922c87abf4ba5af15f3ffdd71843",
+        "dependencies.tar": "e81f18552e0233e8ca63b23b23da608124d85d32c82d650a0f3f23534214210a"
+      },
+      "submodules": [],
+      "preparedExtra": null,
+      "controls": {
+        "gold": {
+          "resultSha256": "de69f5d01b9601a164cda6b20ebf984ef1a6a367e351457a75e192cb6013d8c6",
+          "resolved": true,
+          "passed": 52,
+          "failed": 0
+        },
+        "baseline": {
+          "resultSha256": "cc0172f74e5944103f9bd7b38d5b0934962cd53b677349e255094b89593c4e27",
+          "resolved": false,
+          "passed": 51,
+          "failed": 1
+        }
+      },
+      "scriptedPreflightSha256": "13d669027f8f26bc6a7c4d5286101134af7e188c77b7396c474a4d11d6973fcd",
+      "isolationSha256": "b7eeb86864be45885d1b6a22b37b4811a212af5ec1b02a4af0d3d8aa5cedefbc"
+    },
+    {
+      "instance_id": "mui__material-ui-42412",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "b8a28e13dc0821314700f1aefc9f8e1134cf9034",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-42412:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-42412@sha256:aeaa51c590fab5a5711ae1ca2e1c2bd35e0976bb328b3651f97a69d265ad4658",
+        "id": "sha256:aeaa51c590fab5a5711ae1ca2e1c2bd35e0976bb328b3651f97a69d265ad4658",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 14184018062,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:15f7cfcb791cdc12caeeefe8042dc4f1d9984f30e1b76d9f1fc51a911b750810",
+      "projectNode": "v18.20.8",
+      "npm": "10.8.2",
+      "promptSha256": "31b630fdc97c647c150efb6cc566fe7b3a835ef32869111c0fe9bd7ecc77ebb4",
+      "originalRowCsvSha256": "c109b5f09eb9a299df03a4ef7c8e0b85b785306c0dc0a6b63199325c46a42d38",
+      "lfsAuditSha256": "c361b88db79a36366743bfc338aa26993b341f7a2a67a148347f191bdf3e1ba5",
+      "archives": {
+        "base.tar": "6c37b14102abf94b2d0d0091e018457cb0fce0e01872271deeef6d2381379218",
+        "dependencies.tar": "a479ab37e7c996422d28833c40117436baf04ae845494430371ec78c9011299c"
+      },
+      "submodules": [],
+      "preparedExtra": null,
+      "controls": {
+        "gold": {
+          "resultSha256": "b73d7d7af8154ca5376ac639eb9bd1c4067241053a2e8076226b0998e1dd4020",
+          "resolved": true,
+          "passed": 4,
+          "failed": 0
+        },
+        "baseline": {
+          "resultSha256": "acdaa40957a27e1ee8039e59b674d843dea811f78f7811c50f03cc315dd79890",
+          "resolved": false,
+          "passed": 3,
+          "failed": 1
+        }
+      },
+      "scriptedPreflightSha256": "13d669027f8f26bc6a7c4d5286101134af7e188c77b7396c474a4d11d6973fcd",
+      "isolationSha256": "057b703dbd97ed1a49070bf548f5036fc6a1356b4936909ff50ed04000d5162d"
+    },
+    {
+      "instance_id": "microsoft__vscode-108964",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "13b3c937dc5e3816c79bdd2cdf2cdf6f9c727b75",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-108964:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-108964@sha256:736f9ebdd28a1fc778d148ef494c12ad6beed8513f267596761068c18c4e370f",
+        "id": "sha256:736f9ebdd28a1fc778d148ef494c12ad6beed8513f267596761068c18c4e370f",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 10579073201,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:763e9545076964406f40b88e9970ee4ec404a2c80770ab42eb01db21a3e60883",
+      "projectNode": "v12.22.12",
+      "npm": "6.14.16",
+      "promptSha256": "b02a68ed72f2048380ccf7d93badbc64d3ca3195dde1f79bd95faf92b2ca0ecf",
+      "originalRowCsvSha256": "58ed8e6ab4f195f8f5c1ab0d025a79561bba193fda5990c55dbdd224985d3c41",
+      "lfsAuditSha256": "680dc24f39b6c6b215c04e0a197049f6e2a474df01010fba953dbb6daf66876f",
+      "archives": {
+        "base.tar": "7bbfd7693b51453330644697d0d2f038c1252b6cca3d43986de0dae75e720900",
+        "dependencies.tar": "faec61265c5978625a87086ae5b831e635ce885d88ec3b6395bb5797deed1c5a"
+      },
+      "submodules": [],
+      "preparedExtra": {
+        "directories": [
+          ".build/electron"
+        ],
+        "sha256": "2a16e5edbf1b18f1167b1520702b320bc337c284a31239df8e4d3aa71a3a927e",
+        "version": "9.3.2",
+        "preparation": "node build/lib/electron",
+        "reason": "Published image lacks required Electron binary; downloaded by unchanged original project script before offline evaluation."
+      },
+      "controls": {
+        "gold": {
+          "resultSha256": "76e91f8e750de6414601924189acff44cbb41149b442e8df52dd4d724c0a762c",
+          "resolved": true,
+          "passed": 34,
+          "failed": 0
+        },
+        "baseline": {
+          "resultSha256": "fb2d94f90b7ac7a14a43fc1c214121ebcb32f63056db19a6373acaf001207d23",
+          "resolved": false,
+          "passed": 33,
+          "failed": 1
+        }
+      },
+      "scriptedPreflightSha256": "13d669027f8f26bc6a7c4d5286101134af7e188c77b7396c474a4d11d6973fcd",
+      "isolationSha256": "38241cf4a8b89b57441c1e2fc362cbca1c4b1fa31cf798469ed2c1a65862a7ce"
+    },
+    {
+      "instance_id": "mui__material-ui-18683",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "dfe2779b8b6499ccd1922990ac9178d84e02f8b6",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-18683:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-18683@sha256:4080f04c5ba9c212a34c158caca31960f325608b0c6755497602be4f2a9ff4e0",
+        "id": "sha256:4080f04c5ba9c212a34c158caca31960f325608b0c6755497602be4f2a9ff4e0",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 8886694890,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:7549c7987d033545656d710d8bb6d44ea1f19636231e32e3c7138bd9d7f671a6",
+      "projectNode": "v18.8.0",
+      "npm": "8.18.0",
+      "promptSha256": "e96fecaa61812a00b3f880273235939ed35667385eab699a2a6162a0fb3e4566",
+      "originalRowCsvSha256": "e6aac23b45beebf0e375a855b25f8eefd4153f6719f62b004cbdbacdaa73dfb5",
+      "lfsAuditSha256": "eb0c45a79f61ec4e58017c67316fd9b2f12d0a98b515142907b3882c53511a6c",
+      "archives": {
+        "base.tar": "54f5039b64aa8f0ba58830fc8e28bca5d9d0f5608fcfd056b32647c9b111b3e5",
+        "dependencies.tar": "f33ce81ac3b41e5d65befce8381a9ae6e0d034555f8aead430f9924ad84e94b2"
+      },
+      "submodules": [],
+      "preparedExtra": null,
+      "controls": {
+        "gold": {
+          "resultSha256": "69314f2f27503d24d15427f127a64d36b7f9a30a8a723cb48477c58a88a6a2e2",
+          "resolved": true,
+          "passed": 25,
+          "failed": 0
+        },
+        "baseline": {
+          "resultSha256": "972cd3dc82f2cf1d432187d08e9a99c0b363cb384272c09d8138a5453efaf234",
+          "resolved": false,
+          "passed": 20,
+          "failed": 5
+        }
+      },
+      "scriptedPreflightSha256": "13d669027f8f26bc6a7c4d5286101134af7e188c77b7396c474a4d11d6973fcd",
+      "isolationSha256": "5cb6e0db53744a22380176cbe69335a7c5a8765e7ea58fbb5b2206340456a1b6"
+    },
+    {
+      "instance_id": "microsoft__vscode-135805",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "7d8f55ebb1b7ccb084f7e6969b6926519c5c80c3",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-135805:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.microsoft__vscode-135805@sha256:cde0971bc27970b586820216010344845a68b8694c9a3eaa2225d12c575188da",
+        "id": "sha256:cde0971bc27970b586820216010344845a68b8694c9a3eaa2225d12c575188da",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 9618823009,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:c098153aa0c3c98d164512a1c53764d2c75f3098c70768d449aa8eafff6c73c5",
+      "projectNode": "v14.21.3",
+      "npm": "6.14.18",
+      "promptSha256": "5bfefc63aa4733ed23fbcc264729838f85fc37dcd3b12ee449c73c16c269fb94",
+      "originalRowCsvSha256": "1816872a87948133f8f5a714c8af9a054bc47a17643167f687cffe311326d2eb",
+      "lfsAuditSha256": "82bfafad0aa26dad88e96ebaf6deb569ee1c3332b6dd6a2364e8eacbe30f0f9f",
+      "archives": {
+        "base.tar": "b09dc905600956aa24a6c4315736f848bbaab9c10b6801156ce488aaac3ec6f0",
+        "dependencies.tar": "ce5fbaf8c1f6bf1931ad930eac64121afa95fe4a84cf2d39454a7d7818eff1ef"
+      },
+      "submodules": [],
+      "preparedExtra": {
+        "directories": [
+          ".build/electron"
+        ],
+        "sha256": "94fe455dc10d44cd0575a9553b5c734c876bb88f52f83155aad7756822abb284",
+        "version": "13.5.1",
+        "preparation": "node build/lib/electron",
+        "reason": "Published image lacks required Electron binary; downloaded by unchanged original project script before offline evaluation."
+      },
+      "controls": {
+        "gold": {
+          "resultSha256": "67f9978137218be47136be6bc1a9a061080c432c5b20ed22182ef0f87791eb14",
+          "resolved": true,
+          "passed": 20,
+          "failed": 0
+        },
+        "baseline": {
+          "resultSha256": "e4c120412e459f0e84a94d7ee53f288f07fd61362eae8fe64b51e85e669fc582",
+          "resolved": false,
+          "passed": 18,
+          "failed": 2
+        }
+      },
+      "scriptedPreflightSha256": "13d669027f8f26bc6a7c4d5286101134af7e188c77b7396c474a4d11d6973fcd",
+      "isolationSha256": "e7ce6ea2b1b9bd0035c77d4ec9cdb90f540476b7cdef4be1cbe83517a93fc7e5"
+    }
+  ],
+  "slots": [
+    {
+      "slot": 1,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 2,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "C0",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 3,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "H1",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 4,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "C0",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 5,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "H1",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 6,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 7,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "H1",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 8,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 9,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "C0",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 10,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 11,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "C0",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 12,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "H1",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 13,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "C0",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 14,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "H1",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 15,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 16,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "H1",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 17,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 18,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "C0",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    }
+  ],
+  "realProviderRequestsBeforeFreeze": 0,
+  "campaign": "evidence-backed-core-development-v1",
+  "productSha": "8253fa1c739b43917799f5c23ccffdf1dea618f6",
+  "adapterSha": "cafabe91aa717776a94df93a1f74262c60ce1113",
+  "timeAccounting": {
+    "clarified_on": "2026-10-02",
+    "task_budget_seconds": 1800,
+    "timer_start": "existing taskStarted after preliminary host container/input preparation",
+    "preparation_excludes": [
+      "model requests",
+      "task solving",
+      "agent-selected actions"
+    ],
+    "execution_includes": [
+      "OpenCode startup",
+      "parent/title requests",
+      "author work",
+      "project commands",
+      "ordinary native delegation if used",
+      "checks",
+      "final delivery"
+    ],
+    "preliminary_preparation": "started.at -> timing.taskStarted.at",
+    "agent_execution": "timing.taskStarted -> timing.forwardingClosed",
+    "capture": "timing.captureStarted -> timing.captureFinished",
+    "cleanup": "timing.cleanupStarted -> timing.cleanupFinished",
+    "post_execution_overhead": "timing.forwardingClosed -> completed.at",
+    "full_slot": "started.at -> completed.at; missing completion is incomplete",
+    "unknown_boundaries": "null; never reconstruct or subtract post-start delays",
+    "deadline_mechanism": "unchanged",
+    "applies_to": [
+      "P",
+      "C0",
+      "H1"
+    ]
+  },
+  "planSha256": "4216c364385777d20a5c548d78178538002df7d291deffb97577165ea0e0cf8e",
+  "recordingProfile": "research-full-inspect-ledger-1g-v1",
+  "installedHashes": {
+    "bundle": "824131fd1b43892711ea37fb7305300ca223c5d56c6875ce041b367ee9fcb488",
+    "plain-dependencies": "8f127e4f53502e47188d350cfcff639844d7d17f847abb18e507079e42f19140",
+    "core-bundle": "74bf53f5b6599484c9bea30c9ffcd833a89b10dc76ae3f6f90ac4a7e4a0297bf",
+    "candidate-core-bundle": "10443f9279ef1116066d5d6c6b9365d352ba9f712b474927a8bb1a94b99a3243"
+  },
+  "armModes": {
+    "P": "plain",
+    "C0": "core",
+    "H1": "core"
+  },
+  "armProducts": {
+    "P": null,
+    "C0": "358cb0a3fecce7f8b3af75d7ae6d6d4052257c04",
+    "H1": "8253fa1c739b43917799f5c23ccffdf1dea618f6"
+  },
+  "armBundles": {
+    "P": {
+      "directory": "plain-dependencies",
+      "sha256": "8f127e4f53502e47188d350cfcff639844d7d17f847abb18e507079e42f19140",
+      "coreSha256": null
+    },
+    "C0": {
+      "directory": "core-bundle",
+      "sha256": "74bf53f5b6599484c9bea30c9ffcd833a89b10dc76ae3f6f90ac4a7e4a0297bf",
+      "coreSha256": "9adcc862446ac6c0e5a407ec89e2f65fe4a249aedcc34ba36f143f3589edd4f7"
+    },
+    "H1": {
+      "directory": "candidate-core-bundle",
+      "sha256": "10443f9279ef1116066d5d6c6b9365d352ba9f712b474927a8bb1a94b99a3243",
+      "coreSha256": "5bef7daac081b74078b92db8703400b35f6503cdaaf7ea3326f50796d412ff80"
+    }
+  },
+  "configurationSha256": "d16c89f0390b081948d75ece875c1c10b64a74c809dfe30d916afca875e47cf5",
+  "preparation": {
+    "mrdoob__three.js-24461": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": 72.98879408836365
+    },
+    "serverless__serverless-8159": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": 48.79141807556152
+    },
+    "mui__material-ui-42412": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": 238.66503596305847
+    },
+    "microsoft__vscode-108964": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": 132.12425804138184
+    },
+    "mui__material-ui-18683": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": 71.30408120155334
+    },
+    "microsoft__vscode-135805": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": 84.5274088382721
+    }
+  }
+}
