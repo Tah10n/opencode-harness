@@ -50,6 +50,36 @@ benchmarks do **not** establish a sustained quality advantage. Technical checks,
 benchmark scores and development examples are reported separately in
 [status](docs/STATUS.md) and [results](docs/RESULTS.md).
 
+## Evidence-backed core: development candidate rejected
+
+The fresh six-task screening evaluated Plain P, unchanged core C0 from
+`358cb0a3`, and H1 from `8253fa1c` using OpenCode 1.18.26,
+`openai/gpt-5.6-luna`, high, and the same 1,800-second total budget. H1 added a
+same-call observation of a changed configuration member and a needed retained
+member before choosing a new representation.
+
+| Mode | Official R | Autonomous delivery | D = R ∧ delivery | Requests | Input / output | Agent execution |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Plain P | 4/6 | 6/6 | 4/6 | 163 | 7,883,167 / 44,131 | 2,687.946 s |
+| Unchanged C0 | 3/6 | 6/6 | 3/6 | 162 | 8,117,132 / 46,846 | 2,700.663 s |
+| Candidate H1 | 3/6 | 6/6 | 3/6 | 221 | 13,668,992 / 68,959 | 4,452.398 s |
+
+H1 did not exceed either control. The sole H1/P difference has identical
+production patches and shifted official TAP test identities. H1/P D delta is
+−16.7 pp, descriptive 95% interval [−69.13, +51.62] pp. All 18 captures and
+official evaluations completed; three submissions were officially rejected.
+All 546 requests have usage; money is unknown. H1 used 65.6% more execution
+time and 73.4% more input than P. This known development set is not independent
+confirmation and establishes neither advantage nor equivalence.
+
+**The quality goal was not achieved.** H1 was removed from active instructions;
+its full diff and all results are retained. The result-grounded H2 proposal did
+not justify a new distinguishing public action, so H2 was not implemented or
+run. No candidate qualified for the 30-task confirmation; it was not started.
+See the [report](evaluation/polybench/campaigns/evidence-backed-core-development-v1/REPORT.md),
+[complete data](evaluation/polybench/campaigns/evidence-backed-core-development-v1/results.json)
+and [expenses](evaluation/polybench/campaigns/evidence-backed-core-development-v1/costs.json).
+
 ## A. Historical candidate 39def2ed: nine tasks
 
 The stopped consolidated-v1 ran 27 of 60 slots: nine tasks in all three modes.

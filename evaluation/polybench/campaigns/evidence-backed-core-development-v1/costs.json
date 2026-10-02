@@ -1,0 +1,793 @@
+{
+  "campaign": "evidence-backed-core-development-v1",
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "by_arm": {
+    "P": {
+      "requests": 163,
+      "input_tokens": 7883167,
+      "output_tokens": 44131,
+      "cached_tokens": 4467712,
+      "reasoning_tokens": 22273,
+      "unknown_usage_requests": 0,
+      "task_runs": 6,
+      "roles": {
+        "title": {
+          "requests": 6,
+          "input_tokens": 6536,
+          "output_tokens": 494,
+          "cached_tokens": 0,
+          "reasoning_tokens": 419,
+          "unknown_usage_requests": 0
+        },
+        "author_parent": {
+          "requests": 157,
+          "input_tokens": 7876631,
+          "output_tokens": 43637,
+          "cached_tokens": 4467712,
+          "reasoning_tokens": 21854,
+          "unknown_usage_requests": 0
+        }
+      },
+      "money": null,
+      "agent_execution_seconds": 2687.945518207999,
+      "managed_termination_seconds": 1.5760874159996747,
+      "native_execution_including_termination_seconds": 2689.5216175009978,
+      "full_task_timer_through_capture_cleanup_seconds": 2701.0184392090014,
+      "capture_seconds": 8.575900000999392,
+      "cleanup_seconds": 2.2225365420001326,
+      "tool_calls": 320,
+      "sessions": 6,
+      "deadline_triggers": 0
+    },
+    "C0": {
+      "requests": 162,
+      "input_tokens": 8117132,
+      "output_tokens": 46846,
+      "cached_tokens": 4735488,
+      "reasoning_tokens": 23100,
+      "unknown_usage_requests": 0,
+      "task_runs": 6,
+      "roles": {
+        "title": {
+          "requests": 6,
+          "input_tokens": 6536,
+          "output_tokens": 488,
+          "cached_tokens": 0,
+          "reasoning_tokens": 411,
+          "unknown_usage_requests": 0
+        },
+        "author_parent": {
+          "requests": 156,
+          "input_tokens": 8110596,
+          "output_tokens": 46358,
+          "cached_tokens": 4735488,
+          "reasoning_tokens": 22689,
+          "unknown_usage_requests": 0
+        }
+      },
+      "money": null,
+      "agent_execution_seconds": 2700.66337671,
+      "managed_termination_seconds": 1.598220750001725,
+      "native_execution_including_termination_seconds": 2702.261609252,
+      "full_task_timer_through_capture_cleanup_seconds": 2713.9640432909987,
+      "capture_seconds": 8.613377626000089,
+      "cleanup_seconds": 2.3562452919989596,
+      "tool_calls": 365,
+      "sessions": 6,
+      "deadline_triggers": 0
+    },
+    "H1": {
+      "requests": 221,
+      "input_tokens": 13668992,
+      "output_tokens": 68959,
+      "cached_tokens": 8369152,
+      "reasoning_tokens": 36614,
+      "unknown_usage_requests": 0,
+      "task_runs": 6,
+      "roles": {
+        "title": {
+          "requests": 6,
+          "input_tokens": 6536,
+          "output_tokens": 477,
+          "cached_tokens": 0,
+          "reasoning_tokens": 403,
+          "unknown_usage_requests": 0
+        },
+        "author_parent": {
+          "requests": 200,
+          "input_tokens": 12835166,
+          "output_tokens": 60724,
+          "cached_tokens": 8166912,
+          "reasoning_tokens": 31624,
+          "unknown_usage_requests": 0
+        },
+        "child": {
+          "requests": 15,
+          "input_tokens": 827290,
+          "output_tokens": 7758,
+          "cached_tokens": 202240,
+          "reasoning_tokens": 4587,
+          "unknown_usage_requests": 0
+        }
+      },
+      "money": null,
+      "agent_execution_seconds": 4452.398285460001,
+      "managed_termination_seconds": 1.5632313770011532,
+      "native_execution_including_termination_seconds": 4453.961528833001,
+      "full_task_timer_through_capture_cleanup_seconds": 4465.960331208001,
+      "capture_seconds": 8.781481708999607,
+      "cleanup_seconds": 2.450254208000726,
+      "tool_calls": 451,
+      "sessions": 7,
+      "deadline_triggers": 0
+    }
+  },
+  "total": {
+    "task_runs": 18,
+    "requests": 546,
+    "input_tokens": 29669291,
+    "output_tokens": 159936,
+    "cached_tokens": 17572352,
+    "reasoning_tokens": 81987,
+    "unknown_usage_requests": 0,
+    "agent_execution_seconds": 9841.007180378001,
+    "full_task_timer_through_capture_cleanup_seconds": 9880.942813708
+  },
+  "subsets": "cached input and reasoning output are included subsets, not additional tokens",
+  "request_attribution": {
+    "method": "recorded prompt_cache_key linked to native session.id; parent_id distinguishes child; recorded requestKind distinguishes title",
+    "unattributed_work_requests": 0,
+    "raw_recording_hashes_verified": true,
+    "all_requests_model_effort_match": true,
+    "receipt_sha256": "fa037e59c18691e964a2b7286a6c142b486f7b1ee2a39a889a33d374b2e16677"
+  },
+  "preparation": {
+    "common_control_seconds_sum": 2252.0841720104218,
+    "author_input_preparation_seconds_sum": 648.4009962081909,
+    "meaning": "summed per-task preparation intervals outside the shared task timer; not CLI wall time"
+  },
+  "official_evaluation": {
+    "by_arm": {
+      "P": {
+        "exit_code": 0,
+        "elapsed_seconds": 707.4990479946136
+      },
+      "C0": {
+        "exit_code": 0,
+        "elapsed_seconds": 703.2629010677338
+      },
+      "H1": {
+        "exit_code": 0,
+        "elapsed_seconds": 702.5995059013367
+      }
+    },
+    "elapsed_seconds_sum": 2113.361454963684,
+    "extra_model_requests": 0
+  },
+  "ci": {
+    "accounting": "external PR checks, separate from model and evaluator totals",
+    "compute_cost": null
+  },
+  "maintainer_development": {
+    "model_usage": null,
+    "money": null,
+    "accounting": "analysis, implementation, review and scripted fixtures are not included in author-provider totals; complete maintainer input/output metering unavailable"
+  },
+  "money": null,
+  "slots": [
+    {
+      "slot": 1,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "P",
+      "agent_execution_seconds": 115.77381687499997,
+      "managed_termination_seconds": 0.2793397499999846,
+      "forwarding_closed_seconds_from_task_start": 116.10658212499996,
+      "capture_seconds": 2.8883365420000047,
+      "cleanup_seconds": 0.24197420799999964,
+      "full_task_timer_seconds": 119.301991667,
+      "usage": {
+        "requests": 18,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 264254,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 3118,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 78848,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 1244,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 24,
+      "sessions": 1
+    },
+    {
+      "slot": 2,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "C0",
+      "agent_execution_seconds": 175.1924747090001,
+      "managed_termination_seconds": 0.27281354200001806,
+      "forwarding_closed_seconds_from_task_start": 175.51694091700006,
+      "capture_seconds": 2.9250883330000796,
+      "cleanup_seconds": 0.2902672499999171,
+      "full_task_timer_seconds": 178.8020475,
+      "usage": {
+        "requests": 21,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 506495,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 5209,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 217600,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 2311,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 42,
+      "sessions": 1
+    },
+    {
+      "slot": 3,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "H1",
+      "agent_execution_seconds": 174.79084420799998,
+      "managed_termination_seconds": 0.25973379199998453,
+      "forwarding_closed_seconds_from_task_start": 175.1158062499999,
+      "capture_seconds": 2.902703542000032,
+      "cleanup_seconds": 0.2654867500000401,
+      "full_task_timer_seconds": 178.348547916,
+      "usage": {
+        "requests": 22,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 535178,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 5037,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 187904,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 2173,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 40,
+      "sessions": 1
+    },
+    {
+      "slot": 4,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "C0",
+      "agent_execution_seconds": 243.51075891699992,
+      "managed_termination_seconds": 0.25607833300018684,
+      "forwarding_closed_seconds_from_task_start": 243.82278454099992,
+      "capture_seconds": 0.6441300840000622,
+      "cleanup_seconds": 0.1868851250000298,
+      "full_task_timer_seconds": 244.72520245800004,
+      "usage": {
+        "requests": 25,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 803184,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 9430,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 365056,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 4350,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 68,
+      "sessions": 1
+    },
+    {
+      "slot": 5,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "H1",
+      "agent_execution_seconds": 285.0626525419999,
+      "managed_termination_seconds": 0.2607815839999821,
+      "forwarding_closed_seconds_from_task_start": 285.3814271249999,
+      "capture_seconds": 0.7488766660001129,
+      "cleanup_seconds": 0.1863870000001043,
+      "full_task_timer_seconds": 286.38512741700004,
+      "usage": {
+        "requests": 24,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 930166,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 9622,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 379392,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 5431,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 55,
+      "sessions": 1
+    },
+    {
+      "slot": 6,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "P",
+      "agent_execution_seconds": 218.289736792,
+      "managed_termination_seconds": 0.25499633300001734,
+      "forwarding_closed_seconds_from_task_start": 218.59775766700017,
+      "capture_seconds": 0.7129044589998667,
+      "cleanup_seconds": 0.18865483399992808,
+      "full_task_timer_seconds": 219.5611691670001,
+      "usage": {
+        "requests": 19,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 560180,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 7290,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 183808,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 3640,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 46,
+      "sessions": 1
+    },
+    {
+      "slot": 7,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "H1",
+      "agent_execution_seconds": 262.1704815000002,
+      "managed_termination_seconds": 0.2676679170001298,
+      "forwarding_closed_seconds_from_task_start": 262.4951843330001,
+      "capture_seconds": 2.105683083000127,
+      "cleanup_seconds": 0.9011054580002091,
+      "full_task_timer_seconds": 265.57082645800034,
+      "usage": {
+        "requests": 20,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 487275,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 4617,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 250880,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 2011,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 46,
+      "sessions": 1
+    },
+    {
+      "slot": 8,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "P",
+      "agent_execution_seconds": 71.9064746249998,
+      "managed_termination_seconds": 0.26520804199995474,
+      "forwarding_closed_seconds_from_task_start": 72.22090937499982,
+      "capture_seconds": 2.0992282920000145,
+      "cleanup_seconds": 0.4813708330001682,
+      "full_task_timer_seconds": 74.86132258300017,
+      "usage": {
+        "requests": 13,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 192471,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 2326,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 66048,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 917,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 25,
+      "sessions": 1
+    },
+    {
+      "slot": 9,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "C0",
+      "agent_execution_seconds": 226.20559350000042,
+      "managed_termination_seconds": 0.26694799999985847,
+      "forwarding_closed_seconds_from_task_start": 226.52598470799998,
+      "capture_seconds": 2.1133166249999777,
+      "cleanup_seconds": 0.7420010000001639,
+      "full_task_timer_seconds": 229.44058387500002,
+      "usage": {
+        "requests": 15,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 280569,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 3442,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 128000,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 1422,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 32,
+      "sessions": 1
+    },
+    {
+      "slot": 10,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "P",
+      "agent_execution_seconds": 894.9669599159998,
+      "managed_termination_seconds": 0.2559875419996679,
+      "forwarding_closed_seconds_from_task_start": 895.2772295829998,
+      "capture_seconds": 0.9884793750001117,
+      "cleanup_seconds": 0.5721761249997653,
+      "full_task_timer_seconds": 896.9009302499998,
+      "usage": {
+        "requests": 41,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 2370576,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 9608,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 1459200,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 5208,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 74,
+      "sessions": 1
+    },
+    {
+      "slot": 11,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "C0",
+      "agent_execution_seconds": 741.9535224589998,
+      "managed_termination_seconds": 0.25542983300052585,
+      "forwarding_closed_seconds_from_task_start": 742.2670092910002,
+      "capture_seconds": 1.0059127500001341,
+      "cleanup_seconds": 0.5732586669996381,
+      "full_task_timer_seconds": 743.9146475829999,
+      "usage": {
+        "requests": 35,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 2393929,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 7081,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 1411584,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 3474,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 69,
+      "sessions": 1
+    },
+    {
+      "slot": 12,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "H1",
+      "agent_execution_seconds": 1664.9357832090006,
+      "managed_termination_seconds": 0.2493309590006247,
+      "forwarding_closed_seconds_from_task_start": 1665.2387946669999,
+      "capture_seconds": 0.9755256249997765,
+      "cleanup_seconds": 0.3675806660000235,
+      "full_task_timer_seconds": 1666.6516528329998,
+      "usage": {
+        "requests": 76,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 5461570,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 19498,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 4263936,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 8694,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 103,
+      "sessions": 1
+    },
+    {
+      "slot": 13,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "C0",
+      "agent_execution_seconds": 349.8092312089996,
+      "managed_termination_seconds": 0.2761036250004545,
+      "forwarding_closed_seconds_from_task_start": 350.14051233299915,
+      "capture_seconds": 0.8878721669996157,
+      "cleanup_seconds": 0.24130662499926983,
+      "full_task_timer_seconds": 351.33334612499925,
+      "usage": {
+        "requests": 20,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 502975,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 8275,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 235008,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 4847,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 51,
+      "sessions": 1
+    },
+    {
+      "slot": 14,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "H1",
+      "agent_execution_seconds": 397.33517833400055,
+      "managed_termination_seconds": 0.2521662499997765,
+      "forwarding_closed_seconds_from_task_start": 397.64467512500005,
+      "capture_seconds": 0.9297368339998647,
+      "cleanup_seconds": 0.23859716700017453,
+      "full_task_timer_seconds": 398.87565825000036,
+      "usage": {
+        "requests": 18,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 464986,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 7750,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 207360,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 5044,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 39,
+      "sessions": 1
+    },
+    {
+      "slot": 15,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "P",
+      "agent_execution_seconds": 662.2964832499996,
+      "managed_termination_seconds": 0.25068370799999684,
+      "forwarding_closed_seconds_from_task_start": 662.6054992920002,
+      "capture_seconds": 0.8737527499999851,
+      "cleanup_seconds": 0.23330320900026708,
+      "full_task_timer_seconds": 663.7707212089998,
+      "usage": {
+        "requests": 30,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 893220,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 10380,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 441856,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 6034,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 56,
+      "sessions": 1
+    },
+    {
+      "slot": 16,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "H1",
+      "agent_execution_seconds": 1668.103345667,
+      "managed_termination_seconds": 0.27355087500065567,
+      "forwarding_closed_seconds_from_task_start": 1668.431415,
+      "capture_seconds": 1.1189559589996934,
+      "cleanup_seconds": 0.49109716700017453,
+      "full_task_timer_seconds": 1670.1285183340003,
+      "usage": {
+        "requests": 61,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 5789817,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 22435,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 3079680,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 13261,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 168,
+      "sessions": 2
+    },
+    {
+      "slot": 17,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "P",
+      "agent_execution_seconds": 724.7120467499998,
+      "managed_termination_seconds": 0.2698720410000533,
+      "forwarding_closed_seconds_from_task_start": 725.0371842500009,
+      "capture_seconds": 1.0131985829994083,
+      "cleanup_seconds": 0.5050573330000043,
+      "full_task_timer_seconds": 726.6223043330014,
+      "usage": {
+        "requests": 42,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 3602466,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 11409,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 2237952,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 5230,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 95,
+      "sessions": 1
+    },
+    {
+      "slot": 18,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "C0",
+      "agent_execution_seconds": 963.9917959160003,
+      "managed_termination_seconds": 0.27084741700068116,
+      "forwarding_closed_seconds_from_task_start": 964.3200762499999,
+      "capture_seconds": 1.0370576670002192,
+      "cleanup_seconds": 0.3225266249999404,
+      "full_task_timer_seconds": 965.7482157499995,
+      "usage": {
+        "requests": 46,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 3629980,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 13409,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 2378240,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 6696,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "tool_calls": 103,
+      "sessions": 1
+    }
+  ],
+  "timer_scope": "The enforced shared author timer covers startup through autonomous delivery; it is cleared before native extraction/capture. Complete measured task timers include capture/cleanup and every observed task remained below 1800 seconds. No general post-author capture timer guarantee is claimed."
+}
