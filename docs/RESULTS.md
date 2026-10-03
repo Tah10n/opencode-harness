@@ -11,8 +11,11 @@ prepares direct as control and D as candidate on the accepted PR #31 runtime.
 Baseline, gold and plausible wrong-patch controls, independent stable-ID scoring,
 installed scripted delivery and deadline controls are model-free evidence. The
 future sixteen-run protocol has no real outcomes; model/variant/environment
-selection and explicit model-run authorization remain outstanding. See the
-[model-free report](../evaluation/feedback-development/evidence/MODEL_FREE.md).
+selection and explicit model-run authorization remain outstanding. The
+[acceptance repair report](../evaluation/feedback-development/evidence/ACCEPTANCE_FIX.md)
+separates reproduced original false successes from the corrected preflight and
+scripted delivery. The [initial model-free report](../evaluation/feedback-development/evidence/MODEL_FREE.md)
+is retained as historical evidence.
 This is neither an official SWE-PolyBench result nor proof of effectiveness.
 
 ## Evidence-backed core: completed development rejection

@@ -18,6 +18,23 @@ test('fd03.cancel-reopen-repeat',()=>withWallet((file,w)=>{
  assert.equal(reopened.reserve('first',40),true); assert.equal(reopened.commit('first'),true);
  assert.equal(new Wallet(file).read().available,160); assert.equal(reopened.cancel('first'),false);
 }));
+test('fd03.cancel-one-hold-accounting',()=>withWallet((file,w)=>{
+ assert.deepEqual(w.read(),{available:200,holds:{},settled:[]});
+ assert.equal(w.reserve('a',50),true); assert.equal(w.reserve('b',70),true);
+ const before=new Wallet(file).read();
+ assert.deepEqual(before,{available:80,holds:{a:50,b:70},settled:[]});
+ assert.equal(before.available+Object.values(before.holds).reduce((sum,cents)=>sum+cents,0),200);
+ assert.equal(w.cancel('a'),true);
+ const reopened=new Wallet(file), after=reopened.read();
+ assert.deepEqual(after,{available:130,holds:{b:70},settled:[]});
+ assert.equal(after.available+Object.values(after.holds).reduce((sum,cents)=>sum+cents,0),200);
+ const bytes=fs.readFileSync(file,'utf8');
+ assert.equal(reopened.cancel('a'),false); assert.equal(fs.readFileSync(file,'utf8'),bytes);
+ assert.equal(reopened.commit('b'),true);
+ const committed=new Wallet(file).read();
+ assert.deepEqual(committed,{available:130,holds:{},settled:['b']});
+ assert.equal(committed.available+Object.values(committed.holds).reduce((sum,cents)=>sum+cents,0)+70,200);
+}));
 test('fd03.other-holds-preserved',()=>withWallet((file,w)=>{
  assert.equal(w.reserve('a',50),true); assert.equal(w.reserve('b',70),true);
  assert.deepEqual(w.read().holds,{a:50,b:70}); assert.equal(w.read().available,80);

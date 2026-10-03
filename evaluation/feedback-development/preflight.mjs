@@ -26,13 +26,28 @@ export async function preflight(output,{contained=false,toolchain}={}) {
   const harnessKeys=auditFlags(),inputHashes=manifest(path.join(directory,'tasks')),rows=[];
   for(const task of tasks) {
     const row={task:task.id,category:task.category,results:{}};
-    for(const variant of ['baseline','gold','wrong']) {
-      const patch=variant==='baseline'?Buffer.alloc(0):fs.readFileSync(path.join(task.directory,variant+'.patch'));
+    const variants=['baseline','gold','wrong'];
+    if(task.id==='01-invoice-discount')variants.push('discount-field-loss');
+    if(task.id==='03-wallet-cancel')variants.push('all-holds-refund');
+    for(const variant of variants) {
+      const additional=variant==='discount-field-loss'||variant==='all-holds-refund';
+      const patch=additional?controlPatch(task,fs.readFileSync(path.join(task.directory,'gold.patch')),repo=>{
+        const file=path.join(repo,variant==='discount-field-loss'?'src/pricing.mjs':'src/wallet.mjs'),source=fs.readFileSync(file,'utf8');
+        const from=variant==='discount-field-loss'?'  return {items,totalCents:':'state.available+=state.holds[id];';
+        const to=variant==='discount-field-loss'?'  for (const item of items) delete item.discountPercent;\n'+from:'state.available += Object.values(state.holds)\n   .reduce((sum, cents) => sum + cents, 0);';
+        assert.equal(source.split(from).length,2);fs.writeFileSync(file,source.replace(from,to));
+      }):variant==='baseline'?Buffer.alloc(0):fs.readFileSync(path.join(task.directory,variant+'.patch'));
+      if(additional)assert.deepEqual(patch,fs.readFileSync(path.join(task.directory,variant+'.patch')),'The retained full negative patch must match controlPatch');
       const result=await evaluatePatch({task,patch,output:path.join(output,task.id,variant),contained,toolchain});
       row.results[variant]=result;
       assert.equal(result.cleanupVerified,true);
       if(variant==='gold')assert.equal(result.R,true,JSON.stringify({task:task.id,variant,result}));
       else assert.equal(result.R,false,JSON.stringify({task:task.id,variant,result}));
+      if(additional) {
+        assert.equal(result.status,'FAIL');assert.equal(result.patchApplied,true);
+        const failed=variant==='discount-field-loss'?'fd01.discount-roundtrip':'fd03.cancel-one-hold-accounting';
+        assert.equal(result.obligations.find(r=>r.id===failed)?.status,'FAIL');
+      }
       if(variant==='baseline') {
         assert.ok(task.feature.some(id=>result.obligations.find(r=>r.id===id)?.status==='FAIL'));
         assert.ok(task.preservation.every(id=>result.obligations.find(r=>r.id===id)?.status==='PASS'));
@@ -47,6 +62,7 @@ export async function preflight(output,{contained=false,toolchain}={}) {
         result.publicExit=publicRun.status;
         privateJSON(path.join(output,task.id,variant,'public-process.json'),{status:publicRun.status,stdout:publicRun.stdout,stderr:publicRun.stderr});
         if(variant==='gold')assert.equal(publicRun.status,0,publicRun.stdout+publicRun.stderr);
+        if(additional)assert.equal(publicRun.status,variant==='discount-field-loss'?1:0);
         if(task.id==='08-options-refactor'&&variant==='baseline')assert.equal(publicRun.status,0);
       }finally{fs.rmSync(temp,{recursive:true,force:true});}
     }

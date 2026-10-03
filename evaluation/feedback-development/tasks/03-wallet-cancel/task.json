@@ -3,7 +3,8 @@
   "category": "state-sequences",
   "title": "Cancel one persisted wallet reservation",
   "feature": [
-    "fd03.cancel-reopen-repeat"
+    "fd03.cancel-reopen-repeat",
+    "fd03.cancel-one-hold-accounting"
   ],
   "preservation": [
     "fd03.other-holds-preserved",

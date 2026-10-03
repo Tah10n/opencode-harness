@@ -1,5 +1,11 @@
 # Stage-2 model-free evidence
 
+This is the original preparation evidence from
+`f01ac872987d822e718ce4ef61e7ea43326e6f8d`. Its passing triples did not detect the
+two false successes subsequently reproduced with additional patches. The
+[acceptance repair report](ACCEPTANCE_FIX.md) and its separate receipt cover the
+corrected judge; this historical receipt does not verify the updated acceptance.
+
 The accepted feedback fix is present in main at
 `f23f2cd6f293e4ec496ad119485d7d4bde1f822f` (PR #31, accepted head
 `4659cb2218e10ef93371c2d39a5080f42c389dd9`). The agent made it Ready;

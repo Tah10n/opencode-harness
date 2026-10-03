@@ -10,11 +10,23 @@ const {invoice}=await load('src/pricing.mjs');
 const {exportInvoice}=await load('src/export.mjs');
 const {validateLine}=await load('src/validate.mjs');
 test('fd01.discount-roundtrip',()=>{
- const input=[{name:'A',quantity:3,unitCents:101,discountPercent:12.5},{name:'B',quantity:1,unitCents:15,discountPercent:100},{name:'C',quantity:1,unitCents:50,discountPercent:0}];
- const copy=structuredClone(input), bill=invoice(input), encoded=JSON.parse(exportInvoice(input));
- assert.deepEqual(bill.items.map(l=>l.totalCents),[265,0,50]);
- assert.equal(bill.totalCents,315);
- assert.deepEqual(encoded.lines,bill.items); assert.equal(encoded.totalCents,315);
+ const input=[{name:'A',quantity:3,unitCents:101,discountPercent:12.5},{name:'B',quantity:1,unitCents:15,discountPercent:100},{name:'C',quantity:1,unitCents:50,discountPercent:0},{name:'D',quantity:2,unitCents:19}];
+ const expected=[
+  {name:'A',quantity:3,unitCents:101,discountPercent:12.5,totalCents:265},
+  {name:'B',quantity:1,unitCents:15,discountPercent:100,totalCents:0},
+  {name:'C',quantity:1,unitCents:50,discountPercent:0,totalCents:50},
+  {name:'D',quantity:2,unitCents:19,totalCents:38},
+ ];
+ const copy=structuredClone(input), bill=invoice(input);
+ assert.deepEqual(bill.items,expected); assert.equal(bill.totalCents,353);
+ assert.equal(Object.hasOwn(bill.items[2],'discountPercent'),true);
+ assert.equal(Object.hasOwn(bill.items[3],'discountPercent'),false);
+ assert.deepEqual(input,copy);
+ const encoded=JSON.parse(exportInvoice(input));
+ assert.deepEqual(encoded.lines,expected); assert.equal(encoded.totalCents,353);
+ assert.equal(Object.hasOwn(encoded.lines[2],'discountPercent'),true);
+ assert.equal(Object.hasOwn(encoded.lines[3],'discountPercent'),false);
+ assert.deepEqual(encoded.lines,bill.items);
  assert.deepEqual(input,copy);
 });
 test('fd01.discount-validation',()=>{

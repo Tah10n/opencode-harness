@@ -27,8 +27,9 @@ OPENCODE_BIN=/absolute/path/to/opencode npm run verify:installed
 ```
 
 Use a fresh output directory for each fixture; retain earlier outputs. The
-ordinary verify path runs the eight-task controls and lightweight configuration,
-reporting and schedule regressions. It never executes real model requests.
+ordinary verify path runs all eight baseline/gold/wrong triples, two additional
+negative controls and lightweight configuration, reporting and schedule regressions.
+It never executes real model requests.
 
 For the actual container path, install the platform-matching Linux OpenCode
 **1.18.26** binary without lifecycle scripts, build the existing support
@@ -67,7 +68,10 @@ After preserving and checking the fixture outputs, remove the owned builder with
 
 Each task directory contains `source/` (including TASK.md and ordinary tests),
 independent `acceptance.test.mjs`, `gold.patch`, `wrong.patch` and an obligation
-inventory. Only `source/` is copied into author input. Tasks have no dependencies;
+inventory. Task 01 also retains `discount-field-loss.patch`; task 03 retains
+`all-holds-refund.patch`. Preflight regenerates both from gold with the existing
+`controlPatch`, checks the complete retained bytes and grades each separately.
+Only `source/` is copied into author input. Tasks have no dependencies;
 the package locks make that explicit.
 
 | Task | Group | Required work and preserved contracts |
@@ -176,4 +180,23 @@ is synthetic and must not be interpreted as model tokens or measured efficiency.
 Missing usage leaves total token fields unknown; the known portion is reported
 separately. Missing or duplicate task outcomes never complete a pair.
 
-See [the model-free report](evidence/MODEL_FREE.md) for retained results and scope.
+The [acceptance repair report](evidence/ACCEPTANCE_FIX.md) records two real false
+successes on the original preparation head and the corrected controls. Invoice
+items and exported lines have independently specified values, including discount
+presence and omission. The multi-hold refund and accounting obligation belongs
+to feature; the existing preservation obligations are unchanged.
+
+To reproduce the original false successes, export commit
+`f01ac872987d822e718ce4ef61e7ea43326e6f8d` into a fresh temporary checkout, then use
+that checkout's `evaluate.mjs` with each retained additional patch and an explicit
+immutable `EVALUATION_IMAGE` and absolute toolchain. The original source, public
+tests and judge must remain unchanged. The ordinary `evaluate.mjs TASK_ID
+ABS_PATCH ABS_OUTPUT ABS_TOOLCHAIN` interface runs the real independent reporter;
+preflight on the current checkout must reject both patches with completed FAIL
+results. No provider is needed for either reproduction.
+
+See [the original stage-2 report](evidence/MODEL_FREE.md) for historical results on
+the initial preparation. Its receipt does not verify the corrected acceptance;
+the repair report and receipt record the new checks separately. The preparatory
+manifest is refreshed before any real runs, with the same campaign, sixteen-row
+order and 600-second budget. Real execution remains unauthorized.

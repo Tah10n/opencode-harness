@@ -289,7 +289,7 @@
   },
   "files": {
     "evaluation/feedback-development/README.md": {
-      "sha256": "fa371c5df162e8e0c8ce68d5ca264632a7fb920d3eb766a87120b493509abcb8",
+      "sha256": "60b3bf6601c4e02f158f98f2a4eda9c877ca2fcfc6f00497d1c55d8f3c07df46",
       "executable": false
     },
     "evaluation/feedback-development/assets.mjs": {
@@ -317,7 +317,7 @@
       "executable": false
     },
     "evaluation/feedback-development/preflight.mjs": {
-      "sha256": "85f175df589c76a57600133860033605c9f12d9d3b132272c562b9b1aa918bc4",
+      "sha256": "3b56402c1f69c55c8a85c62c8efc4af13af9c549fc320fe329da378234b3275a",
       "executable": false
     },
     "evaluation/feedback-development/prepare.mjs": {
@@ -341,7 +341,11 @@
       "executable": false
     },
     "evaluation/feedback-development/tasks/01-invoice-discount/acceptance.test.mjs": {
-      "sha256": "54bbb85cc34fa7f4019f25964639e6d8c2e8083cdc849da2ede9d0aa5c365815",
+      "sha256": "de122e36bc9f4c0cd07c3360351d371bea68746df0ddaa29004b90465f90b1e3",
+      "executable": false
+    },
+    "evaluation/feedback-development/tasks/01-invoice-discount/discount-field-loss.patch": {
+      "sha256": "0ace16e5737714d2beaf65b8fe837fc8475242ef186f0624482de508a648f5c3",
       "executable": false
     },
     "evaluation/feedback-development/tasks/01-invoice-discount/gold.patch": {
@@ -441,7 +445,11 @@
       "executable": false
     },
     "evaluation/feedback-development/tasks/03-wallet-cancel/acceptance.test.mjs": {
-      "sha256": "f97e3c71cb2aaa959ea0fd58e56d0198221c33cf19f4d099be023ec72c818581",
+      "sha256": "8b26e37d18e66f19ba0e279b3a41881f540e25cdf3ce5fe5e490f911565a3dc7",
+      "executable": false
+    },
+    "evaluation/feedback-development/tasks/03-wallet-cancel/all-holds-refund.patch": {
+      "sha256": "9fdb2786196677baa417a78ce82fd60266965f5844515ca54682e2e948416773",
       "executable": false
     },
     "evaluation/feedback-development/tasks/03-wallet-cancel/gold.patch": {
@@ -473,7 +481,7 @@
       "executable": false
     },
     "evaluation/feedback-development/tasks/03-wallet-cancel/task.json": {
-      "sha256": "63e65ef6fcca29cc7c1a8a63e176337bbd161d1b05d99549fbf4d4c48906781b",
+      "sha256": "18a77d2507d26db0c5c687067d9cb78b6f9fce93c6ccb6de68389edd8bf776b2",
       "executable": false
     },
     "evaluation/feedback-development/tasks/03-wallet-cancel/wrong.patch": {

@@ -1,0 +1,1425 @@
+{
+  "suite": "feedback-development-v1",
+  "scope": "Acceptance repairs before real development runs; model-free evidence only",
+  "originalHead": "f01ac872987d822e718ce4ef61e7ea43326e6f8d",
+  "originalControlsReceipt": "acceptance-controls-before.json",
+  "frozenManifestSha256": "b91ef805288fca62542e219831ea8cdb8c797a09da74819ac72a99fcd16c6466",
+  "modelFree": true,
+  "realProviderCalls": 0,
+  "realDevelopmentTaskRuns": 0,
+  "preflights": [
+    {
+      "command": "preflight",
+      "passed": true,
+      "contained": false,
+      "modelFree": true,
+      "realProviderCalls": 0,
+      "evaluations": 26,
+      "tasks": [
+        {
+          "task": "01-invoice-discount",
+          "category": "related-files",
+          "results": {
+            "baseline": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 1
+            },
+            "gold": {
+              "R": true,
+              "status": "PASS",
+              "publicExit": 0
+            },
+            "wrong": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 1
+            },
+            "discount-field-loss": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 1
+            }
+          }
+        },
+        {
+          "task": "02-cli-limit",
+          "category": "related-files",
+          "results": {
+            "baseline": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 1
+            },
+            "gold": {
+              "R": true,
+              "status": "PASS",
+              "publicExit": 0
+            },
+            "wrong": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 0
+            }
+          }
+        },
+        {
+          "task": "03-wallet-cancel",
+          "category": "state-sequences",
+          "results": {
+            "baseline": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 1
+            },
+            "gold": {
+              "R": true,
+              "status": "PASS",
+              "publicExit": 0
+            },
+            "wrong": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 0
+            },
+            "all-holds-refund": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 0
+            }
+          }
+        },
+        {
+          "task": "04-invite-redeem",
+          "category": "state-sequences",
+          "results": {
+            "baseline": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 1
+            },
+            "gold": {
+              "R": true,
+              "status": "PASS",
+              "publicExit": 0
+            },
+            "wrong": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 1
+            }
+          }
+        },
+        {
+          "task": "05-query-arrays",
+          "category": "compatible-behavior",
+          "results": {
+            "baseline": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 1
+            },
+            "gold": {
+              "R": true,
+              "status": "PASS",
+              "publicExit": 0
+            },
+            "wrong": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 0
+            }
+          }
+        },
+        {
+          "task": "06-events-once",
+          "category": "compatible-behavior",
+          "results": {
+            "baseline": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 1
+            },
+            "gold": {
+              "R": true,
+              "status": "PASS",
+              "publicExit": 0
+            },
+            "wrong": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 1
+            }
+          }
+        },
+        {
+          "task": "07-config-merge",
+          "category": "diagnosis-refactor",
+          "results": {
+            "baseline": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 1
+            },
+            "gold": {
+              "R": true,
+              "status": "PASS",
+              "publicExit": 0
+            },
+            "wrong": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 0
+            }
+          }
+        },
+        {
+          "task": "08-options-refactor",
+          "category": "diagnosis-refactor",
+          "results": {
+            "baseline": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 0
+            },
+            "gold": {
+              "R": true,
+              "status": "PASS",
+              "publicExit": 0
+            },
+            "wrong": {
+              "R": false,
+              "status": "FAIL",
+              "publicExit": 1
+            }
+          }
+        }
+      ],
+      "scorerControls": [
+        {
+          "name": "empty-patch",
+          "R": false,
+          "status": "FAIL"
+        },
+        {
+          "name": "actual-zero-obligations",
+          "R": null,
+          "status": "unproven"
+        },
+        {
+          "name": "delete-public-tests",
+          "R": false,
+          "status": "FAIL"
+        },
+        {
+          "name": "npm-test-noop",
+          "R": false,
+          "status": "FAIL"
+        },
+        {
+          "name": "gold-extra-test",
+          "R": true,
+          "status": "PASS"
+        },
+        {
+          "name": "wrong-extra-test",
+          "R": false,
+          "status": "FAIL"
+        },
+        {
+          "name": "actual-timeout",
+          "R": null,
+          "status": "unproven"
+        },
+        {
+          "name": "zero-obligations",
+          "R": null,
+          "status": "unproven"
+        },
+        {
+          "name": "partial-output",
+          "R": null,
+          "status": "unproven"
+        },
+        {
+          "name": "missing-obligation",
+          "R": null,
+          "status": "unproven"
+        },
+        {
+          "name": "launch-error",
+          "R": null,
+          "status": "unproven"
+        },
+        {
+          "name": "timeout",
+          "R": null,
+          "status": "unproven"
+        },
+        {
+          "name": "duplicate-id",
+          "R": null,
+          "status": "unproven"
+        }
+      ],
+      "reorderedStableIds": true,
+      "internalStatusSeparated": true,
+      "rawReceiptSha256": "69fe74c71d977c411ed1088fc6654e27e890e869bf47c88b35a66bd5b7bbafb3"
+    },
+    {
+      "command": "preflight-contained",
+      "passed": true,
+      "contained": true,
+      "modelFree": true,
+      "realProviderCalls": 0,
+      "evaluations": 26,
+      "tasks": [
+        {
+          "task": "01-invoice-discount",
+          "category": "related-files",
+          "results": {
+            "baseline": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "acceptanceSha256": "de122e36bc9f4c0cd07c3360351d371bea68746df0ddaa29004b90465f90b1e3",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 1,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd01.discount-roundtrip",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd01.discount-validation",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd01.legacy-shape-and-validation",
+                  "status": "PASS"
+                }
+              ]
+            },
+            "gold": {
+              "R": true,
+              "status": "PASS",
+              "patchApplied": true,
+              "patchSha256": "5206fcf736a77f2e0d6a6d1f10f27d530adbf81089b4651bd3958e1ba824922f",
+              "acceptanceSha256": "de122e36bc9f4c0cd07c3360351d371bea68746df0ddaa29004b90465f90b1e3",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 0,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd01.discount-roundtrip",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd01.discount-validation",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd01.legacy-shape-and-validation",
+                  "status": "PASS"
+                }
+              ]
+            },
+            "wrong": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "449cfca9412251a8518edddde431dda6d4cb239be5a52de13a20aa7eef1e0a8e",
+              "acceptanceSha256": "de122e36bc9f4c0cd07c3360351d371bea68746df0ddaa29004b90465f90b1e3",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 1,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd01.discount-roundtrip",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd01.discount-validation",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd01.legacy-shape-and-validation",
+                  "status": "FAIL"
+                }
+              ]
+            },
+            "discount-field-loss": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "0ace16e5737714d2beaf65b8fe837fc8475242ef186f0624482de508a648f5c3",
+              "acceptanceSha256": "de122e36bc9f4c0cd07c3360351d371bea68746df0ddaa29004b90465f90b1e3",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 1,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd01.discount-roundtrip",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd01.discount-validation",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd01.legacy-shape-and-validation",
+                  "status": "PASS"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "task": "02-cli-limit",
+          "category": "related-files",
+          "results": {
+            "baseline": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "acceptanceSha256": "957bdcf12c030df5fe693c6668d7857e6182660ab0d5d1fb2f40fe7a7875e20e",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 1,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd02.filter-before-limit",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd02.limit-validation",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd02.original-cli-contracts",
+                  "status": "PASS"
+                }
+              ]
+            },
+            "gold": {
+              "R": true,
+              "status": "PASS",
+              "patchApplied": true,
+              "patchSha256": "6e0cbe814c9aedf6c0dcec3a2ac1d143ee016352474f9acde0859104806f1e7d",
+              "acceptanceSha256": "957bdcf12c030df5fe693c6668d7857e6182660ab0d5d1fb2f40fe7a7875e20e",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 0,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd02.filter-before-limit",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd02.limit-validation",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd02.original-cli-contracts",
+                  "status": "PASS"
+                }
+              ]
+            },
+            "wrong": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "03304c39360bef2c5a9f2cf81d84a7d20155f838a94b1af63aec18b72efcc12c",
+              "acceptanceSha256": "957bdcf12c030df5fe693c6668d7857e6182660ab0d5d1fb2f40fe7a7875e20e",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 0,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd02.filter-before-limit",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd02.limit-validation",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd02.original-cli-contracts",
+                  "status": "PASS"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "task": "03-wallet-cancel",
+          "category": "state-sequences",
+          "results": {
+            "baseline": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "acceptanceSha256": "8b26e37d18e66f19ba0e279b3a41881f540e25cdf3ce5fe5e490f911565a3dc7",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 1,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd03.cancel-reopen-repeat",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd03.cancel-one-hold-accounting",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd03.other-holds-preserved",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd03.deposit-and-rejection",
+                  "status": "PASS"
+                }
+              ]
+            },
+            "gold": {
+              "R": true,
+              "status": "PASS",
+              "patchApplied": true,
+              "patchSha256": "92c56fc6360b8a81a9ed5714818b6267ed7b3b6a9f844f8cd656984edfd090d3",
+              "acceptanceSha256": "8b26e37d18e66f19ba0e279b3a41881f540e25cdf3ce5fe5e490f911565a3dc7",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 0,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd03.cancel-reopen-repeat",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd03.cancel-one-hold-accounting",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd03.other-holds-preserved",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd03.deposit-and-rejection",
+                  "status": "PASS"
+                }
+              ]
+            },
+            "wrong": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "be8db52a5a4ad69908379226ea96066bd034b8dbee8a3277c9f6376b5a8283b5",
+              "acceptanceSha256": "8b26e37d18e66f19ba0e279b3a41881f540e25cdf3ce5fe5e490f911565a3dc7",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 0,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd03.cancel-reopen-repeat",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd03.cancel-one-hold-accounting",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd03.other-holds-preserved",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd03.deposit-and-rejection",
+                  "status": "PASS"
+                }
+              ]
+            },
+            "all-holds-refund": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "9fdb2786196677baa417a78ce82fd60266965f5844515ca54682e2e948416773",
+              "acceptanceSha256": "8b26e37d18e66f19ba0e279b3a41881f540e25cdf3ce5fe5e490f911565a3dc7",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 0,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd03.cancel-reopen-repeat",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd03.cancel-one-hold-accounting",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd03.other-holds-preserved",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd03.deposit-and-rejection",
+                  "status": "PASS"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "task": "04-invite-redeem",
+          "category": "state-sequences",
+          "results": {
+            "baseline": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "acceptanceSha256": "293cfec2d83c728b6c4dfeef0a2373e2f87e22d1edf0d26a1cecba0240b1e12e",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 1,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd04.reject-before-consume",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd04.replay-and-other-state",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd04.create-revoke-idempotency",
+                  "status": "PASS"
+                }
+              ]
+            },
+            "gold": {
+              "R": true,
+              "status": "PASS",
+              "patchApplied": true,
+              "patchSha256": "0dc1e3affe1b03e3be6a0f10489f5895b8e615d1c08ebcc82856d3bec5a1cdb8",
+              "acceptanceSha256": "293cfec2d83c728b6c4dfeef0a2373e2f87e22d1edf0d26a1cecba0240b1e12e",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 0,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd04.reject-before-consume",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd04.replay-and-other-state",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd04.create-revoke-idempotency",
+                  "status": "PASS"
+                }
+              ]
+            },
+            "wrong": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "3f80afa5eff992b724577d70b73d9af65162e18b5cd77efc0db407660cd8baec",
+              "acceptanceSha256": "293cfec2d83c728b6c4dfeef0a2373e2f87e22d1edf0d26a1cecba0240b1e12e",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 1,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd04.reject-before-consume",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd04.replay-and-other-state",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd04.create-revoke-idempotency",
+                  "status": "PASS"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "task": "05-query-arrays",
+          "category": "compatible-behavior",
+          "results": {
+            "baseline": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "acceptanceSha256": "6e983a22556156cd4a9bcd24fc40131127259fb2742c7c1e79897c1440930054",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 1,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd05.repeated-array-values",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd05.invalid-arrays",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd05.scalar-and-unrelated-contracts",
+                  "status": "PASS"
+                }
+              ]
+            },
+            "gold": {
+              "R": true,
+              "status": "PASS",
+              "patchApplied": true,
+              "patchSha256": "430dc72a5c944cb771324bbe7754acf1fdc58c680ba090a69b8f4517ff6bf0a6",
+              "acceptanceSha256": "6e983a22556156cd4a9bcd24fc40131127259fb2742c7c1e79897c1440930054",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 0,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd05.repeated-array-values",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd05.invalid-arrays",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd05.scalar-and-unrelated-contracts",
+                  "status": "PASS"
+                }
+              ]
+            },
+            "wrong": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "6fd5724c81677d7b51dda8fd7d5a546416bf4c0732f2e395e924ad0748aa7036",
+              "acceptanceSha256": "6e983a22556156cd4a9bcd24fc40131127259fb2742c7c1e79897c1440930054",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 0,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd05.repeated-array-values",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd05.invalid-arrays",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd05.scalar-and-unrelated-contracts",
+                  "status": "PASS"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "task": "06-events-once",
+          "category": "compatible-behavior",
+          "results": {
+            "baseline": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "acceptanceSha256": "994365aa1145d302ded97d9c226c28cf0648a0aadb1c1af80927140d3e983290",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 1,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd06.once-reentrant-and-throw",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd06.registration-identity",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd06.ordinary-snapshot-order",
+                  "status": "PASS"
+                }
+              ]
+            },
+            "gold": {
+              "R": true,
+              "status": "PASS",
+              "patchApplied": true,
+              "patchSha256": "6c8883a0e3b2eeb946232aa1324b5c45e57d9e027fd880e0dc87103ae8fdce18",
+              "acceptanceSha256": "994365aa1145d302ded97d9c226c28cf0648a0aadb1c1af80927140d3e983290",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 0,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd06.once-reentrant-and-throw",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd06.registration-identity",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd06.ordinary-snapshot-order",
+                  "status": "PASS"
+                }
+              ]
+            },
+            "wrong": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "def85d1b496f3fd0160b30db7a01d2cd40b0fa009309d78927c0be9f3a258a1c",
+              "acceptanceSha256": "994365aa1145d302ded97d9c226c28cf0648a0aadb1c1af80927140d3e983290",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 1,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd06.once-reentrant-and-throw",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd06.registration-identity",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd06.ordinary-snapshot-order",
+                  "status": "FAIL"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "task": "07-config-merge",
+          "category": "diagnosis-refactor",
+          "results": {
+            "baseline": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "acceptanceSha256": "77d6c5c3a5a624f8b9ffc3ea2cf05bac362e81a640134a316958fa8e60502d0e",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 1,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd07.input-isolation-and-repeat",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd07.recursive-undefined-and-arrays",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd07.original-value-contracts",
+                  "status": "PASS"
+                }
+              ]
+            },
+            "gold": {
+              "R": true,
+              "status": "PASS",
+              "patchApplied": true,
+              "patchSha256": "73ae877f42ceee6e5964301d72176afe950362dbb313adc90918bdaf2b824f1b",
+              "acceptanceSha256": "77d6c5c3a5a624f8b9ffc3ea2cf05bac362e81a640134a316958fa8e60502d0e",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 0,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd07.input-isolation-and-repeat",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd07.recursive-undefined-and-arrays",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd07.original-value-contracts",
+                  "status": "PASS"
+                }
+              ]
+            },
+            "wrong": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "52b911ebb95f5cd911802336e20f32060de0e5f755386af7bf9306092b1db25a",
+              "acceptanceSha256": "77d6c5c3a5a624f8b9ffc3ea2cf05bac362e81a640134a316958fa8e60502d0e",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 0,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd07.input-isolation-and-repeat",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd07.recursive-undefined-and-arrays",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd07.original-value-contracts",
+                  "status": "PASS"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "task": "08-options-refactor",
+          "category": "diagnosis-refactor",
+          "results": {
+            "baseline": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "acceptanceSha256": "f7d5106bbde5155e8202514142644ec2bfb728bdf1e51b211b4d5ea20460a59b",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 0,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd08.shared-normalizer-delegation",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd08.defaults-values-and-no-mutation",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd08.validation-preserved",
+                  "status": "PASS"
+                }
+              ]
+            },
+            "gold": {
+              "R": true,
+              "status": "PASS",
+              "patchApplied": true,
+              "patchSha256": "1f3a40b79511025b311398dd6378c2ba44483734f27a38ed1b3f8e24bcf3cb6d",
+              "acceptanceSha256": "f7d5106bbde5155e8202514142644ec2bfb728bdf1e51b211b4d5ea20460a59b",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 0,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd08.shared-normalizer-delegation",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd08.defaults-values-and-no-mutation",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd08.validation-preserved",
+                  "status": "PASS"
+                }
+              ]
+            },
+            "wrong": {
+              "R": false,
+              "status": "FAIL",
+              "patchApplied": true,
+              "patchSha256": "cea9f25823f2d297094efccc39b2812f07a7ce3766917bb2d11f2befca4b40ff",
+              "acceptanceSha256": "f7d5106bbde5155e8202514142644ec2bfb728bdf1e51b211b4d5ea20460a59b",
+              "contained": true,
+              "cleanupVerified": true,
+              "publicExit": 1,
+              "obligations": [
+                {
+                  "type": "obligation",
+                  "id": "fd08.shared-normalizer-delegation",
+                  "status": "PASS"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd08.defaults-values-and-no-mutation",
+                  "status": "FAIL"
+                },
+                {
+                  "type": "obligation",
+                  "id": "fd08.validation-preserved",
+                  "status": "FAIL"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "scorerControls": [
+        {
+          "name": "empty-patch",
+          "R": false,
+          "status": "FAIL"
+        },
+        {
+          "name": "actual-zero-obligations",
+          "R": null,
+          "status": "unproven"
+        },
+        {
+          "name": "delete-public-tests",
+          "R": false,
+          "status": "FAIL"
+        },
+        {
+          "name": "npm-test-noop",
+          "R": false,
+          "status": "FAIL"
+        },
+        {
+          "name": "gold-extra-test",
+          "R": true,
+          "status": "PASS"
+        },
+        {
+          "name": "wrong-extra-test",
+          "R": false,
+          "status": "FAIL"
+        },
+        {
+          "name": "actual-timeout",
+          "R": null,
+          "status": "unproven"
+        },
+        {
+          "name": "zero-obligations",
+          "R": null,
+          "status": "unproven"
+        },
+        {
+          "name": "partial-output",
+          "R": null,
+          "status": "unproven"
+        },
+        {
+          "name": "missing-obligation",
+          "R": null,
+          "status": "unproven"
+        },
+        {
+          "name": "launch-error",
+          "R": null,
+          "status": "unproven"
+        },
+        {
+          "name": "timeout",
+          "R": null,
+          "status": "unproven"
+        },
+        {
+          "name": "duplicate-id",
+          "R": null,
+          "status": "unproven"
+        }
+      ],
+      "reorderedStableIds": true,
+      "internalStatusSeparated": true,
+      "rawReceiptSha256": "dba61edb426c0a7eb4d9a45b29c6d74fab943ea8433388773cbdd18e8029cd8b"
+    }
+  ],
+  "scripted": {
+    "passed": true,
+    "modelFree": true,
+    "realProviderCalls": 0,
+    "scriptedRequests": 31,
+    "syntheticUsage": true,
+    "bundleUnchanged": true,
+    "configDifference": "HARNESS_TASK_STRATEGY only",
+    "runtimeVersion": "1.18.26",
+    "binarySha256": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe",
+    "executionImage": "sha256:0874025605cca5c7e29ad5f16329843ad4e9ef0eab48ccf43e0ce0de1dd492a7",
+    "rows": [
+      {
+        "slot": 1,
+        "task": "01-invoice-discount",
+        "arm": "direct",
+        "R": false,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "incomplete",
+        "corrections": 0,
+        "Q": false,
+        "requests": 13,
+        "requestsWithoutUsage": 0,
+        "tokens": {
+          "input_tokens": 130,
+          "output_tokens": 65,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "knownTokens": {
+          "input_tokens": 130,
+          "output_tokens": 65,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "usageKind": "synthetic",
+        "taskElapsedMs": 4837.9229159999995,
+        "preparationElapsedMs": 1866.90745799996,
+        "evaluationElapsedMs": 600.9193339999983,
+        "evaluationCleanupElapsedMs": 131.25833300000158,
+        "cleanupElapsedMs": 160.87379200000032,
+        "environmentErrors": [],
+        "unknownResults": [],
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd01.discount-roundtrip",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd01.discount-validation",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd01.legacy-shape-and-validation",
+            "status": "FAIL"
+          }
+        ]
+      },
+      {
+        "slot": 2,
+        "task": "01-invoice-discount",
+        "arm": "D",
+        "R": true,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "checks_passed",
+        "corrections": 1,
+        "Q": true,
+        "requests": 18,
+        "requestsWithoutUsage": 0,
+        "tokens": {
+          "input_tokens": 180,
+          "output_tokens": 90,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "knownTokens": {
+          "input_tokens": 180,
+          "output_tokens": 90,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "usageKind": "synthetic",
+        "taskElapsedMs": 6732.279708,
+        "preparationElapsedMs": 1922.036999999973,
+        "evaluationElapsedMs": 703.2309580000001,
+        "evaluationCleanupElapsedMs": 88.37812499999927,
+        "cleanupElapsedMs": 130.54491599999892,
+        "environmentErrors": [],
+        "unknownResults": [],
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd01.discount-roundtrip",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd01.discount-validation",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd01.legacy-shape-and-validation",
+            "status": "PASS"
+          }
+        ]
+      }
+    ]
+  },
+  "deadline": {
+    "passed": true,
+    "fixtureBudgetMs": 5000,
+    "developmentBudgetMs": 600000,
+    "realProviderCalls": 0,
+    "controls": [
+      {
+        "arm": "direct",
+        "timedOut": true,
+        "nativeCompleted": false,
+        "terminationVerified": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "delivery": false,
+        "Q": false
+      },
+      {
+        "arm": "D",
+        "timedOut": true,
+        "nativeCompleted": false,
+        "terminationVerified": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "delivery": false,
+        "Q": false
+      }
+    ]
+  },
+  "negativeControlProcesses": [
+    {
+      "task": "01-invoice-discount",
+      "control": "discount-field-loss",
+      "status": 1,
+      "signal": null,
+      "error": null,
+      "completion": {
+        "type": "complete",
+        "counts": {
+          "tests": 3,
+          "failed": 1,
+          "passed": 2,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0,
+          "topLevel": 3,
+          "suites": 0
+        }
+      }
+    },
+    {
+      "task": "03-wallet-cancel",
+      "control": "all-holds-refund",
+      "status": 1,
+      "signal": null,
+      "error": null,
+      "completion": {
+        "type": "complete",
+        "counts": {
+          "tests": 4,
+          "failed": 1,
+          "passed": 3,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0,
+          "topLevel": 4,
+          "suites": 0
+        }
+      }
+    }
+  ],
+  "limitedReview": {
+    "scope": "Only actual as sole expected for an explicit public contract",
+    "tasks": [
+      "02-cli-limit",
+      "04-invite-redeem",
+      "05-query-arrays",
+      "06-events-once",
+      "07-config-merge",
+      "08-options-refactor"
+    ],
+    "additionalConfirmedCases": 0
+  },
+  "freezeComplete": false,
+  "missing": [
+    "explicit model",
+    "explicit variant",
+    "immutable execution image and installed runtime/dependency hashes for real runs"
+  ],
+  "money": "unknown",
+  "preflightsAgree": true,
+  "standardChecks": {
+    "verifyInstalled": {
+      "command": "OPENCODE_BIN=/Users/tahion/.opencode/bin/opencode npm run verify:installed",
+      "exit": 0,
+      "components": 5,
+      "installedTaskScenarios": 39,
+      "logSha256": "a0531bb278334600d6dcf55e5fc3c22b7ffaa37b9059713f75a8655cfab0929d",
+      "realProviderCalls": 0
+    },
+    "aggregate": {
+      "command": "npm run verify",
+      "status": 1,
+      "passedComponents": [
+        "scripts/verify-native-template.mjs",
+        "scripts/verify-native-review.mjs",
+        "scripts/verify-native-task.mjs",
+        "scripts/verify-native-command-hints.mjs",
+        "scripts/verify-native-project-feedback.mjs",
+        "scripts/verify-native-preservation-nudge.mjs",
+        "scripts/verify-native-preservation-hooks.mjs",
+        "scripts/verify-native-task-investigation.mjs",
+        "scripts/verify-native-task-investigation-delivery.mjs",
+        "scripts/verify-native-stateful.mjs",
+        "scripts/verify-native-sensitivity.mjs",
+        "scripts/verify-native-sensitivity-dependencies.mjs",
+        "scripts/verify-native-type-compat.mjs",
+        "scripts/verify-native-type-compat-hooks.mjs"
+      ],
+      "failedComponent": "scripts/verify-large-git.mjs",
+      "cause": "CommonJS fixture wrapper inherited ESM type from TMPDIR inside repository",
+      "logSha256": "0f9ff8663f800438858b070743a6947cc93bfabe9ea47bcd7a55d1daea45deef"
+    },
+    "largeGitRetry": {
+      "file": "scripts/verify-large-git.mjs",
+      "status": 0,
+      "signal": null,
+      "error": null
+    },
+    "continuationAssemblyFailure": {
+      "file": "scripts/verify-boundary.mjs",
+      "status": 1,
+      "signal": null,
+      "error": null
+    },
+    "remaining": [
+      {
+        "file": "scripts/verify-boundary.mjs",
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      {
+        "file": "evaluation/support/verify-input-admission.mjs",
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      {
+        "file": "evaluation/support/verify-scheduler.mjs",
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      {
+        "file": "evaluation/support/verify-recording.mjs",
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      {
+        "file": "evaluation/polybench/verify.py",
+        "status": 0,
+        "signal": null,
+        "error": null
+      },
+      {
+        "file": "evaluation/feedback-development/verify.mjs",
+        "status": 0,
+        "signal": null,
+        "error": null
+      }
+    ],
+    "all21ComponentsPassed": true,
+    "dependencyInstalls": {
+      "npmCiIgnoreScripts": 0,
+      "sensitivityNpmCiIgnoreScripts": 0
+    }
+  },
+  "cleanup": {
+    "ownedBuilderRemoved": true,
+    "ownedExecutionImageRemoved": true,
+    "ownedBuilderVolumeRemoved": true,
+    "localRemovedAllocatedMiB": 627.125,
+    "builderCacheReportedSize": "491.3 MB",
+    "executionImageLogicalBytes": 491179312,
+    "preserved": "Original results, full patches, compact receipts and small raw synthetic/process evidence; no shared cache or foreign resource was a deletion target"
+  }
+}
