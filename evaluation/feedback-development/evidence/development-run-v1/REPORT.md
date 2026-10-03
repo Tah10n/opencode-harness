@@ -64,10 +64,21 @@ and global OpenCode settings were not changed. No executable adapter change was
 made after admission.
 
 PR #32 was made Ready at the accepted head. Its three CI jobs passed, but merge
-requires one qualifying approval; reviews were empty and REVIEW_REQUIRED
-blocked integration. This Draft [PR #33](https://github.com/Tah10n/opencode-harness/pull/33)
+requires one qualifying approval; the initial review list was empty and
+REVIEW_REQUIRED blocked integration. This Draft [PR #33](https://github.com/Tah10n/opencode-harness/pull/33)
 is consequently stacked on `eval/feedback-development-v1`. No protection bypass,
 force push, PR #30/#31 operation, release or package publication was performed.
+
+Final publication verification found a COMMENTED automated review of the accepted
+head, submitted at 2026-10-03T21:28:39Z, with nine inline remarks (seven P1, two P2)
+covering freeze binding, evaluator cleanup, repeat reporting, acceptance gaps,
+missing bundle artifacts and CI retained-evidence cleanup. It was published
+before campaign admission but retrieved only during the final check; the review
+was not refreshed after Ready before admission. No qualifying approval exists.
+The [base review](https://github.com/Tah10n/opencode-harness/pull/32/files)
+remarks remain unvalidated and unresolved in this stage. They are an additional
+base limitation, not evidence that this empty stopped artifact is a model result.
+No runtime, evaluator or task test was changed after admission to address them.
 
 ## All sixteen assignments
 
