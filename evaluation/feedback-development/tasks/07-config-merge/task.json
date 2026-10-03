@@ -1,0 +1,13 @@
+{
+  "id": "07-config-merge",
+  "category": "diagnosis-refactor",
+  "title": "Fix shared configuration mutation",
+  "feature": [
+    "fd07.input-isolation-and-repeat",
+    "fd07.recursive-undefined-and-arrays"
+  ],
+  "preservation": [
+    "fd07.original-value-contracts"
+  ],
+  "wrongControl": "A top-level spread fixes the visible mutation, but leaves nested sharing and shallow merge errors."
+}

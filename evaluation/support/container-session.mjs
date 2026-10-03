@@ -9,8 +9,8 @@ import {stopWorkload} from './stop-workload.mjs';
 import {outputRoot,privateJSON} from './output-files.mjs';
 
 export const image=process.env.EVALUATION_IMAGE??null;
-export async function startContainer({source,toolchain,template,output,onRequest,workMemoryMb=512,memoryMb=2048,preparedEnvironment=null}) {
-  for(const p of [source,toolchain,output,...(template?[template]:[])])if(!path.isAbsolute(p))throw Error('absolute paths required');
+export async function startContainer({source,toolchain,template,output,onRequest,workMemoryMb=512,memoryMb=2048,preparedEnvironment=null,evaluationDirectory=null}) {
+  for(const p of [source,toolchain,output,...(template?[template]:[]),...(evaluationDirectory?[evaluationDirectory]:[])])if(!path.isAbsolute(p))throw Error('absolute paths required');
   fs.mkdirSync(output,{mode:0o700});
   if (preparedEnvironment && (!/^sha256:[a-f0-9]{64}$/.test(preparedEnvironment.image) || preparedEnvironment.node !== '/diagnostic/node' || typeof preparedEnvironment.projectPath !== 'string' || preparedEnvironment.projectPath.includes('\n'))) throw Error('Invalid prepared benchmark environment');
   const selectedImage=preparedEnvironment?.image??image;
@@ -28,6 +28,7 @@ export async function startContainer({source,toolchain,template,output,onRequest
     '--mount',`type=bind,source=${path.join(toolchain,'package/bin/opencode')},target=/opt/opencode,readonly`,
     '--mount',`type=bind,source=${relay},target=/relay.mjs,readonly`,
     ...(template?['--mount',`type=bind,source=${template},target=/template,readonly`]:[]),
+    ...(evaluationDirectory?['--mount',`type=bind,source=${evaluationDirectory},target=/judge,readonly`]:[]),
     ...Object.entries({HOME:'/work/home',TMPDIR:'/work/tmp',XDG_CONFIG_HOME:'/work/config',XDG_DATA_HOME:'/work/data',
       XDG_CACHE_HOME:'/work/cache',XDG_STATE_HOME:'/work/state',OPENCODE_DISABLE_MODELS_FETCH:'true',OPENCODE_DISABLE_AUTOUPDATE:'true'}).flatMap(([k,v])=>['--env',`${k}=${v}`]),
     selectedImage,selectedNode,'/relay.mjs'];

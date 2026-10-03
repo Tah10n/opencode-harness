@@ -1,0 +1,13 @@
+{
+  "id": "02-cli-limit",
+  "category": "related-files",
+  "title": "Limit a filtered CLI record list",
+  "feature": [
+    "fd02.filter-before-limit",
+    "fd02.limit-validation"
+  ],
+  "preservation": [
+    "fd02.original-cli-contracts"
+  ],
+  "wrongControl": "Plain limit examples work, but combining filtering with a limit loses matching records."
+}

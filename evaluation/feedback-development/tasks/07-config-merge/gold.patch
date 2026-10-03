@@ -1,0 +1,18 @@
+diff --git a/src/config.mjs b/src/config.mjs
+index b445d860369cbb51526b5a102a0d862597b1baac..9f19dcdc5e90635b4ee3990e0c9b01ac1983c836 100644
+--- a/src/config.mjs
++++ b/src/config.mjs
+@@ -1,8 +1,10 @@
++const plain=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
++const copy=value=>Array.isArray(value)?value.map(copy):plain(value)?Object.fromEntries(Object.entries(value).map(([k,v])=>[k,copy(v)])):value;
+ export function mergeConfig(defaults,overrides) {
++ const result=copy(defaults);
+  for(const [key,value] of Object.entries(overrides)) {
+   if(value===undefined)continue;
+-  if(value && !Array.isArray(value) && typeof value==='object' && defaults[key] && typeof defaults[key]==='object') Object.assign(defaults[key],value);
+-  else defaults[key]=value;
++  result[key]=plain(value)&&plain(result[key]) ? mergeConfig(result[key],value) : copy(value);
+  }
+- return defaults;
++ return result;
+ }

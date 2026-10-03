@@ -1,0 +1,13 @@
+{
+  "id": "08-options-refactor",
+  "category": "diagnosis-refactor",
+  "title": "Share the option normalizer",
+  "feature": [
+    "fd08.shared-normalizer-delegation"
+  ],
+  "preservation": [
+    "fd08.defaults-values-and-no-mutation",
+    "fd08.validation-preserved"
+  ],
+  "wrongControl": "Shared helper is used, but the text entrypoint accidentally discards user options."
+}

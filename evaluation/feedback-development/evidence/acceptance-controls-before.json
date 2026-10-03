@@ -1,0 +1,148 @@
+{
+  "sourceHead": "f01ac872987d822e718ce4ef61e7ea43326e6f8d",
+  "scope": "Original acceptance false successes; real offline evaluatePatch and independent node:test reporter",
+  "executionImage": "sha256:0874025605cca5c7e29ad5f16329843ad4e9ef0eab48ccf43e0ce0de1dd492a7",
+  "modelFree": true,
+  "realProviderCalls": 0,
+  "rows": [
+    {
+      "task": "01-invoice-discount",
+      "control": "discount-field-loss",
+      "patch": "tasks/01-invoice-discount/discount-field-loss.patch",
+      "evaluation": {
+        "R": true,
+        "status": "PASS",
+        "patchApplied": true,
+        "patchSha256": "0ace16e5737714d2beaf65b8fe837fc8475242ef186f0624482de508a648f5c3",
+        "acceptanceSha256": "54bbb85cc34fa7f4019f25964639e6d8c2e8083cdc849da2ede9d0aa5c365815",
+        "contained": true,
+        "cleanupVerified": true,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd01.discount-roundtrip",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd01.discount-validation",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd01.legacy-shape-and-validation",
+            "status": "PASS"
+          }
+        ]
+      },
+      "process": {
+        "status": 0,
+        "signal": null,
+        "error": null,
+        "completion": {
+          "type": "complete",
+          "counts": {
+            "tests": 3,
+            "failed": 0,
+            "passed": 3,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0,
+            "topLevel": 3,
+            "suites": 0
+          }
+        }
+      },
+      "public": {
+        "exit": 1,
+        "sourceUnchanged": true,
+        "failedTest": "discount travels from validation through pricing to export",
+        "expectedDiscountPercent": 20,
+        "actualDiscountPercent": "absent"
+      },
+      "walletObservation": null
+    },
+    {
+      "task": "03-wallet-cancel",
+      "control": "all-holds-refund",
+      "patch": "tasks/03-wallet-cancel/all-holds-refund.patch",
+      "evaluation": {
+        "R": true,
+        "status": "PASS",
+        "patchApplied": true,
+        "patchSha256": "9fdb2786196677baa417a78ce82fd60266965f5844515ca54682e2e948416773",
+        "acceptanceSha256": "f97e3c71cb2aaa959ea0fd58e56d0198221c33cf19f4d099be023ec72c818581",
+        "contained": true,
+        "cleanupVerified": true,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd03.cancel-reopen-repeat",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd03.other-holds-preserved",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd03.deposit-and-rejection",
+            "status": "PASS"
+          }
+        ]
+      },
+      "process": {
+        "status": 0,
+        "signal": null,
+        "error": null,
+        "completion": {
+          "type": "complete",
+          "counts": {
+            "tests": 3,
+            "failed": 0,
+            "passed": 3,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0,
+            "topLevel": 3,
+            "suites": 0
+          }
+        }
+      },
+      "public": {
+        "exit": 0,
+        "sourceUnchanged": true
+      },
+      "walletObservation": {
+        "initial": {
+          "available": 200,
+          "holds": {},
+          "settled": []
+        },
+        "before": {
+          "available": 80,
+          "holds": {
+            "a": 50,
+            "b": 70
+          },
+          "settled": []
+        },
+        "after": {
+          "available": 200,
+          "holds": {
+            "b": 70
+          },
+          "settled": []
+        },
+        "persisted": {
+          "available": 200,
+          "holds": {
+            "b": 70
+          },
+          "settled": []
+        }
+      }
+    }
+  ]
+}
