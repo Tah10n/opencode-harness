@@ -1,7 +1,9 @@
 // Scripted native OpenCode sessions; no auth read and no external model calls.
 import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';
 import {run} from './run.mjs';import {manifest} from '../support/manifest.mjs';
-import {local,campaign,selectionPath,arms} from './campaign.mjs';
+import {local,campaign,selectionPath,arms,qualityCampaign} from './campaign.mjs';
+const quality=qualityCampaign(campaign?.name),runtime=JSON.parse(fs.readFileSync(local+'/runtime.json'));
+const direct=arm=>quality||['P','C'].includes(arm);
 const out=local+'/'+(process.argv[2]??'scripted-preflight');fs.mkdirSync(out,{mode:0o700});
 const task=process.argv[3]??'serverless__serverless-2434',source=local+'/author-inputs/'+task+'/source';
 const row=JSON.parse(fs.readFileSync(selectionPath)).selected.find(r=>r.instance_id===task);assert.ok(row);
@@ -14,15 +16,16 @@ const environment=environments[source];assert.ok(environment);
 const shellQuote=value=>"'"+value.replaceAll("'", "'\"'\"'")+"'";
 const dependencyCheck=`node -e ${shellQuote('const fs=require("fs"); for(const d of '+JSON.stringify(environment.dependencyDirectories)+'){if(!fs.existsSync(d))throw Error("Missing local dependency directory: "+d);}console.log("PREPARED_WORKTREE_OK");')}`;
 const publicCheck=task==='serverless__serverless-2434'?'npm test -- --grep "should attach serverless instance"':dependencyCheck;
-fs.writeFileSync(out+'/freeze.json',JSON.stringify({version:1,experimentKind:process.argv[4]?'fixture':'polybench-preflight',...(campaign?{campaign:campaign.name,templates:{P:local+'/plain-dependencies',C:local+'/core-bundle',T:local+'/bundle'},recordingProfile:campaign.recording_profile}:{}),runtimeSha:JSON.parse(fs.readFileSync(local+'/runtime.json')).sha,model:config.model,variant:JSON.parse(fs.readFileSync(local+'/runtime.json')).variant,budgetMs:1800000,strategy:'direct',preflightPassed:true,streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,toolchain:local+'/toolchain',template:local+'/bundle',dependencies:local+'/plain-dependencies',config,attempts,inputManifests,environments,files:{}}));
+fs.writeFileSync(out+'/freeze.json',JSON.stringify({version:1,experimentKind:process.argv[4]?'fixture':'polybench-preflight',...(campaign?{campaign:campaign.name,templates:quality?runtime.templates:{P:local+'/plain-dependencies',C:local+'/core-bundle',T:local+'/bundle'},...(quality?{armModes:runtime.armModes}:{}),recordingProfile:campaign.recording_profile}:{}),runtimeSha:runtime.sha,model:config.model,variant:runtime.variant,budgetMs:1800000,strategy:'direct',preflightPassed:true,streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,toolchain:local+'/toolchain',template:local+'/bundle',dependencies:local+'/plain-dependencies',config,attempts,inputManifests,environments,files:{}}));
 let seq=0;const states=new Map();
 const outcome=await run(out,{readAuth:()=>({access:'scripted-no-credential',accountId:'scripted'}),fetchImpl:async(url,settings)=>{
  assert.equal(url,'https://chatgpt.com/backend-api/codex/responses');const body=JSON.parse(settings.body),all=JSON.stringify(body);
  const a=attempts.find(a=>fs.existsSync(out+'/runs/'+task+'-'+a.arm+'/started.json')&&!fs.existsSync(out+'/runs/'+task+'-'+a.arm+'/completed.json'));assert.ok(a);
  const state=states.get(a.arm)??{parent:0,author:0};states.set(a.arm,state);
- const names=(body.tools??[]).map(t=>t.name),title=!names.length,author=['P','C'].includes(a.arm)||all.includes('Implement the complete original task');let call;
+ const names=(body.tools??[]).map(t=>t.name),title=!names.length,author=direct(a.arm)||all.includes('Implement the complete original task');let call;
  if(names.length){assert.ok(!names.includes('webfetch'));for(const name of ['read','bash','glob','grep','apply_patch'])assert.ok(names.includes(name));}
- if(['P','C'].includes(a.arm)){assert.ok(!names.includes('harness_task'));assert.ok(!all.includes('Native task workflow'));}
+ if(direct(a.arm)){assert.ok(!names.includes('harness_task'));assert.ok(!all.includes('Native task workflow'));}
+ if(!title&&quality&&runtime.armModes[a.arm]==='core')assert.ok(all.includes(JSON.stringify(fs.readFileSync(runtime.templates[a.arm]+'/core.md','utf8').trim()).slice(1,-1)),'Frozen arm core instructions missing');
  if(!title&&a.arm==='C')assert.ok(all.includes(JSON.stringify(fs.readFileSync(local+'/core-bundle/core.md','utf8').trim()).slice(1,-1)),'Core instructions missing');
  if(!title&&a.arm==='T'&&author)assert.ok(names.includes('harness_investigate'),'Investigator tool missing');
  if(!title&&!author){assert.ok(names.includes('harness_task'));if(state.parent++===0)call={name:'harness_task',args:{}};}
@@ -53,7 +56,7 @@ for(const a of attempts){
  assert.ok(native.tools.some(t=>t.data.tool==='bash'&&t.data.state?.input?.command===publicCheck&&t.data.state?.metadata?.exit===0),'Public test command must run successfully in actual delivery worktree');
  const art=dir+'/task-artifacts';let compatibility=null;
  assert.ok(fs.readFileSync(dir+'/model.patch','utf8').includes('preflight-marker.txt'));
- if(['P','C'].includes(a.arm)){assert.equal(fs.readdirSync(art).length,0);}
+ if(direct(a.arm)){assert.equal(fs.readdirSync(art).length,0);}
  else{const folder=art+'/'+fs.readdirSync(art)[0];assert.equal(fs.readFileSync(folder+'/terminal.patch','utf8'),fs.readFileSync(dir+'/model.patch','utf8'),'Common collector must preserve terminal patch bytes');
   if(['H0','T'].includes(a.arm))assert.ok(!fs.existsSync(folder+'/type-compat.json'));
   else{compatibility=JSON.parse(fs.readFileSync(folder+'/type-compat.json'));assert.ok(compatibility);assert.notEqual(compatibility.status,'NOT RUN','Compiler permissions must be prepared before applicability is assessed');}}

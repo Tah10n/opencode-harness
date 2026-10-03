@@ -1,5 +1,5 @@
 """Reuse the existing pinned Node image, never replace the project toolchain."""
-import subprocess,tarfile,shutil
+import subprocess,tarfile,shutil,json
 from pathlib import Path
 from campaign import LOCAL as CAMPAIGN_LOCAL, SELECTION, CONFIG
 ROOT=Path(__file__).resolve().parents[2];folder=CAMPAIGN_LOCAL/'diagnostic';folder.mkdir(parents=True,exist_ok=True)
@@ -15,5 +15,6 @@ for file in files:
  if not (folder/file.lstrip('/')).is_file():raise RuntimeError('Incomplete diagnostic preparation')
 (folder/'.dockerignore').write_text('runtime.tar\n')
 
-for directory in (['bundle','core-bundle','plain-dependencies'] if CONFIG else ['bundle','plain-dependencies']):
+runtime=json.loads((CAMPAIGN_LOCAL/'runtime.json').read_text())
+for directory in runtime.get('bundleDirectories', ['bundle','core-bundle','plain-dependencies'] if CONFIG else ['bundle','plain-dependencies']):
  shutil.copy2(folder/'usr/bin/rg',CAMPAIGN_LOCAL/directory/'rg')

@@ -1,0 +1,47 @@
+{
+  "campaign": "evidence-backed-core-development-v1",
+  "completed_eligible_batch": true,
+  "admission_stop": false,
+  "selected": false,
+  "product_sha": "8253fa1c739b43917799f5c23ccffdf1dea618f6",
+  "primary_endpoint": "D = R AND T_delivery",
+  "counts": {
+    "P": {
+      "R": 4,
+      "D": 4,
+      "T_delivery": 6,
+      "tasks": 6
+    },
+    "C0": {
+      "R": 3,
+      "D": 3,
+      "T_delivery": 6,
+      "tasks": 6
+    },
+    "H1": {
+      "R": 3,
+      "D": 3,
+      "T_delivery": 6,
+      "tasks": 6
+    }
+  },
+  "decision": "reject_H1",
+  "reason": "H1 does not exceed either fresh control; the sole H1/P difference is evaluator test identity with identical production patches",
+  "results_sha256": "23ff0e71ef5483180cdb425fc4480d6d0c52fd377905ffb9cf1354c17263eea3",
+  "H2": {
+    "status": "not_implemented_not_run",
+    "reason": "The feature-baseline proposal repeats existing task/caller/check principles without a result-grounded distinguishing public action; unavailable GIF semantics and browser execution remain unresolved",
+    "independent_review": "read-only review of the third deeply inspected task agreed that this proposal fails its pre-implementation gate"
+  },
+  "confirmation": {
+    "status": "not_started",
+    "task_runs": 0,
+    "reason": "No eligible selected candidate; metadata selection remains unused"
+  },
+  "active_product": {
+    "core_source": "358cb0a3fecce7f8b3af75d7ae6d6d4052257c04",
+    "candidate_preserved": "candidate-h1.patch",
+    "candidate_recovery_verified": true
+  },
+  "quality_increase_achieved": false
+}

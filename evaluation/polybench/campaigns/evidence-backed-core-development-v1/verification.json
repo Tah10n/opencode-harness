@@ -1,0 +1,60 @@
+{
+  "source_head": "faa140efe4e1ab618e89f8180c2bc936b068b833",
+  "model_free_verify": {
+    "exit_code": 0,
+    "groups": [
+      "scripts/verify-native-template.mjs",
+      "scripts/verify-native-review.mjs",
+      "scripts/verify-native-task.mjs",
+      "scripts/verify-native-command-hints.mjs",
+      "scripts/verify-native-project-feedback.mjs",
+      "scripts/verify-native-preservation-nudge.mjs",
+      "scripts/verify-native-preservation-hooks.mjs",
+      "scripts/verify-native-task-investigation.mjs",
+      "scripts/verify-native-task-investigation-delivery.mjs",
+      "scripts/verify-native-stateful.mjs",
+      "scripts/verify-native-sensitivity.mjs",
+      "scripts/verify-native-sensitivity-dependencies.mjs",
+      "scripts/verify-native-type-compat.mjs",
+      "scripts/verify-native-type-compat-hooks.mjs",
+      "scripts/verify-large-git.mjs",
+      "scripts/verify-boundary.mjs",
+      "evaluation/support/verify-input-admission.mjs",
+      "evaluation/support/verify-scheduler.mjs",
+      "evaluation/support/verify-recording.mjs",
+      "evaluation/polybench/verify.py"
+    ],
+    "log_sha256": "eaa2ab6909bb92f9c95cffdf3eeadd852c09e90bb2fc675edddbd54f725e3068"
+  },
+  "installed": {
+    "passed": true,
+    "installedWorkflow": true,
+    "scenarios": 35,
+    "scriptedRequests": 268,
+    "workflowRequests": 233,
+    "auxiliaryRequests": 35,
+    "realProviderRequests": 0
+  },
+  "installed_version": "1.18.26",
+  "installed_temp_removed": true,
+  "installed_log_sha256": "dd855defb485e7ae9c238ef969710a4fe43f6eaac81878ec4750d482788cd89d",
+  "active_core_exact_C0": true,
+  "candidate_recovery": {
+    "strict_apply": true,
+    "exact_bytes_modes": true
+  },
+  "semantic_review": {
+    "scope": "current working tree published at source_head; causal claims and adapter admission/isolation/recording preservation; no additional deep tasks",
+    "confirmed_issue": "Incorrect statement that enforced deadline includes post-author capture",
+    "disposition": "report and cost timer scope corrected; no other confirmed defects in reviewed scope",
+    "github_approval": false
+  },
+  "diff_check": {
+    "source_docs_and_other_data_exit_code": 0,
+    "verbatim_candidate_patch_exit_code": 2,
+    "diagnostic": "evaluation/polybench/campaigns/evidence-backed-core-development-v1/candidate-h1.patch:7: trailing whitespace.\n+",
+    "interpretation": "Preserved blank context line in the byte-exact unified diff; candidate source diff/recovery verified. No patch bytes altered to suppress this warning."
+  },
+  "model_quality": "H1 rejected at completed development screening; no confirmation",
+  "CI": "Required external check remains separately bound to the actual PR head"
+}

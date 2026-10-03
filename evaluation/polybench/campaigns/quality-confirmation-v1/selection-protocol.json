@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "seed": "opencode-harness-quality-confirmation-v1",
+  "languages": [
+    "JavaScript",
+    "TypeScript"
+  ],
+  "per_language": 15,
+  "max_per_repository": 6,
+  "min_repositories": 5,
+  "excluded_instance_ids": [
+    "coder__code-server-3277",
+    "coder__code-server-4923",
+    "microsoft__vscode-108964",
+    "microsoft__vscode-135805",
+    "microsoft__vscode-136347",
+    "microsoft__vscode-177084",
+    "microsoft__vscode-189223",
+    "mrdoob__three.js-24461",
+    "mui__material-ui-17301",
+    "mui__material-ui-18141",
+    "mui__material-ui-18683",
+    "mui__material-ui-20356",
+    "mui__material-ui-36971",
+    "mui__material-ui-38544",
+    "mui__material-ui-42412",
+    "prettier__prettier-5025",
+    "prettier__prettier-8777",
+    "serverless__serverless-2434",
+    "serverless__serverless-2945",
+    "serverless__serverless-6534",
+    "serverless__serverless-6842",
+    "serverless__serverless-6869",
+    "serverless__serverless-8159",
+    "sveltejs__svelte-1190",
+    "sveltejs__svelte-3151",
+    "sveltejs__svelte-5452",
+    "sveltejs__svelte-5850",
+    "sveltejs__svelte-6458",
+    "sveltejs__svelte-738",
+    "tailwindlabs__tailwindcss-550"
+  ],
+  "reserves_per_language": 5,
+  "source_revision": "358cb0a3fecce7f8b3af75d7ae6d6d4052257c04",
+  "exclusion_sources": [
+    {
+      "path": "evaluation/polybench/selection.json",
+      "sha256": "f6fe8e65780de1e492b1891463c94c10c6bb278ab41b3994a5f93e0393210345"
+    },
+    {
+      "path": "evaluation/polybench/campaigns/consolidated-v1/selection.json",
+      "sha256": "fc63631c02baf256e0c726e217a25010bca2e0a2f3dc31613cfdd578f808f1fc"
+    },
+    {
+      "path": "evaluation/polybench/campaigns/consolidated-remaining-v1/selection.json",
+      "sha256": "43476ea3fc5b1068760a79563a2994800703129d403393e4b2919cc1607aed04"
+    }
+  ],
+  "selector_source": "evaluation/polybench/selection.py",
+  "selector_sha256": "3fbb095ecec8d8735691f80806efed7633cace61b29925d7c5d44d5ed24143c7"
+}

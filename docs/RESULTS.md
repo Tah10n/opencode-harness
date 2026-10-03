@@ -4,6 +4,34 @@
 campaigns have different runtimes, datasets and scoring contracts; they must not
 be pooled into a project success rate. Technical fixtures are not model lift.
 
+## Evidence-backed core: completed development rejection
+
+The [report](../evaluation/polybench/campaigns/evidence-backed-core-development-v1/REPORT.md)
+and [18 full slot records](../evaluation/polybench/campaigns/evidence-backed-core-development-v1/results.json)
+screen H1 product `8253fa1c` against fresh Plain and unchanged C0 `358cb0a3`.
+All six prescribed tasks ran once per arm and received official evaluation:
+P R=D **4/6**, C0 R=D **3/6**, H1 R=D **3/6**; each delivery **6/6**.
+No unknown outcomes, repeats, replacements or new admission stop. All full
+author patches, strict applicability and exact capture/roundtrip are retained;
+three MUI-18683 full submissions were officially rejected.
+
+H1/P: zero wins, one loss, five ties; −16.7 pp, descriptive conservative 95%
+interval [−69.13, +51.62] pp. H1/C0: six ties; 0 pp, interval [−51.83, +51.83] pp.
+The only H1/P difference is Three.js test identity with identical production.
+Serverless supplies visible method use, but no additional D versus either control.
+H1 is rejected and active core restored. An insufficiently grounded H2 proposal
+was declined before implementation or model runs. Confirmation was not started.
+The intended quality increase was not achieved; this is a bounded development
+decision, not formal independent testing or proof of equivalence.
+
+[Cost data](../evaluation/polybench/campaigns/evidence-backed-core-development-v1/costs.json)
+attribute 546 real requests: 18 title, 513 author/parent, 15 native child; zero
+unknown usage. Input/output totals 29,669,291 / 159,936; cached/reasoning are
+included subsets. H1 used 65.6% more agent time and 73.4% more input than P.
+Preparation, complete task timers, evaluator and unmetered maintainer/CI costs
+are separate. Money is unknown. Historical results below are unchanged and
+are not added to this candidate's score or expenses.
+
 ## Remaining eight tasks: candidate f83b101b
 
 The [new report](../evaluation/polybench/campaigns/consolidated-remaining-v1/REPORT.md)

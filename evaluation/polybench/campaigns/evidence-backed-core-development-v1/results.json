@@ -1,0 +1,2053 @@
+{
+  "campaign": "evidence-backed-core-development-v1",
+  "product_sha": "8253fa1c739b43917799f5c23ccffdf1dea618f6",
+  "adapter_sha": "cafabe91aa717776a94df93a1f74262c60ce1113",
+  "C0_sha": "358cb0a3fecce7f8b3af75d7ae6d6d4052257c04",
+  "model": "openai/gpt-5.6-luna",
+  "effort": "high",
+  "opencode_version": "1.18.26",
+  "total_task_budget_seconds": 1800,
+  "outcome": {
+    "status": "finished",
+    "pause": null
+  },
+  "scheduling_pause": null,
+  "assigned": 18,
+  "started": 18,
+  "officially_evaluated": 18,
+  "primary_endpoint": "D = R AND T_delivery",
+  "comparisons": {
+    "H1-P": {
+      "D": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 5,
+        "unknown": 0,
+        "paired_tasks": 6,
+        "delta_pp": -16.666666666666668,
+        "ci95_pp": [
+          -69.12644157756638,
+          51.615949034447276
+        ],
+        "interval_method": "Bonferroni difference of two 97.5% exact Clopper-Pearson binomial intervals",
+        "exact_mcnemar_p": null,
+        "formal_primary": false
+      },
+      "R": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 5,
+        "unknown": 0,
+        "paired_tasks": 6,
+        "delta_pp": -16.666666666666668,
+        "ci95_pp": [
+          -69.12644157756638,
+          51.615949034447276
+        ],
+        "interval_method": "Bonferroni difference of two 97.5% exact Clopper-Pearson binomial intervals",
+        "exact_mcnemar_p": null,
+        "formal_primary": false
+      }
+    },
+    "H1-C0": {
+      "D": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 6,
+        "unknown": 0,
+        "paired_tasks": 6,
+        "delta_pp": 0.0,
+        "ci95_pp": [
+          -51.825375800050196,
+          51.825375800050196
+        ],
+        "interval_method": "Bonferroni difference of two 97.5% exact Clopper-Pearson binomial intervals",
+        "exact_mcnemar_p": null,
+        "formal_primary": false
+      },
+      "R": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 6,
+        "unknown": 0,
+        "paired_tasks": 6,
+        "delta_pp": 0.0,
+        "ci95_pp": [
+          -51.825375800050196,
+          51.825375800050196
+        ],
+        "interval_method": "Bonferroni difference of two 97.5% exact Clopper-Pearson binomial intervals",
+        "exact_mcnemar_p": null,
+        "formal_primary": false
+      }
+    },
+    "C0-P": {
+      "D": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 5,
+        "unknown": 0,
+        "paired_tasks": 6,
+        "delta_pp": -16.666666666666668,
+        "ci95_pp": [
+          -69.12644157756638,
+          51.615949034447276
+        ],
+        "interval_method": "Bonferroni difference of two 97.5% exact Clopper-Pearson binomial intervals",
+        "exact_mcnemar_p": null,
+        "formal_primary": false
+      },
+      "R": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 5,
+        "unknown": 0,
+        "paired_tasks": 6,
+        "delta_pp": -16.666666666666668,
+        "ci95_pp": [
+          -69.12644157756638,
+          51.615949034447276
+        ],
+        "interval_method": "Bonferroni difference of two 97.5% exact Clopper-Pearson binomial intervals",
+        "exact_mcnemar_p": null,
+        "formal_primary": false
+      }
+    }
+  },
+  "leave_one_repository_out": {
+    "microsoft/vscode": {
+      "D": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 3,
+        "unknown": 0,
+        "paired_tasks": 4,
+        "delta_pp": -25.0,
+        "ci95_pp": [
+          -84.77699852319122,
+          66.24900913361625
+        ],
+        "interval_method": "Bonferroni difference of two 97.5% exact Clopper-Pearson binomial intervals",
+        "exact_mcnemar_p": null,
+        "formal_primary": false
+      },
+      "R": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 3,
+        "unknown": 0,
+        "paired_tasks": 4,
+        "delta_pp": -25.0,
+        "ci95_pp": [
+          -84.77699852319122,
+          66.24900913361625
+        ],
+        "interval_method": "Bonferroni difference of two 97.5% exact Clopper-Pearson binomial intervals",
+        "exact_mcnemar_p": null,
+        "formal_primary": false
+      }
+    },
+    "mrdoob/three.js": {
+      "D": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 5,
+        "unknown": 0,
+        "paired_tasks": 5,
+        "delta_pp": 0.0,
+        "ci95_pp": [
+          -58.372339629906335,
+          58.372339629906335
+        ],
+        "interval_method": "Bonferroni difference of two 97.5% exact Clopper-Pearson binomial intervals",
+        "exact_mcnemar_p": null,
+        "formal_primary": false
+      },
+      "R": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 5,
+        "unknown": 0,
+        "paired_tasks": 5,
+        "delta_pp": 0.0,
+        "ci95_pp": [
+          -58.372339629906335,
+          58.372339629906335
+        ],
+        "interval_method": "Bonferroni difference of two 97.5% exact Clopper-Pearson binomial intervals",
+        "exact_mcnemar_p": null,
+        "formal_primary": false
+      }
+    },
+    "mui/material-ui": {
+      "D": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 3,
+        "unknown": 0,
+        "paired_tasks": 4,
+        "delta_pp": -25.0,
+        "ci95_pp": [
+          -84.77699852319122,
+          66.24900913361625
+        ],
+        "interval_method": "Bonferroni difference of two 97.5% exact Clopper-Pearson binomial intervals",
+        "exact_mcnemar_p": null,
+        "formal_primary": false
+      },
+      "R": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 3,
+        "unknown": 0,
+        "paired_tasks": 4,
+        "delta_pp": -25.0,
+        "ci95_pp": [
+          -84.77699852319122,
+          66.24900913361625
+        ],
+        "interval_method": "Bonferroni difference of two 97.5% exact Clopper-Pearson binomial intervals",
+        "exact_mcnemar_p": null,
+        "formal_primary": false
+      }
+    },
+    "serverless/serverless": {
+      "D": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 4,
+        "unknown": 0,
+        "paired_tasks": 5,
+        "delta_pp": -20.0,
+        "ci95_pp": [
+          -76.44086910853733,
+          58.121080172087915
+        ],
+        "interval_method": "Bonferroni difference of two 97.5% exact Clopper-Pearson binomial intervals",
+        "exact_mcnemar_p": null,
+        "formal_primary": false
+      },
+      "R": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 4,
+        "unknown": 0,
+        "paired_tasks": 5,
+        "delta_pp": -20.0,
+        "ci95_pp": [
+          -76.44086910853733,
+          58.121080172087915
+        ],
+        "interval_method": "Bonferroni difference of two 97.5% exact Clopper-Pearson binomial intervals",
+        "exact_mcnemar_p": null,
+        "formal_primary": false
+      }
+    }
+  },
+  "accounting_sha256": "96e170e46086aac3b83e34af03eebdd6400115c142aa7c415a9822860f90783c",
+  "freeze_sha256": "fae2df856e7d4fff531f4fef8806191b8357063c4b16bb7e478f2980f8e5b706",
+  "request_attribution_sha256": "fa037e59c18691e964a2b7286a6c142b486f7b1ee2a39a889a33d374b2e16677",
+  "interpretation": "Completed development screening; not independent confirmation. H1 rejected; no quality increase established.",
+  "slots": [
+    {
+      "slot": 1,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "P",
+      "repo": "mrdoob/three.js",
+      "language": "JavaScript",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "T_delivery": true,
+      "D": true,
+      "D_bench": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "a92a2e82cd4908864f0d5b4831db21ec2da7ad9e2334d1b6e5a56d12f22996c8",
+      "patch_bytes": 1620,
+      "author_elapsed_ms": 116053.159041,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 18,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 264254,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 3118,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 78848,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 1244,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 18
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T00:15:39.771Z",
+          "monotonicMs": 381113.21425
+        },
+        "deadlineAt": "2026-10-02T00:45:39.770Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T00:17:35.878Z",
+          "monotonicMs": 497219.796375
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T00:17:35.879Z",
+          "monotonicMs": 497220.842084
+        },
+        "captureStarted": {
+          "at": "2026-10-02T00:17:35.942Z",
+          "monotonicMs": 497283.891417
+        },
+        "captureFinished": {
+          "at": "2026-10-02T00:17:38.830Z",
+          "monotonicMs": 500172.227959
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T00:17:38.831Z",
+          "monotonicMs": 500173.231709
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T00:17:39.073Z",
+          "monotonicMs": 500415.205917
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": true,
+        "patch_applied": true,
+        "parsed_passed_tests": 718,
+        "parsed_failed_or_todo_tests": 897,
+        "source_sha256": "538c7a78acd09947f2a13394b35ce3175b0da36f14c622c7a2ec4c0c71ce805c"
+      }
+    },
+    {
+      "slot": 2,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "C0",
+      "repo": "mrdoob/three.js",
+      "language": "JavaScript",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "T_delivery": true,
+      "D": false,
+      "D_bench": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "a4a9b671446e6c7171b4cb08bd5f8e68c1306ef7dd44c5a7ac293c8b52f3d8d6",
+      "patch_bytes": 1973,
+      "author_elapsed_ms": 175465.28995900007,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 21,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 506495,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 5209,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 217600,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 2311,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 21
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T00:18:51.200Z",
+          "monotonicMs": 572542.327417
+        },
+        "deadlineAt": "2026-10-02T00:48:51.200Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T00:21:46.717Z",
+          "monotonicMs": 748059.268334
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T00:21:46.718Z",
+          "monotonicMs": 748059.856334
+        },
+        "captureStarted": {
+          "at": "2026-10-02T00:21:46.786Z",
+          "monotonicMs": 748127.952292
+        },
+        "captureFinished": {
+          "at": "2026-10-02T00:21:49.711Z",
+          "monotonicMs": 751053.040625
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T00:21:49.712Z",
+          "monotonicMs": 751054.107667
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T00:21:50.002Z",
+          "monotonicMs": 751344.374917
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": false,
+        "patch_applied": true,
+        "parsed_passed_tests": 719,
+        "parsed_failed_or_todo_tests": 897,
+        "source_sha256": "5a7ad72e86f0d06b05516225f0a83eeb92e58fdefe3e46debfb34c5d829bc8ee"
+      }
+    },
+    {
+      "slot": 3,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "H1",
+      "repo": "mrdoob/three.js",
+      "language": "JavaScript",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "T_delivery": true,
+      "D": false,
+      "D_bench": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "26e61d7d570410a8367a14978e861cdab98c5e800f4b61df30178d6562d0849c",
+      "patch_bytes": 1711,
+      "author_elapsed_ms": 175050.58045799995,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 22,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 535178,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 5037,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 187904,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 2173,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 22
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T00:23:03.310Z",
+          "monotonicMs": 824651.524834
+        },
+        "deadlineAt": "2026-10-02T00:53:03.309Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T00:25:58.426Z",
+          "monotonicMs": 999767.331084
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T00:25:58.426Z",
+          "monotonicMs": 999768.088084
+        },
+        "captureStarted": {
+          "at": "2026-10-02T00:25:58.489Z",
+          "monotonicMs": 999830.536375
+        },
+        "captureFinished": {
+          "at": "2026-10-02T00:26:01.392Z",
+          "monotonicMs": 1002733.239917
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T00:26:01.393Z",
+          "monotonicMs": 1002734.586
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T00:26:01.658Z",
+          "monotonicMs": 1003000.07275
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": false,
+        "patch_applied": true,
+        "parsed_passed_tests": 719,
+        "parsed_failed_or_todo_tests": 897,
+        "source_sha256": "ef752134a71e528f3bbf1215f218fc5c05732ed7ee8ccb36e1619a9967152a9d"
+      }
+    },
+    {
+      "slot": 4,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "C0",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "T_delivery": true,
+      "D": true,
+      "D_bench": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "1180c05cb22046780092d220f916e1ad861cc7432fc26b0925bb7213a22f99e4",
+      "patch_bytes": 7398,
+      "author_elapsed_ms": 243766.83945899992,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 25,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 803184,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 9430,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 365056,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 4350,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 25
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T00:27:12.116Z",
+          "monotonicMs": 1073457.273459
+        },
+        "deadlineAt": "2026-10-02T00:57:12.115Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T00:31:15.939Z",
+          "monotonicMs": 1317280.058
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T00:31:15.940Z",
+          "monotonicMs": 1317281.208375
+        },
+        "captureStarted": {
+          "at": "2026-10-02T00:31:16.009Z",
+          "monotonicMs": 1317349.984625
+        },
+        "captureFinished": {
+          "at": "2026-10-02T00:31:16.653Z",
+          "monotonicMs": 1317994.114709
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T00:31:16.654Z",
+          "monotonicMs": 1317995.590792
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T00:31:16.841Z",
+          "monotonicMs": 1318182.475917
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": true,
+        "patch_applied": true,
+        "parsed_passed_tests": 54,
+        "parsed_failed_or_todo_tests": 0,
+        "source_sha256": "eed33d20e5192fc05230ec8c01282ff101de4d0efa313f28a23b23ec26ac3c7f"
+      }
+    },
+    {
+      "slot": 5,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "H1",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "T_delivery": true,
+      "D": true,
+      "D_bench": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "45e727be98d02d0d4e8e02ac251d7cfa30dee1004fd9c26a8190ff9541213f73",
+      "patch_bytes": 5442,
+      "author_elapsed_ms": 285323.43625,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 24,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 930166,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 9622,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 379392,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 5431,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 24
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T00:32:20.235Z",
+          "monotonicMs": 1381575.562542
+        },
+        "deadlineAt": "2026-10-02T01:02:20.235Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T00:37:05.617Z",
+          "monotonicMs": 1666956.989667
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T00:37:05.617Z",
+          "monotonicMs": 1666957.381875
+        },
+        "captureStarted": {
+          "at": "2026-10-02T00:37:05.683Z",
+          "monotonicMs": 1667023.201459
+        },
+        "captureFinished": {
+          "at": "2026-10-02T00:37:06.432Z",
+          "monotonicMs": 1667772.078125
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T00:37:06.434Z",
+          "monotonicMs": 1667774.302959
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T00:37:06.621Z",
+          "monotonicMs": 1667960.689959
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": true,
+        "patch_applied": true,
+        "parsed_passed_tests": 54,
+        "parsed_failed_or_todo_tests": 0,
+        "source_sha256": "da74cdc7c3ba06c15e68c24f44180512fe32bb942ff474ddc0601fbe440d36fa"
+      }
+    },
+    {
+      "slot": 6,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "P",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "T_delivery": true,
+      "D": true,
+      "D_bench": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "b53a329a8b08e79c22612ba940096d755fe1a7f0b0e25735edc2eaddb20680b3",
+      "patch_bytes": 4875,
+      "author_elapsed_ms": 218544.73504199996,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 19,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 560180,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 7290,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 183808,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 3640,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 19
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T00:38:09.193Z",
+          "monotonicMs": 1730533.213542
+        },
+        "deadlineAt": "2026-10-02T01:08:09.193Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T00:41:47.791Z",
+          "monotonicMs": 1949130.971209
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T00:41:47.792Z",
+          "monotonicMs": 1949131.234084
+        },
+        "captureStarted": {
+          "at": "2026-10-02T00:41:47.851Z",
+          "monotonicMs": 1949191.180625
+        },
+        "captureFinished": {
+          "at": "2026-10-02T00:41:48.564Z",
+          "monotonicMs": 1949904.085084
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T00:41:48.566Z",
+          "monotonicMs": 1949905.727875
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T00:41:48.755Z",
+          "monotonicMs": 1950094.382709
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": true,
+        "patch_applied": true,
+        "parsed_passed_tests": 53,
+        "parsed_failed_or_todo_tests": 0,
+        "source_sha256": "e240948354cdbd5b05ce739c58d1e3a5e2536d79783c954e7b8922fe21cd0214"
+      }
+    },
+    {
+      "slot": 7,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "H1",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "T_delivery": true,
+      "D": true,
+      "D_bench": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "f727f9d2c3fa996486d865768015af04e99ca62be783c00dd60960d62c67eaf9",
+      "patch_bytes": 1901,
+      "author_elapsed_ms": 262438.15145799983,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 20,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 487275,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 4617,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 250880,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 2011,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 20
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T00:43:38.615Z",
+          "monotonicMs": 2059954.287167
+        },
+        "deadlineAt": "2026-10-02T01:13:38.614Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T00:48:01.110Z",
+          "monotonicMs": 2322449.4715
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T00:48:01.111Z",
+          "monotonicMs": 2322449.778209
+        },
+        "captureStarted": {
+          "at": "2026-10-02T00:48:01.178Z",
+          "monotonicMs": 2322516.850417
+        },
+        "captureFinished": {
+          "at": "2026-10-02T00:48:03.283Z",
+          "monotonicMs": 2324622.5335
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T00:48:03.285Z",
+          "monotonicMs": 2324624.008167
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T00:48:04.186Z",
+          "monotonicMs": 2325525.113625
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": true,
+        "patch_applied": true,
+        "parsed_passed_tests": 5,
+        "parsed_failed_or_todo_tests": 0,
+        "source_sha256": "44c48d4ca4b9612c8af2070eba4b7293f171cd3f7cd8d4a082139cbe3393a16d"
+      }
+    },
+    {
+      "slot": 8,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "P",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "T_delivery": true,
+      "D": true,
+      "D_bench": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "2cd0f106f3e1e9cc411f93b49bdf7a5f9373df364c6e1fe1ebdfd3eb99c11ebc",
+      "patch_bytes": 1593,
+      "author_elapsed_ms": 72171.68454199983,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 13,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 192471,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 2326,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 66048,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 917,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 13
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T00:49:55.643Z",
+          "monotonicMs": 2436982.490834
+        },
+        "deadlineAt": "2026-10-02T01:19:55.643Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T00:51:07.864Z",
+          "monotonicMs": 2509203.400209
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T00:51:07.865Z",
+          "monotonicMs": 2509203.860042
+        },
+        "captureStarted": {
+          "at": "2026-10-02T00:51:07.923Z",
+          "monotonicMs": 2509262.273917
+        },
+        "captureFinished": {
+          "at": "2026-10-02T00:51:10.023Z",
+          "monotonicMs": 2511361.502209
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T00:51:10.024Z",
+          "monotonicMs": 2511362.442584
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T00:51:10.505Z",
+          "monotonicMs": 2511843.813417
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": true,
+        "patch_applied": true,
+        "parsed_passed_tests": 5,
+        "parsed_failed_or_todo_tests": 0,
+        "source_sha256": "09715906761bf2547cb1aa2fbfa0813127a82ae13f9a7ede058f1fa87b1058db"
+      }
+    },
+    {
+      "slot": 9,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "C0",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "T_delivery": true,
+      "D": true,
+      "D_bench": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "105cad058119c32627901fceda0cbb58f51a0c2b8700e665a0997a5d8e8ec9bf",
+      "patch_bytes": 1604,
+      "author_elapsed_ms": 226472.54350000015,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 15,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 280569,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 3442,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 128000,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 1422,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 15
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T00:52:57.236Z",
+          "monotonicMs": 2618574.943084
+        },
+        "deadlineAt": "2026-10-02T01:22:57.236Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T00:56:43.762Z",
+          "monotonicMs": 2845100.927792
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T00:56:43.763Z",
+          "monotonicMs": 2845101.281334
+        },
+        "captureStarted": {
+          "at": "2026-10-02T00:56:43.820Z",
+          "monotonicMs": 2845158.784625
+        },
+        "captureFinished": {
+          "at": "2026-10-02T00:56:45.934Z",
+          "monotonicMs": 2847272.10125
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T00:56:45.935Z",
+          "monotonicMs": 2847273.525959
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T00:56:46.677Z",
+          "monotonicMs": 2848015.526959
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": true,
+        "patch_applied": true,
+        "parsed_passed_tests": 5,
+        "parsed_failed_or_todo_tests": 0,
+        "source_sha256": "44c48d4ca4b9612c8af2070eba4b7293f171cd3f7cd8d4a082139cbe3393a16d"
+      }
+    },
+    {
+      "slot": 10,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "P",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "T_delivery": true,
+      "D": true,
+      "D_bench": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "73d52ebb531fcca16748c39295295dcc8a21d1197eff41dd327621c9b51b8622",
+      "patch_bytes": 1910,
+      "author_elapsed_ms": 895222.9493749999,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 41,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 2370576,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 9608,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 1459200,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 5208,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 41
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T00:58:11.955Z",
+          "monotonicMs": 2933294.335917
+        },
+        "deadlineAt": "2026-10-02T01:28:11.955Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T01:13:07.234Z",
+          "monotonicMs": 3828571.5655
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T01:13:07.234Z",
+          "monotonicMs": 3828571.967042
+        },
+        "captureStarted": {
+          "at": "2026-10-02T01:13:07.295Z",
+          "monotonicMs": 3828632.867
+        },
+        "captureFinished": {
+          "at": "2026-10-02T01:13:08.283Z",
+          "monotonicMs": 3829621.346375
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T01:13:08.285Z",
+          "monotonicMs": 3829623.090042
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T01:13:08.857Z",
+          "monotonicMs": 3830195.266167
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": true,
+        "patch_applied": true,
+        "parsed_passed_tests": 35,
+        "parsed_failed_or_todo_tests": 0,
+        "source_sha256": "b96b9f68167ba4024f881c430d472cca2be96c6fa5fc46f5af2239e5c03efc1d"
+      }
+    },
+    {
+      "slot": 11,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "C0",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "T_delivery": true,
+      "D": true,
+      "D_bench": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "7c19896e2dc9e8a19dc4fa5ea9044c58cf536092e653ff48dc52502f09f3bf5d",
+      "patch_bytes": 2069,
+      "author_elapsed_ms": 742208.9537919997,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 35,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 2393929,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 7081,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 1411584,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 3474,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 35
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T01:14:21.023Z",
+          "monotonicMs": 3902361.068459
+        },
+        "deadlineAt": "2026-10-02T01:44:21.023Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T01:26:43.290Z",
+          "monotonicMs": 4644628.07775
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T01:26:43.290Z",
+          "monotonicMs": 4644628.524334
+        },
+        "captureStarted": {
+          "at": "2026-10-02T01:26:43.356Z",
+          "monotonicMs": 4644694.41325
+        },
+        "captureFinished": {
+          "at": "2026-10-02T01:26:44.362Z",
+          "monotonicMs": 4645700.326
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T01:26:44.364Z",
+          "monotonicMs": 4645702.457375
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T01:26:44.938Z",
+          "monotonicMs": 4646275.716042
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": true,
+        "patch_applied": true,
+        "parsed_passed_tests": 35,
+        "parsed_failed_or_todo_tests": 0,
+        "source_sha256": "366814d431ea2bffe4c8239ea6b859f8ae952cf5577b524791da962a44285cc6"
+      }
+    },
+    {
+      "slot": 12,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "H1",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "status": "started",
+      "R": true,
+      "T": true,
+      "T_delivery": true,
+      "D": true,
+      "D_bench": true,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "3569df0b11c53bc3efe6ac06e5310fc4e610a724dd97f88acdefcac98051a700",
+      "patch_bytes": 1801,
+      "author_elapsed_ms": 1665185.1160420002,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 76,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 5461570,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 19498,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 4263936,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 8694,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 76
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T01:27:58.186Z",
+          "monotonicMs": 4719524.163167
+        },
+        "deadlineAt": "2026-10-02T01:57:58.186Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T01:55:43.425Z",
+          "monotonicMs": 6384762.957834
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T01:55:43.426Z",
+          "monotonicMs": 6384763.391834
+        },
+        "captureStarted": {
+          "at": "2026-10-02T01:55:43.493Z",
+          "monotonicMs": 6384830.491584
+        },
+        "captureFinished": {
+          "at": "2026-10-02T01:55:44.468Z",
+          "monotonicMs": 6385806.017209
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T01:55:44.470Z",
+          "monotonicMs": 6385808.235334
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T01:55:44.838Z",
+          "monotonicMs": 6386175.816
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": true,
+        "patch_applied": true,
+        "parsed_passed_tests": 35,
+        "parsed_failed_or_todo_tests": 0,
+        "source_sha256": "2f03d55796126cc163830ecfa582f2911eac500fbe2ee3d6ff9208b04775c958"
+      }
+    },
+    {
+      "slot": 13,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "C0",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "T_delivery": true,
+      "D": false,
+      "D_bench": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_patch_rejected",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "cb35c03221e99ee6be8bb185b5088fdc169b44a1794ff5caf3a9ca2a7b6012b6",
+      "patch_bytes": 5389,
+      "author_elapsed_ms": 350085.3362920005,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 20,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 502975,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 8275,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 235008,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 4847,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 20
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T01:56:53.615Z",
+          "monotonicMs": 6454952.485167
+        },
+        "deadlineAt": "2026-10-02T02:26:53.614Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T02:02:43.755Z",
+          "monotonicMs": 6805092.9975
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T02:02:43.756Z",
+          "monotonicMs": 6805093.436584
+        },
+        "captureStarted": {
+          "at": "2026-10-02T02:02:43.818Z",
+          "monotonicMs": 6805155.288125
+        },
+        "captureFinished": {
+          "at": "2026-10-02T02:02:44.706Z",
+          "monotonicMs": 6806043.160292
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T02:02:44.707Z",
+          "monotonicMs": 6806044.524667
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T02:02:44.948Z",
+          "monotonicMs": 6806285.831292
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": false,
+        "patch_applied": false,
+        "parsed_passed_tests": 0,
+        "parsed_failed_or_todo_tests": 0,
+        "source_sha256": "940579f56ecdf949a8ba2208512c85e21f85ed61089a1342358e16d01aa01210"
+      }
+    },
+    {
+      "slot": 14,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "H1",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "T_delivery": true,
+      "D": false,
+      "D_bench": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_patch_rejected",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "6f6950608a5970bb0c3027257711d01bef1f71c0029af1dae21110dcc311c950",
+      "patch_bytes": 4344,
+      "author_elapsed_ms": 397587.3460420007,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 18,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 464986,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 7750,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 207360,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 5044,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 18
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T02:03:44.753Z",
+          "monotonicMs": 6866090.271292
+        },
+        "deadlineAt": "2026-10-02T02:33:44.752Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T02:10:22.398Z",
+          "monotonicMs": 7263734.946417
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T02:10:22.398Z",
+          "monotonicMs": 7263735.412542
+        },
+        "captureStarted": {
+          "at": "2026-10-02T02:10:22.459Z",
+          "monotonicMs": 7263796.44575
+        },
+        "captureFinished": {
+          "at": "2026-10-02T02:10:23.389Z",
+          "monotonicMs": 7264726.182584
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T02:10:23.390Z",
+          "monotonicMs": 7264727.332375
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T02:10:23.629Z",
+          "monotonicMs": 7264965.929542
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": false,
+        "patch_applied": false,
+        "parsed_passed_tests": 0,
+        "parsed_failed_or_todo_tests": 0,
+        "source_sha256": "940579f56ecdf949a8ba2208512c85e21f85ed61089a1342358e16d01aa01210"
+      }
+    },
+    {
+      "slot": 15,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "P",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "T_delivery": true,
+      "D": false,
+      "D_bench": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_patch_rejected",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "98b8e86ef912b36406b71617db9c6bb011d5320dc8350db33520ac49ffbe7ff2",
+      "patch_bytes": 4841,
+      "author_elapsed_ms": 662547.1690419996,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 30,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 893220,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 10380,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 441856,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 6034,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 30
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T02:11:22.968Z",
+          "monotonicMs": 7324305.71275
+        },
+        "deadlineAt": "2026-10-02T02:41:22.968Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T02:22:25.573Z",
+          "monotonicMs": 7986911.212042
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T02:22:25.573Z",
+          "monotonicMs": 7986911.743917
+        },
+        "captureStarted": {
+          "at": "2026-10-02T02:22:25.629Z",
+          "monotonicMs": 7986967.698042
+        },
+        "captureFinished": {
+          "at": "2026-10-02T02:22:26.503Z",
+          "monotonicMs": 7987841.450792
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T02:22:26.505Z",
+          "monotonicMs": 7987843.13075
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T02:22:26.738Z",
+          "monotonicMs": 7988076.433959
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": false,
+        "patch_applied": false,
+        "parsed_passed_tests": 0,
+        "parsed_failed_or_todo_tests": 0,
+        "source_sha256": "940579f56ecdf949a8ba2208512c85e21f85ed61089a1342358e16d01aa01210"
+      }
+    },
+    {
+      "slot": 16,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "H1",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "T_delivery": true,
+      "D": false,
+      "D_bench": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "7f68b33825d8ad4061c95a59f77d85e467167a2cf92493452ce0dbf2ca390b1f",
+      "patch_bytes": 2734,
+      "author_elapsed_ms": 1668376.8985829996,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 61,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 5789817,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 22435,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 3079680,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 13261,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 61
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T02:23:35.930Z",
+          "monotonicMs": 8057267.913875
+        },
+        "deadlineAt": "2026-10-02T02:53:35.929Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T02:51:24.360Z",
+          "monotonicMs": 9725699.328875
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T02:51:24.360Z",
+          "monotonicMs": 9725699.714875
+        },
+        "captureStarted": {
+          "at": "2026-10-02T02:51:24.443Z",
+          "monotonicMs": 9725783.014125
+        },
+        "captureFinished": {
+          "at": "2026-10-02T02:51:25.562Z",
+          "monotonicMs": 9726901.970084
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T02:51:25.566Z",
+          "monotonicMs": 9726905.335042
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T02:51:26.057Z",
+          "monotonicMs": 9727396.432209
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": false,
+        "patch_applied": true,
+        "parsed_passed_tests": 19,
+        "parsed_failed_or_todo_tests": 2,
+        "source_sha256": "cc7fcfe95fbaf3483eb70762d37d38ed63b2c409fc7c93d569c70a9730ffe9da"
+      }
+    },
+    {
+      "slot": 17,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "P",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "T_delivery": true,
+      "D": false,
+      "D_bench": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "c2af4517553be35ffb4521834e461c8373d46fc801582077dea50c697e331a19",
+      "patch_bytes": 6999,
+      "author_elapsed_ms": 724981.9204589985,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 42,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 3602466,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 11409,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 2237952,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 5230,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 42
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T02:52:42.151Z",
+          "monotonicMs": 9803491.054417
+        },
+        "deadlineAt": "2026-10-02T03:22:42.151Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T03:04:47.188Z",
+          "monotonicMs": 10528528.238667
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T03:04:47.189Z",
+          "monotonicMs": 10528528.60575
+        },
+        "captureStarted": {
+          "at": "2026-10-02T03:04:47.253Z",
+          "monotonicMs": 10528593.130709
+        },
+        "captureFinished": {
+          "at": "2026-10-02T03:04:48.267Z",
+          "monotonicMs": 10529606.329292
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T03:04:48.269Z",
+          "monotonicMs": 10529608.301417
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T03:04:48.774Z",
+          "monotonicMs": 10530113.35875
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": false,
+        "patch_applied": true,
+        "parsed_passed_tests": 20,
+        "parsed_failed_or_todo_tests": 2,
+        "source_sha256": "5d34901812572be92c6898e49956364cc206c0828e5026013c18bbf5e5c50ddf"
+      }
+    },
+    {
+      "slot": 18,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "C0",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "status": "started",
+      "R": false,
+      "T": true,
+      "T_delivery": true,
+      "D": false,
+      "D_bench": false,
+      "artifact_kind": "terminal",
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_roundtrip": true,
+      "patch_sha256": "e0b71f8a265cb4459ea9f0efecd12d4230bc5a836c28b47ab24ab50c62b410d0",
+      "patch_bytes": 8273,
+      "author_elapsed_ms": 964262.6462500002,
+      "stop_reason": null,
+      "workflow_status": null,
+      "usage": {
+        "requests": 46,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 3629980,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 13409,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 2378240,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 6696,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 46
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "execution_error_present": false,
+      "usage_complete": true,
+      "timing": {
+        "taskStarted": {
+          "at": "2026-10-02T03:06:00.459Z",
+          "monotonicMs": 10601799.195625
+        },
+        "deadlineAt": "2026-10-02T03:36:00.459Z",
+        "forwardingClosed": {
+          "at": "2026-10-02T03:22:04.779Z",
+          "monotonicMs": 11566119.271875
+        },
+        "handlersSettled": {
+          "at": "2026-10-02T03:22:04.780Z",
+          "monotonicMs": 11566119.607459
+        },
+        "captureStarted": {
+          "at": "2026-10-02T03:22:04.845Z",
+          "monotonicMs": 11566185.209125
+        },
+        "captureFinished": {
+          "at": "2026-10-02T03:22:05.882Z",
+          "monotonicMs": 11567222.266792
+        },
+        "cleanupStarted": {
+          "at": "2026-10-02T03:22:05.885Z",
+          "monotonicMs": 11567224.88475
+        },
+        "cleanupFinished": {
+          "at": "2026-10-02T03:22:06.207Z",
+          "monotonicMs": 11567547.411375
+        }
+      },
+      "stop_verification": {
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false,
+        "ownTaskDeadlineTriggered": false
+      },
+      "official_result_summary": {
+        "resolved": false,
+        "patch_applied": true,
+        "parsed_passed_tests": 20,
+        "parsed_failed_or_todo_tests": 2,
+        "source_sha256": "d6bb0abec0f6483435dc86080e8db86d2a7f2aa7f03d12d58a4b402f0aaf0d7a"
+      }
+    }
+  ]
+}

@@ -9,19 +9,21 @@ import {runNativePhase} from '../support/native-run.mjs';
 import {stopWorkload} from '../support/stop-workload.mjs';
 import {captureCandidate} from './capture.mjs';
 import {verifyReadyInputs} from './input-preflight.mjs';
-import {nativeCampaign} from './campaign.mjs';
+import {nativeCampaign,qualityCampaign,qualityAssignments} from './campaign.mjs';
 export async function runTask(session,options){
  session.arm=options.arm;
- if(!['P','C','T','H0','H1'].includes(options.arm))throw Error('Unknown PolyBench arm');
+ const mode=options.armMode??(options.arm==='P'?'plain':options.arm==='C'?'core':['T','H0','H1'].includes(options.arm)?'task':null);
+ if(!['plain','core','task'].includes(mode)||!['P','C','C0','T','H0','H1','H2','H'].includes(options.arm))throw Error('Unknown PolyBench arm');
+ session.armMode=mode;
  if(Object.hasOwn(process.env,'OPENCODE_CONFIG_CONTENT'))throw Error('Existing inline override must be preserved; unsupported launch');
  const offline=JSON.parse(fs.readFileSync('fixtures/native-offline/build.json'));
  const prepared=session.exec(['node','-e',`require('fs').writeFileSync('/work/config/experiment.json',${JSON.stringify(JSON.stringify(options.config))})`]);
  if(prepared.status!==0)throw Error('Cannot prepare experiment configuration');
- const result=await runNativePhase(session,{...options,enabled:!['P','C'].includes(options.arm),config:offline,strategy:'direct'},{spawnProcess:(cmd,args,settings)=>{
+ const result=await runNativePhase(session,{...options,enabled:mode==='task',config:offline,strategy:'direct'},{spawnProcess:(cmd,args,settings)=>{
   const at=args.indexOf(session.name);if(at<0)throw Error('Container missing');
   const env=['OPENCODE_CONFIG=/work/config/experiment.json','BASH_ENV=/work/config/project-shell.sh','GIT_LFS_SKIP_SMUDGE=1'];
-  if(options.arm==='C')env.push('OPENCODE_CONFIG_DIR=/template');
-  if(options.arm!=='P'){
+  if(mode==='core')env.push('OPENCODE_CONFIG_DIR=/template');
+  if(mode==='task'){
    env.push(...['CONTEXT','CHECKS','SENSITIVITY','COMMAND_HINTS','EXTRA_ATTENTION','PRESERVATION_NUDGE'].map(k=>'HARNESS_TASK_'+k+'=0'));
    env.push('HARNESS_TASK_INVESTIGATION='+(options.arm==='T'?'1':'0'));
    env.push('HARNESS_TASK_TYPE_COMPAT='+(options.arm==='H1'?'1':'0'),'HARNESS_TASK_TYPE_COMPAT_PROFILE=returned-callable-strict-v1','HARNESS_TASK_TYPE_COMPAT_COMPILER=/template/node_modules/typescript/lib/typescript.js','HARNESS_TASK_TYPE_COMPAT_NODE=/diagnostic/node');
@@ -35,6 +37,7 @@ export async function runTask(session,options){
 export async function run(root,extra={}){
  if(!extra.fetchImpl&&!extra.authorized)throw Error('Explicit --authorize-model-runs is required before credential access');
  const freeze=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
+ if(!extra.fetchImpl&&qualityCampaign(freeze.campaign)&&path.resolve(root)!==path.resolve(qualityAssignments(freeze.campaign).config.local_directory,'batch'))throw Error('Real quality admission requires the canonical batch root; copies cannot resume or repeat');
  if(!extra.fetchImpl && freeze.experimentKind!=='polybench')throw Error('Scripted preparation cannot access provider');
  if(!extra.fetchImpl){
   if(freeze.controlsPassed!==true||freeze.authorIsolationPassed!==true)throw Error('Real admission requires controls and isolation');

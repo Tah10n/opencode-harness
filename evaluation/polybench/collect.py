@@ -3,6 +3,7 @@ import csv,hashlib,importlib.util,json,os,subprocess,tempfile
 from pathlib import Path
 from campaign import LOCAL, SELECTION, CONFIG, ARMS
 ROOT=Path(__file__).resolve().parents[2];DEV=ROOT/'evaluation/polybench'
+QUALITY_NAMES=['evidence-backed-core-development-v1','evidence-backed-core-h2-v1','quality-confirmation-v1']
 spec=importlib.util.spec_from_file_location('pilot_results',DEV/'results.py');helpers=importlib.util.module_from_spec(spec);spec.loader.exec_module(helpers)
 def read(path,default=None):return json.loads(path.read_text()) if path.exists() else default
 
@@ -36,7 +37,9 @@ def main():
   native_stops=bool(last) and all(value=='stop' for value in last.values())
   terminal=bool(result.get('nativeCompleted') and native_stops and stop.get('terminationVerified') and stop.get('captureSaved') and stop.get('relayRemoved') and stop.get('forwardingClosed') and not pending)
   harness_terminals=list((folder/'task-artifacts').glob('*/terminal.json')) if (folder/'task-artifacts').exists() else []
-  delivery_record=arm in ['P','C'] or (len(harness_terminals)==1 and read(harness_terminals[0],{}).get('status')=='captured')
+  quality=CONFIG is not None and CONFIG.get('name') in QUALITY_NAMES
+  direct=CONFIG.get('arm_modes',{}).get(arm) in ['plain','core'] if quality else arm in ['P','C']
+  delivery_record=direct or (len(harness_terminals)==1 and read(harness_terminals[0],{}).get('status')=='captured')
   T=bool(terminal and delivery_record and strict is True) if started else None
   row={**meta[id],**slot,'artifact_kind':('terminal' if terminal and delivery_record else 'partial') if patch is not None else None,'status':'started' if started else 'not_started','R':None,'T':T,'D_bench':None,'evaluation_status':'not_evaluated' if started and patch is not None else 'missing_capture' if started else 'not_started',
        'autonomous_delivery_record':delivery_record,'native_completed':result.get('nativeCompleted'),'native_session_stops':last,'pending_tools':pending,'termination':stop,'strict_patch_applicable':strict,'strict_application_diagnostic':strict_error,
@@ -70,6 +73,13 @@ def main():
   if started and not row['recording_complete']:row['evidence_status']='evidence_incomplete'
   row['execution_error_present']=(folder/'error.json').exists()
   row['usage_complete']=all(v['unknown_requests']==0 for k,v in row['usage'].items() if k in ['input_tokens','output_tokens','cached_tokens','reasoning_tokens']) if started else None
+  if quality:
+   row['patch_roundtrip']=read(folder/'patch-capture.json',{}).get('roundtripVerified')
+   row['T_delivery']=bool(T and row['evidence_status']=='evidence_complete' and row['recording_complete'] is True and row['provider_outcome']=='completed' and row['patch_roundtrip'] is True) if started else None
+   row['T']=row['T_delivery']
+   row['D_bench']=row['R'] and row['T_delivery'] is True if type(row['R']) is bool else None
+   row['artifact_kind']=('terminal' if row['T_delivery'] else 'partial') if patch is not None else None
+   row['timing']=stop.get('timing')
   row['D']=row['D_bench']
   if CONFIG:
    calls=[t['data'].get('state',{}) for t in native.get('tools',[]) if t.get('data',{}).get('tool')=='harness_investigate']
@@ -88,7 +98,24 @@ def main():
    expected=[{'instance_id':s['instance_id'],'model_patch':records[s['slot']]['patch']} for s in selection['slots'] if s['arm']==arm and records[s['slot']]['started'] and isinstance(records[s['slot']]['patch'],str)]
    actual=[json.loads(line) for line in (export/arm/'predictions.jsonl').read_text().splitlines()]
    if actual!=expected:raise RuntimeError('Export differs from immutable captured patches')
- output={'outcome':read(batch/'outcome.json'),'scheduling_pause':read(batch/'scheduling-paused.json'),'assigned':len(selection['slots']),'started':sum(r['status']=='started' for r in rows),'slots':rows,'comparisons':{a+'-'+b:{field:helpers.paired_statistics(rows,a,b,field,formal=CONFIG is not None and a=='T' and b=='P' and field=='R') if CONFIG else helpers.paired(rows,a,b,field) for field in ['R','D_bench']} for a,b in ([(ARMS[2],ARMS[0]),(ARMS[1],ARMS[0]),(ARMS[2],ARMS[1])])},'leave_one_repository_out':{repo:helpers.paired([r for r in rows if r['repo']!=repo],ARMS[2],ARMS[0],'R') for repo in sorted({r['repo'] for r in rows})}}
+ output={'outcome':read(batch/'outcome.json'),'scheduling_pause':read(batch/'scheduling-paused.json'),'assigned':len(selection['slots']),'started':sum(r['status']=='started' for r in rows),'slots':rows}
+ if CONFIG and CONFIG.get('name') in QUALITY_NAMES:
+  output['campaign']=CONFIG['name'];output['product_sha']=frozen.get('runtimeSha');output['adapter_sha']=frozen.get('adapterSha')
+  comparison_rows=rows
+  if CONFIG['name']=='evidence-backed-core-h2-v1':
+   source=Path(CONFIG['fresh_controls']['path']);assert hashlib.sha256(source.read_bytes()).hexdigest()==CONFIG['fresh_controls']['sha256']
+   controls=[r for r in read(source)['slots'] if r['arm'] in ['P','C0']]
+   assert len(controls)==12 and {(r['instance_id'],r['arm']) for r in controls}=={(r['instance_id'],a) for r in rows for a in ['P','C0']}
+   output['fresh_control_slots']=controls;comparison_rows=rows+controls;pairs=[('H2','P'),('H2','C0')]
+  elif CONFIG['name']=='quality-confirmation-v1':pairs=[('H','P')]
+  else:pairs=[('H1','P'),('H1','C0'),('C0','P')]
+  formal=CONFIG['name']=='quality-confirmation-v1'
+  output['comparisons']={a+'-'+b:{field:helpers.quality_paired_statistics(comparison_rows,a,b,field,formal=formal and field=='D') for field in ['D','R']} for a,b in pairs}
+  output['leave_one_repository_out']={repo:{field:helpers.quality_paired_statistics([r for r in comparison_rows if r['repo']!=repo],pairs[0][0],pairs[0][1],field,formal=formal and field=='D') for field in ['D','R']} for repo in sorted({r['repo'] for r in comparison_rows})}
+  output['primary_endpoint']='D = R AND T_delivery'
+ else:
+  output['comparisons']={a+'-'+b:{field:helpers.paired_statistics(rows,a,b,field,formal=CONFIG is not None and a=='T' and b=='P' and field=='R') if CONFIG else helpers.paired(rows,a,b,field) for field in ['R','D_bench']} for a,b in [(ARMS[2],ARMS[0]),(ARMS[1],ARMS[0]),(ARMS[2],ARMS[1])]}
+  output['leave_one_repository_out']={repo:helpers.paired([r for r in rows if r['repo']!=repo],ARMS[2],ARMS[0],'R') for repo in sorted({r['repo'] for r in rows})}
  (batch/'accounting.json').write_text(json.dumps(output,indent=2))
  print(json.dumps({'assigned':len(selection['slots']),'started':output['started'],'comparisons':output['comparisons']}))
 if __name__=='__main__':main()

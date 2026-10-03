@@ -80,3 +80,48 @@ def paired_statistics(rows, first, second, field, formal=False):
         discordant = counts['wins'] + counts['losses']
         result['exact_mcnemar_p'] = min(1., 2 * sum(math.comb(discordant, k) for k in range(min(counts['wins'], counts['losses']) + 1)) / 2**discordant) if discordant else 1.
     return result
+
+
+def quality_paired_statistics(rows, first, second, field, formal=False):
+    """New quality protocol; historical bootstrap reports remain unchanged.
+
+    Two 97.5% Clopper-Pearson intervals for wins/n and losses/n give a
+    conservative 95% interval for their difference by the union bound.
+    """
+    import math
+    counts = paired(rows, first, second, field)
+    n = counts['wins'] + counts['losses'] + counts['ties']
+    result = {**counts, 'paired_tasks': n, 'delta_pp': None, 'ci95_pp': None,
+              'interval_method': 'Bonferroni difference of two 97.5% exact Clopper-Pearson binomial intervals',
+              'exact_mcnemar_p': None, 'formal_primary': formal}
+    if not n:
+        return result
+    tail = .0125
+    def probability(p, start, end):
+        return sum(math.comb(n, k) * p**k * (1-p)**(n-k) for k in range(start, end+1))
+    def interval(k):
+        lower = 0.
+        if k:
+            lo, hi = 0., 1.
+            for _ in range(80):
+                mid = (lo+hi)/2
+                if probability(mid, k, n) < tail: lo = mid
+                else: hi = mid
+            lower = (lo+hi)/2
+        upper = 1.
+        if k < n:
+            lo, hi = 0., 1.
+            for _ in range(80):
+                mid = (lo+hi)/2
+                if probability(mid, 0, k) > tail: lo = mid
+                else: hi = mid
+            upper = (lo+hi)/2
+        return lower, upper
+    wins, losses = counts['wins'], counts['losses']
+    win_bounds, loss_bounds = interval(wins), interval(losses)
+    result['delta_pp'] = 100*(wins-losses)/n
+    result['ci95_pp'] = [100*(win_bounds[0]-loss_bounds[1]), 100*(win_bounds[1]-loss_bounds[0])]
+    if formal:
+        discordant = wins+losses
+        result['exact_mcnemar_p'] = min(1., 2*sum(math.comb(discordant, k) for k in range(min(wins, losses)+1))/2**discordant) if discordant else 1.
+    return result

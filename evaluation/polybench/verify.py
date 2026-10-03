@@ -1,5 +1,5 @@
 """Model-free checks of deterministic allocation and prediction validation."""
-import collections, csv, importlib.util, json, random
+import collections, csv, importlib.util, json, random, subprocess
 from pathlib import Path
 root=Path(__file__).resolve().parents[2]
 spec=importlib.util.spec_from_file_location('pilot_selection',Path(__file__).with_name('selection.py'))
@@ -85,7 +85,16 @@ if '--consolidated-dataset' in __import__('sys').argv:
  from campaign import CONFIG as active_config, SELECTION as active_selection
  active_config=active_config or config
  with (root/active_config['local_directory']/'verified.csv').open(newline='') as f: full=list(csv.DictReader(f))
- if active_config['name']=='consolidated-remaining-v1':
+ if active_config['name'] in ['evidence-backed-core-development-v1','evidence-backed-core-h2-v1','quality-confirmation-v1']:
+  active_saved=json.loads(active_selection.read_text())
+  assert len(active_saved['selected'])==active_config['task_count']
+  assert len(active_saved['slots'])==active_config['slot_count']
+  assert __import__('hashlib').sha256((root/active_config['local_directory']/'verified.csv').read_bytes()).hexdigest()==active_saved['dataset_sha256']
+  by_id={x['instance_id']:x for x in full};chosen=[by_id[x['instance_id']] for x in active_saved['selected']]
+  assert all(all(row[k]==saved[k] for k in saved) for row,saved in zip(chosen,active_saved['selected']))
+  checked=subprocess.run(['node','--input-type=module','-e',"import {qualityAssignments} from './evaluation/polybench/campaign.mjs'; qualityAssignments("+json.dumps(active_config['name'])+");"],cwd=root,capture_output=True,text=True)
+  if checked.returncode:raise RuntimeError(checked.stdout+checked.stderr)
+ elif active_config['name']=='consolidated-remaining-v1':
   selected,slots=m.remaining_assignment(active_config)
   active_saved=json.loads(active_selection.read_text());assert active_saved['selected']==selected and active_saved['slots']==slots
   by_id={x['instance_id']:x for x in full};chosen=[by_id[x['instance_id']] for x in selected]
@@ -147,6 +156,36 @@ missing=r.paired_statistics([{'instance_id':'missing','arm':'P','R':None}],'T','
 assert missing['paired_tasks']==0 and missing['unknown']==1 and missing['delta_pp'] is None and missing['exact_mcnemar_p'] is None
 assert r.paired_statistics(six,'T','P','R')['exact_mcnemar_p'] is None
 print('Paired task statistics and missing-data accounting passed')
+for wins,losses,ties in [(0,0,30),(6,0,0),(3,0,3),(2,4,24),(30,0,0)]:
+ outcomes=[(True,False)]*wins+[(False,True)]*losses+[(False,False)]*ties
+ sample=[{'instance_id':str(i),'arm':arm,'D':pair[j]} for i,pair in enumerate(outcomes) for j,arm in enumerate(['H','P'])]
+ q=r.quality_paired_statistics(sample,'H','P','D',formal=True)
+ assert q['paired_tasks']==len(outcomes) and q['delta_pp']==100*(wins-losses)/len(outcomes)
+ assert q['ci95_pp'][0] < q['delta_pp'] < q['ci95_pp'][1] or q['delta_pp'] in [-100,100]
+ if wins==6 and not losses and not ties:assert q['exact_mcnemar_p']==.03125
+ if wins==3 and not losses:assert q['exact_mcnemar_p']==.25
+ if not wins and not losses:
+  bound=100*(1-.0125**(1/30));assert abs(q['ci95_pp'][0]+bound)<1e-10 and abs(q['ci95_pp'][1]-bound)<1e-10
+  assert q['exact_mcnemar_p']==1 and q['ci95_pp'][0]<0<q['ci95_pp'][1]
+assert r.quality_paired_statistics([{'instance_id':'missing','arm':'P','D':None}],'H','P','D',True)['ci95_pp'] is None
+print('New quality interval is nondegenerate for all ties; exact McNemar and missing-pair checks passed')
+# Independent multinomial enumeration checks interval coverage, including ties.
+import math
+intervals={}
+for w in range(7):
+ for l in range(7-w):
+  sample=[{'instance_id':str(i),'arm':arm,'D':pair[j]} for i,pair in enumerate([(True,False)]*w+[(False,True)]*l+[(False,False)]*(6-w-l)) for j,arm in enumerate(['H','P'])]
+  intervals[w,l]=r.quality_paired_statistics(sample,'H','P','D')['ci95_pp']
+minimum_coverage=1.
+for a in range(21):
+ for b in range(21-a):
+  pw,pl=a/20,b/20;coverage=0.;delta=100*(pw-pl)
+  for (w,l),(low,high) in intervals.items():
+   if low-1e-10<=delta<=high+1e-10:
+    t=6-w-l;coverage+=math.factorial(6)/math.factorial(w)/math.factorial(l)/math.factorial(t)*pw**w*pl**l*max(0.,1-pw-pl)**t
+  minimum_coverage=min(minimum_coverage,coverage)
+assert minimum_coverage>=.95-1e-10
+print('Exact multinomial interval coverage grid passed; minimum='+str(minimum_coverage))
 checked=subprocess.run(['node',str(root/'evaluation/polybench/verify-campaign.mjs')],capture_output=True,text=True)
 if checked.returncode:raise RuntimeError(checked.stdout+checked.stderr)
 print(checked.stdout.splitlines()[-1])
@@ -189,4 +228,28 @@ with tempfile.TemporaryDirectory() as tmp:
  assert by['T']['R'] is True and by['T']['T'] is False and by['T']['D'] is False and by['T']['artifact_kind']=='partial'
  assert by['T']['provider_outcome']=='unknown_submission' and by['T']['usage_complete'] is False
  assert (batch/'export/C/predictions.jsonl').read_text()==''
-print('Campaign reader preserves partial R, autonomous T/D, missing capture and unknown usage independently')
+ print('Campaign reader preserves partial R, autonomous T/D, missing capture and unknown usage independently')
+ # New native core labels deliver directly; no task terminal record is required.
+ import shutil
+ shutil.copytree(batch/'runs'/(task+'-C'),batch/'runs'/(task+'-C0'))
+ shutil.copytree(batch/'runs'/(task+'-T'),batch/'runs'/(task+'-H1'))
+ shutil.copytree(base/'evaluations/T',base/'evaluations/H1')
+ new_slots=[{**slot,'arm':arm} for slot,arm in zip(slots,['P','C0','H1'])]
+ (base/'selection.json').write_text(json.dumps({'selected':[selected],'slots':new_slots}))
+ for arm in ['P','H1']:
+  folder=batch/'runs'/(task+'-'+arm)
+  (folder/'result.json').write_text(json.dumps({'nativeCompleted':True}))
+  (folder/'patch-capture.json').write_text(json.dumps({'roundtripVerified':True}))
+  (folder/'provider-metadata.json').write_text(json.dumps([{'forwarded':True,'serverCompletion':'completed','usage':{'input_tokens':10,'output_tokens':2,'cached_tokens':0,'reasoning_tokens':0},'recording':{'evidenceComplete':True}}]))
+ shutil.rmtree(batch/'export')
+ collector.CONFIG={'name':'evidence-backed-core-development-v1','arm_modes':{'P':'plain','C0':'core','H1':'core'}};collector.ARMS=['P','C0','H1']
+ new_records={1:records[1],2:records[2],3:records[3]};r.export_started(new_slots,new_records,[selected],batch/'export')
+ with contextlib.redirect_stdout(io.StringIO()):collector.main()
+ data=json.loads((batch/'accounting.json').read_text());by={x['arm']:x for x in data['slots']}
+ assert by['H1']['R'] is True and by['H1']['T_delivery'] is True and by['H1']['D'] is True and by['H1']['autonomous_delivery_record'] is True
+ assert by['C0']['D'] is None and data['comparisons']['H1-P']['D']['unknown']==0
+ (batch/'runs'/(task+'-H1')/'provider-metadata.json').write_text(json.dumps([{'forwarded':True,'serverCompletion':'unknown','usage':None,'recording':{'evidenceComplete':True}}]))
+ with contextlib.redirect_stdout(io.StringIO()):collector.main()
+ by={x['arm']:x for x in json.loads((batch/'accounting.json').read_text())['slots']}
+ assert by['H1']['R'] is True and by['H1']['T_delivery'] is False and by['H1']['D'] is False and by['H1']['artifact_kind']=='partial'
+print('New direct core delivery, roundtrip/capture/provider trust and primary D accounting passed')

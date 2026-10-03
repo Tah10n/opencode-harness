@@ -1,0 +1,215 @@
+{
+  "stage": "selected_before_technical_controls_and_model_results",
+  "campaign": "evidence-backed-core-development-v1",
+  "configuration_sha256": "0d45ec6ae69dd2b06fb6b45c053d1ac300183ef3230d60d6343bd5d2631bf85b",
+  "dataset_revision": "b3fca77b637379f0c01ad86d18753a7ac1998b53",
+  "dataset_sha256": "0c8138e73c34fa29a5276b675b146b72d78ce001fcc4560d76302c908b4808a5",
+  "selected": [
+    {
+      "instance_id": "mrdoob__three.js-24461",
+      "repo": "mrdoob/three.js",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "9e5512f067e3a0de8d4069217d20903c1725edf7"
+    },
+    {
+      "instance_id": "serverless__serverless-8159",
+      "repo": "serverless/serverless",
+      "language": "JavaScript",
+      "task_category": "Feature",
+      "base_commit": "56aa5aa15abed64db6758aecd8c27719928b5a14"
+    },
+    {
+      "instance_id": "mui__material-ui-42412",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "b8a28e13dc0821314700f1aefc9f8e1134cf9034"
+    },
+    {
+      "instance_id": "microsoft__vscode-108964",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "13b3c937dc5e3816c79bdd2cdf2cdf6f9c727b75"
+    },
+    {
+      "instance_id": "mui__material-ui-18683",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Bug Fix",
+      "base_commit": "dfe2779b8b6499ccd1922990ac9178d84e02f8b6"
+    },
+    {
+      "instance_id": "microsoft__vscode-135805",
+      "repo": "microsoft/vscode",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "7d8f55ebb1b7ccb084f7e6969b6926519c5c80c3"
+    }
+  ],
+  "slots": [
+    {
+      "slot": 1,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 2,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "C0",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 3,
+      "instance_id": "mrdoob__three.js-24461",
+      "arm": "H1",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 4,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "C0",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 5,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "H1",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 6,
+      "instance_id": "serverless__serverless-8159",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 7,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "H1",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 8,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 9,
+      "instance_id": "mui__material-ui-42412",
+      "arm": "C0",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 10,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 11,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "C0",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 12,
+      "instance_id": "microsoft__vscode-108964",
+      "arm": "H1",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 13,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "C0",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 14,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "H1",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 15,
+      "instance_id": "mui__material-ui-18683",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 16,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "H1",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 17,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "P",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    },
+    {
+      "slot": 18,
+      "instance_id": "microsoft__vscode-135805",
+      "arm": "C0",
+      "status": "not_started",
+      "R": null,
+      "T_delivery": null,
+      "D": null
+    }
+  ]
+}
