@@ -83,6 +83,9 @@ export async function installed({output,bundle,toolchain,executionImage}) {
   const outcome=await runPrepared(output,{scriptedFetch:fetchImpl,readAuth:()=>({access:'scripted-not-a-credential',accountId:'scripted-local'})});
   if(fixtureError)throw fixtureError;
   assert.equal(outcome.status,'finished',JSON.stringify(outcome));
+  let unexpectedCalls=0;
+  await assert.rejects(()=>runPrepared(output,{scriptedFetch:()=>{unexpectedCalls++;throw Error('No retry provider');},readAuth:()=>{unexpectedCalls++;throw Error('No retry auth');}}),/Previously created slot/);
+  assert.equal(unexpectedCalls,0);
   const result=await report(output);
   assert.equal(result.rows.length,2);
   const direct=result.rows.find(r=>r.arm==='direct'),candidate=result.rows.find(r=>r.arm==='D');
@@ -105,7 +108,7 @@ export async function installed({output,bundle,toolchain,executionImage}) {
     assert.ok(finished.timing.budgetMs<=f.budgetMs&&finished.timing.budgetMs>0);
     boundaries.push({arm,container:container.name,deadline:finished.timing.deadlineAt,budgetMs:f.budgetMs,terminationVerified:finished.termination.terminationVerified});
   }
-  const evidence={passed:true,modelFree:true,realProviderCalls:0,scriptedRequests:requests,syntheticUsage:true,bundleUnchanged:true,configDifference:'HARNESS_TASK_STRATEGY only',runtimeVersion:config.runtimeVersion,binarySha256:hashFile(path.join(toolchain,'package/bin/opencode')).sha256,executionImage,rows:result.rows,boundaries,inventories};
+  const evidence={passed:true,modelFree:true,realProviderCalls:0,scriptedRequests:requests,syntheticUsage:true,bundleUnchanged:true,bundleManifest:before,configDifference:'HARNESS_TASK_STRATEGY only',runtimeVersion:config.runtimeVersion,binarySha256:hashFile(path.join(toolchain,'package/bin/opencode')).sha256,executionImage,rows:result.rows,boundaries,inventories};
   privateJSON(path.join(output,'installed.json'),evidence);console.log(JSON.stringify(evidence));return evidence;
 }
 export async function deadlineControls({output,bundle,toolchain,executionImage}) {
@@ -129,7 +132,7 @@ export async function deadlineControls({output,bundle,toolchain,executionImage})
     const final=await report(root);assert.equal(final.rows[0].delivery,false);assert.equal(final.rows[0].Q,false);
     controls.push({arm,hangIssued,requests,outcome,runtime,stop,row:final.rows[0]});
   }
-  const evidence={passed:true,fixtureBudgetMs:5000,developmentBudgetMs:config.budgetMs,realProviderCalls:0,controls};privateJSON(path.join(output,'deadline-controls.json'),evidence);return evidence;
+  const evidence={passed:true,fixtureBudgetMs:5000,developmentBudgetMs:config.budgetMs,realProviderCalls:0,executionImage,binarySha256:hashFile(path.join(toolchain,'package/bin/opencode')).sha256,bundleManifest:manifest(bundle),controls};privateJSON(path.join(output,'deadline-controls.json'),evidence);return evidence;
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)) {
   const [output,bundle,toolchain]=process.argv.slice(2);

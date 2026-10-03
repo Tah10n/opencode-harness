@@ -27,7 +27,15 @@ export async function report(root,{toolchain,evaluate=true}={}) {
     const knownTokens=Object.fromEntries(['input_tokens','output_tokens','cached_tokens','reasoning_tokens'].map(k=>[k,known.length&&known.every(r=>Number.isFinite(r.usage[k]))?known.reduce((n,r)=>n+r.usage[k],0):null]));
     const tokens=Object.fromEntries(Object.entries(knownTokens).map(([k,value])=>[k,unknown===0?value:null]));
     const accounting={requests:forwarded?.length??null,requestsWithoutUsage:unknown,tokens,knownTokens,money:'unknown',usageKind:f.experimentKind==='fixture'?'synthetic':'provider-reported'};
-    if(!runtime) {rows.push({...attempt,R:null,delivery:null,Q:null,internalStatus:null,corrections:null,...accounting,environmentErrors,unknownResults,status:fs.existsSync(out)?'environment_or_unknown':'not_started'});continue;}
+    if(!runtime) {
+      let scoring=null;
+      if(fs.existsSync(path.join(out,'model.patch'))) {
+        try {scoring=evaluate?await evaluatePatch({task,patch:fs.readFileSync(path.join(out,'model.patch')),output:path.join(out,'independent'),toolchain:toolchain??f.toolchain}):read('independent/evaluation.json');}
+        catch(error){environmentErrors.push({phase:'independent_evaluation',message:error.message});}
+        unknownResults.push('Native completion unavailable; retained full partial patch evaluated independently');
+      }
+      rows.push({...attempt,R:scoring?.R??null,delivery:scoring?false:null,Q:scoring&&scoring.R!==null?false:null,internalStatus:null,corrections:null,...accounting,evaluationElapsedMs:scoring?.evaluationElapsedMs??null,obligations:scoring?.obligations??[],environmentErrors,unknownResults,status:fs.existsSync(out)?'environment_or_unknown':'not_started'});continue;
+    }
     const capture=read('patch-capture.json'),stop=read('stop-verification.json'),nativeEvidence=read('native-evidence.json');
     const artifacts=path.join(out,'task-artifacts');
     const reports=fs.existsSync(artifacts)?fs.readdirSync(artifacts).filter(id=>fs.existsSync(path.join(artifacts,id,'result.json'))):[];

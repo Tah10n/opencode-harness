@@ -289,7 +289,7 @@
   },
   "files": {
     "evaluation/feedback-development/README.md": {
-      "sha256": "60b3bf6601c4e02f158f98f2a4eda9c877ca2fcfc6f00497d1c55d8f3c07df46",
+      "sha256": "01e5c70d83e7956e4a8bd566343a48a83ed42d7ac509b781db7e39fd201a42ad",
       "executable": false
     },
     "evaluation/feedback-development/assets.mjs": {
@@ -313,19 +313,19 @@
       "executable": false
     },
     "evaluation/feedback-development/installed.mjs": {
-      "sha256": "7f10a147e8891ea0c5b9e43139dbe662fa0fa03d2618aac8bb6b42266211aae0",
+      "sha256": "e947a04c319c0939bd1cd4a2fa431fcd19488de0d796c1409c64785f6d17c008",
       "executable": false
     },
     "evaluation/feedback-development/preflight.mjs": {
-      "sha256": "3b56402c1f69c55c8a85c62c8efc4af13af9c549fc320fe329da378234b3275a",
+      "sha256": "715b8d6573629b96e2495dda36736accb58c2a5107c77d1fcffd17562f42da07",
       "executable": false
     },
     "evaluation/feedback-development/prepare.mjs": {
-      "sha256": "7f9087efd5c841cb211d799e2bf0602dba0d1473d0a4b7cab2179a95f3850d7a",
+      "sha256": "88d28c18c799e0faa8ffbb873553b7a2e007df01bf2eb046788c84a63ecf9697",
       "executable": false
     },
     "evaluation/feedback-development/report.mjs": {
-      "sha256": "923fa561ec40c93154ec295e7d627af97c60c8af44dfb858bc220e0557c75f33",
+      "sha256": "10b340fbfcbf7e1a151d9d180407a1b961adc31158dc532a04b02cc9df32deb3",
       "executable": false
     },
     "evaluation/feedback-development/reporter.mjs": {
@@ -333,11 +333,11 @@
       "executable": false
     },
     "evaluation/feedback-development/run.mjs": {
-      "sha256": "81255b2d3bb58b9815be86b4bf1cd0ea7ec83778c3d89032a549eab00b812f70",
+      "sha256": "1a37722b8d945de3a30ef7822b1dda86ed9300b97b7d7f8360cc5bcf593355b6",
       "executable": false
     },
     "evaluation/feedback-development/suite.mjs": {
-      "sha256": "ad919cf40618ba7701b8ad80f7fe062019660ba2777957d8d822f372b86ed060",
+      "sha256": "98e18af0a50011f6e007902fba5a3f11e1f2d5ca9d29d3ab026d13e7afbaee86",
       "executable": false
     },
     "evaluation/feedback-development/tasks/01-invoice-discount/acceptance.test.mjs": {
@@ -693,7 +693,7 @@
       "executable": false
     },
     "evaluation/feedback-development/verify.mjs": {
-      "sha256": "23815cdc16c14b33e9bedbec83fec3efa1799444bfd094d28afd0544443aba89",
+      "sha256": "c12300662400d3bc523be6542eb114e27dd5ed21cd78074a16a0483f38f22e8b",
       "executable": false
     }
   }
