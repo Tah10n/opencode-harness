@@ -136,7 +136,7 @@ try {
    }else check(mode==='diagnostic-failure'?'node --test --test-name-pattern=first value.test.mjs':mode==='both-required'?variant:needed);
    return {info:{finish:'stop'},parts:[{type:'text',text:'actual tools recorded'}]};
   }});
-  assert.equal(result.repairs,mode==='variant'?0:mode==='diagnostic-failure'?3:mode==='environment'?2:1,mode);
+  assert.equal(result.repairs,mode==='variant'?0:mode==='diagnostic-failure'?3:1,mode);
   assert.equal(result.status,['diagnostic-failure','environment'].includes(mode)?'incomplete':'checks_passed',mode);
   if(mode==='variant'){assert.equal(first.checks[0].requirement,'diagnostic');assert.equal(first.checks[0].current,false);assert.equal(first.checks[1].requirement,'required');}
   if(mode==='environment'){assert.ok(result.remaining.some(r=>r.includes('CHECK_MODE=required')));assert.ok(result.observations.checks.filter(c=>c.command.startsWith('CHECK_MODE=')).every(c=>c.execution.observed&&!c.successful&&c.interpretation.status==='unsupported'));}

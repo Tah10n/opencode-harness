@@ -35,6 +35,7 @@ git('add','.');git('-c','core.hooksPath=/dev/null','-c','user.name=Fixture','-c'
 materializeNativeTemplate({repositoryRoot:root,outputDirectory:bundle,task:true,review:true});
 if(process.env.NATIVE_TASK_FIXTURE_SENSITIVITY==='1')fs.symlinkSync(path.join(root,'profiles/native/sensitivity/node_modules'),path.join(bundle,'sensitivity/node_modules'));
 const ordinaryErrorModes=['missing-read','edit-context','glob-error','glob-parallel','glob-compound','glob-compound-failure','glob-after-check'];
+const actionableModes=['unsupported-current','unsupported-mixed','unsupported-missing','unsupported-stale'];
 const continuationModes=['external-path','external-argument','bash-denial','second-denial'];
 const forbiddenContent='UNREAD_NATIVE_DENIAL_SENTINEL';
 const denialText='The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules '+JSON.stringify([{permission:'bash',pattern:'*',action:'deny'}]);
@@ -79,7 +80,7 @@ const fixture=http.createServer(async(req,res)=>{
   assert.ok(!JSON.stringify(body).includes(forbiddenContent),'Forbidden resource content must never reach the provider');
   const stage=text.includes('Prepare executable project regressions')?'regressions':text.includes('Corrective pass')?'correction':text.includes('Implement the complete original task')?'implementation':'bootstrap';
   const pass=stage==='correction'?JSON.parse(text).pass:0;
-  const key=mode+stage+pass,n=counts.get(key)??0;counts.set(key,n+1);requests.push({mode,stage,n});
+  const key=mode+stage+pass,n=counts.get(key)??0;counts.set(key,n+1);requests.push({mode,stage,pass,n});
   const bash=command=>({name:'bash',args:{command,description:'Installed scripted fixture'}});
   if(stage==='bootstrap'){response(res,n===0?{name:'harness_task',args:{}}:null,'Actual workflow result retained');return;}
   if(stage==='regressions') {
@@ -94,7 +95,12 @@ const fixture=http.createServer(async(req,res)=>{
   }
   let calls=[];
   if(stage==='implementation') {
-   if(mode.startsWith('sensitivity')) {
+   if(actionableModes.includes(mode)) {
+    if(mode==='unsupported-current')calls=[bash('npm run opaque')];
+    if(mode==='unsupported-mixed')calls=[bash(writeFixture('value.mjs',source.replace('value = 2','value = 1'))),bash('node --test'),bash('npm run opaque')];
+    if(mode==='unsupported-stale')calls=[bash('npm run opaque'),bash(writeFixture('value.mjs',source+'// after required command\n'))];
+   }
+   else if(mode.startsWith('sensitivity')) {
     const all=JSON.stringify(body.messages), schema=body.tools.find(t=>t.function?.name==='harness_sense');
     const enabled=process.env.NATIVE_TASK_FIXTURE_SENSITIVITY==='1';
     toolSchemas.set(mode,schema??null);
@@ -205,7 +211,21 @@ const fixture=http.createServer(async(req,res)=>{
    else calls=[bash('node --test')];
   } else {
    const feedback=JSON.parse(text);assert.ok(feedback.originalTask.includes('ORIGINAL_TASK_FIXTURE'));assert.ok(feedback.current.diff!==undefined);
-   if(mode==='stateful'){assert.ok(feedback.observations.checks.some(c=>c.exit===1&&c.output.includes('undefined')));calls=[bash(writeFixture('example.test.mjs',repaired)),bash('node --test')];}
+   if(actionableModes.includes(mode)) {
+    assert.equal(pass,1,'No repeat solely for unsupported interpretation');
+    assert.ok(feedback.observations.correctionReasons.length);
+    if(mode==='unsupported-mixed'){
+     assert.ok(feedback.observations.checks.some(c=>c.exit===1&&c.interpretation.status==='supported'));
+     assert.ok(!feedback.observations.correctionReasons.some(r=>r.includes('npm run opaque')));
+     assert.ok(feedback.observations.limits.some(r=>r.includes('npm run opaque')));
+     calls=[bash(writeFixture('value.mjs',source)),bash('node --test'),bash('npm run opaque')];
+    }else{
+     assert.ok(['unsupported-missing','unsupported-stale'].includes(mode),'Current exit 0 must not call the author again');
+     assert.ok(feedback.observations.correctionReasons.some(r=>r.includes('npm run opaque')));
+     calls=[bash('npm run opaque')];
+    }
+   }
+   else if(mode==='stateful'){assert.ok(feedback.observations.checks.some(c=>c.exit===1&&c.output.includes('undefined')));calls=[bash(writeFixture('example.test.mjs',repaired)),bash('node --test')];}
    else if(mode==='coverage-loss'){assert.ok(feedback.observations.checks.some(c=>c.successful&&c.current));assert.ok(feedback.observations.testChanges[0].before.includes('legacy(),7'));assert.ok(feedback.observations.testChanges[0].diff.includes('-test'));calls=[bash(writeFixture('value.test.mjs',originalTest)),bash('node --test')];}
    else if(mode==='intentional'){assert.ok(feedback.instruction.includes('Do not restore an old expectation'));assert.ok(feedback.observations.testChanges[0].after.includes('value,3'));calls=[];}
    else if(mode==='relocation'){assert.equal(feedback.observations.testChanges[0].assessment,'not_automatically_classified');assert.ok(feedback.observations.addedTests.some(t=>t.content===originalTest));calls=[];}
@@ -256,12 +276,16 @@ const api = async (method, route, body) => { const r = await fetch(`http://127.0
 try {
  let ready=false;for(let n=0;n<150;n++){try{await api('GET','/global/health');ready=true;break;}catch{await new Promise(r=>setTimeout(r,100));}}assert.ok(ready,stderr);
  const fixtureHead=git('rev-parse','HEAD');
- const allModes=[...ordinaryErrorModes.filter(m=>!m.startsWith('glob-compound')),'stateful','variant','both-required','narrow','worktree-path','external-path','external-argument','bash-denial','second-denial','stdout-denial','runtime-error','unknown-error','diagnostic','unresolved','correct','two-fixes','comment-only','defect','coverage-loss','intentional','relocation','late-check','final-stale','no-progress','permission','cancel','budget','concurrent-save','staged-work','external-save'];
+ const allModes=[...actionableModes,...ordinaryErrorModes.filter(m=>!m.startsWith('glob-compound')),'stateful','variant','both-required','narrow','worktree-path','external-path','external-argument','bash-denial','second-denial','stdout-denial','runtime-error','unknown-error','diagnostic','unresolved','correct','two-fixes','comment-only','defect','coverage-loss','intentional','relocation','late-check','final-stale','no-progress','permission','cancel','budget','concurrent-save','staged-work','external-save'];
  const selectedModes=process.env.NATIVE_TASK_FIXTURE_MODES?.split(',')??allModes;
  for(mode of selectedModes){
   git('reset','--hard',fixtureHead);git('clean','-fd');
   const artifactRoot=path.join(project,'.git/harness-task');priorArtifacts=new Set(fs.existsSync(artifactRoot)?fs.readdirSync(artifactRoot):[]);
   fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Deliver value '+(mode==='intentional'?'3 instead of 2':'2')+'; preserve the independent legacy() = 7 scenario. Run node --test after the last edit.');
+  if(actionableModes.includes(mode)){
+   fs.writeFileSync(path.join(project,'package.json'),JSON.stringify({private:true,scripts:{test:'node --test',opaque:'node --version'}}));
+   fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Preserve value 2 and legacy() = 7. Run `npm run opaque`.'+(mode==='unsupported-mixed'?' Also run `node --test` after the last edit.':''));
+  }
   if(continuationModes.includes(mode)||ordinaryErrorModes.includes(mode))fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Change value from 2 to 3 and update its public test expectation, preserving the independent legacy() = 7 scenario. Run `npm test` and `git diff --check`.');
   if(['stdout-denial','runtime-error'].includes(mode))fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Preserve value 2 and legacy() = 7; run `npm test`.');
   if(['variant','both-required','narrow'].includes(mode))fs.appendFileSync(task,' Required: `node --test value.test.mjs`.'+(mode==='both-required'?' Also required: `node --test --test-concurrency=1 value.test.mjs`.':''));
@@ -350,9 +374,26 @@ try {
    console.log(JSON.stringify({largeGitBytes:Buffer.byteLength(git('ls-files','-v','-z')),installedOpenCode:version.stdout.trim(),portablePatch:true,userStatePreserved:true,elapsedMs:Date.now()-fixtureStarted}));
   }
   assert.equal(fs.readFileSync(path.join(project,'value.mjs'),'utf8'),mode==='concurrent-save'?source+'// concurrent USER_SAVE\n':userBytes);
-  const corrected=['stateful','both-required','narrow','defect','two-fixes','comment-only','late-check','final-stale','no-progress'].includes(mode);
+  const corrected=['unsupported-mixed','unsupported-missing','unsupported-stale','stateful','both-required','narrow','defect','two-fixes','comment-only','late-check','final-stale','no-progress'].includes(mode);
   assert.equal(report.repairs,['two-fixes','comment-only','no-progress','unresolved'].includes(mode)?2:mode==='final-stale'?2:corrected?1:0,JSON.stringify(report));assert.deepEqual(Object.keys(report.sessions),['author']);
-  assert.equal(report.status,['glob-compound','glob-compound-failure','diagnostic','no-progress','comment-only','unresolved','final-stale','permission','second-denial','unknown-error','runtime-error','external-save'].includes(mode)?'incomplete':'checks_passed',JSON.stringify(report));
+  assert.equal(report.status,[...actionableModes,'glob-compound','glob-compound-failure','diagnostic','no-progress','comment-only','unresolved','final-stale','permission','second-denial','unknown-error','runtime-error','external-save'].includes(mode)?'incomplete':'checks_passed',JSON.stringify(report));
+  assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='correction'&&r.n===0).length,report.repairs,'Actual corrective author calls: '+mode);
+  if(actionableModes.includes(mode)){
+   assert.match(report.stopReason,/No actionable/);assert.doesNotMatch(report.stopReason,/exhausted/);
+   assert.deepEqual(report.observations.correctionReasons,[]);assert.ok(report.remaining.length);assert.ok(report.limits.length);
+   const opaque=report.observations.latestChecks.find(c=>c.command==='npm run opaque');
+   assert.equal(opaque.current,true);assert.equal(opaque.execution.status,'completed_exit_0');assert.equal(opaque.interpretation.status,'unsupported');assert.equal(opaque.successful,false);
+   assert.equal(report.observations.checksCurrent,false);
+   const full=JSON.parse(fs.readFileSync(path.join(report.artifacts,'result.json')));
+   const events=JSON.parse(fs.readFileSync(path.join(report.artifacts,'tool-events.json')));
+   const event=events.find(e=>e.callID===opaque.callID);assert.equal(event.exit,0);assert.equal(event.state,'completed');
+   assert.ok(full.observations.checks.some(c=>c.callID===opaque.callID&&c.execution.successful&&!c.successful));
+   if(mode==='unsupported-mixed'){
+    assert.ok(report.observations.latestChecks.some(c=>c.command==='node --test'&&c.current&&c.successful));
+    assert.equal(events.filter(e=>e.args?.command==='npm run opaque').length,2);
+   }
+   console.log(JSON.stringify({mode,correctiveAuthorCalls:report.repairs,stopReason:report.stopReason,requiredExecution:opaque.execution.status,interpretation:opaque.interpretation.status}));
+  }
   if(corrected){const impl=JSON.parse(fs.readFileSync(path.join(report.artifacts,'implementation-original.json'))),cor=JSON.parse(fs.readFileSync(path.join(report.artifacts,'correction-original.json')));assert.equal(impl.info.sessionID,cor.info.sessionID);}
   if(mode==='stateful'){assert.equal(fs.readFileSync(path.join(report.executionDirectory,'example.test.mjs'),'utf8'),repaired);assert.match(fs.readFileSync(path.join(report.artifacts,'final.patch'),'utf8'),/read\('item'\)/);assert.ok(report.observations.checks.some(c=>c.exit===0&&c.current));}
   if(mode==='coverage-loss'){assert.equal(fs.readFileSync(path.join(report.executionDirectory,'value.test.mjs'),'utf8'),reducedTest);assert.ok(report.observations.coverageWarnings.length);}
