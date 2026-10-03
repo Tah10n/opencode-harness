@@ -253,3 +253,4 @@ with tempfile.TemporaryDirectory() as tmp:
  by={x['arm']:x for x in json.loads((batch/'accounting.json').read_text())['slots']}
  assert by['H1']['R'] is True and by['H1']['T_delivery'] is False and by['H1']['D'] is False and by['H1']['artifact_kind']=='partial'
 print('New direct core delivery, roundtrip/capture/provider trust and primary D accounting passed')
+subprocess.run([__import__('sys').executable, Path(__file__).with_name('verify_tap_identity.py')], check=True)

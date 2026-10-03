@@ -24,6 +24,12 @@ was declined before implementation or model runs. Confirmation was not started.
 The intended quality increase was not achieved; this is a bounded development
 decision, not formal independent testing or proof of equivalence.
 
+The separate [TAP identity diagnostic](../evaluation/polybench/TAP_IDENTITY.md)
+reproduces the Three.js ordinal discrepancy while retaining every official
+figure. Two F2P assertions map uniquely; nine P2P obligations have rendered-name
+collisions. Full diagnostic mapping is ambiguous for baseline/gold/P/C0/H1;
+there is no new resolved score or evidence of H1 lift.
+
 [Cost data](../evaluation/polybench/campaigns/evidence-backed-core-development-v1/costs.json)
 attribute 546 real requests: 18 title, 513 author/parent, 15 native child; zero
 unknown usage. Input/output totals 29,669,291 / 159,936; cached/reasoning are

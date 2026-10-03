@@ -1,0 +1,362 @@
+diff --git a/src/poly_bench_evaluation/parsers/javascript_parsers.py b/src/poly_bench_evaluation/parsers/javascript_parsers.py
+--- a/src/poly_bench_evaluation/parsers/javascript_parsers.py
++++ b/src/poly_bench_evaluation/parsers/javascript_parsers.py
+@@ -7,6 +7,7 @@
+
+ from poly_bench_evaluation.parsers.parser_protocol import TestOutputParser  # noqa: F401
+ from poly_bench_evaluation.parsers.parser_results import ParserResults
++from poly_bench_evaluation.tap_identity import parse_qunit_tap
+
+
+ class JavascriptGenericParser:
+@@ -15,11 +16,13 @@
+     def __init__(self, test_content: str):
+         self.content = test_content
+
+-    def parse(self) -> Dict:
++    def parse(self, *, tap_identity: bool = False) -> Dict:
+         """Parse function that parses the run logs string.
+         Returns:
+             Dict: A dictionary containing the parsed test results.
+         """
++        if tap_identity:
++            return parse_qunit_tap(self.content)
+         result = ParserResults()
+         js_test_commands_found = re.findall(r"(^>.*--reporter json)", self.content, re.MULTILINE)
+         if js_test_commands_found and "mocha" in js_test_commands_found[0]:
+diff --git a/src/poly_bench_evaluation/scoring.py b/src/poly_bench_evaluation/scoring.py
+--- a/src/poly_bench_evaluation/scoring.py
++++ b/src/poly_bench_evaluation/scoring.py
+@@ -15,6 +15,7 @@
+     PolyBenchOutput,
+     PolyBenchRetrievalMetrics,
+ )
++from poly_bench_evaluation.tap_identity import VERSION as TAP_IDENTITY_VERSION, diagnose_tap
+
+
+ def instance_level_scoring(
+@@ -24,6 +25,8 @@
+     p2p: List[str],
+     patch_applied: bool,
+     generation: bool,
++    *,
++    tap_identity: bool = False,
+ ) -> Union[PolyBenchOutput, PolyBenchRetrievalMetrics]:
+     """Logging and storing function (instance level).
+
+@@ -37,6 +40,25 @@
+         patch_applied: whether patch is applied or not
+         generation: whether a patch is generated or not
+     """
++    if tap_identity:
++        if result.get("tap_identity") != TAP_IDENTITY_VERSION:
++            raise ValueError("unsupported: explicit QUnit identity parser required")
++        diagnostic = diagnose_tap(result, f2p, p2p)
++        if diagnostic["result"] not in ("pass", "fail"):
++            raise ValueError(f"{TAP_IDENTITY_VERSION}: {diagnostic['result']}: "
++                             + "; ".join(diagnostic["issues"]))
++        return PolyBenchOutput(
++            instance_id=instance_id,
++            patch_applied=patch_applied,
++            generation=generation,
++            with_logs=True,
++            all_f2p_passed=diagnostic["all_f2p_passed"],
++            no_p2p_failed=diagnostic["all_p2p_passed"],
++            resolved=patch_applied and diagnostic["result"] == "pass",
++            passed_tests=result["passed_tests"],
++            failed_tests=result["failed_tests"],
++        )
++
+     with_logs = False
+     all_f2p_passed = False
+     no_p2p_failed = False
+diff --git a/src/poly_bench_evaluation/tap_identity.py b/src/poly_bench_evaluation/tap_identity.py
+new file mode 100644
+--- /dev/null
++++ b/src/poly_bench_evaluation/tap_identity.py
+@@ -0,0 +1,177 @@
++"""Explicit diagnostic for one flat QUnit 2.19 TAP 13 stream, not a scorer replacement.
++
++Keep every occurrence. A rendered QUnit suite path is the available scope;
++the transcript cannot recover a file or disambiguate equal rendered paths.
++"""
++import re
++from collections import defaultdict
++
++VERSION = 'tap_identity_diagnostic_v1'
++POINT = re.compile(r'(ok|not ok) ([1-9][0-9]*) (.+)')
++LABEL = re.compile(r'([1-9][0-9]*) (.+)')
++
++
++def identity(description):
++    """Preserve meaningful digits, whitespace and the complete rendered scope."""
++    parts = description.split(' > ')
++    if (len(parts) < 2 or any(not p or p != p.strip() for p in parts)
++            or '#' in description or '\t' in description):
++        raise ValueError('unsupported QUnit scope: ' + description)
++    return description
++
++
++def normalize_required(label):
++    match = LABEL.fullmatch(label)
++    if not match:
++        raise ValueError('unsupported numbered requirement: ' + label)
++    return identity(match[2])
++
++
++def parse_qunit_tap(content):
++    """Require the observed header, sequential points, trailing plan and totals.
++
++    SKIP/TODO are exclusions, never assertion passes. Nested/multiple streams,
++    bailouts, incomplete YAML and unrecognized syntax are explicitly unsupported.
++    Preamble is allowed for the saved shell/npm log; trailer is limited to the
++    observed container exit messages. Completeness does not establish identity.
++    """
++    result = {'tap_identity': VERSION, 'status': 'complete', 'issues': [],
++              'tests': [], 'passed_tests': [], 'failed_tests': [],
++              'excluded_tests': [], 'collisions': [], 'plan': None, 'totals': {}, 'exit_codes': []}
++
++    def stop(status, reason):
++        result['status'] = status
++        result['issues'].append(reason)
++        return result
++
++    lines = content.splitlines()
++    headers = [i for i, line in enumerate(lines) if line == 'TAP version 13']
++    if len(headers) != 1:
++        return stop('unsupported', 'expected one TAP version 13 stream')
++    start = headers[0]
++    if any(re.match(r'(?:ok |not ok |TAP version |\d+\.\.|Bail out!)', line)
++           for line in lines[:start]):
++        return stop('unsupported', 'test stream before TAP header')
++    yaml = False
++    for line_number, line in enumerate(lines[start + 1:], start + 2):
++        if yaml:
++            if line == '  ...':
++                yaml = False
++            # QUnit 2.19 emits JSON object closing delimiters without YAML indent.
++            elif not line.startswith('  ') and line not in ('}', ']'):
++                return stop('incomplete', 'unterminated QUnit YAML diagnostic')
++            continue
++        if line == '  ---':
++            if result['plan'] is not None or not result['tests']:
++                return stop('unsupported', 'unexpected YAML diagnostic')
++            if result['tests'][-1]['outcome'] == 'pass':
++                return stop('unsupported', 'QUnit diagnostic after a successful test point')
++            yaml = True
++            continue
++        point = POINT.fullmatch(line)
++        if point:
++            if result['plan'] is not None:
++                return stop('unsupported', 'test point after trailing plan')
++            number, body = int(point[2]), point[3]
++            if number != len(result['tests']) + 1:
++                return stop('incomplete', 'nonsequential or duplicate structural number')
++            directive = None
++            # QUnit emits directives BEFORE the description, unlike other TAP dialects.
++            for token in ('TODO', 'SKIP'):
++                if body.startswith('# ' + token + ' '):
++                    directive, body = token, body[len(token) + 3:]
++                    break
++            try:
++                name = identity(body)
++            except ValueError as error:
++                return stop('unsupported', str(error))
++            outcome = 'excluded' if directive else ('pass' if point[1] == 'ok' else 'fail')
++            result['tests'].append({'number': number, 'identity': name, 'outcome': outcome,
++                                    'directive': directive, 'line_number': line_number,
++                                    'tap_line': line})
++            key = {'pass': 'passed_tests', 'fail': 'failed_tests', 'excluded': 'excluded_tests'}[outcome]
++            result[key].append(name)
++            continue
++        plan = re.fullmatch(r'1\.\.([0-9]+)', line)
++        if plan:
++            if result['plan'] is not None:
++                return stop('unsupported', 'multiple trailing plans')
++            result['plan'] = int(plan[1])
++            continue
++        total = re.fullmatch(r'# (pass|skip|todo|fail) ([0-9]+)', line)
++        if total and result['plan'] is not None:
++            if total[1] in result['totals']:
++                return stop('unsupported', 'duplicate summary total')
++            result['totals'][total[1]] = int(total[2])
++            continue
++        if not line:
++            continue
++        exited = re.fullmatch(r'Container exited with status code: ([0-9]+)', line)
++        if exited:
++            if len(result['totals']) != 4:
++                return stop('incomplete', 'container exited before QUnit footer')
++            result['exit_codes'].append(int(exited[1]))
++            continue
++        return stop('unsupported', 'unrecognized QUnit TAP line: ' + line)
++    if yaml or result['plan'] is None or len(result['totals']) != 4:
++        return stop('incomplete', 'missing complete QUnit footer or YAML end')
++    if result['plan'] == 0 or result['plan'] != len(result['tests']):
++        return stop('incomplete', 'empty or truncated test plan')
++    actual = {'pass': len(result['passed_tests']), 'fail': len(result['failed_tests']),
++              'skip': sum(t['directive'] == 'SKIP' for t in result['tests']),
++              'todo': sum(t['directive'] == 'TODO' for t in result['tests'])}
++    if result['totals'] != actual:
++        return stop('incomplete', 'summary disagrees with observed test outcomes')
++    if result['exit_codes'] and any(code != result['exit_codes'][0] for code in result['exit_codes']):
++        return stop('unsupported', 'contradictory container exit codes')
++    if any(result['exit_codes']) and actual['fail'] == 0:
++        return stop('incomplete', 'execution failed despite successful QUnit footer')
++    groups = defaultdict(list)
++    for test in result['tests']:
++        groups[test['identity']].append(test)
++    result['collisions'] = [name for name, tests in groups.items() if len(tests) > 1]
++    return result
++
++
++def diagnose_tap(result, f2p, p2p):
++    """Map both sides without sets/overwrites; never infer a missing P2P pass."""
++    report = {'version': VERSION, 'result': 'unproven', 'stream_status': result['status'],
++              'issues': list(result['issues']), 'mapping': [], 'collisions': result['collisions'],
++              'all_f2p_passed': False, 'all_p2p_passed': False}
++    observed = defaultdict(list)
++    for test in result['tests']:
++        observed[test['identity']].append(test)
++    required = defaultdict(list)
++    try:
++        for kind, labels in [('F2P', f2p), ('P2P', p2p)]:
++            for label in labels:
++                name = normalize_required(label)
++                required[name].append(label)
++                report['mapping'].append({'kind': kind, 'required': label, 'identity': name,
++                                          'candidates': observed[name]})
++    except ValueError as error:
++        report['issues'].append(str(error))
++        report['result'] = 'unsupported'
++        return report
++    for item in report['mapping']:
++        matches = item['candidates']
++        item['status'] = ('ambiguous' if len(required[item['identity']]) > 1 or len(matches) > 1
++                          else 'missing' if not matches else matches[0]['outcome'])
++    statuses = [item['status'] for item in report['mapping']]
++    report['coverage'] = {'required': len(statuses), 'observed_points': len(result['tests']),
++                          **{s: statuses.count(s) for s in ['pass', 'fail', 'excluded', 'missing', 'ambiguous']}}
++    for kind, key in [('F2P', 'all_f2p_passed'), ('P2P', 'all_p2p_passed')]:
++        subset = [item for item in report['mapping'] if item['kind'] == kind]
++        report[key] = all(item['status'] == 'pass' for item in subset)
++    if result['tap_identity'] != VERSION or not statuses:
++        report['issues'].append('no supported nonempty obligations')
++    elif result['status'] != 'complete':
++        report['result'] = 'unsupported' if result['status'] == 'unsupported' else 'unproven'
++    elif result['collisions'] or 'ambiguous' in statuses:
++        report['result'] = 'ambiguous'
++        report['issues'].append('rendered scope collisions require stable producer identities')
++    elif 'missing' in statuses or 'excluded' in statuses:
++        report['issues'].append('required assertion missing or excluded')
++    else:
++        report['result'] = 'fail' if 'fail' in statuses else 'pass'
++    return report
+diff --git a/test/test_tap_identity.py b/test/test_tap_identity.py
+new file mode 100644
+--- /dev/null
++++ b/test/test_tap_identity.py
+@@ -0,0 +1,103 @@
++import importlib.util
++import unittest
++from pathlib import Path
++
++# Import the pure helper without package __init__ (which loads Docker dependencies).
++source = Path(__file__).resolve().parents[1] / "src/poly_bench_evaluation/tap_identity.py"
++spec = importlib.util.spec_from_file_location("tap_identity", source)
++helper = importlib.util.module_from_spec(spec)
++spec.loader.exec_module(helper)
++diagnose_tap = helper.diagnose_tap
++normalize_required = helper.normalize_required
++parse_qunit_tap = helper.parse_qunit_tap
++
++
++def log(points):
++    totals = {'pass': 0, 'skip': 0, 'todo': 0, 'fail': 0}
++    lines = ['TAP version 13']
++    for number, (status, description) in enumerate(points, 1):
++        lines.append(f'{status} {number} {description}')
++        kind = ('skip' if description.startswith('# SKIP ') else
++                'todo' if description.startswith('# TODO ') else
++                'pass' if status == 'ok' else 'fail')
++        totals[kind] += 1
++    lines.append(f'1..{len(points)}')
++    lines.extend(f'# {k} {v}' for k, v in totals.items())
++    return '\n'.join(lines) + '\n'
++
++
++class IdentityControls(unittest.TestCase):
++    f2p = ['1 Maths > Color > decimal 50.0%']
++    p2p = ['2 Maths > Color > preserved 360']
++    points = [('ok', 'Maths > Color > decimal 50.0%'), ('ok', 'Maths > Color > preserved 360')]
++
++    def score(self, points):
++        return diagnose_tap(parse_qunit_tap(log(points)), self.f2p, self.p2p)
++
++    def test_reorder_and_insert_preserve_obligations(self):
++        for points in [self.points, self.points[::-1], [('ok', 'Other > harmless')] + self.points]:
++            report = self.score(points)
++            self.assertEqual(report['result'], 'pass')
++            self.assertEqual(report['coverage']['pass'], 2)
++
++    def test_real_failure_survives_many_passes(self):
++        points = [('not ok', self.points[0][1]), self.points[1]]
++        points += [('ok', f'Other > added {i}') for i in range(20)]
++        self.assertEqual(self.score(points)['result'], 'fail')
++        self.assertEqual(self.score(points)['coverage']['fail'], 1)
++
++    def test_missing_or_different_scope_is_not_a_pass(self):
++        for description in ['Other > Color > decimal 50.0%', 'Maths > Color > decimal 50.1%']:
++            report = self.score([('ok', description), self.points[1]])
++            self.assertEqual(report['result'], 'unproven')
++            self.assertEqual(report['coverage']['missing'], 1)
++
++    def test_only_structural_digits_are_removed(self):
++        self.assertEqual(normalize_required(self.f2p[0]), 'Maths > Color > decimal 50.0%')
++        self.assertNotEqual(normalize_required('99 Maths > Color > decimal 50.1%'),
++                            normalize_required(self.f2p[0]))
++        self.assertEqual(normalize_required('12 Maths > Interpolant > evaluate -> intervalChanged_'),
++                         'Maths > Interpolant > evaluate -> intervalChanged_')
++
++    def test_collisions_are_retained_and_ambiguous(self):
++        report = self.score(self.points + [self.points[0]])
++        self.assertEqual(report['result'], 'ambiguous')
++        self.assertEqual(len(report['mapping'][0]['candidates']), 2)
++        # Requirement-side duplicates also must not disappear into a set.
++        report = diagnose_tap(parse_qunit_tap(log(self.points)),
++                              self.f2p + ['9 Maths > Color > decimal 50.0%'], self.p2p)
++        self.assertEqual(report['result'], 'ambiguous')
++        self.assertEqual(len(report['mapping']), 3)
++
++    def test_skip_todo_cannot_prove_an_assertion(self):
++        for status, directive in [('ok', 'SKIP'), ('ok', 'TODO'), ('not ok', 'TODO')]:
++            report = self.score([(status, '# ' + directive + ' ' + self.points[0][1]), self.points[1]])
++            self.assertEqual(report['result'], 'unproven')
++            self.assertEqual(report['coverage']['excluded'], 1)
++        self.assertEqual(self.score(self.points + [('not ok', '# TODO ' + self.points[0][1])])['result'], 'ambiguous')
++
++    def test_observed_qunit_object_diagnostic(self):
++        content = log([('not ok', self.points[0][1]), self.points[1]])
++        content = content.replace('ok 2 ', '  ---\n  actual: {\n  "a": 0\n}\n  ...\nok 2 ')
++        self.assertEqual(diagnose_tap(parse_qunit_tap(content), self.f2p, self.p2p)['result'], 'fail')
++
++    def test_incomplete_empty_and_unsupported_streams(self):
++        complete = log(self.points)
++        examples = [complete.rsplit('1..', 1)[0], complete.replace('1..2', '1..3'),
++                    complete.replace('ok 2 ', 'ok 3 '), complete.replace('# pass 2', '# pass 1'),
++                    complete + '# pass 2\n', complete + 'TAP version 13\n',
++                    complete + 'ok 3 Other > late\n', complete.replace('ok 1 ', '    ok 1 '),
++                    complete.replace('ok 2 ', '  ---\n  severity: fail\n  ...\nok 2 '),
++                    complete + 'Container exited with status code: 1\n',
++                    complete + 'Container exited with status code: 0\nContainer exited with status code: 1\n',
++                    complete.replace('ok 1 ', 'Bail out! '), log([]),
++                    'TAP version 13\nnot ok 1 Maths > Color > decimal 50.0%\n  ---\n  message: failure\n',
++                    complete.replace('Maths > Color > decimal 50.0%', 'unscoped')]
++        for content in examples:
++            with self.subTest(content=content):
++                self.assertNotEqual(diagnose_tap(parse_qunit_tap(content), self.f2p, self.p2p)['result'], 'pass')
++        self.assertEqual(diagnose_tap(parse_qunit_tap(complete), [], [])['result'], 'unproven')
++
++
++if __name__ == "__main__":
++    unittest.main()

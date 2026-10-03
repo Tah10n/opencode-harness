@@ -80,6 +80,10 @@ See the [report](evaluation/polybench/campaigns/evidence-backed-core-development
 [complete data](evaluation/polybench/campaigns/evidence-backed-core-development-v1/results.json)
 and [expenses](evaluation/polybench/campaigns/evidence-backed-core-development-v1/costs.json).
 
+Official figures remain unchanged. A [reproducible TAP identity diagnostic](evaluation/polybench/TAP_IDENTITY.md)
+confirms ordinal-dependent comparison in this Three.js QUnit path and ambiguous
+duplicate identities. This is a measurement limitation, not demonstrated lift.
+
 ## A. Historical candidate 39def2ed: nine tasks
 
 The stopped consolidated-v1 ran 27 of 60 slots: nine tasks in all three modes.
