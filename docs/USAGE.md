@@ -26,6 +26,15 @@ completion is not success. Patch delivery does not apply changes to your checkou
 The deadline and native cancellation are execution controls, not a host sandbox
 against arbitrary hostile code. Respect native OpenCode permissions.
 
+The default workflow requests a corrective pass only for actionable observations,
+such as a missing or stale required command or an observed failed check. A current
+command that exits 0 with unsupported or incomplete result interpretation remains
+unverified; the workflow does not repeat it solely to compensate for its parser.
+Execution facts, remaining verification gaps and limitations stay in the report.
+`repairs`, `stopReason` and `observations.correctionReasons` explain the correction
+count and why the cycle stopped. No corrective pass does not imply `checks_passed`
+or complete delivery of the original task.
+
 Additional diagnostics require `HARNESS_TASK_STRATEGY=direct` and remain explicit opt-ins: `HARNESS_TASK_CONTEXT=1`,
 `HARNESS_TASK_CHECKS=1`, `HARNESS_TASK_SENSITIVITY=1`,
 `HARNESS_TASK_INVESTIGATION=1`, `HARNESS_TASK_TYPE_COMPAT=1`,
