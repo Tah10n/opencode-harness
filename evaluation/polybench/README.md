@@ -7,6 +7,11 @@ Preparation reuses the existing ten metadata-selected tasks and cyclic P/H0/H1
 allocation; it does not choose new tasks or resume the stopped historical pilot.
 [Historical results](../../docs/RESULTS.md) are separate from a new run.
 
+The explicitly selected [TAP identity diagnostic](TAP_IDENTITY.md) replays one
+saved Three.js case and public model-free controls in a separate patched copy.
+It preserves official files, scoring and integrity checks. Rendered-name
+collisions keep the complete case ambiguous; it cannot select a new candidate.
+
 ## Interface
 
 Run from the repository root. Node 24, Python 3.12+, npm, Git, Docker with

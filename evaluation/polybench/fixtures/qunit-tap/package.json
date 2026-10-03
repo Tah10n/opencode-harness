@@ -1,0 +1,8 @@
+{
+  "name": "polybench-qunit-identity-fixture",
+  "private": true,
+  "version": "1.0.0",
+  "devDependencies": {
+    "qunit": "2.19.1"
+  }
+}

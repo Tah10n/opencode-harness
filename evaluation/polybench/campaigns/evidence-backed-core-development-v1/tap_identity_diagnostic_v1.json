@@ -1,0 +1,977 @@
+{
+  "version": "tap_identity_diagnostic_v1",
+  "official_evaluator": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+  "upstream_patch_sha256": "2258de6d40b8e7e3192b5ddfd00735355c54dc16295e3d22554213ca7f3656d7",
+  "execution": "Unchanged pure AST parser/scoring replay and explicit patched-copy diagnostic",
+  "new_model_provider_reviewer_benchmark_task_runs": 0,
+  "minimal_controls": {
+    "original": {
+      "official_resolved": true,
+      "diagnostic_result": "pass",
+      "refusal": null
+    },
+    "inserted": {
+      "official_resolved": false,
+      "diagnostic_result": "pass",
+      "refusal": null
+    },
+    "defective": {
+      "official_resolved": false,
+      "diagnostic_result": "fail",
+      "refusal": null
+    },
+    "collision": {
+      "official_resolved": true,
+      "diagnostic_result": "ambiguous",
+      "refusal": "tap_identity_diagnostic_v1: ambiguous: rendered scope collisions require stable producer identities"
+    }
+  },
+  "threejs": {
+    "instance_id": "mrdoob__three.js-24461",
+    "base_commit": "9e5512f067e3a0de8d4069217d20903c1725edf7",
+    "archive_sha256": "86d7321ae9ba2e26fa02e603638d749c24944242fb9beacecfdbfeee7abab9d0",
+    "metadata_sha256": "50d61210a0add03247fe90f56a250da4444902b8e5e631867813c984f4510861",
+    "production_patch": {
+      "bytes": 848,
+      "sha256": "107efece16f581847ae1e5e1477d26dc0f8a63917eed1a8414d3612dca2e41cf",
+      "equal_across": [
+        "P",
+        "C0",
+        "H1"
+      ]
+    },
+    "required": {
+      "F2P": 2,
+      "P2P": 716
+    },
+    "cases": [
+      {
+        "case": "baseline",
+        "official_R": false,
+        "full_M_applied": false,
+        "log_sha256": "967aba67416d93becc0fe4a57af4502e5c24bfd6eca2f5b40bfeab764d998d24",
+        "stream_status": "complete",
+        "plan": 1615,
+        "totals": {
+          "pass": 716,
+          "skip": 0,
+          "todo": 897,
+          "fail": 2
+        },
+        "coverage": {
+          "required": 718,
+          "observed_points": 1615,
+          "pass": 707,
+          "fail": 2,
+          "excluded": 0,
+          "missing": 0,
+          "ambiguous": 9
+        },
+        "matching_unique": false,
+        "diagnostic_result": "ambiguous",
+        "corrected_scorer_refusal": "tap_identity_diagnostic_v1: ambiguous: rendered scope collisions require stable producer identities",
+        "official_F2P_not_passed": [
+          "923 Maths > Color > setStyleHSLRedWithDecimals",
+          "924 Maths > Color > setStyleHSLARedWithDecimals"
+        ],
+        "official_P2P_absent": 0,
+        "mapping_sha256": "0883062e4a97cf1b19042249ad36cadd3284c011cb2339ef247517dc48b96911",
+        "F2P": [
+          {
+            "kind": "F2P",
+            "required": "923 Maths > Color > setStyleHSLRedWithDecimals",
+            "identity": "Maths > Color > setStyleHSLRedWithDecimals",
+            "candidates": [
+              {
+                "number": 923,
+                "identity": "Maths > Color > setStyleHSLRedWithDecimals",
+                "outcome": "fail",
+                "directive": null,
+                "line_number": 6754,
+                "tap_line": "not ok 923 Maths > Color > setStyleHSLRedWithDecimals"
+              }
+            ],
+            "status": "fail"
+          },
+          {
+            "kind": "F2P",
+            "required": "924 Maths > Color > setStyleHSLARedWithDecimals",
+            "identity": "Maths > Color > setStyleHSLARedWithDecimals",
+            "candidates": [
+              {
+                "number": 924,
+                "identity": "Maths > Color > setStyleHSLARedWithDecimals",
+                "outcome": "fail",
+                "directive": null,
+                "line_number": 6771,
+                "tap_line": "not ok 924 Maths > Color > setStyleHSLARedWithDecimals"
+              }
+            ],
+            "status": "fail"
+          }
+        ]
+      },
+      {
+        "case": "gold",
+        "official_R": true,
+        "full_M_applied": true,
+        "log_sha256": "9c1228ac0ee9563a7613506fbb655e8b9d61857ac9dc524c9387e164fb2e9ae6",
+        "stream_status": "complete",
+        "plan": 1615,
+        "totals": {
+          "pass": 718,
+          "skip": 0,
+          "todo": 897,
+          "fail": 0
+        },
+        "coverage": {
+          "required": 718,
+          "observed_points": 1615,
+          "pass": 709,
+          "fail": 0,
+          "excluded": 0,
+          "missing": 0,
+          "ambiguous": 9
+        },
+        "matching_unique": false,
+        "diagnostic_result": "ambiguous",
+        "corrected_scorer_refusal": "tap_identity_diagnostic_v1: ambiguous: rendered scope collisions require stable producer identities",
+        "official_F2P_not_passed": [],
+        "official_P2P_absent": 0,
+        "mapping_sha256": "d2a88291516334d9138ab104e94cfa26b112e95904606930dc03be87e674a18a",
+        "F2P": [
+          {
+            "kind": "F2P",
+            "required": "923 Maths > Color > setStyleHSLRedWithDecimals",
+            "identity": "Maths > Color > setStyleHSLRedWithDecimals",
+            "candidates": [
+              {
+                "number": 923,
+                "identity": "Maths > Color > setStyleHSLRedWithDecimals",
+                "outcome": "pass",
+                "directive": null,
+                "line_number": 6753,
+                "tap_line": "ok 923 Maths > Color > setStyleHSLRedWithDecimals"
+              }
+            ],
+            "status": "pass"
+          },
+          {
+            "kind": "F2P",
+            "required": "924 Maths > Color > setStyleHSLARedWithDecimals",
+            "identity": "Maths > Color > setStyleHSLARedWithDecimals",
+            "candidates": [
+              {
+                "number": 924,
+                "identity": "Maths > Color > setStyleHSLARedWithDecimals",
+                "outcome": "pass",
+                "directive": null,
+                "line_number": 6754,
+                "tap_line": "ok 924 Maths > Color > setStyleHSLARedWithDecimals"
+              }
+            ],
+            "status": "pass"
+          }
+        ]
+      },
+      {
+        "case": "P",
+        "official_R": true,
+        "full_M_applied": true,
+        "log_sha256": "bc61e49ae84f5143daff8a86a38d24b351b214774ea2a787282da7a543f32517",
+        "stream_status": "complete",
+        "plan": 1615,
+        "totals": {
+          "pass": 718,
+          "skip": 0,
+          "todo": 897,
+          "fail": 0
+        },
+        "coverage": {
+          "required": 718,
+          "observed_points": 1615,
+          "pass": 709,
+          "fail": 0,
+          "excluded": 0,
+          "missing": 0,
+          "ambiguous": 9
+        },
+        "matching_unique": false,
+        "diagnostic_result": "ambiguous",
+        "corrected_scorer_refusal": "tap_identity_diagnostic_v1: ambiguous: rendered scope collisions require stable producer identities",
+        "official_F2P_not_passed": [],
+        "official_P2P_absent": 0,
+        "mapping_sha256": "d2a88291516334d9138ab104e94cfa26b112e95904606930dc03be87e674a18a",
+        "F2P": [
+          {
+            "kind": "F2P",
+            "required": "923 Maths > Color > setStyleHSLRedWithDecimals",
+            "identity": "Maths > Color > setStyleHSLRedWithDecimals",
+            "candidates": [
+              {
+                "number": 923,
+                "identity": "Maths > Color > setStyleHSLRedWithDecimals",
+                "outcome": "pass",
+                "directive": null,
+                "line_number": 6753,
+                "tap_line": "ok 923 Maths > Color > setStyleHSLRedWithDecimals"
+              }
+            ],
+            "status": "pass"
+          },
+          {
+            "kind": "F2P",
+            "required": "924 Maths > Color > setStyleHSLARedWithDecimals",
+            "identity": "Maths > Color > setStyleHSLARedWithDecimals",
+            "candidates": [
+              {
+                "number": 924,
+                "identity": "Maths > Color > setStyleHSLARedWithDecimals",
+                "outcome": "pass",
+                "directive": null,
+                "line_number": 6754,
+                "tap_line": "ok 924 Maths > Color > setStyleHSLARedWithDecimals"
+              }
+            ],
+            "status": "pass"
+          }
+        ]
+      },
+      {
+        "case": "C0",
+        "official_R": false,
+        "full_M_applied": true,
+        "log_sha256": "78bff16d214fd8048222b78c8ecc51de5a2a4f3f2cb75279fc0e0df617da7fce",
+        "stream_status": "complete",
+        "plan": 1616,
+        "totals": {
+          "pass": 719,
+          "skip": 0,
+          "todo": 897,
+          "fail": 0
+        },
+        "coverage": {
+          "required": 718,
+          "observed_points": 1616,
+          "pass": 709,
+          "fail": 0,
+          "excluded": 0,
+          "missing": 0,
+          "ambiguous": 9
+        },
+        "matching_unique": false,
+        "diagnostic_result": "ambiguous",
+        "corrected_scorer_refusal": "tap_identity_diagnostic_v1: ambiguous: rendered scope collisions require stable producer identities",
+        "official_F2P_not_passed": [
+          "923 Maths > Color > setStyleHSLRedWithDecimals",
+          "924 Maths > Color > setStyleHSLARedWithDecimals"
+        ],
+        "official_P2P_absent": 360,
+        "mapping_sha256": "5ae395e2cfe639f1378fb0d2b40d1f5ef4a7c0901b51a68b0691324038b0f7f3",
+        "F2P": [
+          {
+            "kind": "F2P",
+            "required": "923 Maths > Color > setStyleHSLRedWithDecimals",
+            "identity": "Maths > Color > setStyleHSLRedWithDecimals",
+            "candidates": [
+              {
+                "number": 924,
+                "identity": "Maths > Color > setStyleHSLRedWithDecimals",
+                "outcome": "pass",
+                "directive": null,
+                "line_number": 6754,
+                "tap_line": "ok 924 Maths > Color > setStyleHSLRedWithDecimals"
+              }
+            ],
+            "status": "pass"
+          },
+          {
+            "kind": "F2P",
+            "required": "924 Maths > Color > setStyleHSLARedWithDecimals",
+            "identity": "Maths > Color > setStyleHSLARedWithDecimals",
+            "candidates": [
+              {
+                "number": 925,
+                "identity": "Maths > Color > setStyleHSLARedWithDecimals",
+                "outcome": "pass",
+                "directive": null,
+                "line_number": 6755,
+                "tap_line": "ok 925 Maths > Color > setStyleHSLARedWithDecimals"
+              }
+            ],
+            "status": "pass"
+          }
+        ]
+      },
+      {
+        "case": "H1",
+        "official_R": false,
+        "full_M_applied": true,
+        "log_sha256": "e470741b530ed27be43f2df388dc71e68f151411f2c384ab39bacdd7fbb67318",
+        "stream_status": "complete",
+        "plan": 1616,
+        "totals": {
+          "pass": 719,
+          "skip": 0,
+          "todo": 897,
+          "fail": 0
+        },
+        "coverage": {
+          "required": 718,
+          "observed_points": 1616,
+          "pass": 709,
+          "fail": 0,
+          "excluded": 0,
+          "missing": 0,
+          "ambiguous": 9
+        },
+        "matching_unique": false,
+        "diagnostic_result": "ambiguous",
+        "corrected_scorer_refusal": "tap_identity_diagnostic_v1: ambiguous: rendered scope collisions require stable producer identities",
+        "official_F2P_not_passed": [
+          "923 Maths > Color > setStyleHSLRedWithDecimals",
+          "924 Maths > Color > setStyleHSLARedWithDecimals"
+        ],
+        "official_P2P_absent": 360,
+        "mapping_sha256": "5ae395e2cfe639f1378fb0d2b40d1f5ef4a7c0901b51a68b0691324038b0f7f3",
+        "F2P": [
+          {
+            "kind": "F2P",
+            "required": "923 Maths > Color > setStyleHSLRedWithDecimals",
+            "identity": "Maths > Color > setStyleHSLRedWithDecimals",
+            "candidates": [
+              {
+                "number": 924,
+                "identity": "Maths > Color > setStyleHSLRedWithDecimals",
+                "outcome": "pass",
+                "directive": null,
+                "line_number": 6754,
+                "tap_line": "ok 924 Maths > Color > setStyleHSLRedWithDecimals"
+              }
+            ],
+            "status": "pass"
+          },
+          {
+            "kind": "F2P",
+            "required": "924 Maths > Color > setStyleHSLARedWithDecimals",
+            "identity": "Maths > Color > setStyleHSLARedWithDecimals",
+            "candidates": [
+              {
+                "number": 925,
+                "identity": "Maths > Color > setStyleHSLARedWithDecimals",
+                "outcome": "pass",
+                "directive": null,
+                "line_number": 6755,
+                "tap_line": "ok 925 Maths > Color > setStyleHSLARedWithDecimals"
+              }
+            ],
+            "status": "pass"
+          }
+        ]
+      }
+    ],
+    "rendered_scope_collisions": [
+      {
+        "identity": "Materials > LineBasicMaterial > Extending",
+        "required": [],
+        "observed": {
+          "baseline": [
+            {
+              "number": 747,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 811,
+              "outcome": "excluded",
+              "directive": "TODO"
+            }
+          ],
+          "gold": [
+            {
+              "number": 747,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 811,
+              "outcome": "excluded",
+              "directive": "TODO"
+            }
+          ],
+          "P": [
+            {
+              "number": 747,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 811,
+              "outcome": "excluded",
+              "directive": "TODO"
+            }
+          ],
+          "C0": [
+            {
+              "number": 747,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 811,
+              "outcome": "excluded",
+              "directive": "TODO"
+            }
+          ],
+          "H1": [
+            {
+              "number": 747,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 811,
+              "outcome": "excluded",
+              "directive": "TODO"
+            }
+          ]
+        }
+      },
+      {
+        "identity": "Materials > LineBasicMaterial > Instancing",
+        "required": [],
+        "observed": {
+          "baseline": [
+            {
+              "number": 748,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 812,
+              "outcome": "excluded",
+              "directive": "TODO"
+            }
+          ],
+          "gold": [
+            {
+              "number": 748,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 812,
+              "outcome": "excluded",
+              "directive": "TODO"
+            }
+          ],
+          "P": [
+            {
+              "number": 748,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 812,
+              "outcome": "excluded",
+              "directive": "TODO"
+            }
+          ],
+          "C0": [
+            {
+              "number": 748,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 812,
+              "outcome": "excluded",
+              "directive": "TODO"
+            }
+          ],
+          "H1": [
+            {
+              "number": 748,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 812,
+              "outcome": "excluded",
+              "directive": "TODO"
+            }
+          ]
+        }
+      },
+      {
+        "identity": "Maths > Quaternion > slerp",
+        "required": [
+          "1077 Maths > Quaternion > slerp",
+          "1100 Maths > Quaternion > slerp"
+        ],
+        "observed": {
+          "baseline": [
+            {
+              "number": 1077,
+              "outcome": "pass",
+              "directive": null
+            },
+            {
+              "number": 1100,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "gold": [
+            {
+              "number": 1077,
+              "outcome": "pass",
+              "directive": null
+            },
+            {
+              "number": 1100,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "P": [
+            {
+              "number": 1077,
+              "outcome": "pass",
+              "directive": null
+            },
+            {
+              "number": 1100,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "C0": [
+            {
+              "number": 1078,
+              "outcome": "pass",
+              "directive": null
+            },
+            {
+              "number": 1101,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "H1": [
+            {
+              "number": 1078,
+              "outcome": "pass",
+              "directive": null
+            },
+            {
+              "number": 1101,
+              "outcome": "pass",
+              "directive": null
+            }
+          ]
+        }
+      },
+      {
+        "identity": "Maths > Triangle > getNormal",
+        "required": [
+          "1170 Maths > Triangle > getNormal"
+        ],
+        "observed": {
+          "baseline": [
+            {
+              "number": 1160,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 1170,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "gold": [
+            {
+              "number": 1160,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 1170,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "P": [
+            {
+              "number": 1160,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 1170,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "C0": [
+            {
+              "number": 1161,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 1171,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "H1": [
+            {
+              "number": 1161,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 1171,
+              "outcome": "pass",
+              "directive": null
+            }
+          ]
+        }
+      },
+      {
+        "identity": "Maths > Triangle > getBarycoord",
+        "required": [
+          "1172 Maths > Triangle > getBarycoord"
+        ],
+        "observed": {
+          "baseline": [
+            {
+              "number": 1161,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 1172,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "gold": [
+            {
+              "number": 1161,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 1172,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "P": [
+            {
+              "number": 1161,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 1172,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "C0": [
+            {
+              "number": 1162,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 1173,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "H1": [
+            {
+              "number": 1162,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 1173,
+              "outcome": "pass",
+              "directive": null
+            }
+          ]
+        }
+      },
+      {
+        "identity": "Maths > Triangle > containsPoint",
+        "required": [
+          "1173 Maths > Triangle > containsPoint"
+        ],
+        "observed": {
+          "baseline": [
+            {
+              "number": 1162,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 1173,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "gold": [
+            {
+              "number": 1162,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 1173,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "P": [
+            {
+              "number": 1162,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 1173,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "C0": [
+            {
+              "number": 1163,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 1174,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "H1": [
+            {
+              "number": 1163,
+              "outcome": "excluded",
+              "directive": "TODO"
+            },
+            {
+              "number": 1174,
+              "outcome": "pass",
+              "directive": null
+            }
+          ]
+        }
+      },
+      {
+        "identity": "Maths > Vector2 > multiply/divide",
+        "required": [
+          "1233 Maths > Vector2 > multiply/divide",
+          "1241 Maths > Vector2 > multiply/divide"
+        ],
+        "observed": {
+          "baseline": [
+            {
+              "number": 1233,
+              "outcome": "pass",
+              "directive": null
+            },
+            {
+              "number": 1241,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "gold": [
+            {
+              "number": 1233,
+              "outcome": "pass",
+              "directive": null
+            },
+            {
+              "number": 1241,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "P": [
+            {
+              "number": 1233,
+              "outcome": "pass",
+              "directive": null
+            },
+            {
+              "number": 1241,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "C0": [
+            {
+              "number": 1234,
+              "outcome": "pass",
+              "directive": null
+            },
+            {
+              "number": 1242,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "H1": [
+            {
+              "number": 1234,
+              "outcome": "pass",
+              "directive": null
+            },
+            {
+              "number": 1242,
+              "outcome": "pass",
+              "directive": null
+            }
+          ]
+        }
+      },
+      {
+        "identity": "Maths > Vector3 > multiply/divide",
+        "required": [
+          "1316 Maths > Vector3 > multiply/divide",
+          "1317 Maths > Vector3 > multiply/divide"
+        ],
+        "observed": {
+          "baseline": [
+            {
+              "number": 1316,
+              "outcome": "pass",
+              "directive": null
+            },
+            {
+              "number": 1317,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "gold": [
+            {
+              "number": 1316,
+              "outcome": "pass",
+              "directive": null
+            },
+            {
+              "number": 1317,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "P": [
+            {
+              "number": 1316,
+              "outcome": "pass",
+              "directive": null
+            },
+            {
+              "number": 1317,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "C0": [
+            {
+              "number": 1317,
+              "outcome": "pass",
+              "directive": null
+            },
+            {
+              "number": 1318,
+              "outcome": "pass",
+              "directive": null
+            }
+          ],
+          "H1": [
+            {
+              "number": 1317,
+              "outcome": "pass",
+              "directive": null
+            },
+            {
+              "number": 1318,
+              "outcome": "pass",
+              "directive": null
+            }
+          ]
+        }
+      }
+    ],
+    "historical_files_unchanged": {
+      "REPORT.md": "e2d75f3773679233a472655985bf2bde83b85e546299e47a21756cf6e8dcbdb8",
+      "results.json": "23ff0e71ef5483180cdb425fc4480d6d0c52fd377905ffb9cf1354c17263eea3",
+      "predictions-P.jsonl": "f6946cc5943239547b05b5f8e47d7eeb22d0b70dd63fe0c56785b4d2b6c54f36",
+      "predictions-C0.jsonl": "01f961e0a8e28f056f6354949103993f5aba897ecd1452167f8b156aafda8ca7",
+      "predictions-H1.jsonl": "3ffe93c4428de35585e3e49f654b359def620ae26a909ef3e5d5b03a23fc719c",
+      "costs.json": "627bdecce392e8c77cdf37460203e3e2bffcda3adc0d1cd5c9737be0902f3f3e",
+      "screening.json": "0a2c15978e48ad5eb5a9b9f98e04abf9f392379469097d03d5edcf7587996e27",
+      "frozen-manifest.json": "7b708aabf22933d128dc8224919e9e0bb83146267cedd2c34aa592e20bf28390"
+    },
+    "conclusion": "Numeric discrepancy reproduced; complete obligation mapping is ambiguous. No corrected resolved claim or H1 lift; this scoring path cannot select the next candidate."
+  },
+  "producer_controls": {
+    "original": {
+      "exit_code": 0,
+      "result": "pass",
+      "required_lines": [
+        "ok 1 Maths > Color > decimal 50.0%",
+        "ok 2 Maths > Color > preserved 360"
+      ],
+      "plan": 2,
+      "totals": {
+        "pass": 2,
+        "skip": 0,
+        "todo": 0,
+        "fail": 0
+      }
+    },
+    "inserted": {
+      "exit_code": 0,
+      "result": "pass",
+      "required_lines": [
+        "ok 2 Maths > Color > decimal 50.0%",
+        "ok 3 Maths > Color > preserved 360"
+      ],
+      "plan": 3,
+      "totals": {
+        "pass": 3,
+        "skip": 0,
+        "todo": 0,
+        "fail": 0
+      }
+    },
+    "defective": {
+      "exit_code": 1,
+      "result": "fail",
+      "required_lines": [
+        "not ok 2 Maths > Color > decimal 50.0%",
+        "ok 3 Maths > Color > preserved 360"
+      ],
+      "plan": 3,
+      "totals": {
+        "pass": 2,
+        "skip": 0,
+        "todo": 0,
+        "fail": 1
+      }
+    }
+  }
+}
