@@ -1,0 +1,879 @@
+{
+  "suite": "feedback-development-v1",
+  "kind": "development-screening",
+  "status": "stopped_before_provider",
+  "acceptedHead": "f63bee5853a0babff838e53b23b9820b1043c667",
+  "verifiedSourceCommit": "8b5609dd556d05d10057cb3c8390534675c1b9f4",
+  "preRunCommit": "36b9b714037ec84e805e45420ce3808b258d3b88",
+  "freezeSha256": "b1cac1a464b60277fc16e85758d5fd5a1239ae80bcd96287ab3c8f7262e2fc4b",
+  "rawReportSha256": "f4f3655177b6526d0341165d794092eec2130b440d4b2c4c8cee1fdf6c6adb9d",
+  "configuredModel": "openai/gpt-5.6-luna",
+  "configuredVariant": "high",
+  "executionImage": "sha256:6ddc119af8a204548428504ef970a44640edfaa3238deacb558825ee25bce181",
+  "executionEnvironment": {
+    "executionImage": "sha256:6ddc119af8a204548428504ef970a44640edfaa3238deacb558825ee25bce181",
+    "nodeVersion": "24.19.0",
+    "runtimeVersion": "1.18.26",
+    "npmVersion": "11.17.0",
+    "gitVersion": "git version 2.39.5",
+    "binarySha256": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe"
+  },
+  "budgetMs": 600000,
+  "modelRunsAuthorized": true,
+  "counts": {
+    "scheduled": 16,
+    "nativeAttemptsStarted": 1,
+    "nativeNormallyCompleted": 0,
+    "locallyTerminatedAndCaptured": 1,
+    "notStarted": 15,
+    "realProviderRequests": 0,
+    "relayFrames": 7,
+    "authorStagesStarted": 0,
+    "DNativeCorrections": 0
+  },
+  "actualRequestModels": [
+    {
+      "kind": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "none",
+      "forwarded": false
+    },
+    {
+      "kind": "work",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": false
+    },
+    {
+      "kind": "work",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": false
+    },
+    {
+      "kind": "work",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": false
+    },
+    {
+      "kind": "work",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": false
+    },
+    {
+      "kind": "work",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": false
+    },
+    {
+      "kind": "work",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": false
+    }
+  ],
+  "providerReturnedModels": [],
+  "providerModelIdentity": "unobserved; no request forwarded",
+  "pause": {
+    "kind": "boundary_refusal",
+    "slot": 1
+  },
+  "rows": [
+    {
+      "slot": 1,
+      "task": "01-invoice-discount",
+      "arm": "direct",
+      "R": false,
+      "delivery": false,
+      "providerConfirmed": false,
+      "authorCompleted": false,
+      "internalStatus": null,
+      "corrections": null,
+      "Q": false,
+      "requests": 0,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 72059.328208,
+      "preparationElapsedMs": 1529.5382080000477,
+      "evaluationElapsedMs": 462.506167,
+      "evaluationCleanupElapsedMs": 100.30458399999998,
+      "cleanupElapsedMs": 106.35804199999257,
+      "environmentErrors": [],
+      "unknownResults": [
+        "Normal author completion unproven",
+        "Provider completion or forwarding unproven"
+      ],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd01.discount-roundtrip",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd01.discount-validation",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd01.legacy-shape-and-validation",
+          "status": "PASS"
+        }
+      ],
+      "status": "technical_stop",
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "modelBackedOutcome": null,
+      "relayFrames": 7,
+      "authorStagesStarted": 0,
+      "correctionPassesObserved": 0,
+      "nativeCompletion": false,
+      "patchFile": "patches/01-invoice-discount-direct.patch",
+      "measurementReason": "Title requested reasoning effort none; fixed high boundary refused before credentials/provider; remaining work frames blocked by persisted pause."
+    },
+    {
+      "slot": 2,
+      "task": "01-invoice-discount",
+      "arm": "D",
+      "R": null,
+      "delivery": null,
+      "Q": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "evaluationElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "modelBackedOutcome": null,
+      "measurementReason": "Not started after slot 1 boundary_refusal; no model outcome."
+    },
+    {
+      "slot": 3,
+      "task": "02-cli-limit",
+      "arm": "D",
+      "R": null,
+      "delivery": null,
+      "Q": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "evaluationElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "modelBackedOutcome": null,
+      "measurementReason": "Not started after slot 1 boundary_refusal; no model outcome."
+    },
+    {
+      "slot": 4,
+      "task": "02-cli-limit",
+      "arm": "direct",
+      "R": null,
+      "delivery": null,
+      "Q": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "evaluationElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "modelBackedOutcome": null,
+      "measurementReason": "Not started after slot 1 boundary_refusal; no model outcome."
+    },
+    {
+      "slot": 5,
+      "task": "03-wallet-cancel",
+      "arm": "direct",
+      "R": null,
+      "delivery": null,
+      "Q": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "evaluationElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "modelBackedOutcome": null,
+      "measurementReason": "Not started after slot 1 boundary_refusal; no model outcome."
+    },
+    {
+      "slot": 6,
+      "task": "03-wallet-cancel",
+      "arm": "D",
+      "R": null,
+      "delivery": null,
+      "Q": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "evaluationElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "modelBackedOutcome": null,
+      "measurementReason": "Not started after slot 1 boundary_refusal; no model outcome."
+    },
+    {
+      "slot": 7,
+      "task": "04-invite-redeem",
+      "arm": "D",
+      "R": null,
+      "delivery": null,
+      "Q": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "evaluationElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "modelBackedOutcome": null,
+      "measurementReason": "Not started after slot 1 boundary_refusal; no model outcome."
+    },
+    {
+      "slot": 8,
+      "task": "04-invite-redeem",
+      "arm": "direct",
+      "R": null,
+      "delivery": null,
+      "Q": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "evaluationElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "modelBackedOutcome": null,
+      "measurementReason": "Not started after slot 1 boundary_refusal; no model outcome."
+    },
+    {
+      "slot": 9,
+      "task": "05-query-arrays",
+      "arm": "direct",
+      "R": null,
+      "delivery": null,
+      "Q": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "evaluationElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "modelBackedOutcome": null,
+      "measurementReason": "Not started after slot 1 boundary_refusal; no model outcome."
+    },
+    {
+      "slot": 10,
+      "task": "05-query-arrays",
+      "arm": "D",
+      "R": null,
+      "delivery": null,
+      "Q": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "evaluationElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "modelBackedOutcome": null,
+      "measurementReason": "Not started after slot 1 boundary_refusal; no model outcome."
+    },
+    {
+      "slot": 11,
+      "task": "06-events-once",
+      "arm": "D",
+      "R": null,
+      "delivery": null,
+      "Q": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "evaluationElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "modelBackedOutcome": null,
+      "measurementReason": "Not started after slot 1 boundary_refusal; no model outcome."
+    },
+    {
+      "slot": 12,
+      "task": "06-events-once",
+      "arm": "direct",
+      "R": null,
+      "delivery": null,
+      "Q": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "evaluationElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "modelBackedOutcome": null,
+      "measurementReason": "Not started after slot 1 boundary_refusal; no model outcome."
+    },
+    {
+      "slot": 13,
+      "task": "07-config-merge",
+      "arm": "direct",
+      "R": null,
+      "delivery": null,
+      "Q": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "evaluationElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "modelBackedOutcome": null,
+      "measurementReason": "Not started after slot 1 boundary_refusal; no model outcome."
+    },
+    {
+      "slot": 14,
+      "task": "07-config-merge",
+      "arm": "D",
+      "R": null,
+      "delivery": null,
+      "Q": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "evaluationElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "modelBackedOutcome": null,
+      "measurementReason": "Not started after slot 1 boundary_refusal; no model outcome."
+    },
+    {
+      "slot": 15,
+      "task": "08-options-refactor",
+      "arm": "D",
+      "R": null,
+      "delivery": null,
+      "Q": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "evaluationElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "modelBackedOutcome": null,
+      "measurementReason": "Not started after slot 1 boundary_refusal; no model outcome."
+    },
+    {
+      "slot": 16,
+      "task": "08-options-refactor",
+      "arm": "direct",
+      "R": null,
+      "delivery": null,
+      "Q": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "evaluationElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "modelBackedOutcome": null,
+      "measurementReason": "Not started after slot 1 boundary_refusal; no model outcome."
+    }
+  ],
+  "comparison": {
+    "kind": "development-screening",
+    "candidateWins": 0,
+    "candidateLosses": 0,
+    "ties": 0,
+    "unknownPairs": 8,
+    "deltaQPercentagePoints": null,
+    "pairs": [
+      {
+        "task": "01-invoice-discount",
+        "result": "unknown"
+      },
+      {
+        "task": "02-cli-limit",
+        "result": "unknown"
+      },
+      {
+        "task": "03-wallet-cancel",
+        "result": "unknown"
+      },
+      {
+        "task": "04-invite-redeem",
+        "result": "unknown"
+      },
+      {
+        "task": "05-query-arrays",
+        "result": "unknown"
+      },
+      {
+        "task": "06-events-once",
+        "result": "unknown"
+      },
+      {
+        "task": "07-config-merge",
+        "result": "unknown"
+      },
+      {
+        "task": "08-options-refactor",
+        "result": "unknown"
+      }
+    ],
+    "limitation": "Eight development tasks; no independent confirmation or statistically persuasive effectiveness claim."
+  },
+  "costs": {
+    "participants": {
+      "requests": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cached_tokens": 0,
+      "reasoning_tokens": 0,
+      "cachedAndReasoningAreIncludedSubsets": true,
+      "money": "unknown",
+      "nativeStartupAndFailedExecutionMs": 72059.328208,
+      "preparationMs": 1529.5382080000477,
+      "captureMs": 214.64854199999536,
+      "containerCleanupMs": 106.35804199999257
+    },
+    "modelFreeChecks": {
+      "realProviderRequests": 0,
+      "usage": "synthetic fixtures only",
+      "money": "unknown"
+    },
+    "developer": {
+      "codexUsage": "unmetered; unknown",
+      "extraRealReviewerOrDiagnosticRequests": 0,
+      "money": "unknown"
+    },
+    "CI": {
+      "modelFree": true,
+      "realProviderRequests": 0,
+      "computeCost": "unknown"
+    },
+    "relativeDTimeAndTokens": null
+  },
+  "interpretation": "No real comparison occurred. Empty captured baseline has R=false, delivery=false, Q=false; this is a technical-stop artifact, not a model task failure. All eight pairs remain unknown. No D correction utility or disadvantage is measurable.",
+  "unchangedConditionsAfterAdmission": true,
+  "additionalRealAttempts": 0,
+  "executableAdapterMutationsAfterAdmission": 0
+}

@@ -1,0 +1,53 @@
+{
+  "filesystem": {
+    "at": "2026-10-03T22:26:22.818542+00:00",
+    "logicalBytesRemoved": 628817615,
+    "allocatedFileBytesRemoved": 641462272,
+    "allTargetsAbsent": true,
+    "archiveHashesReverifiedBeforeDeletion": true,
+    "admissionAndPauseRetained": true,
+    "sharedDependenciesRetained": true
+  },
+  "docker": {
+    "ownedNamedContainersRemaining": [],
+    "builderRemoved": true,
+    "builderVolumeRemoved": true,
+    "executionImageRemoved": true,
+    "imageMissingExitCode": 1,
+    "recordedAttemptAndEvaluationContainers": 70,
+    "recordedContainersRemaining": [],
+    "ownedBuilderCacheLogicalBytesBeforeRemoval": 491300000,
+    "executionImageLogicalBytesBeforeRemoval": 491179268,
+    "physicalDockerSpaceReclaimed": "unknown; shared layers not summed"
+  },
+  "archives": {
+    "frozen-environment.tar.gz": {
+      "bytes": 114603272,
+      "sha256": "dbea6ddb8331a4afd77116c2d367b43d6cf9201055fe8fc9e80e539da5d2f433",
+      "members": 13
+    },
+    "frozen-assets.tar.gz": {
+      "bytes": 91772505,
+      "sha256": "1451a0a0e6cec305207455761c13ca46befed4ef166c137f18bf6b387de5d290",
+      "members": 4290
+    },
+    "executionImageReloadVerified": true,
+    "assetsRoundtripVerified": true,
+    "private-evidence.tar.gz": {
+      "bytes": 2425345,
+      "sha256": "72c086503cbe252c2e3b807e7b62cf913f7e70afd2f11cc10dcda4c581510ee2",
+      "members": 933,
+      "allMemberBytesAndModesVerified": true,
+      "rawRecordingsAndFreezeIncluded": true,
+      "credentialsIncluded": false
+    }
+  },
+  "archivesPrivate": true,
+  "privateArchiveLocation": "local/feedback-development-run-v1",
+  "retainedArchivesBytes": 208801122,
+  "retentionReason": "Raw evidence plus exact immutable image, materialized bundle, dependencies and binary; admission marker and pause retained to prevent replay.",
+  "globalPrunePerformed": false,
+  "foreignResourcesTouched": false,
+  "ownedRoundtripTemporaryDirectoriesRemaining": 0,
+  "ownedFailedSensitivityTemporaryDirectoryRemoved": true
+}

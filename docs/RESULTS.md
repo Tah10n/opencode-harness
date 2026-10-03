@@ -4,14 +4,32 @@
 campaigns have different runtimes, datasets and scoring contracts; they must not
 be pooled into a project success rate. Technical fixtures are not model lift.
 
-## Feedback development v1: stage-2 preparation
+## Feedback development v1: stage-3 admission stopped before provider
+
+The [bounded development run](../evaluation/feedback-development/evidence/development-run-v1/REPORT.md)
+entered slot 1 (direct) once, then closed admission before any upstream request.
+OpenCode's actual title frame requested gpt-5.6-luna with reasoning effort
+`none`; the committed freeze requires `high` for every request. The guard refused
+it before credential access, and six subsequent work frames were blocked by the
+persisted pause. Real provider requests and participant tokens are zero. The
+remaining fifteen slots are not_started; no D author or correction ran.
+
+All [sixteen records](../evaluation/feedback-development/evidence/development-run-v1/results.json),
+the captured empty full patch and its independent R=false evaluation are retained.
+Delivery=false and Q=false describe this technical artifact, not a model task
+failure. All eight pairs, Q rates, delta and relative D expense remain unknown.
+The real comparison did not occur and offers no evidence about D effectiveness.
+The runtime, task set, checks, budget and conditions were not changed after
+admission; the stopped campaign was not restarted.
+
+## Feedback development v1: historical stage-2 preparation
 
 The separate [eight-task Node.js development set](../evaluation/feedback-development/README.md)
 prepares direct as control and D as candidate on the accepted PR #31 runtime.
 Baseline, gold and plausible wrong-patch controls, independent stable-ID scoring,
 installed scripted delivery and deadline controls are model-free evidence. The
-future sixteen-run protocol has no real outcomes; model/variant/environment
-selection and explicit model-run authorization remain outstanding. The
+then-future sixteen-run protocol had no real outcomes; its model/variant/environment
+selection and explicit model-run authorization were still outstanding. The
 [acceptance repair report](../evaluation/feedback-development/evidence/ACCEPTANCE_FIX.md)
 separates reproduced original false successes from the corrected preflight and
 scripted delivery. The [initial model-free report](../evaluation/feedback-development/evidence/MODEL_FREE.md)

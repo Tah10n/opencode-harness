@@ -1,0 +1,28 @@
+{
+  "R": false,
+  "status": "FAIL",
+  "obligations": [
+    {
+      "type": "obligation",
+      "id": "fd01.discount-roundtrip",
+      "status": "FAIL"
+    },
+    {
+      "type": "obligation",
+      "id": "fd01.discount-validation",
+      "status": "FAIL"
+    },
+    {
+      "type": "obligation",
+      "id": "fd01.legacy-shape-and-validation",
+      "status": "PASS"
+    }
+  ],
+  "patchApplied": true,
+  "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "acceptanceSha256": "de122e36bc9f4c0cd07c3360351d371bea68746df0ddaa29004b90465f90b1e3",
+  "contained": true,
+  "evaluationElapsedMs": 462.506167,
+  "cleanupElapsedMs": 100.30458399999998,
+  "cleanupVerified": true
+}
