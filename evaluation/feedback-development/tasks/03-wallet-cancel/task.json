@@ -1,0 +1,13 @@
+{
+  "id": "03-wallet-cancel",
+  "category": "state-sequences",
+  "title": "Cancel one persisted wallet reservation",
+  "feature": [
+    "fd03.cancel-reopen-repeat"
+  ],
+  "preservation": [
+    "fd03.other-holds-preserved",
+    "fd03.deposit-and-rejection"
+  ],
+  "wrongControl": "Single hold is refunded, but cancellation refunds and removes unrelated holds."
+}

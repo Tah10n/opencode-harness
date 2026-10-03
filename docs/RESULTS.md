@@ -4,6 +4,17 @@
 campaigns have different runtimes, datasets and scoring contracts; they must not
 be pooled into a project success rate. Technical fixtures are not model lift.
 
+## Feedback development v1: stage-2 preparation
+
+The separate [eight-task Node.js development set](../evaluation/feedback-development/README.md)
+prepares direct as control and D as candidate on the accepted PR #31 runtime.
+Baseline, gold and plausible wrong-patch controls, independent stable-ID scoring,
+installed scripted delivery and deadline controls are model-free evidence. The
+future sixteen-run protocol has no real outcomes; model/variant/environment
+selection and explicit model-run authorization remain outstanding. See the
+[model-free report](../evaluation/feedback-development/evidence/MODEL_FREE.md).
+This is neither an official SWE-PolyBench result nor proof of effectiveness.
+
 ## Evidence-backed core: completed development rejection
 
 The [report](../evaluation/polybench/campaigns/evidence-backed-core-development-v1/REPORT.md)

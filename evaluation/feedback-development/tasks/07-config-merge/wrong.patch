@@ -1,0 +1,16 @@
+diff --git a/src/config.mjs b/src/config.mjs
+index b445d860369cbb51526b5a102a0d862597b1baac..195631e92711d98e7b2967d4be86e0881937be9d 100644
+--- a/src/config.mjs
++++ b/src/config.mjs
+@@ -1,8 +1,8 @@
+ export function mergeConfig(defaults,overrides) {
++ const result={...defaults};
+  for(const [key,value] of Object.entries(overrides)) {
+   if(value===undefined)continue;
+-  if(value && !Array.isArray(value) && typeof value==='object' && defaults[key] && typeof defaults[key]==='object') Object.assign(defaults[key],value);
+-  else defaults[key]=value;
++  result[key]=value && !Array.isArray(value) && typeof value==='object' && result[key] && typeof result[key]==='object' ? {...result[key],...value} : value;
+  }
+- return defaults;
++ return result;
+ }

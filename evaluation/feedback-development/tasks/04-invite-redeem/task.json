@@ -1,0 +1,13 @@
+{
+  "id": "04-invite-redeem",
+  "category": "state-sequences",
+  "title": "Consume a persisted invite only on valid redemption",
+  "feature": [
+    "fd04.reject-before-consume"
+  ],
+  "preservation": [
+    "fd04.replay-and-other-state",
+    "fd04.create-revoke-idempotency"
+  ],
+  "wrongControl": "Invalid attempts no longer consume a token, but successful redemption no longer consumes it either."
+}

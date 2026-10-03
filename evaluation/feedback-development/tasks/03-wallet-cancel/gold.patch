@@ -1,0 +1,12 @@
+diff --git a/src/wallet.mjs b/src/wallet.mjs
+index 79993c6e506fba156799656b85c3c720f947aebf..13a4136f08f3b9753915d5d4b6567dba2121be97 100644
+--- a/src/wallet.mjs
++++ b/src/wallet.mjs
+@@ -22,6 +22,6 @@ export class Wallet {
+  }
+  cancel(id) {
+   const state=this.read(); if(!Object.hasOwn(state.holds,id)) return false;
+-  delete state.holds[id]; this.write(state); return true;
++  state.available+=state.holds[id]; delete state.holds[id]; this.write(state); return true;
+  }
+ }

@@ -1,0 +1,33 @@
+{
+  "suite": "feedback-development-v1",
+  "runtimeVersion": "1.18.26",
+  "nodeVersion": "24.19.0",
+  "budgetMs": 600000,
+  "evaluationTimeoutMs": 5000,
+  "arms": ["direct", "D"],
+  "labels": {"direct": "control", "D": "candidate"},
+  "environment": {
+    "HARNESS_TASK_CONTEXT": "0",
+    "HARNESS_TASK_CHECKS": "0",
+    "HARNESS_TASK_INVESTIGATION": "0",
+    "HARNESS_TASK_SENSITIVITY": "0",
+    "HARNESS_TASK_TYPE_COMPAT": "0",
+    "HARNESS_TASK_COMMAND_HINTS": "0",
+    "HARNESS_TASK_EXTRA_ATTENTION": "0",
+    "HARNESS_TASK_PRESERVATION_NUDGE": "0"
+  },
+  "permissions": {
+    "edit": "allow",
+    "bash": "allow",
+    "read": "allow",
+    "glob": "allow",
+    "grep": "allow",
+    "task": "allow",
+    "external_directory": "deny",
+    "webfetch": "deny",
+    "websearch": "deny"
+  },
+  "model": null,
+  "variant": null,
+  "modelRunsAuthorized": false
+}

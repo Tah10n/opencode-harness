@@ -1,0 +1,34 @@
+diff --git a/src/export.mjs b/src/export.mjs
+index ec764928ec4d3656ee5b1ca8fe5896322b420df9..4e53cd150e0bccabbdbdb386cf9bfe5cba97215b 100644
+--- a/src/export.mjs
++++ b/src/export.mjs
+@@ -1,5 +1,5 @@
+ import {invoice} from './pricing.mjs';
+ export function exportInvoice(lines) {
+   const bill=invoice(lines);
+-  return JSON.stringify({totalCents:bill.totalCents,lines:bill.items.map(({name,quantity,unitCents,totalCents})=>({name,quantity,unitCents,totalCents}))});
++  return JSON.stringify({totalCents:bill.totalCents,lines:bill.items.map(({name,quantity,unitCents,totalCents,...discount})=>({name,quantity,unitCents,totalCents,...discount}))});
+ }
+diff --git a/src/pricing.mjs b/src/pricing.mjs
+index 9bc46633ec8fca11c8ccd6cb8a117117c19f4ca8..d45093fe5b169c365f0aa893a9f86f4e4319b5f5 100644
+--- a/src/pricing.mjs
++++ b/src/pricing.mjs
+@@ -1,5 +1,5 @@
+ import {validateLine} from './validate.mjs';
+ export function invoice(lines) {
+-  const items=lines.map(validateLine).map(line=>({...line, totalCents:line.quantity*line.unitCents}));
++  const items=lines.map(validateLine).map(line=>({...line, totalCents:Math.round(line.quantity*line.unitCents*(1-(line.discountPercent ?? 0)/100))}));
+   return {items,totalCents:items.reduce((sum,line)=>sum+line.totalCents,0)};
+ }
+diff --git a/src/validate.mjs b/src/validate.mjs
+index 08962bd2d1d310c6402c47d2752752aefdc8eacf..4bfef2c8eadb77bd961603943f7e2d1a2790e2d1 100644
+--- a/src/validate.mjs
++++ b/src/validate.mjs
+@@ -2,5 +2,6 @@ export function validateLine(line) {
+   if (typeof line.name !== 'string' || !line.name.trim()) throw new RangeError('name');
+   if (!Number.isInteger(line.quantity) || line.quantity < 1) throw new RangeError('quantity');
+   if (!Number.isInteger(line.unitCents) || line.unitCents < 0) throw new RangeError('unitCents');
+-  return {name:line.name, quantity:line.quantity, unitCents:line.unitCents};
++  if (line.discountPercent !== undefined && (!Number.isFinite(line.discountPercent) || line.discountPercent < 0 || line.discountPercent > 100)) throw new RangeError('discountPercent');
++  return {name:line.name, quantity:line.quantity, unitCents:line.unitCents,...(line.discountPercent === undefined ? {} : {discountPercent:line.discountPercent})};
+ }

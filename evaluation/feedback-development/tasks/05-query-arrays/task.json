@@ -1,0 +1,13 @@
+{
+  "id": "05-query-arrays",
+  "category": "compatible-behavior",
+  "title": "Repeated URL query values",
+  "feature": [
+    "fd05.repeated-array-values",
+    "fd05.invalid-arrays"
+  ],
+  "preservation": [
+    "fd05.scalar-and-unrelated-contracts"
+  ],
+  "wrongControl": "Repeated query values work, but the array branch drops fragments."
+}

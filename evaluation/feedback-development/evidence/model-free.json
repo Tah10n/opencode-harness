@@ -1,0 +1,579 @@
+{
+  "suite": "feedback-development-v1",
+  "scope": "model-free development preparation; no model effectiveness result",
+  "productBase": "f23f2cd6f293e4ec496ad119485d7d4bde1f822f",
+  "acceptedFeedbackHead": "4659cb2218e10ef93371c2d39a5080f42c389dd9",
+  "realProviderCalls": 0,
+  "realDevelopmentTaskRuns": 0,
+  "passed": true,
+  "contained": true,
+  "runtimeVersion": "1.18.26",
+  "binarySha256": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe",
+  "executionImage": "sha256:4758fc5bc84624a6d93019b2ecb6429a73255cd510e5c1feb1cc18fcf303436b",
+  "frozenManifestSha256": "d520541d85220dfc5a04303e1da36bf276e76ee61814a7325e701a6044e3eb5e",
+  "tasks": [
+    {
+      "task": "01-invoice-discount",
+      "category": "related-files",
+      "baseline": false,
+      "gold": true,
+      "wrong": false,
+      "baselineObligations": [
+        {
+          "type": "obligation",
+          "id": "fd01.discount-roundtrip",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd01.discount-validation",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd01.legacy-shape-and-validation",
+          "status": "PASS"
+        }
+      ],
+      "goldPublicExit": 0,
+      "wrongObligations": [
+        {
+          "type": "obligation",
+          "id": "fd01.discount-roundtrip",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd01.discount-validation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd01.legacy-shape-and-validation",
+          "status": "FAIL"
+        }
+      ]
+    },
+    {
+      "task": "02-cli-limit",
+      "category": "related-files",
+      "baseline": false,
+      "gold": true,
+      "wrong": false,
+      "baselineObligations": [
+        {
+          "type": "obligation",
+          "id": "fd02.filter-before-limit",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd02.limit-validation",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd02.original-cli-contracts",
+          "status": "PASS"
+        }
+      ],
+      "goldPublicExit": 0,
+      "wrongObligations": [
+        {
+          "type": "obligation",
+          "id": "fd02.filter-before-limit",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd02.limit-validation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd02.original-cli-contracts",
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "task": "03-wallet-cancel",
+      "category": "state-sequences",
+      "baseline": false,
+      "gold": true,
+      "wrong": false,
+      "baselineObligations": [
+        {
+          "type": "obligation",
+          "id": "fd03.cancel-reopen-repeat",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd03.other-holds-preserved",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd03.deposit-and-rejection",
+          "status": "PASS"
+        }
+      ],
+      "goldPublicExit": 0,
+      "wrongObligations": [
+        {
+          "type": "obligation",
+          "id": "fd03.cancel-reopen-repeat",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd03.other-holds-preserved",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd03.deposit-and-rejection",
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "task": "04-invite-redeem",
+      "category": "state-sequences",
+      "baseline": false,
+      "gold": true,
+      "wrong": false,
+      "baselineObligations": [
+        {
+          "type": "obligation",
+          "id": "fd04.reject-before-consume",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd04.replay-and-other-state",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd04.create-revoke-idempotency",
+          "status": "PASS"
+        }
+      ],
+      "goldPublicExit": 0,
+      "wrongObligations": [
+        {
+          "type": "obligation",
+          "id": "fd04.reject-before-consume",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd04.replay-and-other-state",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd04.create-revoke-idempotency",
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "task": "05-query-arrays",
+      "category": "compatible-behavior",
+      "baseline": false,
+      "gold": true,
+      "wrong": false,
+      "baselineObligations": [
+        {
+          "type": "obligation",
+          "id": "fd05.repeated-array-values",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd05.invalid-arrays",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd05.scalar-and-unrelated-contracts",
+          "status": "PASS"
+        }
+      ],
+      "goldPublicExit": 0,
+      "wrongObligations": [
+        {
+          "type": "obligation",
+          "id": "fd05.repeated-array-values",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd05.invalid-arrays",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd05.scalar-and-unrelated-contracts",
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "task": "06-events-once",
+      "category": "compatible-behavior",
+      "baseline": false,
+      "gold": true,
+      "wrong": false,
+      "baselineObligations": [
+        {
+          "type": "obligation",
+          "id": "fd06.once-reentrant-and-throw",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd06.registration-identity",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd06.ordinary-snapshot-order",
+          "status": "PASS"
+        }
+      ],
+      "goldPublicExit": 0,
+      "wrongObligations": [
+        {
+          "type": "obligation",
+          "id": "fd06.once-reentrant-and-throw",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd06.registration-identity",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd06.ordinary-snapshot-order",
+          "status": "FAIL"
+        }
+      ]
+    },
+    {
+      "task": "07-config-merge",
+      "category": "diagnosis-refactor",
+      "baseline": false,
+      "gold": true,
+      "wrong": false,
+      "baselineObligations": [
+        {
+          "type": "obligation",
+          "id": "fd07.input-isolation-and-repeat",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd07.recursive-undefined-and-arrays",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd07.original-value-contracts",
+          "status": "PASS"
+        }
+      ],
+      "goldPublicExit": 0,
+      "wrongObligations": [
+        {
+          "type": "obligation",
+          "id": "fd07.input-isolation-and-repeat",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd07.recursive-undefined-and-arrays",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd07.original-value-contracts",
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "task": "08-options-refactor",
+      "category": "diagnosis-refactor",
+      "baseline": false,
+      "gold": true,
+      "wrong": false,
+      "baselineObligations": [
+        {
+          "type": "obligation",
+          "id": "fd08.shared-normalizer-delegation",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd08.defaults-values-and-no-mutation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd08.validation-preserved",
+          "status": "PASS"
+        }
+      ],
+      "goldPublicExit": 0,
+      "wrongObligations": [
+        {
+          "type": "obligation",
+          "id": "fd08.shared-normalizer-delegation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd08.defaults-values-and-no-mutation",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd08.validation-preserved",
+          "status": "FAIL"
+        }
+      ]
+    }
+  ],
+  "scorerControls": [
+    {
+      "name": "empty-patch",
+      "R": false,
+      "status": "FAIL"
+    },
+    {
+      "name": "actual-zero-obligations",
+      "R": null,
+      "status": "unproven"
+    },
+    {
+      "name": "delete-public-tests",
+      "R": false,
+      "status": "FAIL"
+    },
+    {
+      "name": "npm-test-noop",
+      "R": false,
+      "status": "FAIL"
+    },
+    {
+      "name": "gold-extra-test",
+      "R": true,
+      "status": "PASS"
+    },
+    {
+      "name": "wrong-extra-test",
+      "R": false,
+      "status": "FAIL"
+    },
+    {
+      "name": "actual-timeout",
+      "R": null,
+      "status": "unproven"
+    },
+    {
+      "name": "zero-obligations",
+      "R": null,
+      "status": "unproven"
+    },
+    {
+      "name": "partial-output",
+      "R": null,
+      "status": "unproven"
+    },
+    {
+      "name": "missing-obligation",
+      "R": null,
+      "status": "unproven"
+    },
+    {
+      "name": "launch-error",
+      "R": null,
+      "status": "unproven"
+    },
+    {
+      "name": "timeout",
+      "R": null,
+      "status": "unproven"
+    },
+    {
+      "name": "duplicate-id",
+      "R": null,
+      "status": "unproven"
+    }
+  ],
+  "scripted": {
+    "realProviderCalls": 0,
+    "syntheticUsage": true,
+    "scriptedRequests": 31,
+    "bundleUnchanged": true,
+    "configDifference": "HARNESS_TASK_STRATEGY only",
+    "rows": [
+      {
+        "slot": 1,
+        "task": "01-invoice-discount",
+        "arm": "direct",
+        "R": false,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "incomplete",
+        "corrections": 0,
+        "Q": false,
+        "requests": 13,
+        "requestsWithoutUsage": 0,
+        "tokens": {
+          "input_tokens": 130,
+          "output_tokens": 65,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "knownTokens": {
+          "input_tokens": 130,
+          "output_tokens": 65,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "usageKind": "synthetic",
+        "taskElapsedMs": 4140.172833,
+        "preparationElapsedMs": 1547.503207999996,
+        "evaluationElapsedMs": 462.6698749999996,
+        "evaluationCleanupElapsedMs": 78.29195900000013,
+        "cleanupElapsedMs": 96.58391700000084,
+        "environmentErrors": [],
+        "unknownResults": [],
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd01.discount-roundtrip",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd01.discount-validation",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd01.legacy-shape-and-validation",
+            "status": "FAIL"
+          }
+        ]
+      },
+      {
+        "slot": 2,
+        "task": "01-invoice-discount",
+        "arm": "D",
+        "R": true,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "checks_passed",
+        "corrections": 1,
+        "Q": true,
+        "requests": 18,
+        "requestsWithoutUsage": 0,
+        "tokens": {
+          "input_tokens": 180,
+          "output_tokens": 90,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "knownTokens": {
+          "input_tokens": 180,
+          "output_tokens": 90,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "usageKind": "synthetic",
+        "taskElapsedMs": 4779.680791999999,
+        "preparationElapsedMs": 1399.0397090000342,
+        "evaluationElapsedMs": 449.6522499999992,
+        "evaluationCleanupElapsedMs": 75.49029100000007,
+        "cleanupElapsedMs": 96.72458300000108,
+        "environmentErrors": [],
+        "unknownResults": [],
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd01.discount-roundtrip",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd01.discount-validation",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd01.legacy-shape-and-validation",
+            "status": "PASS"
+          }
+        ]
+      }
+    ]
+  },
+  "deadline": {
+    "passed": true,
+    "fixtureBudgetMs": 5000,
+    "developmentBudgetMs": 600000,
+    "rows": [
+      {
+        "arm": "direct",
+        "hangIssued": true,
+        "timedOut": true,
+        "ownTaskDeadlineTriggered": true,
+        "terminationVerified": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "R": false,
+        "delivery": false,
+        "Q": false
+      },
+      {
+        "arm": "D",
+        "hangIssued": true,
+        "timedOut": true,
+        "ownTaskDeadlineTriggered": true,
+        "terminationVerified": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "R": false,
+        "delivery": false,
+        "Q": false
+      }
+    ]
+  },
+  "freezeComplete": false,
+  "missing": [
+    "explicit real model",
+    "explicit variant",
+    "next-stage immutable execution image/runtime/dependency identities"
+  ],
+  "money": "unknown",
+  "localChecks": {
+    "dependencyInstalls": "PASS pinned npm ci --ignore-scripts for root and sensitivity",
+    "aggregateVerify": "FAIL at sandbox listen EPERM after 18 PASS components; all 21 components PASS after affected recording retry plus remaining PolyBench and adapter checks",
+    "installedVerify": "PASS with loopback permission; initial sandbox invocation listen EPERM",
+    "containedPreflight": "PASS",
+    "scriptedInstalled": "PASS",
+    "deadlineStop": "PASS",
+    "realModelRuns": "NOT RUN"
+  }
+}

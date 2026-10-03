@@ -1,0 +1,28 @@
+diff --git a/src/args.mjs b/src/args.mjs
+index 7b5b592845f938ae7a5cd02ebb701ccdac473905..3940816c269d69178f05a07a0ca1fc72e9a6919d 100644
+--- a/src/args.mjs
++++ b/src/args.mjs
+@@ -1,7 +1,12 @@
+ export function parseArgs(args) {
+- const options={tag:null,json:false};
++ const options={tag:null,json:false,limit:null};
+  for(let i=0;i<args.length;i++) {
+   if(args[i]==='--tag' && args[i+1]!==undefined) options.tag=args[++i];
++  else if(args[i]==='--limit') {
++   const raw=args[++i];
++   if(typeof raw!=='string' || !/^(0|[1-9][0-9]*)$/.test(raw) || !Number.isSafeInteger(Number(raw))) throw new RangeError('limit');
++   options.limit=Number(raw);
++  }
+   else if(args[i]==='--json') options.json=true;
+   else throw new RangeError('Unknown or incomplete option: '+args[i]);
+  }
+diff --git a/src/query.mjs b/src/query.mjs
+index 59b86bcc8b8b1469c439ff40afaff7c753136c22..38263a3484aa786c98fdb704d8fff1bc588383e2 100644
+--- a/src/query.mjs
++++ b/src/query.mjs
+@@ -1,3 +1,4 @@
+ export function select(records,options) {
+- return records.filter(r=>options.tag===null || r.tags.includes(options.tag));
++ const filtered=records.filter(r=>options.tag===null || r.tags.includes(options.tag));
++ return options.limit===null ? filtered : filtered.slice(0,options.limit);
+ }

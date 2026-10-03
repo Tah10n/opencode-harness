@@ -1,0 +1,13 @@
+{
+  "id": "06-events-once",
+  "category": "compatible-behavior",
+  "title": "Once listeners with reentrant emission",
+  "feature": [
+    "fd06.once-reentrant-and-throw"
+  ],
+  "preservation": [
+    "fd06.registration-identity",
+    "fd06.ordinary-snapshot-order"
+  ],
+  "wrongControl": "Once behavior works, but every ordinary listener becomes single-use."
+}

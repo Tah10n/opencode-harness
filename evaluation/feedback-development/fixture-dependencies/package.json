@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "dependencies": {
+    "@opencode-ai/plugin": "1.18.26",
+    "typescript": "6.0.3"
+  }
+}
