@@ -3,7 +3,9 @@ import os from 'node:os';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
-import {privateJSON} from '../support/output-files.mjs';
+import {privateJSON,hashFile} from '../support/output-files.mjs';
+import {startContainer,image} from '../support/container-session.mjs';
+import {stopWorkload} from '../support/stop-workload.mjs';
 import {manifest} from '../support/manifest.mjs';
 import {tasks,command,applyPatch,auditFlags,config,cleanEnvironment,directory} from './suite.mjs';
 import {evaluatePatch,scoreOutput,deliveryFacts} from './evaluate.mjs';
@@ -24,6 +26,7 @@ export async function preflight(output,{contained=false,toolchain}={}) {
   assert.deepEqual([...categories.values()],[2,2,2,2]);
   assert.deepEqual(cleanEnvironment({PATH:'safe',HARNESS_TASK_CHECKS:'1',HARNESS_UNKNOWN:'1',OPENCODE_CONFIG_CONTENT:'bad'}),{PATH:'safe'});
   const harnessKeys=auditFlags(),inputHashes=manifest(path.join(directory,'tasks')),rows=[];
+  let executionEnvironment=null;
   for(const task of tasks) {
     const row={task:task.id,category:task.category,results:{}};
     const variants=['baseline','gold','wrong'];
@@ -56,8 +59,24 @@ export async function preflight(output,{contained=false,toolchain}={}) {
       try {
         const source=path.join(temp,'source');applyPatch(task.source,patch,source);
         // Run the ordinary public command too; its result never defines R.
-        const {spawnSync}=await import('node:child_process');
-        const publicRun=spawnSync('npm',['test'],{cwd:source,env:cleanEnvironment(),encoding:'utf8',timeout:10000,maxBuffer:1024*1024});
+        let publicRun;
+        if(contained) {
+          let session;
+          try {
+            session=await startContainer({source,toolchain,template:null,output:path.join(output,task.id,variant,'public-session'),onRequest:()=>{throw Error('Public controls cannot access any provider');}});
+            if(!executionEnvironment) {
+              const version=argv=>{const r=session.exec(argv);assert.equal(r.status,0);return r.stdout.trim();};
+              executionEnvironment={executionImage:image,nodeVersion:version(['node','--version']).replace(/^v/,''),runtimeVersion:version(['/opt/opencode','--version']),npmVersion:version(['npm','--version']),gitVersion:version(['git','--version']),binarySha256:hashFile(path.join(toolchain,'package/bin/opencode')).sha256};
+              assert.equal(executionEnvironment.nodeVersion,config.nodeVersion);assert.equal(executionEnvironment.runtimeVersion,config.runtimeVersion);
+            }
+            const r=session.exec(['node','-e',"const {spawnSync}=require('child_process');const r=spawnSync('npm',['test'],{cwd:'/work/repo',encoding:'utf8',timeout:10000,killSignal:'SIGKILL',maxBuffer:1048576});console.log(JSON.stringify({status:r.status,signal:r.signal,error:r.error?.code??null,stdout:r.stdout??'',stderr:r.stderr??''}));"]);
+            assert.equal(r.status,0,r.stderr);publicRun=JSON.parse(r.stdout);
+            assert.equal(stopWorkload(session).terminationVerified,true);
+          }finally {if(session)assert.equal(session.close(),0);}
+        }else {
+          const {spawnSync}=await import('node:child_process');
+          publicRun=spawnSync('npm',['test'],{cwd:source,env:cleanEnvironment(),encoding:'utf8',timeout:10000,maxBuffer:1024*1024});
+        }
         assert.ok(!publicRun.error&&!publicRun.signal);
         result.publicExit=publicRun.status;
         privateJSON(path.join(output,task.id,variant,'public-process.json'),{status:publicRun.status,stdout:publicRun.stdout,stderr:publicRun.stderr});
@@ -106,7 +125,7 @@ export async function preflight(output,{contained=false,toolchain}={}) {
   const facts={runtime:{nativeCompleted:true,continuationApplied:false,delivery:'/public/worktree'},capture:{roundtripVerified:true,hasArtifacts:true,delivery:'/public/worktree'},stop:{terminationVerified:true,captureSaved:true,relayRemoved:true,forwardingClosed:true,activeProviderHandlers:0},requests:[{forwarded:true,terminalResponse:{status:'completed'},clientDelivery:'stream-forwarded'}],workflow:{status:'incomplete',repairs:0,stages:[{role:'author',messageID:'completed-author'}],termination:{verified:true,abortRequests:0,pendingTools:0,queuedTools:0,activeTools:0,abortErrors:[]}},nativeEvidence:{messages:[{id:'completed-author',data:{role:'assistant',finish:'stop',time:{created:1,completed:2},path:{cwd:'/public/worktree'}}}]},patchApplied:true};
   assert.equal(deliveryFacts(facts).delivery,true,'Internal incomplete cannot override independently established delivery');
   for(const changed of [{requests:[{forwarded:true,clientDelivery:'unconfirmed-after-transport-error'}]},{stop:{...facts.stop,terminationVerified:false}},{patchApplied:false},{runtime:{...facts.runtime,nativeCompleted:false}},{capture:{...facts.capture,delivery:'/different/worktree'}},{nativeEvidence:{messages:[]}},{workflow:{...facts.workflow,termination:{...facts.workflow.termination,abortRequests:1}}},{nativeEvidence:{messages:[{id:'completed-author',data:{...facts.nativeEvidence.messages[0].data,finish:'cancelled'}}]}}])assert.equal(deliveryFacts({...facts,...changed}).delivery,false);
-  const result={suite:config.suite,passed:true,contained,modelFree:true,realProviderCalls:0,harnessKeys,inputHashes,tasks:rows,scorerControls:controls,reorderedStableIds:true,internalStatusSeparated:true};
+  const result={suite:config.suite,passed:true,contained,modelFree:true,realProviderCalls:0,executionEnvironment,harnessKeys,inputHashes,tasks:rows,scorerControls:controls,reorderedStableIds:true,internalStatusSeparated:true};
   privateJSON(path.join(output,'preflight.json'),result);return result;
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)) {

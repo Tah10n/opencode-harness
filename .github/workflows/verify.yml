@@ -3,7 +3,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, eval/feedback-development-v1]
   workflow_dispatch:
     inputs:
       mode:

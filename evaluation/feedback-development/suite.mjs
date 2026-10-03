@@ -6,6 +6,8 @@ import {hashFile} from '../support/output-files.mjs';
 
 export const directory=import.meta.dirname;
 export const repository=path.resolve(directory,'../..');
+export const realBatch=path.join(repository,'local/feedback-development-run-v1/batch');
+export const executionManifest='evaluation/feedback-development/evidence/execution-freeze.json';
 export const config=JSON.parse(fs.readFileSync(path.join(directory,'config.json')));
 export const tasks=fs.readdirSync(path.join(directory,'tasks')).sort().map(id=>({
   ...JSON.parse(fs.readFileSync(path.join(directory,'tasks',id,'task.json'))),
