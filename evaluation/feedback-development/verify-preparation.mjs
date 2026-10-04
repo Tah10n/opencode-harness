@@ -44,6 +44,9 @@ export function verifyPreparation(root) {
       assert.doesNotMatch(fs.readFileSync(diagnostics,'utf8'),/MUST_NOT_UPLOAD|PRIVATE_ARGUMENT/);
     }
     process.env.FIXTURE_INVENTORY='absent';assert.equal(recoverRetained([path.dirname(out)],diagnostics).cleanupMayProceed,true);
+    fs.writeFileSync(session+'/retained-resource.json','MUST_NOT_UPLOAD');
+    assert.throws(()=>recoverRetained([path.dirname(out)],diagnostics),/unrecovered/);
+    assert.doesNotMatch(fs.readFileSync(diagnostics,'utf8'),/MUST_NOT_UPLOAD/);
   }finally{for(const [key,value] of Object.entries(original))if(value===undefined)delete process.env[key];else process.env[key]=value;}
   console.log('PASS missing rg/dependencies/versions and retained CI recovery failure/confirmed absence');
 }
