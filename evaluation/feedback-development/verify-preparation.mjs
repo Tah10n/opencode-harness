@@ -44,6 +44,12 @@ export function verifyPreparation(root) {
       assert.doesNotMatch(fs.readFileSync(diagnostics,'utf8'),/MUST_NOT_UPLOAD|PRIVATE_ARGUMENT/);
     }
     process.env.FIXTURE_INVENTORY='absent';assert.equal(recoverRetained([path.dirname(out)],diagnostics).cleanupMayProceed,true);
+    fs.unlinkSync(session+'/retained-resource.json');
+    process.env.FIXTURE_INVENTORY='live';
+    assert.throws(()=>recoverRetained([path.dirname(out)],diagnostics),/unrecovered/);
+    assert.equal(fs.readFileSync(session+'/container.json','utf8'),container);
+    assert.doesNotMatch(fs.readFileSync(diagnostics,'utf8'),/PRIVATE_ARGUMENT/);
+    process.env.FIXTURE_INVENTORY='absent';assert.equal(recoverRetained([path.dirname(out)],diagnostics).cleanupMayProceed,true);
     fs.writeFileSync(session+'/retained-resource.json','MUST_NOT_UPLOAD');
     assert.throws(()=>recoverRetained([path.dirname(out)],diagnostics),/unrecovered/);
     assert.doesNotMatch(fs.readFileSync(diagnostics,'utf8'),/MUST_NOT_UPLOAD/);
