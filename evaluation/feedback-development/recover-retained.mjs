@@ -33,7 +33,9 @@ export function recoverRetained(roots,diagnostics) {
       const after=spawnSync('docker',['ps','-a','--no-trunc','--format','{{json .}}'],{encoding:'utf8',timeout:10000});
       if(after.status!==0||after.error||after.signal||after.stdout.includes(saved.containerID)||after.stdout.includes(saved.name))throw Error('Recovered container removal unproven');
     }catch(error){
-      failures.push({reason:error.message,...(saved&&/^template-dev-[a-f0-9-]{36}$/.test(saved.name)?{name:saved.name}:{}),...(saved&&/^[a-f0-9]{64}$/.test(saved.containerID)?{containerID:saved.containerID}:{}),...(Number.isSafeInteger(saved?.relayPid)?{relayPid:saved.relayPid}:{}),...(container&&/^sha256:[a-f0-9]{64}$/.test(container.image)?{image:container.image}:{})});
+      const known=['Untrusted retained container identity','Container inventory unavailable','Retained container identity changed','Existing retained recovery failed','Recovered container removal unproven'];
+      const reason=known.includes(error.message)?error.message:'Retained metadata unreadable or incomplete';
+      failures.push({reason,...(saved&&/^template-dev-[a-f0-9-]{36}$/.test(saved.name)?{name:saved.name}:{}),...(saved&&/^[a-f0-9]{64}$/.test(saved.containerID)?{containerID:saved.containerID}:{}),...(Number.isSafeInteger(saved?.relayPid)?{relayPid:saved.relayPid}:{}),...(container&&/^sha256:[a-f0-9]{64}$/.test(container.image)?{image:container.image}:{})});
     }
   }
   if(failures.length) {
