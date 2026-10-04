@@ -6,8 +6,8 @@ attempts are absent. The stopped run, execution seal, admission/pause markers,
 full patches, results and private archives remain byte-identical.
 
 The [compact receipt](installed.json) binds the contained preflight and actual
-installed direct/D chain to source 43256165 and its preparation SHA-256. A later
-safe-diagnostics-only change is separately identified; its targeted recovery
+installed direct/D chain to source 43256165 and its preparation SHA-256. Later
+cleanup-only corrections are separately identified; their targeted recovery
 regression was rerun. Those older receipts prove their tested bytes only.
 No real execution preparation was created.
 

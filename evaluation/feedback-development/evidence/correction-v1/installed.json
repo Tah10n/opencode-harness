@@ -1,8 +1,8 @@
 {
   "testedSourceCommit": "43256165f6bc2c5ae006a3a41af3ac9db9481de1",
   "testedPreparationSha256": "04521c7439cb7e3ba0b441e30c53e05457a45fb5459884c6879e31dba4fa79ca",
-  "currentPreparationSha256": "c10c5c34661434c7774245b8a6c7e4dc07fe998abb002b233e70a7fa85549391",
-  "laterChange": "Allowlisted malformed recovery metadata diagnostics only; targeted preparation/cleanup regression rerun",
+  "currentPreparationSha256": "11b4697e1ccdba854f90900ae75ac457072578ce1d1612e1b1f7092f9b6b2a22",
+  "laterChange": "Cleanup only: allowlist malformed diagnostics and confirm absence/removal for every owned container record, including missing retained marker; targeted regressions rerun",
   "model": "openai/gpt-5.6-luna",
   "variant": "high",
   "executionImage": "sha256:f2f54e316675ded75d3f25a0fbeb8623e7b4c522243ba06d6b53f5f15f96ec6e",
