@@ -4,6 +4,11 @@
 campaigns have different runtimes, datasets and scoring contracts; they must not
 be pooled into a project success rate. Technical fixtures are not model lift.
 
+The [feedback corrective preparation](../evaluation/feedback-development/evidence/correction-v1/REPORT.md)
+records four more reproduced false-success controls and the model-free report,
+bundle and retained-container recovery regressions. It does not rerun or
+reclassify the stopped development campaign.
+
 ## Feedback development v1: stage-2 preparation
 
 The separate [eight-task Node.js development set](../evaluation/feedback-development/README.md)

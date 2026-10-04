@@ -8,6 +8,8 @@ import {preflight} from './preflight.mjs';
 import {providerConfig,prepare} from './prepare.mjs';
 import {summarize,report} from './report.mjs';
 import {runPrepared} from './run.mjs';
+import {verifyReport} from './verify-report.mjs';
+import {verifyPreparation} from './verify-preparation.mjs';
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'feedback-verify-'));
 try {
   const f={experimentKind:'feedback-development',model:'openai/explicit-fixture',variant:'high',budgetMs:600000,strategy:'per-slot',streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,preflightPassed:true,files:{},attempts:schedule.map(a=>({...a,source:tasks.find(t=>t.id===a.task).source}))};
@@ -31,6 +33,8 @@ try {
   const incomplete=(await report(partial,{evaluate:false})).rows[0];
   assert.equal(incomplete.requests,2);assert.equal(incomplete.tokens.input_tokens,null);assert.equal(incomplete.knownTokens.input_tokens,10);assert.equal(incomplete.Q,null);
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(directory,'frozen-manifest.json'))),frozenManifest());
+  await verifyReport(path.join(temp,'report-regressions'));
+  verifyPreparation(path.join(temp,'preparation-regressions'));
   await preflight(path.join(temp,'preflight'));
   console.log('PASS feedback development allocation, explicit configuration, model admission and controls');
 }finally{fs.rmSync(temp,{recursive:true,force:true});}

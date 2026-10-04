@@ -23,12 +23,12 @@ export function prepare({output,model,variant,toolchain,bundle,executionImage,fi
   const nativeConfig=providerConfig(model,variant); // Fail before creating any input.
   if(![output,toolchain,bundle].every(p=>typeof p==='string'&&path.isAbsolute(p))||!/^sha256:[a-f0-9]{64}$/.test(executionImage??''))throw Error('Absolute output/toolchain/bundle and immutable image required');
   if(fs.existsSync(output))throw Error('Existing preparation cannot be replaced');
-  validateBundle(bundle);
+  validateBundle(bundle,{executionImage});
   let receipt=null;
   if(!fixture) {
     if(!preflightReceipt||!path.isAbsolute(preflightReceipt))throw Error('Explicit model-free preflight receipt required');
     receipt=JSON.parse(fs.readFileSync(preflightReceipt));
-    if(receipt.suite!==config.suite||receipt.passed!==true||receipt.modelFree!==true||receipt.realProviderCalls!==0||JSON.stringify(receipt.inputHashes)!==JSON.stringify(manifest(path.join(directory,'tasks')))||!tasks.every(task=>{const row=receipt.tasks.find(r=>r.task===task.id);return row?.results.baseline.R===false&&row?.results.gold.R===true&&row?.results.wrong.R===false;}))throw Error('Unproven or stale model-free receipt');
+    if(receipt.preparationSha256!==hashFile(path.join(directory,'frozen-manifest.json')).sha256||receipt.suite!==config.suite||receipt.passed!==true||receipt.modelFree!==true||receipt.realProviderCalls!==0||JSON.stringify(receipt.inputHashes)!==JSON.stringify(manifest(path.join(directory,'tasks')))||!tasks.every(task=>{const row=receipt.tasks.find(r=>r.task===task.id);return row?.results.baseline.R===false&&row?.results.gold.R===true&&row?.results.wrong.R===false;}))throw Error('Unproven or stale model-free receipt');
   }
   const committed=JSON.parse(fs.readFileSync(path.join(directory,'frozen-manifest.json')));
   if(JSON.stringify(committed)!==JSON.stringify(frozenManifest()))throw Error('Suite/product changed since the stage-2 manifest');
