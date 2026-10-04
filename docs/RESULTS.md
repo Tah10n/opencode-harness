@@ -8,6 +8,9 @@ The [feedback corrective preparation](../evaluation/feedback-development/evidenc
 records four more reproduced false-success controls and the model-free report,
 bundle and retained-container recovery regressions. It does not rerun or
 reclassify the stopped development campaign.
+The [exact-model technical follow-up](../evaluation/feedback-development/evidence/correction-v1/TITLE_AND_DELIVERY.md)
+records title none/refusal before correction, installed model/high frames after
+correction and synthetic direct/D delivery. It makes no model effectiveness claim.
 
 ## Feedback development v1: stage-3 admission stopped before provider
 

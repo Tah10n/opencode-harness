@@ -1,0 +1,373 @@
+{
+  "testedSourceCommit": "43256165f6bc2c5ae006a3a41af3ac9db9481de1",
+  "testedPreparationSha256": "04521c7439cb7e3ba0b441e30c53e05457a45fb5459884c6879e31dba4fa79ca",
+  "currentPreparationSha256": "c10c5c34661434c7774245b8a6c7e4dc07fe998abb002b233e70a7fa85549391",
+  "laterChange": "Allowlisted malformed recovery metadata diagnostics only; targeted preparation/cleanup regression rerun",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "high",
+  "executionImage": "sha256:f2f54e316675ded75d3f25a0fbeb8623e7b4c522243ba06d6b53f5f15f96ec6e",
+  "binarySha256": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe",
+  "realProviderRequests": 0,
+  "scriptedRequests": 31,
+  "syntheticUsage": true,
+  "frames": [
+    {
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "bootstrap",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "bootstrap",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "bootstrap",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "correction",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "correction",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "correction",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "correction",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "correction",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    },
+    {
+      "stage": "bootstrap",
+      "model": "gpt-5.6-luna",
+      "effort": "high"
+    }
+  ],
+  "rows": [
+    {
+      "arm": "direct",
+      "R": false,
+      "diagnosticR": false,
+      "evaluationProven": true,
+      "delivery": true,
+      "Q": false,
+      "corrections": 0,
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd01.discount-roundtrip",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd01.discount-validation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd01.legacy-shape-and-validation",
+          "status": "FAIL"
+        }
+      ]
+    },
+    {
+      "arm": "D",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "Q": true,
+      "corrections": 1,
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd01.discount-roundtrip",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd01.discount-validation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd01.legacy-shape-and-validation",
+          "status": "PASS"
+        }
+      ]
+    }
+  ],
+  "reportRepeated": true,
+  "partialEvaluationResumed": true,
+  "containedPreflight": {
+    "passed": true,
+    "evaluations": 30,
+    "preparationSha256": "04521c7439cb7e3ba0b441e30c53e05457a45fb5459884c6879e31dba4fa79ca",
+    "executionEnvironment": {
+      "executionImage": "sha256:f2f54e316675ded75d3f25a0fbeb8623e7b4c522243ba06d6b53f5f15f96ec6e",
+      "nodeVersion": "24.19.0",
+      "runtimeVersion": "1.18.26",
+      "npmVersion": "11.17.0",
+      "gitVersion": "git version 2.39.5",
+      "binarySha256": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe"
+    },
+    "negativeControls": [
+      {
+        "task": "01-invoice-discount",
+        "control": "discount-field-loss",
+        "R": false,
+        "status": "FAIL",
+        "evaluationComplete": true,
+        "patchApplied": true,
+        "cleanupVerified": true,
+        "contained": true
+      },
+      {
+        "task": "01-invoice-discount",
+        "control": "invoice-extra-fields",
+        "R": false,
+        "status": "FAIL",
+        "evaluationComplete": true,
+        "patchApplied": true,
+        "cleanupVerified": true,
+        "contained": true
+      },
+      {
+        "task": "03-wallet-cancel",
+        "control": "all-holds-refund",
+        "R": false,
+        "status": "FAIL",
+        "evaluationComplete": true,
+        "patchApplied": true,
+        "cleanupVerified": true,
+        "contained": true
+      },
+      {
+        "task": "03-wallet-cancel",
+        "control": "committed-wallet-reuse",
+        "R": false,
+        "status": "FAIL",
+        "evaluationComplete": true,
+        "patchApplied": true,
+        "cleanupVerified": true,
+        "contained": true
+      },
+      {
+        "task": "05-query-arrays",
+        "control": "absolute-array-url",
+        "R": false,
+        "status": "FAIL",
+        "evaluationComplete": true,
+        "patchApplied": true,
+        "cleanupVerified": true,
+        "contained": true
+      },
+      {
+        "task": "06-events-once",
+        "control": "emit-return-true",
+        "R": false,
+        "status": "FAIL",
+        "evaluationComplete": true,
+        "patchApplied": true,
+        "cleanupVerified": true,
+        "contained": true
+      }
+    ]
+  },
+  "beforeTitle": {
+    "model": "openai/gpt-5.6-luna",
+    "variant": "high",
+    "outcome": {
+      "status": "paused",
+      "pause": {
+        "kind": "boundary_refusal",
+        "slot": 1
+      }
+    },
+    "frames": [
+      {
+        "stage": "title",
+        "model": "gpt-5.6-luna",
+        "effort": "none"
+      },
+      {
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      }
+    ],
+    "authReads": 0,
+    "scriptedCalls": 0,
+    "author": "not reached after boundary refusal",
+    "correction": "not reached after boundary refusal"
+  },
+  "deadlines": [
+    {
+      "arm": "direct",
+      "hangIssued": true,
+      "terminationVerified": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "delivery": false,
+      "Q": false
+    },
+    {
+      "arm": "D",
+      "hangIssued": true,
+      "terminationVerified": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "delivery": false,
+      "Q": false
+    }
+  ]
+}
