@@ -14,6 +14,11 @@ and a committed seal of a separately authorized execution freeze. The opt-in
 only covers this sixteen-slot development campaign, `openai/gpt-5.6-luna`, high,
 OpenCode 1.18.26 and Node 24.19.0. It never changes product or global settings.
 
+The authorized development-run-v1 campaign is stopped and cannot be resumed.
+Its seal, admission marker, pause and scores are historical, immutable evidence.
+This corrective preparation does not authorize another campaign; any future
+real run needs a separate directory and new user authorization.
+
 ## Reproduce the model-free checks
 
 From the repository root, with Node 24.19.0 and Git:
@@ -44,6 +49,9 @@ docker buildx build --builder "$feedback_builder" --load \
 export EVALUATION_IMAGE="$(cat local/feedback-image-id)"
 node evaluation/feedback-development/assets.mjs \
   "$PWD/local/feedback-assets" /absolute/path/to/linux/opencode
+node evaluation/feedback-development/verify-title.mjs \
+  "$PWD/local/feedback-title-boundary" "$PWD/local/feedback-assets/bundle" \
+  "$PWD/local/feedback-assets/toolchain"
 node evaluation/feedback-development/preflight.mjs \
   "$PWD/local/feedback-contained" --contained \
   --toolchain "$PWD/local/feedback-assets/toolchain"
@@ -63,6 +71,15 @@ with the existing `evaluation/support/recover.mjs` before removal.
 After preserving and checking the fixture outputs, remove the owned builder with
 `docker buildx rm "$feedback_builder"`, remove the owned execution image with
 `docker image rm "$EVALUATION_IMAGE"`, and remove `local/feedback-assets`.
+
+The title boundary command reconstructs the old experimental configuration
+before request formation and verifies title none/refusal with zero auth or
+transport calls. The installed direct/D fixture uses exactly
+openai/gpt-5.6-luna/high and checks actual title, bootstrap, author and correction
+frames through the unchanged scheduler. Model-level reasoningEffort covers small
+title requests in OpenCode 1.18.26; the variant remains high for work requests.
+It also resumes interrupted independent grading and repeats the default report
+without rerunning the author. All responses and usage are synthetic.
 
 ## Tasks and public contracts
 

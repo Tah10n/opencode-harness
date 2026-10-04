@@ -8,11 +8,12 @@ import {privateJSON,hashFile} from '../support/output-files.mjs';
 import {prepare} from './prepare.mjs';
 import {runPrepared} from './run.mjs';
 import {report} from './report.mjs';
+import {evaluatePatch} from './evaluate.mjs';
 import {tasks,config,command,directory} from './suite.mjs';
 
 function response(id,call,text='') {
   const item=call?{type:'function_call',id:'fc_'+id,call_id:'call_'+id,name:call.name,arguments:JSON.stringify(call.args),status:'completed'}:{type:'message',id:'msg_'+id,role:'assistant',status:'completed',content:[{type:'output_text',text,annotations:[]}]};
-  const base={id:'resp_'+id,object:'response',created_at:1,model:'gpt-5.6-fixture',status:'in_progress',output:[]};
+  const base={id:'resp_'+id,object:'response',created_at:1,model:'gpt-5.6-luna',status:'in_progress',output:[]};
   const events=[{type:'response.created',response:base},{type:'response.output_item.added',output_index:0,item:call?{...item,arguments:'',status:'in_progress'}:{...item,content:[],status:'in_progress'}}];
   if(call)events.push({type:'response.function_call_arguments.delta',item_id:item.id,output_index:0,delta:item.arguments});
   else events.push({type:'response.content_part.added',item_id:item.id,output_index:0,content_index:0,part:{type:'output_text',text:'',annotations:[]}},{type:'response.output_text.delta',item_id:item.id,output_index:0,content_index:0,delta:text},{type:'response.output_text.done',item_id:item.id,output_index:0,content_index:0,text});
@@ -24,6 +25,7 @@ const userText=body=>{
   const message=body.input?.findLast(item=>item.role==='user');
   return typeof message?.content==='string'?message.content:(message?.content??[]).map(part=>part.text??'').join('\n');
 };
+const isTitle=body=>(body.input??[]).some(item=>['developer','system'].includes(item.role)&&(typeof item.content==='string'?item.content:JSON.stringify(item.content)).startsWith('You are a title generator.'));
 const bash=command=>({name:'bash',args:{command,description:'Local scripted fixture public observation'}});
 const read=filePath=>({name:'read',args:{filePath}});
 const edit=(filePath,oldString,newString)=>({name:'edit',args:{filePath,oldString,newString}});
@@ -36,8 +38,8 @@ function nativeCall(call,tools) {
 
 export async function installed({output,bundle,toolchain,executionImage}) {
   const before=manifest(bundle),task=tasks[0];
-  const f=prepare({output,model:'openai/gpt-5.6-fixture',variant:'high',bundle,toolchain,executionImage,fixture:true});
-  const counters=new Map(),inventories=[];let requests=0;
+  const f=prepare({output,model:'openai/gpt-5.6-luna',variant:'high',bundle,toolchain,executionImage,fixture:true});
+  const counters=new Map(),inventories=[],frames=[];let requests=0;
   const baseline=Object.fromEntries(['validate','pricing','export'].map(name=>[name,fs.readFileSync(path.join(task.source,'src',name+'.mjs'),'utf8')]));
   const quantity="  if (!Number.isInteger(line.quantity) || line.quantity < 1) throw new RangeError('quantity');\n";
   const wrong={
@@ -52,10 +54,12 @@ export async function installed({output,bundle,toolchain,executionImage}) {
     try {
       assert.equal(url,'https://chatgpt.com/backend-api/codex/responses');
       const body=JSON.parse(options.body),text=userText(body),all=JSON.stringify(body);requests++;
+      assert.equal(body.model,'gpt-5.6-luna');assert.equal(body.reasoning?.effort,'high');
       // Never send independent acceptance identities/results or reference artifacts.
       assert.doesNotMatch(all,/fd01\.(discount-roundtrip|discount-validation|legacy-shape-and-validation)|FEEDBACK_PRIVATE_SENTINEL/);
-      if(!body.tools?.length)return response(requests,null,'Local fixture title');
+      if(isTitle(body)) {frames.push({stage:'title',model:body.model,effort:body.reasoning.effort});return response(requests,null,'Local fixture title');}
       const stage=text.includes('Corrective pass')?'correction':text.includes('Implement the complete original task')?'author':'bootstrap';
+      frames.push({stage,model:body.model,effort:body.reasoning.effort});
       if(stage==='bootstrap'&&!currentArm)currentArm='direct';
       const key=currentArm+':'+stage,n=counters.get(key)??0;counters.set(key,n+1);
       inventories.push({arm:currentArm,stage,index:n,tools:body.tools.map(t=>t.name).sort()});
@@ -86,13 +90,24 @@ export async function installed({output,bundle,toolchain,executionImage}) {
   let unexpectedCalls=0;
   await assert.rejects(()=>runPrepared(output,{scriptedFetch:()=>{unexpectedCalls++;throw Error('No retry provider');},readAuth:()=>{unexpectedCalls++;throw Error('No retry auth');}}),/Previously created slot/);
   assert.equal(unexpectedCalls,0);
-  const result=await report(output);
+  // Continue after an interrupted evaluation, without rerunning either author.
+  const directOut=path.join(output,'runs',task.id+'-direct'),candidateOut=path.join(output,'runs',task.id+'-D');
+  await evaluatePatch({task,patch:fs.readFileSync(path.join(directOut,'model.patch')),output:path.join(directOut,'independent'),toolchain});
+  const completedDirect=manifest(path.join(directOut,'independent'));
+  fs.mkdirSync(path.join(candidateOut,'independent/session'),{recursive:true});
+  fs.writeFileSync(path.join(candidateOut,'independent/interrupted-fixture.txt'),'Retain partial grading; allocate a new evaluation directory.');
+  const result=await report(output),repeated=await report(output);
+  assert.deepEqual(repeated,result,'Default report reentry must preserve meaningful results');
+  assert.deepEqual(manifest(path.join(directOut,'independent')),completedDirect);
+  assert.equal(fs.readFileSync(path.join(candidateOut,'independent/interrupted-fixture.txt'),'utf8'),'Retain partial grading; allocate a new evaluation directory.');
+  assert.equal(fs.readdirSync(candidateOut).filter(n=>n.startsWith('independent-')).length,1);
   assert.equal(result.rows.length,2);
   const direct=result.rows.find(r=>r.arm==='direct'),candidate=result.rows.find(r=>r.arm==='D');
   assert.equal(direct.delivery,true);assert.equal(direct.R,false);assert.equal(direct.Q,false);assert.equal(direct.corrections,0);
   assert.equal(candidate.delivery,true);assert.equal(candidate.R,true);assert.equal(candidate.Q,true);assert.equal(candidate.corrections,1);
   assert.equal(inventories.filter(r=>r.arm==='direct'&&r.stage==='correction').length,0);
   assert.ok(inventories.some(r=>r.arm==='D'&&r.stage==='correction'));
+  for(const stage of ['title','bootstrap','author','correction'])assert.ok(frames.some(f=>f.stage===stage),'Actual installed frame missing: '+stage);
   for(const inventory of inventories.filter(r=>r.stage!=='bootstrap')) {
     assert.ok(!inventory.tools.includes('task')&&!inventory.tools.includes('harness_task'),'Native child prevents recursion');
     assert.deepEqual(inventory.tools,inventories.find(r=>r.stage==='author').tools);
@@ -108,20 +123,21 @@ export async function installed({output,bundle,toolchain,executionImage}) {
     assert.ok(finished.timing.budgetMs<=f.budgetMs&&finished.timing.budgetMs>0);
     boundaries.push({arm,container:container.name,deadline:finished.timing.deadlineAt,budgetMs:f.budgetMs,terminationVerified:finished.termination.terminationVerified});
   }
-  const evidence={passed:true,modelFree:true,realProviderCalls:0,scriptedRequests:requests,syntheticUsage:true,bundleUnchanged:true,bundleManifest:before,configDifference:'HARNESS_TASK_STRATEGY only',runtimeVersion:config.runtimeVersion,binarySha256:hashFile(path.join(toolchain,'package/bin/opencode')).sha256,executionImage,rows:result.rows,boundaries,inventories};
+  const evidence={passed:true,modelFree:true,realProviderCalls:0,model:f.model,variant:f.variant,frames,reportRepeated:true,partialEvaluationResumed:true,preparationSha256:hashFile(path.join(directory,'frozen-manifest.json')).sha256,scriptedRequests:requests,syntheticUsage:true,bundleUnchanged:true,bundleManifest:before,configDifference:'HARNESS_TASK_STRATEGY only',runtimeVersion:config.runtimeVersion,binarySha256:hashFile(path.join(toolchain,'package/bin/opencode')).sha256,executionImage,rows:result.rows,boundaries,inventories};
   privateJSON(path.join(output,'installed.json'),evidence);console.log(JSON.stringify(evidence));return evidence;
 }
 export async function deadlineControls({output,bundle,toolchain,executionImage}) {
   const controls=[];
   for(const arm of config.arms) {
     const root=path.join(output,arm);
-    const f=prepare({output:root,model:'openai/gpt-5.6-fixture',variant:'high',bundle,toolchain,executionImage,fixture:true});
+    const f=prepare({output:root,model:'openai/gpt-5.6-luna',variant:'high',bundle,toolchain,executionImage,fixture:true});
     // A separate stop fixture, not a development assignment or changed product budget.
     f.budgetMs=5000;f.attempts=[{...f.attempts[0],arm}];privateJSON(path.join(root,'freeze.json'),f);
     let requests=0,hangIssued=false;
     const outcome=await runPrepared(root,{readAuth:()=>({access:'scripted-not-a-credential',accountId:'scripted-local'}),scriptedFetch:async(_,options)=>{
       const body=JSON.parse(options.body),text=userText(body);requests++;
-      if(!body.tools?.length)return response(requests,null,'Deadline fixture title');
+      assert.equal(body.model,'gpt-5.6-luna');assert.equal(body.reasoning?.effort,'high');
+      if(isTitle(body))return response(requests,null,'Deadline fixture title');
       if(text.includes('Corrective pass'))throw Error('No corrective work after stop');
       if(text.includes('Implement the complete original task')) {hangIssued=true;return response(requests,bash("node -e 'setInterval(()=>{},1000)'"));}
       return response(requests,{name:'harness_task',args:{}});
@@ -132,7 +148,7 @@ export async function deadlineControls({output,bundle,toolchain,executionImage})
     const final=await report(root);assert.equal(final.rows[0].delivery,false);assert.equal(final.rows[0].Q,false);
     controls.push({arm,hangIssued,requests,outcome,runtime,stop,row:final.rows[0]});
   }
-  const evidence={passed:true,fixtureBudgetMs:5000,developmentBudgetMs:config.budgetMs,realProviderCalls:0,executionImage,binarySha256:hashFile(path.join(toolchain,'package/bin/opencode')).sha256,bundleManifest:manifest(bundle),controls};privateJSON(path.join(output,'deadline-controls.json'),evidence);return evidence;
+  const evidence={passed:true,preparationSha256:hashFile(path.join(directory,'frozen-manifest.json')).sha256,fixtureBudgetMs:5000,developmentBudgetMs:config.budgetMs,realProviderCalls:0,executionImage,binarySha256:hashFile(path.join(toolchain,'package/bin/opencode')).sha256,bundleManifest:manifest(bundle),controls};privateJSON(path.join(output,'deadline-controls.json'),evidence);return evidence;
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)) {
   const [output,bundle,toolchain]=process.argv.slice(2);

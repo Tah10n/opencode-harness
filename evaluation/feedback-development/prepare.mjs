@@ -15,7 +15,7 @@ export function providerConfig(model,variant) {
     agent:{build:{permission:{webfetch:'deny',websearch:'deny'}}},
     provider:{openai:{
       options:{baseURL:'http://127.0.0.1:4099/v1',apiKey:'owned-relay-no-credential'},
-      models:{[name]:{name,variants:{[variant]:{reasoningEffort:variant}}}},
+      models:{[name]:{name,options:{reasoningEffort:variant},variants:{[variant]:{reasoningEffort:variant}}}},
     }},
   };
 }
@@ -36,7 +36,8 @@ export function prepare({output,model,variant,toolchain,bundle,executionImage,fi
       if(!receipt.contained||env?.executionImage!==executionImage||env.nodeVersion!==config.nodeVersion||env.runtimeVersion!==config.runtimeVersion||env.binarySha256!==binarySha256||receipt.tasks[0].results['discount-field-loss']?.R!==false||receipt.tasks[2].results['all-holds-refund']?.R!==false||!tasks.every(task=>{const row=receipt.tasks.find(r=>r.task===task.id);return row.results.gold.publicExit===0&&task.preservation.every(id=>row.results.baseline.obligations.find(o=>o.id===id)?.status==='PASS');}))throw Error('Real execution requires matching contained controls and toolchain');
       if(![installedReceipt,deadlineReceipt].every(p=>typeof p==='string'&&path.isAbsolute(p)))throw Error('Installed scripted and deadline receipts required');
       const installed=JSON.parse(fs.readFileSync(installedReceipt)),deadline=JSON.parse(fs.readFileSync(deadlineReceipt)),bundleManifest=manifest(bundle);
-      for(const check of [installed,deadline])if(check.passed!==true||check.realProviderCalls!==0||check.executionImage!==executionImage||check.binarySha256!==binarySha256||JSON.stringify(check.bundleManifest)!==JSON.stringify(bundleManifest))throw Error('Unproven or changed installed scripted environment');
+      for(const check of [installed,deadline])if(check.preparationSha256!==receipt.preparationSha256||check.passed!==true||check.realProviderCalls!==0||check.executionImage!==executionImage||check.binarySha256!==binarySha256||JSON.stringify(check.bundleManifest)!==JSON.stringify(bundleManifest))throw Error('Unproven or changed installed scripted environment');
+      if(installed.model!==model||installed.variant!==variant||!['title','bootstrap','author','correction'].every(stage=>installed.frames?.some(frame=>frame.stage===stage))||installed.frames?.some(frame=>frame.model!==model.slice('openai/'.length)||frame.effort!==variant))throw Error('Unproven exact-model installed request frames');
       if(installed.bundleUnchanged!==true||installed.rows.length!==2||!config.arms.every(arm=>{const r=installed.rows.find(r=>r.arm===arm);return r?.delivery===true&&r.R===(arm==='D')&&r.corrections===(arm==='D'?1:0);})||deadline.controls.length!==2||!config.arms.every(arm=>{const c=deadline.controls.find(c=>c.arm===arm);return c?.hangIssued===true&&c.stop.terminationVerified===true&&c.stop.relayRemoved===true&&c.stop.activeProviderHandlers===0;}))throw Error('Unproven scripted completion/stop controls');
       if(command('git',['status','--porcelain'],repository).trim())throw Error('Commit executable code and public protocol before preparing real execution');
     }

@@ -70,14 +70,15 @@ jobs:
         run: |
           export EVALUATION_IMAGE="$(cat "$RUNNER_TEMP/evaluation-image")"
           node evaluation/feedback-development/assets.mjs "$RUNNER_TEMP/feedback-assets" "$OPENCODE_LINUX_BIN"
+          node evaluation/feedback-development/verify-title.mjs "$RUNNER_TEMP/feedback-title-boundary" "$RUNNER_TEMP/feedback-assets/bundle" "$RUNNER_TEMP/feedback-assets/toolchain"
           node evaluation/feedback-development/preflight.mjs "$RUNNER_TEMP/feedback-preflight" --contained --toolchain "$RUNNER_TEMP/feedback-assets/toolchain"
           node evaluation/feedback-development/installed.mjs "$RUNNER_TEMP/feedback-fixture" "$RUNNER_TEMP/feedback-assets/bundle" "$RUNNER_TEMP/feedback-assets/toolchain"
       - name: Remove owned feedback fixture files
         id: feedback-cleanup
         if: always()
         run: |
-          node evaluation/feedback-development/recover-retained.mjs "$RUNNER_TEMP/feedback-cleanup-safe.json" "$RUNNER_TEMP/feedback-preflight" "$RUNNER_TEMP/feedback-fixture" "$RUNNER_TEMP/feedback-fixture-deadline"
-          rm -rf "$RUNNER_TEMP/feedback-assets" "$RUNNER_TEMP/feedback-preflight" "$RUNNER_TEMP/feedback-fixture" "$RUNNER_TEMP/feedback-fixture-deadline"
+          node evaluation/feedback-development/recover-retained.mjs "$RUNNER_TEMP/feedback-cleanup-safe.json" "$RUNNER_TEMP/feedback-preflight" "$RUNNER_TEMP/feedback-fixture" "$RUNNER_TEMP/feedback-fixture-deadline" "$RUNNER_TEMP/feedback-title-boundary"
+          rm -rf "$RUNNER_TEMP/feedback-assets" "$RUNNER_TEMP/feedback-preflight" "$RUNNER_TEMP/feedback-fixture" "$RUNNER_TEMP/feedback-fixture-deadline" "$RUNNER_TEMP/feedback-title-boundary"
       - name: Preserve minimal safe cleanup diagnostics
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import {tasks,schedule,config,frozenManifest,directory,repository,realBatch} from './suite.mjs';
-import {verifyFrozenSchedule} from '../support/scheduler.mjs';
+import {verifyFrozenSchedule,runComparison} from '../support/scheduler.mjs';
 import {preflight} from './preflight.mjs';
 import {providerConfig,prepare} from './prepare.mjs';
 import {summarize,report} from './report.mjs';
@@ -40,6 +40,19 @@ try {
   // This is admission validation only, with no runner, auth or network call.
   verifyRealAdmission(realBatch,admitted,seal,digest,testImage);
   for(const changed of [{modelRunsAuthorized:false},{model:'openai/other'},{variant:'low'},{nodeVersion:'24.18.0'},{runtimeVersion:'1.18.25'},{executionImage:'sha256:'+'c'.repeat(64)},{config:{}},{inputManifests:{}},{files:{}},{attempts:admitted.attempts.slice(1)}])assert.throws(()=>verifyRealAdmission(realBatch,{...admitted,...changed},seal,digest,testImage));
+  for(const change of [
+    {suite:'other suite'},
+    {attempts:admitted.attempts.map((a,i)=>i<2?{...a,task:'other task'}:a)},
+    {attempts:admitted.attempts.map((a,i)=>i<2?{...a,source:'/same-but-other-source'}:a)},
+    {attempts:admitted.attempts.map((a,i)=>({...a,task:i<4?admitted.attempts[(i+2)%4].task:a.task}))},
+    {config:{...admitted.config,permission:{...admitted.config.permission,external_directory:'allow'}}},
+    {config:{...admitted.config,instructions:['changed instructions']}},
+    {config:{...admitted.config,provider:{openai:{...admitted.config.provider.openai,options:{baseURL:'https://unexpected.example'}}}}},
+    {inputManifests:{...admitted.inputManifests,[schedule[0].task+'-direct']:{'TASK.md':{sha256:'different'}}}},
+    {files:{...admitted.files,[path.join(repository,'evaluation/feedback-development/config.json')]:'different'}},
+  ])assert.throws(()=>verifyRealAdmission(realBatch,{...admitted,...change},seal,digest,testImage));
+  for(const change of [{freezeSha256:'other'},{sourceCommit:'c'.repeat(40)},{executionImage:'sha256:'+'e'.repeat(64)}])assert.throws(()=>verifyRealAdmission(realBatch,admitted,{...seal,...change},digest,testImage));
+  assert.equal(providerConfig('openai/gpt-5.6-luna','high').provider.openai.models['gpt-5.6-luna'].options.reasoningEffort,'high');
   assert.throws(()=>verifyRealAdmission(realBatch,admitted,seal,'changed',testImage),/Changed execution freeze/);
   assert.throws(()=>verifyRealAdmission(temp,admitted,seal,digest,testImage),/canonical/);
   const runtimeDirectory=path.join(temp,'runtime');fs.mkdirSync(runtimeDirectory);
@@ -48,6 +61,17 @@ try {
   verifyRealAdmission(realBatch,runtimeFreeze,seal,digest,testImage);
   fs.writeFileSync(runtimeFile,'changed runtime bytes');
   assert.throws(()=>verifyRealAdmission(realBatch,runtimeFreeze,seal,digest,testImage),/Runtime\/dependencies\/input changed/);
+  // Exercise the actual scheduler guard with work frames, before any auth/transport.
+  for(const body of [{model:'gpt-5.6-luna',reasoning:{effort:'none'}},{model:'other-model',reasoning:{effort:'high'}}]) {
+    const root=path.join(temp,'work-boundary-'+body.model+'-'+body.reasoning.effort);fs.mkdirSync(root);
+    const task=tasks[0],attempt={slot:1,task:task.id,arm:'direct',source:task.source};
+    fs.writeFileSync(path.join(root,'freeze.json'),JSON.stringify({...f,experimentKind:'fixture',model:'openai/gpt-5.6-luna',attempts:[attempt],inputManifests:{[task.id+'-direct']:manifest(task.source)}}));
+    let auth=0,calls=0;
+    const outcome=await runComparison({root,fetchImpl:()=>{calls++;throw Error('No provider');},readAuth:()=>{auth++;throw Error('No credentials');},readInput:async()=>({manifest:manifest(task.source),receipt:{fixture:true}}),startContainer:async({output,onRequest})=>{
+      fs.mkdirSync(output);return {name:'work-boundary',output,onRequest,setTaskBudget(){},exec(argv){return {status:0,stdout:argv[0]==='/opt/opencode'?'1.18.26':argv[2]?.includes('DatabaseSync')?'{"sessions":[],"messages":[],"tools":[]}':''};},close(){return 0;}};
+    },runTaskImplementation:async session=>{await session.onRequest({path:'/v1/responses',body:{...body,stream:true,tools:[{name:'bash'}]}},()=>{},new AbortController().signal);return {exitCode:0};},stopWorkload:()=>({terminationVerified:true}),captureCandidate:()=>({status:0})});
+    assert.equal(outcome.pause?.kind,'boundary_refusal');assert.equal(auth,0);assert.equal(calls,0);
+  }
   const rows=tasks.flatMap((t,i)=>[{task:t.id,arm:'direct',Q:i<2},{task:t.id,arm:'D',Q:i===0||i===2}]);
   const paired=summarize(rows);assert.equal(paired.candidateWins,1);assert.equal(paired.candidateLosses,1);assert.equal(paired.ties,6);assert.equal(paired.deltaQPercentagePoints,0);
   assert.equal(summarize(rows.slice(1)).deltaQPercentagePoints,null);

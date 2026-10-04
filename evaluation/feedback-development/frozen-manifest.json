@@ -289,7 +289,7 @@
   },
   "files": {
     "evaluation/feedback-development/README.md": {
-      "sha256": "fd7c6191619cbc2945e5c545bf484cc361353b8532330b87dd43bd6d4835cf79",
+      "sha256": "9221fd4c2225f53aa67028fad2ef637b22707dd12cfd9bae64c31f458b9e5748",
       "executable": false
     },
     "evaluation/feedback-development/assets.mjs": {
@@ -313,7 +313,7 @@
       "executable": false
     },
     "evaluation/feedback-development/installed.mjs": {
-      "sha256": "e947a04c319c0939bd1cd4a2fa431fcd19488de0d796c1409c64785f6d17c008",
+      "sha256": "86cda66ba12be4c18295d476e86fee29fa4375764dcbbad1405c1b943e4b17b8",
       "executable": false
     },
     "evaluation/feedback-development/preflight.mjs": {
@@ -321,7 +321,7 @@
       "executable": false
     },
     "evaluation/feedback-development/prepare.mjs": {
-      "sha256": "3a928f76111891cd19452790d78fb7b8b9c398531a53d5af18138cf53ca728f6",
+      "sha256": "231e652ca5343b921da6acbc1e0445c97c9c6b878ecd6a5b9c5539b37bb001e4",
       "executable": false
     },
     "evaluation/feedback-development/recover-retained.mjs": {
@@ -720,8 +720,12 @@
       "sha256": "4b92d3bcda2215b418519f0866a73f7f7361b746a54617d54b23da50b51b1973",
       "executable": false
     },
+    "evaluation/feedback-development/verify-title.mjs": {
+      "sha256": "613dcdff0de8a53d85f8f2ac3b2f6cf74ca6b0e2b7a356bef2075831d6dc894d",
+      "executable": false
+    },
     "evaluation/feedback-development/verify.mjs": {
-      "sha256": "4ddd0f227154ec58bc3bcfd413ab58def640f131e04fbf171575f1fd6d4e2ef6",
+      "sha256": "d7fc5a7f32842baad55c8ba89fea836f4c0cdd85d5b1fd2aa5df6a825aa4c578",
       "executable": false
     }
   }
