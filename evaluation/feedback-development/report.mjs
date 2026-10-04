@@ -1,9 +1,32 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {randomUUID} from 'node:crypto';
 import {privateJSON} from '../support/output-files.mjs';
 import {tasks,config} from './suite.mjs';
-import {evaluatePatch,deliveryFacts} from './evaluate.mjs';
+import {evaluatePatch,readEvaluation,deliveryFacts} from './evaluate.mjs';
+
+async function evaluationFor(out,task,f,{toolchain,evaluate},environmentErrors,unknownResults) {
+  const patch=fs.readFileSync(path.join(out,'model.patch'));
+  const candidates=fs.readdirSync(out).filter(name=>/^independent(?:-[a-f0-9-]{36})?$/.test(name));
+  let diagnostic=null;
+  for(const name of candidates) {
+    const checked=readEvaluation({task,patch,output:path.join(out,name),executionImage:f.executionImage});
+    if(checked.proven)return {...checked.result,evaluationProven:true,diagnosticR:checked.result.R};
+    diagnostic=checked;
+  }
+  if(evaluate) {
+    const target=path.join(out,fs.existsSync(path.join(out,'independent'))?'independent-'+randomUUID():'independent');
+    try{await evaluatePatch({task,patch,output:target,toolchain:toolchain??f.toolchain});}
+    catch(error){environmentErrors.push({phase:'independent_evaluation',message:error.message});}
+    const checked=readEvaluation({task,patch,output:target,executionImage:f.executionImage});
+    if(checked.proven)return {...checked.result,evaluationProven:true,diagnosticR:checked.result.R};
+    diagnostic=checked;
+  }
+  const reason=diagnostic?.reason??'Independent evaluation unavailable';
+  unknownResults.push(reason);
+  return {...diagnostic?.result,R:null,diagnosticR:diagnostic?.result?.R??null,evaluationProven:false,patchApplied:false,reason,obligations:diagnostic?.result?.obligations??[]};
+}
 
 export function summarize(rows) {
   const pairs=tasks.map(task=>{
@@ -33,16 +56,16 @@ export async function report(root,{toolchain,evaluate=true}={}) {
     const reports=fs.existsSync(artifacts)?fs.readdirSync(artifacts).filter(id=>fs.existsSync(path.join(artifacts,id,'result.json'))):[];
     const workflow=reports.length===1?read(path.join('task-artifacts',reports[0],'result.json')):null;
     let scoring;
-    try{scoring=evaluate?await evaluatePatch({task,patch:fs.readFileSync(path.join(out,'model.patch')),output:path.join(out,'independent'),toolchain:toolchain??f.toolchain}):read('independent/evaluation.json');}
+    try{scoring=await evaluationFor(out,task,f,{toolchain,evaluate},environmentErrors,unknownResults);}
     catch(error){environmentErrors.push({phase:'independent_evaluation',message:error.message});}
     scoring??={R:null,patchApplied:false,reason:'Independent evaluation unavailable',obligations:[]};
-    const facts=deliveryFacts({runtime,capture,stop,requests,workflow,nativeEvidence,patchApplied:scoring.patchApplied});
+    const facts=deliveryFacts({runtime,capture,stop,requests,workflow,nativeEvidence,patchApplied:scoring.evaluationProven===true&&scoring.patchApplied});
     if(scoring.R===null)unknownResults.push(scoring.reason);
     if(!facts.authorCompleted)unknownResults.push('Normal author completion unproven');
     if(!facts.providerConfirmed)unknownResults.push('Provider completion or forwarding unproven');
     if(unknown)unknownResults.push('Provider usage missing for '+unknown+' requests');
     const duration=(a,b)=>stop?.timing?.[a]&&stop?.timing?.[b]?stop.timing[b].monotonicMs-stop.timing[a].monotonicMs:null;
-    rows.push({slot:attempt.slot,task:attempt.task,arm:attempt.arm,R:scoring.R,...facts,Q:facts.delivery?scoring.R:false,...accounting,taskElapsedMs:runtime.executionElapsedMs,preparationElapsedMs:runtime.preparationElapsedMs,evaluationElapsedMs:scoring.evaluationElapsedMs,evaluationCleanupElapsedMs:scoring.cleanupElapsedMs,cleanupElapsedMs:duration('cleanupStarted','cleanupFinished'),environmentErrors,unknownResults,obligations:scoring.obligations});
+    rows.push({slot:attempt.slot,task:attempt.task,arm:attempt.arm,R:scoring.R,diagnosticR:scoring.diagnosticR??null,evaluationProven:scoring.evaluationProven===true,...facts,Q:facts.delivery?scoring.R:false,...accounting,taskElapsedMs:runtime.executionElapsedMs,preparationElapsedMs:runtime.preparationElapsedMs,evaluationElapsedMs:scoring.evaluationElapsedMs,evaluationCleanupElapsedMs:scoring.cleanupElapsedMs,cleanupElapsedMs:duration('cleanupStarted','cleanupFinished'),environmentErrors,unknownResults,obligations:scoring.obligations});
   }
   const result={suite:config.suite,experimentKind:f.experimentKind,model:f.model,variant:f.variant,money:'unknown',rows,comparison:summarize(rows)};
   privateJSON(path.join(root,'report.json'),result);return result;

@@ -5,7 +5,8 @@ import {spawnSync} from 'node:child_process';
 import {performance} from 'node:perf_hooks';
 import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
-import {startContainer} from '../support/container-session.mjs';
+import {startContainer,image} from '../support/container-session.mjs';
+import {manifest} from '../support/manifest.mjs';
 import {stopWorkload} from '../support/stop-workload.mjs';
 import {privateJSON,hashFile} from '../support/output-files.mjs';
 import {applyPatch,cleanEnvironment,config,directory,tasks} from './suite.mjs';
@@ -39,9 +40,34 @@ export function deliveryFacts({runtime,capture,stop,requests,workflow,nativeEvid
   return {delivery:delivered,providerConfirmed,authorCompleted,internalStatus:workflow?.status??null,corrections:workflow?.repairs??null};
 }
 
+export function evaluationBinding(task,patch) {
+  const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
+  return {task:task.id,patchSha256:sha(patch),sourceSha256:sha(JSON.stringify(manifest(task.source))),taskSha256:hashFile(path.join(task.directory,'task.json')).sha256,acceptanceSha256:hashFile(path.join(task.directory,'acceptance.test.mjs')).sha256,reporterSha256:hashFile(path.join(directory,'reporter.mjs')).sha256,evaluatorSha256:hashFile(fileURLToPath(import.meta.url)).sha256};
+}
+
+export function readEvaluation({task,patch,output,contained=true,executionImage=image}) {
+  let result=null;
+  try {
+    result=JSON.parse(fs.readFileSync(path.join(output,'evaluation.json')));
+    for(const [key,value] of Object.entries(evaluationBinding(task,patch)))if(result[key]!==value)throw Error('Evaluation binding mismatch: '+key);
+    if(result.contained!==contained||result.cleanupVerified!==true||result.terminationVerified!==true||result.evaluationComplete!==true)throw Error('Evaluation containment/completion/cleanup unproven');
+    if(contained) {
+      const container=JSON.parse(fs.readFileSync(path.join(output,'session/container.json'))),cleanup=JSON.parse(fs.readFileSync(path.join(output,'session/cleanup.json')));
+      if(result.executionImage!==executionImage||container.image!==executionImage||cleanup.status!==0)throw Error('Evaluation container/image cleanup unproven');
+      for(const target of ['/judge','/input'])if(!container.argv.some(a=>a.includes('target='+target+',readonly')))throw Error('Evaluation read-only mounts unproven');
+    }
+    const file=path.join(output,'check-process.json');
+    if(hashFile(file).sha256!==result.processSha256)throw Error('Evaluation process evidence changed');
+    const scored=scoreOutput(task,JSON.parse(fs.readFileSync(file)));
+    if(scored.R===null||scored.R!==result.R||scored.status!==result.status||JSON.stringify(scored.obligations)!==JSON.stringify(result.obligations)||result.patchApplied!==true)throw Error('Evaluation process completion/obligations unproven');
+    if(![result.evaluationElapsedMs,result.cleanupElapsedMs].every(v=>Number.isFinite(v)&&v>=0))throw Error('Evaluation timing missing');
+    return {proven:true,result};
+  }catch(error){return {proven:false,result,reason:error.message};}
+}
+
 export async function evaluatePatch({task,patch,output,toolchain,contained=true}) {
   const started=performance.now(),temp=fs.mkdtempSync(path.join(os.tmpdir(),'feedback-evaluate-'));
-  let session,result,applied=false;
+  let session,result,applied=false,terminationVerified=false;
   fs.mkdirSync(output,{recursive:true,mode:0o700});
   try {
     const source=path.join(temp,'source'),judge=path.join(temp,'judge');
@@ -65,14 +91,17 @@ export async function evaluatePatch({task,patch,output,toolchain,contained=true}
       if(outer.status!==0||outer.error||outer.signal)run={status:outer.status,signal:outer.signal,error:outer.error?.message??outer.stderr,stdout:''};
       else run=JSON.parse(outer.stdout);
       const termination=stopWorkload(session);
+      terminationVerified=termination.terminationVerified===true;
       if(!termination.terminationVerified)run.error='Scoring termination unverified';
     }else {
       // Only repository-owned model-free controls use this fast verification path.
       run=spawnSync(process.execPath,['--test','--test-reporter='+path.join(judge,'reporter.mjs'),path.join(judge,'acceptance.test.mjs')],{cwd:source,env:{...cleanEnvironment(),FEEDBACK_PROJECT_ROOT:source,HOME:temp},encoding:'utf8',timeout:config.evaluationTimeoutMs,killSignal:'SIGKILL',maxBuffer:1024*1024});
       run={status:run.status,signal:run.signal,error:run.error?.code??null,stdout:run.stdout??'',stderr:run.stderr??''};
+      terminationVerified=!run.error&&!run.signal;
     }
     privateJSON(path.join(output,'check-process.json'),run);
-    result={...scoreOutput(task,run),patchApplied:applied,patchSha256:createHash('sha256').update(patch).digest('hex'),acceptanceSha256:hashFile(path.join(task.directory,'acceptance.test.mjs')).sha256,contained};
+    result={...scoreOutput(task,run),...evaluationBinding(task,patch),processSha256:hashFile(path.join(output,'check-process.json')).sha256,patchApplied:applied,contained,executionImage:contained?image:null,terminationVerified};
+    result.evaluationComplete=typeof result.R==='boolean';
     return result;
   }finally {
     const evaluationElapsedMs=performance.now()-started,cleanupStarted=performance.now();
