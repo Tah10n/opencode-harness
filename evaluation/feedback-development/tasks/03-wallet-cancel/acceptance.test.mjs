@@ -49,4 +49,9 @@ test('fd03.deposit-and-rejection',()=>withWallet((file,w)=>{
  for(const call of [()=>w.deposit(-1),()=>w.reserve('z',1.5)]) assert.throws(call);
  assert.equal(w.reserve('x',1),false); assert.equal(w.reserve('too-big',300),false); assert.equal(w.commit('missing'),false); assert.equal(w.cancel('missing'),false);
  assert.equal(fs.readFileSync(file,'utf8'),bytes);
+ assert.equal(w.commit('x'),true);
+ const reopened=new Wallet(file), committed=fs.readFileSync(file,'utf8');
+ assert.deepEqual(reopened.read(),{available:210,holds:{},settled:['x']});
+ assert.equal(reopened.reserve('x',10),false);
+ assert.equal(fs.readFileSync(file,'utf8'),committed);
 }));

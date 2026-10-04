@@ -289,11 +289,11 @@
   },
   "files": {
     "evaluation/feedback-development/README.md": {
-      "sha256": "01e5c70d83e7956e4a8bd566343a48a83ed42d7ac509b781db7e39fd201a42ad",
+      "sha256": "fd7c6191619cbc2945e5c545bf484cc361353b8532330b87dd43bd6d4835cf79",
       "executable": false
     },
     "evaluation/feedback-development/assets.mjs": {
-      "sha256": "8cca9734ac5f177b22b6f3b0910f32f274182f6377fe43cb86010e4aa73b4575",
+      "sha256": "4e6f319cca472d734ddc0ec04340d3626a63f22b0c61172f1e509c34d20e2527",
       "executable": false
     },
     "evaluation/feedback-development/config.json": {
@@ -301,7 +301,7 @@
       "executable": false
     },
     "evaluation/feedback-development/evaluate.mjs": {
-      "sha256": "4a8fd98bfeab7d20ed75232f08738d28f9787d3e4766ccc2d87a041f0a58a28b",
+      "sha256": "506c24f8f076e8aef6a3aeec6df23ef9a1d245779de6baa7b58809fea4759ba6",
       "executable": false
     },
     "evaluation/feedback-development/fixture-dependencies/package-lock.json": {
@@ -317,15 +317,19 @@
       "executable": false
     },
     "evaluation/feedback-development/preflight.mjs": {
-      "sha256": "715b8d6573629b96e2495dda36736accb58c2a5107c77d1fcffd17562f42da07",
+      "sha256": "2f7c56475a43c0daab022d4c3fb51fe09015f1029fa708634e76fc5e54a63803",
       "executable": false
     },
     "evaluation/feedback-development/prepare.mjs": {
-      "sha256": "88d28c18c799e0faa8ffbb873553b7a2e007df01bf2eb046788c84a63ecf9697",
+      "sha256": "3a928f76111891cd19452790d78fb7b8b9c398531a53d5af18138cf53ca728f6",
+      "executable": false
+    },
+    "evaluation/feedback-development/recover-retained.mjs": {
+      "sha256": "ff0ae272c2e2b1e3f5301b54cd4c3b004946872a0c5514a92ad7ba646234ecdd",
       "executable": false
     },
     "evaluation/feedback-development/report.mjs": {
-      "sha256": "10b340fbfcbf7e1a151d9d180407a1b961adc31158dc532a04b02cc9df32deb3",
+      "sha256": "8a24310e2931e573247d1754edb27354e314f4817dd8595097e204477d60bcca",
       "executable": false
     },
     "evaluation/feedback-development/reporter.mjs": {
@@ -341,7 +345,7 @@
       "executable": false
     },
     "evaluation/feedback-development/tasks/01-invoice-discount/acceptance.test.mjs": {
-      "sha256": "de122e36bc9f4c0cd07c3360351d371bea68746df0ddaa29004b90465f90b1e3",
+      "sha256": "6680d5442c9f2f21b5d475b579311450ef8262e4bf72ed12b5960671387eb947",
       "executable": false
     },
     "evaluation/feedback-development/tasks/01-invoice-discount/discount-field-loss.patch": {
@@ -350,6 +354,10 @@
     },
     "evaluation/feedback-development/tasks/01-invoice-discount/gold.patch": {
       "sha256": "5206fcf736a77f2e0d6a6d1f10f27d530adbf81089b4651bd3958e1ba824922f",
+      "executable": false
+    },
+    "evaluation/feedback-development/tasks/01-invoice-discount/invoice-extra-fields.patch": {
+      "sha256": "f1899d11cc6684567a42b66ec8f12ce27a0c559b39378d472e57eb1be9daf9f5",
       "executable": false
     },
     "evaluation/feedback-development/tasks/01-invoice-discount/source/.gitignore": {
@@ -445,11 +453,15 @@
       "executable": false
     },
     "evaluation/feedback-development/tasks/03-wallet-cancel/acceptance.test.mjs": {
-      "sha256": "8b26e37d18e66f19ba0e279b3a41881f540e25cdf3ce5fe5e490f911565a3dc7",
+      "sha256": "54cf3bf7646f167b818fdea27c30da5d55ea54984afb86422884afe3223b52b4",
       "executable": false
     },
     "evaluation/feedback-development/tasks/03-wallet-cancel/all-holds-refund.patch": {
       "sha256": "9fdb2786196677baa417a78ce82fd60266965f5844515ca54682e2e948416773",
+      "executable": false
+    },
+    "evaluation/feedback-development/tasks/03-wallet-cancel/committed-wallet-reuse.patch": {
+      "sha256": "bf6cc75c5781523e97c8f02d7ed7ca4d41915028549f70948d6ae485331ac06b",
       "executable": false
     },
     "evaluation/feedback-development/tasks/03-wallet-cancel/gold.patch": {
@@ -528,8 +540,12 @@
       "sha256": "3f80afa5eff992b724577d70b73d9af65162e18b5cd77efc0db407660cd8baec",
       "executable": false
     },
+    "evaluation/feedback-development/tasks/05-query-arrays/absolute-array-url.patch": {
+      "sha256": "5d578d037b281e91951ee3d084ca7b2ebca214cb7dacdee33553e01af98aed5d",
+      "executable": false
+    },
     "evaluation/feedback-development/tasks/05-query-arrays/acceptance.test.mjs": {
-      "sha256": "6e983a22556156cd4a9bcd24fc40131127259fb2742c7c1e79897c1440930054",
+      "sha256": "e21266d76abdca08f113dac6ff160b91eceffdfb823e7b8a57f59b959457e65e",
       "executable": false
     },
     "evaluation/feedback-development/tasks/05-query-arrays/gold.patch": {
@@ -569,7 +585,11 @@
       "executable": false
     },
     "evaluation/feedback-development/tasks/06-events-once/acceptance.test.mjs": {
-      "sha256": "994365aa1145d302ded97d9c226c28cf0648a0aadb1c1af80927140d3e983290",
+      "sha256": "55fdb3f98a57ecda2f1b9f42fc3b617f28d0819b5d52b9703c40415a30c0d625",
+      "executable": false
+    },
+    "evaluation/feedback-development/tasks/06-events-once/emit-return-true.patch": {
+      "sha256": "fc33d186e9ca46e8e541614d27cc716fd79dc1287ed460099055c5ae0b61e7e2",
       "executable": false
     },
     "evaluation/feedback-development/tasks/06-events-once/gold.patch": {
@@ -692,8 +712,16 @@
       "sha256": "cea9f25823f2d297094efccc39b2812f07a7ce3766917bb2d11f2befca4b40ff",
       "executable": false
     },
+    "evaluation/feedback-development/verify-preparation.mjs": {
+      "sha256": "4102b9dbbe2eb82b75d36eb2ea12a888b67d7af6728adf0a9bad0fefb911b94b",
+      "executable": false
+    },
+    "evaluation/feedback-development/verify-report.mjs": {
+      "sha256": "4b92d3bcda2215b418519f0866a73f7f7361b746a54617d54b23da50b51b1973",
+      "executable": false
+    },
     "evaluation/feedback-development/verify.mjs": {
-      "sha256": "c12300662400d3bc523be6542eb114e27dd5ed21cd78074a16a0483f38f22e8b",
+      "sha256": "4ddd0f227154ec58bc3bcfd413ab58def640f131e04fbf171575f1fd6d4e2ef6",
       "executable": false
     }
   }

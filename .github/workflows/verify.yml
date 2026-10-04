@@ -73,10 +73,21 @@ jobs:
           node evaluation/feedback-development/preflight.mjs "$RUNNER_TEMP/feedback-preflight" --contained --toolchain "$RUNNER_TEMP/feedback-assets/toolchain"
           node evaluation/feedback-development/installed.mjs "$RUNNER_TEMP/feedback-fixture" "$RUNNER_TEMP/feedback-assets/bundle" "$RUNNER_TEMP/feedback-assets/toolchain"
       - name: Remove owned feedback fixture files
+        id: feedback-cleanup
         if: always()
-        run: rm -rf "$RUNNER_TEMP/feedback-assets" "$RUNNER_TEMP/feedback-preflight" "$RUNNER_TEMP/feedback-fixture" "$RUNNER_TEMP/feedback-fixture-deadline"
+        run: |
+          node evaluation/feedback-development/recover-retained.mjs "$RUNNER_TEMP/feedback-cleanup-safe.json" "$RUNNER_TEMP/feedback-preflight" "$RUNNER_TEMP/feedback-fixture" "$RUNNER_TEMP/feedback-fixture-deadline"
+          rm -rf "$RUNNER_TEMP/feedback-assets" "$RUNNER_TEMP/feedback-preflight" "$RUNNER_TEMP/feedback-fixture" "$RUNNER_TEMP/feedback-fixture-deadline"
+      - name: Preserve minimal safe cleanup diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: feedback-cleanup-safe
+          path: ${{ runner.temp }}/feedback-cleanup-safe.json
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Remove owned fixture image
-        if: always()
+        if: always() && steps.feedback-cleanup.outcome == 'success'
         run: |
           if test -f "$RUNNER_TEMP/evaluation-image"; then
             docker image rm "$(cat "$RUNNER_TEMP/evaluation-image")"

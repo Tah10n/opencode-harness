@@ -19,6 +19,15 @@ export function controlPatch(task,patch,mutate) {
   }finally{fs.rmSync(root,{recursive:true,force:true});}
 }
 
+export const negativeControls=[
+  {task:'01-invoice-discount',name:'discount-field-loss',file:'src/pricing.mjs',from:'  return {items,totalCents:',to:'  for (const item of items) delete item.discountPercent;\n  return {items,totalCents:',failed:'fd01.discount-roundtrip'},
+  {task:'03-wallet-cancel',name:'all-holds-refund',file:'src/wallet.mjs',from:'state.available+=state.holds[id];',to:'state.available += Object.values(state.holds)\n   .reduce((sum, cents) => sum + cents, 0);',failed:'fd03.cancel-one-hold-accounting'},
+  {task:'03-wallet-cancel',name:'committed-wallet-reuse',file:'src/wallet.mjs',from:'state.settled.includes(id)||',to:'',failed:'fd03.deposit-and-rejection'},
+  {task:'06-events-once',name:'emit-return-true',file:'src/events.mjs',from:'\n }\n}',to:'\n  return true;\n }\n}',failed:'fd06.ordinary-snapshot-order'},
+  {task:'01-invoice-discount',name:'invoice-extra-fields',file:'src/validate.mjs',from:'return {name:line.name, quantity:line.quantity, unitCents:line.unitCents,...(line.discountPercent === undefined ? {} : {discountPercent:line.discountPercent})};',to:'return {...line};',failed:'fd01.legacy-shape-and-validation'},
+  {task:'05-query-arrays',name:'absolute-array-url',file:'src/query.mjs',from:"return base+(text?'?'+text:'')+hash;",to:"const result=base+(text?'?'+text:'')+hash;return Object.values(updates).some(v=>Array.isArray(v)&&v.length)?new URL(result,'https://example.test').href:result;",failed:'fd05.repeated-array-values'},
+];
+
 export async function preflight(output,{contained=false,toolchain}={}) {
   fs.mkdirSync(output,{recursive:true,mode:0o700});
   assert.equal(tasks.length,8);
@@ -29,15 +38,12 @@ export async function preflight(output,{contained=false,toolchain}={}) {
   let executionEnvironment=null;
   for(const task of tasks) {
     const row={task:task.id,category:task.category,results:{}};
-    const variants=['baseline','gold','wrong'];
-    if(task.id==='01-invoice-discount')variants.push('discount-field-loss');
-    if(task.id==='03-wallet-cancel')variants.push('all-holds-refund');
+    const variants=['baseline','gold','wrong',...negativeControls.filter(c=>c.task===task.id).map(c=>c.name)];
     for(const variant of variants) {
-      const additional=variant==='discount-field-loss'||variant==='all-holds-refund';
+      const additional=negativeControls.find(c=>c.task===task.id&&c.name===variant);
       const patch=additional?controlPatch(task,fs.readFileSync(path.join(task.directory,'gold.patch')),repo=>{
-        const file=path.join(repo,variant==='discount-field-loss'?'src/pricing.mjs':'src/wallet.mjs'),source=fs.readFileSync(file,'utf8');
-        const from=variant==='discount-field-loss'?'  return {items,totalCents:':'state.available+=state.holds[id];';
-        const to=variant==='discount-field-loss'?'  for (const item of items) delete item.discountPercent;\n'+from:'state.available += Object.values(state.holds)\n   .reduce((sum, cents) => sum + cents, 0);';
+        const file=path.join(repo,additional.file),source=fs.readFileSync(file,'utf8');
+        const {from,to}=additional;
         assert.equal(source.split(from).length,2);fs.writeFileSync(file,source.replace(from,to));
       }):variant==='baseline'?Buffer.alloc(0):fs.readFileSync(path.join(task.directory,variant+'.patch'));
       if(additional)assert.deepEqual(patch,fs.readFileSync(path.join(task.directory,variant+'.patch')),'The retained full negative patch must match controlPatch');
@@ -48,7 +54,7 @@ export async function preflight(output,{contained=false,toolchain}={}) {
       else assert.equal(result.R,false,JSON.stringify({task:task.id,variant,result}));
       if(additional) {
         assert.equal(result.status,'FAIL');assert.equal(result.patchApplied,true);
-        const failed=variant==='discount-field-loss'?'fd01.discount-roundtrip':'fd03.cancel-one-hold-accounting';
+        const failed=additional.failed;
         assert.equal(result.obligations.find(r=>r.id===failed)?.status,'FAIL');
       }
       if(variant==='baseline') {
@@ -81,7 +87,7 @@ export async function preflight(output,{contained=false,toolchain}={}) {
         result.publicExit=publicRun.status;
         privateJSON(path.join(output,task.id,variant,'public-process.json'),{status:publicRun.status,stdout:publicRun.stdout,stderr:publicRun.stderr});
         if(variant==='gold')assert.equal(publicRun.status,0,publicRun.stdout+publicRun.stderr);
-        if(additional)assert.equal(publicRun.status,variant==='discount-field-loss'?1:0);
+        if(['discount-field-loss','all-holds-refund'].includes(variant))assert.equal(publicRun.status,variant==='discount-field-loss'?1:0);
         if(task.id==='08-options-refactor'&&variant==='baseline')assert.equal(publicRun.status,0);
       }finally{fs.rmSync(temp,{recursive:true,force:true});}
     }
@@ -125,7 +131,7 @@ export async function preflight(output,{contained=false,toolchain}={}) {
   const facts={runtime:{nativeCompleted:true,continuationApplied:false,delivery:'/public/worktree'},capture:{roundtripVerified:true,hasArtifacts:true,delivery:'/public/worktree'},stop:{terminationVerified:true,captureSaved:true,relayRemoved:true,forwardingClosed:true,activeProviderHandlers:0},requests:[{forwarded:true,terminalResponse:{status:'completed'},clientDelivery:'stream-forwarded'}],workflow:{status:'incomplete',repairs:0,stages:[{role:'author',messageID:'completed-author'}],termination:{verified:true,abortRequests:0,pendingTools:0,queuedTools:0,activeTools:0,abortErrors:[]}},nativeEvidence:{messages:[{id:'completed-author',data:{role:'assistant',finish:'stop',time:{created:1,completed:2},path:{cwd:'/public/worktree'}}}]},patchApplied:true};
   assert.equal(deliveryFacts(facts).delivery,true,'Internal incomplete cannot override independently established delivery');
   for(const changed of [{requests:[{forwarded:true,clientDelivery:'unconfirmed-after-transport-error'}]},{stop:{...facts.stop,terminationVerified:false}},{patchApplied:false},{runtime:{...facts.runtime,nativeCompleted:false}},{capture:{...facts.capture,delivery:'/different/worktree'}},{nativeEvidence:{messages:[]}},{workflow:{...facts.workflow,termination:{...facts.workflow.termination,abortRequests:1}}},{nativeEvidence:{messages:[{id:'completed-author',data:{...facts.nativeEvidence.messages[0].data,finish:'cancelled'}}]}}])assert.equal(deliveryFacts({...facts,...changed}).delivery,false);
-  const result={suite:config.suite,passed:true,contained,modelFree:true,realProviderCalls:0,executionEnvironment,harnessKeys,inputHashes,tasks:rows,scorerControls:controls,reorderedStableIds:true,internalStatusSeparated:true};
+  const result={suite:config.suite,preparationSha256:hashFile(path.join(directory,'frozen-manifest.json')).sha256,passed:true,contained,modelFree:true,realProviderCalls:0,executionEnvironment,harnessKeys,inputHashes,tasks:rows,scorerControls:controls,reorderedStableIds:true,internalStatusSeparated:true};
   privateJSON(path.join(output,'preflight.json'),result);return result;
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)) {

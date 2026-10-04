@@ -25,12 +25,12 @@ export function prepare({output,model,variant,toolchain,bundle,executionImage,fi
   if(authorizeModelRuns&&(fixture||output!==realBatch||model!=='openai/gpt-5.6-luna'||variant!=='high'))throw Error('Authorization only covers the exact canonical development configuration');
   if(![output,toolchain,bundle].every(p=>typeof p==='string'&&path.isAbsolute(p))||!/^sha256:[a-f0-9]{64}$/.test(executionImage??''))throw Error('Absolute output/toolchain/bundle and immutable image required');
   if(fs.existsSync(output))throw Error('Existing preparation cannot be replaced');
-  validateBundle(bundle);
+  validateBundle(bundle,{executionImage});
   let receipt=null;
   if(!fixture) {
     if(!preflightReceipt||!path.isAbsolute(preflightReceipt))throw Error('Explicit model-free preflight receipt required');
     receipt=JSON.parse(fs.readFileSync(preflightReceipt));
-    if(receipt.suite!==config.suite||receipt.passed!==true||receipt.modelFree!==true||receipt.realProviderCalls!==0||JSON.stringify(receipt.inputHashes)!==JSON.stringify(manifest(path.join(directory,'tasks')))||!tasks.every(task=>{const row=receipt.tasks.find(r=>r.task===task.id);return row?.results.baseline.R===false&&row?.results.gold.R===true&&row?.results.wrong.R===false;}))throw Error('Unproven or stale model-free receipt');
+    if(receipt.preparationSha256!==hashFile(path.join(directory,'frozen-manifest.json')).sha256||receipt.suite!==config.suite||receipt.passed!==true||receipt.modelFree!==true||receipt.realProviderCalls!==0||JSON.stringify(receipt.inputHashes)!==JSON.stringify(manifest(path.join(directory,'tasks')))||!tasks.every(task=>{const row=receipt.tasks.find(r=>r.task===task.id);return row?.results.baseline.R===false&&row?.results.gold.R===true&&row?.results.wrong.R===false;}))throw Error('Unproven or stale model-free receipt');
     if(authorizeModelRuns) {
       const env=receipt.executionEnvironment,binarySha256=hashFile(path.join(toolchain,'package/bin/opencode')).sha256;
       if(!receipt.contained||env?.executionImage!==executionImage||env.nodeVersion!==config.nodeVersion||env.runtimeVersion!==config.runtimeVersion||env.binarySha256!==binarySha256||receipt.tasks[0].results['discount-field-loss']?.R!==false||receipt.tasks[2].results['all-holds-refund']?.R!==false||!tasks.every(task=>{const row=receipt.tasks.find(r=>r.task===task.id);return row.results.gold.publicExit===0&&task.preservation.every(id=>row.results.baseline.obligations.find(o=>o.id===id)?.status==='PASS');}))throw Error('Real execution requires matching contained controls and toolchain');

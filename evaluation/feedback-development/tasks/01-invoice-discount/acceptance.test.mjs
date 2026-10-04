@@ -38,9 +38,11 @@ test('fd01.discount-validation',()=>{
  assert.equal(validateLine({...base,discountPercent:0}).discountPercent,0);
 });
 test('fd01.legacy-shape-and-validation',()=>{
- const line={name:'Legacy',quantity:2,unitCents:19}, copy={...line};
- assert.deepEqual(invoice([line]).items,[{...line,totalCents:38}]);
- assert.deepEqual(JSON.parse(exportInvoice([line])).lines,[{...line,totalCents:38}]);
+ const line={name:'Legacy',quantity:2,unitCents:19,internalNote:'private input field'}, copy={...line};
+ const allowed={name:'Legacy',quantity:2,unitCents:19};
+ assert.deepEqual(validateLine(line),allowed); assert.deepEqual(line,copy);
+ assert.deepEqual(invoice([line]).items,[{...allowed,totalCents:38}]);
+ assert.deepEqual(JSON.parse(exportInvoice([line])).lines,[{...allowed,totalCents:38}]);
  assert.deepEqual(line,copy); assert.deepEqual(invoice([]),{items:[],totalCents:0});
  for(const bad of [{...line,name:''},{...line,quantity:1.5},{...line,unitCents:-1}]) assert.throws(()=>invoice([bad]));
 });

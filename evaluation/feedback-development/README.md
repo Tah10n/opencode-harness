@@ -27,7 +27,7 @@ OPENCODE_BIN=/absolute/path/to/opencode npm run verify:installed
 ```
 
 Use a fresh output directory for each fixture; retain earlier outputs. The
-ordinary verify path runs all eight baseline/gold/wrong triples, two additional
+ordinary verify path runs all eight baseline/gold/wrong triples, six additional
 negative controls and lightweight configuration, reporting and schedule regressions.
 It never executes real model requests.
 
@@ -71,6 +71,8 @@ independent `acceptance.test.mjs`, `gold.patch`, `wrong.patch` and an obligation
 inventory. Task 01 also retains `discount-field-loss.patch`; task 03 retains
 `all-holds-refund.patch`. Preflight regenerates both from gold with the existing
 `controlPatch`, checks the complete retained bytes and grades each separately.
+Four more gold-derived controls reject reuse of a committed wallet ID, a changed
+emit return, leaked invoice input fields and absolute URLs for nonempty arrays.
 Only `source/` is copied into author input. Tasks have no dependencies;
 the package locks make that explicit.
 
@@ -124,6 +126,12 @@ Each author stage is bound to its persisted OpenCode assistant message, normal
 insufficient. Aborted or missing author stages fail delivery.
 Internal status and correction count remain separate; `incomplete` alone does
 not determine R or delivery. Unknown completion or grading never gives Q=true.
+Saved grading is rechecked against the full patch, task/source, acceptance,
+reporter and evaluator hashes, complete process events, contained mounts,
+termination and successful cleanup. An untrusted saved R remains diagnostic
+only. Repeated reports reuse a matching verified evaluation or grade in a fresh
+sibling directory; completed evidence is retained and the final report is
+published atomically after assembly.
 
 The thin adapter reuses `evaluation/support/native-run.mjs`, container session
 and relay, deadline/stop modules, input manifest/comparison, scheduler, full
