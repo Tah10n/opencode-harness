@@ -1,0 +1,21 @@
+diff --git a/src/wallet.mjs b/src/wallet.mjs
+index 79993c6e506fba156799656b85c3c720f947aebf..bb6ead04bab100148794fe87008f59852e83c8d6 100644
+--- a/src/wallet.mjs
++++ b/src/wallet.mjs
+@@ -13,7 +13,7 @@ export class Wallet {
+  reserve(id,cents) {
+   const state=this.read();
+   if(typeof id!=='string'||!id||!Number.isInteger(cents)||cents<=0) throw new RangeError('reservation');
+-  if(Object.hasOwn(state.holds,id)||state.settled.includes(id)||state.available<cents) return false;
++  if(Object.hasOwn(state.holds,id)||state.available<cents) return false;
+   state.available-=cents; state.holds[id]=cents; this.write(state); return true;
+  }
+  commit(id) {
+@@ -22,6 +22,6 @@ export class Wallet {
+  }
+  cancel(id) {
+   const state=this.read(); if(!Object.hasOwn(state.holds,id)) return false;
+-  delete state.holds[id]; this.write(state); return true;
++  state.available+=state.holds[id]; delete state.holds[id]; this.write(state); return true;
+  }
+ }

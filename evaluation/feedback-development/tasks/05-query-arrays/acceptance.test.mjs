@@ -10,7 +10,10 @@ const {withQuery}=await load('src/query.mjs');
 const parsed=s=>new URL(s,'https://example.test');
 test('fd05.repeated-array-values',()=>{
  const updates={tag:['a b','c&d',0,false]}, before=structuredClone(updates);
- const url=parsed(withQuery('/p?tag=x&tag=y&keep=1&keep=2#exact%20fragment',updates));
+ const output=withQuery('../p%20ath?tag=x&tag=y&keep=1&keep=2#exact%20fragment',updates);
+ assert.equal(output.split(/[?#]/,1)[0],'../p%20ath');
+ assert.equal(output.slice(output.indexOf('#')),'#exact%20fragment');
+ const url=parsed(output);
  assert.deepEqual(url.searchParams.getAll('tag'),['a b','c&d','0','false']);
  assert.deepEqual(url.searchParams.getAll('keep'),['1','2']); assert.equal(url.hash,'#exact%20fragment');
  assert.deepEqual(updates,before);

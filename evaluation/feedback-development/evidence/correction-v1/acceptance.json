@@ -1,0 +1,241 @@
+{
+  "originalHead": "f63bee5853a0babff838e53b23b9820b1043c667",
+  "modelFree": true,
+  "realProviderRequests": 0,
+  "rows": [
+    {
+      "task": "03-wallet-cancel",
+      "control": "committed-wallet-reuse",
+      "patchSha256": "bf6cc75c5781523e97c8f02d7ed7ca4d41915028549f70948d6ae485331ac06b",
+      "before": {
+        "R": true,
+        "status": "PASS",
+        "acceptanceSha256": "8b26e37d18e66f19ba0e279b3a41881f540e25cdf3ce5fe5e490f911565a3dc7",
+        "cleanupVerified": true,
+        "contained": false,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd03.cancel-reopen-repeat",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd03.cancel-one-hold-accounting",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd03.other-holds-preserved",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd03.deposit-and-rejection",
+            "status": "PASS"
+          }
+        ]
+      },
+      "after": {
+        "R": false,
+        "status": "FAIL",
+        "acceptanceSha256": "54cf3bf7646f167b818fdea27c30da5d55ea54984afb86422884afe3223b52b4",
+        "reporterSha256": "8ea8da7ea8142bb487254eb9d3d176f0d3e463aae74aa78db9ac809bb965ffb9",
+        "evaluatorSha256": "506c24f8f076e8aef6a3aeec6df23ef9a1d245779de6baa7b58809fea4759ba6",
+        "cleanupVerified": true,
+        "contained": false,
+        "evaluationComplete": true,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd03.cancel-reopen-repeat",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd03.cancel-one-hold-accounting",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd03.other-holds-preserved",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd03.deposit-and-rejection",
+            "status": "FAIL"
+          }
+        ]
+      }
+    },
+    {
+      "task": "06-events-once",
+      "control": "emit-return-true",
+      "patchSha256": "fc33d186e9ca46e8e541614d27cc716fd79dc1287ed460099055c5ae0b61e7e2",
+      "before": {
+        "R": true,
+        "status": "PASS",
+        "acceptanceSha256": "994365aa1145d302ded97d9c226c28cf0648a0aadb1c1af80927140d3e983290",
+        "cleanupVerified": true,
+        "contained": false,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd06.once-reentrant-and-throw",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd06.registration-identity",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd06.ordinary-snapshot-order",
+            "status": "PASS"
+          }
+        ]
+      },
+      "after": {
+        "R": false,
+        "status": "FAIL",
+        "acceptanceSha256": "55fdb3f98a57ecda2f1b9f42fc3b617f28d0819b5d52b9703c40415a30c0d625",
+        "reporterSha256": "8ea8da7ea8142bb487254eb9d3d176f0d3e463aae74aa78db9ac809bb965ffb9",
+        "evaluatorSha256": "506c24f8f076e8aef6a3aeec6df23ef9a1d245779de6baa7b58809fea4759ba6",
+        "cleanupVerified": true,
+        "contained": false,
+        "evaluationComplete": true,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd06.once-reentrant-and-throw",
+            "status": "FAIL"
+          },
+          {
+            "type": "obligation",
+            "id": "fd06.registration-identity",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd06.ordinary-snapshot-order",
+            "status": "FAIL"
+          }
+        ]
+      }
+    },
+    {
+      "task": "01-invoice-discount",
+      "control": "invoice-extra-fields",
+      "patchSha256": "f1899d11cc6684567a42b66ec8f12ce27a0c559b39378d472e57eb1be9daf9f5",
+      "before": {
+        "R": true,
+        "status": "PASS",
+        "acceptanceSha256": "de122e36bc9f4c0cd07c3360351d371bea68746df0ddaa29004b90465f90b1e3",
+        "cleanupVerified": true,
+        "contained": false,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd01.discount-roundtrip",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd01.discount-validation",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd01.legacy-shape-and-validation",
+            "status": "PASS"
+          }
+        ]
+      },
+      "after": {
+        "R": false,
+        "status": "FAIL",
+        "acceptanceSha256": "6680d5442c9f2f21b5d475b579311450ef8262e4bf72ed12b5960671387eb947",
+        "reporterSha256": "8ea8da7ea8142bb487254eb9d3d176f0d3e463aae74aa78db9ac809bb965ffb9",
+        "evaluatorSha256": "506c24f8f076e8aef6a3aeec6df23ef9a1d245779de6baa7b58809fea4759ba6",
+        "cleanupVerified": true,
+        "contained": false,
+        "evaluationComplete": true,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd01.discount-roundtrip",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd01.discount-validation",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd01.legacy-shape-and-validation",
+            "status": "FAIL"
+          }
+        ]
+      }
+    },
+    {
+      "task": "05-query-arrays",
+      "control": "absolute-array-url",
+      "patchSha256": "5d578d037b281e91951ee3d084ca7b2ebca214cb7dacdee33553e01af98aed5d",
+      "before": {
+        "R": true,
+        "status": "PASS",
+        "acceptanceSha256": "6e983a22556156cd4a9bcd24fc40131127259fb2742c7c1e79897c1440930054",
+        "cleanupVerified": true,
+        "contained": false,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd05.repeated-array-values",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd05.invalid-arrays",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd05.scalar-and-unrelated-contracts",
+            "status": "PASS"
+          }
+        ]
+      },
+      "after": {
+        "R": false,
+        "status": "FAIL",
+        "acceptanceSha256": "e21266d76abdca08f113dac6ff160b91eceffdfb823e7b8a57f59b959457e65e",
+        "reporterSha256": "8ea8da7ea8142bb487254eb9d3d176f0d3e463aae74aa78db9ac809bb965ffb9",
+        "evaluatorSha256": "506c24f8f076e8aef6a3aeec6df23ef9a1d245779de6baa7b58809fea4759ba6",
+        "cleanupVerified": true,
+        "contained": false,
+        "evaluationComplete": true,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd05.repeated-array-values",
+            "status": "FAIL"
+          },
+          {
+            "type": "obligation",
+            "id": "fd05.invalid-arrays",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd05.scalar-and-unrelated-contracts",
+            "status": "PASS"
+          }
+        ]
+      }
+    }
+  ]
+}
