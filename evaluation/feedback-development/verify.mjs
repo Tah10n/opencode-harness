@@ -72,7 +72,7 @@ try {
     },runTaskImplementation:async session=>{await session.onRequest({path:'/v1/responses',body:{...body,stream:true,tools:[{name:'bash'}]}},()=>{},new AbortController().signal);return {exitCode:0};},stopWorkload:()=>({terminationVerified:true}),captureCandidate:()=>({status:0})});
     assert.equal(outcome.pause?.kind,'boundary_refusal');assert.equal(auth,0);assert.equal(calls,0);
   }
-  const rows=tasks.flatMap((t,i)=>[{task:t.id,arm:'direct',Q:i<2},{task:t.id,arm:'D',Q:i===0||i===2}]);
+  const rows=tasks.flatMap((t,i)=>[{task:t.id,arm:'direct',R:i<2,Q:i<2,evaluationProven:true},{task:t.id,arm:'D',R:i===0||i===2,Q:i===0||i===2,evaluationProven:true}]);
   const paired=summarize(rows);assert.equal(paired.candidateWins,1);assert.equal(paired.candidateLosses,1);assert.equal(paired.ties,6);assert.equal(paired.deltaQPercentagePoints,0);
   assert.equal(summarize(rows.slice(1)).deltaQPercentagePoints,null);
   assert.equal(summarize([...rows,rows[0]]).pairs[0].result,'unknown');
