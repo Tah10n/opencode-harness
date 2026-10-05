@@ -12,12 +12,12 @@ import {startContainer,image} from '../support/container-session.mjs';
 import {runNativePhase} from '../support/native-run.mjs';
 import {stopWorkload} from '../support/stop-workload.mjs';
 import {captureCandidate} from '../polybench/capture.mjs';
-import {config,cleanEnvironment,command,repository,realBatch,executionManifest,schedule,frozenManifest,tasks} from './suite.mjs';
+import {config,cleanEnvironment,command,repository,realBatch,executionManifest,schedule,frozenManifest,tasks,runId,conditionsHead} from './suite.mjs';
 import {providerConfig} from './prepare.mjs';
 import {manifest} from '../support/manifest.mjs';
 
 export function verifyRealAdmission(root,f,seal,freezeSha256,executionImage=image) {
-  if(path.resolve(root)!==realBatch||f.experimentKind!=='feedback-development'||f.modelRunsAuthorized!==true)throw Error('Real admission requires the authorized canonical development batch');
+  if(path.resolve(root)!==realBatch||f.runId!==runId||f.experimentKind!=='feedback-development'||f.modelRunsAuthorized!==true)throw Error('Real admission requires the authorized canonical development batch');
   if(f.suite!==config.suite||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.runtimeVersion!==config.runtimeVersion||f.nodeVersion!==config.nodeVersion||f.budgetMs!==600000||!/^sha256:[a-f0-9]{64}$/.test(f.executionImage??'')||f.executionImage!==executionImage)throw Error('Unapproved development model/environment/configuration');
   if(JSON.stringify(f.config)!==JSON.stringify(providerConfig(f.model,f.variant)))throw Error('Changed provider configuration');
   const expected=schedule.map(a=>({...a,source:path.join(realBatch,'inputs',a.task)}));
@@ -25,8 +25,12 @@ export function verifyRealAdmission(root,f,seal,freezeSha256,executionImage=imag
   for(const task of tasks)for(const arm of config.arms)if(JSON.stringify(f.inputManifests[task.id+'-'+arm])!==JSON.stringify(manifest(task.source)))throw Error('Changed public inputs');
   const plan=frozenManifest();
   for(const [file,value] of Object.entries({...plan.files,...plan.product}))if(f.files[path.join(repository,file)]!==value.sha256)throw Error('Unfrozen adapter/product file: '+file);
-  if(seal.freezeSha256!==freezeSha256||seal.sourceCommit!==f.sourceCommit||seal.executionImage!==f.executionImage)throw Error('Changed execution freeze');
+  if(seal.runId!==runId||seal.conditionsHead!==conditionsHead||seal.reviewedHead!==f.sourceCommit||seal.preRunSourceCommit!==f.sourceCommit||seal.freezeSha256!==freezeSha256||seal.sourceCommit!==f.sourceCommit||seal.executionImage!==f.executionImage)throw Error('Changed execution freeze');
   verifyFrozenSchedule(f,runTask,fetch);
+}
+
+export function verifyUnstarted(root) {
+  if(fs.existsSync(path.join(root,'admission-started.json'))||fs.existsSync(path.join(root,'scheduling-paused.json'))||fs.existsSync(path.join(root,'runs'))&&fs.readdirSync(path.join(root,'runs')).length)throw Error('Previously admitted campaign must never be retried');
 }
 
 function readExistingAuth() {
@@ -60,7 +64,7 @@ export async function runPrepared(root,{scriptedFetch,authorizeModelRuns=false,r
     const published=fs.readFileSync(path.join(repository,executionManifest));
     if(!published.equals(Buffer.from(command('git',['show','HEAD:'+executionManifest],repository))))throw Error('Execution seal must be committed before admission');
     verifyRealAdmission(root,f,JSON.parse(published),hashFile(path.join(root,'freeze.json')).sha256);
-    if(fs.existsSync(path.join(root,'admission-started.json'))||fs.existsSync(path.join(root,'scheduling-paused.json'))||fs.existsSync(path.join(root,'runs'))&&fs.readdirSync(path.join(root,'runs')).length)throw Error('Previously admitted campaign must never be retried');
+    verifyUnstarted(root);
     command('git',['merge-base','--is-ancestor',f.sourceCommit,'HEAD'],repository);
     for(const [file,digest] of Object.entries({...frozenManifest().files,...frozenManifest().product})) {
       const committed=command('git',['show',f.sourceCommit+':'+file],repository,{encoding:null});

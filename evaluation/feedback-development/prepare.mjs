@@ -4,7 +4,7 @@ import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 import {hashFile,privateJSON} from '../support/output-files.mjs';
 import {manifest} from '../support/manifest.mjs';
-import {tasks,schedule,config,directory,repository,prepareSource,frozenManifest,realBatch,command} from './suite.mjs';
+import {tasks,schedule,config,directory,repository,prepareSource,frozenManifest,realBatch,command,runId,conditionsHead} from './suite.mjs';
 import {validateBundle} from './assets.mjs';
 
 export function providerConfig(model,variant) {
@@ -55,9 +55,9 @@ export function prepare({output,model,variant,toolchain,bundle,executionImage,fi
   const files=Object.fromEntries([...Object.entries(committed.files),...Object.entries(committed.product)].map(([file,value])=>[path.join(repository,file),value.sha256]));
   const binary=path.join(toolchain,'package/bin/opencode');files[binary]=hashFile(binary).sha256;
   for(const file of [preflightReceipt,installedReceipt,deadlineReceipt].filter(Boolean))files[file]=hashFile(file).sha256;
-  const f={experimentKind:fixture?'fixture':'feedback-development',suite:config.suite,model,variant,budgetMs:config.budgetMs,strategy:'per-slot',streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,executionImage,runtimeVersion:config.runtimeVersion,nodeVersion:config.nodeVersion,preflightPassed:true,files,attempts,toolchain,template:bundle,runtimeManifests:{[bundle]:manifest(bundle),...Object.fromEntries(Object.values(inputs).map(i=>[i.source,i.manifest]))},inputManifests:Object.fromEntries(attempts.map(a=>[a.task+'-'+a.arm,inputs[a.task].manifest])),config:nativeConfig,modelRunsAuthorized:authorizeModelRuns,...(authorizeModelRuns?{sourceCommit:command('git',['rev-parse','HEAD'],repository).trim()}: {})};
+  const f={experimentKind:fixture?'fixture':'feedback-development',runId,suite:config.suite,model,variant,budgetMs:config.budgetMs,strategy:'per-slot',streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,executionImage,runtimeVersion:config.runtimeVersion,nodeVersion:config.nodeVersion,preflightPassed:true,files,attempts,toolchain,template:bundle,runtimeManifests:{[bundle]:manifest(bundle),...Object.fromEntries(Object.values(inputs).map(i=>[i.source,i.manifest]))},inputManifests:Object.fromEntries(attempts.map(a=>[a.task+'-'+a.arm,inputs[a.task].manifest])),config:nativeConfig,modelRunsAuthorized:authorizeModelRuns,...(authorizeModelRuns?{sourceCommit:command('git',['rev-parse','HEAD'],repository).trim()}: {})};
   privateJSON(path.join(output,'freeze.json'),f);
-  if(authorizeModelRuns)privateJSON(path.join(output,'execution-manifest.json'),{suite:config.suite,acceptedHead:'f63bee5853a0babff838e53b23b9820b1043c667',sourceCommit:f.sourceCommit,freezeSha256:hashFile(path.join(output,'freeze.json')).sha256,model,variant,budgetMs:f.budgetMs,executionImage,executionEnvironment:receipt.executionEnvironment,bundleManifestSha256:createHash('sha256').update(JSON.stringify(manifest(bundle))).digest('hex'),dependenciesLockSha256:hashFile(path.join(bundle,'package-lock.json')).sha256,inputHashes:receipt.inputHashes,preflightSha256:hashFile(preflightReceipt).sha256,installedSha256:hashFile(installedReceipt).sha256,deadlineSha256:hashFile(deadlineReceipt).sha256,order:schedule,realProviderCallsBeforeFreeze:0});
+  if(authorizeModelRuns)privateJSON(path.join(output,'execution-manifest.json'),{runId,suite:config.suite,conditionsHead,reviewedHead:f.sourceCommit,preRunSourceCommit:f.sourceCommit,sourceCommit:f.sourceCommit,freezeSha256:hashFile(path.join(output,'freeze.json')).sha256,model,variant,budgetMs:f.budgetMs,executionImage,executionEnvironment:receipt.executionEnvironment,bundleManifestSha256:createHash('sha256').update(JSON.stringify(manifest(bundle))).digest('hex'),dependenciesLockSha256:hashFile(path.join(bundle,'package-lock.json')).sha256,inputHashes:receipt.inputHashes,preflightSha256:hashFile(preflightReceipt).sha256,installedSha256:hashFile(installedReceipt).sha256,deadlineSha256:hashFile(deadlineReceipt).sha256,order:schedule,realProviderCallsBeforeFreeze:0});
   return f;
 }
 

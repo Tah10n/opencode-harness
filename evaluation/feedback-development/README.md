@@ -183,7 +183,7 @@ image. Commit the adapter and this protocol before preparing the private batch:
 
 ```sh
 node evaluation/feedback-development/prepare.mjs \
-  --output "$PWD/local/feedback-development-run-v1/batch" \
+  --output "$PWD/local/feedback-development-run-v2/batch" \
   --model openai/gpt-5.6-luna --variant high \
   --toolchain /absolute/path/to/toolchain \
   --bundle /absolute/path/to/bundle --image sha256:EXPLICIT_IMAGE_ID \
@@ -194,13 +194,14 @@ node evaluation/feedback-development/prepare.mjs \
 ```
 
 Preparation still makes no provider call and reads no credentials. Copy the
-generated safe `execution-manifest.json` to `evidence/execution-freeze.json` and
+generated safe `execution-manifest.json` to
+`evidence/development-run-v2/execution-freeze.json` and
 commit it before the first request. Keep `freeze.json` and all private paths and
 recordings outside Git. Launch only with the same immutable `EVALUATION_IMAGE`:
 
 ```sh
 node evaluation/feedback-development/run.mjs \
-  "$PWD/local/feedback-development-run-v1/batch" --authorize-model-runs
+  "$PWD/local/feedback-development-run-v2/batch" --authorize-model-runs
 ```
 
 Admission checks the committed seal, exact source bytes, public inputs, installed

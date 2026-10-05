@@ -6,8 +6,10 @@ import {hashFile} from '../support/output-files.mjs';
 
 export const directory=import.meta.dirname;
 export const repository=path.resolve(directory,'../..');
-export const realBatch=path.join(repository,'local/feedback-development-run-v1/batch');
-export const executionManifest='evaluation/feedback-development/evidence/execution-freeze.json';
+export const runId='development-run-v2';
+export const conditionsHead='779fb00ea8bab16e3e5da6695c76c622e70d26b0';
+export const realBatch=path.join(repository,'local/feedback-development-run-v2/batch');
+export const executionManifest='evaluation/feedback-development/evidence/development-run-v2/execution-freeze.json';
 export const config=JSON.parse(fs.readFileSync(path.join(directory,'config.json')));
 export const tasks=fs.readdirSync(path.join(directory,'tasks')).sort().map(id=>({
   ...JSON.parse(fs.readFileSync(path.join(directory,'tasks',id,'task.json'))),

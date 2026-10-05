@@ -2,12 +2,12 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-import {tasks,schedule,config,frozenManifest,directory,repository,realBatch} from './suite.mjs';
+import {tasks,schedule,config,frozenManifest,directory,repository,realBatch,runId,conditionsHead} from './suite.mjs';
 import {verifyFrozenSchedule,runComparison} from '../support/scheduler.mjs';
 import {preflight} from './preflight.mjs';
 import {providerConfig,prepare} from './prepare.mjs';
 import {summarize,report} from './report.mjs';
-import {runPrepared,verifyRealAdmission} from './run.mjs';
+import {runPrepared,verifyRealAdmission,verifyUnstarted} from './run.mjs';
 import {manifest} from '../support/manifest.mjs';
 import {image} from '../support/container-session.mjs';
 import {verifyReport} from './verify-report.mjs';
@@ -35,11 +35,11 @@ try {
   await assert.rejects(()=>runPrepared(temp,{scriptedFetch:deniedProvider,readAuth:deniedAuth}),/explicit authorization/);
   assert.equal(authReads,0);assert.equal(providerCalls,0);
   const plan=frozenManifest(),digest='a'.repeat(64),sourceCommit='b'.repeat(40),testImage=image??'sha256:'+'d'.repeat(64);
-  const admitted={...f,suite:config.suite,model:'openai/gpt-5.6-luna',variant:'high',modelRunsAuthorized:true,runtimeVersion:config.runtimeVersion,nodeVersion:config.nodeVersion,executionImage:testImage,sourceCommit,config:providerConfig('openai/gpt-5.6-luna','high'),attempts:schedule.map(a=>({...a,source:path.join(realBatch,'inputs',a.task)})),files:Object.fromEntries(Object.entries({...plan.files,...plan.product}).map(([name,value])=>[path.join(repository,name),value.sha256])),inputManifests:Object.fromEntries(schedule.map(a=>[a.task+'-'+a.arm,manifest(tasks.find(t=>t.id===a.task).source)]))};
-  const seal={freezeSha256:digest,sourceCommit,executionImage:testImage};
+  const admitted={...f,runId,suite:config.suite,model:'openai/gpt-5.6-luna',variant:'high',modelRunsAuthorized:true,runtimeVersion:config.runtimeVersion,nodeVersion:config.nodeVersion,executionImage:testImage,sourceCommit,config:providerConfig('openai/gpt-5.6-luna','high'),attempts:schedule.map(a=>({...a,source:path.join(realBatch,'inputs',a.task)})),files:Object.fromEntries(Object.entries({...plan.files,...plan.product}).map(([name,value])=>[path.join(repository,name),value.sha256])),inputManifests:Object.fromEntries(schedule.map(a=>[a.task+'-'+a.arm,manifest(tasks.find(t=>t.id===a.task).source)]))};
+  const seal={runId,conditionsHead,reviewedHead:sourceCommit,preRunSourceCommit:sourceCommit,freezeSha256:digest,sourceCommit,executionImage:testImage};
   // This is admission validation only, with no runner, auth or network call.
   verifyRealAdmission(realBatch,admitted,seal,digest,testImage);
-  for(const changed of [{modelRunsAuthorized:false},{model:'openai/other'},{variant:'low'},{nodeVersion:'24.18.0'},{runtimeVersion:'1.18.25'},{executionImage:'sha256:'+'c'.repeat(64)},{config:{}},{inputManifests:{}},{files:{}},{attempts:admitted.attempts.slice(1)}])assert.throws(()=>verifyRealAdmission(realBatch,{...admitted,...changed},seal,digest,testImage));
+  for(const changed of [{runId:'development-run-v1'},{modelRunsAuthorized:false},{model:'openai/other'},{variant:'low'},{nodeVersion:'24.18.0'},{runtimeVersion:'1.18.25'},{executionImage:'sha256:'+'c'.repeat(64)},{config:{}},{inputManifests:{}},{files:{}},{attempts:admitted.attempts.slice(1)}])assert.throws(()=>verifyRealAdmission(realBatch,{...admitted,...changed},seal,digest,testImage));
   for(const change of [
     {suite:'other suite'},
     {attempts:admitted.attempts.map((a,i)=>i<2?{...a,task:'other task'}:a)},
@@ -51,10 +51,17 @@ try {
     {inputManifests:{...admitted.inputManifests,[schedule[0].task+'-direct']:{'TASK.md':{sha256:'different'}}}},
     {files:{...admitted.files,[path.join(repository,'evaluation/feedback-development/config.json')]:'different'}},
   ])assert.throws(()=>verifyRealAdmission(realBatch,{...admitted,...change},seal,digest,testImage));
-  for(const change of [{freezeSha256:'other'},{sourceCommit:'c'.repeat(40)},{executionImage:'sha256:'+'e'.repeat(64)}])assert.throws(()=>verifyRealAdmission(realBatch,admitted,{...seal,...change},digest,testImage));
+  for(const change of [{runId:'development-run-v1'},{conditionsHead:'old'},{reviewedHead:'old'},{preRunSourceCommit:'old'},{freezeSha256:'other'},{sourceCommit:'c'.repeat(40)},{executionImage:'sha256:'+'e'.repeat(64)}])assert.throws(()=>verifyRealAdmission(realBatch,admitted,{...seal,...change},digest,testImage));
   assert.equal(providerConfig('openai/gpt-5.6-luna','high').provider.openai.models['gpt-5.6-luna'].options.reasoningEffort,'high');
   assert.throws(()=>verifyRealAdmission(realBatch,admitted,seal,'changed',testImage),/Changed execution freeze/);
   assert.throws(()=>verifyRealAdmission(temp,admitted,seal,digest,testImage),/canonical/);
+  assert.throws(()=>verifyRealAdmission(path.join(repository,'local/feedback-development-run-v1/batch'),admitted,seal,digest,testImage),/canonical/);
+  const replay=path.join(temp,'v2-replay');fs.mkdirSync(replay);verifyUnstarted(replay);
+  for(const marker of ['admission-started.json','scheduling-paused.json','runs/01-invoice-discount-direct/started.json']) {
+    const file=path.join(replay,marker);fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,'{}');
+    assert.throws(()=>verifyUnstarted(replay),/never be retried/);fs.rmSync(file);
+  }
+  fs.rmSync(path.join(replay,'runs'),{recursive:true});verifyUnstarted(replay);
   const runtimeDirectory=path.join(temp,'runtime');fs.mkdirSync(runtimeDirectory);
   const runtimeFile=path.join(runtimeDirectory,'installed-runtime');fs.writeFileSync(runtimeFile,'frozen runtime bytes');
   const runtimeFreeze={...admitted,runtimeManifests:{[runtimeDirectory]:manifest(runtimeDirectory)}};
