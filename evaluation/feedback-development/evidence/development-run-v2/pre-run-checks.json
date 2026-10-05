@@ -1,0 +1,83 @@
+{
+  "sourceCommit": "ab35be599df62873e763271b4f7116c1293618ae",
+  "preparationSha256": "56b71cf0d95f7c839b60522a949e9aacde7ce77673ce6a933b3a97fc4c996364",
+  "passed": true,
+  "modelFree": true,
+  "realProviderCalls": 0,
+  "aggregation": {
+    "beforeSource": "ba78761426c21a2a70f7b86724ff3c522ecf1ff5",
+    "before": {
+      "candidateWins": 1,
+      "candidateLosses": 0,
+      "ties": 7,
+      "unknownPairs": 0,
+      "deltaQPercentagePoints": 12.5
+    },
+    "after": {
+      "candidateWins": 0,
+      "candidateLosses": 0,
+      "ties": 7,
+      "unknownPairs": 1,
+      "deltaQPercentagePoints": null
+    },
+    "readerPath": true,
+    "unknownDirectCandidateBoth": true,
+    "trueFailPassAndFailFail": true,
+    "missingDuplicateAndRepeat": true
+  },
+  "containedPreflight": {
+    "passed": true,
+    "originalControls": 24,
+    "negativeControls": 6,
+    "retainedScorerControls": 13,
+    "sha256": "19e74b3caa8bf6891cae92405c01418a401c22f580f7f69a51e8c0c6b4c2a9b4"
+  },
+  "installedScripted": {
+    "passed": true,
+    "model": "openai/gpt-5.6-luna",
+    "variant": "high",
+    "frames": 31,
+    "stages": {
+      "title": 2,
+      "bootstrap": 4,
+      "author": 20,
+      "correction": 5
+    },
+    "sha256": "05286c2430227323a377dd4b569901c056c8459836cc0e685bd29f18c1ec3f4f"
+  },
+  "deadline": {
+    "passed": true,
+    "arms": [
+      "direct",
+      "D"
+    ],
+    "sha256": "0fb28663ff1b9f788be8bda9b6d977fcae95e62174a90995a20e7349b0e457f3"
+  },
+  "ordinaryVerify": {
+    "passed": true,
+    "checks": 21,
+    "logSha256": "a637dd655b75ad820bd090f29b89b8605543997da1a707415d92f56451a64257"
+  },
+  "ordinaryInstalled": {
+    "passed": true,
+    "scenarios": 39,
+    "scriptedRequests": 298,
+    "logSha256": "61f8973028e1aa5f7df6683921a8122861a1581333b85e3846270f519b8e41ab"
+  },
+  "executionEnvironment": {
+    "executionImage": "sha256:6ddc119af8a204548428504ef970a44640edfaa3238deacb558825ee25bce181",
+    "nodeVersion": "24.19.0",
+    "runtimeVersion": "1.18.26",
+    "npmVersion": "11.17.0",
+    "gitVersion": "git version 2.39.5",
+    "binarySha256": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe"
+  },
+  "oldRunPreservation": {
+    "privateFiles": 138,
+    "publicFiles": 8,
+    "byteIdentical": true
+  },
+  "preliminaryProbeErrors": [
+    "Custom read-only version probes lacked writable tmp/home and returned EROFS. The existing contained preflight independently proved the actual runtime versions; no runtime or boundary change."
+  ]
+}
