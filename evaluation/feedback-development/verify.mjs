@@ -23,7 +23,7 @@ try {
   for(const [model,variant] of [[undefined,'high'],['openai/x',undefined],['',''],['another/x','high']])assert.throws(()=>providerConfig(model,variant));
   assert.throws(()=>prepare({output:path.join(temp,'missing-model')}),/Explicit/);assert.ok(!fs.existsSync(path.join(temp,'missing-model')));
   await assert.rejects(()=>runPrepared(temp),/scripted provider/);
-  const rows=tasks.flatMap((t,i)=>[{task:t.id,arm:'direct',Q:i<2},{task:t.id,arm:'D',Q:i===0||i===2}]);
+  const rows=tasks.flatMap((t,i)=>[{task:t.id,arm:'direct',R:i<2,Q:i<2,evaluationProven:true},{task:t.id,arm:'D',R:i===0||i===2,Q:i===0||i===2,evaluationProven:true}]);
   const paired=summarize(rows);assert.equal(paired.candidateWins,1);assert.equal(paired.candidateLosses,1);assert.equal(paired.ties,6);assert.equal(paired.deltaQPercentagePoints,0);
   assert.equal(summarize(rows.slice(1)).deltaQPercentagePoints,null);
   assert.equal(summarize([...rows,rows[0]]).pairs[0].result,'unknown');

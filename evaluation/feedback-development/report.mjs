@@ -31,7 +31,7 @@ async function evaluationFor(out,task,f,{toolchain,evaluate},environmentErrors,u
 export function summarize(rows) {
   const pairs=tasks.map(task=>{
     const matching=rows.filter(r=>r.task===task.id),pair=Object.fromEntries(matching.map(r=>[r.arm,r]));
-    if(matching.length!==2||!pair.direct||!pair.D||![pair.direct.Q,pair.D.Q].every(q=>typeof q==='boolean'))return {task:task.id,result:'unknown'};
+    if(matching.length!==2||!pair.direct||!pair.D||![pair.direct,pair.D].every(row=>row.evaluationProven===true&&typeof row.R==='boolean'&&typeof row.Q==='boolean'))return {task:task.id,result:'unknown'};
     return {task:task.id,result:pair.D.Q===pair.direct.Q?'tie':pair.D.Q?'candidate_win':'candidate_loss'};
   });
   const wins=pairs.filter(p=>p.result==='candidate_win').length,losses=pairs.filter(p=>p.result==='candidate_loss').length,ties=pairs.filter(p=>p.result==='tie').length,unknown=pairs.filter(p=>p.result==='unknown').length;
