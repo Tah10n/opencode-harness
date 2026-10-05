@@ -12,6 +12,28 @@ The [exact-model technical follow-up](../evaluation/feedback-development/evidenc
 records title none/refusal before correction, installed model/high frames after
 correction and synthetic direct/D delivery. It makes no model effectiveness claim.
 
+## Feedback development v2: expired authorization before provider
+
+The separately frozen [development-run-v2](../evaluation/feedback-development/evidence/development-run-v2/REPORT.md)
+started slot 1 (task 01 direct) once after the corrected pair-aggregation checks,
+contained 24+6 preflight, exact-model scripted/deadline controls and source CI.
+The actual title frame requested gpt-5.6-luna/high. Existing OAuth access had
+expired, so admission closed before forwarding or author work. There were zero
+provider requests, normal completions and participant tokens; 15 slots remained
+not_started. No D correction, probe, substitution, repair or retry followed.
+
+All [16 records](../evaluation/feedback-development/evidence/development-run-v2/results.json)
+are retained. The complete empty patch has proven artifact R=false/Q=false and
+delivery=false; it is not a failed model solution. There are zero measured pairs,
+eight unknown pairs, wins/losses/ties 0/0/0 and null delta. This is technically
+incomplete measurement with no evidence about correction usefulness. V1 evidence
+remains byte-identical and is excluded from the new figures.
+
+The [pair admission regression](../evaluation/feedback-development/evidence/correction-v1/PAIR_ADMISSION.md)
+reproduces a false +12.5 pp candidate win through the actual report reader and
+fixes it to seven ties, one unknown and null delta. Proven failed scores remain
+measured; nullable or unproven grading does not enter wins/losses/ties.
+
 ## Feedback development v1: stage-3 admission stopped before provider
 
 The [bounded development run](../evaluation/feedback-development/evidence/development-run-v1/REPORT.md)
