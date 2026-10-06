@@ -7,6 +7,9 @@ import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import {existingConnection,authSource,ConnectionError} from './auth.mjs';
 import {realBatch} from './suite.mjs';
+import {runComparison} from '../support/scheduler.mjs';
+import {manifest} from '../support/manifest.mjs';
+import {mock} from 'node:test';
 
 export async function verifyAuth(root) {
   fs.mkdirSync(root,{recursive:true});
@@ -73,10 +76,25 @@ export async function verifyAuth(root) {
   fs.rmSync(file);await assert.rejects(()=>existingConnection({env,home,fetchImpl:neverFetch}).readiness(),/source-missing/);
   fs.writeFileSync(file,'invalid');await assert.rejects(()=>existingConnection({env,home,fetchImpl:neverFetch}).readiness(),/source-invalid/);
   assert.equal(fetches,0);
+  // Actual scheduler + asynchronous native auth, after part of a short budget.
+  // This formerly stopped before auth with RangeError for fractional milliseconds.
+  save(auth(Date.now()-1));
+  const bounded=existingConnection({env,home,fetchImpl:tokenFetch}),shortRoot=path.join(root,'short-budget'),source=path.join(root,'public');
+  fs.mkdirSync(shortRoot);fs.mkdirSync(source);fs.writeFileSync(path.join(source,'TASK.md'),'Synthetic asynchronous auth deadline');
+  const inputs=manifest(source),attempt={slot:1,task:'short-budget',arm:'direct',source};
+  fs.writeFileSync(path.join(shortRoot,'freeze.json'),JSON.stringify({experimentKind:'fixture',model:'openai/gpt-5.6-luna',variant:'high',budgetMs:5000,streamLimit:'remaining-task-budget',preflightPassed:true,files:{},attempts:[attempt],inputManifests:{'short-budget-direct':inputs}}));
+  let syntheticRequests=0;
+  let outcome;mock.timers.enable({apis:['Date'],now:Date.now()});
+  try{outcome=await runComparison({root:shortRoot,readAuth:bounded.read,readInput:async()=>({manifest:inputs,receipt:{fixture:true}}),
+    fetchImpl:async()=>{syntheticRequests++;return new Response(['response.created','response.completed'].map((type,i)=>'data: '+JSON.stringify({type,response:{id:'synthetic-response',model:'gpt-5.6-luna',status:i?'completed':'in_progress',usage:i?{input_tokens:1,output_tokens:1,total_tokens:2}:undefined}})+'\n\n').join(''),{headers:{'content-type':'text/event-stream'}});},
+    startContainer:async({output,onRequest})=>{fs.mkdirSync(output);return {name:'synthetic-short-auth',onRequest,setTaskBudget(){},close(){return 0;},exec(argv){return {status:0,stdout:argv[0]==='/opt/opencode'?'1.18.26':argv[2]?.includes('DatabaseSync')?'{"sessions":[],"messages":[],"tools":[]}':''};}};},
+    runTaskImplementation:async session=>{await new Promise(resolve=>setTimeout(resolve,1));await session.onRequest({id:'1',path:'/v1/responses',body:{model:'gpt-5.6-luna',reasoning:{effort:'high'},stream:true}},()=>{},new AbortController().signal);return {exitCode:0,termination:{terminationVerified:true}};},
+    stopWorkload:()=>({terminationVerified:true}),captureCandidate:()=>({status:0})});}finally{mock.timers.reset();}
+  assert.equal(outcome.status,'finished',JSON.stringify(outcome.pause));assert.equal(syntheticRequests,1);assert.equal(bounded.safeStatus().authRefreshCalls,1);
   const native=fs.readFileSync(new URL('./vendor/native-auth.mjs',import.meta.url));
   const provenance=JSON.parse(fs.readFileSync(new URL('./vendor/native-auth-source.json',import.meta.url)));
   assert.equal(createHash('sha256').update(native).digest('hex'),provenance.generatedSha256);
-  return {passed:true,synthetic:true,realInferenceRequests:0,realAuthorizationRequests:0,sourceResolution:true,currentRecordReread:true,expiryAfterReadiness:true,nativeRefreshSingleFlight:true,failedRefreshUnchanged:true,deadlineCancellation:true,readinessBeforePreparation:true,secretFreeStatus:true,nativeSourceHashVerified:true};
+  return {passed:true,synthetic:true,realInferenceRequests:0,realAuthorizationRequests:0,sourceResolution:true,currentRecordReread:true,expiryAfterReadiness:true,nativeRefreshSingleFlight:true,failedRefreshUnchanged:true,deadlineCancellation:true,readinessBeforePreparation:true,shortBudgetAsyncAuth:true,secretFreeStatus:true,nativeSourceHashVerified:true};
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)) {
   const root=fs.mkdtempSync(path.join(os.tmpdir(),'feedback-auth-'));

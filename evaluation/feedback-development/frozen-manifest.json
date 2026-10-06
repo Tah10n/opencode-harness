@@ -266,7 +266,7 @@
       "sha256": "b21c23f5a334dc54af340e2773e3e56427aa27a946231769d36df249ea54a69e"
     },
     "evaluation/support/scheduler.mjs": {
-      "sha256": "93c9f34d45beff1260635aa2a04dd81edfb2ed0101a06b83896e9fd6c62f2066"
+      "sha256": "2bcf08574ef255c788057d92031d22b5f706266224b306e62facffc60dd3f9c8"
     },
     "evaluation/support/input-manifest.mjs": {
       "sha256": "0bbbb680723d9903b492038c7ec3269f9ac215149170ec202f7ab9e48536f1d6"
@@ -729,7 +729,7 @@
       "executable": false
     },
     "evaluation/feedback-development/verify-auth.mjs": {
-      "sha256": "39c6ea017912ee8ab26b3c573c2b895f13ef60a7c737b64b8cb0918760569df1",
+      "sha256": "25da5bcb25e91a3ede5a83e1643179b6ffae5b5e9fdd5edc16d3fda374a18800",
       "executable": false
     },
     "evaluation/feedback-development/verify-preparation.mjs": {
