@@ -12,6 +12,25 @@ The [exact-model technical follow-up](../evaluation/feedback-development/evidenc
 records title none/refusal before correction, installed model/high frames after
 correction and synthetic direct/D delivery. It makes no model effectiveness claim.
 
+## Feedback development v3: no observed difference
+
+The separately authorized [development-run-v3](../evaluation/feedback-development/evidence/development-run-v3/REPORT.md)
+reused the current ordinary OpenCode OAuth connection after correcting native
+refresh/readiness. Sixteen fresh native attempts completed once on the unchanged
+Luna/high, OpenCode 1.18.26, Node 24.19.0, eight-task/600-second conditions.
+All [16 complete patches](../evaluation/feedback-development/evidence/development-run-v3/results.json)
+have proven R, delivery and Q: direct 8/8 and D 8/8; eight ties, zero wins/losses
+or unknown pairs, delta 0 pp. Native corrections were zero, required public checks
+passed and D0/final patches matched. This detects no advantage on the set and does
+not establish equivalence or superiority over ordinary OpenCode.
+
+There were 350 fully accounted provider requests, all actual Luna/high; returned
+model IDs are retained. Totals are 4,255,616 input / 110,217 output tokens, with
+cached/reasoning included subsets and money unknown. D used 11.7% more native time,
+11.0% less input and 19.4% more output. Fixtures, development, CI and authentication
+remain separate. V1/v2 are byte-identical and excluded; no retries, added probes,
+confirmation or default-strategy change followed.
+
 ## Feedback development v2: expired authorization before provider
 
 The separately frozen [development-run-v2](../evaluation/feedback-development/evidence/development-run-v2/REPORT.md)
