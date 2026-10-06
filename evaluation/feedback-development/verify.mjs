@@ -12,6 +12,7 @@ import {manifest} from '../support/manifest.mjs';
 import {image} from '../support/container-session.mjs';
 import {verifyReport} from './verify-report.mjs';
 import {verifyPreparation} from './verify-preparation.mjs';
+import {verifyAuth} from './verify-auth.mjs';
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'feedback-verify-'));
 try {
   const f={experimentKind:'feedback-development',model:'openai/explicit-fixture',variant:'high',budgetMs:600000,strategy:'per-slot',streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,preflightPassed:true,files:{},attempts:schedule.map(a=>({...a,source:tasks.find(t=>t.id===a.task).source}))};
@@ -56,6 +57,7 @@ try {
   assert.throws(()=>verifyRealAdmission(realBatch,admitted,seal,'changed',testImage),/Changed execution freeze/);
   assert.throws(()=>verifyRealAdmission(temp,admitted,seal,digest,testImage),/canonical/);
   assert.throws(()=>verifyRealAdmission(path.join(repository,'local/feedback-development-run-v1/batch'),admitted,seal,digest,testImage),/canonical/);
+  assert.throws(()=>verifyRealAdmission(path.join(repository,'local/feedback-development-run-v2/batch'),admitted,seal,digest,testImage),/canonical/);
   const replay=path.join(temp,'v2-replay');fs.mkdirSync(replay);verifyUnstarted(replay);
   for(const marker of ['admission-started.json','scheduling-paused.json','runs/01-invoice-discount-direct/started.json']) {
     const file=path.join(replay,marker);fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,'{}');
@@ -90,6 +92,7 @@ try {
   assert.equal(incomplete.requests,2);assert.equal(incomplete.tokens.input_tokens,null);assert.equal(incomplete.knownTokens.input_tokens,10);assert.equal(incomplete.Q,null);
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(directory,'frozen-manifest.json'))),frozenManifest());
   await verifyReport(path.join(temp,'report-regressions'));
+  await verifyAuth(path.join(temp,'auth-regressions'));
   verifyPreparation(path.join(temp,'preparation-regressions'));
   await preflight(path.join(temp,'preflight'));
   console.log('PASS feedback development allocation, explicit configuration, model admission and controls');

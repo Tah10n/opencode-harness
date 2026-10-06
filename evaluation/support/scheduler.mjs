@@ -139,7 +139,8 @@ for(const attempt of f.attempts){
      const body=JSON.stringify({...frame.body,store:false});
      try{recorder=recording.begin(record,JSON.stringify(frame.body),body);if(!save())throw Error(recordingPersistenceError);}
      catch(error){record.notForwardedReason='recording-preparation-failed';record.recordingPreparationError=error.message;recordingFailed();throw Object.assign(error,{recordingPreparation:true});}
-     const a=readAuth();record.maxDurationMs=f.streamLimit==='remaining-task-budget'?Math.max(0,remaining()):180000;record.connectionTimeoutMs=f.connectionTimeoutMs??null;save();
+     const authSignal=AbortSignal.any([signal,abort.signal,AbortSignal.timeout(Math.max(1,Math.min(30000,remaining())))]);
+     const a=await readAuth({signal:authSignal});record.maxDurationMs=f.streamLimit==='remaining-task-budget'?Math.max(0,remaining()):180000;record.connectionTimeoutMs=f.connectionTimeoutMs??null;save();
      const connectionAbort=new AbortController();const connectionTimer=f.connectionTimeoutMs?setTimeout(()=>connectionAbort.abort(new Error('Connection timeout')),f.connectionTimeoutMs):null;
      requestSignal=AbortSignal.any([signal,abort.signal,...(f.streamLimit==='remaining-task-budget'?[connectionAbort.signal]:[AbortSignal.timeout(180000)])]);
      let response;try {

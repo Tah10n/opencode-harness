@@ -3,7 +3,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
 import {performance} from 'node:perf_hooks';
-import os from 'node:os';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 import {hashFile} from '../support/output-files.mjs';
@@ -15,6 +14,7 @@ import {captureCandidate} from '../polybench/capture.mjs';
 import {config,cleanEnvironment,command,repository,realBatch,executionManifest,schedule,frozenManifest,tasks,runId,conditionsHead} from './suite.mjs';
 import {providerConfig} from './prepare.mjs';
 import {manifest} from '../support/manifest.mjs';
+import {existingConnection} from './auth.mjs';
 
 export function verifyRealAdmission(root,f,seal,freezeSha256,executionImage=image) {
   if(path.resolve(root)!==realBatch||f.runId!==runId||f.experimentKind!=='feedback-development'||f.modelRunsAuthorized!==true)throw Error('Real admission requires the authorized canonical development batch');
@@ -33,12 +33,6 @@ export function verifyUnstarted(root) {
   if(fs.existsSync(path.join(root,'admission-started.json'))||fs.existsSync(path.join(root,'scheduling-paused.json'))||fs.existsSync(path.join(root,'runs'))&&fs.readdirSync(path.join(root,'runs')).length)throw Error('Previously admitted campaign must never be retried');
 }
 
-function readExistingAuth() {
-  const a=JSON.parse(fs.readFileSync(path.join(os.homedir(),'.local/share/opencode/auth.json'))).openai;
-  if(a?.type!=='oauth'||!a.access||!a.accountId||a.expires<=Date.now())throw Error('Existing authorization unavailable or expired');
-  return {access:a.access,accountId:a.accountId};
-}
-
 export async function runTask(session,options) {
   if(!config.arms.includes(options.arm))throw Error('Unknown feedback strategy');
   session.armMode='task';session.arm=options.arm;
@@ -55,7 +49,7 @@ export async function runPrepared(root,{scriptedFetch,authorizeModelRuns=false,r
   if(!authorizeModelRuns&&typeof scriptedFetch!=='function')throw Error('Explicit scripted provider or --authorize-model-runs required before credential access');
   if(scriptedFetch===fetch)throw Error('Fixtures cannot use the real provider transport');
   const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
-  let fetchImpl;
+  let fetchImpl,connection;
   if(f.experimentKind==='fixture') {
     if(authorizeModelRuns||typeof scriptedFetch!=='function')throw Error('Fixtures require an explicit scripted provider and cannot authorize real calls');
     fetchImpl=scriptedFetch;readAuth??=()=>{throw Error('Fixture credential access forbidden');};
@@ -70,21 +64,26 @@ export async function runPrepared(root,{scriptedFetch,authorizeModelRuns=false,r
       const committed=command('git',['show',f.sourceCommit+':'+file],repository,{encoding:null});
       if(createHash('sha256').update(committed).digest('hex')!==digest.sha256)throw Error('Executable source differs from verified source commit: '+file);
     }
-    fetchImpl=fetch;readAuth??=readExistingAuth;
+    fetchImpl=fetch;
+    if(!readAuth){connection=existingConnection({providerID:f.model.split('/')[0]});readAuth=connection.read;}
   }
   if(image!==f.executionImage)throw Error('Unfrozen execution image');
   verifyFrozenSchedule(f,runTask,fetchImpl);
+  // Source/expiry/refresh readiness must succeed before any admission or slot marker.
+  if(f.experimentKind!=='fixture')await readAuth();
   if(f.experimentKind!=='fixture')fs.writeFileSync(path.join(root,'admission-started.json'),JSON.stringify({sourceCommit:f.sourceCommit,freezeSha256:hashFile(path.join(root,'freeze.json')).sha256,at:new Date().toISOString()}),{flag:'wx',mode:0o600});
-  return runComparison({root,fetchImpl,readAuth,startContainer:async options=>{
+  try{return await runComparison({root,fetchImpl,readAuth,startContainer:async options=>{
     const started=performance.now();
     const session=await startContainer(options);
     try {session.preparationStartedMono=started;session.baseline=command('docker',['exec',session.name,'git','-C','/work/repo','rev-parse','HEAD'],root).trim();return session;}
     catch(error){session.close();throw error;}
-  },runTaskImplementation:async(session,options)=>({...await runTask(session,options),preparationElapsedMs:Math.max(0,options.deadlineMono-f.budgetMs-session.preparationStartedMono)}),stopWorkload,captureCandidate});
+  },runTaskImplementation:async(session,options)=>({...await runTask(session,options),preparationElapsedMs:Math.max(0,options.deadlineMono-f.budgetMs-session.preparationStartedMono)}),stopWorkload,captureCandidate});}
+  finally{if(connection){let status;try{status=connection.safeStatus();}catch(error){status={providerID:'openai',sourceKind:connection.source.kind,ready:false,reason:error.reason??'status-unavailable'};}fs.writeFileSync(path.join(root,'connection-status.json'),JSON.stringify(status,null,2),{mode:0o600});}}
 }
 
 if(process.argv[1]===fileURLToPath(import.meta.url)) {
   const [root,...flags]=process.argv.slice(2);
+  if(root==='--check-auth'&&!flags.length){console.log(JSON.stringify(await existingConnection().readiness()));process.exit(0);}
   if(!root||!path.isAbsolute(root)||flags.some(flag=>flag!=='--authorize-model-runs'))throw Error('Usage: run.mjs ABS_CANONICAL_BATCH --authorize-model-runs');
   await runPrepared(root,{authorizeModelRuns:flags.includes('--authorize-model-runs')});
 }

@@ -1,0 +1,15 @@
+{
+  "version": "1.18.26",
+  "source": "https://github.com/anomalyco/opencode/tree/v1.18.26",
+  "codexSha256": "a1e214a02cb93cb4833a35b5049bbee4707a0eece265df9902755546adf636b2",
+  "poolSha256": "d73d98545c8c5281673b1f700b78f5c9dc25d53c9117982a54b626a2e9455130",
+  "sections": {
+    "claims": "3cc0883f989d4c49a728235a4c05b170ea516ac0cd41f6656e7a0de55cbf8164",
+    "residency": "0cc323a2facb092244a748bf6d49820f66c43c987950c53f1a9fb13493b11dff",
+    "refresh": "7f63df1df4bc4626f4fe2c162f091dd7756cbe930041baa6f7b681ac3ca2b78b",
+    "loader": "dde3ef97f0a0f6d4a82a3087f70ee683a81cc3a9206cff31f2902c39c45d1428",
+    "headers": "e6604c6c8bd0cc8c1dbda91bf47cbd7892b5c5aa2aa788179a6f286f76a51c32"
+  },
+  "generatedSha256": "b5d1ea3171e2d0cb970067f704a05da1361fca080eb85c1ed587bb3c5b884690",
+  "transformation": "TypeScript type erasure and host bindings only; loader/refresh/claims/header logic unchanged; WebSockets disabled; no login methods"
+}

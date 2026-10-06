@@ -14,10 +14,11 @@ and a committed seal of a separately authorized execution freeze. The opt-in
 only covers this sixteen-slot development campaign, `openai/gpt-5.6-luna`, high,
 OpenCode 1.18.26 and Node 24.19.0. It never changes product or global settings.
 
-The authorized development-run-v1 campaign is stopped and cannot be resumed.
-Its seal, admission marker, pause and scores are historical, immutable evidence.
-This corrective preparation does not authorize another campaign; any future
-real run needs a separate directory and new user authorization.
+The development-run-v1 and development-run-v2 campaigns are stopped and cannot
+be resumed. Their seals, admission markers, pauses and scores are historical,
+immutable evidence. The separately authorized development-run-v3 retains the
+same tasks/model/budget and corrects host authorization only. Any later run needs
+a separate directory and new user authorization.
 
 ## Reproduce the model-free checks
 
@@ -176,6 +177,22 @@ The 600 seconds includes OpenCode startup, title/author requests, tools, public
 checks and all native D corrections. Input/container preparation, independent
 evaluation and cleanup have separate timing fields.
 
+Before restoring/building an execution environment or running costly contained
+preparation, check the current ordinary OpenCode connection without inference:
+
+```sh
+node evaluation/feedback-development/run.mjs --check-auth
+```
+
+The host uses OpenCode's XDG data path and auth-content override, with its pinned
+1.18.26 native auth.loader/refresh logic. The readiness endpoint is intercepted
+locally; only a necessary OAuth refresh can contact the authorization service.
+No login/logout, model availability probe or inference is performed. Credentials
+remain on the host and never enter the participant or recordings. Readiness is
+checked again before real preparation and admission markers; each admitted
+request rereads the current record and can refresh expired access within its
+remaining task budget. Refresh failure closes admission without inference retry.
+
 The preparatory manifest leaves model/environment unset. A real execution freeze
 requires fresh contained preflight and installed scripted/stop receipts from
 one immutable image and unchanged bundle. Public gold checks run in that same
@@ -183,7 +200,7 @@ image. Commit the adapter and this protocol before preparing the private batch:
 
 ```sh
 node evaluation/feedback-development/prepare.mjs \
-  --output "$PWD/local/feedback-development-run-v2/batch" \
+  --output "$PWD/local/feedback-development-run-v3/batch" \
   --model openai/gpt-5.6-luna --variant high \
   --toolchain /absolute/path/to/toolchain \
   --bundle /absolute/path/to/bundle --image sha256:EXPLICIT_IMAGE_ID \
@@ -193,15 +210,16 @@ node evaluation/feedback-development/prepare.mjs \
   --authorize-model-runs
 ```
 
-Preparation still makes no provider call and reads no credentials. Copy the
+Model-free preparation reads no credentials. Real preparation first checks the
+existing host connection; neither path makes an inference call. Copy the
 generated safe `execution-manifest.json` to
-`evidence/development-run-v2/execution-freeze.json` and
+`evidence/development-run-v3/execution-freeze.json` and
 commit it before the first request. Keep `freeze.json` and all private paths and
 recordings outside Git. Launch only with the same immutable `EVALUATION_IMAGE`:
 
 ```sh
 node evaluation/feedback-development/run.mjs \
-  "$PWD/local/feedback-development-run-v2/batch" --authorize-model-runs
+  "$PWD/local/feedback-development-run-v3/batch" --authorize-model-runs
 ```
 
 Admission checks the committed seal, exact source bytes, public inputs, installed

@@ -6,6 +6,7 @@ import {hashFile,privateJSON} from '../support/output-files.mjs';
 import {manifest} from '../support/manifest.mjs';
 import {tasks,schedule,config,directory,repository,prepareSource,frozenManifest,realBatch,command,runId,conditionsHead} from './suite.mjs';
 import {validateBundle} from './assets.mjs';
+import {existingConnection} from './auth.mjs';
 
 export function providerConfig(model,variant) {
   if(typeof model!=='string'||!/^openai\/[^/\s]+$/.test(model)||typeof variant!=='string'||!variant.trim())throw Error('Explicit OpenAI model and variant required; no fallback');
@@ -23,6 +24,8 @@ export function providerConfig(model,variant) {
 export function prepare({output,model,variant,toolchain,bundle,executionImage,fixture=false,preflightReceipt,installedReceipt,deadlineReceipt,authorizeModelRuns=false}) {
   const nativeConfig=providerConfig(model,variant); // Fail before creating any input.
   if(authorizeModelRuns&&(fixture||output!==realBatch||model!=='openai/gpt-5.6-luna'||variant!=='high'))throw Error('Authorization only covers the exact canonical development configuration');
+  // CLI performs native refresh first; API callers must also have a ready current record.
+  if(authorizeModelRuns)existingConnection({providerID:model.split('/')[0]}).assertStoredReady();
   if(![output,toolchain,bundle].every(p=>typeof p==='string'&&path.isAbsolute(p))||!/^sha256:[a-f0-9]{64}$/.test(executionImage??''))throw Error('Absolute output/toolchain/bundle and immutable image required');
   if(fs.existsSync(output))throw Error('Existing preparation cannot be replaced');
   validateBundle(bundle,{executionImage});
@@ -68,6 +71,10 @@ if(process.argv[1]===fileURLToPath(import.meta.url)) {
     console.log('Stage-2 contents frozen; model/variant/environment still unset.');
   }else {
     const options={};for(let i=0;i<args.length;i++){if(args[i]==='--authorize-model-runs'){options.authorizeModelRuns=true;continue;}if(!['--output','--model','--variant','--toolchain','--bundle','--image','--preflight','--installed','--deadline'].includes(args[i])||!args[i+1])throw Error('Usage: prepare.mjs --output ABS --model openai/ID --variant VARIANT --toolchain ABS --bundle ABS --image sha256:ID --preflight ABS_RECEIPT [--installed ABS --deadline ABS --authorize-model-runs]');options[args[i].slice(2)]=args[++i];}
+    if(options.authorizeModelRuns){
+      if(options.output!==realBatch||options.model!=='openai/gpt-5.6-luna'||options.variant!=='high')throw Error('Authorization only covers the exact canonical development configuration');
+      await existingConnection({providerID:options.model.split('/')[0]}).readiness();
+    }
     const f=prepare({...options,executionImage:options.image,preflightReceipt:options.preflight,installedReceipt:options.installed,deadlineReceipt:options.deadline});console.log(JSON.stringify({runs:f.attempts.length,model:f.model,variant:f.variant,budgetMs:f.budgetMs,modelRunsAuthorized:f.modelRunsAuthorized}));
   }
 }
