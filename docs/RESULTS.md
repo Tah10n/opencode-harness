@@ -14,6 +14,11 @@ correction and synthetic direct/D delivery. It makes no model effectiveness clai
 
 ## Plain / direct / D calibration: Plain ceiling, no D activation
 
+The [model-free post-hoc outbox diagnosis](../evaluation/feedback-development/evidence/calibration-run-v1/DIAGNOSIS.md)
+reproduces the wrong author expectation, the public-contract failure and the
+unchanged observer path. It changes no historical score. The decision is to keep
+D experimental: no materially new hypothesis is justified by the retained evidence.
+
 The [six-task calibration](../evaluation/feedback-development/evidence/calibration-run-v1/REPORT.md)
 completed exactly 18 one-shot P/H0/H1 attempts with unchanged Luna/high,
 OpenCode 1.18.26 and a shared 600-second external budget. All final independent

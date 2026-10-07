@@ -1,0 +1,105 @@
+{
+  "scope": "model-free post-hoc diagnosis and preparation of existing Draft #33",
+  "publicationBase": "2bb68a7784623d16a288b695a1d14a05f4b0cc19",
+  "calibrationLocalCommit": "6c833b241b7590f006cba6b3393933cc0122cbdc",
+  "selectedHistoricalAttempts": [
+    {
+      "attempt": "plain-ledger-native-high",
+      "immutableRef": "030b4ee2b5df7af050ef49bb58098b096ef486d6",
+      "savedArtifacts": {
+        "development/plain-ledger-native-high/assessment.json": "0814e453d194304ac58f723c5e492c0088bb6b56cdbfb027ffb4fb753f24c051",
+        "development/plain-ledger-native-high/trajectory.json": "aab12876e9230ced6090936c1f7ac522489e804cf44c831ac8a5e564bbaef2e6",
+        "development/plain-ledger-native-high/REPORT.md": "a2c8ebb0d949a060a71c2cac8509f024a7b83704ac13597e1c604e49d177618b"
+      }
+    },
+    {
+      "attempt": "direct-assertion-review/model-pair/AR0",
+      "immutableRef": "030b4ee2b5df7af050ef49bb58098b096ef486d6",
+      "savedArtifacts": {
+        "development/direct-assertion-review/model-pair/AR0-assessment.json": "55641ac21e9a3dd971e6204e020fae6a3766a3ed2049d3fdbb1c71207d7b8bee",
+        "development/direct-assertion-review/model-pair/AR0-trajectory.json": "ae7f02e7e00faa4fee2d070ac73a05de402dbcf3490ed005ba342bb526746abc",
+        "development/direct-assertion-review/model-pair/REPORT.md": "55d7d51234b4b4f17b34d3a1c13db0628c7f8d03f35a0aca01a6a5f1608224a4"
+      }
+    },
+    {
+      "attempt": "direct-assertion-review/model-pair/AR1",
+      "immutableRef": "030b4ee2b5df7af050ef49bb58098b096ef486d6",
+      "savedArtifacts": {
+        "development/direct-assertion-review/model-pair/AR1-assessment.json": "e615780549f7dc750aea5763dc87ead7571f369fd278798875dbb527801a6f28",
+        "development/direct-assertion-review/model-pair/AR1-trajectory.json": "9181c9d2a1cb5b34dfb766df8bc73918f0a19c616395a8a42fb55982c13ca527",
+        "development/direct-assertion-review/model-pair/REPORT.md": "55d7d51234b4b4f17b34d3a1c13db0628c7f8d03f35a0aca01a6a5f1608224a4"
+      }
+    }
+  ],
+  "reproduction": {
+    "inferenceRequests": 0,
+    "publicSourceFilesVerified": 11,
+    "PAuthorTests": 6,
+    "directAuthorTests": 7,
+    "DAuthorTests": 8,
+    "publicContractProbe": {
+      "P": "PASS",
+      "direct": "PASS",
+      "D": "expected FAIL: pending actual 1/expected 2 and actual 2/expected 3"
+    },
+    "observerAllFieldsMatchAfterPathNormalization": [
+      "direct",
+      "D"
+    ],
+    "retainedInputsUnchanged": true,
+    "disposableCopiesRemoved": true
+  },
+  "preserved": {
+    "sourceTasks": true,
+    "acceptance": true,
+    "savedPatches": true,
+    "officialScores": true,
+    "CONFIRMATION_DRAFT": "NOT RUN",
+    "historicalDeadlineFail": "UNRESOLVED",
+    "productCoreAndStopBoundaries": true
+  },
+  "privacy": "Public paths and changed text checked: no provider records, credentials, archives or private host paths",
+  "limitations": [
+    "Post-hoc known-error diagnosis is not independent quality confirmation",
+    "Historical selection has three attempts of one task",
+    "Installed/container controls in original calibration receipts are historical evidence; new CI reported separately"
+  ],
+  "currentLocalChecks": {
+    "npm ci --ignore-scripts": "PASS",
+    "npm ci --ignore-scripts --prefix profiles/native/sensitivity": "PASS",
+    "npm run verify": {
+      "exit": 0,
+      "status": "PASS",
+      "groups": 21,
+      "checks": [
+        "scripts/verify-native-template.mjs",
+        "scripts/verify-native-review.mjs",
+        "scripts/verify-native-task.mjs",
+        "scripts/verify-native-command-hints.mjs",
+        "scripts/verify-native-project-feedback.mjs",
+        "scripts/verify-native-preservation-nudge.mjs",
+        "scripts/verify-native-preservation-hooks.mjs",
+        "scripts/verify-native-task-investigation.mjs",
+        "scripts/verify-native-task-investigation-delivery.mjs",
+        "scripts/verify-native-stateful.mjs",
+        "scripts/verify-native-sensitivity.mjs",
+        "scripts/verify-native-sensitivity-dependencies.mjs",
+        "scripts/verify-native-type-compat.mjs",
+        "scripts/verify-native-type-compat-hooks.mjs",
+        "scripts/verify-large-git.mjs",
+        "scripts/verify-boundary.mjs",
+        "evaluation/support/verify-input-admission.mjs",
+        "evaluation/support/verify-scheduler.mjs",
+        "evaluation/support/verify-recording.mjs",
+        "evaluation/polybench/verify.py",
+        "evaluation/feedback-development/verify.mjs"
+      ],
+      "logSha256": "603d8496b78028049a8b1602f872f1aab3af5015fbfe76af9a730ff1e27e6ed2"
+    },
+    "node --check reproduce-outbox.mjs": "PASS",
+    "public reproduction": "PASS as diagnosis; expected D contract FAIL retained",
+    "git diff --check": "PASS",
+    "new remote CI": "NOT OBSERVED in this pre-publication receipt; post-publication readback separate"
+  },
+  "checkedAt": "2026-10-07T16:41:47.551833+00:00"
+}
