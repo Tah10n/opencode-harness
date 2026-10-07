@@ -12,6 +12,33 @@ The [exact-model technical follow-up](../evaluation/feedback-development/evidenc
 records title none/refusal before correction, installed model/high frames after
 correction and synthetic direct/D delivery. It makes no model effectiveness claim.
 
+## Plain / direct / D calibration: Plain ceiling, no D activation
+
+The [six-task calibration](../evaluation/feedback-development/evidence/calibration-run-v1/REPORT.md)
+completed exactly 18 one-shot P/H0/H1 attempts with unchanged Luna/high,
+OpenCode 1.18.26 and a shared 600-second external budget. All final independent
+evaluations are proven; delivery is 6/6 per mode. R/Q: **Plain 6/6, direct 6/6,
+D 5/6**. Direct/Plain has six ties; D has one loss versus either control and
+five ties, with zero unknown pairs. Plain has no observed headroom on this set.
+
+D corrections were zero in all six slots. The outbox failure already exists in
+D0: pending counts incorrectly exclude inflight work despite the public contract;
+author tests expect the wrong count. D0/final R is unchanged on all six tasks.
+One byte-different DAG patch only reorders seven identical diff sections;
+both complete representations independently pass. No artificial correction,
+new reviewer or product change followed. Direct uses 34.5% more native time and
+44.6% more input tokens than Plain on this fixed set. These are descriptive
+findings, with no general superiority or equivalence claim.
+
+The [18 slot records](../evaluation/feedback-development/evidence/calibration-run-v1/results.json)
+retain 375 complete Luna/high requests, 6,634,437 input / 265,548 output tokens,
+included cached/reasoning subsets and unknown money. All original eight tasks
+and v1/v2/v3 evidence remain historical and excluded. The separate bounded
+[deadline investigation](../evaluation/feedback-development/evidence/calibration-run-v1/DEADLINE.md)
+passed current stop controls while leaving the historical seal CI cause unresolved.
+The outcome-blind [30 × 3 × 2 confirmation draft](../evaluation/feedback-development/calibration/CONFIRMATION_DRAFT.md)
+is not run; its 30 task identities are not yet selected or prepared.
+
 ## Feedback development v3: no observed difference
 
 The separately authorized [development-run-v3](../evaluation/feedback-development/evidence/development-run-v3/REPORT.md)

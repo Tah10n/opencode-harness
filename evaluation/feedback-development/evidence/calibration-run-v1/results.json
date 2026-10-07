@@ -1,0 +1,1460 @@
+{
+  "suite": "feedback-calibration-v1",
+  "experimentKind": "feedback-calibration",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "high",
+  "money": "unknown",
+  "comparison": {
+    "kind": "calibration",
+    "plainProven": 6,
+    "plainCorrect": 6,
+    "plainFailures": 0,
+    "contrasts": {
+      "H0_vs_P": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 6,
+        "unknown": 0,
+        "deltaQPercentagePoints": 0,
+        "pairs": [
+          {
+            "task": "c01-catalog-batch",
+            "result": "tie"
+          },
+          {
+            "task": "c02-durable-outbox",
+            "result": "tie"
+          },
+          {
+            "task": "c03-generation-cache",
+            "result": "tie"
+          },
+          {
+            "task": "c04-stream-import",
+            "result": "tie"
+          },
+          {
+            "task": "c05-plugin-sdk",
+            "result": "tie"
+          },
+          {
+            "task": "c06-dag-refactor",
+            "result": "tie"
+          }
+        ]
+      },
+      "H1_vs_P": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 5,
+        "unknown": 0,
+        "deltaQPercentagePoints": -16.666666666666668,
+        "pairs": [
+          {
+            "task": "c01-catalog-batch",
+            "result": "tie"
+          },
+          {
+            "task": "c02-durable-outbox",
+            "result": "loss"
+          },
+          {
+            "task": "c03-generation-cache",
+            "result": "tie"
+          },
+          {
+            "task": "c04-stream-import",
+            "result": "tie"
+          },
+          {
+            "task": "c05-plugin-sdk",
+            "result": "tie"
+          },
+          {
+            "task": "c06-dag-refactor",
+            "result": "tie"
+          }
+        ]
+      },
+      "H1_vs_H0": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 5,
+        "unknown": 0,
+        "deltaQPercentagePoints": -16.666666666666668,
+        "pairs": [
+          {
+            "task": "c01-catalog-batch",
+            "result": "tie"
+          },
+          {
+            "task": "c02-durable-outbox",
+            "result": "loss"
+          },
+          {
+            "task": "c03-generation-cache",
+            "result": "tie"
+          },
+          {
+            "task": "c04-stream-import",
+            "result": "tie"
+          },
+          {
+            "task": "c05-plugin-sdk",
+            "result": "tie"
+          },
+          {
+            "task": "c06-dag-refactor",
+            "result": "tie"
+          }
+        ]
+      }
+    },
+    "D": {
+      "activated": 0,
+      "changedPatch": 1,
+      "initialProven": 6,
+      "improvedR": 0,
+      "worsenedR": 0
+    },
+    "limitation": "Six known calibration mini-projects, one attempt per mode: descriptive contrasts only, no independent confirmation or equivalence claim."
+  },
+  "D0PatchReadback": {
+    "task": "c06-dag-refactor",
+    "mode": "H1",
+    "D0Sha256": "6982f134fff143094297ced8c192715c5fd31b1c97d5d786f2f9df9335bde478",
+    "finalSha256": "8bb5c48d332a8f605b3396598922714ede202a3e5f74b6d08e4bcbb8e193ac3a",
+    "bytesDiffer": true,
+    "sectionOrderOnly": true,
+    "identicalFileSections": 7,
+    "nativeCorrections": 0
+  },
+  "providerResponseModels": {
+    "providerRequests": 375,
+    "returnedModelsByRequest": {
+      "gpt-5.6-luna": 375
+    }
+  },
+  "sourceCommit": "2b45773455f48fcd886c4ef7407f84e9649721ad",
+  "preRunSealCommit": "8a48533bf601aa1c6d9f7398f00d134c1bd207f3",
+  "freezeSha256": "f325d7c75c4351d2702381ae2937aebe11e580ad6ae84d122a0c3301116a6b28",
+  "executionManifestSha256": "20e218618516de5892521b3d4b3947fb1c4e05b8723cb9d1511a92a5d762b935",
+  "privateReportSha256": "0b85e47cda1a2b8826c41c3d39651382e91ae0806c4f2e57db782c1c4beff1a4",
+  "plannedCalibrationAttempts": 18,
+  "calibrationAttempts": 18,
+  "confirmationAttempts": 0,
+  "rows": [
+    {
+      "slot": 1,
+      "task": "c01-catalog-batch",
+      "arm": "P",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": null,
+      "corrections": null,
+      "Q": true,
+      "requests": 17,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 215928,
+        "output_tokens": 9408,
+        "cached_tokens": 35840,
+        "reasoning_tokens": 6046
+      },
+      "knownTokens": {
+        "input_tokens": 215928,
+        "output_tokens": 9408,
+        "cached_tokens": 35840,
+        "reasoning_tokens": 6046
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 170799.496583,
+      "preparationElapsedMs": 1301.855417000042,
+      "evaluationElapsedMs": 468.148083,
+      "evaluationCleanupElapsedMs": 77.18283300000002,
+      "cleanupElapsedMs": 83.00125000000116,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd09.atomic-persistence",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd09.validation-and-filtering",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd09.legacy-shape-and-errors",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "7e658b87faaa62bd3804f387d1dd6a60ecd3c54619b301638ad40a1f15e19748",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 17,
+      "requestKinds": {
+        "title": 1,
+        "work": 16
+      }
+    },
+    {
+      "slot": 2,
+      "task": "c01-catalog-batch",
+      "arm": "H0",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 25,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 417643,
+        "output_tokens": 12008,
+        "cached_tokens": 37376,
+        "reasoning_tokens": 6666
+      },
+      "knownTokens": {
+        "input_tokens": 417643,
+        "output_tokens": 12008,
+        "cached_tokens": 37376,
+        "reasoning_tokens": 6666
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 364812.892292,
+      "preparationElapsedMs": 1289.5188330000383,
+      "evaluationElapsedMs": 471.0810409999999,
+      "evaluationCleanupElapsedMs": 74.1260420000001,
+      "cleanupElapsedMs": 86.08766700001433,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd09.atomic-persistence",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd09.validation-and-filtering",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd09.legacy-shape-and-errors",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "94b65cff1624cd9a13c0afa962bb45d1d6d32358bc6739eeb3f70f699c040d0b",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 25,
+      "requestKinds": {
+        "title": 1,
+        "work": 24
+      }
+    },
+    {
+      "slot": 3,
+      "task": "c01-catalog-batch",
+      "arm": "H1",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "initialR": true,
+      "initialEvaluationProven": true,
+      "initialPatchSha256": "3a5bdc252d4bbc147c737b9bb6a327c362792cb3ae431ce84fa67f457987a095",
+      "patchChanged": false,
+      "Q": true,
+      "requests": 24,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 433038,
+        "output_tokens": 12144,
+        "cached_tokens": 117760,
+        "reasoning_tokens": 6105
+      },
+      "knownTokens": {
+        "input_tokens": 433038,
+        "output_tokens": 12144,
+        "cached_tokens": 117760,
+        "reasoning_tokens": 6105
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 204659.91987500002,
+      "preparationElapsedMs": 1331.018582999939,
+      "evaluationElapsedMs": 469.548458,
+      "evaluationCleanupElapsedMs": 75.34754199999998,
+      "cleanupElapsedMs": 88.25037500006147,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd09.atomic-persistence",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd09.validation-and-filtering",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd09.legacy-shape-and-errors",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "3a5bdc252d4bbc147c737b9bb6a327c362792cb3ae431ce84fa67f457987a095",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 24,
+      "requestKinds": {
+        "title": 1,
+        "work": 23
+      },
+      "finalCorrectionReasons": [],
+      "initialCorrectionReasons": [],
+      "initialSnapshotSha256": "74ca2795fe63b40a2547b9c30983077801789866151eb94629ba79f0b6bde769"
+    },
+    {
+      "slot": 4,
+      "task": "c02-durable-outbox",
+      "arm": "H0",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 20,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 314065,
+        "output_tokens": 14823,
+        "cached_tokens": 81920,
+        "reasoning_tokens": 9710
+      },
+      "knownTokens": {
+        "input_tokens": 314065,
+        "output_tokens": 14823,
+        "cached_tokens": 81920,
+        "reasoning_tokens": 9710
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 261445.21016600006,
+      "preparationElapsedMs": 1313.1887080000015,
+      "evaluationElapsedMs": 458.10175000000004,
+      "evaluationCleanupElapsedMs": 69.79599999999982,
+      "cleanupElapsedMs": 115.8775420000311,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd10.overlap-order-and-close",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd10.failure-recovery-and-limits",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd10.legacy-id-and-snapshot",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "16ecf754e769d9a9532d28b1c37ccbd9dd2e36444235c2b89e13bec7ef3552ee",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 20,
+      "requestKinds": {
+        "title": 1,
+        "work": 19
+      }
+    },
+    {
+      "slot": 5,
+      "task": "c02-durable-outbox",
+      "arm": "H1",
+      "R": false,
+      "diagnosticR": false,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "initialR": false,
+      "initialEvaluationProven": true,
+      "initialPatchSha256": "e3be2c664a6f954dfeaa8d5ab6e8f3caab0b84fea8de07e9bd32ccdeb2e0ac71",
+      "patchChanged": false,
+      "Q": false,
+      "requests": 24,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 486020,
+        "output_tokens": 17074,
+        "cached_tokens": 79872,
+        "reasoning_tokens": 10717
+      },
+      "knownTokens": {
+        "input_tokens": 486020,
+        "output_tokens": 17074,
+        "cached_tokens": 79872,
+        "reasoning_tokens": 10717
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 283585.063583,
+      "preparationElapsedMs": 1378.2445409999928,
+      "evaluationElapsedMs": 462.83574999999973,
+      "evaluationCleanupElapsedMs": 78.09870799999999,
+      "cleanupElapsedMs": 84.01954200002365,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd10.overlap-order-and-close",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd10.failure-recovery-and-limits",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd10.legacy-id-and-snapshot",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "e3be2c664a6f954dfeaa8d5ab6e8f3caab0b84fea8de07e9bd32ccdeb2e0ac71",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 24,
+      "requestKinds": {
+        "title": 1,
+        "work": 23
+      },
+      "finalCorrectionReasons": [],
+      "initialCorrectionReasons": [],
+      "initialSnapshotSha256": "a82383afb608cb30921a98a8823bf6085bc2f532e42b8218a171c48523320093"
+    },
+    {
+      "slot": 6,
+      "task": "c02-durable-outbox",
+      "arm": "P",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": null,
+      "corrections": null,
+      "Q": true,
+      "requests": 17,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 280141,
+        "output_tokens": 15493,
+        "cached_tokens": 51712,
+        "reasoning_tokens": 11441
+      },
+      "knownTokens": {
+        "input_tokens": 280141,
+        "output_tokens": 15493,
+        "cached_tokens": 51712,
+        "reasoning_tokens": 11441
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 196011.46308299992,
+      "preparationElapsedMs": 1310.1142919999547,
+      "evaluationElapsedMs": 484.9212499999999,
+      "evaluationCleanupElapsedMs": 66.6388750000001,
+      "cleanupElapsedMs": 86.81312499986961,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd10.overlap-order-and-close",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd10.failure-recovery-and-limits",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd10.legacy-id-and-snapshot",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "cfb15d5065526f1558acb19051d0f703a98f70609cfabdec4d8c77bfb3c80629",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 17,
+      "requestKinds": {
+        "title": 1,
+        "work": 16
+      }
+    },
+    {
+      "slot": 7,
+      "task": "c03-generation-cache",
+      "arm": "H1",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "initialR": true,
+      "initialEvaluationProven": true,
+      "initialPatchSha256": "943550610819ad0fe81a57f11e5c5ea730c5fb7354baac1e1073e0d705c40972",
+      "patchChanged": false,
+      "Q": true,
+      "requests": 22,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 391730,
+        "output_tokens": 17646,
+        "cached_tokens": 161280,
+        "reasoning_tokens": 10427
+      },
+      "knownTokens": {
+        "input_tokens": 391730,
+        "output_tokens": 17646,
+        "cached_tokens": 161280,
+        "reasoning_tokens": 10427
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 307072.86354100006,
+      "preparationElapsedMs": 1281.902165999636,
+      "evaluationElapsedMs": 456.71616700000004,
+      "evaluationCleanupElapsedMs": 74.05258300000014,
+      "cleanupElapsedMs": 86.46954199997708,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd11.generation-and-coalescing",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd11.subscriber-cancellation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd11.legacy-clones-errors-and-client",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "943550610819ad0fe81a57f11e5c5ea730c5fb7354baac1e1073e0d705c40972",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 22,
+      "requestKinds": {
+        "title": 1,
+        "work": 21
+      },
+      "finalCorrectionReasons": [],
+      "initialCorrectionReasons": [],
+      "initialSnapshotSha256": "729c0eb6f77c3d4a5509cbe37a7355fb60c1470b0896bc67f3344bddfffa1143"
+    },
+    {
+      "slot": 8,
+      "task": "c03-generation-cache",
+      "arm": "P",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": null,
+      "corrections": null,
+      "Q": true,
+      "requests": 15,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 228185,
+        "output_tokens": 15974,
+        "cached_tokens": 49152,
+        "reasoning_tokens": 11890
+      },
+      "knownTokens": {
+        "input_tokens": 228185,
+        "output_tokens": 15974,
+        "cached_tokens": 49152,
+        "reasoning_tokens": 11890
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 234463.06933399988,
+      "preparationElapsedMs": 1317.1028750000987,
+      "evaluationElapsedMs": 459.3874590000005,
+      "evaluationCleanupElapsedMs": 68.57141700000011,
+      "cleanupElapsedMs": 87.74120900011621,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd11.generation-and-coalescing",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd11.subscriber-cancellation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd11.legacy-clones-errors-and-client",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "b2d11a912b53645e48feff5b1de540ad730419bfd86f4e10479936786dfda41a",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 15,
+      "requestKinds": {
+        "title": 1,
+        "work": 14
+      }
+    },
+    {
+      "slot": 9,
+      "task": "c03-generation-cache",
+      "arm": "H0",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 20,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 362311,
+        "output_tokens": 16180,
+        "cached_tokens": 135680,
+        "reasoning_tokens": 9691
+      },
+      "knownTokens": {
+        "input_tokens": 362311,
+        "output_tokens": 16180,
+        "cached_tokens": 135680,
+        "reasoning_tokens": 9691
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 239232.04670900013,
+      "preparationElapsedMs": 1507.276499999687,
+      "evaluationElapsedMs": 461.7984999999999,
+      "evaluationCleanupElapsedMs": 76.28520800000024,
+      "cleanupElapsedMs": 95.28529200004414,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd11.generation-and-coalescing",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd11.subscriber-cancellation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd11.legacy-clones-errors-and-client",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "19bb3867d4a96f4b0eabf139e6d09d6f47d23a6d1bb7ad7e66d97666f5bc3c60",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 20,
+      "requestKinds": {
+        "title": 1,
+        "work": 19
+      }
+    },
+    {
+      "slot": 10,
+      "task": "c04-stream-import",
+      "arm": "P",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": null,
+      "corrections": null,
+      "Q": true,
+      "requests": 27,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 535989,
+        "output_tokens": 19950,
+        "cached_tokens": 213504,
+        "reasoning_tokens": 11201
+      },
+      "knownTokens": {
+        "input_tokens": 535989,
+        "output_tokens": 19950,
+        "cached_tokens": 213504,
+        "reasoning_tokens": 11201
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 383239.83074999973,
+      "preparationElapsedMs": 1389.8990830001421,
+      "evaluationElapsedMs": 533.7064169999994,
+      "evaluationCleanupElapsedMs": 77.75545899999997,
+      "cleanupElapsedMs": 116.08541599987075,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd12.stream-boundaries-and-limits",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd12.errors-and-iterator-cleanup",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd12.legacy-api-and-cli",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd12.cli-stream-and-errors",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "f0e24c6e9d2d64a2600ca7bbbc809d311f2ee5ea40c9a476ab1bc9c41bfa63e3",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 27,
+      "requestKinds": {
+        "title": 1,
+        "work": 26
+      }
+    },
+    {
+      "slot": 11,
+      "task": "c04-stream-import",
+      "arm": "H1",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "initialR": true,
+      "initialEvaluationProven": true,
+      "initialPatchSha256": "51c86686ac1ef86d02518a54719aab9f936dd7650cb485e928e1cd0d339ca26f",
+      "patchChanged": false,
+      "Q": true,
+      "requests": 24,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 526249,
+        "output_tokens": 20988,
+        "cached_tokens": 206848,
+        "reasoning_tokens": 13294
+      },
+      "knownTokens": {
+        "input_tokens": 526249,
+        "output_tokens": 20988,
+        "cached_tokens": 206848,
+        "reasoning_tokens": 13294
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 349024.9350419999,
+      "preparationElapsedMs": 1848.3764159996063,
+      "evaluationElapsedMs": 548.4874169999994,
+      "evaluationCleanupElapsedMs": 68.71537500000068,
+      "cleanupElapsedMs": 99.10604199999943,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd12.stream-boundaries-and-limits",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd12.errors-and-iterator-cleanup",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd12.legacy-api-and-cli",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd12.cli-stream-and-errors",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "51c86686ac1ef86d02518a54719aab9f936dd7650cb485e928e1cd0d339ca26f",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 24,
+      "requestKinds": {
+        "title": 1,
+        "work": 23
+      },
+      "finalCorrectionReasons": [],
+      "initialCorrectionReasons": [],
+      "initialSnapshotSha256": "9235080e97fd8d6b679cedad72d71bfd1f4260c528aaf9a93d3806ff5ae33737"
+    },
+    {
+      "slot": 12,
+      "task": "c04-stream-import",
+      "arm": "H0",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 29,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 648793,
+        "output_tokens": 20344,
+        "cached_tokens": 263168,
+        "reasoning_tokens": 14109
+      },
+      "knownTokens": {
+        "input_tokens": 648793,
+        "output_tokens": 20344,
+        "cached_tokens": 263168,
+        "reasoning_tokens": 14109
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 435947.5299170003,
+      "preparationElapsedMs": 1340.7901250002906,
+      "evaluationElapsedMs": 541.207958,
+      "evaluationCleanupElapsedMs": 71.76224999999977,
+      "cleanupElapsedMs": 92.46425000019372,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd12.stream-boundaries-and-limits",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd12.errors-and-iterator-cleanup",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd12.legacy-api-and-cli",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd12.cli-stream-and-errors",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "67599e0f97c10bd61a96ddd60955c49116d79bcd97fb3a4918b4f65630fa6948",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 29,
+      "requestKinds": {
+        "title": 1,
+        "work": 28
+      }
+    },
+    {
+      "slot": 13,
+      "task": "c05-plugin-sdk",
+      "arm": "H1",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "initialR": true,
+      "initialEvaluationProven": true,
+      "initialPatchSha256": "762e50bd9dd5efa361908df6147a137de4ac67b4d8afe3de39a204f66dfb3edd",
+      "patchChanged": false,
+      "Q": true,
+      "requests": 20,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 378451,
+        "output_tokens": 17126,
+        "cached_tokens": 143360,
+        "reasoning_tokens": 9561
+      },
+      "knownTokens": {
+        "input_tokens": 378451,
+        "output_tokens": 17126,
+        "cached_tokens": 143360,
+        "reasoning_tokens": 9561
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 351082.01350000035,
+      "preparationElapsedMs": 1311.9747919999063,
+      "evaluationElapsedMs": 460.0508749999999,
+      "evaluationCleanupElapsedMs": 83.00274999999965,
+      "cleanupElapsedMs": 96.33466599974781,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd13.alias-atomicity-and-copying",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd13.mixed-settlement-and-clones",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd13.legacy-exports-and-callbacks",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "762e50bd9dd5efa361908df6147a137de4ac67b4d8afe3de39a204f66dfb3edd",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 20,
+      "requestKinds": {
+        "title": 1,
+        "work": 19
+      },
+      "finalCorrectionReasons": [],
+      "initialCorrectionReasons": [],
+      "initialSnapshotSha256": "f7e2b4abac37ff100b7cd694ecfaf48ddc841b552705cea850c8ea4d5a4e6026"
+    },
+    {
+      "slot": 14,
+      "task": "c05-plugin-sdk",
+      "arm": "H0",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 21,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 355089,
+        "output_tokens": 14461,
+        "cached_tokens": 122368,
+        "reasoning_tokens": 8566
+      },
+      "knownTokens": {
+        "input_tokens": 355089,
+        "output_tokens": 14461,
+        "cached_tokens": 122368,
+        "reasoning_tokens": 8566
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 230615.42333299993,
+      "preparationElapsedMs": 1379.485582999885,
+      "evaluationElapsedMs": 453.1569589999999,
+      "evaluationCleanupElapsedMs": 70.12850000000071,
+      "cleanupElapsedMs": 93.94745899969712,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd13.alias-atomicity-and-copying",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd13.mixed-settlement-and-clones",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd13.legacy-exports-and-callbacks",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "830227c5c900a5def46b147a23adeee86650a58aa24f88775db68b880e882023",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 21,
+      "requestKinds": {
+        "title": 1,
+        "work": 20
+      }
+    },
+    {
+      "slot": 15,
+      "task": "c05-plugin-sdk",
+      "arm": "P",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": null,
+      "corrections": null,
+      "Q": true,
+      "requests": 19,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 314610,
+        "output_tokens": 16428,
+        "cached_tokens": 111104,
+        "reasoning_tokens": 10308
+      },
+      "knownTokens": {
+        "input_tokens": 314610,
+        "output_tokens": 16428,
+        "cached_tokens": 111104,
+        "reasoning_tokens": 10308
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 228183.24512499943,
+      "preparationElapsedMs": 1629.7765000001527,
+      "evaluationElapsedMs": 454.5854589999999,
+      "evaluationCleanupElapsedMs": 68.65745900000002,
+      "cleanupElapsedMs": 96.591666999273,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd13.alias-atomicity-and-copying",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd13.mixed-settlement-and-clones",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd13.legacy-exports-and-callbacks",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "f5d520482e65a05bc21e7f7174497e2e843231c1ec4a7e370b4380d26a4242de",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 19,
+      "requestKinds": {
+        "title": 1,
+        "work": 18
+      }
+    },
+    {
+      "slot": 16,
+      "task": "c06-dag-refactor",
+      "arm": "H0",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 19,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 289004,
+        "output_tokens": 9278,
+        "cached_tokens": 97280,
+        "reasoning_tokens": 5363
+      },
+      "knownTokens": {
+        "input_tokens": 289004,
+        "output_tokens": 9278,
+        "cached_tokens": 97280,
+        "reasoning_tokens": 5363
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 204418.29862499982,
+      "preparationElapsedMs": 1455.6205420000479,
+      "evaluationElapsedMs": 490.1578750000008,
+      "evaluationCleanupElapsedMs": 69.78675000000112,
+      "cleanupElapsedMs": 91.64383300021291,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd14.shared-planner-delegation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd14.legacy-planning-and-validation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd14.legacy-wave-settlement",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "899c9644860fcd56a6c8c8713387e3aaeef18dc634463532ffd69fa380b2d15a",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 19,
+      "requestKinds": {
+        "title": 1,
+        "work": 18
+      }
+    },
+    {
+      "slot": 17,
+      "task": "c06-dag-refactor",
+      "arm": "P",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": null,
+      "corrections": null,
+      "Q": true,
+      "requests": 9,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 76257,
+        "output_tokens": 3436,
+        "cached_tokens": 36864,
+        "reasoning_tokens": 1617
+      },
+      "knownTokens": {
+        "input_tokens": 76257,
+        "output_tokens": 3436,
+        "cached_tokens": 36864,
+        "reasoning_tokens": 1617
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 78219.07404199988,
+      "preparationElapsedMs": 1350.1880409996957,
+      "evaluationElapsedMs": 485.7125840000008,
+      "evaluationCleanupElapsedMs": 70.77629100000013,
+      "cleanupElapsedMs": 88.96783299930394,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd14.shared-planner-delegation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd14.legacy-planning-and-validation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd14.legacy-wave-settlement",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "05463a38b2a22516054755931c42095fe12775cb3a7ed0dc6c1198c8177fbbe9",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 9,
+      "requestKinds": {
+        "title": 1,
+        "work": 8
+      }
+    },
+    {
+      "slot": 18,
+      "task": "c06-dag-refactor",
+      "arm": "H1",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "initialR": true,
+      "initialEvaluationProven": true,
+      "initialPatchSha256": "6982f134fff143094297ced8c192715c5fd31b1c97d5d786f2f9df9335bde478",
+      "patchChanged": true,
+      "Q": true,
+      "requests": 23,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 380934,
+        "output_tokens": 12787,
+        "cached_tokens": 147968,
+        "reasoning_tokens": 6739
+      },
+      "knownTokens": {
+        "input_tokens": 380934,
+        "output_tokens": 12787,
+        "cached_tokens": 147968,
+        "reasoning_tokens": 6739
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 254974.57245799992,
+      "preparationElapsedMs": 1359.5002080006525,
+      "evaluationElapsedMs": 481.35491700000057,
+      "evaluationCleanupElapsedMs": 71.9916659999999,
+      "cleanupElapsedMs": 95.80449999962002,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd14.shared-planner-delegation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd14.legacy-planning-and-validation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd14.legacy-wave-settlement",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompleted": true,
+      "timedOut": false,
+      "patchSha256": "8bb5c48d332a8f605b3396598922714ede202a3e5f74b6d08e4bcbb8e193ac3a",
+      "requestModelEffort": [
+        "gpt-5.6-luna/high"
+      ],
+      "terminalCompletedRequests": 23,
+      "requestKinds": {
+        "title": 1,
+        "work": 22
+      },
+      "finalCorrectionReasons": [],
+      "initialCorrectionReasons": [],
+      "initialSnapshotSha256": "099dcfe9452604e9195b8b1f0fd0b14318a197f54e722a64b13c5dc8db60667e",
+      "patchDifferenceKind": "diff-section-order-only",
+      "identicalFileSections": 7
+    }
+  ],
+  "modeTotals": {
+    "P": {
+      "slots": 6,
+      "evaluationProven": 6,
+      "R": 6,
+      "delivery": 6,
+      "Q": 6,
+      "unknownQuality": 0,
+      "requests": 104,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 1651110,
+        "output_tokens": 80689,
+        "cached_tokens": 498176,
+        "reasoning_tokens": 52503
+      },
+      "taskElapsedMs": 1290916.178916999,
+      "preparationElapsedMs": 8298.936208000086,
+      "evaluationElapsedMs": 2886.4612520000005,
+      "cleanupElapsedMs": 559.2004999984347,
+      "money": "unknown"
+    },
+    "H0": {
+      "slots": 6,
+      "evaluationProven": 6,
+      "R": 6,
+      "delivery": 6,
+      "Q": 6,
+      "unknownQuality": 0,
+      "requests": 134,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 2386905,
+        "output_tokens": 87094,
+        "cached_tokens": 737792,
+        "reasoning_tokens": 54105
+      },
+      "taskElapsedMs": 1736471.4010420004,
+      "preparationElapsedMs": 8285.88029099995,
+      "evaluationElapsedMs": 2875.5040830000007,
+      "cleanupElapsedMs": 575.3060430001933,
+      "money": "unknown"
+    },
+    "H1": {
+      "slots": 6,
+      "evaluationProven": 6,
+      "R": 5,
+      "delivery": 6,
+      "Q": 5,
+      "unknownQuality": 0,
+      "requests": 137,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 2596422,
+        "output_tokens": 97765,
+        "cached_tokens": 857088,
+        "reasoning_tokens": 56843
+      },
+      "taskElapsedMs": 1750399.3679990002,
+      "preparationElapsedMs": 8511.016705999733,
+      "evaluationElapsedMs": 2878.993584,
+      "cleanupElapsedMs": 549.9846669994295,
+      "money": "unknown"
+    }
+  }
+}
