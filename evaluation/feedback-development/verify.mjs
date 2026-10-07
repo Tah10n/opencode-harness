@@ -13,6 +13,7 @@ import {image} from '../support/container-session.mjs';
 import {verifyReport} from './verify-report.mjs';
 import {verifyPreparation} from './verify-preparation.mjs';
 import {verifyAuth} from './verify-auth.mjs';
+import {verifyCalibration} from './calibration/verify.mjs';
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'feedback-verify-'));
 try {
   const f={experimentKind:'feedback-development',model:'openai/explicit-fixture',variant:'high',budgetMs:600000,strategy:'per-slot',streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,preflightPassed:true,files:{},attempts:schedule.map(a=>({...a,source:tasks.find(t=>t.id===a.task).source}))};
@@ -95,5 +96,6 @@ try {
   await verifyAuth(path.join(temp,'auth-regressions'));
   verifyPreparation(path.join(temp,'preparation-regressions'));
   await preflight(path.join(temp,'preflight'));
+  await verifyCalibration(path.join(temp,'calibration'));
   console.log('PASS feedback development allocation, explicit configuration, model admission and controls');
 }finally{fs.rmSync(temp,{recursive:true,force:true});}

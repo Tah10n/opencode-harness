@@ -1,0 +1,14 @@
+{
+  "id": "c04-stream-import",
+  "category": "compatibility",
+  "title": "Incremental inventory import",
+  "feature": [
+    "fd12.stream-boundaries-and-limits",
+    "fd12.errors-and-iterator-cleanup",
+    "fd12.cli-stream-and-errors"
+  ],
+  "preservation": [
+    "fd12.legacy-api-and-cli"
+  ],
+  "wrongControl": "Decodes each byte chunk independently, corrupting split UTF-8 characters."
+}

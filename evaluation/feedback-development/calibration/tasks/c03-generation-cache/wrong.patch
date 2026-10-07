@@ -1,0 +1,43 @@
+diff --git a/src/cache.mjs b/src/cache.mjs
+index 43109d48ef8c71dba150572bbe93c72d776bde9e..e98c7408dd036a19ad99a80e9e9de197459c5bc5 100644
+--- a/src/cache.mjs
++++ b/src/cache.mjs
+@@ -1,11 +1,32 @@
++const aborted=()=>new DOMException('The operation was aborted','AbortError');
+ export class Cache {
+- constructor(source) { this.source=source;this.values=new Map(); }
+- async get(key) {
+-  if(typeof key!=='string'||!key)throw new TypeError('key');
+-  if(this.values.has(key))return structuredClone(this.values.get(key));
+-  const value=await this.source(key);this.values.set(key,structuredClone(value));return structuredClone(value);
++ constructor(source) { this.source=source;this.values=new Map();this.pending=new Map(); }
++ get(key,{signal}={}) {
++  if(typeof key!=='string'||!key)return Promise.reject(new TypeError('key'));
++  if(signal?.aborted)return Promise.reject(aborted());
++  if(this.values.has(key))return Promise.resolve(structuredClone(this.values.get(key)));
++  let entry=this.pending.get(key);
++  if(!entry) {
++   entry={controller:new AbortController(),subscribers:new Set()};this.pending.set(key,entry);
++   Promise.resolve().then(()=>this.source(key,{signal:entry.controller.signal})).then(value=>{
++    { this.values.set(key,structuredClone(value));this.pending.delete(key); }
++    for(const sub of [...entry.subscribers])sub.finish(null,value);
++   },error=>{
++    if(this.pending.get(key)===entry)this.pending.delete(key);
++    for(const sub of [...entry.subscribers])sub.finish(error);
++   });
++  }
++  return new Promise((resolve,reject)=>{
++   const sub={finish:(error,value)=>{if(!entry.subscribers.delete(sub))return;signal?.removeEventListener('abort',cancel);if(error)reject(error);else resolve(structuredClone(value));}};
++   const cancel=()=>{
++    sub.finish(aborted());
++    if(!entry.subscribers.size) { if(this.pending.get(key)===entry)this.pending.delete(key);entry.controller.abort(); }
++   };
++   entry.subscribers.add(sub);signal?.addEventListener('abort',cancel,{once:true});if(signal?.aborted)cancel();
++  });
+  }
+  has(key) { return this.values.has(key); }
+  peek(key) { return structuredClone(this.values.get(key)); }
+- clear() { this.values.clear(); }
++ invalidate(key) { this.values.delete(key);this.pending.delete(key); }
++ clear() { this.values.clear();this.pending.clear(); }
+ }

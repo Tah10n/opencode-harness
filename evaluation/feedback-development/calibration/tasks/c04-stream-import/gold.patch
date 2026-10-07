@@ -1,0 +1,66 @@
+diff --git a/bin/import.mjs b/bin/import.mjs
+index c3bf264cc5483678b3d4a63306553478195668d1..ceb2cca3e6f2866f07ceda4229316621da70ae6a 100644
+--- a/bin/import.mjs
++++ b/bin/import.mjs
+@@ -1,3 +1,7 @@
+ import fs from 'node:fs';import {importRecords} from '../src/index.mjs';
+-try { const [file]=process.argv.slice(2);if(!file)throw Error('file required');console.log(JSON.stringify(await importRecords(fs.readFileSync(file,'utf8')))); }
+-catch(error) { console.error(error.message);process.exitCode=1; }
++try {
++ const [file,...args]=process.argv.slice(2);if(!file)throw Error('file required');
++ if(args.length>1||args.length===1&&args[0]!=='--stream')throw Error('unknown option');
++ const streaming=args[0]==='--stream';const input=streaming?fs.createReadStream(file):fs.readFileSync(file,'utf8');
++ console.log(JSON.stringify(await importRecords(input,{format:streaming?'stream':'text'})));
++} catch(error) { console.error(error.message);process.exitCode=1; }
+diff --git a/src/import.mjs b/src/import.mjs
+index 9c0d098652bc070966a81840933827593670a228..b23e571c8e30aa47ba75584492b57e43d1c7f268 100644
+--- a/src/import.mjs
++++ b/src/import.mjs
+@@ -1,4 +1,6 @@
+-import {parseText} from './parse.mjs';
+-export async function importRecords(input) {
+- const records=parseText(input);return {records,total:records.reduce((n,r)=>n+r.count,0)};
++import {parseText,parseStream} from './parse.mjs';
++export async function importRecords(input,{format='text',maxLineBytes}={}) {
++ if(!['text','stream'].includes(format))throw new RangeError('format');
++ const records=[];if(format==='text')records.push(...parseText(input));else for await(const r of parseStream(input,{maxLineBytes}))records.push(r);
++ return {records,total:records.reduce((n,r)=>n+r.count,0)};
+ }
+diff --git a/src/index.mjs b/src/index.mjs
+index be1ae420de113dad0e92a0e5abf3eeec315552ee..f816c260c7a952db8700bb721fa64a32b5f99f11 100644
+--- a/src/index.mjs
++++ b/src/index.mjs
+@@ -1,2 +1,2 @@
+-export {parseText} from './parse.mjs';
++export {parseText,parseStream} from './parse.mjs';
+ export {importRecords} from './import.mjs';
+diff --git a/src/parse.mjs b/src/parse.mjs
+index 9cc7ce60d00aec80945d4b7c6a6842ec1e628818..b030ff479fd169d229b84a3c6aed620bd8d06312 100644
+--- a/src/parse.mjs
++++ b/src/parse.mjs
+@@ -1,2 +1,25 @@
+ import {record} from './record.mjs';
+ export function parseText(text) { return text.split(/\r?\n/).filter(s=>s.trim()).map(s=>record(JSON.parse(s))); }
++function maximum(options) {
++ const max=options.maxLineBytes??65536;
++ if(!Number.isSafeInteger(max)||max<1)throw new RangeError('maxLineBytes');return max;
++}
++function line(value,n,max) {
++ const text=value.endsWith('\r')?value.slice(0,-1):value;
++ if(Buffer.byteLength(text,'utf8')>max)throw new RangeError('line '+n+': maxLineBytes');
++ if(!text.trim())return null;
++ let raw;try{raw=JSON.parse(text);}catch(e){throw new SyntaxError('line '+n+': '+e.message);}
++ try{return record(raw);}catch(e){throw new e.constructor('line '+n+': '+e.message);}
++}
++export async function* parseStream(chunks,options={}) {
++ const max=maximum(options),decoder=new TextDecoder('utf-8',{fatal:true});let pending='',n=1;
++ for await(const chunk of chunks) {
++  if(!(chunk instanceof Uint8Array))throw new TypeError('byte chunk');
++  pending+=decoder.decode(chunk,{stream:true});let at;
++  while((at=pending.indexOf('\n'))>=0) {
++   const value=line(pending.slice(0,at),n++,max);pending=pending.slice(at+1);if(value!==null)yield value;
++  }
++  if(Buffer.byteLength(pending,'utf8')>max+(pending.endsWith('\r')?1:0))throw new RangeError('line '+n+': maxLineBytes');
++ }
++ pending+=decoder.decode();if(pending.length){const value=line(pending,n,max);if(value!==null)yield value;}
++}

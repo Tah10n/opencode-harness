@@ -1,0 +1,13 @@
+{
+  "id": "c01-catalog-batch",
+  "category": "coordinated-files",
+  "title": "Revisioned catalog commands",
+  "feature": [
+    "fd09.atomic-persistence",
+    "fd09.validation-and-filtering"
+  ],
+  "preservation": [
+    "fd09.legacy-shape-and-errors"
+  ],
+  "wrongControl": "Writes before all operations validate; correct happy paths but violates atomic rollback."
+}

@@ -1,5 +1,12 @@
 # Feedback development v1
 
+The original eight tasks are retained regression controls. The separately
+authorized [six-task Plain/direct/D calibration](calibration/PROTOCOL.md)
+reuses this runner and independent evaluator. P is ordinary OpenCode without
+core/plugin, H0 is existing direct, and H1 is existing D. Its
+[180-slot confirmation draft](calibration/CONFIRMATION_DRAFT.md) is not launched
+by calibration. Historical v1/v2/v3 evidence remains unchanged.
+
 Eight small Node.js repositories prepare a development comparison of **direct
 (control)** against **D (candidate)** after the accepted actionable-feedback fix
 in PR #31. Both use the unchanged native core, one identical materialized task

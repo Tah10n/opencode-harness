@@ -1,0 +1,13 @@
+{
+  "id": "c05-plugin-sdk",
+  "category": "compatibility",
+  "title": "Callback and Promise plugin SDK",
+  "feature": [
+    "fd13.alias-atomicity-and-copying",
+    "fd13.mixed-settlement-and-clones"
+  ],
+  "preservation": [
+    "fd13.legacy-exports-and-callbacks"
+  ],
+  "wrongControl": "Retains caller aliases by reference, breaking metadata and unregister after mutation."
+}

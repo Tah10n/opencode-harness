@@ -16,6 +16,17 @@ export const tasks=fs.readdirSync(path.join(directory,'tasks')).sort().map(id=>(
   directory:path.join(directory,'tasks',id), source:path.join(directory,'tasks',id,'source'),
 }));
 export const schedule=tasks.flatMap((task,index)=>(index%2?['D','direct']:['direct','D']).map(arm=>({slot:index*2+(arm===(index%2?'D':'direct')?1:2),task:task.id,arm})));
+export const calibrationTasks=fs.readdirSync(path.join(directory,'calibration/tasks')).sort().map(id=>({
+  ...JSON.parse(fs.readFileSync(path.join(directory,'calibration/tasks',id,'task.json'))),
+  directory:path.join(directory,'calibration/tasks',id),source:path.join(directory,'calibration/tasks',id,'source'),
+}));
+export const calibrationOrders=[['P','H0','H1'],['H0','H1','P'],['H1','P','H0'],['P','H1','H0'],['H1','H0','P'],['H0','P','H1']];
+export const calibrationSchedule=calibrationTasks.flatMap((t,i)=>calibrationOrders[i].map((arm,j)=>({slot:i*3+j+1,task:t.id,arm})));
+export const calibrationConfig={...config,suite:'feedback-calibration-v1',arms:['P','H0','H1'],labels:{P:'Plain OpenCode',H0:'existing direct',H1:'existing D'}};
+export function suiteFor(f={}) {
+  const calibration=f.experimentKind==='feedback-calibration'||f.suite===calibrationConfig.suite;
+  return calibration?{config:calibrationConfig,tasks:calibrationTasks,schedule:calibrationSchedule,runId:'calibration-run-v1',kind:'feedback-calibration',realBatch:path.join(repository,'local/feedback-calibration-20261007/batch'),executionManifest:'evaluation/feedback-development/evidence/calibration-run-v1/execution-freeze.json',conditionsHead:'2bb68a7784623d16a288b695a1d14a05f4b0cc19'}:{config,tasks,schedule,runId,kind:'feedback-development',realBatch,executionManifest,conditionsHead};
+}
 export function cleanEnvironment(input=process.env) {
   return Object.fromEntries(Object.entries(input).filter(([key])=>!key.startsWith('HARNESS_')&&!key.startsWith('OPENCODE_')));
 }

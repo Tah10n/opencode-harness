@@ -1,0 +1,13 @@
+{
+  "id": "c03-generation-cache",
+  "category": "asynchronous-state",
+  "title": "Generation-safe asset cache",
+  "feature": [
+    "fd11.generation-and-coalescing",
+    "fd11.subscriber-cancellation"
+  ],
+  "preservation": [
+    "fd11.legacy-clones-errors-and-client"
+  ],
+  "wrongControl": "Late invalidated load overwrites the current value and retires a newer generation."
+}

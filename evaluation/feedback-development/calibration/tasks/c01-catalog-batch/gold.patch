@@ -1,0 +1,55 @@
+diff --git a/src/catalog.mjs b/src/catalog.mjs
+index 1af105673c1322e29290d93ac117ff9713ea1f69..602129722b2827c453c98ebaf09be37e963812b8 100644
+--- a/src/catalog.mjs
++++ b/src/catalog.mjs
+@@ -7,5 +7,26 @@ export class Catalog {
+   if(at<0)s.products.push(next);else s.products[at]=next;
+   s.revision++;this.storage.write(s);return structuredClone(next);
+  }
++
++ applyBatch({expectedRevision,operations}) {
++  const s=this.storage.read();
++  if(!Number.isSafeInteger(expectedRevision)||expectedRevision<0)throw new RangeError('expectedRevision');
++  if(s.revision!==expectedRevision)throw new Error('revision conflict');
++  if(!Array.isArray(operations))throw new TypeError('operations');
++  const working=structuredClone(s);
++  for(const op of operations) {
++   if(op?.type==='upsert') {
++    const next=product(op.product),at=working.products.findIndex(p=>p.id===next.id);
++    if(at<0)working.products.push(next);else working.products[at]=next;
++   } else if(op?.type==='delete') {
++    if(typeof op.id!=='string'||!op.id.trim())throw new TypeError('id');
++    const at=working.products.findIndex(p=>p.id===op.id);
++    if(at<0)throw new Error('missing product');
++    working.products.splice(at,1);
++   } else throw new RangeError('operation');
++  }
++  if(operations.length) { working.revision++;this.storage.write(working); }
++  return {revision:working.revision,products:structuredClone(working.products)};
++ }
+  revision() { return this.storage.read().revision; }
+ }
+diff --git a/src/command.mjs b/src/command.mjs
+index 5925111e03bdccf6153b89bcca8a597962d75822..d0ef0ac39ed049f001328ad8c14a72349afd0197 100644
+--- a/src/command.mjs
++++ b/src/command.mjs
+@@ -1,5 +1,6 @@
+ import {render} from './render.mjs';
+ export function command(catalog,request) {
++ if(request.action==='batch')return catalog.applyBatch(request);
+  if(request.action==='upsert')return catalog.upsert(request.product);
+  if(request.action==='list')return render(catalog,request);
+  throw new RangeError('action');
+diff --git a/src/render.mjs b/src/render.mjs
+index 26f8644767bb2cdb13e291f2d4036f766ee52ac7..ffecbf94bc9e3d27c7a54bb33b9a9c2f35f6ebf7 100644
+--- a/src/render.mjs
++++ b/src/render.mjs
+@@ -1,5 +1,6 @@
+-export function render(catalog,{tag,format='json'}={}) {
+- const products=catalog.list({tag});
++export function render(catalog,{tag,minPrice=0,maxPrice=Infinity,format='json'}={}) {
++ if(typeof minPrice!=='number'||!Number.isFinite(minPrice)||minPrice<0||typeof maxPrice!=='number'||Number.isNaN(maxPrice)||maxPrice<minPrice)throw new RangeError('price range');
++ const products=catalog.list({tag}).filter(p=>p.priceCents>=minPrice&&p.priceCents<=maxPrice);
+  if(format==='json')return JSON.stringify(products);
+  if(format==='text')return products.map(p=>p.id+'\t'+p.name+'\t'+p.priceCents).join('\n');
+  throw new RangeError('format');

@@ -1,0 +1,1 @@
+[{"id":"compile","seconds":4},{"id":"lint","seconds":2},{"id":"package","needs":["compile","lint"],"slots":2,"seconds":3}]

@@ -1,0 +1,106 @@
+{
+  "historicalCI": "https://github.com/Tah10n/opencode-harness/actions/runs/37451496974",
+  "historicalFailure": "Termination not verified; secondary ENOENT for result.json",
+  "historicalRootCause": "unresolved: CI log has no watchdog/finished termination reason",
+  "historicalHostNode": "24.21.0",
+  "currentHostNode": "24.19.0",
+  "boundedReproductions": [
+    {
+      "group": "deadline-original-deadline",
+      "arm": "direct",
+      "fixtureBudgetMs": 5000,
+      "hangIssued": true,
+      "terminationVerified": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "stopElapsedMs": 5069.529125000001,
+      "killedProcesses": 1
+    },
+    {
+      "group": "deadline-original-deadline",
+      "arm": "D",
+      "fixtureBudgetMs": 5000,
+      "hangIssued": true,
+      "terminationVerified": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "stopElapsedMs": 5073.167042000001,
+      "killedProcesses": 1
+    },
+    {
+      "group": "deadline-second-deadline",
+      "arm": "direct",
+      "fixtureBudgetMs": 5000,
+      "hangIssued": true,
+      "terminationVerified": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "stopElapsedMs": 5077.041041,
+      "killedProcesses": 1
+    },
+    {
+      "group": "deadline-second-deadline",
+      "arm": "D",
+      "fixtureBudgetMs": 5000,
+      "hangIssued": true,
+      "terminationVerified": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "stopElapsedMs": 5073.480541000001,
+      "killedProcesses": 3
+    },
+    {
+      "group": "installed-three-deadline",
+      "arm": "P",
+      "fixtureBudgetMs": 5000,
+      "hangIssued": true,
+      "terminationVerified": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "stopElapsedMs": 5064.578334000002,
+      "killedProcesses": 2
+    },
+    {
+      "group": "installed-three-deadline",
+      "arm": "H0",
+      "fixtureBudgetMs": 5000,
+      "hangIssued": true,
+      "terminationVerified": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "stopElapsedMs": 5061.1781249999985,
+      "killedProcesses": 3
+    },
+    {
+      "group": "installed-three-deadline",
+      "arm": "H1",
+      "fixtureBudgetMs": 5000,
+      "hangIssued": true,
+      "terminationVerified": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0,
+      "stopElapsedMs": 5085.025374999997,
+      "killedProcesses": 4
+    }
+  ],
+  "busyHostControl": {
+    "passed": true,
+    "fixtureBudgetMs": 3000,
+    "blockedMainMs": 6000,
+    "killed": 4,
+    "watchdogLatenessMs": 1.1989579999999478,
+    "realProviderCalls": 0
+  },
+  "stopBodiesUnchanged": {
+    "evaluation/support/native-run.mjs": true,
+    "evaluation/support/deadline-stop.mjs": true,
+    "evaluation/support/stop-workload.mjs": true,
+    "evaluation/support/container-session.mjs": true,
+    "evaluation/support/container-relay.mjs": true,
+    "scheduler.runComparison": true
+  },
+  "currentBlockingCompletionFailureObserved": false,
+  "realProviderCalls": 0,
+  "inferenceGate": "eligible after remaining mandatory checks and committed freeze; new unverified termination closes admission",
+  "limitation": "Successful bounded controls do not identify the historical cause or establish randomness."
+}

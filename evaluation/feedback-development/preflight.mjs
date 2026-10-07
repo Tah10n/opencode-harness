@@ -7,7 +7,7 @@ import {privateJSON,hashFile} from '../support/output-files.mjs';
 import {startContainer,image} from '../support/container-session.mjs';
 import {stopWorkload} from '../support/stop-workload.mjs';
 import {manifest} from '../support/manifest.mjs';
-import {tasks,command,applyPatch,auditFlags,config,cleanEnvironment,directory} from './suite.mjs';
+import {command,applyPatch,auditFlags,cleanEnvironment,directory,suiteFor} from './suite.mjs';
 import {evaluatePatch,scoreOutput,deliveryFacts} from './evaluate.mjs';
 
 export function controlPatch(task,patch,mutate) {
@@ -28,13 +28,14 @@ export const negativeControls=[
   {task:'05-query-arrays',name:'absolute-array-url',file:'src/query.mjs',from:"return base+(text?'?'+text:'')+hash;",to:"const result=base+(text?'?'+text:'')+hash;return Object.values(updates).some(v=>Array.isArray(v)&&v.length)?new URL(result,'https://example.test').href:result;",failed:'fd05.repeated-array-values'},
 ];
 
-export async function preflight(output,{contained=false,toolchain}={}) {
+export async function preflight(output,{contained=false,toolchain,calibration=false}={}) {
+  const {tasks,config}=suiteFor(calibration?{experimentKind:'feedback-calibration'}:{});
   fs.mkdirSync(output,{recursive:true,mode:0o700});
-  assert.equal(tasks.length,8);
+  assert.equal(tasks.length,calibration?6:8);
   const categories=new Map();for(const task of tasks)categories.set(task.category,(categories.get(task.category)??0)+1);
-  assert.deepEqual([...categories.values()],[2,2,2,2]);
+  if(!calibration)assert.deepEqual([...categories.values()],[2,2,2,2]);
   assert.deepEqual(cleanEnvironment({PATH:'safe',HARNESS_TASK_CHECKS:'1',HARNESS_UNKNOWN:'1',OPENCODE_CONFIG_CONTENT:'bad'}),{PATH:'safe'});
-  const harnessKeys=auditFlags(),inputHashes=manifest(path.join(directory,'tasks')),rows=[];
+  const harnessKeys=auditFlags(),inputHashes=manifest(path.join(directory,calibration?'calibration/tasks':'tasks')),rows=[];
   let executionEnvironment=null;
   for(const task of tasks) {
     const row={task:task.id,category:task.category,results:{}};
@@ -93,6 +94,10 @@ export async function preflight(output,{contained=false,toolchain}={}) {
     }
     rows.push(row);console.log('PASS controls '+task.id);
   }
+  if(calibration) {
+    const result={suite:config.suite,preparationSha256:hashFile(path.join(directory,'frozen-manifest.json')).sha256,passed:true,contained,modelFree:true,realProviderCalls:0,executionEnvironment,harnessKeys,inputHashes,tasks:rows};
+    privateJSON(path.join(output,'preflight.json'),result);return result;
+  }
   const task=tasks[0],gold=fs.readFileSync(path.join(task.directory,'gold.patch')),wrong=fs.readFileSync(path.join(task.directory,'wrong.patch'));
   const controls=[];
   const check=async(name,patch,expected)=>{
@@ -137,6 +142,6 @@ export async function preflight(output,{contained=false,toolchain}={}) {
 if(process.argv[1]===fileURLToPath(import.meta.url)) {
   const output=process.argv[2]?path.resolve(process.argv[2]):fs.mkdtempSync(path.join(os.tmpdir(),'feedback-preflight-'));
   const at=process.argv.indexOf('--toolchain');
-  try{await preflight(output,{contained:process.argv.includes('--contained'),toolchain:at<0?undefined:path.resolve(process.argv[at+1])});console.log('PASS feedback-development model-free preflight');}
+  try{await preflight(output,{contained:process.argv.includes('--contained'),calibration:process.argv.includes('--calibration'),toolchain:at<0?undefined:path.resolve(process.argv[at+1])});console.log('PASS feedback-development model-free preflight');}
   finally{if(!process.argv[2])fs.rmSync(output,{recursive:true,force:true});}
 }

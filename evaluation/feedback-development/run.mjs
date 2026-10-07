@@ -11,13 +11,14 @@ import {startContainer,image} from '../support/container-session.mjs';
 import {runNativePhase} from '../support/native-run.mjs';
 import {stopWorkload} from '../support/stop-workload.mjs';
 import {captureCandidate} from '../polybench/capture.mjs';
-import {config,cleanEnvironment,command,repository,realBatch,executionManifest,schedule,frozenManifest,tasks,runId,conditionsHead} from './suite.mjs';
+import {config,cleanEnvironment,command,repository,frozenManifest,suiteFor} from './suite.mjs';
 import {providerConfig} from './prepare.mjs';
 import {manifest} from '../support/manifest.mjs';
 import {existingConnection} from './auth.mjs';
 
 export function verifyRealAdmission(root,f,seal,freezeSha256,executionImage=image) {
-  if(path.resolve(root)!==realBatch||f.runId!==runId||f.experimentKind!=='feedback-development'||f.modelRunsAuthorized!==true)throw Error('Real admission requires the authorized canonical development batch');
+  const {config,tasks,schedule,runId,realBatch,conditionsHead,kind}=suiteFor(f);
+  if(path.resolve(root)!==realBatch||f.runId!==runId||f.experimentKind!==kind||f.modelRunsAuthorized!==true)throw Error('Real admission requires the authorized canonical development batch');
   if(f.suite!==config.suite||f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.runtimeVersion!==config.runtimeVersion||f.nodeVersion!==config.nodeVersion||f.budgetMs!==600000||!/^sha256:[a-f0-9]{64}$/.test(f.executionImage??'')||f.executionImage!==executionImage)throw Error('Unapproved development model/environment/configuration');
   if(JSON.stringify(f.config)!==JSON.stringify(providerConfig(f.model,f.variant)))throw Error('Changed provider configuration');
   const expected=schedule.map(a=>({...a,source:path.join(realBatch,'inputs',a.task)}));
@@ -34,11 +35,12 @@ export function verifyUnstarted(root) {
 }
 
 export async function runTask(session,options) {
-  if(!config.arms.includes(options.arm))throw Error('Unknown feedback strategy');
-  session.armMode='task';session.arm=options.arm;
-  const result=await runNativePhase(session,{...options,enabled:true,strategy:options.arm},{spawnProcess:(cmd,args,settings)=>{
+  if(![...config.arms,'P','H0','H1'].includes(options.arm))throw Error('Unknown feedback strategy');
+  session.armMode=options.arm==='P'?'plain':'task';session.arm=options.arm;
+  const strategy={H0:'direct',H1:'D'}[options.arm]??options.arm;
+  const result=await runNativePhase(session,{...options,enabled:options.arm!=='P',strategy},{spawnProcess:(cmd,args,settings)=>{
     const at=args.indexOf(session.name);if(at<0)throw Error('Missing container');
-    const disabled=Object.entries(config.environment).flatMap(([key,value])=>['--env',key+'='+value]);
+    const disabled=options.arm==='P'?[]:Object.entries(config.environment).flatMap(([key,value])=>['--env',key+'='+value]);
     return spawn(cmd,[...args.slice(0,at),...disabled,...args.slice(at)],{...settings,env:cleanEnvironment()});
   }});
   const {events,stderr,...summary}=result;
@@ -49,6 +51,7 @@ export async function runPrepared(root,{scriptedFetch,authorizeModelRuns=false,r
   if(!authorizeModelRuns&&typeof scriptedFetch!=='function')throw Error('Explicit scripted provider or --authorize-model-runs required before credential access');
   if(scriptedFetch===fetch)throw Error('Fixtures cannot use the real provider transport');
   const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
+  const {executionManifest}=suiteFor(f);
   let fetchImpl,connection;
   if(f.experimentKind==='fixture') {
     if(authorizeModelRuns||typeof scriptedFetch!=='function')throw Error('Fixtures require an explicit scripted provider and cannot authorize real calls');

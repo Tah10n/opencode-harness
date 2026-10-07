@@ -49,6 +49,12 @@ export function assets({output,linuxBin,executionImage}) {
   const accessible=dir=>{fs.chmodSync(dir,0o755);for(const e of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,e.name);if(e.isDirectory())accessible(p);else if(e.isFile())fs.chmodSync(p,fs.statSync(p).mode|0o444);}};accessible(bundle);
   validateBundle(bundle,{executionImage});return {bundle,toolchain};
 }
+export function plainAssets(bundle,destination) {
+  if(fs.existsSync(destination))throw Error('Plain assets already exist');
+  fs.mkdirSync(destination,{recursive:true});
+  for(const name of ['node_modules','package.json','package-lock.json','rg'])fs.cpSync(path.join(bundle,name),path.join(destination,name),{recursive:true,verbatimSymlinks:true});
+  return manifest(destination);
+}
 if(process.argv[1]===fileURLToPath(import.meta.url)) {
   const [output,linuxBin]=process.argv.slice(2);console.log(JSON.stringify(assets({output,linuxBin,executionImage:process.env.EVALUATION_IMAGE})));
 }
