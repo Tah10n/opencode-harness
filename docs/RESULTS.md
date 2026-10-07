@@ -1,6 +1,8 @@
 # Results and limits
 
-**No sustained harness quality advantage is established.** These separate
+**No sustained harness quality advantage over Plain is established.** The primary
+product path remains [native instructions/config](../README.md#quick-start);
+task/direct/D and review remain experimental opt-ins. These separate
 campaigns have different runtimes, datasets and scoring contracts; they must not
 be pooled into a project success rate. Technical fixtures are not model lift.
 
@@ -16,7 +18,9 @@ correction and synthetic direct/D delivery. It makes no model effectiveness clai
 
 The [model-free post-hoc outbox diagnosis](../evaluation/feedback-development/evidence/calibration-run-v1/DIAGNOSIS.md)
 reproduces the wrong author expectation, the public-contract failure and the
-unchanged observer path. It changes no historical score. The decision is to keep
+unchanged observer path. No correct contract check was present in the D
+trajectory; observer/workflow did not lose the signal. It changes no historical
+score. The decision is to keep
 D experimental: no materially new hypothesis is justified by the retained evidence.
 
 The [six-task calibration](../evaluation/feedback-development/evidence/calibration-run-v1/REPORT.md)
@@ -40,9 +44,11 @@ retain 375 complete Luna/high requests, 6,634,437 input / 265,548 output tokens,
 included cached/reasoning subsets and unknown money. All original eight tasks
 and v1/v2/v3 evidence remain historical and excluded. The separate bounded
 [deadline investigation](../evaluation/feedback-development/evidence/calibration-run-v1/DEADLINE.md)
-passed current stop controls while leaving the historical seal CI cause unresolved.
+passed current stop controls while leaving the historical seal deadline FAIL
+**UNRESOLVED**, separate from the [current Actions server error](STATUS.md#publication-checkpoint-draft-pr-33).
 The outcome-blind [30 × 3 × 2 confirmation draft](../evaluation/feedback-development/calibration/CONFIRMATION_DRAFT.md)
-is not run; its 30 task identities are not yet selected or prepared.
+remains **NOT RUN**; its 30 task identities are not yet selected or prepared.
+There is no new candidate or automatic commitment to run 180 attempts.
 
 ## Feedback development v3: no observed difference
 
@@ -51,7 +57,8 @@ reused the current ordinary OpenCode OAuth connection after correcting native
 refresh/readiness. Sixteen fresh native attempts completed once on the unchanged
 Luna/high, OpenCode 1.18.26, Node 24.19.0, eight-task/600-second conditions.
 All [16 complete patches](../evaluation/feedback-development/evidence/development-run-v3/results.json)
-have proven R, delivery and Q: direct 8/8 and D 8/8; eight ties, zero wins/losses
+have proven R, delivery and Q: direct 8/8 and D 8/8; **Plain did not participate**.
+There are eight ties, zero wins/losses
 or unknown pairs, delta 0 pp. Native corrections were zero, required public checks
 passed and D0/final patches matched. This detects no advantage on the set and does
 not establish equivalence or superiority over ordinary OpenCode.

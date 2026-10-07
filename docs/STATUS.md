@@ -3,16 +3,60 @@
 The maintained product is the native materializer and native runtime. Technical
 implementation and model effectiveness are separate claims. Historical results
 are bound to their original commits in [RESULTS](RESULTS.md); they are not a
-current-head test receipt.
+current-head test receipt. The primary path is the two-file native
+instructions/config bundle; task (direct/D) and review are experimental opt-ins.
+**A sustained solution-quality improvement over Plain is not established.**
 
 | Capability | Implementation/status | Technical evidence |
 | --- | --- | --- |
 | Two-file native instructions/config | Supported | `verify-native-template.mjs`: collision, symlink, settings, exact bundle |
 | Read-only native review | Experimental opt-in | `verify-native-review.mjs`; installed `verify-native-review-fixture.mjs` |
-| Isolated task and patch delivery | Experimental opt-in; effectiveness unconfirmed | `verify-native-task.mjs`; installed fixture checks actual patch application, staged index, concurrent saves, permissions, cancellation/deadline |
+| Isolated task and patch delivery (direct/D) | Experimental opt-in; effectiveness unconfirmed | `verify-native-task.mjs`; installed fixture checks actual patch application, staged index, concurrent saves, permissions, cancellation/deadline |
 | Check/context/type/sensitivity/investigation feedback | Experimental, default-off where originally default-off | Retained native regression suites; no general quality claim |
 | SWE-PolyBench adapter | Maintained external evaluation path | Model-free selection/export/accounting, scheduler/recorder, container boundary checks |
 | Legacy core/quality/assurance/verified-change/v3 runtime | Archived, unsupported | Original commits and reports in [ARCHIVE](ARCHIVE.md); old checks no longer validate the current product |
+
+## Publication checkpoint: Draft PR #33
+
+The 2026-10-07 readback of [Verify run 37654162202](https://github.com/Tah10n/opencode-harness/actions/runs/37654162202)
+at `e5ac7e5154ee403459fa459d31ea0eb847ecf526` found completed/failure:
+Native product and model-free evaluation and Evaluation container boundary both
+passed, but **Harness verification did not run** and has no job/check-run.
+The actual workflow includes `required-status`, `if: always()` and dependencies
+on both checks; its graph shows the unstarted gate.
+
+The Actions summary reports **Internal server error**, correlation ID
+`24f64fa1-7938-4014-9e7b-684b5c0492bc`. This confirms a GitHub Actions
+infrastructure error; the underlying server cause is unknown. Available job
+annotations are deprecation/migration notices and do not explain the failure.
+There is no diagnostic establishing a workflow defect, runner unavailability
+or account limit, so no workflow/runtime fix or manual rerun was made.
+
+Two passed jobs do not constitute a required-gate PASS or establish project
+stability. The final documentation push uses ordinary automatic CI; consult
+[Draft PR #33](https://github.com/Tah10n/opencode-harness/pull/33) for its current
+head, executed gate and reviews. Chat acceptance of the diagnosis is not a
+qualifying approval of the PR.
+
+The separate historical [seal deadline FAIL](../evaluation/feedback-development/evidence/calibration-run-v1/DEADLINE.md)
+remains **UNRESOLVED**; no evidence links it to this server error.
+
+## Latest quality evidence
+
+- [v3 report](../evaluation/feedback-development/evidence/development-run-v3/REPORT.md)
+  and [results.json](../evaluation/feedback-development/evidence/development-run-v3/results.json):
+  direct 8/8 and D 8/8 for R/delivery/Q, zero native corrections; Plain did not participate.
+- [Calibration report](../evaluation/feedback-development/evidence/calibration-run-v1/REPORT.md)
+  and [results.json](../evaluation/feedback-development/evidence/calibration-run-v1/results.json):
+  Plain 6/6, direct 6/6, D 5/6 for R/Q, delivery 6/6 per mode and zero native corrections.
+
+The [diagnosis](../evaluation/feedback-development/evidence/calibration-run-v1/DIAGNOSIS.md)
+places the D outbox error in its initial patch. The author test had an incorrect
+expectation; no correct contract check occurred in the trajectory, and
+observer/workflow did not lose the signal. Samples and versions are not pooled;
+these findings establish neither equivalence nor general uselessness of D.
+There is no new candidate. [CONFIRMATION_DRAFT](../evaluation/feedback-development/calibration/CONFIRMATION_DRAFT.md)
+remains **NOT RUN** and does not authorize or commit to 180 attempts.
 
 ## What is usable now
 

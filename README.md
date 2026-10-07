@@ -5,6 +5,13 @@ Git projects. The task workflow executes in an isolated worktree, preserves the
 user checkout and index, and delivers a patch with observed checks and explicit
 incomplete/unknown outcomes. It does not certify task correctness.
 
+**Current status:** the primary install path is the two-file native
+instructions/config bundle. Task delivery (direct or D) and diagnostic review
+are experimental opt-ins. A sustained quality improvement over Plain is **not
+established**; technical verification and solution quality are separate claims.
+See [status](docs/STATUS.md) for the current publication gate and [results](docs/RESULTS.md)
+for the separate research samples.
+
 ## Quick start
 
 Use Node.js 24+, Git, npm and OpenCode **1.18.26**. From a clean clone:
@@ -44,11 +51,27 @@ and invoke `/harness-task` with no arguments. Inspect its result and patch befor
 applying it. Diagnostic `/harness-review` is read-only and requires an explicit
 base and task; see [usage](docs/USAGE.md).
 
-**Current status:** the native mechanisms have regression and local-provider
-fixtures. Task delivery and additional diagnostics remain experimental. Existing
-benchmarks do **not** establish a sustained quality advantage. Technical checks,
-benchmark scores and development examples are reported separately in
-[status](docs/STATUS.md) and [results](docs/RESULTS.md).
+## Latest research evidence
+
+R is independent requirement acceptance; Q also requires autonomous delivery.
+The two fixed development samples remain separate:
+
+| Sample | Plain R/Q | direct R/Q | D R/Q | Native corrections |
+| --- | ---: | ---: | ---: | ---: |
+| v3 ([report](evaluation/feedback-development/evidence/development-run-v3/REPORT.md), [data](evaluation/feedback-development/evidence/development-run-v3/results.json)) | Not included | 8/8 | 8/8 | 0 |
+| Calibration ([report](evaluation/feedback-development/evidence/calibration-run-v1/REPORT.md), [data](evaluation/feedback-development/evidence/calibration-run-v1/results.json)) | 6/6 | 6/6 | 5/6 | 0 |
+
+The [outbox diagnosis](evaluation/feedback-development/evidence/calibration-run-v1/DIAGNOSIS.md)
+finds the D error already in its initial patch: an author test expected the wrong
+count, and the trajectory contained no correct contract check. Observer/workflow
+did not lose the signal. No observed advantage is not proof of equivalence or
+of a generally useless mechanism; correction benefit/harm was not measured.
+There is no new candidate. [CONFIRMATION_DRAFT](evaluation/feedback-development/calibration/CONFIRMATION_DRAFT.md)
+remains **NOT RUN**, with no automatic commitment to 180 attempts.
+
+The historical [deadline FAIL](evaluation/feedback-development/evidence/calibration-run-v1/DEADLINE.md)
+remains **UNRESOLVED**, separate from the current GitHub Actions infrastructure
+incident documented in [status](docs/STATUS.md#publication-checkpoint-draft-pr-33).
 
 ## Evidence-backed core: development candidate rejected
 
