@@ -94,11 +94,11 @@ try {
   assert.equal(incomplete.requests,2);assert.equal(incomplete.tokens.input_tokens,null);assert.equal(incomplete.knownTokens.input_tokens,10);assert.equal(incomplete.Q,null);
   // The completed campaign's manifest is historical evidence, not the current
   // runtime freeze. Preserve its exact bytes and all unchanged source entries;
-  // only this verifier and the two product changes may have new source hashes.
+  // only the product presentation/cleanup and live fixture checks may differ.
   const historicalFile=path.join(directory,'frozen-manifest.json');
   assert.equal(hashFile(historicalFile).sha256,'b458d3d4f0efd49dcf71c31ee98e21b7e88deeed352ceaef14078ba9bcb9f3c3');
   const historical=JSON.parse(fs.readFileSync(historicalFile)),comparison=frozenManifest();
-  for(const [section,file] of [['product','lib/native-task-plugin.mjs'],['product','lib/native-task-workflow.mjs'],['files','evaluation/feedback-development/verify.mjs']]) {
+  for(const [section,file] of [['product','lib/native-task-plugin.mjs'],['product','lib/native-task-workflow.mjs'],['files','evaluation/feedback-development/verify.mjs'],['files','evaluation/feedback-development/prepare.mjs'],['files','evaluation/feedback-development/verify-title.mjs']]) {
     // A retained hash must still be rejected for admission against current
     // source bytes; the compatibility check below never changes that boundary.
     if(plan[section][file].sha256!==historical[section][file].sha256)

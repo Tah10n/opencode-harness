@@ -48,8 +48,10 @@ export function prepare({output,model,variant,toolchain,bundle,dependencies,exec
       if(command('git',['status','--porcelain'],repository).trim())throw Error('Commit executable code and public protocol before preparing real execution');
     }
   }
-  const committed=JSON.parse(fs.readFileSync(path.join(directory,'frozen-manifest.json')));
-  if(JSON.stringify(committed)!==JSON.stringify(frozenManifest()))throw Error('Suite/product changed since the stage-2 manifest');
+  // Scripted fixtures freeze current source; real campaign preparation remains
+  // bound to its retained stage-2 manifest and all existing authorization gates.
+  const current=frozenManifest(),committed=fixture?current:JSON.parse(fs.readFileSync(path.join(directory,'frozen-manifest.json')));
+  if(!fixture&&JSON.stringify(committed)!==JSON.stringify(current))throw Error('Suite/product changed since the stage-2 manifest');
   fs.mkdirSync(output,{recursive:true,mode:0o700});
   const inputRoot=path.join(output,'inputs');fs.mkdirSync(inputRoot);
   const selected=fixture?tasks.slice(0,1):tasks,inputs={};
