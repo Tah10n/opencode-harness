@@ -3,7 +3,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {evaluatePatch,readEvaluation,deliveryFacts} from '../feedback-development/evaluate.mjs';
 import {privateJSON} from '../support/output-files.mjs';
-import {tasks,runId} from './suite.mjs';
+import {tasks,campaignFor} from './suite.mjs';
 export function summarizePairs(rows) {
   return tasks.map(t=>{
     const a=rows.filter(r=>r.task===t.id&&r.arm==='control'),b=rows.filter(r=>r.task===t.id&&r.arm==='candidate');
@@ -35,7 +35,7 @@ export async function report(root) {
     rows.push({...attempt,status:!fs.existsSync(out)?'not_started':!runtime?'unknown':'completed',R:final?.R??null,obligations:final?.obligations??[],stages,evaluationProven:!!final,initialR:initial?.R??null,initialEvaluationProven:!!initial,...facts,Q:final?facts.delivery&&final.R:null,requests:forwarded?.length??null,requestsWithoutUsage:forwarded?forwarded.length-known.length:null,knownTokens,tokens:forwarded?.length===known.length?knownTokens:null,money:'unknown',taskElapsedMs:runtime?.executionElapsedMs??null,preparationElapsedMs:runtime?.preparationElapsedMs??null,evaluationElapsedMs:final?.evaluationElapsedMs??null,cleanupElapsedMs:runtime?.cleanupElapsedMs??null,probeElapsedMs:observations.reduce((n,o)=>n+(o.compatReplay?.elapsedMs??0),0),newDifferencesDelivered:delivered.reduce((n,o)=>n+o.compatReplay.differences.length,0),probeObservations:observations.map(o=>({stage:o.stage,status:o.compatReplay?.status??'disabled',snapshotSha256:o.snapshotSha256,differences:o.compatReplay?.differences??[],limits:o.compatReplay?.limits??[]})),errors});
   }
   const pairs=summarizePairs(rows);
-  const result={suite:runId,usageKind:f.experimentKind==='fixture'?'synthetic':'provider-reported',rows,pairs,...Object.fromEntries(['win','loss','tie','unknown'].map(k=>[k,pairs.filter(p=>p.result===k).length])),money:'unknown'};
+  const result={suite:campaignFor(f.runId).runId,usageKind:f.experimentKind==='fixture'?'synthetic':'provider-reported',rows,pairs,...Object.fromEntries(['win','loss','tie','unknown'].map(k=>[k,pairs.filter(p=>p.result===k).length])),money:'unknown'};
   privateJSON(path.join(root,'report.json'),result);return result;
 }
 if(process.argv[1]===fileURLToPath(import.meta.url))console.log(JSON.stringify(await report(process.argv[2])));

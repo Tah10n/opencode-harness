@@ -1,0 +1,17 @@
+{
+  "source": "e8f0547dd8c78c0b5d3a020f58c2498be59fa30c",
+  "preservedPublished": {
+    "evaluation/compat-replay-development/PROTOCOL.md": "09caa059ccd4b6e66d46c0edb713fc8e88b88883792f4e7277e88d01eefa8544",
+    "evaluation/compat-replay-development/evidence/REPORT.md": "e921204591bb9f6c38183849229bc7798edbd00e0a34e3461477737879da70aa",
+    "evaluation/compat-replay-development/evidence/execution-freeze.json": "60a84e7cfaf528e8ee83198c558d888791bae57158adde2e83d1a98e54032a1c",
+    "evaluation/compat-replay-development/evidence/model-free.json": "f71bb73b8528e898380f74a30f7a4257744ef3cab95a01f7473d58edf3ef7fbb",
+    "evaluation/compat-replay-development/evidence/results.json": "64d562eb8d853b5e077dda299524c9f32050bb677b0678157f1f06c4bf903cae"
+  },
+  "preservedPrivate": {
+    "local/compat-replay-20261008/batch/admission-started.json": "1b004e2699b40b8e4352ba5e63e848135baf130af138a3851956a3389f9dedbd",
+    "local/compat-replay-20261008/batch/freeze.json": "63dedb856482bc229e76732c0b5aa3f5273fd78457102240b624580dd365ae6b",
+    "local/compat-replay-20261008/batch/execution-manifest.json": "60a84e7cfaf528e8ee83198c558d888791bae57158adde2e83d1a98e54032a1c",
+    "local/compat-replay-20261008/batch/scheduling-paused.json": "f8eedfe3f51d2d39633026cefd94fe6a1e6ac81247708aa3c464c074021fb34d",
+    "local/compat-replay-20261008/batch/report.json": "e19767853828c62b653a8e152e67e0358a11c583a4419d61d504dc7ac0187727"
+  }
+}

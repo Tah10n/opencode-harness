@@ -91,3 +91,27 @@ Private raw requests, session paths and captures stay under ignored `local/`.
 Only sanitized evidence belongs in `evidence/` and the results index. Remove
 owned assets/caches/containers after verifying retained evidence; do not prune
 shared Docker resources.
+
+## Readiness and the separate v2 development rerun
+
+[V2 protocol](PROTOCOL-v2.md) preserves all model/task conditions and closes the
+preparation race. V1 remains terminal and readable. The sequential launcher below
+uses a fresh task-owned directory, an immutable evaluation image and pinned host
+and Linux OpenCode binaries; it makes zero model requests:
+
+```sh
+EVALUATION_IMAGE=sha256:YOUR_IMAGE node evaluation/compat-replay-development/prepare-ready.mjs prepare \
+  "$PWD/local/compat-replay-v2/preparation" /absolute/pinned/host/opencode /absolute/pinned/linux/opencode
+```
+
+Commit and push source/protocol to Draft PR #36 before preparation. The launcher
+installs locked dependencies, completes full verification and installed checks,
+container/deadline controls, all twelve scripted positions, then confirms current
+successful CI and actual checkout manifests. It publishes `readiness.json`
+atomically after rechecking all inputs. Logs and failed steps stay private.
+
+Pass that receipt and the pinned host binary as the final two arguments to
+`campaign.mjs prepare`; v2 uses `local/compat-replay-v2/batch`. Commit the generated
+execution manifest under `evidence/development-run-v2/execution-freeze.json`
+before the explicitly authorized real run. Both preparation and direct
+`runPrepared()` check readiness; a CLI flag alone never admits inference.

@@ -26,3 +26,6 @@ assert.equal(summarizePairs([delivered,interrupted])[0].result,'unknown','A capt
 assert.equal(summarizePairs([delivered,{...interrupted,status:'completed'}])[0].result,'loss','Completed proven failures remain measurable');
 assert.equal(summarizePairs([delivered,{...interrupted,status:'completed',Q:true}])[0].result,'tie');
 assert.equal(summarizePairs([delivered,{...interrupted,status:'completed',R:null}])[0].result,'unknown');
+
+// Resolve the repository wrapper imports; installed scripted checks cover the bundle.
+assert.equal(typeof (await import('./plugin.mjs')).default,'function');

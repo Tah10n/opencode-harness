@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import {fileURLToPath} from 'node:url';
+import {fileURLToPath,pathToFileURL} from 'node:url';
 import {validateBundle} from '../feedback-development/assets.mjs';
 import {directory} from './suite.mjs';
 import {manifest} from '../support/manifest.mjs';
@@ -25,5 +25,6 @@ export async function validateExperimentBundle(bundle) {
     const config=portableConfig(JSON.parse(fs.readFileSync(path.join(expected,'opencode.json'))));config.plugin=['file:///template/compat/plugin.mjs'];
     if(JSON.stringify(config)!==JSON.stringify(JSON.parse(fs.readFileSync(path.join(bundle,'opencode.json')))))throw Error('Changed experimental config');
     for(const name of ['plugin.mjs','probe.mjs','worker.mjs'])if(!Buffer.from(installedSource(name)).equals(fs.readFileSync(path.join(bundle,'compat',name))))throw Error('Stale experimental bundle: '+name);
+    if(typeof (await import(pathToFileURL(path.join(bundle,'compat/plugin.mjs')).href)).default!=='function')throw Error('Installed wrapper import failed');
   }finally{fs.rmSync(temp,{recursive:true,force:true});}
 }

@@ -302,3 +302,13 @@ fixtures test transport, deadlines, capture errors and unknown usage. Compiler
 and sensitivity fixtures test their implemented diagnostic mechanisms. They
 contain no evidence of improved model decisions. Current-head technical status
 belongs in [STATUS](STATUS.md) and the actual PR check results.
+
+## Compatibility replay development v2
+
+The [separate v2 protocol](../evaluation/compat-replay-development/PROTOCOL-v2.md)
+authorizes one twelve-slot development rerun after fixing premature admission.
+The sequential readiness launcher must complete all local, installed, container,
+scripted-schedule and current CI checks before any model request. Its result is
+recorded separately in
+[`development-run-v2/REPORT.md`](../evaluation/compat-replay-development/evidence/development-run-v2/REPORT.md).
+The stopped v1 campaign and its two attempts remain historical and are not pooled.

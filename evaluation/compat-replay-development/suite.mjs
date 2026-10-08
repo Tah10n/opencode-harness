@@ -7,3 +7,9 @@ export const tasks=fs.readdirSync(path.join(directory,'tasks')).sort().map(id=>(
 export const schedule=tasks.flatMap((task,i)=>(i%2?['candidate','control']:['control','candidate']).map((arm,j)=>({slot:i*2+j+1,task:task.id,arm})));
 export const realBatch=path.join(repository,'local/compat-replay-20261008/batch');
 export const executionManifest='evaluation/compat-replay-development/evidence/execution-freeze.json';
+// Explicit identities retain historical readers; only v2 can be newly admitted.
+export function campaignFor(id=runId) {
+  if(id===runId)return {runId,realBatch,executionManifest,closed:true};
+  if(id==='compat-replay-development-v2')return {runId:id,realBatch:path.join(repository,'local/compat-replay-v2/batch'),executionManifest:'evaluation/compat-replay-development/evidence/development-run-v2/execution-freeze.json',closed:false};
+  throw Error('Unknown compatibility campaign');
+}

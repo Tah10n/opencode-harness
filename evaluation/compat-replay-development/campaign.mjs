@@ -14,21 +14,23 @@ import {stopWorkload} from '../support/stop-workload.mjs';
 import {captureCandidate} from '../polybench/capture.mjs';
 import {existingConnection} from '../feedback-development/auth.mjs';
 import {providerConfig} from '../feedback-development/prepare.mjs';
-import {config,command,cleanEnvironment,frozenManifest,prepareSource} from '../feedback-development/suite.mjs';
+import {config,command,cleanEnvironment,prepareSource} from '../feedback-development/suite.mjs';
 import {verifyUnstarted} from '../feedback-development/run.mjs';
-import {directory,repository,tasks,schedule,runId,realBatch,executionManifest} from './suite.mjs';
+import {directory,repository,tasks,schedule,runId,campaignFor} from './suite.mjs';
+import {sourceManifest,verifyReadiness} from './readiness.mjs';
 import {treeHash} from './probe.mjs';
 import {validateExperimentBundle} from './assets.mjs';
 const sha=v=>createHash('sha256').update(v).digest('hex');
 export function sourceFiles() {
-  const old=frozenManifest(),entries={...old.files,...old.product};
-  for(const [name,entry] of Object.entries(manifest(directory)))if(!name.startsWith('evidence/'))entries['evaluation/compat-replay-development/'+name]=entry;
-  return Object.fromEntries(Object.entries(entries).map(([name,e])=>[path.join(repository,name),e.sha256]));
+  return Object.fromEntries(Object.entries(sourceManifest()).map(([name,e])=>[path.join(repository,name),e.sha256]));
 }
-export function prepare({output,bundle,toolchain,executionImage=image,fixture=false,attempts,preflight,installed,deadline,budgetMs=600000}) {
+export function prepare({output,bundle,toolchain,executionImage=image,fixture=false,attempts,preflight,installed,deadline,budgetMs=600000,campaign=runId,readiness,hostOpenCode}) {
+  const selectedCampaign=campaignFor(campaign);
+  if(!fixture&&selectedCampaign.closed)throw Error('Historical compatibility campaign is closed');
   if(![output,bundle,toolchain].every(p=>path.isAbsolute(p))||fs.existsSync(output))throw Error('Fresh absolute paths required');
-  if(!fixture&&(output!==realBatch||attempts||budgetMs!==600000))throw Error('Only canonical once-only campaign authorized');
-  let receipts=[];
+  if(!fixture&&(output!==selectedCampaign.realBatch||attempts||budgetMs!==600000))throw Error('Only canonical once-only campaign authorized');
+  let receipts=[],ready;
+  if(!fixture)ready=verifyReadiness(readiness,{bundle,toolchain,hostOpenCode,executionImage});
   if(!fixture){
     receipts=[preflight,installed,deadline].map(file=>{if(!file||!path.isAbsolute(file))throw Error('Required gate receipt missing');return JSON.parse(fs.readFileSync(file));});
     const [p,i,d]=receipts;
@@ -42,10 +44,10 @@ export function prepare({output,bundle,toolchain,executionImage=image,fixture=fa
   fs.mkdirSync(path.join(output,'inputs'),{recursive:true,mode:0o700});
   const selected=attempts??schedule,inputs={};
   for(const id of new Set(selected.map(a=>a.task))){const task=tasks.find(t=>t.id===id);if(!task)throw Error('Unknown task');const source=path.join(output,'inputs',id);inputs[id]={source,manifest:prepareSource(task,source)};}
-  const files={...sourceFiles(),[path.join(toolchain,'package/bin/opencode')]:hashFile(path.join(toolchain,'package/bin/opencode')).sha256,...Object.fromEntries([preflight,installed,deadline].filter(Boolean).map(p=>[p,hashFile(p).sha256]))};
-  const f={experimentKind:fixture?'fixture':'compat-replay-development',runId,suite:runId,model:'openai/gpt-5.6-luna',variant:'high',runtimeVersion:'1.18.26',nodeVersion:'24.19.0',budgetMs,strategy:'per-slot',streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,preflightPassed:true,executionImage,files,attempts:selected.map(a=>({...a,source:inputs[a.task].source})),toolchain,template:bundle,runtimeManifests:{[bundle]:manifest(bundle),...Object.fromEntries(Object.values(inputs).map(i=>[i.source,i.manifest]))},inputManifests:Object.fromEntries(selected.map(a=>[a.task+'-'+a.arm,inputs[a.task].manifest])),config:providerConfig('openai/gpt-5.6-luna','high'),modelRunsAuthorized:!fixture,sourceCommit:command('git',['rev-parse','HEAD'],repository).trim()};
+  const files={...sourceFiles(),[path.join(toolchain,'package/bin/opencode')]:hashFile(path.join(toolchain,'package/bin/opencode')).sha256,...Object.fromEntries([preflight,installed,deadline,readiness].filter(Boolean).map(p=>[p,hashFile(p).sha256]))};
+  const f={experimentKind:fixture?'fixture':'compat-replay-development',runId:selectedCampaign.runId,suite:selectedCampaign.runId,model:'openai/gpt-5.6-luna',variant:'high',runtimeVersion:'1.18.26',nodeVersion:'24.19.0',budgetMs,strategy:'per-slot',streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,preflightPassed:true,executionImage,files,attempts:selected.map(a=>({...a,source:inputs[a.task].source})),toolchain,template:bundle,runtimeManifests:{[bundle]:manifest(bundle),...Object.fromEntries(Object.values(inputs).map(i=>[i.source,i.manifest]))},inputManifests:Object.fromEntries(selected.map(a=>[a.task+'-'+a.arm,inputs[a.task].manifest])),config:providerConfig('openai/gpt-5.6-luna','high'),modelRunsAuthorized:!fixture,readiness:readiness??null,hostOpenCode:hostOpenCode??null,sourceCommit:ready?.sourceCommit??command('git',['rev-parse','HEAD'],repository).trim()};
   privateJSON(path.join(output,'freeze.json'),f);
-  if(!fixture)privateJSON(path.join(output,'execution-manifest.json'),{runId,sourceCommit:f.sourceCommit,freezeSha256:hashFile(path.join(output,'freeze.json')).sha256,executionImage,order:schedule,model:f.model,variant:f.variant,budgetMs,files,bundleManifest:manifest(bundle),toolchainManifest:manifest(toolchain),receipts:[preflight,installed,deadline].map(p=>({sha256:hashFile(p).sha256})),realProviderCallsBeforeFreeze:0});
+  if(!fixture)privateJSON(path.join(output,'execution-manifest.json'),{runId:selectedCampaign.runId,sourceCommit:f.sourceCommit,freezeSha256:hashFile(path.join(output,'freeze.json')).sha256,executionImage,order:schedule,model:f.model,variant:f.variant,budgetMs,files,bundleManifest:manifest(bundle),toolchainManifest:manifest(toolchain),receipts:[preflight,installed,deadline,readiness].map(p=>({sha256:hashFile(p).sha256})),realProviderCallsBeforeFreeze:0});
   return f;
 }
 export async function runTask(session,options) {
@@ -60,6 +62,9 @@ export async function runTask(session,options) {
   return {...summary,phaseCount:1,continuationApplied:false,nativeCompleted:result.exitCode===0&&!result.timedOut&&!result.parseErrors&&!events.some(e=>e.type==='error')&&events.some(e=>e.type==='step_finish'&&e.part?.reason==='stop')};
 }
 export function verifyAdmission(root,f,seal) {
+  const {runId,realBatch,closed}=campaignFor(f.runId);
+  if(closed)throw Error('Historical compatibility campaign is closed');
+  verifyReadiness(f.readiness,{bundle:f.template,toolchain:f.toolchain,hostOpenCode:f.hostOpenCode,executionImage:f.executionImage});
   if(root!==realBatch||f.experimentKind!=='compat-replay-development'||f.runId!==runId||f.modelRunsAuthorized!==true||f.runtimeVersion!=='1.18.26'||f.nodeVersion!=='24.19.0'||f.executionImage!==image)throw Error('Unapproved compatibility execution');
   if(JSON.stringify(f.config)!==JSON.stringify(providerConfig(f.model,f.variant))||JSON.stringify(f.attempts)!==JSON.stringify(schedule.map(a=>({...a,source:path.join(realBatch,'inputs',a.task)}))))throw Error('Changed configuration/order');
   if(seal.runId!==runId||seal.sourceCommit!==f.sourceCommit||seal.freezeSha256!==hashFile(path.join(root,'freeze.json')).sha256)throw Error('Changed committed seal');
@@ -73,9 +78,13 @@ export function verifyAdmission(root,f,seal) {
 export async function runPrepared(root,{scriptedFetch,authorizeModelRuns=false,readAuth}={}) {
   if(!authorizeModelRuns&&typeof scriptedFetch!=='function'||scriptedFetch===fetch)throw Error('Explicit model authorization or local scripted provider required');
   const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));let connection;
-  if(f.experimentKind==='fixture'){if(authorizeModelRuns||!scriptedFetch)throw Error('Fixture cannot authorize real calls');}
+  if(f.experimentKind==='fixture'){if(authorizeModelRuns||!scriptedFetch)throw Error('Fixture cannot authorize real calls');readAuth=()=>({access:'scripted',accountId:'scripted'});}
   else {
     if(!authorizeModelRuns||scriptedFetch)throw Error('No transport fallback');
+    const {executionManifest,closed}=campaignFor(f.runId);
+    if(closed)throw Error('Historical compatibility campaign is closed');
+    verifyUnstarted(root);
+    verifyReadiness(f.readiness,{bundle:f.template,toolchain:f.toolchain,hostOpenCode:f.hostOpenCode,executionImage:f.executionImage});
     const published=fs.readFileSync(path.join(repository,executionManifest));
     if(!published.equals(Buffer.from(command('git',['show','HEAD:'+executionManifest],repository))))throw Error('Execution seal must be committed');
     verifyAdmission(root,f,JSON.parse(published));verifyUnstarted(root);await validateExperimentBundle(f.template);
@@ -84,12 +93,12 @@ export async function runPrepared(root,{scriptedFetch,authorizeModelRuns=false,r
   }
   if(f.executionImage!==image)throw Error('Unfrozen execution image');
   verifyFrozenSchedule(f,runTask,scriptedFetch??fetch);
-  if(f.experimentKind!=='fixture'){await readAuth();privateJSON(path.join(root,'admission-started.json'),{at:new Date().toISOString(),freezeSha256:hashFile(path.join(root,'freeze.json')).sha256});}
+  if(f.experimentKind!=='fixture'){await readAuth();fs.writeFileSync(path.join(root,'admission-started.json'),JSON.stringify({at:new Date().toISOString(),freezeSha256:hashFile(path.join(root,'freeze.json')).sha256}),{flag:'wx',mode:0o600});}
   return runComparison({root,fetchImpl:scriptedFetch??fetch,readAuth:readAuth??(()=>{throw Error('Fixture auth forbidden');}),startContainer:async options=>{const start=performance.now(),s=await startContainer(options);try{s.preparationStartedMono=start;s.baseline=command('docker',['exec',s.name,'git','-C','/work/repo','rev-parse','HEAD'],root).trim();return s;}catch(e){s.close();throw e;}},runTaskImplementation:async(s,o)=>({...await runTask(s,o),preparationElapsedMs:Math.max(0,o.deadlineMono-f.budgetMs-s.preparationStartedMono)}),stopWorkload,captureCandidate});
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){
   const [mode,...args]=process.argv.slice(2);
-  if(mode==='prepare'){const [output,bundle,toolchain,preflight,installed,deadline]=args;await validateExperimentBundle(bundle);await existingConnection().readiness();prepare({output,bundle,toolchain,preflight,installed,deadline});}
+  if(mode==='prepare'){const [output,bundle,toolchain,preflight,installed,deadline,readiness,hostOpenCode]=args;prepare({output,bundle,toolchain,preflight,installed,deadline,readiness,hostOpenCode,campaign:'compat-replay-development-v2'});await validateExperimentBundle(bundle);}
   else if(mode==='run'&&args[1]==='--authorize-model-runs')console.log(JSON.stringify(await runPrepared(args[0],{authorizeModelRuns:true})));
-  else throw Error('Usage: campaign.mjs prepare ABS_OUTPUT ABS_BUNDLE ABS_TOOLCHAIN ABS_PREFLIGHT ABS_INSTALLED ABS_DEADLINE | run ABS_BATCH --authorize-model-runs');
+  else throw Error('Usage: campaign.mjs prepare ABS_OUTPUT ABS_BUNDLE ABS_TOOLCHAIN ABS_PREFLIGHT ABS_INSTALLED ABS_DEADLINE ABS_READINESS ABS_HOST_OPENCODE | run ABS_BATCH --authorize-model-runs');
 }
