@@ -1,4 +1,77 @@
 import fs from 'node:fs';import os from 'node:os';import path from 'node:path';import assert from 'node:assert/strict';import {mock} from 'node:test';import {runComparison} from './scheduler.mjs';
+import {EventEmitter} from 'node:events';
+import {PassThrough} from 'node:stream';
+import {performance} from 'node:perf_hooks';
+import {runNativePhase} from './native-run.mjs';
+
+// Exercise the real scheduler -> AbortSignal -> native result -> persisted row.
+// Timers and clocks move independently: an own timer may fire while both native
+// clocks still have budget. No sleeps, external processes or provider calls.
+const lifecycleRoot=fs.mkdtempSync(path.join(os.tmpdir(),'scheduler-native-stop-'));
+try {
+ for(const mode of ['own-deadline','native-expired','cancel-first','deadline-first','pre-cancelled-expired','normal-late-timer','termination-unverified']) {
+  const root=path.join(lifecycleRoot,mode),source=path.join(root,'source');
+  fs.mkdirSync(source,{recursive:true});fs.writeFileSync(path.join(source,'TASK.md'),'Scripted stop control');
+  const budgetMs=1000,epoch=Date.now();let clock=0,stops=0,kills=0,closes=0,nativeResult;
+  // Two slots prove an attributed task deadline does not itself pause the batch.
+  const attempts=[1,2].map(slot=>({slot,task:'task'+slot,arm:'P',source}));
+  fs.writeFileSync(path.join(root,'freeze.json'),JSON.stringify({experimentKind:'fixture',model:'openai/gpt-5.6-luna',variant:'high',budgetMs,preflightPassed:true,files:{},streamLimit:'remaining-task-budget',attempts,inputManifests:{'task1-P':{},'task2-P':{}}}));
+  mock.timers.enable({apis:['setTimeout']});
+  const wall=mock.method(Date,'now',()=>epoch+clock),mono=mock.method(performance,'now',()=>clock);
+  try {
+   const outcome=await runComparison({root,fetchImpl:()=>{throw Error('No provider calls');},readAuth:()=>{throw Error('No credential access');},readInput:async()=>({manifest:{},receipt:{fixture:true}}),
+    startContainer:async({output})=>{fs.mkdirSync(output);return {name:'scripted',output,setTaskBudget:()=>{},exec:argv=>({status:0,stdout:argv[0]==='/opt/opencode'?'1.18.26':argv[2]?.includes('DatabaseSync')?'{"sessions":[],"messages":[],"tools":[]}':''}),close:()=>{closes++;return 0;}};},
+    captureCandidate:()=>({status:0}),stopWorkload:()=>{throw Error('Native must own cleanup');},
+    runTaskImplementation:async(session,options)=>{
+     const second=closes===1,user=new AbortController(),signal=AbortSignal.any([user.signal,options.signal]);
+     const child=new EventEmitter();child.stdout=new PassThrough();child.stderr=new PassThrough();
+     const close=(code=0)=>{child.stdout.end();child.stderr.end();child.emit('close',code,code===0?null:'SIGKILL');};
+     child.kill=()=>{kills++;queueMicrotask(()=>close(null));};
+     let releaseStop,stopStarted;
+     const stopReady=new Promise(resolve=>{stopStarted=resolve;}),stopDone=new Promise(resolve=>{releaseStop=resolve;});
+     if(!second&&mode==='pre-cancelled-expired'){user.abort(new Error('User cancelled'));clock+=budgetMs+1;}
+     const running=runNativePhase(session,{...options,signal,stopWorkload:()=>{stops++;stopStarted();return stopDone;}},{spawnProcess:()=>child});
+     if(second||mode==='normal-late-timer')close();
+     else if(mode==='native-expired'){clock+=budgetMs+1;close();}
+     else if(mode==='cancel-first')user.abort(new Error('User cancelled before deadline'));
+     else if(mode!=='pre-cancelled-expired'){
+      assert.ok(options.deadline-Date.now()>0&&options.deadlineMono-performance.now()>0);
+      mock.timers.tick(budgetMs); // real scheduler callback and its real reason
+      assert.equal(options.signal.aborted,true);
+      if(mode==='deadline-first')user.abort(new Error('Late user cancellation'));
+     }
+     await stopReady;
+     // Repeated stop shares the same pending cleanup, including normal cleanup.
+     assert.strictEqual(session.stopOwnedWorkload(),session.stopOwnedWorkload());
+     let resolved=false;running.then(()=>{resolved=true;});await Promise.resolve();assert.equal(resolved,false);
+     if(!second&&['cancel-first','normal-late-timer','pre-cancelled-expired'].includes(mode)){
+      clock+=budgetMs+1;mock.timers.tick(budgetMs);user.abort(new Error('Repeated cancellation'));
+     }
+     releaseStop({terminationVerified:mode!=='termination-unverified'});
+     const result=await running;if(!second)nativeResult=result;return result;
+    }});
+   const expected=mode==='normal-late-timer'?null:['cancel-first','pre-cancelled-expired'].includes(mode)?'cancelled':'hard_deadline';
+   const out=path.join(root,'runs/task1-P');
+   const finished=JSON.parse(fs.readFileSync(path.join(out,'session/finished.json')));
+   for(const result of [nativeResult,finished])assert.deepEqual({kind:result.stopReason?.kind??null,timedOut:result.timedOut},{kind:expected,timedOut:expected==='hard_deadline'},mode+' native result');
+   if(mode==='termination-unverified'){
+    assert.equal(outcome.pause.kind,'execution_or_capture_error');assert.equal(outcome.pause.message,'Termination not verified');
+    assert.equal(fs.existsSync(path.join(out,'result.json')),false);assert.equal(closes,1);
+   }else{
+    const row=JSON.parse(fs.readFileSync(path.join(out,'result.json')));
+    assert.deepEqual({kind:row.stopReason?.kind??null,timedOut:row.timedOut},{kind:expected,timedOut:expected==='hard_deadline'},mode+' scheduler row');
+    assert.equal(outcome.status,mode==='native-expired'?'paused':'finished');
+    if(mode==='native-expired')assert.equal(outcome.pause.kind,'unattributed_timeout');
+    else {const next=JSON.parse(fs.readFileSync(path.join(root,'runs/task2-P/result.json')));assert.equal(next.timedOut,false);assert.equal(next.stopReason,null);}
+   }
+   const stop=JSON.parse(fs.readFileSync(path.join(out,'stop-verification.json')));
+   assert.equal(stop.terminationVerified,mode!=='termination-unverified');assert.equal(stop.relayRemoved,true);assert.equal(stop.forwardingClosed,true);assert.equal(stop.activeProviderHandlers,0);
+   assert.equal(stops,closes,'One cleanup per started native phase');
+   assert.equal(kills,['normal-late-timer','native-expired','pre-cancelled-expired'].includes(mode)?0:1);
+   console.log('PASS scheduler/native stop '+mode);
+  }finally{wall.mock.restore();mono.mock.restore();mock.timers.reset();}
+ }
+}finally{fs.rmSync(lifecycleRoot,{recursive:true,force:true});}
 
 const targeted=false;
 const replay=false;
