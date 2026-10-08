@@ -37,6 +37,16 @@ if(process.argv[2]!=='--child'){
   const jobs=Object.entries(required).map(([name,names],i)=>({id:i+1,run_id:1,name,status:'completed',conclusion:'success',completed_at:new Date().toISOString(),steps:names.map(name=>({name,status:'completed',conclusion:'success'}))}));
   const ci={run:{id:1,head_sha:sourceCommit,status:'completed',conclusion:'success',event:'pull_request',repository:{full_name:'Tah10n/opencode-harness'},pull_requests:[{number:36}]},jobs:{jobs},checkouts:jobs.slice(0,2).map(j=>({name:j.name,jobId:j.id,commit:sourceCommit,sourceManifest:inputs.sourceManifest,log:steps[0].log}))};
   const linuxOpenCode=hostOpenCode;steps.forEach((s,i)=>{s.command=preparationCommands(work,sourceCommit,linuxOpenCode)[i];});
+  // Run the real CI collector through the real step recorder: their files must not collide.
+  const ciWork=work+'/ci-step';fs.mkdirSync(ciWork);
+  const apiFixture={...ci,run:{...ci.run,name:'Verify',head_branch:'experiment/compat-replay'}};
+  fs.writeFileSync(work+'/github.json',JSON.stringify(apiFixture));
+  fs.writeFileSync(temp+'/bin/gh',`#!${process.execPath}\nconst f=JSON.parse(require('fs').readFileSync(${JSON.stringify(work+'/github.json')}));const route=process.argv.at(-1);if(route.endsWith('/logs'))console.log('git log -1 --format=%H\\n'+f.run.head_sha);else console.log(JSON.stringify(route.includes('actions/runs?')?{workflow_runs:[f.run]}:route.includes('/jobs?')?f.jobs:f.run));`,{mode:0o755});
+  const remote=spawnSync('git',['remote','set-url','origin',repository],{encoding:'utf8'});assert.equal(remote.status,0,remote.stderr);
+  await executeStep({name:'ci',argv:[process.execPath,path.join(repository,'evaluation/compat-replay-development/prepare-ready.mjs'),'ci',sourceCommit,ciWork],output:ciWork});
+  const retainedCI=JSON.parse(fs.readFileSync(ciWork+'/ci-metadata.json'));
+  const {verifyCI}=await import('./readiness.mjs');verifyCI(retainedCI,sourceCommit);
+  assert.equal(JSON.parse(fs.readFileSync(ciWork+'/ci.json')).name,'ci');assert.equal(retainedCI.checkouts.length,2);
   const valid={output:work,linuxOpenCode,revision:1,runId:'compat-replay-development-v2',status:'ready',sourceCommit,executionImage,steps,inputs,ci,completedAt:new Date().toISOString()};
   const readiness=work+'/readiness.json',root=work+'/direct',real=campaignFor(valid.runId).realBatch;fs.mkdirSync(root);
   const freeze={runId:valid.runId,experimentKind:'compat-replay-development',readiness,template:bundle,toolchain,hostOpenCode,executionImage};
@@ -74,5 +84,5 @@ if(process.argv[2]!=='--child'){
   await negative('already-started',valid,{fixtureOnly:true,marker:true});
   // Actual child exit, signal and timeout cannot create a successful step.
   for(const [name,code,timeoutMs] of [['failed-command','process.exit(4)',1000],['interrupted-command',"process.kill(process.pid,'SIGTERM')",1000],['timed-out-command','setInterval(()=>{},1000)',50]])await assert.rejects(()=>executeStep({name,argv:[process.execPath,'-e',code],output:work,timeoutMs}));
-  console.log(JSON.stringify({passed:true,fixtureOnly:true,rows,commandFailureControls:3}));
+  console.log(JSON.stringify({passed:true,fixtureOnly:true,rows,commandFailureControls:3,ciMetadataPreservedAfterStep:true}));
 }

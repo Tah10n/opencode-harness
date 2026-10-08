@@ -54,7 +54,7 @@ export async function collectCI(sourceCommit,output) {
     const file=path.join(output,'ci-job-'+job.id+'.log');fs.writeFileSync(file,log,{mode:0o600});
     ci.checkouts.push({jobId:job.id,name,commit,sourceManifest:expected,log:{path:file,sha256:hashFile(file).sha256}});
   }
-  privateJSON(path.join(output,'ci.json'),ci);
+  privateJSON(path.join(output,'ci-metadata.json'),ci);
 }
 export async function prepareReady({output,hostOpenCode,linuxOpenCode,executionImage}) {
   if(![output,hostOpenCode,linuxOpenCode].every(p=>p&&path.isAbsolute(p))||fs.existsSync(output))throw Error('Fresh absolute preparation directory and runtimes required');
@@ -76,7 +76,7 @@ export async function prepareReady({output,hostOpenCode,linuxOpenCode,executionI
     if(!same(sourceManifest(),source))throw Error('Sources changed during preparation');
   }
   if(!same(inputs,snapshot({bundle,toolchain,hostOpenCode,executionImage})))throw Error('Runtime changed during preparation');
-  const r={output,linuxOpenCode,revision:1,runId:'compat-replay-development-v2',status:'ready',sourceCommit,executionImage,hostOpenCode,bundle,toolchain,steps,inputs,ci:JSON.parse(fs.readFileSync(path.join(output,'ci.json'))),completedAt:new Date().toISOString(),realProviderCalls:0};
+  const r={output,linuxOpenCode,revision:1,runId:'compat-replay-development-v2',status:'ready',sourceCommit,executionImage,hostOpenCode,bundle,toolchain,steps,inputs,ci:JSON.parse(fs.readFileSync(path.join(output,'ci-metadata.json'))),completedAt:new Date().toISOString(),realProviderCalls:0};
   const pending=path.join(output,'readiness.pending.json'),dest=path.join(output,'readiness.json');privateJSON(pending,r);
   verifyReadiness(pending,{bundle,toolchain,hostOpenCode,executionImage});fs.renameSync(pending,dest);
   console.log('READY '+dest);return r;
