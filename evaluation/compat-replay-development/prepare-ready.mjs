@@ -41,7 +41,7 @@ export async function collectCI(sourceCommit,output) {
   // Preserve GitHub output, including the checkout commit actually used by each substantive job.
   ci.checkouts=[];
   for(const name of ['Native product and model-free evaluation','Evaluation container boundary']){
-    const job=jobs.jobs.find(j=>j.name===name),log=command('gh',['run','view',String(run.id),'--job',String(job.id),'--log'],repository,{timeout:60000,maxBuffer:32*1024*1024});
+    const job=jobs.jobs.find(j=>j.name===name),log=command('gh',['api','--allow-escape-sequences','repos/Tah10n/opencode-harness/actions/jobs/'+job.id+'/logs'],repository,{timeout:60000,maxBuffer:32*1024*1024});
     const lines=log.split('\n'),at=lines.findIndex(l=>l.includes('git log -1 --format=%H'));
     const commit=at<0?null:lines[at+1]?.match(/\b[a-f0-9]{40}\b/)?.[0];
     if(!commit)throw Error('Cannot establish actual CI checkout');

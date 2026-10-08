@@ -23,6 +23,8 @@ if(process.argv[2]!=='--child'){
     console.log(result.stdout.trim());
   }finally{fs.rmSync(temp,{recursive:true,force:true});}
 }else{
+  // This isolated subprocess models pinned tools; CI itself may use a newer Node 24.
+  Object.defineProperty(process,'version',{value:'v24.19.0'});
   const temp=process.argv[3],{prepare,runPrepared}=await import('./campaign.mjs'),{snapshot,verifyReadiness}=await import('./readiness.mjs'),{hashFile}=await import('../support/output-files.mjs'),{campaignFor}=await import('./suite.mjs');
   const work=path.join(repository,'local/regression');fs.mkdirSync(work,{recursive:true});
   const bundle=work+'/bundle',toolchain=work+'/toolchain',hostOpenCode=temp+'/bin/opencode',executionImage='sha256:'+'1'.repeat(64);
@@ -31,7 +33,7 @@ if(process.argv[2]!=='--child'){
   const {executeStep}=await import('./prepare-ready.mjs');const steps=[];
   for(const name of requiredSteps)steps.push(await executeStep({name,argv:[process.execPath,'-e','process.exit(0)'],output:work}));
   const sourceCommit=spawnSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).stdout.trim(),inputs=snapshot({bundle,toolchain,hostOpenCode,executionImage});
-  const required={ 'Native product and model-free evaluation':['npm run verify','Actual installed local-provider checks'],'Evaluation container boundary':['Verify real isolation, descendant stop and private capture','Experimental compatibility replay and native corrective delivery','Complete compatibility scripted schedule'],'Harness verification':['Require actually executed checks']};
+  const required={ 'Native product and model-free evaluation':['Run npm run verify','Actual installed local-provider checks'],'Evaluation container boundary':['Verify real isolation, descendant stop and private capture','Experimental compatibility replay and native corrective delivery','Complete compatibility scripted schedule'],'Harness verification':['Require actually executed checks']};
   const jobs=Object.entries(required).map(([name,names],i)=>({id:i+1,run_id:1,name,status:'completed',conclusion:'success',completed_at:new Date().toISOString(),steps:names.map(name=>({name,status:'completed',conclusion:'success'}))}));
   const ci={run:{id:1,head_sha:sourceCommit,status:'completed',conclusion:'success',event:'pull_request',repository:{full_name:'Tah10n/opencode-harness'},pull_requests:[{number:36}]},jobs:{jobs},checkouts:jobs.slice(0,2).map(j=>({name:j.name,jobId:j.id,commit:sourceCommit,sourceManifest:inputs.sourceManifest,log:steps[0].log}))};
   const linuxOpenCode=hostOpenCode;steps.forEach((s,i)=>{s.command=preparationCommands(work,sourceCommit,linuxOpenCode)[i];});

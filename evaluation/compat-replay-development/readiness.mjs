@@ -62,7 +62,7 @@ export function verifyCI(ci,sourceCommit) {
   const run=ci?.run,jobs=ci?.jobs?.jobs;
   if(!run||run.head_sha!==sourceCommit||run.status!=='completed'||run.conclusion!=='success'||run.event!=='pull_request'||run.repository?.full_name!=='Tah10n/opencode-harness'||!run.pull_requests?.some(p=>p.number===36)||!Array.isArray(jobs))throw Error('Readiness requires completed successful PR #36 CI on source commit');
   const required={
-    'Native product and model-free evaluation':['npm run verify','Actual installed local-provider checks'],
+    'Native product and model-free evaluation':['Run npm run verify','Actual installed local-provider checks'],
     'Evaluation container boundary':['Verify real isolation, descendant stop and private capture','Experimental compatibility replay and native corrective delivery','Complete compatibility scripted schedule'],
     'Harness verification':['Require actually executed checks'],
   };
