@@ -1,0 +1,13 @@
+{
+  "id": "01-invoice-discount",
+  "category": "related-files",
+  "title": "Per-line invoice discounts",
+  "feature": [
+    "fd01.discount-roundtrip",
+    "fd01.discount-validation"
+  ],
+  "preservation": [
+    "fd01.legacy-shape-and-validation"
+  ],
+  "wrongControl": "Discount example works, but quantity validation is accidentally removed."
+}

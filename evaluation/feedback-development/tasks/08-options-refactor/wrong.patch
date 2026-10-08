@@ -1,0 +1,44 @@
+diff --git a/src/json.mjs b/src/json.mjs
+index 778f0371d5a8b085772934c786a381ae5d98ba46..e8b9d38ae834feb843a6c75c564d1d3ba8b19333 100644
+--- a/src/json.mjs
++++ b/src/json.mjs
+@@ -1,8 +1,2 @@
+-export function jsonReport(options={}) {
+-
+- const attempts=options.attempts===undefined?3:options.attempts;
+- const timeout=options.timeout===undefined?250:options.timeout;
+- if(!Number.isInteger(attempts)||attempts<1||attempts>10)throw new RangeError('attempts');
+- if(!Number.isFinite(timeout)||timeout<0)throw new RangeError('timeout');
+- return {attempts,timeout};
+-}
++import {normalize} from './options.mjs';
++export function jsonReport(options={}) {return normalize(options);}
+diff --git a/src/options.mjs b/src/options.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..4919d3b87e3276cfe48f51a0fc80215cd67215f9
+--- /dev/null
++++ b/src/options.mjs
+@@ -0,0 +1,8 @@
++export function normalize(options={}) {
++
++ const attempts=options.attempts===undefined?3:options.attempts;
++ const timeout=options.timeout===undefined?250:options.timeout;
++ if(!Number.isInteger(attempts)||attempts<1||attempts>10)throw new RangeError('attempts');
++ if(!Number.isFinite(timeout)||timeout<0)throw new RangeError('timeout');
++ return {attempts,timeout};
++}
+diff --git a/src/text.mjs b/src/text.mjs
+index 12a17738af9abd2f30f12428d89cca020db3f0ce..2e15b430fe494622ef42a06aa48f5ddb8a0190c6 100644
+--- a/src/text.mjs
++++ b/src/text.mjs
+@@ -1,8 +1,5 @@
++import {normalize} from './options.mjs';
+ export function textReport(options={}) {
+-
+- const attempts=options.attempts===undefined?3:options.attempts;
+- const timeout=options.timeout===undefined?250:options.timeout;
+- if(!Number.isInteger(attempts)||attempts<1||attempts>10)throw new RangeError('attempts');
+- if(!Number.isFinite(timeout)||timeout<0)throw new RangeError('timeout');
++ const {attempts,timeout}=normalize();
+  return `attempts=${attempts}; timeout=${timeout}`;
+ }

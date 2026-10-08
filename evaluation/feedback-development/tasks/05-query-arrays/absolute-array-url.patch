@@ -1,0 +1,17 @@
+diff --git a/src/query.mjs b/src/query.mjs
+index 8460a08579f06d887120de9a16d24f01c40f339e..44b377a2738067995932e2c585e0917567592825 100644
+--- a/src/query.mjs
++++ b/src/query.mjs
+@@ -3,7 +3,10 @@ export function withQuery(input,updates) {
+  const at=bare.indexOf('?'), base=at<0?bare:bare.slice(0,at), params=new URLSearchParams(at<0?'':bare.slice(at+1));
+  for(const [key,value] of Object.entries(updates)) {
+   if(value===undefined)continue;
+-  if(value===null)params.delete(key); else params.set(key,String(value));
++  if(Array.isArray(value)) {
++   if(value.some(item=>!['string','number','boolean'].includes(typeof item)||(typeof item==='number'&&!Number.isFinite(item))))throw new TypeError('array values');
++   params.delete(key);for(const item of value)params.append(key,String(item));
++  } else if(value===null)params.delete(key); else params.set(key,String(value));
+  }
+- const text=params.toString();return base+(text?'?'+text:'')+hash;
++ const text=params.toString();const result=base+(text?'?'+text:'')+hash;return Object.values(updates).some(v=>Array.isArray(v)&&v.length)?new URL(result,'https://example.test').href:result;
+ }

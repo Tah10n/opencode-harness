@@ -1,0 +1,24 @@
+diff --git a/src/events.mjs b/src/events.mjs
+index 0ea98b65360c2b52f9efe776c5e5d2ff8836113a..b3e486fb16292f674b3da3cb99330c1f26477d34 100644
+--- a/src/events.mjs
++++ b/src/events.mjs
+@@ -1,11 +1,16 @@
+ export class Events {
+  constructor(){this.listeners=new Map();}
+- on(name,fn) {
+-  const entry={fn}; const list=this.listeners.get(name)??[];list.push(entry);this.listeners.set(name,list);
++ on(name,fn,options={}) {
++  const entry={fn,once:options.once===true}; const list=this.listeners.get(name)??[];list.push(entry);this.listeners.set(name,list);
+   return ()=>{const current=this.listeners.get(name)??[], at=current.indexOf(entry);if(at<0)return false;current.splice(at,1);return true;};
+  }
+  emit(name,...args) {
+   const snapshot=[...(this.listeners.get(name)??[])];
+-  for(const entry of snapshot)if((this.listeners.get(name)??[]).includes(entry))entry.fn(...args);
++  for(const entry of snapshot) {
++   const current=this.listeners.get(name)??[],at=current.indexOf(entry); if(at<0)continue;
++   if(entry.once)current.splice(at,1);
++   entry.fn(...args);
++  }
++  return true;
+  }
+ }

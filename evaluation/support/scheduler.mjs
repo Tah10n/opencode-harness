@@ -48,13 +48,18 @@ export function knownResponseTerminal(record){return !!record.terminalResponse&&
 
 export function verifyFrozenSchedule(f,runTaskImplementation,fetchImpl=fetch){
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
- if(!['polybench','polybench-preflight','fixture'].includes(f.experimentKind))throw Error('Unsupported evaluation schedule; historical campaigns cannot resume');
+ if(!['polybench','polybench-preflight','fixture','feedback-development'].includes(f.experimentKind))throw Error('Unsupported evaluation schedule; historical campaigns cannot resume');
  if(f.experimentKind==='fixture'&&fetchImpl===fetch)throw Error('Fixtures cannot access provider');
  if(typeof runTaskImplementation!=='function'||typeof f.model!=='string'||!/^openai\/[^/\s]+$/.test(f.model)||typeof f.variant!=='string'||!f.variant||!Number.isSafeInteger(f.budgetMs)||f.budgetMs<=0||f.budgetMs>3600000||!f.preflightPassed)throw Error('Invalid frozen configuration');
  for(const [file,digest] of Object.entries(f.files))if(sha(fs.readFileSync(file))!==digest)throw Error('Frozen file changed: '+file);
  for(const [directory,expected]of Object.entries(f.runtimeManifests??{}))if(JSON.stringify(manifest(directory))!==JSON.stringify(expected))throw Error('Runtime/dependencies/input changed: '+directory);
  if(new Set(f.attempts.map(a=>a.slot)).size!==f.attempts.length||f.attempts.some((a,i)=>a.slot!==i+1)||!f.attempts.length)throw Error('Invalid slot identity');
- if(f.experimentKind!=='fixture'){
+ if(f.experimentKind==='feedback-development'){
+  if(f.budgetMs!==600000||f.strategy!=='per-slot'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.length!==16)throw Error('Invalid feedback development budget/allocation');
+  const tasks=new Set();
+  for(let i=0;i<16;i+=2){const a=f.attempts[i],b=f.attempts[i+1];if(a.task!==b.task||tasks.has(a.task)||[a.arm,b.arm].join(',')!==(i%4===0?'direct,D':'D,direct')||a.source!==b.source)throw Error('Invalid feedback development pair/order');tasks.add(a.task);}
+ }
+ if(!['fixture','feedback-development'].includes(f.experimentKind)){
   const consolidated=nativeCampaign(f.campaign),remaining=f.campaign==='consolidated-remaining-v1',quality=qualityCampaign(f.campaign);
   if(f.campaign&&!consolidated)throw Error('Unsupported PolyBench campaign');
   const spec=quality?qualitySpecification(f.campaign):null;

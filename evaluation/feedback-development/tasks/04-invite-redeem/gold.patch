@@ -1,0 +1,14 @@
+diff --git a/src/invites.mjs b/src/invites.mjs
+index 0a4bf80b86462b61e4698c1683e7df07060eb39d..1f187a54db090a267e8f3d029a8459b273b833a4 100644
+--- a/src/invites.mjs
++++ b/src/invites.mjs
+@@ -9,8 +9,8 @@ export class Invites {
+  }
+  redeem(token,user,team) {
+   const s=this.read(), invite=s.tokens[token]; if(!invite||invite.used)return false;
+-  invite.used=true; this.write(s);
+   if(typeof user!=='string'||!user.trim()||invite.team!==team)return false;
++  invite.used=true;
+   s.members[team]??=[]; if(!s.members[team].includes(user))s.members[team].push(user);
+   this.write(s); return true;
+  }
