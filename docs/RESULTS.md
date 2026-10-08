@@ -1,6 +1,8 @@
 # Results and limits
 
-**No sustained harness quality advantage is established.** These separate
+**No sustained harness quality advantage over Plain is established.** The primary
+product path remains [native instructions/config](../README.md#quick-start);
+task/direct/D and review remain experimental opt-ins. These separate
 campaigns have different runtimes, datasets and scoring contracts; they must not
 be pooled into a project success rate. Technical fixtures are not model lift.
 
@@ -8,15 +10,114 @@ The [feedback corrective preparation](../evaluation/feedback-development/evidenc
 records four more reproduced false-success controls and the model-free report,
 bundle and retained-container recovery regressions. It does not rerun or
 reclassify the stopped development campaign.
+The [exact-model technical follow-up](../evaluation/feedback-development/evidence/correction-v1/TITLE_AND_DELIVERY.md)
+records title none/refusal before correction, installed model/high frames after
+correction and synthetic direct/D delivery. It makes no model effectiveness claim.
 
-## Feedback development v1: stage-2 preparation
+## Plain / direct / D calibration: Plain ceiling, no D activation
+
+The [model-free post-hoc outbox diagnosis](../evaluation/feedback-development/evidence/calibration-run-v1/DIAGNOSIS.md)
+reproduces the wrong author expectation, the public-contract failure and the
+unchanged observer path. No correct contract check was present in the D
+trajectory; observer/workflow did not lose the signal. It changes no historical
+score. The decision is to keep
+D experimental: no materially new hypothesis is justified by the retained evidence.
+
+The [six-task calibration](../evaluation/feedback-development/evidence/calibration-run-v1/REPORT.md)
+completed exactly 18 one-shot P/H0/H1 attempts with unchanged Luna/high,
+OpenCode 1.18.26 and a shared 600-second external budget. All final independent
+evaluations are proven; delivery is 6/6 per mode. R/Q: **Plain 6/6, direct 6/6,
+D 5/6**. Direct/Plain has six ties; D has one loss versus either control and
+five ties, with zero unknown pairs. Plain has no observed headroom on this set.
+
+D corrections were zero in all six slots. The outbox failure already exists in
+D0: pending counts incorrectly exclude inflight work despite the public contract;
+author tests expect the wrong count. D0/final R is unchanged on all six tasks.
+One byte-different DAG patch only reorders seven identical diff sections;
+both complete representations independently pass. No artificial correction,
+new reviewer or product change followed. Direct uses 34.5% more native time and
+44.6% more input tokens than Plain on this fixed set. These are descriptive
+findings, with no general superiority or equivalence claim.
+
+The [18 slot records](../evaluation/feedback-development/evidence/calibration-run-v1/results.json)
+retain 375 complete Luna/high requests, 6,634,437 input / 265,548 output tokens,
+included cached/reasoning subsets and unknown money. All original eight tasks
+and v1/v2/v3 evidence remain historical and excluded. The separate bounded
+[deadline investigation](../evaluation/feedback-development/evidence/calibration-run-v1/DEADLINE.md)
+passed current stop controls while leaving the historical seal deadline FAIL
+**UNRESOLVED**, separate from the [current Actions server error](STATUS.md#publication-checkpoint-draft-pr-33).
+The outcome-blind [30 × 3 × 2 confirmation draft](../evaluation/feedback-development/calibration/CONFIRMATION_DRAFT.md)
+remains **NOT RUN**; its 30 task identities are not yet selected or prepared.
+There is no new candidate or automatic commitment to run 180 attempts.
+
+## Feedback development v3: no observed difference
+
+The separately authorized [development-run-v3](../evaluation/feedback-development/evidence/development-run-v3/REPORT.md)
+reused the current ordinary OpenCode OAuth connection after correcting native
+refresh/readiness. Sixteen fresh native attempts completed once on the unchanged
+Luna/high, OpenCode 1.18.26, Node 24.19.0, eight-task/600-second conditions.
+All [16 complete patches](../evaluation/feedback-development/evidence/development-run-v3/results.json)
+have proven R, delivery and Q: direct 8/8 and D 8/8; **Plain did not participate**.
+There are eight ties, zero wins/losses
+or unknown pairs, delta 0 pp. Native corrections were zero, required public checks
+passed and D0/final patches matched. This detects no advantage on the set and does
+not establish equivalence or superiority over ordinary OpenCode.
+
+There were 350 fully accounted provider requests, all actual Luna/high; returned
+model IDs are retained. Totals are 4,255,616 input / 110,217 output tokens, with
+cached/reasoning included subsets and money unknown. D used 11.7% more native time,
+11.0% less input and 19.4% more output. Fixtures, development, CI and authentication
+remain separate. V1/v2 are byte-identical and excluded; no retries, added probes,
+confirmation or default-strategy change followed.
+
+## Feedback development v2: expired authorization before provider
+
+The separately frozen [development-run-v2](../evaluation/feedback-development/evidence/development-run-v2/REPORT.md)
+started slot 1 (task 01 direct) once after the corrected pair-aggregation checks,
+contained 24+6 preflight, exact-model scripted/deadline controls and source CI.
+The actual title frame requested gpt-5.6-luna/high. Existing OAuth access had
+expired, so admission closed before forwarding or author work. There were zero
+provider requests, normal completions and participant tokens; 15 slots remained
+not_started. No D correction, probe, substitution, repair or retry followed.
+
+All [16 records](../evaluation/feedback-development/evidence/development-run-v2/results.json)
+are retained. The complete empty patch has proven artifact R=false/Q=false and
+delivery=false; it is not a failed model solution. There are zero measured pairs,
+eight unknown pairs, wins/losses/ties 0/0/0 and null delta. This is technically
+incomplete measurement with no evidence about correction usefulness. V1 evidence
+remains byte-identical and is excluded from the new figures.
+
+The [pair admission regression](../evaluation/feedback-development/evidence/correction-v1/PAIR_ADMISSION.md)
+reproduces a false +12.5 pp candidate win through the actual report reader and
+fixes it to seven ties, one unknown and null delta. Proven failed scores remain
+measured; nullable or unproven grading does not enter wins/losses/ties.
+
+## Feedback development v1: stage-3 admission stopped before provider
+
+The [bounded development run](../evaluation/feedback-development/evidence/development-run-v1/REPORT.md)
+entered slot 1 (direct) once, then closed admission before any upstream request.
+OpenCode's actual title frame requested gpt-5.6-luna with reasoning effort
+`none`; the committed freeze requires `high` for every request. The guard refused
+it before credential access, and six subsequent work frames were blocked by the
+persisted pause. Real provider requests and participant tokens are zero. The
+remaining fifteen slots are not_started; no D author or correction ran.
+
+All [sixteen records](../evaluation/feedback-development/evidence/development-run-v1/results.json),
+the captured empty full patch and its independent R=false evaluation are retained.
+Delivery=false and Q=false describe this technical artifact, not a model task
+failure. All eight pairs, Q rates, delta and relative D expense remain unknown.
+The real comparison did not occur and offers no evidence about D effectiveness.
+The runtime, task set, checks, budget and conditions were not changed after
+admission; the stopped campaign was not restarted.
+
+## Feedback development v1: historical stage-2 preparation
 
 The separate [eight-task Node.js development set](../evaluation/feedback-development/README.md)
 prepares direct as control and D as candidate on the accepted PR #31 runtime.
 Baseline, gold and plausible wrong-patch controls, independent stable-ID scoring,
 installed scripted delivery and deadline controls are model-free evidence. The
-future sixteen-run protocol has no real outcomes; model/variant/environment
-selection and explicit model-run authorization remain outstanding. The
+then-future sixteen-run protocol had no real outcomes; its model/variant/environment
+selection and explicit model-run authorization were still outstanding. The
 [acceptance repair report](../evaluation/feedback-development/evidence/ACCEPTANCE_FIX.md)
 separates reproduced original false successes from the corrected preflight and
 scripted delivery. The [initial model-free report](../evaluation/feedback-development/evidence/MODEL_FREE.md)

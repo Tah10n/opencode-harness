@@ -1,0 +1,62 @@
+diff --git a/src/dispatch.mjs b/src/dispatch.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..f5122d29d21dcd34cb6d50754c95182e5b8cb551
+--- /dev/null
++++ b/src/dispatch.mjs
+@@ -0,0 +1,13 @@
++export async function dispatch(outbox,ids) {
++ const sent=[],failed=[];
++ const change=(id,fn)=>{const s=outbox.store.load(),r=s.records.find(r=>r.id===id);fn(r);outbox.store.save(s);return structuredClone(r);};
++ for(const id of ids) {
++  const r=change(id,r=>{r.status='inflight';r.attempts++;});
++  let error=null;
++  try { await outbox.send({id:r.id,payload:structuredClone(r.payload),sequence:r.sequence}); }
++  catch(e) { error=String(e?.message??e); }
++  change(id,r=>{r.status=error===null?'sent':'pending';r.lastError=error;});
++  (error===null?sent:failed).push(id);
++ }
++ return {sent,failed,remaining:outbox.snapshot().records.filter(r=>r.status==='pending').map(r=>r.id)};
++}
+diff --git a/src/queue.mjs b/src/queue.mjs
+index 89bb94ffb60ecdffcd927a2b646849048735a103..25bad50d09ab5a2e49c07c3c27435da0ccdfaa34 100644
+--- a/src/queue.mjs
++++ b/src/queue.mjs
+@@ -1,9 +1,26 @@
+ import {message} from './message.mjs';
++import {dispatch} from './dispatch.mjs';
+ export class Outbox {
+- constructor(store,send) { this.store=store;this.send=send; }
++ constructor(store,send) {
++  this.store=store;this.send=send;this.active=null;this.closed=false;
++  const s=store.load();let changed=false;
++  for(const r of s.records)if(r.status==='inflight'){r.status='pending';changed=true;}
++  if(changed)store.save(s);
++ }
+  enqueue(id,payload) {
+-  const s=this.store.load();const old=s.records.find(r=>r.id===id);if(old)return structuredClone(old);
++  if(this.closed)throw new Error('closed');
++  if(typeof id!=='string'||!id.trim())throw new TypeError('id');
++  const s=this.store.load(),old=s.records.find(r=>r.id===id);if(old)return structuredClone(old);
+   const r=message(id,payload,s.nextSequence++);s.records.push(r);this.store.save(s);return structuredClone(r);
+  }
+  snapshot() { return this.store.load(); }
++ drain({limit=Infinity}={}) {
++  if(this.closed)return Promise.reject(new Error('closed'));
++  if(limit!==Infinity&&(!Number.isSafeInteger(limit)||limit<0))return Promise.reject(new RangeError('limit'));
++  if(this.active)return this.active;
++  const ids=this.snapshot().records.filter(r=>r.status==='pending').sort((a,b)=>a.sequence-b.sequence).slice(0,limit).map(r=>r.id);
++  this.active=Promise.resolve().then(()=>dispatch(this,ids)).finally(()=>{this.active=null;});
++  return this.active;
++ }
++ async close() { this.closed=true;await this.active; }
+ }
+diff --git a/src/status.mjs b/src/status.mjs
+index 1523371df5ac0061c4f7a4ee7e69f965ebda9694..5ee3f87ef8cacceb7c70e845076c9ecd680bda68 100644
+--- a/src/status.mjs
++++ b/src/status.mjs
+@@ -1,4 +1,4 @@
+ export function counts(outbox) {
+  const records=outbox.snapshot().records;
+- return {pending:records.filter(r=>r.status==='pending').length,sent:records.filter(r=>r.status==='sent').length};
++ return {pending:records.filter(r=>r.status!=='sent').length,sent:records.filter(r=>r.status==='sent').length};
+ }

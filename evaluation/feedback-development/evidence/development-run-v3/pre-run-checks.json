@@ -1,0 +1,140 @@
+{
+  "runId": "development-run-v3",
+  "testedExecutableSource": "5351a3b642077a3541d4e734a3d818a487a9fa2c",
+  "conditionsHead": "779fb00ea8bab16e3e5da6695c76c622e70d26b0",
+  "preparationSha256": "b22cd2c65f9c3e41efe150058945f29ac5868dc38457bd0c3d2b33406ab52b56",
+  "modelFree": true,
+  "realInferenceCalls": 0,
+  "currentConnectionReadiness": {
+    "passed": true,
+    "sourceKind": "file",
+    "type": "oauth",
+    "currentAccessReady": true,
+    "authRefreshCalls": 0,
+    "inferenceCalls": 0
+  },
+  "authRegressions": {
+    "passed": true,
+    "synthetic": true,
+    "realInferenceRequests": 0,
+    "realAuthorizationRequests": 0,
+    "sourceResolution": true,
+    "currentRecordReread": true,
+    "expiryAfterReadiness": true,
+    "nativeRefreshSingleFlight": true,
+    "failedRefreshUnchanged": true,
+    "deadlineCancellation": true,
+    "readinessBeforePreparation": true,
+    "shortBudgetAsyncAuth": true,
+    "secretFreeStatus": true,
+    "nativeSourceHashVerified": true
+  },
+  "localStandard": {
+    "npmRunVerify": "PASS",
+    "source": "5351a3b642077a3541d4e734a3d818a487a9fa2c",
+    "checks": 21
+  },
+  "localInstalled": {
+    "passed": true,
+    "testedSource": "ee43fcbf1320a8f076ae9a5e36b34a1ecaf0652c",
+    "runtimeVersion": "1.18.26",
+    "scenarios": 39,
+    "syntheticRequests": 298,
+    "testedNativeAndScriptBytesUnchangedInFinalSource": true,
+    "experimentalSchedulerNotCoveredByTheseProductChecks": true
+  },
+  "containedPreflight": {
+    "passed": true,
+    "originalControls": 24,
+    "negativeControls": 6,
+    "receiptSha256": "71bebc4c1a236bc1d652716d533064e356d36680f977018a079027b309e32832",
+    "executionEnvironment": {
+      "executionImage": "sha256:6ddc119af8a204548428504ef970a44640edfaa3238deacb558825ee25bce181",
+      "nodeVersion": "24.19.0",
+      "runtimeVersion": "1.18.26",
+      "npmVersion": "11.17.0",
+      "gitVersion": "git version 2.39.5",
+      "binarySha256": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe"
+    }
+  },
+  "exactModelScripted": {
+    "passed": true,
+    "receiptSha256": "da211d9447d4ae8c027fc5db66673f2b22f08420317912dd8b2e0fd8c3de466a",
+    "frames": 31,
+    "model": "openai/gpt-5.6-luna",
+    "variant": "high",
+    "allFramesMatch": true,
+    "realProviderCalls": 0,
+    "rows": [
+      {
+        "arm": "direct",
+        "R": false,
+        "evaluationProven": true,
+        "delivery": true,
+        "Q": false,
+        "corrections": 0
+      },
+      {
+        "arm": "D",
+        "R": true,
+        "evaluationProven": true,
+        "delivery": true,
+        "Q": true,
+        "corrections": 1
+      }
+    ]
+  },
+  "deadlineControls": {
+    "passed": true,
+    "receiptSha256": "1dedb3dfd8a609972e3d19ec658c2ea978f5379cfd275a69874e978cc0857e5c",
+    "controls": [
+      {
+        "arm": "direct",
+        "timedOut": true,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0
+      },
+      {
+        "arm": "D",
+        "timedOut": true,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0
+      }
+    ]
+  },
+  "sourceCI": {
+    "head": "5351a3b642077a3541d4e734a3d818a487a9fa2c",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "Evaluation container boundary",
+        "conclusion": "success"
+      },
+      {
+        "name": "Native product and model-free evaluation",
+        "conclusion": "success"
+      },
+      {
+        "name": "Harness verification",
+        "conclusion": "success"
+      }
+    ],
+    "url": "https://github.com/Tah10n/opencode-harness/actions/runs/37449240643"
+  },
+  "firstSourceFailure": {
+    "source": "ee43fcbf1320a8f076ae9a5e36b34a1ecaf0652c",
+    "localShortDeadline": "FAIL before auth dispatch: fractional AbortSignal.timeout RangeError",
+    "originalSourceCI": "FAIL",
+    "originalSourceCIURL": "https://github.com/Tah10n/opencode-harness/actions/runs/37447185231",
+    "reproducedThroughActualScheduler": true,
+    "integerFloorFixPreservesBudget": true,
+    "originalReceiptsRetained": true,
+    "realInferenceCalls": 0
+  },
+  "historicalRunsUnchanged": true,
+  "nativeAttemptsBeforeAdmission": 0
+}

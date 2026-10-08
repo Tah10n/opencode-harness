@@ -1,0 +1,1098 @@
+{
+  "runId": "development-run-v2",
+  "suite": "feedback-development-v1",
+  "kind": "development-screening",
+  "status": "stopped_before_provider",
+  "outcomeClass": "technically_incomplete_measurement",
+  "conditionsHead": "779fb00ea8bab16e3e5da6695c76c622e70d26b0",
+  "reviewedHead": "ab35be599df62873e763271b4f7116c1293618ae",
+  "verifiedSourceCommit": "ab35be599df62873e763271b4f7116c1293618ae",
+  "preRunCommit": "1312ac79c32fb2fe5b5eb38ebfd9616acbfc2e48",
+  "basePRHead": "b7f9f1dce50139488254b12ea7924fa07b1ca084",
+  "freezeSha256": "9b65c8a4ff79bb33ef7ce7a87eb1d4e5950bfc8e6d06287bacd75ae2a4256e5b",
+  "executionSealSha256": "f2dc58ffdef3224014c9b233c5e40cdb928656237a5c8f78fd8edef6412bdfc8",
+  "rawReportSha256": "771dfbc8e006457bb8ea2f0cf93a434ca3ede0c1645fca5cdc1c3c90b9c1c02e",
+  "configuredModel": "openai/gpt-5.6-luna",
+  "configuredVariant": "high",
+  "modelLevelReasoningEffort": "high",
+  "executionImage": "sha256:6ddc119af8a204548428504ef970a44640edfaa3238deacb558825ee25bce181",
+  "executionEnvironment": {
+    "executionImage": "sha256:6ddc119af8a204548428504ef970a44640edfaa3238deacb558825ee25bce181",
+    "nodeVersion": "24.19.0",
+    "runtimeVersion": "1.18.26",
+    "npmVersion": "11.17.0",
+    "gitVersion": "git version 2.39.5",
+    "binarySha256": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe"
+  },
+  "bundleManifestSha256": "618db25cdf0bfac4ba3d3efa5abbbaaa7b15e2f4ada11214b27f959b2cced33a",
+  "dependenciesLockSha256": "9ddca616bb0cf944c76d6f12f6adb66fa937d39cd0274eb8d5ffa7555b954aba",
+  "budgetMs": 600000,
+  "modelRunsAuthorized": true,
+  "counts": {
+    "scheduled": 16,
+    "nativeAttemptsStarted": 1,
+    "nativeNormallyCompleted": 0,
+    "locallyTerminatedAndCaptured": 1,
+    "notStarted": 15,
+    "realProviderRequests": 0,
+    "relayFrames": 1,
+    "authorStagesStarted": 0,
+    "DNativeCorrections": 0,
+    "independentEvaluations": 1
+  },
+  "actualRequestModels": [
+    {
+      "slot": 1,
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": false
+    }
+  ],
+  "providerReturnedModels": [],
+  "providerModelIdentity": "unobserved; no request forwarded",
+  "pause": {
+    "kind": "authorization_unavailable",
+    "slot": 1,
+    "cause": "existing_oauth_expired"
+  },
+  "rows": [
+    {
+      "slot": 1,
+      "task": "01-invoice-discount",
+      "arm": "direct",
+      "R": false,
+      "diagnosticR": false,
+      "evaluationProven": true,
+      "delivery": false,
+      "Q": false,
+      "providerConfirmed": false,
+      "authorCompleted": false,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": 0,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 1135.9862919999996,
+      "preparationElapsedMs": 1349.7973330000382,
+      "evaluationElapsedMs": 409.166125,
+      "evaluationCleanupElapsedMs": 71.18512500000003,
+      "cleanupElapsedMs": 78.83116599999994,
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd01.discount-roundtrip",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd01.discount-validation",
+          "status": "FAIL"
+        },
+        {
+          "type": "obligation",
+          "id": "fd01.legacy-shape-and-validation",
+          "status": "PASS"
+        }
+      ],
+      "environmentErrors": [],
+      "unknownResults": [
+        "Normal author completion unproven",
+        "Provider completion or forwarding unproven"
+      ],
+      "status": "technical_stop",
+      "modelBackedOutcome": null,
+      "technicalOutcome": "authorization_unavailable",
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "relayFrames": 1,
+      "authorStagesStarted": 0,
+      "correctionPassesObserved": 0,
+      "nativeCompletion": false,
+      "evaluationStatus": "FAIL",
+      "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "patchBytes": 0,
+      "measurementReason": "Existing OAuth access expired; first high-effort title request was refused before provider forwarding and before author work."
+    },
+    {
+      "slot": 2,
+      "task": "01-invoice-discount",
+      "arm": "D",
+      "R": null,
+      "diagnosticR": null,
+      "evaluationProven": false,
+      "delivery": null,
+      "Q": null,
+      "providerConfirmed": null,
+      "authorCompleted": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": null,
+      "preparationElapsedMs": null,
+      "evaluationElapsedMs": null,
+      "evaluationCleanupElapsedMs": null,
+      "cleanupElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "modelBackedOutcome": null,
+      "technicalOutcome": null,
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "relayFrames": 0,
+      "authorStagesStarted": 0,
+      "correctionPassesObserved": 0,
+      "nativeCompletion": null
+    },
+    {
+      "slot": 3,
+      "task": "02-cli-limit",
+      "arm": "D",
+      "R": null,
+      "diagnosticR": null,
+      "evaluationProven": false,
+      "delivery": null,
+      "Q": null,
+      "providerConfirmed": null,
+      "authorCompleted": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": null,
+      "preparationElapsedMs": null,
+      "evaluationElapsedMs": null,
+      "evaluationCleanupElapsedMs": null,
+      "cleanupElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "modelBackedOutcome": null,
+      "technicalOutcome": null,
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "relayFrames": 0,
+      "authorStagesStarted": 0,
+      "correctionPassesObserved": 0,
+      "nativeCompletion": null
+    },
+    {
+      "slot": 4,
+      "task": "02-cli-limit",
+      "arm": "direct",
+      "R": null,
+      "diagnosticR": null,
+      "evaluationProven": false,
+      "delivery": null,
+      "Q": null,
+      "providerConfirmed": null,
+      "authorCompleted": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": null,
+      "preparationElapsedMs": null,
+      "evaluationElapsedMs": null,
+      "evaluationCleanupElapsedMs": null,
+      "cleanupElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "modelBackedOutcome": null,
+      "technicalOutcome": null,
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "relayFrames": 0,
+      "authorStagesStarted": 0,
+      "correctionPassesObserved": 0,
+      "nativeCompletion": null
+    },
+    {
+      "slot": 5,
+      "task": "03-wallet-cancel",
+      "arm": "direct",
+      "R": null,
+      "diagnosticR": null,
+      "evaluationProven": false,
+      "delivery": null,
+      "Q": null,
+      "providerConfirmed": null,
+      "authorCompleted": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": null,
+      "preparationElapsedMs": null,
+      "evaluationElapsedMs": null,
+      "evaluationCleanupElapsedMs": null,
+      "cleanupElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "modelBackedOutcome": null,
+      "technicalOutcome": null,
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "relayFrames": 0,
+      "authorStagesStarted": 0,
+      "correctionPassesObserved": 0,
+      "nativeCompletion": null
+    },
+    {
+      "slot": 6,
+      "task": "03-wallet-cancel",
+      "arm": "D",
+      "R": null,
+      "diagnosticR": null,
+      "evaluationProven": false,
+      "delivery": null,
+      "Q": null,
+      "providerConfirmed": null,
+      "authorCompleted": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": null,
+      "preparationElapsedMs": null,
+      "evaluationElapsedMs": null,
+      "evaluationCleanupElapsedMs": null,
+      "cleanupElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "modelBackedOutcome": null,
+      "technicalOutcome": null,
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "relayFrames": 0,
+      "authorStagesStarted": 0,
+      "correctionPassesObserved": 0,
+      "nativeCompletion": null
+    },
+    {
+      "slot": 7,
+      "task": "04-invite-redeem",
+      "arm": "D",
+      "R": null,
+      "diagnosticR": null,
+      "evaluationProven": false,
+      "delivery": null,
+      "Q": null,
+      "providerConfirmed": null,
+      "authorCompleted": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": null,
+      "preparationElapsedMs": null,
+      "evaluationElapsedMs": null,
+      "evaluationCleanupElapsedMs": null,
+      "cleanupElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "modelBackedOutcome": null,
+      "technicalOutcome": null,
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "relayFrames": 0,
+      "authorStagesStarted": 0,
+      "correctionPassesObserved": 0,
+      "nativeCompletion": null
+    },
+    {
+      "slot": 8,
+      "task": "04-invite-redeem",
+      "arm": "direct",
+      "R": null,
+      "diagnosticR": null,
+      "evaluationProven": false,
+      "delivery": null,
+      "Q": null,
+      "providerConfirmed": null,
+      "authorCompleted": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": null,
+      "preparationElapsedMs": null,
+      "evaluationElapsedMs": null,
+      "evaluationCleanupElapsedMs": null,
+      "cleanupElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "modelBackedOutcome": null,
+      "technicalOutcome": null,
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "relayFrames": 0,
+      "authorStagesStarted": 0,
+      "correctionPassesObserved": 0,
+      "nativeCompletion": null
+    },
+    {
+      "slot": 9,
+      "task": "05-query-arrays",
+      "arm": "direct",
+      "R": null,
+      "diagnosticR": null,
+      "evaluationProven": false,
+      "delivery": null,
+      "Q": null,
+      "providerConfirmed": null,
+      "authorCompleted": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": null,
+      "preparationElapsedMs": null,
+      "evaluationElapsedMs": null,
+      "evaluationCleanupElapsedMs": null,
+      "cleanupElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "modelBackedOutcome": null,
+      "technicalOutcome": null,
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "relayFrames": 0,
+      "authorStagesStarted": 0,
+      "correctionPassesObserved": 0,
+      "nativeCompletion": null
+    },
+    {
+      "slot": 10,
+      "task": "05-query-arrays",
+      "arm": "D",
+      "R": null,
+      "diagnosticR": null,
+      "evaluationProven": false,
+      "delivery": null,
+      "Q": null,
+      "providerConfirmed": null,
+      "authorCompleted": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": null,
+      "preparationElapsedMs": null,
+      "evaluationElapsedMs": null,
+      "evaluationCleanupElapsedMs": null,
+      "cleanupElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "modelBackedOutcome": null,
+      "technicalOutcome": null,
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "relayFrames": 0,
+      "authorStagesStarted": 0,
+      "correctionPassesObserved": 0,
+      "nativeCompletion": null
+    },
+    {
+      "slot": 11,
+      "task": "06-events-once",
+      "arm": "D",
+      "R": null,
+      "diagnosticR": null,
+      "evaluationProven": false,
+      "delivery": null,
+      "Q": null,
+      "providerConfirmed": null,
+      "authorCompleted": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": null,
+      "preparationElapsedMs": null,
+      "evaluationElapsedMs": null,
+      "evaluationCleanupElapsedMs": null,
+      "cleanupElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "modelBackedOutcome": null,
+      "technicalOutcome": null,
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "relayFrames": 0,
+      "authorStagesStarted": 0,
+      "correctionPassesObserved": 0,
+      "nativeCompletion": null
+    },
+    {
+      "slot": 12,
+      "task": "06-events-once",
+      "arm": "direct",
+      "R": null,
+      "diagnosticR": null,
+      "evaluationProven": false,
+      "delivery": null,
+      "Q": null,
+      "providerConfirmed": null,
+      "authorCompleted": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": null,
+      "preparationElapsedMs": null,
+      "evaluationElapsedMs": null,
+      "evaluationCleanupElapsedMs": null,
+      "cleanupElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "modelBackedOutcome": null,
+      "technicalOutcome": null,
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "relayFrames": 0,
+      "authorStagesStarted": 0,
+      "correctionPassesObserved": 0,
+      "nativeCompletion": null
+    },
+    {
+      "slot": 13,
+      "task": "07-config-merge",
+      "arm": "direct",
+      "R": null,
+      "diagnosticR": null,
+      "evaluationProven": false,
+      "delivery": null,
+      "Q": null,
+      "providerConfirmed": null,
+      "authorCompleted": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": null,
+      "preparationElapsedMs": null,
+      "evaluationElapsedMs": null,
+      "evaluationCleanupElapsedMs": null,
+      "cleanupElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "modelBackedOutcome": null,
+      "technicalOutcome": null,
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "relayFrames": 0,
+      "authorStagesStarted": 0,
+      "correctionPassesObserved": 0,
+      "nativeCompletion": null
+    },
+    {
+      "slot": 14,
+      "task": "07-config-merge",
+      "arm": "D",
+      "R": null,
+      "diagnosticR": null,
+      "evaluationProven": false,
+      "delivery": null,
+      "Q": null,
+      "providerConfirmed": null,
+      "authorCompleted": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": null,
+      "preparationElapsedMs": null,
+      "evaluationElapsedMs": null,
+      "evaluationCleanupElapsedMs": null,
+      "cleanupElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "modelBackedOutcome": null,
+      "technicalOutcome": null,
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "relayFrames": 0,
+      "authorStagesStarted": 0,
+      "correctionPassesObserved": 0,
+      "nativeCompletion": null
+    },
+    {
+      "slot": 15,
+      "task": "08-options-refactor",
+      "arm": "D",
+      "R": null,
+      "diagnosticR": null,
+      "evaluationProven": false,
+      "delivery": null,
+      "Q": null,
+      "providerConfirmed": null,
+      "authorCompleted": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": null,
+      "preparationElapsedMs": null,
+      "evaluationElapsedMs": null,
+      "evaluationCleanupElapsedMs": null,
+      "cleanupElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "modelBackedOutcome": null,
+      "technicalOutcome": null,
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "relayFrames": 0,
+      "authorStagesStarted": 0,
+      "correctionPassesObserved": 0,
+      "nativeCompletion": null
+    },
+    {
+      "slot": 16,
+      "task": "08-options-refactor",
+      "arm": "direct",
+      "R": null,
+      "diagnosticR": null,
+      "evaluationProven": false,
+      "delivery": null,
+      "Q": null,
+      "providerConfirmed": null,
+      "authorCompleted": null,
+      "internalStatus": null,
+      "corrections": null,
+      "requests": null,
+      "requestsWithoutUsage": null,
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "knownTokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "cached_tokens": null,
+        "reasoning_tokens": null
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": null,
+      "preparationElapsedMs": null,
+      "evaluationElapsedMs": null,
+      "evaluationCleanupElapsedMs": null,
+      "cleanupElapsedMs": null,
+      "obligations": [],
+      "environmentErrors": [],
+      "unknownResults": [
+        "result.json: ENOENT",
+        "provider-metadata.json: ENOENT"
+      ],
+      "status": "not_started",
+      "modelBackedOutcome": null,
+      "technicalOutcome": null,
+      "providerRequestsObserved": 0,
+      "providerUsageObserved": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "relayFrames": 0,
+      "authorStagesStarted": 0,
+      "correctionPassesObserved": 0,
+      "nativeCompletion": null
+    }
+  ],
+  "comparison": {
+    "kind": "development-screening",
+    "candidateWins": 0,
+    "candidateLosses": 0,
+    "ties": 0,
+    "unknownPairs": 8,
+    "deltaQPercentagePoints": null,
+    "pairs": [
+      {
+        "task": "01-invoice-discount",
+        "result": "unknown"
+      },
+      {
+        "task": "02-cli-limit",
+        "result": "unknown"
+      },
+      {
+        "task": "03-wallet-cancel",
+        "result": "unknown"
+      },
+      {
+        "task": "04-invite-redeem",
+        "result": "unknown"
+      },
+      {
+        "task": "05-query-arrays",
+        "result": "unknown"
+      },
+      {
+        "task": "06-events-once",
+        "result": "unknown"
+      },
+      {
+        "task": "07-config-merge",
+        "result": "unknown"
+      },
+      {
+        "task": "08-options-refactor",
+        "result": "unknown"
+      }
+    ],
+    "limitation": "Eight development tasks; no independent confirmation or statistically persuasive effectiveness claim.",
+    "measuredPairs": 0
+  },
+  "costs": {
+    "participants": {
+      "requests": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cached_tokens": 0,
+      "reasoning_tokens": 0,
+      "cachedAndReasoningAreIncludedSubsets": true,
+      "money": "unknown",
+      "nativeExecutionMs": 1135.9862919999996,
+      "preparationMs": 1349.7973330000382
+    },
+    "modelFreeChecks": {
+      "realProviderRequests": 0,
+      "syntheticUsageExcluded": true,
+      "money": "unknown"
+    },
+    "developer": {
+      "codexUsage": "unmetered; unknown",
+      "extraRealReviewerOrDiagnosticRequests": 0,
+      "money": "unknown"
+    },
+    "CI": {
+      "modelFree": true,
+      "realProviderRequests": 0,
+      "computeCost": "unknown"
+    },
+    "relativeDTimeAndTokens": null
+  },
+  "interpretation": "Technically incomplete measurement. No provider request or author work occurred. The proven R=false/Q=false grade of the empty captured baseline is an artifact evaluation, not a failed model solution. D was not started, no correction ran and no usefulness comparison is measurable. All eight pairs remain unknown.",
+  "verification": {
+    "aggregationBefore": {
+      "candidateWins": 1,
+      "candidateLosses": 0,
+      "ties": 7,
+      "unknownPairs": 0,
+      "deltaQPercentagePoints": 12.5
+    },
+    "aggregationAfter": {
+      "candidateWins": 0,
+      "candidateLosses": 0,
+      "ties": 7,
+      "unknownPairs": 1,
+      "deltaQPercentagePoints": null
+    },
+    "preRunChecksSha256": "9c78225b553d7b008a5ffeb92b6f4d6efa5bef102cb8d16845add147d62f6105",
+    "baseCI": {
+      "conclusion": "success",
+      "headSha": "b7f9f1dce50139488254b12ea7924fa07b1ca084",
+      "status": "completed",
+      "url": "https://github.com/Tah10n/opencode-harness/actions/runs/37385767594"
+    },
+    "sourceCI": {
+      "conclusion": "success",
+      "headSha": "ab35be599df62873e763271b4f7116c1293618ae",
+      "status": "completed",
+      "url": "https://github.com/Tah10n/opencode-harness/actions/runs/37386457340"
+    },
+    "reviewRefreshBeforeAdmission": {
+      "baseResolvedThreads": 9,
+      "baseUnresolvedThreads": 0,
+      "candidateThreads": 0,
+      "newBlockingComments": 0
+    },
+    "patchRoundtripVerified": true,
+    "terminationVerified": true,
+    "relayRemoved": true,
+    "activeProviderHandlers": 0,
+    "reportRepeated": true,
+    "requestNotRewritten": true
+  },
+  "unchangedConditionsAfterAdmission": true,
+  "additionalRealAttempts": 0,
+  "executableAdapterMutationsAfterAdmission": 0,
+  "historicalRunExcluded": "development-run-v1",
+  "privateEvidence": {
+    "sha256": "d1fba8c8974ae12b9109e520c0a55dca1177acd1a60ea9bb8ed0a8e50b096baa",
+    "bytes": 2242186,
+    "members": 707,
+    "allMemberBytesAndModesVerified": true,
+    "requestCapturePatchAndFreezeIncluded": true,
+    "credentialsIncluded": false,
+    "environmentReusesVerifiedHistoricalArchives": true
+  },
+  "cleanup": {
+    "ownedContainerRecordsAbsent": 77,
+    "removedAllocatedLocalBytes": 361132032,
+    "temporaryLocalPathsRemoved": 20,
+    "restoredExecutionImageRemoved": true,
+    "oldArchivesPreserved": true,
+    "globalPruneUsed": false,
+    "rawBatchAndCompactReceiptsRetained": true
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "kind": "post-hoc diagnosis of known error; not independent quality confirmation",
+  "inferenceRequests": 0,
+  "frozenSource": "2b45773455f48fcd886c4ef7407f84e9649721ad",
+  "sourceManifestSha256": "75835ed324cf6d964fbd4a42a5449db1bec900d6df5c956612ec718a7f025653",
+  "rows": [
+    {
+      "arm": "P",
+      "patchSha256": "cfb15d5065526f1558acb19051d0f703a98f70609cfabdec4d8c77bfb3c80629",
+      "authorSuite": {
+        "exit": 0,
+        "output": "✔ drain admits a fixed batch and overlapping calls join it (2.042791ms)\n✔ inflight records recover without resetting attempts (0.233458ms)\n✔ records and payloads are detached and duplicate IDs are stable (0.163791ms)\n✔ drain validates limits (0.156459ms)\n✔ legacy enqueue survives reopening (1.078125ms)\n✔ one bounded drain and retry on later drain (1.100875ms)\nℹ tests 6\nℹ suites 0\nℹ pass 6\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 56.171333\nnpm notice run c02-durable-outbox@1.0.0 test\nnpm notice run node --test test/*.test.mjs\n"
+      },
+      "publicContractProbe": {
+        "exit": 0,
+        "output": "✔ public counts.pending includes inflight: 2 (1.42075ms)\n✔ public counts.pending includes inflight: 3 (0.177708ms)\nℹ tests 2\nℹ suites 0\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 59.319333\n"
+      }
+    },
+    {
+      "arm": "H0",
+      "patchSha256": "16ecf754e769d9a9532d28b1c37ccbd9dd2e36444235c2b89e13bec7ef3552ee",
+      "observer": {
+        "allFieldsMatchAfterPathNormalization": true,
+        "eventsSha256": "3fb6a7a8ec2055217efe79b5d3cca49207e58776cc37041d8dfb22b683c3683f",
+        "snapshotSha256": "3f9a6bf94bd695c67a8f23e4552d0193b2b7873382467d9d8b7e5c284be3efac",
+        "reasons": [],
+        "correctionReasons": [],
+        "limits": [
+          "Uninterpreted command failures are retained; their relevance and any baseline/environment exception remain unverified.",
+          "Command execution observed: node --test --test-name-pattern='records and snapshots|overlapping drains|reopening recovers|drain validates|failed acknowledgement' test/public.test.mjs; completed_exit_0; internal runner results not interpreted by a supported adapter.",
+          "Command execution observed: node --test --test-name-pattern='legacy enqueue survives reopening|one bounded drain and retry' test/public.test.mjs; completed_exit_0; internal runner results not interpreted by a supported adapter.",
+          "Command execution observed: git diff --check; completed_exit_0; internal runner results not interpreted by a supported adapter.",
+          "Additional check failure has unresolved task relevance; no baseline/environment exception established: node --test --test-name-pattern='records and snapshots|overlapping drains|reopening recovers|drain validates|failed acknowledgement' test/public.test.mjs"
+        ],
+        "checksCurrent": true,
+        "finalPublicCheck": [
+          {
+            "eventIndex": 27,
+            "callID": "call_aPZYPhynbjJqp3K8YAwx3hzw",
+            "exit": 0,
+            "tests": 7,
+            "current": true,
+            "successful": true
+          }
+        ],
+        "retainedWrongAssertion": false
+      },
+      "D0EqualsFinal": true,
+      "authorSuite": {
+        "exit": 0,
+        "output": "✔ legacy enqueue survives reopening (1.238042ms)\n✔ records and snapshots are detached and duplicate enqueue is idempotent (0.144292ms)\n✔ one bounded drain and retry on later drain (0.433458ms)\n✔ overlapping drains use the first limit and preserve enqueues during dispatch (0.33275ms)\n✔ reopening recovers inflight records without resending acknowledged records (0.2175ms)\n✔ drain validates limits and close waits for its admitted drain (0.321583ms)\n✔ a failed acknowledgement save propagates without counting the record as sent (0.170541ms)\nℹ tests 7\nℹ suites 0\nℹ pass 7\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 57.483625\nnpm notice run c02-durable-outbox@1.0.0 test\nnpm notice run node --test test/*.test.mjs\n"
+      },
+      "publicContractProbe": {
+        "exit": 0,
+        "output": "✔ public counts.pending includes inflight: 2 (1.375833ms)\n✔ public counts.pending includes inflight: 3 (0.154916ms)\nℹ tests 2\nℹ suites 0\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 54.17175\n"
+      }
+    },
+    {
+      "arm": "H1",
+      "patchSha256": "e3be2c664a6f954dfeaa8d5ab6e8f3caab0b84fea8de07e9bd32ccdeb2e0ac71",
+      "observer": {
+        "allFieldsMatchAfterPathNormalization": true,
+        "eventsSha256": "6c6f3c5571f46208deb95069382ca362ee8e4e6dfcea590d490b0d86a71edcfb",
+        "snapshotSha256": "a82383afb608cb30921a98a8823bf6085bc2f532e42b8218a171c48523320093",
+        "reasons": [],
+        "correctionReasons": [],
+        "limits": [
+          "Command execution observed: node --test --test-name-pattern='enqueue preserves|drain joins|reopening recovers|limit validation|failed persistence' test/public.test.mjs; completed_exit_0; internal runner results not interpreted by a supported adapter.",
+          "Command execution observed: node --test --test-name-pattern='legacy enqueue|one bounded drain' test/public.test.mjs; completed_exit_0; internal runner results not interpreted by a supported adapter.",
+          "Command execution observed: node --test --test-name-pattern='enqueue preserves|enqueue rejects|drain joins|reopening recovers|limit validation|failed persistence' test/public.test.mjs; completed_exit_0; internal runner results not interpreted by a supported adapter."
+        ],
+        "checksCurrent": true,
+        "finalPublicCheck": [
+          {
+            "eventIndex": 28,
+            "callID": "call_16bbbe4b78d94684b2331a8e5d0eec46",
+            "exit": 0,
+            "tests": 8,
+            "current": true,
+            "successful": true
+          }
+        ],
+        "retainedWrongAssertion": true
+      },
+      "D0EqualsFinal": true,
+      "authorSuite": {
+        "exit": 0,
+        "output": "✔ legacy enqueue survives reopening (1.480334ms)\n✔ enqueue rejects empty IDs (0.229209ms)\n✔ enqueue preserves canonical records and detaches data (0.150667ms)\n✔ one bounded drain and retry on later drain (0.434042ms)\n✔ drain joins, dispatches sequentially, and leaves new records for later (0.362875ms)\n✔ reopening recovers inflight records without resending acknowledged records (0.191209ms)\n✔ limit validation is rejected and close waits for an admitted drain (0.318208ms)\n✔ a failed persistence does not acknowledge a sent record (0.212167ms)\nℹ tests 8\nℹ suites 0\nℹ pass 8\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 56.991625\nnpm notice run c02-durable-outbox@1.0.0 test\nnpm notice run node --test test/*.test.mjs\n"
+      },
+      "wrongAuthorExpectation": {
+        "exit": 0,
+        "output": "✔ drain joins, dispatches sequentially, and leaves new records for later (1.79225ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 55.673042\n"
+      },
+      "publicContractProbe": {
+        "exit": 1,
+        "output": "✖ public counts.pending includes inflight: 2 (2.15575ms)\n✖ public counts.pending includes inflight: 3 (0.258084ms)\nℹ tests 2\nℹ suites 0\nℹ pass 0\nℹ fail 2\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 54.965666\n\n✖ failing tests:\n\ntest at test/posthoc-contract.test.mjs:4:28\n✖ public counts.pending includes inflight: 2 (2.15575ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n  + actual - expected\n  \n    {\n  +   pending: 1,\n  -   pending: 2,\n      sent: 0\n    }\n  \n      at TestContext.<anonymous> (file:///private<disposable>/H1/test/posthoc-contract.test.mjs:12:10)\n      at async Test.run (node:internal/test_runner/test:1389:7)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: { pending: 1, sent: 0 },\n    expected: { pending: 2, sent: 0 },\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\n\ntest at test/posthoc-contract.test.mjs:4:28\n✖ public counts.pending includes inflight: 3 (0.258084ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n  + actual - expected\n  \n    {\n  +   pending: 2,\n  -   pending: 3,\n      sent: 0\n    }\n  \n      at TestContext.<anonymous> (file:///private<disposable>/H1/test/posthoc-contract.test.mjs:12:10)\n      at async Test.run (node:internal/test_runner/test:1389:7)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: { pending: 2, sent: 0 },\n    expected: { pending: 3, sent: 0 },\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\n"
+      }
+    }
+  ],
+  "retainedInputsUnchanged": true,
+  "disposableCopiesRemoved": true
+}

@@ -1,0 +1,13 @@
+{
+  "id": "c02-durable-outbox",
+  "category": "asynchronous-state",
+  "title": "Durable outbox dispatcher",
+  "feature": [
+    "fd10.overlap-order-and-close",
+    "fd10.failure-recovery-and-limits"
+  ],
+  "preservation": [
+    "fd10.legacy-id-and-snapshot"
+  ],
+  "wrongControl": "Marks rejected delivery sent, losing retryable durable work."
+}

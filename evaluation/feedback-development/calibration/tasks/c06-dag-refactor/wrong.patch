@@ -1,0 +1,66 @@
+diff --git a/src/index.mjs b/src/index.mjs
+index 77f4f692f43055631be04a9472b4458ddf50263c..cad9f0253f5793d0e1ef8e06728c11eb861a76ed 100644
+--- a/src/index.mjs
++++ b/src/index.mjs
+@@ -1 +1,2 @@
+ export {preview} from './preview.mjs';export {runJobs} from './run.mjs';export {formatPreview} from './format.mjs';
++export {planJobs} from './planner.mjs';
+diff --git a/src/planner.mjs b/src/planner.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..99b0c65befe91df24dbe8dac3a921b892a5de947
+--- /dev/null
++++ b/src/planner.mjs
+@@ -0,0 +1,12 @@
++import {normalize} from './normalize.mjs';
++export function planJobs(jobs,options) {
++
++ const {items,capacity}=normalize(jobs,options),done=new Set(),waves=[];
++ while(done.size<items.length) {
++  const ready=items.filter(j=>!done.has(j.id)&&j.needs.every(n=>done.has(n))).sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0);
++  let available=capacity;const wave=[];
++  for(const job of ready)if(job.slots<=available){wave.push(job.id);available-=job.slots;}
++  if(!wave.length)throw new Error('dependency cycle');waves.push(wave);wave.forEach(id=>done.add(id));
++ }
++ return {waves,order:waves.flat(),estimated: waves.reduce((sum,wave)=>sum+Math.max(...wave.map(id=>items.find(j=>j.id===id).seconds)),0)};
++}
+diff --git a/src/preview.mjs b/src/preview.mjs
+index 20890f90c2a94a14dd7326861c162e99695a6b88..b7600d7f7549171224378d552ac20d5321e1bb11 100644
+--- a/src/preview.mjs
++++ b/src/preview.mjs
+@@ -1,12 +1,2 @@
+-import {normalize} from './normalize.mjs';
+-export function preview(jobs,options) {
+-
+- const {items,capacity}=normalize(jobs,options),done=new Set(),waves=[];
+- while(done.size<items.length) {
+-  const ready=items.filter(j=>!done.has(j.id)&&j.needs.every(n=>done.has(n))).sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0);
+-  let available=capacity;const wave=[];
+-  for(const job of ready)if(job.slots<=available){wave.push(job.id);available-=job.slots;}
+-  if(!wave.length)throw new Error('dependency cycle');waves.push(wave);wave.forEach(id=>done.add(id));
+- }
+- return {waves,order:waves.flat(),estimated: waves.reduce((sum,wave)=>sum+Math.max(...wave.map(id=>items.find(j=>j.id===id).seconds)),0)};
+-}
++import {planJobs} from './planner.mjs';
++export function preview(jobs,options) { return planJobs(jobs,options); }
+diff --git a/src/run.mjs b/src/run.mjs
+index 4134a67711400718f156599a16150af6207ea68b..9a2402e744fe963b520235a9402df65cebcf7f7b 100644
+--- a/src/run.mjs
++++ b/src/run.mjs
+@@ -1,6 +1,6 @@
+-import {normalize} from './normalize.mjs';
++import {planJobs} from './planner.mjs';
+ export async function runJobs(jobs,runner,options) {
+- const plan=(()=>{
++ const {normalize}=await import('./normalize.mjs');const plan=(()=>{
+ 
+  const {items,capacity}=normalize(jobs,options),done=new Set(),waves=[];
+  while(done.size<items.length) {
+@@ -10,7 +10,7 @@ export async function runJobs(jobs,runner,options) {
+   if(!wave.length)throw new Error('dependency cycle');waves.push(wave);wave.forEach(id=>done.add(id));
+  }
+  return {waves,order:waves.flat(),estimated: waves.reduce((sum,wave)=>sum+Math.max(...wave.map(id=>items.find(j=>j.id===id).seconds)),0)};
+- })();
++})();
+ 
+  const results=[];
+  for(const wave of plan.waves) {

@@ -1,0 +1,956 @@
+{
+  "sourceCommit": "2b45773455f48fcd886c4ef7407f84e9649721ad",
+  "preparedAt": "2026-10-07T11:36:29.680970+00:00",
+  "realProviderCallsBeforeAdmission": 0,
+  "executionManifestSha256": "20e218618516de5892521b3d4b3947fb1c4e05b8723cb9d1511a92a5d762b935",
+  "requiredChecks": {
+    "npm ci --ignore-scripts": {
+      "status": "PASS",
+      "logSha256": "3ff8a14a2e9f983fd670188c859475126afa04e2fb98acfd14b46cdc95d3be13"
+    },
+    "npm ci --ignore-scripts --prefix profiles/native/sensitivity": {
+      "status": "PASS",
+      "logSha256": "b528e21ea2be1ecf4434543cd5ec45ac39f0c63d66a617c8d6cf381ad4311af6"
+    },
+    "npm run verify (restricted sandbox)": {
+      "status": "FAIL",
+      "reason": "Loopback listen EPERM in verify-recording; preserved separately.",
+      "logSha256": "44c79b58cf6fa95bc3b3927332dfce723dad2bf6a620b1bc05b245265d6307ee"
+    },
+    "npm run verify (permitted host execution)": {
+      "status": "PASS",
+      "logSha256": "a637dd655b75ad820bd090f29b89b8605543997da1a707415d92f56451a64257",
+      "checks": [
+        "scripts/verify-native-template.mjs",
+        "scripts/verify-native-review.mjs",
+        "scripts/verify-native-task.mjs",
+        "scripts/verify-native-command-hints.mjs",
+        "scripts/verify-native-project-feedback.mjs",
+        "scripts/verify-native-preservation-nudge.mjs",
+        "scripts/verify-native-preservation-hooks.mjs",
+        "scripts/verify-native-task-investigation.mjs",
+        "scripts/verify-native-task-investigation-delivery.mjs",
+        "scripts/verify-native-stateful.mjs",
+        "scripts/verify-native-sensitivity.mjs",
+        "scripts/verify-native-sensitivity-dependencies.mjs",
+        "scripts/verify-native-type-compat.mjs",
+        "scripts/verify-native-type-compat-hooks.mjs",
+        "scripts/verify-large-git.mjs",
+        "scripts/verify-boundary.mjs",
+        "evaluation/support/verify-input-admission.mjs",
+        "evaluation/support/verify-scheduler.mjs",
+        "evaluation/support/verify-recording.mjs",
+        "evaluation/polybench/verify.py",
+        "evaluation/feedback-development/verify.mjs"
+      ]
+    },
+    "npm run verify:installed (OpenCode 1.18.26)": {
+      "status": "PASS",
+      "logSha256": "0a774438c380fc1c0426faf07de2b62b52c3de87cfc932998012a37424cbcbd3",
+      "realProviderCalls": 0
+    },
+    "current remote CI": {
+      "status": "NOT RUN"
+    }
+  },
+  "taskControls": [
+    {
+      "task": "c01-catalog-batch",
+      "family": "coordinated-files",
+      "results": {
+        "baseline": {
+          "R": false,
+          "status": "FAIL",
+          "publicExit": 1,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "116875a02a2a17f35e97a9994bbc9c39355f86660be453af69ca2e4e0ac033d9",
+          "taskSha256": "1bd7e1b97de98c210da9b2c9ce9511eb4597b66a0c18863fd3ed5abd7c9e2924",
+          "acceptanceSha256": "5961779a43aa5fdbdc1b9c6ad787fe56fc03b6274a4893981f53b722cb44815a",
+          "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd09.atomic-persistence",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd09.validation-and-filtering",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd09.legacy-shape-and-errors",
+              "status": "PASS"
+            }
+          ]
+        },
+        "gold": {
+          "R": true,
+          "status": "PASS",
+          "publicExit": 0,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "116875a02a2a17f35e97a9994bbc9c39355f86660be453af69ca2e4e0ac033d9",
+          "taskSha256": "1bd7e1b97de98c210da9b2c9ce9511eb4597b66a0c18863fd3ed5abd7c9e2924",
+          "acceptanceSha256": "5961779a43aa5fdbdc1b9c6ad787fe56fc03b6274a4893981f53b722cb44815a",
+          "patchSha256": "6289dd91e18b7dbaf2f606aefd50d499d6b411d28a75b909732441a4c662ddbc",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd09.atomic-persistence",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd09.validation-and-filtering",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd09.legacy-shape-and-errors",
+              "status": "PASS"
+            }
+          ]
+        },
+        "wrong": {
+          "R": false,
+          "status": "FAIL",
+          "publicExit": 0,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "116875a02a2a17f35e97a9994bbc9c39355f86660be453af69ca2e4e0ac033d9",
+          "taskSha256": "1bd7e1b97de98c210da9b2c9ce9511eb4597b66a0c18863fd3ed5abd7c9e2924",
+          "acceptanceSha256": "5961779a43aa5fdbdc1b9c6ad787fe56fc03b6274a4893981f53b722cb44815a",
+          "patchSha256": "ad6d1189670359c8f5008e42ff38e2042dd0b2631b8ca0030680661a354f68ac",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd09.atomic-persistence",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd09.validation-and-filtering",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd09.legacy-shape-and-errors",
+              "status": "PASS"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "task": "c02-durable-outbox",
+      "family": "asynchronous-state",
+      "results": {
+        "baseline": {
+          "R": false,
+          "status": "FAIL",
+          "publicExit": 1,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "08803799997e4d0e6bf1abb633fb5cd3d32c0bba0408d9310554449471d12ccd",
+          "taskSha256": "dfd4ce53b86ee7de508fee3c4df4f588a6e1ec1491f9ec9ac493e71d488f98fb",
+          "acceptanceSha256": "f3884efc0ba832fcd3fe9815e36ae1ff3daec71374f63fdee8f78f23f35ab8b5",
+          "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd10.overlap-order-and-close",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd10.failure-recovery-and-limits",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd10.legacy-id-and-snapshot",
+              "status": "PASS"
+            }
+          ]
+        },
+        "gold": {
+          "R": true,
+          "status": "PASS",
+          "publicExit": 0,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "08803799997e4d0e6bf1abb633fb5cd3d32c0bba0408d9310554449471d12ccd",
+          "taskSha256": "dfd4ce53b86ee7de508fee3c4df4f588a6e1ec1491f9ec9ac493e71d488f98fb",
+          "acceptanceSha256": "f3884efc0ba832fcd3fe9815e36ae1ff3daec71374f63fdee8f78f23f35ab8b5",
+          "patchSha256": "a133a504d2037d9d4a6a946d8466063a36eecde1c90b3a9338148ee2dc30ce0e",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd10.overlap-order-and-close",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd10.failure-recovery-and-limits",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd10.legacy-id-and-snapshot",
+              "status": "PASS"
+            }
+          ]
+        },
+        "wrong": {
+          "R": false,
+          "status": "FAIL",
+          "publicExit": 1,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "08803799997e4d0e6bf1abb633fb5cd3d32c0bba0408d9310554449471d12ccd",
+          "taskSha256": "dfd4ce53b86ee7de508fee3c4df4f588a6e1ec1491f9ec9ac493e71d488f98fb",
+          "acceptanceSha256": "f3884efc0ba832fcd3fe9815e36ae1ff3daec71374f63fdee8f78f23f35ab8b5",
+          "patchSha256": "f80124b99bd7e29f7fccf7c8e5bdd7c197c1093fb847dd6a07a9cc439c01d97a",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd10.overlap-order-and-close",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd10.failure-recovery-and-limits",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd10.legacy-id-and-snapshot",
+              "status": "PASS"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "task": "c03-generation-cache",
+      "family": "asynchronous-state",
+      "results": {
+        "baseline": {
+          "R": false,
+          "status": "FAIL",
+          "publicExit": 1,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "9836bb6b349de0bf9c3d3fd5a2227f6ce2223310510bac14cc705e0bf278146b",
+          "taskSha256": "98fd76040cc51d987c7b1bd8277a1b52536a186682e3f42d9bf3595e30d24bd3",
+          "acceptanceSha256": "0cf811c3282eed024e395cda1a0bbf8f354534719223b1ca871b95ffcc13cf15",
+          "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd11.generation-and-coalescing",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd11.subscriber-cancellation",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd11.legacy-clones-errors-and-client",
+              "status": "PASS"
+            }
+          ]
+        },
+        "gold": {
+          "R": true,
+          "status": "PASS",
+          "publicExit": 0,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "9836bb6b349de0bf9c3d3fd5a2227f6ce2223310510bac14cc705e0bf278146b",
+          "taskSha256": "98fd76040cc51d987c7b1bd8277a1b52536a186682e3f42d9bf3595e30d24bd3",
+          "acceptanceSha256": "0cf811c3282eed024e395cda1a0bbf8f354534719223b1ca871b95ffcc13cf15",
+          "patchSha256": "33e3f427874b5bc3105ae96da583831b151b08d1ccbaf5ca09ee53fc134ca8c4",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd11.generation-and-coalescing",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd11.subscriber-cancellation",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd11.legacy-clones-errors-and-client",
+              "status": "PASS"
+            }
+          ]
+        },
+        "wrong": {
+          "R": false,
+          "status": "FAIL",
+          "publicExit": 0,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "9836bb6b349de0bf9c3d3fd5a2227f6ce2223310510bac14cc705e0bf278146b",
+          "taskSha256": "98fd76040cc51d987c7b1bd8277a1b52536a186682e3f42d9bf3595e30d24bd3",
+          "acceptanceSha256": "0cf811c3282eed024e395cda1a0bbf8f354534719223b1ca871b95ffcc13cf15",
+          "patchSha256": "71e9435cb1d92ed674ea55bbc8edf27ba498e1de89127364ee61b557b9d665c6",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd11.generation-and-coalescing",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd11.subscriber-cancellation",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd11.legacy-clones-errors-and-client",
+              "status": "PASS"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "task": "c04-stream-import",
+      "family": "compatibility",
+      "results": {
+        "baseline": {
+          "R": false,
+          "status": "FAIL",
+          "publicExit": 1,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "3884e21ed374cdfa171a705b1d927784bea285503c56e951fac23fc8ac262cb3",
+          "taskSha256": "a6f774c8000fbbfab249391b730ac20e4eacb46fedd2f8169cdc186e28e1e258",
+          "acceptanceSha256": "dc1284e6e00e6f4d95e724fd48004784bb4d85d51cc013137b40409e7bb06e65",
+          "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd12.stream-boundaries-and-limits",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd12.errors-and-iterator-cleanup",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd12.legacy-api-and-cli",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd12.cli-stream-and-errors",
+              "status": "FAIL"
+            }
+          ]
+        },
+        "gold": {
+          "R": true,
+          "status": "PASS",
+          "publicExit": 0,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "3884e21ed374cdfa171a705b1d927784bea285503c56e951fac23fc8ac262cb3",
+          "taskSha256": "a6f774c8000fbbfab249391b730ac20e4eacb46fedd2f8169cdc186e28e1e258",
+          "acceptanceSha256": "dc1284e6e00e6f4d95e724fd48004784bb4d85d51cc013137b40409e7bb06e65",
+          "patchSha256": "38667827cf0b9786be4b4901ac36eb4d265a5f74a2e87bd9b0e3913bf57be192",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd12.stream-boundaries-and-limits",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd12.errors-and-iterator-cleanup",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd12.legacy-api-and-cli",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd12.cli-stream-and-errors",
+              "status": "PASS"
+            }
+          ]
+        },
+        "wrong": {
+          "R": false,
+          "status": "FAIL",
+          "publicExit": 1,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "3884e21ed374cdfa171a705b1d927784bea285503c56e951fac23fc8ac262cb3",
+          "taskSha256": "a6f774c8000fbbfab249391b730ac20e4eacb46fedd2f8169cdc186e28e1e258",
+          "acceptanceSha256": "dc1284e6e00e6f4d95e724fd48004784bb4d85d51cc013137b40409e7bb06e65",
+          "patchSha256": "ede9c0fc07d648bc59b2ab6af72326cd85000d1d64af888ae3c9be3c6375ab0e",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd12.stream-boundaries-and-limits",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd12.errors-and-iterator-cleanup",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd12.legacy-api-and-cli",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd12.cli-stream-and-errors",
+              "status": "PASS"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "task": "c05-plugin-sdk",
+      "family": "compatibility",
+      "results": {
+        "baseline": {
+          "R": false,
+          "status": "FAIL",
+          "publicExit": 1,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "2ef5092026f357ebb982d6306f1035120f69030f9980dc5acd950a4611a91a24",
+          "taskSha256": "6b219f7615e1311c4370d5a7b1613e5bcdfd65cb1e24055ea9eab0809b0f840a",
+          "acceptanceSha256": "3524c620fb98e2f9c2c29e269d64c4d00e7600815d996e21cace904f091a399a",
+          "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd13.alias-atomicity-and-copying",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd13.mixed-settlement-and-clones",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd13.legacy-exports-and-callbacks",
+              "status": "PASS"
+            }
+          ]
+        },
+        "gold": {
+          "R": true,
+          "status": "PASS",
+          "publicExit": 0,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "2ef5092026f357ebb982d6306f1035120f69030f9980dc5acd950a4611a91a24",
+          "taskSha256": "6b219f7615e1311c4370d5a7b1613e5bcdfd65cb1e24055ea9eab0809b0f840a",
+          "acceptanceSha256": "3524c620fb98e2f9c2c29e269d64c4d00e7600815d996e21cace904f091a399a",
+          "patchSha256": "00d9dd704f1ebe7b13014eca84945a06ba9cde3cdb5b1234586819fad46aea4a",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd13.alias-atomicity-and-copying",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd13.mixed-settlement-and-clones",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd13.legacy-exports-and-callbacks",
+              "status": "PASS"
+            }
+          ]
+        },
+        "wrong": {
+          "R": false,
+          "status": "FAIL",
+          "publicExit": 0,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "2ef5092026f357ebb982d6306f1035120f69030f9980dc5acd950a4611a91a24",
+          "taskSha256": "6b219f7615e1311c4370d5a7b1613e5bcdfd65cb1e24055ea9eab0809b0f840a",
+          "acceptanceSha256": "3524c620fb98e2f9c2c29e269d64c4d00e7600815d996e21cace904f091a399a",
+          "patchSha256": "45ebcd2470eb5d0b57bbc41d312d1d7af598ebb21a34050fdcc89361187ede88",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd13.alias-atomicity-and-copying",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd13.mixed-settlement-and-clones",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd13.legacy-exports-and-callbacks",
+              "status": "PASS"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "task": "c06-dag-refactor",
+      "family": "refactoring",
+      "results": {
+        "baseline": {
+          "R": false,
+          "status": "FAIL",
+          "publicExit": 1,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "318ddc1b6653eff21d342758510a6b5664289d182b8a0b6a8006067b0fa89e6e",
+          "taskSha256": "5cb496c48482f37ba3e7b53e8202c5b5fb7060007280ac7d338202998a704095",
+          "acceptanceSha256": "48199766427876e405171ac1a2f4dd1dfba85805a1c20e1c3a8d59d4f515b25d",
+          "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd14.shared-planner-delegation",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd14.legacy-planning-and-validation",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd14.legacy-wave-settlement",
+              "status": "PASS"
+            }
+          ]
+        },
+        "gold": {
+          "R": true,
+          "status": "PASS",
+          "publicExit": 0,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "318ddc1b6653eff21d342758510a6b5664289d182b8a0b6a8006067b0fa89e6e",
+          "taskSha256": "5cb496c48482f37ba3e7b53e8202c5b5fb7060007280ac7d338202998a704095",
+          "acceptanceSha256": "48199766427876e405171ac1a2f4dd1dfba85805a1c20e1c3a8d59d4f515b25d",
+          "patchSha256": "7c8008b56e067cfbad1e0271df74e4794375f5f68bfbabcf21c313b79ceb7fae",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd14.shared-planner-delegation",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd14.legacy-planning-and-validation",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd14.legacy-wave-settlement",
+              "status": "PASS"
+            }
+          ]
+        },
+        "wrong": {
+          "R": false,
+          "status": "FAIL",
+          "publicExit": 1,
+          "patchApplied": true,
+          "terminationVerified": true,
+          "evaluationComplete": true,
+          "cleanupVerified": true,
+          "sourceSha256": "318ddc1b6653eff21d342758510a6b5664289d182b8a0b6a8006067b0fa89e6e",
+          "taskSha256": "5cb496c48482f37ba3e7b53e8202c5b5fb7060007280ac7d338202998a704095",
+          "acceptanceSha256": "48199766427876e405171ac1a2f4dd1dfba85805a1c20e1c3a8d59d4f515b25d",
+          "patchSha256": "43db78f208333aa4c51efc65b818866b07d50ddd94fde92b5454a96226efee0b",
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd14.shared-planner-delegation",
+              "status": "FAIL"
+            },
+            {
+              "type": "obligation",
+              "id": "fd14.legacy-planning-and-validation",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd14.legacy-wave-settlement",
+              "status": "PASS"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "installedModes": {
+    "realProviderCalls": 0,
+    "scriptedRequests": 42,
+    "model": "openai/gpt-5.6-luna",
+    "variant": "high",
+    "frames": [
+      {
+        "stage": "title",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "plain",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "plain",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "plain",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "plain",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "plain",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "plain",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "plain",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "plain",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "plain",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "plain",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "title",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "title",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      }
+    ],
+    "plainNativeToolsPreserved": true,
+    "plainWithoutHarnessArtifacts": true,
+    "rows": [
+      {
+        "arm": "P",
+        "R": false,
+        "evaluationProven": true,
+        "delivery": true,
+        "Q": false,
+        "corrections": null
+      },
+      {
+        "arm": "H0",
+        "R": false,
+        "evaluationProven": true,
+        "delivery": true,
+        "Q": false,
+        "corrections": 0
+      },
+      {
+        "arm": "H1",
+        "R": true,
+        "evaluationProven": true,
+        "delivery": true,
+        "Q": true,
+        "corrections": 1
+      }
+    ],
+    "reportRepeated": true,
+    "partialEvaluationResumed": true
+  },
+  "finalDeadlineControls": {
+    "realProviderCalls": 0,
+    "fixtureBudgetMs": 5000,
+    "developmentBudgetMs": 600000,
+    "controls": [
+      {
+        "arm": "P",
+        "hangIssued": true,
+        "timedOut": true,
+        "terminationVerified": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0
+      },
+      {
+        "arm": "H0",
+        "hangIssued": true,
+        "timedOut": true,
+        "terminationVerified": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0
+      },
+      {
+        "arm": "H1",
+        "hangIssued": true,
+        "timedOut": true,
+        "terminationVerified": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0
+      }
+    ],
+    "reasonForFinalRecheck": "Final control receipts regenerated once to match the committed content manifest; previous successful receipts retained.",
+    "historicalSealFailureCause": "UNRESOLVED",
+    "currentBlockingCompletionDefectReproduced": false
+  },
+  "preservation": {
+    "preservation-before.json": {
+      "files": 144,
+      "changed": 0,
+      "baselineSha256": "547e061e5b09c85bd1bf1f1665fdc3b46b1a1e04e691940cd128f3c4acced071"
+    },
+    "historical-private-before.json": {
+      "files": 2585,
+      "changed": 0,
+      "baselineSha256": "1bd545180e120f6f52681ac8988c379ea07ddee08466acb64fc265325a2b9b69"
+    }
+  },
+  "stopMechanismBytePreservation": {
+    "evaluation/support/native-run.mjs": true,
+    "evaluation/support/deadline-stop.mjs": true,
+    "evaluation/support/stop-workload.mjs": true,
+    "evaluation/support/container-session.mjs": true,
+    "evaluation/support/container-relay.mjs": true,
+    "scheduler.runComparison": true
+  },
+  "confirmation": {
+    "attempts": 180,
+    "status": "NOT RUN",
+    "taskIdentitiesPrepared": 0
+  }
+}

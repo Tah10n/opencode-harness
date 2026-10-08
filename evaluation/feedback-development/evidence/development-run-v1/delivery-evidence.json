@@ -1,0 +1,200 @@
+{
+  "runtime": {
+    "exitCode": 1,
+    "timedOut": false,
+    "continuationApplied": false,
+    "phaseCount": 1,
+    "nativeCompleted": false,
+    "workflowStatus": null,
+    "repairs": null,
+    "toolCalls": 0,
+    "sessions": 1
+  },
+  "capture": {
+    "baseline": "87bfd7bc96b0306eef27eeb0245c1ce734e844d1",
+    "delivery": "/work/repo",
+    "snapshotTree": "b95c7a46f9326340b45cc656cbe5d19de91c1bd2",
+    "roundtripVerified": true,
+    "hasArtifacts": false
+  },
+  "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stop": {
+    "timing": {
+      "taskStarted": {
+        "at": "2026-10-03T21:47:12.347Z",
+        "monotonicMs": 4329.310875
+      },
+      "deadlineAt": "2026-10-03T21:57:12.346Z",
+      "forwardingClosed": {
+        "at": "2026-10-03T21:48:24.463Z",
+        "monotonicMs": 76445.673167
+      },
+      "handlersSettled": {
+        "at": "2026-10-03T21:48:24.463Z",
+        "monotonicMs": 76445.820458
+      },
+      "captureStarted": {
+        "at": "2026-10-03T21:48:24.518Z",
+        "monotonicMs": 76500.698375
+      },
+      "captureFinished": {
+        "at": "2026-10-03T21:48:24.733Z",
+        "monotonicMs": 76715.346917
+      },
+      "cleanupStarted": {
+        "at": "2026-10-03T21:48:24.734Z",
+        "monotonicMs": 76716.347083
+      },
+      "cleanupFinished": {
+        "at": "2026-10-03T21:48:24.840Z",
+        "monotonicMs": 76822.705125
+      }
+    },
+    "ownTaskDeadlineTriggered": false,
+    "terminationVerified": true,
+    "captureSaved": true,
+    "forwardingClosed": true,
+    "relayRemoved": true,
+    "activeProviderHandlers": 0,
+    "providerServerStateMayRemainUnknown": false
+  },
+  "inputVerification": {
+    "matched": true,
+    "files": 8,
+    "providerRequestsBeforeStart": 0
+  },
+  "container": {
+    "image": "sha256:6ddc119af8a204548428504ef970a44640edfaa3238deacb558825ee25bce181",
+    "network": "none",
+    "readOnlyRoot": true,
+    "readonlyMountTargets": [
+      "/input",
+      "/opt/opencode",
+      "/relay.mjs",
+      "/template"
+    ],
+    "judgeMounted": false
+  },
+  "providerFrames": [
+    {
+      "requestIndex": 1,
+      "requestKind": "title",
+      "at": "2026-10-03T21:47:13.597Z",
+      "finishedAt": null,
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "none",
+      "forwarded": false,
+      "rejected": true,
+      "notForwardedReason": null,
+      "blockedBy": null
+    },
+    {
+      "requestIndex": 2,
+      "requestKind": "work",
+      "at": "2026-10-03T21:47:13.969Z",
+      "finishedAt": "2026-10-03T21:47:13.969Z",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "forwarded": false,
+      "rejected": null,
+      "notForwardedReason": "series-paused",
+      "blockedBy": {
+        "kind": "boundary_refusal",
+        "slot": 1
+      }
+    },
+    {
+      "requestIndex": 3,
+      "requestKind": "work",
+      "at": "2026-10-03T21:47:16.113Z",
+      "finishedAt": "2026-10-03T21:47:16.113Z",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "forwarded": false,
+      "rejected": null,
+      "notForwardedReason": "series-paused",
+      "blockedBy": {
+        "kind": "boundary_refusal",
+        "slot": 1
+      }
+    },
+    {
+      "requestIndex": 4,
+      "requestKind": "work",
+      "at": "2026-10-03T21:47:20.581Z",
+      "finishedAt": "2026-10-03T21:47:20.582Z",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "forwarded": false,
+      "rejected": null,
+      "notForwardedReason": "series-paused",
+      "blockedBy": {
+        "kind": "boundary_refusal",
+        "slot": 1
+      }
+    },
+    {
+      "requestIndex": 5,
+      "requestKind": "work",
+      "at": "2026-10-03T21:47:29.633Z",
+      "finishedAt": "2026-10-03T21:47:29.635Z",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "forwarded": false,
+      "rejected": null,
+      "notForwardedReason": "series-paused",
+      "blockedBy": {
+        "kind": "boundary_refusal",
+        "slot": 1
+      }
+    },
+    {
+      "requestIndex": 6,
+      "requestKind": "work",
+      "at": "2026-10-03T21:47:47.834Z",
+      "finishedAt": "2026-10-03T21:47:47.835Z",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "forwarded": false,
+      "rejected": null,
+      "notForwardedReason": "series-paused",
+      "blockedBy": {
+        "kind": "boundary_refusal",
+        "slot": 1
+      }
+    },
+    {
+      "requestIndex": 7,
+      "requestKind": "work",
+      "at": "2026-10-03T21:48:24.343Z",
+      "finishedAt": "2026-10-03T21:48:24.344Z",
+      "path": "/v1/responses",
+      "model": "gpt-5.6-luna",
+      "effort": "high",
+      "forwarded": false,
+      "rejected": null,
+      "notForwardedReason": "series-paused",
+      "blockedBy": {
+        "kind": "boundary_refusal",
+        "slot": 1
+      }
+    }
+  ],
+  "originalHashes": {
+    "result.json": "6f838834362108b8efd6bce8256b03b999229ed695c4c20ced6122b17692ed17",
+    "provider-metadata.json": "e3535b1ae62fd284198749c72393443aebcfe3047ab7284577fbaa2c663f85be",
+    "native-evidence.json": "4091df3c012a639f711c68c420d46880343b8f97b72d793dca1e41c0a7a8bb85",
+    "patch-capture.json": "276b06736fb2f09f6804764b8474fdfc48c70c9c357298da24e429a979ad37b5",
+    "stop-verification.json": "e0239367b4c80d6bd5dd83dcdb5426f4d74308e87619e5bbadb232baae36d6c9",
+    "input-verification.json": "b71e8b97825da0eed3957b22c3ed974adf7d33b06723c64303d80214a7f8a6ef",
+    "session/container.json": "0a5204b411bad30b1910eb929860348a934c26ecc689049a180f5095f2a2094a",
+    "evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+  },
+  "authAccess": "All frames rejected before readAuth in the frozen scheduler; no credentials read for execution."
+}

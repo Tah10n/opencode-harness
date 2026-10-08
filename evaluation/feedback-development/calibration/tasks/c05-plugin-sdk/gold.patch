@@ -1,0 +1,55 @@
+diff --git a/src/invoke.cjs b/src/invoke.cjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..b93947427c03fdd417d93af77e1613444df9caae
+--- /dev/null
++++ b/src/invoke.cjs
+@@ -0,0 +1,10 @@
++exports.invoke=(plugin,input)=>new Promise((resolve,reject)=>{
++ if(!plugin){reject(new Error('unknown plugin'));return;}
++ let settled=false;
++ const done=(error,value)=>{if(settled)return;settled=true;if(error)reject(error);else {try{resolve(structuredClone(value));}catch(e){reject(e);}}};
++ try {
++  const result=plugin.run.call({name:plugin.name},structuredClone(input),done);
++  if(result&&typeof result.then==='function')Promise.resolve(result).then(value=>done(null,value),error=>done(error));
++  else if(result!==undefined)done(null,result);
++ }catch(error){done(error);}
++});
+diff --git a/src/registry.cjs b/src/registry.cjs
+index a29c02460cf7a306bfd3cfcc501789d34a1e579f..678efab846f176a53442825e15bff7157fbba367 100644
+--- a/src/registry.cjs
++++ b/src/registry.cjs
+@@ -1,15 +1,28 @@
+ const {validName}=require('./names.cjs');
++const {invoke}=require('./invoke.cjs');
+ class Registry {
+- constructor() { this.plugins=new Map(); }
++ constructor() { this.plugins=new Map();this.names=new Map(); }
+  register(plugin) {
+-  if(!validName(plugin?.name)||typeof plugin.run!=='function')throw new TypeError('plugin');
+-  if(this.plugins.has(plugin.name))throw new Error('duplicate name');this.plugins.set(plugin.name,plugin);return this;
++  if(!validName(plugin?.name)||typeof plugin.run!=='function'||!Array.isArray(plugin.aliases??[]))throw new TypeError('plugin');
++  const aliases=[...(plugin.aliases??[])],keys=[plugin.name,...aliases];
++  if(keys.some(n=>!validName(n)))throw new TypeError('name');
++  if(new Set(keys).size!==keys.length||keys.some(n=>this.names.has(n)))throw new Error('duplicate name');
++  const stored={name:plugin.name,aliases,run:plugin.run};this.plugins.set(stored.name,stored);
++  for(const key of keys)this.names.set(key,stored.name);return this;
+  }
+  list() { return [...this.plugins.keys()]; }
++ describe(name) { const p=this.plugins.get(this.names.get(name));return p?{name:p.name,aliases:[...p.aliases]}:undefined; }
+  execute(name,input,callback) {
+-  const plugin=this.plugins.get(name);if(!plugin){callback(new Error('unknown plugin'));return;}
+-  try { plugin.run(input,callback); }catch(error) { callback(error); }
++  const plugin=this.plugins.get(this.names.get(name));
++  if(callback!==undefined&&typeof callback!=='function')throw new TypeError('callback');
++  const promise=invoke(plugin,input);
++  if(callback===undefined)return promise;
++  promise.then(value=>callback(null,value),error=>callback(error));
++  return undefined;
++ }
++ unregister(name) {
++  const canonical=this.names.get(name),plugin=this.plugins.get(canonical);if(!plugin)return false;
++  this.plugins.delete(canonical);for(const key of [canonical,...plugin.aliases])this.names.delete(key);return true;
+  }
+- unregister(name) { return this.plugins.delete(name); }
+ }
+ exports.Registry=Registry;

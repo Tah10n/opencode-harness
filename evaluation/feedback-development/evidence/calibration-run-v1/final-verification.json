@@ -1,0 +1,225 @@
+{
+  "checkedAt": "2026-10-07T13:45:44.235902+00:00",
+  "status": "PASS for frozen evidence, historical preservation and owned cleanup; foreign inventory preservation remains UNVERIFIED",
+  "sourceCommit": "2b45773455f48fcd886c4ef7407f84e9649721ad",
+  "preRunSealCommit": "8a48533bf601aa1c6d9f7398f00d134c1bd207f3",
+  "freezeSha256": "f325d7c75c4351d2702381ae2937aebe11e580ad6ae84d122a0c3301116a6b28",
+  "executionManifestSha256": "20e218618516de5892521b3d4b3947fb1c4e05b8723cb9d1511a92a5d762b935",
+  "frozenInputs": {
+    "files": 248,
+    "presentUnchanged": 247,
+    "archivedUnchanged": 1,
+    "sourceFilesEqualFrozenCommit": 244,
+    "sourceManifestUnchanged": true,
+    "runtimeTrees": [
+      {
+        "tree": "bundle",
+        "entries": 3819,
+        "unchanged": true,
+        "storage": "verified runtime archive"
+      },
+      {
+        "tree": "plain",
+        "entries": 3797,
+        "unchanged": true,
+        "storage": "same archived dependency whitelist; no core or harness plugin"
+      },
+      {
+        "tree": "c01-catalog-batch",
+        "entries": 12,
+        "unchanged": true,
+        "storage": "retained canonical public input"
+      },
+      {
+        "tree": "c02-durable-outbox",
+        "entries": 11,
+        "unchanged": true,
+        "storage": "retained canonical public input"
+      },
+      {
+        "tree": "c03-generation-cache",
+        "entries": 10,
+        "unchanged": true,
+        "storage": "retained canonical public input"
+      },
+      {
+        "tree": "c04-stream-import",
+        "entries": 11,
+        "unchanged": true,
+        "storage": "retained canonical public input"
+      },
+      {
+        "tree": "c05-plugin-sdk",
+        "entries": 11,
+        "unchanged": true,
+        "storage": "retained canonical public input"
+      },
+      {
+        "tree": "c06-dag-refactor",
+        "entries": 12,
+        "unchanged": true,
+        "storage": "retained canonical public input"
+      }
+    ]
+  },
+  "historicalPreservation": {
+    "preservation-before.json": {
+      "files": 144,
+      "changed": 0,
+      "manifestSha256": "547e061e5b09c85bd1bf1f1665fdc3b46b1a1e04e691940cd128f3c4acced071"
+    },
+    "historical-private-before.json": {
+      "files": 2585,
+      "changed": 0,
+      "manifestSha256": "1bd545180e120f6f52681ac8988c379ea07ddee08466acb64fc265325a2b9b69"
+    }
+  },
+  "productUnchanged": true,
+  "stopBodiesUnchanged": {
+    "evaluation/support/native-run.mjs": true,
+    "evaluation/support/deadline-stop.mjs": true,
+    "evaluation/support/stop-workload.mjs": true,
+    "evaluation/support/container-session.mjs": true,
+    "evaluation/support/container-relay.mjs": true,
+    "scheduler.runComparison": true
+  },
+  "mandatoryCheckLogsRevalidated": [
+    {
+      "check": "npm ci --ignore-scripts",
+      "status": "PASS",
+      "logSha256": "3ff8a14a2e9f983fd670188c859475126afa04e2fb98acfd14b46cdc95d3be13"
+    },
+    {
+      "check": "npm ci --ignore-scripts --prefix profiles/native/sensitivity",
+      "status": "PASS",
+      "logSha256": "b528e21ea2be1ecf4434543cd5ec45ac39f0c63d66a617c8d6cf381ad4311af6"
+    },
+    {
+      "check": "npm run verify (restricted sandbox)",
+      "status": "FAIL",
+      "logSha256": "44c79b58cf6fa95bc3b3927332dfce723dad2bf6a620b1bc05b245265d6307ee"
+    },
+    {
+      "check": "npm run verify (permitted host execution)",
+      "status": "PASS",
+      "logSha256": "a637dd655b75ad820bd090f29b89b8605543997da1a707415d92f56451a64257"
+    },
+    {
+      "check": "npm run verify:installed (OpenCode 1.18.26)",
+      "status": "PASS",
+      "logSha256": "0a774438c380fc1c0426faf07de2b62b52c3de87cfc932998012a37424cbcbd3"
+    }
+  ],
+  "canonicalPreRunControlReceiptsUnchanged": true,
+  "taskControlSets": 6,
+  "calibration": {
+    "started": 18,
+    "normalCompleted": 18,
+    "provenFinalGrades": 18,
+    "additionalD0Grades": 1,
+    "unknownFinalGrades": 0,
+    "retries": 0,
+    "additionalReviewers": 0,
+    "recordings": 375,
+    "completeRecordings": 375,
+    "boundRecordingBytes": 127468812,
+    "allModelEffortLunaHigh": true,
+    "providerResponseModels": {
+      "providerRequests": 375,
+      "returnedModelsByRequest": {
+        "gpt-5.6-luna": 375
+      }
+    },
+    "allCaptureRoundtripsVerified": true,
+    "allStopsVerified": true,
+    "DActivations": 0,
+    "D0FinalRChanges": 0,
+    "rawBytePatchChanges": 1,
+    "soleByteDifference": "Order of seven identical diff sections; both full representations proven R=true"
+  },
+  "cachedReportReadback": {
+    "passed": true,
+    "identicalReport": true,
+    "reportSha256": "0b85e47cda1a2b8826c41c3d39651382e91ae0806c4f2e57db782c1c4beff1a4",
+    "additionalEvaluationContainers": 0,
+    "realProviderCalls": 0
+  },
+  "replayDeniedBeforeAuth": {
+    "passed": true,
+    "reason": "Previously admitted campaign must never be retried",
+    "authCalls": 0,
+    "providerRequests": 0,
+    "admissionMarkerUnchanged": true
+  },
+  "publishedResultsSha256": "93c21cd4b8a5eaf990fc91b7d1833042ae7fd496c0e223396c3cf091068dc402",
+  "deadline": {
+    "historicalRootCause": "UNRESOLVED",
+    "currentBlockingTerminationFailureReproduced": false,
+    "installedDeadlineControlsPassed": 10,
+    "busyEventLoopControlPassed": true,
+    "realProviderCallsInControls": 0,
+    "stopVerificationWeakened": false
+  },
+  "cleanup": {
+    "ownedCleanupVerified": true,
+    "recordedOwnContainersAbsent": 144,
+    "ownBuilderRemoved": true,
+    "ownBuilderVolumeAbsent": true,
+    "ownImageRemoved": true,
+    "imageDeletionLogTargets": [
+      "sha256:3e0ba9960241e97a92b2fb6fbb0a0e46390ec5736719d0ca18cfa37c663f5766"
+    ],
+    "allocatedFilesystemBytesRemoved": 1025908736,
+    "logicalFilesystemBytesRemoved": 984214416,
+    "measuredImmediateFreeBytesDelta": 0,
+    "physicalFreeSpaceGainProven": false,
+    "remainingOwnedCleanupTargets": [],
+    "remainingMatchingTemporaryDirectories": {},
+    "remainingMatchingTaskProcesses": [],
+    "foreignInventoryStable": false,
+    "foreignPreservationBySnapshot": "UNVERIFIED: inventory changed independently of the recorded task-specific deletion targets; actor attribution is outside this task.",
+    "initialForeignIDsAbsentLaterCount": 14,
+    "foreignIDsAbsentDuringCleanupCount": 3,
+    "globalPruneRun": false,
+    "retainedArchives": [
+      {
+        "file": "environment-runtime.tar.gz",
+        "bytes": 77065639,
+        "sha256": "91daa37822bd9f251c2b0c9d2c3d5e3c22b7408126ee80701cb511172505d7ad",
+        "receiptSha256": "15a11e7b415b4880fca351d85834445700815a13e77c9199660ad5dbc8832f84",
+        "retentionReason": "Exact pinned Linux binary and unchanged bundle bytes; Plain is derived from the same dependency subset."
+      },
+      {
+        "file": "environment-image.tar.gz",
+        "bytes": 116794458,
+        "sha256": "3787dbaf0cfb9031f6e0b918aa555a12bacf090a4b31454b0089fb15f7688203",
+        "receiptSha256": "6772b969f561f11387daa51a9508b55d2a14f2214f51cd64b66c2dcd1db1fc38",
+        "retentionReason": "Exact immutable image for offline evidence reproduction; this image identity is not present in the historical environment archive."
+      },
+      {
+        "file": "private-evidence.tar.gz",
+        "bytes": 60432420,
+        "sha256": "8f70b71a27f49b4340f4f9f6d765b0b007784df27c492efdfa5c3ddde066900f",
+        "receiptSha256": "3ef2db6df9040545ecf1275220851505801fb7a000d59779ea357ba7032cec54",
+        "retentionReason": "Non-reproducible complete participant patches, recordings, native evidence, grading and model-free control receipts."
+      },
+      {
+        "file": "initial-sandbox-recording.tar.gz",
+        "bytes": 946,
+        "sha256": "8de3b09505927d9bcfa120b9958a3e90ef6c5acdb9c37d2bfda5f905397fd09a",
+        "receiptSha256": "9be03da1ef29de22a3743fd8b1b4cadab75af1b0028dcc2198436711c7b6cd61",
+        "retentionReason": "Original failed sandbox fixture evidence before owned temporary directory removal."
+      }
+    ],
+    "retainedLiveEvidence": "Canonical raw batch, compact diagnostics and preservation receipts; needed to inspect non-reproducible participant patches, recordings and grades without unpacking."
+  },
+  "remaining": {
+    "confirmation180": "NOT RUN",
+    "confirmationTaskIdentities30": "NOT SELECTED / NOT PREPARED",
+    "currentRemoteCI": "NOT RUN",
+    "production": "NOT RUN",
+    "release": "NOT RUN",
+    "historicalSealCIRootCause": "UNRESOLVED"
+  },
+  "furtherInferenceAuthorized": false
+}

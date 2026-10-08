@@ -29,14 +29,20 @@ export function scoreOutput(task,processResult) {
   }catch(error){return {R:null,status:'unproven',obligations:rows,reason:error.message};}
 }
 
-export function deliveryFacts({runtime,capture,stop,requests,workflow,nativeEvidence,patchApplied}) {
+export function deliveryFacts({runtime,capture,stop,requests,workflow,nativeEvidence,patchApplied,mode='task'}) {
   const providerConfirmed=Array.isArray(requests)&&requests.some(r=>r.forwarded)&&requests.filter(r=>r.forwarded).every(r=>r.terminalResponse?.status==='completed'&&!r.responseBindingError&&r.clientDelivery==='stream-forwarded');
   const stages=workflow?.stages?.filter(s=>s.role==='author')??[],termination=workflow?.termination;
-  const authorCompleted=stages.length>0&&new Set(stages.map(s=>s.messageID)).size===stages.length&&stages.every(stage=>{
+  let authorCompleted=stages.length>0&&new Set(stages.map(s=>s.messageID)).size===stages.length&&stages.every(stage=>{
     const matches=nativeEvidence?.messages?.filter(m=>m.id===stage.messageID)??[],message=matches[0]?.data;
     return matches.length===1&&message?.role==='assistant'&&message.finish==='stop'&&!message.error&&Number.isFinite(message.time?.completed)&&message.time.completed>=message.time.created&&message.path?.cwd===capture?.delivery;
   })&&termination?.verified===true&&['abortRequests','pendingTools','queuedTools','activeTools'].every(k=>termination[k]===0)&&Array.isArray(termination.abortErrors)&&termination.abortErrors.length===0;
-  const delivered=patchApplied===true&&runtime?.nativeCompleted===true&&runtime?.continuationApplied===false&&capture?.roundtripVerified===true&&capture?.hasArtifacts===true&&typeof capture.delivery==='string'&&path.isAbsolute(capture.delivery)&&capture.delivery===runtime.delivery&&stop?.terminationVerified===true&&stop?.captureSaved===true&&stop?.relayRemoved===true&&stop?.forwardingClosed===true&&stop?.activeProviderHandlers===0&&providerConfirmed&&authorCompleted;
+  if(mode==='plain') {
+    const roots=nativeEvidence?.sessions?.filter(s=>s.parent_id===null)??[];
+    const messages=roots.length===1?(nativeEvidence.messages??[]).filter(m=>m.session_id===roots[0].id&&m.data?.role==='assistant').sort((a,b)=>a.data.time.created-b.data.time.created):[];
+    const message=messages.at(-1)?.data;
+    authorCompleted=messages.length>0&&new Set(messages.map(m=>m.id)).size===messages.length&&message.finish==='stop'&&!message.error&&Number.isFinite(message.time?.completed)&&message.time.completed>=message.time.created&&message.path?.cwd===capture?.delivery&&(nativeEvidence.tools??[]).every(t=>['completed','error'].includes(t.data?.state?.status));
+  }
+  const delivered=patchApplied===true&&runtime?.nativeCompleted===true&&runtime?.continuationApplied===false&&capture?.roundtripVerified===true&&(mode==='plain'||capture?.hasArtifacts===true)&&typeof capture.delivery==='string'&&path.isAbsolute(capture.delivery)&&capture.delivery===runtime.delivery&&stop?.terminationVerified===true&&stop?.captureSaved===true&&stop?.relayRemoved===true&&stop?.forwardingClosed===true&&stop?.activeProviderHandlers===0&&providerConfirmed&&authorCompleted;
   return {delivery:delivered,providerConfirmed,authorCompleted,internalStatus:workflow?.status??null,corrections:workflow?.repairs??null};
 }
 

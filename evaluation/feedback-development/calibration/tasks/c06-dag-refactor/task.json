@@ -1,0 +1,13 @@
+{
+  "id": "c06-dag-refactor",
+  "category": "refactoring",
+  "title": "Shared resource-aware DAG planner",
+  "feature": [
+    "fd14.shared-planner-delegation"
+  ],
+  "preservation": [
+    "fd14.legacy-planning-and-validation",
+    "fd14.legacy-wave-settlement"
+  ],
+  "wrongControl": "Retains the copied execution planner: ordinary outputs pass, but replacing the exported planner fails to control execution."
+}

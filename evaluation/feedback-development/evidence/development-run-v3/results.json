@@ -1,0 +1,2074 @@
+{
+  "runId": "development-run-v3",
+  "suite": "feedback-development-v1",
+  "kind": "development-screening",
+  "status": "completed",
+  "outcomeClass": "advantage_not_detected",
+  "conditionsHead": "779fb00ea8bab16e3e5da6695c76c622e70d26b0",
+  "verifiedSourceCommit": "5351a3b642077a3541d4e734a3d818a487a9fa2c",
+  "preRunCommit": "654e23ed7981e55abf5ebc0acc65af8cfb77731f",
+  "basePRHead": "b7f9f1dce50139488254b12ea7924fa07b1ca084",
+  "freezeSha256": "3280d1caf7f10c285ec946a478d33e361e11ef498bb821e80078752f5268c373",
+  "executionSealSha256": "99dd73b344a2a4ed5aa48ce64417424b8deae3d2efe1d25148954ac547ad0fe3",
+  "rawReportSha256": "c0cf42ae7edb8d4cb7765e0152aa865ebaaa91d0aa9297ab4e6003833ccd3721",
+  "configuredModel": "openai/gpt-5.6-luna",
+  "configuredVariant": "high",
+  "modelLevelReasoningEffort": "high",
+  "executionEnvironment": {
+    "executionImage": "sha256:6ddc119af8a204548428504ef970a44640edfaa3238deacb558825ee25bce181",
+    "nodeVersion": "24.19.0",
+    "runtimeVersion": "1.18.26",
+    "npmVersion": "11.17.0",
+    "gitVersion": "git version 2.39.5",
+    "binarySha256": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe",
+    "bundleManifestSha256": "618db25cdf0bfac4ba3d3efa5abbbaaa7b15e2f4ada11214b27f959b2cced33a",
+    "dependenciesLockSha256": "9ddca616bb0cf944c76d6f12f6adb66fa937d39cd0274eb8d5ffa7555b954aba",
+    "restoredOnce": true,
+    "unchangedComparedWithHistoricalAssets": true,
+    "restorationInferenceCalls": 0
+  },
+  "budgetMs": 600000,
+  "modelRunsAuthorized": true,
+  "counts": {
+    "scheduled": 16,
+    "nativeAttemptsStarted": 16,
+    "nativeNormallyCompleted": 16,
+    "locallyTerminatedAndCaptured": 16,
+    "notStarted": 0,
+    "realProviderRequests": 350,
+    "relayFrames": 350,
+    "authorStagesStarted": 16,
+    "DNativeCorrections": 0,
+    "independentEvaluations": 16,
+    "requestsByStage": {
+      "title": 16,
+      "parent": 32,
+      "author": 302,
+      "correction": 0
+    }
+  },
+  "providerReturnedModels": [
+    {
+      "slot": 1,
+      "models": [
+        "gpt-5.6-luna"
+      ],
+      "requests": 17
+    },
+    {
+      "slot": 2,
+      "models": [
+        "gpt-5.6-luna"
+      ],
+      "requests": 22
+    },
+    {
+      "slot": 3,
+      "models": [
+        "gpt-5.6-luna"
+      ],
+      "requests": 21
+    },
+    {
+      "slot": 4,
+      "models": [
+        "gpt-5.6-luna"
+      ],
+      "requests": 16
+    },
+    {
+      "slot": 5,
+      "models": [
+        "gpt-5.6-luna"
+      ],
+      "requests": 27
+    },
+    {
+      "slot": 6,
+      "models": [
+        "gpt-5.6-luna"
+      ],
+      "requests": 25
+    },
+    {
+      "slot": 7,
+      "models": [
+        "gpt-5.6-luna"
+      ],
+      "requests": 22
+    },
+    {
+      "slot": 8,
+      "models": [
+        "gpt-5.6-luna"
+      ],
+      "requests": 36
+    },
+    {
+      "slot": 9,
+      "models": [
+        "gpt-5.6-luna"
+      ],
+      "requests": 24
+    },
+    {
+      "slot": 10,
+      "models": [
+        "gpt-5.6-luna"
+      ],
+      "requests": 21
+    },
+    {
+      "slot": 11,
+      "models": [
+        "gpt-5.6-luna"
+      ],
+      "requests": 20
+    },
+    {
+      "slot": 12,
+      "models": [
+        "gpt-5.6-luna"
+      ],
+      "requests": 18
+    },
+    {
+      "slot": 13,
+      "models": [
+        "gpt-5.6-luna"
+      ],
+      "requests": 30
+    },
+    {
+      "slot": 14,
+      "models": [
+        "gpt-5.6-luna"
+      ],
+      "requests": 21
+    },
+    {
+      "slot": 15,
+      "models": [
+        "gpt-5.6-luna"
+      ],
+      "requests": 15
+    },
+    {
+      "slot": 16,
+      "models": [
+        "gpt-5.6-luna"
+      ],
+      "requests": 15
+    }
+  ],
+  "pause": null,
+  "rows": [
+    {
+      "slot": 1,
+      "task": "01-invoice-discount",
+      "arm": "direct",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 17,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 174320,
+        "output_tokens": 6044,
+        "cached_tokens": 37888,
+        "reasoning_tokens": 3066
+      },
+      "knownTokens": {
+        "input_tokens": 174320,
+        "output_tokens": 6044,
+        "cached_tokens": 37888,
+        "reasoning_tokens": 3066
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 131178.985667,
+      "preparationElapsedMs": 4680.305584000032,
+      "evaluationElapsedMs": 536.0159160000001,
+      "evaluationCleanupElapsedMs": 73.20612500000004,
+      "cleanupElapsedMs": 85.14091600000393,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd01.discount-roundtrip",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd01.discount-validation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd01.legacy-shape-and-validation",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompletion": true,
+      "authorStagesStarted": 1,
+      "correctionPassesObserved": 0,
+      "relayFrames": 17,
+      "providerRequestsObserved": 17,
+      "technicalOutcome": null,
+      "modelBackedOutcome": "PASS",
+      "patchSha256": "f757b958dc9b9276fd0aedcd404cc7c277887874d2b36f40d1c513278cf7fba0",
+      "patchBytes": 5077,
+      "evaluationStatus": "PASS",
+      "providerUsageObserved": {
+        "input_tokens": 174320,
+        "output_tokens": 6044,
+        "cached_tokens": 37888,
+        "reasoning_tokens": 3066
+      }
+    },
+    {
+      "slot": 2,
+      "task": "01-invoice-discount",
+      "arm": "D",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 22,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 292309,
+        "output_tokens": 8592,
+        "cached_tokens": 62976,
+        "reasoning_tokens": 3853
+      },
+      "knownTokens": {
+        "input_tokens": 292309,
+        "output_tokens": 8592,
+        "cached_tokens": 62976,
+        "reasoning_tokens": 3853
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 192522.185833,
+      "preparationElapsedMs": 1370.238667000027,
+      "evaluationElapsedMs": 479.343708,
+      "evaluationCleanupElapsedMs": 69.43045900000016,
+      "cleanupElapsedMs": 80.54445799998939,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd01.discount-roundtrip",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd01.discount-validation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd01.legacy-shape-and-validation",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompletion": true,
+      "authorStagesStarted": 1,
+      "correctionPassesObserved": 0,
+      "relayFrames": 22,
+      "providerRequestsObserved": 22,
+      "technicalOutcome": null,
+      "modelBackedOutcome": "PASS",
+      "patchSha256": "b1b997280590da7f97f7c82f9d88b2dddd2879cf81548986c58450ef31d7292d",
+      "patchBytes": 6170,
+      "evaluationStatus": "PASS",
+      "providerUsageObserved": {
+        "input_tokens": 292309,
+        "output_tokens": 8592,
+        "cached_tokens": 62976,
+        "reasoning_tokens": 3853
+      }
+    },
+    {
+      "slot": 3,
+      "task": "02-cli-limit",
+      "arm": "D",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 21,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 244570,
+        "output_tokens": 6402,
+        "cached_tokens": 79872,
+        "reasoning_tokens": 2795
+      },
+      "knownTokens": {
+        "input_tokens": 244570,
+        "output_tokens": 6402,
+        "cached_tokens": 79872,
+        "reasoning_tokens": 2795
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 147723.21775,
+      "preparationElapsedMs": 1374.148041999957,
+      "evaluationElapsedMs": 483.2517499999999,
+      "evaluationCleanupElapsedMs": 67.77791700000012,
+      "cleanupElapsedMs": 81.01925000001211,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd02.filter-before-limit",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd02.limit-validation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd02.original-cli-contracts",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompletion": true,
+      "authorStagesStarted": 1,
+      "correctionPassesObserved": 0,
+      "relayFrames": 21,
+      "providerRequestsObserved": 21,
+      "technicalOutcome": null,
+      "modelBackedOutcome": "PASS",
+      "patchSha256": "1f0643414845e0ded46b4de32298defc5faf0d616df4544c993f70bb2a94aab7",
+      "patchBytes": 3664,
+      "evaluationStatus": "PASS",
+      "providerUsageObserved": {
+        "input_tokens": 244570,
+        "output_tokens": 6402,
+        "cached_tokens": 79872,
+        "reasoning_tokens": 2795
+      }
+    },
+    {
+      "slot": 4,
+      "task": "02-cli-limit",
+      "arm": "direct",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 16,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 155764,
+        "output_tokens": 5227,
+        "cached_tokens": 44032,
+        "reasoning_tokens": 2757
+      },
+      "knownTokens": {
+        "input_tokens": 155764,
+        "output_tokens": 5227,
+        "cached_tokens": 44032,
+        "reasoning_tokens": 2757
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 134733.58737500006,
+      "preparationElapsedMs": 1212.4490829998977,
+      "evaluationElapsedMs": 467.5881250000002,
+      "evaluationCleanupElapsedMs": 69.60358300000007,
+      "cleanupElapsedMs": 76.59866699995473,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd02.filter-before-limit",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd02.limit-validation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd02.original-cli-contracts",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompletion": true,
+      "authorStagesStarted": 1,
+      "correctionPassesObserved": 0,
+      "relayFrames": 16,
+      "providerRequestsObserved": 16,
+      "technicalOutcome": null,
+      "modelBackedOutcome": "PASS",
+      "patchSha256": "4f84a7759a037ad03eb933973bf41ddf68a1833cdaa61032066957e5e868c0c3",
+      "patchBytes": 3239,
+      "evaluationStatus": "PASS",
+      "providerUsageObserved": {
+        "input_tokens": 155764,
+        "output_tokens": 5227,
+        "cached_tokens": 44032,
+        "reasoning_tokens": 2757
+      }
+    },
+    {
+      "slot": 5,
+      "task": "03-wallet-cancel",
+      "arm": "direct",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 27,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 353409,
+        "output_tokens": 6289,
+        "cached_tokens": 143360,
+        "reasoning_tokens": 2835
+      },
+      "knownTokens": {
+        "input_tokens": 353409,
+        "output_tokens": 6289,
+        "cached_tokens": 143360,
+        "reasoning_tokens": 2835
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 160796.916708,
+      "preparationElapsedMs": 1204.3025419999612,
+      "evaluationElapsedMs": 454.4604159999999,
+      "evaluationCleanupElapsedMs": 81.90191600000026,
+      "cleanupElapsedMs": 78.13091599999461,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd03.cancel-reopen-repeat",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd03.cancel-one-hold-accounting",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd03.other-holds-preserved",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd03.deposit-and-rejection",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompletion": true,
+      "authorStagesStarted": 1,
+      "correctionPassesObserved": 0,
+      "relayFrames": 27,
+      "providerRequestsObserved": 27,
+      "technicalOutcome": null,
+      "modelBackedOutcome": "PASS",
+      "patchSha256": "f03b082decd767a5ebcc8dd6b10ccec6dde578468042cb3000bffeea03bc6872",
+      "patchBytes": 2631,
+      "evaluationStatus": "PASS",
+      "providerUsageObserved": {
+        "input_tokens": 353409,
+        "output_tokens": 6289,
+        "cached_tokens": 143360,
+        "reasoning_tokens": 2835
+      }
+    },
+    {
+      "slot": 6,
+      "task": "03-wallet-cancel",
+      "arm": "D",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 25,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 328740,
+        "output_tokens": 7904,
+        "cached_tokens": 156672,
+        "reasoning_tokens": 3347
+      },
+      "knownTokens": {
+        "input_tokens": 328740,
+        "output_tokens": 7904,
+        "cached_tokens": 156672,
+        "reasoning_tokens": 3347
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 222241.63920900004,
+      "preparationElapsedMs": 1051.8964999999152,
+      "evaluationElapsedMs": 502.89874999999984,
+      "evaluationCleanupElapsedMs": 72.73041700000022,
+      "cleanupElapsedMs": 77.95108400005847,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd03.cancel-reopen-repeat",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd03.cancel-one-hold-accounting",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd03.other-holds-preserved",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd03.deposit-and-rejection",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompletion": true,
+      "authorStagesStarted": 1,
+      "correctionPassesObserved": 0,
+      "relayFrames": 25,
+      "providerRequestsObserved": 25,
+      "technicalOutcome": null,
+      "modelBackedOutcome": "PASS",
+      "patchSha256": "4bc17cf3754dff387028c0e5795c6ef76116b8dac0e6769c7eaad40d12f9c0a3",
+      "patchBytes": 3625,
+      "evaluationStatus": "PASS",
+      "providerUsageObserved": {
+        "input_tokens": 328740,
+        "output_tokens": 7904,
+        "cached_tokens": 156672,
+        "reasoning_tokens": 3347
+      }
+    },
+    {
+      "slot": 7,
+      "task": "04-invite-redeem",
+      "arm": "D",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 22,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 293844,
+        "output_tokens": 9274,
+        "cached_tokens": 140800,
+        "reasoning_tokens": 4401
+      },
+      "knownTokens": {
+        "input_tokens": 293844,
+        "output_tokens": 9274,
+        "cached_tokens": 140800,
+        "reasoning_tokens": 4401
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 220791.7512500001,
+      "preparationElapsedMs": 1216.966667000088,
+      "evaluationElapsedMs": 494.8571670000001,
+      "evaluationCleanupElapsedMs": 80.86366700000008,
+      "cleanupElapsedMs": 79.81795799988322,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd04.reject-before-consume",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd04.replay-and-other-state",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd04.create-revoke-idempotency",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompletion": true,
+      "authorStagesStarted": 1,
+      "correctionPassesObserved": 0,
+      "relayFrames": 22,
+      "providerRequestsObserved": 22,
+      "technicalOutcome": null,
+      "modelBackedOutcome": "PASS",
+      "patchSha256": "6b2d2dcc812235376def54c7bcc79fc085f80a4b1b3d5ec395d0f6824f185209",
+      "patchBytes": 5351,
+      "evaluationStatus": "PASS",
+      "providerUsageObserved": {
+        "input_tokens": 293844,
+        "output_tokens": 9274,
+        "cached_tokens": 140800,
+        "reasoning_tokens": 4401
+      }
+    },
+    {
+      "slot": 8,
+      "task": "04-invite-redeem",
+      "arm": "direct",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 36,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 544176,
+        "output_tokens": 7815,
+        "cached_tokens": 247808,
+        "reasoning_tokens": 3588
+      },
+      "knownTokens": {
+        "input_tokens": 544176,
+        "output_tokens": 7815,
+        "cached_tokens": 247808,
+        "reasoning_tokens": 3588
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 232623.03741699993,
+      "preparationElapsedMs": 1216.6593329999596,
+      "evaluationElapsedMs": 454.608792,
+      "evaluationCleanupElapsedMs": 75.22575000000052,
+      "cleanupElapsedMs": 79.84941699984483,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd04.reject-before-consume",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd04.replay-and-other-state",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd04.create-revoke-idempotency",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompletion": true,
+      "authorStagesStarted": 1,
+      "correctionPassesObserved": 0,
+      "relayFrames": 36,
+      "providerRequestsObserved": 36,
+      "technicalOutcome": null,
+      "modelBackedOutcome": "PASS",
+      "patchSha256": "bdf24e12a2e9c1ffd6ed363e8acac4b48258e110f2faa19ad3f9805f13f207d7",
+      "patchBytes": 3805,
+      "evaluationStatus": "PASS",
+      "providerUsageObserved": {
+        "input_tokens": 544176,
+        "output_tokens": 7815,
+        "cached_tokens": 247808,
+        "reasoning_tokens": 3588
+      }
+    },
+    {
+      "slot": 9,
+      "task": "05-query-arrays",
+      "arm": "direct",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 24,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 292790,
+        "output_tokens": 7243,
+        "cached_tokens": 118784,
+        "reasoning_tokens": 3810
+      },
+      "knownTokens": {
+        "input_tokens": 292790,
+        "output_tokens": 7243,
+        "cached_tokens": 118784,
+        "reasoning_tokens": 3810
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 177021.49479199992,
+      "preparationElapsedMs": 1264.1054579999764,
+      "evaluationElapsedMs": 434.40350000000035,
+      "evaluationCleanupElapsedMs": 66.50516699999935,
+      "cleanupElapsedMs": 81.93720899987966,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd05.repeated-array-values",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd05.invalid-arrays",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd05.scalar-and-unrelated-contracts",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompletion": true,
+      "authorStagesStarted": 1,
+      "correctionPassesObserved": 0,
+      "relayFrames": 24,
+      "providerRequestsObserved": 24,
+      "technicalOutcome": null,
+      "modelBackedOutcome": "PASS",
+      "patchSha256": "8e39ffbb683a4f78f9b569a216056901aac6f8b7369eefa072792024d8696db1",
+      "patchBytes": 4344,
+      "evaluationStatus": "PASS",
+      "providerUsageObserved": {
+        "input_tokens": 292790,
+        "output_tokens": 7243,
+        "cached_tokens": 118784,
+        "reasoning_tokens": 3810
+      }
+    },
+    {
+      "slot": 10,
+      "task": "05-query-arrays",
+      "arm": "D",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 21,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 234031,
+        "output_tokens": 7446,
+        "cached_tokens": 98816,
+        "reasoning_tokens": 3772
+      },
+      "knownTokens": {
+        "input_tokens": 234031,
+        "output_tokens": 7446,
+        "cached_tokens": 98816,
+        "reasoning_tokens": 3772
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 166578.73504199996,
+      "preparationElapsedMs": 1204.438291999977,
+      "evaluationElapsedMs": 446.1409999999996,
+      "evaluationCleanupElapsedMs": 69.83200000000033,
+      "cleanupElapsedMs": 134.9290420000907,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd05.repeated-array-values",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd05.invalid-arrays",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd05.scalar-and-unrelated-contracts",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompletion": true,
+      "authorStagesStarted": 1,
+      "correctionPassesObserved": 0,
+      "relayFrames": 21,
+      "providerRequestsObserved": 21,
+      "technicalOutcome": null,
+      "modelBackedOutcome": "PASS",
+      "patchSha256": "6acfda67433193b6fa494ad8b72bad848827de79a85792fbe1c4ba6c1d43dab7",
+      "patchBytes": 3678,
+      "evaluationStatus": "PASS",
+      "providerUsageObserved": {
+        "input_tokens": 234031,
+        "output_tokens": 7446,
+        "cached_tokens": 98816,
+        "reasoning_tokens": 3772
+      }
+    },
+    {
+      "slot": 11,
+      "task": "06-events-once",
+      "arm": "D",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 20,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 224627,
+        "output_tokens": 7412,
+        "cached_tokens": 87040,
+        "reasoning_tokens": 3472
+      },
+      "knownTokens": {
+        "input_tokens": 224627,
+        "output_tokens": 7412,
+        "cached_tokens": 87040,
+        "reasoning_tokens": 3472
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 169404.982083,
+      "preparationElapsedMs": 1253.6558749997057,
+      "evaluationElapsedMs": 447.56795799999963,
+      "evaluationCleanupElapsedMs": 73.05233399999997,
+      "cleanupElapsedMs": 79.12695900001563,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd06.once-reentrant-and-throw",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd06.registration-identity",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd06.ordinary-snapshot-order",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompletion": true,
+      "authorStagesStarted": 1,
+      "correctionPassesObserved": 0,
+      "relayFrames": 20,
+      "providerRequestsObserved": 20,
+      "technicalOutcome": null,
+      "modelBackedOutcome": "PASS",
+      "patchSha256": "bffb8485507d6510fd9773ecfce9131501ad5f5f207e09669ddf04c379d3e607",
+      "patchBytes": 4343,
+      "evaluationStatus": "PASS",
+      "providerUsageObserved": {
+        "input_tokens": 224627,
+        "output_tokens": 7412,
+        "cached_tokens": 87040,
+        "reasoning_tokens": 3472
+      }
+    },
+    {
+      "slot": 12,
+      "task": "06-events-once",
+      "arm": "direct",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 18,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 192995,
+        "output_tokens": 6451,
+        "cached_tokens": 73216,
+        "reasoning_tokens": 3368
+      },
+      "knownTokens": {
+        "input_tokens": 192995,
+        "output_tokens": 6451,
+        "cached_tokens": 73216,
+        "reasoning_tokens": 3368
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 128515.323417,
+      "preparationElapsedMs": 1238.3086660001427,
+      "evaluationElapsedMs": 446.863292,
+      "evaluationCleanupElapsedMs": 73.65504099999998,
+      "cleanupElapsedMs": 87.41433300031349,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd06.once-reentrant-and-throw",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd06.registration-identity",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd06.ordinary-snapshot-order",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompletion": true,
+      "authorStagesStarted": 1,
+      "correctionPassesObserved": 0,
+      "relayFrames": 18,
+      "providerRequestsObserved": 18,
+      "technicalOutcome": null,
+      "modelBackedOutcome": "PASS",
+      "patchSha256": "118620cef5963b3364892edd68e4d0e19d6567362f6e8e1f21522e1116addc4c",
+      "patchBytes": 4987,
+      "evaluationStatus": "PASS",
+      "providerUsageObserved": {
+        "input_tokens": 192995,
+        "output_tokens": 6451,
+        "cached_tokens": 73216,
+        "reasoning_tokens": 3368
+      }
+    },
+    {
+      "slot": 13,
+      "task": "07-config-merge",
+      "arm": "direct",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 30,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 401081,
+        "output_tokens": 6990,
+        "cached_tokens": 169472,
+        "reasoning_tokens": 3091
+      },
+      "knownTokens": {
+        "input_tokens": 401081,
+        "output_tokens": 6990,
+        "cached_tokens": 169472,
+        "reasoning_tokens": 3091
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 173364.74416700006,
+      "preparationElapsedMs": 1343.063000000082,
+      "evaluationElapsedMs": 533.1944169999997,
+      "evaluationCleanupElapsedMs": 76.39987500000007,
+      "cleanupElapsedMs": 83.41591700026765,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd07.input-isolation-and-repeat",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd07.recursive-undefined-and-arrays",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd07.original-value-contracts",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompletion": true,
+      "authorStagesStarted": 1,
+      "correctionPassesObserved": 0,
+      "relayFrames": 30,
+      "providerRequestsObserved": 30,
+      "technicalOutcome": null,
+      "modelBackedOutcome": "PASS",
+      "patchSha256": "c8c65c25658a390f5c513b973a3388271b1f48e035dc33d22d009c8bdf47f3fb",
+      "patchBytes": 3858,
+      "evaluationStatus": "PASS",
+      "providerUsageObserved": {
+        "input_tokens": 401081,
+        "output_tokens": 6990,
+        "cached_tokens": 169472,
+        "reasoning_tokens": 3091
+      }
+    },
+    {
+      "slot": 14,
+      "task": "07-config-merge",
+      "arm": "D",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 21,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 244385,
+        "output_tokens": 7710,
+        "cached_tokens": 101376,
+        "reasoning_tokens": 3815
+      },
+      "knownTokens": {
+        "input_tokens": 244385,
+        "output_tokens": 7710,
+        "cached_tokens": 101376,
+        "reasoning_tokens": 3815
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 151950.88604100002,
+      "preparationElapsedMs": 1175.9290419998579,
+      "evaluationElapsedMs": 482.51270899999963,
+      "evaluationCleanupElapsedMs": 83.34495799999968,
+      "cleanupElapsedMs": 81.36983300000429,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd07.input-isolation-and-repeat",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd07.recursive-undefined-and-arrays",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd07.original-value-contracts",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompletion": true,
+      "authorStagesStarted": 1,
+      "correctionPassesObserved": 0,
+      "relayFrames": 21,
+      "providerRequestsObserved": 21,
+      "technicalOutcome": null,
+      "modelBackedOutcome": "PASS",
+      "patchSha256": "0d71485a898ce6237b460bbe406a67c4644d3fb1dca1709ab54498ce761ceaa6",
+      "patchBytes": 4412,
+      "evaluationStatus": "PASS",
+      "providerUsageObserved": {
+        "input_tokens": 244385,
+        "output_tokens": 7710,
+        "cached_tokens": 101376,
+        "reasoning_tokens": 3815
+      }
+    },
+    {
+      "slot": 15,
+      "task": "08-options-refactor",
+      "arm": "D",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 15,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 140971,
+        "output_tokens": 5231,
+        "cached_tokens": 76288,
+        "reasoning_tokens": 2191
+      },
+      "knownTokens": {
+        "input_tokens": 140971,
+        "output_tokens": 5231,
+        "cached_tokens": 76288,
+        "reasoning_tokens": 2191
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 105404.43395800004,
+      "preparationElapsedMs": 1260.683915999718,
+      "evaluationElapsedMs": 483.64304100000027,
+      "evaluationCleanupElapsedMs": 69.679709,
+      "cleanupElapsedMs": 79.31845799973235,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd08.shared-normalizer-delegation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd08.defaults-values-and-no-mutation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd08.validation-preserved",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompletion": true,
+      "authorStagesStarted": 1,
+      "correctionPassesObserved": 0,
+      "relayFrames": 15,
+      "providerRequestsObserved": 15,
+      "technicalOutcome": null,
+      "modelBackedOutcome": "PASS",
+      "patchSha256": "4005b61b40b840b2478f53d59bd95d133f405b22d7589ac51591e571f11a6974",
+      "patchBytes": 3726,
+      "evaluationStatus": "PASS",
+      "providerUsageObserved": {
+        "input_tokens": 140971,
+        "output_tokens": 5231,
+        "cached_tokens": 76288,
+        "reasoning_tokens": 2191
+      }
+    },
+    {
+      "slot": 16,
+      "task": "08-options-refactor",
+      "arm": "direct",
+      "R": true,
+      "diagnosticR": true,
+      "evaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 15,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 137604,
+        "output_tokens": 4187,
+        "cached_tokens": 68608,
+        "reasoning_tokens": 2000
+      },
+      "knownTokens": {
+        "input_tokens": 137604,
+        "output_tokens": 4187,
+        "cached_tokens": 68608,
+        "reasoning_tokens": 2000
+      },
+      "money": "unknown",
+      "usageKind": "provider-reported",
+      "taskElapsedMs": 94155.10887499992,
+      "preparationElapsedMs": 1246.5577500001527,
+      "evaluationElapsedMs": 490.3792080000003,
+      "evaluationCleanupElapsedMs": 70.89812499999971,
+      "cleanupElapsedMs": 567.8654589997604,
+      "environmentErrors": [],
+      "unknownResults": [],
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd08.shared-normalizer-delegation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd08.defaults-values-and-no-mutation",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd08.validation-preserved",
+          "status": "PASS"
+        }
+      ],
+      "status": "completed",
+      "nativeCompletion": true,
+      "authorStagesStarted": 1,
+      "correctionPassesObserved": 0,
+      "relayFrames": 15,
+      "providerRequestsObserved": 15,
+      "technicalOutcome": null,
+      "modelBackedOutcome": "PASS",
+      "patchSha256": "0246349370eb2a0e1c26d6841c51b4d8f98dd303a8f35eecbc0586aa14f642cf",
+      "patchBytes": 3942,
+      "evaluationStatus": "PASS",
+      "providerUsageObserved": {
+        "input_tokens": 137604,
+        "output_tokens": 4187,
+        "cached_tokens": 68608,
+        "reasoning_tokens": 2000
+      }
+    }
+  ],
+  "comparison": {
+    "kind": "development-screening",
+    "candidateWins": 0,
+    "candidateLosses": 0,
+    "ties": 8,
+    "unknownPairs": 0,
+    "deltaQPercentagePoints": 0,
+    "pairs": [
+      {
+        "task": "01-invoice-discount",
+        "result": "tie"
+      },
+      {
+        "task": "02-cli-limit",
+        "result": "tie"
+      },
+      {
+        "task": "03-wallet-cancel",
+        "result": "tie"
+      },
+      {
+        "task": "04-invite-redeem",
+        "result": "tie"
+      },
+      {
+        "task": "05-query-arrays",
+        "result": "tie"
+      },
+      {
+        "task": "06-events-once",
+        "result": "tie"
+      },
+      {
+        "task": "07-config-merge",
+        "result": "tie"
+      },
+      {
+        "task": "08-options-refactor",
+        "result": "tie"
+      }
+    ],
+    "limitation": "Eight development tasks; no independent confirmation or statistically persuasive effectiveness claim."
+  },
+  "costs": {
+    "participant": {
+      "requests": 350,
+      "requestsWithoutUsage": 0,
+      "tokens": {
+        "input_tokens": 4255616,
+        "output_tokens": 110217,
+        "cached_tokens": 1707008,
+        "reasoning_tokens": 52161
+      },
+      "knownTokens": {
+        "input_tokens": 4255616,
+        "output_tokens": 110217,
+        "cached_tokens": 1707008,
+        "reasoning_tokens": 52161
+      },
+      "cachedAndReasoningAreIncludedSubsets": true,
+      "money": "unknown",
+      "billingAvailable": false
+    },
+    "byArm": {
+      "direct": {
+        "slots": 8,
+        "started": 8,
+        "R": 8,
+        "delivery": 8,
+        "Q": 8,
+        "requests": 183,
+        "requestsWithoutUsage": 0,
+        "taskElapsedMs": 1232389.1984179998,
+        "preparationElapsedMs": 13405.751416000203,
+        "evaluationElapsedMs": 3817.5136660000007,
+        "tokens": {
+          "input_tokens": 2252139,
+          "output_tokens": 50246,
+          "cached_tokens": 903168,
+          "reasoning_tokens": 24515
+        },
+        "money": "unknown"
+      },
+      "D": {
+        "slots": 8,
+        "started": 8,
+        "R": 8,
+        "delivery": 8,
+        "Q": 8,
+        "requests": 167,
+        "requestsWithoutUsage": 0,
+        "taskElapsedMs": 1376617.831166,
+        "preparationElapsedMs": 9907.957000999246,
+        "evaluationElapsedMs": 3820.216082999999,
+        "tokens": {
+          "input_tokens": 2003477,
+          "output_tokens": 59971,
+          "cached_tokens": 803840,
+          "reasoning_tokens": 27646
+        },
+        "money": "unknown"
+      }
+    },
+    "relativeDToDirect": {
+      "taskElapsedMsPercentIncrease": 11.703172417702511,
+      "requestsPercentIncrease": -8.743169398907103,
+      "input_tokensPercentIncrease": -11.041147993085687,
+      "output_tokensPercentIncrease": 19.354774509413673,
+      "cached_tokensPercentIncrease": -10.997732426303852,
+      "reasoning_tokensPercentIncrease": 12.771772384254533
+    },
+    "otherCosts": {
+      "fixtures": "synthetic responses; excluded from participant usage",
+      "development": "unmetered; not participant inference",
+      "ci": "separate unmetered infrastructure; not participant inference",
+      "authentication": {
+        "providerID": "openai",
+        "sourceKind": "file",
+        "type": "oauth",
+        "accessPresent": true,
+        "refreshPresent": true,
+        "accountFieldPresent": true,
+        "expiresUTC": "2026-10-16T09:28:20.473Z",
+        "expired": false,
+        "authRefreshCalls": 0,
+        "inferenceRequests": 0
+      },
+      "money": "unknown"
+    }
+  },
+  "limitations": "Eight development tasks; no independent confirmation or statistically persuasive effectiveness claim.",
+  "historicalV1V2Included": false,
+  "reruns": 0,
+  "additionalAvailabilityOrReviewerProbes": 0,
+  "actualRequestModels": [
+    {
+      "slot": 1,
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 14
+    },
+    {
+      "slot": 1,
+      "stage": "parent",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 2
+    },
+    {
+      "slot": 1,
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 1
+    },
+    {
+      "slot": 2,
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 19
+    },
+    {
+      "slot": 2,
+      "stage": "parent",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 2
+    },
+    {
+      "slot": 2,
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 1
+    },
+    {
+      "slot": 3,
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 18
+    },
+    {
+      "slot": 3,
+      "stage": "parent",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 2
+    },
+    {
+      "slot": 3,
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 1
+    },
+    {
+      "slot": 4,
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 13
+    },
+    {
+      "slot": 4,
+      "stage": "parent",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 2
+    },
+    {
+      "slot": 4,
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 1
+    },
+    {
+      "slot": 5,
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 24
+    },
+    {
+      "slot": 5,
+      "stage": "parent",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 2
+    },
+    {
+      "slot": 5,
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 1
+    },
+    {
+      "slot": 6,
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 22
+    },
+    {
+      "slot": 6,
+      "stage": "parent",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 2
+    },
+    {
+      "slot": 6,
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 1
+    },
+    {
+      "slot": 7,
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 19
+    },
+    {
+      "slot": 7,
+      "stage": "parent",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 2
+    },
+    {
+      "slot": 7,
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 1
+    },
+    {
+      "slot": 8,
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 33
+    },
+    {
+      "slot": 8,
+      "stage": "parent",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 2
+    },
+    {
+      "slot": 8,
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 1
+    },
+    {
+      "slot": 9,
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 21
+    },
+    {
+      "slot": 9,
+      "stage": "parent",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 2
+    },
+    {
+      "slot": 9,
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 1
+    },
+    {
+      "slot": 10,
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 18
+    },
+    {
+      "slot": 10,
+      "stage": "parent",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 2
+    },
+    {
+      "slot": 10,
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 1
+    },
+    {
+      "slot": 11,
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 17
+    },
+    {
+      "slot": 11,
+      "stage": "parent",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 2
+    },
+    {
+      "slot": 11,
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 1
+    },
+    {
+      "slot": 12,
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 15
+    },
+    {
+      "slot": 12,
+      "stage": "parent",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 2
+    },
+    {
+      "slot": 12,
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 1
+    },
+    {
+      "slot": 13,
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 27
+    },
+    {
+      "slot": 13,
+      "stage": "parent",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 2
+    },
+    {
+      "slot": 13,
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 1
+    },
+    {
+      "slot": 14,
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 18
+    },
+    {
+      "slot": 14,
+      "stage": "parent",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 2
+    },
+    {
+      "slot": 14,
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 1
+    },
+    {
+      "slot": 15,
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 12
+    },
+    {
+      "slot": 15,
+      "stage": "parent",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 2
+    },
+    {
+      "slot": 15,
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 1
+    },
+    {
+      "slot": 16,
+      "stage": "author",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 12
+    },
+    {
+      "slot": 16,
+      "stage": "parent",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 2
+    },
+    {
+      "slot": 16,
+      "stage": "title",
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "forwarded": true,
+      "requests": 1
+    }
+  ],
+  "providerModelIdentity": "observed in retained provider response lifecycle metadata",
+  "reviewedHead": "5351a3b642077a3541d4e734a3d818a487a9fa2c",
+  "money": "unknown",
+  "executionImage": "sha256:6ddc119af8a204548428504ef970a44640edfaa3238deacb558825ee25bce181",
+  "bundleManifestSha256": "618db25cdf0bfac4ba3d3efa5abbbaaa7b15e2f4ada11214b27f959b2cced33a",
+  "dependenciesLockSha256": "9ddca616bb0cf944c76d6f12f6adb66fa937d39cd0274eb8d5ffa7555b954aba",
+  "evidenceChecks": {
+    "freezeUnchanged": true,
+    "historicalFilesUnchanged": 284,
+    "frozenFilesUnchanged": 154,
+    "requestRecordsChecked": 350,
+    "completeRecords": 350,
+    "actualRequestModels": [
+      "gpt-5.6-luna"
+    ],
+    "actualEfforts": [
+      "high"
+    ],
+    "providerReturnedModels": [
+      "gpt-5.6-luna"
+    ],
+    "evidenceFilesCheckedForCredentials": 3372,
+    "credentialValuesFound": false,
+    "credentialValuesOrHashesRetained": false
+  },
+  "preAdmissionNegativeControl": {
+    "at": "2026-10-06T10:46:02.402Z",
+    "freezeSha256": "3280d1caf7f10c285ec946a478d33e361e11ef498bb821e80078752f5268c373",
+    "sourceCommit": "5351a3b642077a3541d4e734a3d818a487a9fa2c",
+    "canonicalFreezeValid": true,
+    "syntheticAuthReads": 1,
+    "modelRequests": 0,
+    "admissionMarkerCreated": false,
+    "runDirectoryCreated": false,
+    "copyDenied": true
+  },
+  "postRunReplayDenial": {
+    "at": "2026-10-06T11:31:33.834Z",
+    "canonicalReplayDenied": true,
+    "authReads": 0,
+    "newNativeAttempts": 0,
+    "newProviderRequests": 0,
+    "admissionMarkerUnchanged": true,
+    "admissionMarkerSha256": "f2c39d16f751221788060a0e358c4ec9b3bdc13fce7cc5c43c074805fb67f7fe"
+  },
+  "correctionEvidence": {
+    "nativeCorrections": 0,
+    "D0EqualsFinalPatches": 16,
+    "allRequiredChecksGreen": true,
+    "hiddenReasoningInspected": false,
+    "additionalModelCalls": 0,
+    "rows": [
+      {
+        "slot": 1,
+        "arm": "direct",
+        "corrections": 0,
+        "D0EqualsFinalPatch": true,
+        "D0PatchSha256": "f757b958dc9b9276fd0aedcd404cc7c277887874d2b36f40d1c513278cf7fba0",
+        "finalPatchSha256": "f757b958dc9b9276fd0aedcd404cc7c277887874d2b36f40d1c513278cf7fba0",
+        "currentChecks": true,
+        "correctionReasons": []
+      },
+      {
+        "slot": 2,
+        "arm": "D",
+        "corrections": 0,
+        "D0EqualsFinalPatch": true,
+        "D0PatchSha256": "b1b997280590da7f97f7c82f9d88b2dddd2879cf81548986c58450ef31d7292d",
+        "finalPatchSha256": "b1b997280590da7f97f7c82f9d88b2dddd2879cf81548986c58450ef31d7292d",
+        "currentChecks": true,
+        "correctionReasons": []
+      },
+      {
+        "slot": 3,
+        "arm": "D",
+        "corrections": 0,
+        "D0EqualsFinalPatch": true,
+        "D0PatchSha256": "1f0643414845e0ded46b4de32298defc5faf0d616df4544c993f70bb2a94aab7",
+        "finalPatchSha256": "1f0643414845e0ded46b4de32298defc5faf0d616df4544c993f70bb2a94aab7",
+        "currentChecks": true,
+        "correctionReasons": []
+      },
+      {
+        "slot": 4,
+        "arm": "direct",
+        "corrections": 0,
+        "D0EqualsFinalPatch": true,
+        "D0PatchSha256": "4f84a7759a037ad03eb933973bf41ddf68a1833cdaa61032066957e5e868c0c3",
+        "finalPatchSha256": "4f84a7759a037ad03eb933973bf41ddf68a1833cdaa61032066957e5e868c0c3",
+        "currentChecks": true,
+        "correctionReasons": []
+      },
+      {
+        "slot": 5,
+        "arm": "direct",
+        "corrections": 0,
+        "D0EqualsFinalPatch": true,
+        "D0PatchSha256": "f03b082decd767a5ebcc8dd6b10ccec6dde578468042cb3000bffeea03bc6872",
+        "finalPatchSha256": "f03b082decd767a5ebcc8dd6b10ccec6dde578468042cb3000bffeea03bc6872",
+        "currentChecks": true,
+        "correctionReasons": []
+      },
+      {
+        "slot": 6,
+        "arm": "D",
+        "corrections": 0,
+        "D0EqualsFinalPatch": true,
+        "D0PatchSha256": "4bc17cf3754dff387028c0e5795c6ef76116b8dac0e6769c7eaad40d12f9c0a3",
+        "finalPatchSha256": "4bc17cf3754dff387028c0e5795c6ef76116b8dac0e6769c7eaad40d12f9c0a3",
+        "currentChecks": true,
+        "correctionReasons": []
+      },
+      {
+        "slot": 7,
+        "arm": "D",
+        "corrections": 0,
+        "D0EqualsFinalPatch": true,
+        "D0PatchSha256": "6b2d2dcc812235376def54c7bcc79fc085f80a4b1b3d5ec395d0f6824f185209",
+        "finalPatchSha256": "6b2d2dcc812235376def54c7bcc79fc085f80a4b1b3d5ec395d0f6824f185209",
+        "currentChecks": true,
+        "correctionReasons": []
+      },
+      {
+        "slot": 8,
+        "arm": "direct",
+        "corrections": 0,
+        "D0EqualsFinalPatch": true,
+        "D0PatchSha256": "bdf24e12a2e9c1ffd6ed363e8acac4b48258e110f2faa19ad3f9805f13f207d7",
+        "finalPatchSha256": "bdf24e12a2e9c1ffd6ed363e8acac4b48258e110f2faa19ad3f9805f13f207d7",
+        "currentChecks": true,
+        "correctionReasons": []
+      },
+      {
+        "slot": 9,
+        "arm": "direct",
+        "corrections": 0,
+        "D0EqualsFinalPatch": true,
+        "D0PatchSha256": "8e39ffbb683a4f78f9b569a216056901aac6f8b7369eefa072792024d8696db1",
+        "finalPatchSha256": "8e39ffbb683a4f78f9b569a216056901aac6f8b7369eefa072792024d8696db1",
+        "currentChecks": true,
+        "correctionReasons": []
+      },
+      {
+        "slot": 10,
+        "arm": "D",
+        "corrections": 0,
+        "D0EqualsFinalPatch": true,
+        "D0PatchSha256": "6acfda67433193b6fa494ad8b72bad848827de79a85792fbe1c4ba6c1d43dab7",
+        "finalPatchSha256": "6acfda67433193b6fa494ad8b72bad848827de79a85792fbe1c4ba6c1d43dab7",
+        "currentChecks": true,
+        "correctionReasons": []
+      },
+      {
+        "slot": 11,
+        "arm": "D",
+        "corrections": 0,
+        "D0EqualsFinalPatch": true,
+        "D0PatchSha256": "bffb8485507d6510fd9773ecfce9131501ad5f5f207e09669ddf04c379d3e607",
+        "finalPatchSha256": "bffb8485507d6510fd9773ecfce9131501ad5f5f207e09669ddf04c379d3e607",
+        "currentChecks": true,
+        "correctionReasons": []
+      },
+      {
+        "slot": 12,
+        "arm": "direct",
+        "corrections": 0,
+        "D0EqualsFinalPatch": true,
+        "D0PatchSha256": "118620cef5963b3364892edd68e4d0e19d6567362f6e8e1f21522e1116addc4c",
+        "finalPatchSha256": "118620cef5963b3364892edd68e4d0e19d6567362f6e8e1f21522e1116addc4c",
+        "currentChecks": true,
+        "correctionReasons": []
+      },
+      {
+        "slot": 13,
+        "arm": "direct",
+        "corrections": 0,
+        "D0EqualsFinalPatch": true,
+        "D0PatchSha256": "c8c65c25658a390f5c513b973a3388271b1f48e035dc33d22d009c8bdf47f3fb",
+        "finalPatchSha256": "c8c65c25658a390f5c513b973a3388271b1f48e035dc33d22d009c8bdf47f3fb",
+        "currentChecks": true,
+        "correctionReasons": []
+      },
+      {
+        "slot": 14,
+        "arm": "D",
+        "corrections": 0,
+        "D0EqualsFinalPatch": true,
+        "D0PatchSha256": "0d71485a898ce6237b460bbe406a67c4644d3fb1dca1709ab54498ce761ceaa6",
+        "finalPatchSha256": "0d71485a898ce6237b460bbe406a67c4644d3fb1dca1709ab54498ce761ceaa6",
+        "currentChecks": true,
+        "correctionReasons": []
+      },
+      {
+        "slot": 15,
+        "arm": "D",
+        "corrections": 0,
+        "D0EqualsFinalPatch": true,
+        "D0PatchSha256": "9132c78acbc7511fd7b8e0ba593d69feda2d32ce554f3d7474078f4b9433a120",
+        "finalPatchSha256": "9132c78acbc7511fd7b8e0ba593d69feda2d32ce554f3d7474078f4b9433a120",
+        "currentChecks": true,
+        "correctionReasons": []
+      },
+      {
+        "slot": 16,
+        "arm": "direct",
+        "corrections": 0,
+        "D0EqualsFinalPatch": true,
+        "D0PatchSha256": "dcc8a2bfad508a3a990900f163046663c9310ee1877eaf99012320ad84ab13b2",
+        "finalPatchSha256": "dcc8a2bfad508a3a990900f163046663c9310ee1877eaf99012320ad84ab13b2",
+        "currentChecks": true,
+        "correctionReasons": []
+      }
+    ]
+  },
+  "privateEvidenceArchive": {
+    "archive": "evidence-private.tar.gz",
+    "bytes": 32822171,
+    "sha256": "494bed382e8f7a0ac5186109a11a2b501b488f8e065ea422fa9bd3407b079bfe",
+    "members": 3397,
+    "everyMemberBytesAndModesVerified": true,
+    "fullModelPatches": 16,
+    "heavyAssetsExcluded": true,
+    "credentialsExcluded": true,
+    "noAuthJsonMember": true,
+    "sourceAndFixtureReceiptsRetained": true,
+    "historicalArchivesPreserved": true
+  },
+  "cleanup": {
+    "ownedContainerRecordsConfirmedAbsent": 179,
+    "ownedEvaluatorTempDirectoriesConfirmedAbsent": 96,
+    "ownedImageRemoved": true,
+    "allInitialForeignImagesPreserved": true,
+    "ownedFilesAllocatedBytesRemoved": 552771584,
+    "ownedFilesLogicalBytesRemoved": 531197074,
+    "earlierUnusedRestoredCacheLogicalBytesRemoved": 14719411,
+    "allRemovedTargetsAbsent": true,
+    "rawBatchAndPrivateArchivePreserved": true,
+    "historicalV1V2Preserved": true,
+    "globalPruneUsed": false,
+    "dockerSharedLayerBytesAddedToLocalRemoval": false
+  }
+}

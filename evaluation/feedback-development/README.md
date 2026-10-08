@@ -1,5 +1,12 @@
 # Feedback development v1
 
+The original eight tasks are retained regression controls. The separately
+authorized [six-task Plain/direct/D calibration](calibration/PROTOCOL.md)
+reuses this runner and independent evaluator. P is ordinary OpenCode without
+core/plugin, H0 is existing direct, and H1 is existing D. Its
+[180-slot confirmation draft](calibration/CONFIRMATION_DRAFT.md) is not launched
+by calibration. Historical v1/v2/v3 evidence remains unchanged.
+
 Eight small Node.js repositories prepare a development comparison of **direct
 (control)** against **D (candidate)** after the accepted actionable-feedback fix
 in PR #31. Both use the unchanged native core, one identical materialized task
@@ -8,11 +15,17 @@ task deadline. This is a limited JavaScript screening set, separate from all
 historical campaigns and official SWE-PolyBench scoring. Neither strategy has an
 established quality advantage here.
 
-Stage 2 runs only deterministic controls and an installed scripted provider.
-No real inference, availability probe, benchmark task-run or credential lookup
-is authorized. `runPrepared` rejects execution without a scripted transport and
-rejects development schedules. A later explicit instruction is required to
-connect a real provider to the existing scheduler.
+The default path runs deterministic controls and an installed scripted provider.
+Real inference requires both an explicit `--authorize-model-runs` launch flag
+and a committed seal of a separately authorized execution freeze. The opt-in
+only covers this sixteen-slot development campaign, `openai/gpt-5.6-luna`, high,
+OpenCode 1.18.26 and Node 24.19.0. It never changes product or global settings.
+
+The development-run-v1 and development-run-v2 campaigns are stopped and cannot
+be resumed. Their seals, admission markers, pauses and scores are historical,
+immutable evidence. The separately authorized development-run-v3 retains the
+same tasks/model/budget and corrects host authorization only. Any later run needs
+a separate directory and new user authorization.
 
 ## Reproduce the model-free checks
 
@@ -44,6 +57,9 @@ docker buildx build --builder "$feedback_builder" --load \
 export EVALUATION_IMAGE="$(cat local/feedback-image-id)"
 node evaluation/feedback-development/assets.mjs \
   "$PWD/local/feedback-assets" /absolute/path/to/linux/opencode
+node evaluation/feedback-development/verify-title.mjs \
+  "$PWD/local/feedback-title-boundary" "$PWD/local/feedback-assets/bundle" \
+  "$PWD/local/feedback-assets/toolchain"
 node evaluation/feedback-development/preflight.mjs \
   "$PWD/local/feedback-contained" --contained \
   --toolchain "$PWD/local/feedback-assets/toolchain"
@@ -63,6 +79,15 @@ with the existing `evaluation/support/recover.mjs` before removal.
 After preserving and checking the fixture outputs, remove the owned builder with
 `docker buildx rm "$feedback_builder"`, remove the owned execution image with
 `docker image rm "$EVALUATION_IMAGE"`, and remove `local/feedback-assets`.
+
+The title boundary command reconstructs the old experimental configuration
+before request formation and verifies title none/refusal with zero auth or
+transport calls. The installed direct/D fixture uses exactly
+openai/gpt-5.6-luna/high and checks actual title, bootstrap, author and correction
+frames through the unchanged scheduler. Model-level reasoningEffort covers small
+title requests in OpenCode 1.18.26; the variant remains high for work requests.
+It also resumes interrupted independent grading and repeats the default report
+without rerunning the author. All responses and usage are synthetic.
 
 ## Tasks and public contracts
 
@@ -142,7 +167,7 @@ defaults and historical campaign branches remain unchanged. No product prompt,
 default strategy, correction limit, cancellation policy or official evaluator
 changes are included.
 
-## Next-stage protocol, prepared but not executed
+## Once-only development execution
 
 The [frozen manifest](frozen-manifest.json) pins task/source/public-test,
 acceptance, gold, wrong-control, configuration, adapter and native runtime bytes,
@@ -159,24 +184,60 @@ The 600 seconds includes OpenCode startup, title/author requests, tools, public
 checks and all native D corrections. Input/container preparation, independent
 evaluation and cleanup have separate timing fields.
 
-**The real-run freeze is incomplete.** Model, variant and immutable execution
-environment remain unset. Exact model and variant are mandatory explicit
-parameters; no default or alternate-model fallback exists. After those choices,
-an immutable execution image, verified 1.18.26 binary and shared dependency
-manifest are also pinned. Preparation alone does not authorize a provider call:
+Before restoring/building an execution environment or running costly contained
+preparation, check the current ordinary OpenCode connection without inference:
+
+```sh
+node evaluation/feedback-development/run.mjs --check-auth
+```
+
+The host uses OpenCode's XDG data path and auth-content override, with its pinned
+1.18.26 native auth.loader/refresh logic. The readiness endpoint is intercepted
+locally; only a necessary OAuth refresh can contact the authorization service.
+No login/logout, model availability probe or inference is performed. Credentials
+remain on the host and never enter the participant or recordings. Readiness is
+checked again before real preparation and admission markers; each admitted
+request rereads the current record and can refresh expired access within its
+remaining task budget. Refresh failure closes admission without inference retry.
+
+The preparatory manifest leaves model/environment unset. A real execution freeze
+requires fresh contained preflight and installed scripted/stop receipts from
+one immutable image and unchanged bundle. Public gold checks run in that same
+image. Commit the adapter and this protocol before preparing the private batch:
 
 ```sh
 node evaluation/feedback-development/prepare.mjs \
-  --output /absolute/path/to/fresh-next-stage \
-  --model openai/EXPLICIT_MODEL --variant EXPLICIT_VARIANT \
+  --output "$PWD/local/feedback-development-run-v3/batch" \
+  --model openai/gpt-5.6-luna --variant high \
   --toolchain /absolute/path/to/toolchain \
   --bundle /absolute/path/to/bundle --image sha256:EXPLICIT_IMAGE_ID \
-  --preflight /absolute/path/to/preflight.json
+  --preflight /absolute/path/to/preflight.json \
+  --installed /absolute/path/to/installed.json \
+  --deadline /absolute/path/to/deadline-controls.json \
+  --authorize-model-runs
 ```
 
-The receipt must prove baseline/gold/wrong results and match the exact task
-input hashes. This command prepares sixteen frozen rows without opening a
-provider. The stage-2 runner refuses to execute this real-run schedule.
+Model-free preparation reads no credentials. Real preparation first checks the
+existing host connection; neither path makes an inference call. Copy the
+generated safe `execution-manifest.json` to
+`evidence/development-run-v3/execution-freeze.json` and
+commit it before the first request. Keep `freeze.json` and all private paths and
+recordings outside Git. Launch only with the same immutable `EVALUATION_IMAGE`:
+
+```sh
+node evaluation/feedback-development/run.mjs \
+  "$PWD/local/feedback-development-run-v3/batch" --authorize-model-runs
+```
+
+Admission checks the committed seal, exact source bytes, public inputs, installed
+runtime/bundle, configuration and order before credential access. Missing
+scripted transport never falls back to real fetch; fixtures cannot select real
+transport. A persisted admission marker forbids another campaign invocation,
+including copied batches and already-started slots. The first real request must
+belong to slot 1; there are no separate availability probes. Existing OAuth and
+the shared scheduler/recorder/relay/native runner own all requests and stopping.
+Technical admission stops preserve partial evidence and leave the remaining
+slots not_started; they require a new user instruction, never automatic repair.
 
 `report.mjs` stores every R/delivery/Q, original internal status, correction
 count, requests, tokens, execution/preparation/evaluation/cleanup times,
@@ -207,4 +268,4 @@ See [the original stage-2 report](evidence/MODEL_FREE.md) for historical results
 the initial preparation. Its receipt does not verify the corrected acceptance;
 the repair report and receipt record the new checks separately. The preparatory
 manifest is refreshed before any real runs, with the same campaign, sixteen-row
-order and 600-second budget. Real execution remains unauthorized.
+order and 600-second budget. Ordinary verification and CI remain model-free.
