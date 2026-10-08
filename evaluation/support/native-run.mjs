@@ -48,7 +48,8 @@ export async function runNativePhase(session,{config,task,enabled,model,variant,
   }
   settle();
  };
- const cancel=()=>stop(remaining()<=0?'hard_deadline':'cancelled',signal.reason);
+ // The first abort carries its cause; a later clock read cannot reclassify it.
+ const cancel=()=>stop(signal.reason?.kind==='hard_deadline'?'hard_deadline':'cancelled',signal.reason);
  // The hard deadline never waits for researchStopped or provider stream completion.
  hardTimer=setTimeout(()=>{mark('deadlineTimerFired');stop('hard_deadline');},Math.max(0,Math.ceil(remaining())));
  if(signal?.aborted||remaining()<=0){closed=true;if(signal?.aborted)cancel();else stop('hard_deadline');}

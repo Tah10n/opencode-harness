@@ -8,12 +8,18 @@ import {runComparison} from '../support/scheduler.mjs';
 import {startContainer} from '../support/container-session.mjs';
 import {stopWorkload} from '../support/stop-workload.mjs';
 import {captureCandidate} from '../polybench/capture.mjs';
-import {command,directory} from './suite.mjs';
+import {command,directory,repository} from './suite.mjs';
 import {privateJSON,hashFile} from '../support/output-files.mjs';
 import {fileURLToPath} from 'node:url';
 
 export async function verifyTitle({output,bundle,toolchain,executionImage}) {
   const f=prepare({output,bundle,toolchain,executionImage,fixture:true,model:'openai/gpt-5.6-luna',variant:'high'});
+  const plugin=path.join(repository,'lib/native-task-plugin.mjs');
+  assert.equal(f.files[plugin],hashFile(plugin).sha256,'Scripted preparation must freeze current product bytes');
+  assert.equal(f.modelRunsAuthorized,false);
+  const forbidden=output+'-authorized';
+  assert.throws(()=>prepare({output:forbidden,bundle,toolchain,executionImage,fixture:true,model:'openai/gpt-5.6-luna',variant:'high',authorizeModelRuns:true}),/Authorization only covers/);
+  assert.equal(fs.existsSync(forbidden),false,'Fixture authorization refusal must precede input creation');
   // Reconstruct the original configuration, before request formation.
   delete f.config.provider.openai.models['gpt-5.6-luna'].options;
   f.attempts=f.attempts.slice(0,1);privateJSON(output+'/freeze.json',f);

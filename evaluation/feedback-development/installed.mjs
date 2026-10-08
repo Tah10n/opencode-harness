@@ -156,6 +156,9 @@ export async function deadlineControls({output,bundle,toolchain,executionImage,p
     }
     const runtime=JSON.parse(fs.readFileSync(path.join(run,'result.json'))),stop=JSON.parse(fs.readFileSync(path.join(run,'stop-verification.json')));
     assert.equal(hangIssued,true);assert.equal(runtime.timedOut,true);assert.equal(runtime.nativeCompleted,false);
+    const finished=JSON.parse(fs.readFileSync(path.join(run,'session/finished.json')));
+    assert.equal(finished.stopReason?.kind,'hard_deadline');assert.equal(finished.timedOut,true);
+    assert.deepEqual(runtime.stopReason,finished.stopReason);
     assert.equal(stop.ownTaskDeadlineTriggered,true);assert.equal(stop.terminationVerified,true);assert.equal(stop.relayRemoved,true);assert.equal(stop.activeProviderHandlers,0);
     const final=await report(root);assert.equal(final.rows[0].delivery,false);assert.equal(final.rows[0].Q,false);
     controls.push({arm,hangIssued,requests,outcome,runtime,stop,row:final.rows[0]});

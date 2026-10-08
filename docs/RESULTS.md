@@ -45,7 +45,7 @@ included cached/reasoning subsets and unknown money. All original eight tasks
 and v1/v2/v3 evidence remain historical and excluded. The separate bounded
 [deadline investigation](../evaluation/feedback-development/evidence/calibration-run-v1/DEADLINE.md)
 passed current stop controls while leaving the historical seal deadline FAIL
-**UNRESOLVED**, separate from the [current Actions server error](STATUS.md#publication-checkpoint-draft-pr-33).
+**UNRESOLVED**, separate from the [historical Actions server error](STATUS.md#publication-checkpoint-draft-pr-33).
 The outcome-blind [30 × 3 × 2 confirmation draft](../evaluation/feedback-development/calibration/CONFIRMATION_DRAFT.md)
 remains **NOT RUN**; its 30 task identities are not yet selected or prepared.
 There is no new candidate or automatic commitment to run 180 attempts.

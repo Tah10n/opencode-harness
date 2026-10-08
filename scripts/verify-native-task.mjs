@@ -5,7 +5,7 @@ import path from 'node:path';
 import {spawn,spawnSync} from 'node:child_process';
 import nativeTaskPlugin from '../lib/native-task-plugin.mjs';
 import {prepareObservations,commandWords} from '../lib/native-task-observations.mjs';
-import {runWorkflow,nativePermissionDenial,nativePermissionKind,stateTransition} from '../lib/native-task-workflow.mjs';
+import {runWorkflow,nativePermissionDenial,nativePermissionKind,stateTransition,adaptReview,conserveFormat,reviewSchema} from '../lib/native-task-workflow.mjs';
 import {reviewContext} from '../lib/native-review-context.mjs';
 import {materializeNativeTemplate} from '../lib/native-template.mjs';
 import './verify-native-task-command-observations.mjs';
@@ -14,6 +14,20 @@ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'native-d-check-'));
 const rules=[{permission:'read',pattern:'*',action:'allow'}];
 const run=(cwd,args)=>{const r=spawnSync('git',args,{cwd,encoding:'utf8'});assert.equal(r.status,0,r.stderr);return r.stdout.trim();};
 try {
+ // Retained exported readers still accept the historical review shape without
+ // inventing finding meaning, losing unverified obligations, or repairing a
+ // format error by changing the retained evidence.
+ const legacy = {findings:[{id:'legacy',classification:'hypothesis',basis:'public contract',files:['api.mjs'],reproduction:'run public consumer'}],
+  obligations:[{requirement:'retained obligation',status:'unverified',evidence:'not checked'}],unverified:['consumer not checked'],
+  coverageLost:[],checks:[],verificationFiles:['test.mjs']};
+ const adapted=adaptReview(legacy);
+ assert.deepEqual(adapted.findings[0],{id:'legacy',classification:'hypothesis',kind:'unresolved',basis:'public contract',affectedFiles:['api.mjs'],verification:'run public consumer'});
+ assert.deepEqual(adapted.obligations,legacy.obligations);assert.deepEqual(adapted.unverified,legacy.unverified);
+ assert.equal(adapted.proposedVerificationFiles[0],'test.mjs');assert.ok(Object.hasOwn(legacy,'verificationFiles'));
+ const oldText=JSON.stringify(legacy).slice(0,-1)+',}';
+ assert.deepEqual(conserveFormat(oldText,adapted,reviewSchema),adapted);
+ assert.throws(()=>adaptReview({...legacy,proposedVerificationFiles:['different.test.mjs']}),/compatibility conflict/);
+ assert.throws(()=>conserveFormat(oldText,{...adapted,unverified:[]},reviewSchema),/changed or invented unverified/);
  const bundle=path.join(temp,'bundle');materializeNativeTemplate({repositoryRoot:path.resolve('.'),outputDirectory:bundle,task:true,review:true});
  const config=JSON.parse(fs.readFileSync(path.join(bundle,'opencode.json')));
  assert.ok(config.command['harness-review']);assert.ok(config.command['harness-task']);assert.equal(config.agent['harness-task-reviewer'],undefined);

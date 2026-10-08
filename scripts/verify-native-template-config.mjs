@@ -13,8 +13,14 @@ for(const name of ['home','config','data','cache','state','project'])fs.mkdirSyn
 const review=process.argv.includes('--review');
 const offline=process.argv.includes('--offline');
 const bundle=path.join(temp,'bundle');
+const globalConfig=path.join(temp,'config/opencode/opencode.json'),projectConfig=path.join(temp,'project/opencode.json');
+fs.mkdirSync(path.dirname(globalConfig));
+fs.writeFileSync(globalConfig,JSON.stringify({model:'config-fixture/model',permission:{read:{'global-private/**':'deny'}}}));
+fs.writeFileSync(projectConfig,JSON.stringify({permission:{webfetch:'deny',read:{'private/**':'deny'},external_directory:'ask'},...(offline?{agent:{build:{permission:{webfetch:'allow',read:{'ask/**':'ask'}}}}}:{})}));
+const globalBefore=fs.readFileSync(globalConfig),projectBefore=fs.readFileSync(projectConfig);
 materializeNativeTemplate({repositoryRoot:root,outputDirectory:bundle,review});
-fs.writeFileSync(path.join(temp,'project/opencode.json'),JSON.stringify({permission:{webfetch:'deny',read:{'private/**':'deny'},external_directory:'ask'},...(offline?{agent:{build:{permission:{webfetch:'allow',read:{'ask/**':'ask'}}}}}:{})}));
+assert.deepEqual(fs.readFileSync(globalConfig),globalBefore);
+assert.deepEqual(fs.readFileSync(projectConfig),projectBefore);
 const env={PATH:process.env.PATH,HOME:path.join(temp,'home'),TMPDIR:os.tmpdir(),
   ...Object.fromEntries(['config','data','cache','state'].map(n=>[`XDG_${n.toUpperCase()}_HOME`,path.join(temp,n)])),
   OPENCODE_DISABLE_MODELS_FETCH:'true',OPENCODE_DISABLE_AUTOUPDATE:'true',OPENCODE_CONFIG_DIR:bundle};
@@ -30,6 +36,9 @@ assert.deepEqual(config.instructions,[path.join(bundle,'core.md')]);
 assert.equal(fs.readFileSync(config.instructions[0],'utf8'),fs.readFileSync(path.join(root,'profiles/native/core.md'),'utf8'));
 assert.deepEqual(config.plugin,[]);
 assert.equal(config.permission.webfetch,'deny');
+assert.equal(config.model,'config-fixture/model','A separate config directory still merges global settings');
+assert.equal(config.permission.read['global-private/**'],'deny');
+assert.equal(config.permission.read['private/**'],'deny');
 const agent=debug('agent','build');
 assert.equal(agent.native,true);
 for(const name of ['bash','read','edit','glob','grep','todowrite'])assert.equal(agent.tools[name],true);
@@ -55,7 +64,27 @@ if(review){
   assert.ok(reviewer.permission.some(p=>p.permission==='read'&&p.pattern==='private/**'&&p.action==='deny'));
   assert.ok(reviewer.permission.some(p=>p.permission==='webfetch'&&p.action==='deny'));
 }
-console.log(JSON.stringify({passed:true,checks:['resolved instruction path and exact bytes','native build tools','project denial retained','no plugins',...(offline?['global-only denial overridden by agent','agent-scoped denial','other deny/ask rules retained','repeat application stable','ordinary resolution restored']:[])],providerRequests:0,
+// OpenCode can add its schema during first startup. That native migration is
+// separate from materialization; preserve every user setting and compare the
+// resolved bytes across the subsequent fresh-directory upgrade.
+const globalResolvedBytes=fs.readFileSync(globalConfig);
+const projectResolvedBytes=fs.readFileSync(projectConfig);
+assert.equal(JSON.parse(globalResolvedBytes).model,JSON.parse(globalBefore).model);
+assert.deepEqual(JSON.parse(globalResolvedBytes).permission,JSON.parse(globalBefore).permission);
+for(const key of Object.keys(JSON.parse(projectBefore))) assert.deepEqual(JSON.parse(projectResolvedBytes)[key],JSON.parse(projectBefore)[key]);
+const beforeUpgrade=debug('config');
+const upgraded=path.join(temp,'upgraded');
+materializeNativeTemplate({repositoryRoot:root,outputDirectory:upgraded,review});
+env.OPENCODE_CONFIG_DIR=upgraded;
+const upgradeConfig=debug('config');
+assert.deepEqual(upgradeConfig.instructions,[path.join(upgraded,'core.md')]);
+assert.equal(upgradeConfig.model,beforeUpgrade.model);
+assert.deepEqual(upgradeConfig.permission,beforeUpgrade.permission);
+assert.equal(upgradeConfig.permission.read['global-private/**'],'deny');
+assert.equal(upgradeConfig.permission.read['private/**'],'deny');
+assert.deepEqual(fs.readFileSync(globalConfig),globalResolvedBytes);
+assert.deepEqual(fs.readFileSync(projectConfig),projectResolvedBytes);
+console.log(JSON.stringify({passed:true,checks:['resolved instruction path and exact bytes','native build tools','global and project settings merged','fresh-directory upgrade','settings unchanged by materialization and upgrade','project denial retained','no plugins',...(offline?['global-only denial overridden by agent','agent-scoped denial','other deny/ask rules retained','repeat application stable','ordinary resolution restored']:[])],providerRequests:0,
   limit:'Does not exercise model prompt delivery or instruction compliance.'}));
 
 } finally { fs.rmSync(temp,{recursive:true,force:true}); }

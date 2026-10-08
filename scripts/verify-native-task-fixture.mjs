@@ -360,6 +360,14 @@ try {
    console.log(JSON.stringify({mode,cancelled:true,processTerminated:true,terminalPatchStable:true}));continue;
   }
   assert.equal(part?.state.status,'completed',JSON.stringify({mode,part,result,temp}));const report=JSON.parse(part.state.output);
+  if(!['permission','second-denial','unknown-error','external-save'].includes(mode)){
+   const displayed=messages.filter(m=>m.info.role==='assistant').flatMap(m=>m.parts).filter(p=>p.type==='text').at(-1)?.text;
+   assert.match(displayed??'',/^Saved terminal patch:/,'The installed command must deliver the factual human presentation');
+   assert.ok(displayed.includes(`Workflow status: ${report.status}`));
+   assert.ok(displayed.includes(path.join(report.artifacts,'result.json')));
+   assert.ok(displayed.includes(path.join(report.artifacts,'tool-events.json')));
+   assert.ok(Buffer.byteLength(displayed)<=16000);
+  }
   assert.equal(git('ls-files','--stage','-z'),index);
   if(process.env.NATIVE_TASK_FIXTURE_LARGE_GIT==='1'){
    assert.equal(report.status,'checks_passed',JSON.stringify(report));

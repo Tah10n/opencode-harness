@@ -1,9 +1,11 @@
 # OpenCode Harness Rules
 
-The maintained product is the native materializer and runtime. Use the current
-README and docs/USAGE.md; archived profile generations are not supported modes.
-Keep changes in a short branch from main, verify the PR, merge and delete its
-branch. Research results belong in the results index, not permanent branches.
+The primary product is the two-file native instructions/config materializer;
+task delivery and diagnostic review are experimental opt-ins. Use the current
+README and docs/USAGE.md; archived profile generations and their launch commands
+are not supported modes. Keep changes in a short branch from main and verify
+the PR. Merge, release and branch deletion require authorization in the current
+assignment. Research results belong in the results index, not permanent branches.
 
 ## Default operating loop
 
@@ -70,8 +72,11 @@ memory. Do not force-push.
 
 ## Learning and durable state
 
-Learning is an explicit maintenance workflow only. Root, core, deep, and
-assurance deny `oc_learning_*` writes. Only `/learn` or an explicit `improver`
+Learning is an explicit maintenance workflow only. The existing root, core,
+deep and assurance denial policy for `oc_learning_*` writes remains in force;
+these historical role names do not make their archived modes installable.
+The native materializer adds no `/learn` command or learning tools. Only a
+separately available `/learn` or an explicit `improver`
 may request the bounded learning surface. A proposal must be evaluated and
 accepted before it changes an active profile; rejected proposals make no
 runtime change.

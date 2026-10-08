@@ -117,7 +117,7 @@ for(const attempt of f.attempts){
  const timing={};const mark=name=>{timing[name]??={at:new Date().toISOString(),monotonicMs:performance.now()};};
  const remaining=()=>deadline===null?0:Math.min(deadline-Date.now(),deadlineMono-performance.now());
  const stopOwned=()=>session.stopOwnedWorkload?.()??stopWorkload(session);
- const deadlineReason=Object.assign(new Error('Own task deadline reached'),{name:'AbortError'});
+ const deadlineReason=Object.assign(new Error('Own task deadline reached'),{name:'AbortError',kind:'hard_deadline'});
  const settleHandlers=async()=>{let timeout;try{await Promise.race([Promise.allSettled([...active]),new Promise((_,reject)=>{timeout=setTimeout(()=>reject(Error('Provider handlers did not settle after cancellation')),5000);})]);}finally{clearTimeout(timeout);}};
  const save=()=>{try{privateJSON(path.join(out,'provider-metadata.json'),requests);return true;}catch(error){recordingPersistenceError=error.message;forwardingOpen=false;pauseScheduling('evidence_incomplete',attempt.slot,{reason:'Provider metadata persistence: '+error.message});return false;}};
  try{
