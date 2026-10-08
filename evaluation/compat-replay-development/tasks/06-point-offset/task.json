@@ -1,0 +1,10 @@
+{
+  "id": "06-point-offset",
+  "group": "compatible extension",
+  "feature": [
+    "fd26.feature"
+  ],
+  "preservation": [
+    "fd26.preservation"
+  ]
+}

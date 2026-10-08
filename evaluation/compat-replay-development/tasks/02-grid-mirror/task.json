@@ -1,0 +1,10 @@
+{
+  "id": "02-grid-mirror",
+  "group": "refactor",
+  "feature": [
+    "fd22.feature"
+  ],
+  "preservation": [
+    "fd22.preservation"
+  ]
+}

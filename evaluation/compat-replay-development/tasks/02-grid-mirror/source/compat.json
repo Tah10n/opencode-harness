@@ -1,0 +1,38 @@
+{
+  "revision": 1,
+  "domain": "synchronous bounded JSON; declared calls only",
+  "preserved": "Array order is reversed in each row; original rows and nested grid are never mutated, including empty rows.",
+  "excluded": "Internal structure only.",
+  "cases": [
+    {
+      "id": "1",
+      "module": "src/index.mjs",
+      "export": "mirror",
+      "args": [
+        [
+          1,
+          2,
+          3
+        ]
+      ]
+    },
+    {
+      "id": "2",
+      "module": "src/index.mjs",
+      "export": "mirrorGrid",
+      "args": [
+        [
+          [
+            1,
+            2
+          ],
+          [],
+          [
+            3,
+            4
+          ]
+        ]
+      ]
+    }
+  ]
+}

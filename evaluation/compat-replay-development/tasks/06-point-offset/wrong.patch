@@ -1,0 +1,7 @@
+diff --git a/src/point.mjs b/src/point.mjs
+index 979188a..2de2fbb 100644
+--- a/src/point.mjs
++++ b/src/point.mjs
+@@ -1 +1 @@
+-export function point(p,options={}){const scale=options.scale??1;return [p[0]*scale,p[1]*scale];}
++export function point(p,options={}){const scale=options.scale||1;const offset=options.offset??[0,0];return [p[0]*scale+offset[0],p[1]*scale+offset[1]];}

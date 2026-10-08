@@ -11,7 +11,7 @@ import {report} from './report.mjs';
 import {evaluatePatch} from './evaluate.mjs';
 import {tasks,config,command,directory} from './suite.mjs';
 
-function response(id,call,text='') {
+export function response(id,call,text='') {
   const item=call?{type:'function_call',id:'fc_'+id,call_id:'call_'+id,name:call.name,arguments:JSON.stringify(call.args),status:'completed'}:{type:'message',id:'msg_'+id,role:'assistant',status:'completed',content:[{type:'output_text',text,annotations:[]}]};
   const base={id:'resp_'+id,object:'response',created_at:1,model:'gpt-5.6-luna',status:'in_progress',output:[]};
   const events=[{type:'response.created',response:base},{type:'response.output_item.added',output_index:0,item:call?{...item,arguments:'',status:'in_progress'}:{...item,content:[],status:'in_progress'}}];

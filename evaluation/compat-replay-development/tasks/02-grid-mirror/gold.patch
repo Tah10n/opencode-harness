@@ -1,0 +1,15 @@
+diff --git a/src/reverse.mjs b/src/reverse.mjs
+new file mode 100644
+index 0000000..0c3c87f
+--- /dev/null
++++ b/src/reverse.mjs
+@@ -0,0 +1 @@
++export function reverseCopy(row){return [...row].reverse();}
+diff --git a/src/row.mjs b/src/row.mjs
+index a13855a..a052199 100644
+--- a/src/row.mjs
++++ b/src/row.mjs
+@@ -1 +1,2 @@
+-export function rotate(row){return row.slice().reverse();}
++import {reverseCopy} from './reverse.mjs';
++export function rotate(row){return reverseCopy(row);}

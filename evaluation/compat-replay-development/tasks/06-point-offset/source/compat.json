@@ -1,0 +1,56 @@
+{
+  "revision": 1,
+  "domain": "synchronous bounded JSON; declared calls only",
+  "preserved": "Omitted offset keeps scale default 1 and explicit scale 0; preserve point order and nested inputs. Domain nonnegative finite integer coordinates and scales 0..10.",
+  "excluded": "Explicit offset translates the scaled point.",
+  "cases": [
+    {
+      "id": "1",
+      "module": "src/index.mjs",
+      "export": "transform",
+      "args": [
+        [
+          [
+            2,
+            4
+          ],
+          [
+            1,
+            3
+          ]
+        ],
+        {
+          "scale": 0
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "module": "src/index.mjs",
+      "export": "transform",
+      "args": [
+        [
+          [
+            2,
+            4
+          ],
+          [
+            1,
+            3
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "3",
+      "module": "src/index.mjs",
+      "export": "transform",
+      "args": [
+        [],
+        {
+          "scale": 2
+        }
+      ]
+    }
+  ]
+}

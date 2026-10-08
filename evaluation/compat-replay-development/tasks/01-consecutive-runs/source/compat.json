@@ -1,0 +1,41 @@
+{
+  "revision": 1,
+  "domain": "synchronous bounded JSON; declared calls only",
+  "preserved": "Consecutive equal strings coalesce; separated repeats remain separate and ordered. Empty input and input immutability.",
+  "excluded": "Internal structure only.",
+  "cases": [
+    {
+      "id": "1",
+      "module": "src/index.mjs",
+      "export": "encode",
+      "args": [
+        [
+          "a",
+          "b",
+          "a"
+        ]
+      ]
+    },
+    {
+      "id": "2",
+      "module": "src/index.mjs",
+      "export": "summary",
+      "args": [
+        [
+          "b",
+          "b",
+          "a",
+          "b"
+        ]
+      ]
+    },
+    {
+      "id": "3",
+      "module": "src/index.mjs",
+      "export": "encode",
+      "args": [
+        []
+      ]
+    }
+  ]
+}

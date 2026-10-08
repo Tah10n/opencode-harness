@@ -1,0 +1,15 @@
+diff --git a/src/field.mjs b/src/field.mjs
+index 26183a5..e658fc8 100644
+--- a/src/field.mjs
++++ b/src/field.mjs
+@@ -1 +1,2 @@
+-export function readField(row,key){if(!Object.hasOwn(row,key))throw new RangeError('missing field: '+key);return row[key];}
++import {requireField} from './required.mjs';
++export function readField(row,key){requireField(row,key);return row[key];}
+diff --git a/src/required.mjs b/src/required.mjs
+new file mode 100644
+index 0000000..344111b
+--- /dev/null
++++ b/src/required.mjs
+@@ -0,0 +1 @@
++export function requireField(row,key){if(!Object.hasOwn(row,key))throw new RangeError('missing field: '+key);}

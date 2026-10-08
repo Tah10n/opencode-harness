@@ -1,0 +1,51 @@
+{
+  "revision": 1,
+  "domain": "synchronous bounded JSON; declared calls only",
+  "preserved": "Omitted options retain every string field including leading, trailing and adjacent empty fields, and exact field order; no input mutation. Domain arrays of strings.",
+  "excluded": "Explicit separator changes delimiters only.",
+  "cases": [
+    {
+      "id": "1",
+      "module": "src/index.mjs",
+      "export": "packet",
+      "args": [
+        [
+          "",
+          "x",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "id": "2",
+      "module": "src/index.mjs",
+      "export": "packet",
+      "args": [
+        [
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "id": "3",
+      "module": "src/index.mjs",
+      "export": "packet",
+      "args": [
+        []
+      ]
+    },
+    {
+      "id": "4",
+      "module": "src/index.mjs",
+      "export": "packet",
+      "args": [
+        [
+          "b",
+          "a"
+        ]
+      ]
+    }
+  ]
+}
