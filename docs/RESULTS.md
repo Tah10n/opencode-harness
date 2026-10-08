@@ -14,6 +14,19 @@ The [exact-model technical follow-up](../evaluation/feedback-development/evidenc
 records title none/refusal before correction, installed model/high frames after
 correction and synthetic direct/D delivery. It makes no model effectiveness claim.
 
+## Differential compatibility replay: prototype works, comparison stopped
+
+The [experimental replay report](../evaluation/compat-replay-development/evidence/REPORT.md)
+records six new JS baseline/gold/wrong controls. Every wrong patch passes the
+ordinary suite but produces an additional baseline-derived preservation signal;
+installed scripted D receives and repairs it. Technical fixtures do not measure
+model quality. The real Luna/high D versus D-plus-probe campaign stopped when a
+mandatory source-import check failed: one control completed, one candidate was
+interrupted and ten slots never started. All six pairs remain unknown. The
+candidate produced no real differential corrective signal, so model benefit is
+not shown. Packaging was repaired after stop; no retry or campaign continuation
+followed, and the component remains experimental.
+
 ## Plain / direct / D calibration: Plain ceiling, no D activation
 
 The [model-free post-hoc outbox diagnosis](../evaluation/feedback-development/evidence/calibration-run-v1/DIAGNOSIS.md)

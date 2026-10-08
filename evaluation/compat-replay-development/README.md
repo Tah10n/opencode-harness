@@ -5,6 +5,8 @@ captured candidate. Expected behavior comes only from executing that baseline.
 A confirmed difference adds a concrete observation to existing D feedback.
 A match means only that these inputs agree; task acceptance remains independent.
 This component is experimental and is absent from the normal materializer.
+[The actual report](evidence/REPORT.md) records the passed technical gate and
+stopped two-slot model run; the sealed campaign cannot resume.
 
 `tasks/` has six multi-module repositories, fixed public declarations/corpora,
 independent acceptance tests and gold/wrong control patches. See

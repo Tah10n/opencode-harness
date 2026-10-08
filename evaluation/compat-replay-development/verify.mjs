@@ -18,3 +18,11 @@ const {verifyFrozenSchedule}=await import('../support/scheduler.mjs');
 const f={experimentKind:'compat-replay-development',model:'openai/gpt-5.6-luna',variant:'high',budgetMs:600000,strategy:'per-slot',streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,preflightPassed:true,files:{},attempts:schedule.map(a=>({...a,source:tasks.find(t=>t.id===a.task).source}))};
 verifyFrozenSchedule(f,()=>{});
 for(const invalid of [{...f,budgetMs:600001},{...f,model:'openai/other'},{...f,attempts:f.attempts.slice(1)},{...f,attempts:f.attempts.map((a,i)=>i===1?{...a,source:'/other'}:a)},{...f,attempts:f.attempts.map((a,i)=>i===0?{...a,arm:'candidate'}:a)}])assert.throws(()=>verifyFrozenSchedule(invalid,()=>{}));
+
+const {summarizePairs}=await import('./report.mjs');
+const delivered={task:tasks[0].id,arm:'control',status:'completed',evaluationProven:true,R:true,Q:true};
+const interrupted={...delivered,arm:'candidate',status:'unknown',Q:false};
+assert.equal(summarizePairs([delivered,interrupted])[0].result,'unknown','A captured interrupted patch is not a completed model pair');
+assert.equal(summarizePairs([delivered,{...interrupted,status:'completed'}])[0].result,'loss','Completed proven failures remain measurable');
+assert.equal(summarizePairs([delivered,{...interrupted,status:'completed',Q:true}])[0].result,'tie');
+assert.equal(summarizePairs([delivered,{...interrupted,status:'completed',R:null}])[0].result,'unknown');

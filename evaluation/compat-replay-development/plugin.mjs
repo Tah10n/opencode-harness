@@ -1,5 +1,5 @@
 // Installed only in the experimental evaluation bundle, never the materializer.
-import nativeTaskPlugin from '../native-task-plugin.mjs';
+import nativeTaskPlugin from '../../lib/native-task-plugin.mjs';
 import {probe,addObservation,pinInputs} from './probe.mjs';
 export default async function compatPlugin(context) {
   if(process.env.COMPAT_REPLAY_PROBE!=='1')return nativeTaskPlugin(context);
