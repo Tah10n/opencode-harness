@@ -1,5 +1,10 @@
 # Archive and migration
 
+For current installation and upgrades use [native usage](USAGE.md). The supported
+base output is exactly `core.md` and `opencode.json`; task/review are opt-ins.
+Legacy `core`, `deep`, `assurance`, `lab`, quality and verified-change launchers
+below are historical components, not alternatives to `--native --profile core`.
+
 Consolidation uses [PR #25](https://github.com/Tah10n/opencode-harness/pull/25).
 The historical native task head is `030b4ee2b5df7af050ef49bb58098b096ef486d6`;
 it already contains PR #24 head `1e54e21018e340191e69a8f9427ccf8e3330bfcd`,
@@ -18,8 +23,10 @@ development, not the official benchmark.
 Package exports `./feedback`, `./quality`, `./quality-plugin`, `./trace-store`
 and old package scripts are discontinued. Use `./native-template` or the native
 materializer CLI. Historical artifact readers remain recoverable at their source
-commits; the maintained PolyBench result reader preserves its existing unknown
-and missing-capture semantics.
+commits; the maintained PolyBench and feedback-development result readers preserve
+their existing unknown and missing-capture semantics. Exported legacy review and
+format helpers in the installed native workflow module remain available for
+compatibility; absence from the current D path alone does not authorize removal.
 
 Legacy quality containment/platform tests, v3 authority/oracle tests and report
 existence checks are retired with their implementations. Native permission,

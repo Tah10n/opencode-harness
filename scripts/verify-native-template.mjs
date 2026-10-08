@@ -35,6 +35,19 @@ const isolated = path.join(temporary, 'isolated');
 const installed = cli('--native', '--profile', 'core', '--output', isolated);
 assert.equal(installed.status, 0, installed.stderr);
 assert.deepEqual(fs.readdirSync(isolated).sort(), ['core.md', 'opencode.json']);
+// Upgrade is a fresh installation followed by an explicit config-directory
+// switch; the CLI cannot overwrite the previous installation or user settings.
+const settings = path.join(temporary, 'user-opencode.json');
+fs.writeFileSync(settings, '{"model":"user/model","permission":{"edit":"ask"}}\n');
+const settingsBefore = fs.readFileSync(settings), previousConfig = fs.readFileSync(path.join(isolated, 'opencode.json'));
+assert.equal(cli('--native', '--profile', 'core', '--output', isolated).status, 1);
+const upgraded = path.join(temporary, 'upgraded');
+assert.equal(cli('--native', '--profile', 'core', '--output', upgraded).status, 0);
+assert.deepEqual(fs.readdirSync(upgraded).sort(), ['core.md', 'opencode.json']);
+assert.deepEqual(fs.readFileSync(path.join(upgraded, 'core.md')), fs.readFileSync(path.join(isolated, 'core.md')));
+assert.deepEqual(JSON.parse(fs.readFileSync(path.join(upgraded, 'opencode.json'))).instructions, [path.join(upgraded, 'core.md')]);
+assert.deepEqual(fs.readFileSync(path.join(isolated, 'opencode.json')), previousConfig);
+assert.deepEqual(fs.readFileSync(settings), settingsBefore);
 for (const extra of [['--force'], ['--allow-dirty'], ['--profile', 'deep']]) {
   const refused = cli('--native', '--profile', 'core', '--output', path.join(temporary, 'refused'), ...extra);
   assert.equal(refused.status, 1);
@@ -44,6 +57,6 @@ for (const extra of [['--force'], ['--allow-dirty'], ['--profile', 'deep']]) {
 const oldArguments = cli('--unknown');
 assert.equal(oldArguments.status, 1);
 assert.match(oldArguments.stderr, /PROFILE_V3_ARGUMENT:.*unknown argument/);
-console.log(JSON.stringify({ passed: true, temporary, checks: ['two-file bundle', 'settings preserved', 'dry run', 'collision refusal', 'symlink refusal', 'absolute path', 'native CLI without historical code', 'unsupported flags refused'] }));
+console.log(JSON.stringify({ passed: true, temporary, checks: ['two-file bundle', 'settings preserved', 'fresh-directory upgrade', 'dry run', 'collision refusal', 'symlink refusal', 'absolute path', 'native CLI without historical code', 'unsupported flags refused'] }));
 
 } finally { fs.rmSync(temporary,{recursive:true,force:true}); }
