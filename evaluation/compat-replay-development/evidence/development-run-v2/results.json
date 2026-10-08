@@ -1,0 +1,1132 @@
+{
+  "runId": "compat-replay-development-v2",
+  "kind": "new development rerun after technical readiness repair; not independent confirmation",
+  "sourceCommit": "979395caeaa947e735972b04f13289bf1378f174",
+  "sealCommit": "9573cddad4a8ab55b52aee15f242bc0008ba509e",
+  "model": "openai/gpt-5.6-luna",
+  "variant": "high",
+  "runtimeVersion": "1.18.26",
+  "nodeVersion": "24.19.0",
+  "budgetMs": 600000,
+  "executionImage": "sha256:7c70384c988752188f764203e334d415977310e7366961c4c1818ebe5d1795c4",
+  "outcome": {
+    "status": "finished",
+    "pause": null
+  },
+  "rows": [
+    {
+      "slot": 1,
+      "task": "01-consecutive-runs",
+      "arm": "control",
+      "status": "completed",
+      "R": true,
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd21.feature",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd21.preservation",
+          "status": "PASS"
+        }
+      ],
+      "stages": [
+        {
+          "stage": "D0",
+          "R": true,
+          "evaluationProven": true,
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd21.feature",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd21.preservation",
+              "status": "PASS"
+            }
+          ]
+        }
+      ],
+      "evaluationProven": true,
+      "initialR": true,
+      "initialEvaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 15,
+      "requestsWithoutUsage": 0,
+      "knownTokens": {
+        "input_tokens": 130408,
+        "output_tokens": 3959,
+        "cached_tokens": 36352,
+        "reasoning_tokens": 1405
+      },
+      "tokens": {
+        "input_tokens": 130408,
+        "output_tokens": 3959,
+        "cached_tokens": 36352,
+        "reasoning_tokens": 1405
+      },
+      "money": "unknown",
+      "taskElapsedMs": 40735.232625000004,
+      "preparationElapsedMs": 1294.3425410000218,
+      "evaluationElapsedMs": 435.389041,
+      "cleanupElapsedMs": 57.867458000000624,
+      "probeElapsedMs": 0,
+      "newDifferencesDelivered": 0,
+      "probeObservations": [
+        {
+          "stage": "D0-observations.json",
+          "status": "disabled",
+          "snapshotSha256": "c3b9fdf625b74a17d5df36309facda600fa8df9f827ea551e6382c550e2012f6",
+          "differences": [],
+          "limits": []
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slot": 2,
+      "task": "01-consecutive-runs",
+      "arm": "candidate",
+      "status": "completed",
+      "R": true,
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd21.feature",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd21.preservation",
+          "status": "PASS"
+        }
+      ],
+      "stages": [
+        {
+          "stage": "D0",
+          "R": true,
+          "evaluationProven": true,
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd21.feature",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd21.preservation",
+              "status": "PASS"
+            }
+          ]
+        }
+      ],
+      "evaluationProven": true,
+      "initialR": true,
+      "initialEvaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 27,
+      "requestsWithoutUsage": 0,
+      "knownTokens": {
+        "input_tokens": 312650,
+        "output_tokens": 6724,
+        "cached_tokens": 104448,
+        "reasoning_tokens": 2186
+      },
+      "tokens": {
+        "input_tokens": 312650,
+        "output_tokens": 6724,
+        "cached_tokens": 104448,
+        "reasoning_tokens": 2186
+      },
+      "money": "unknown",
+      "taskElapsedMs": 77611.97537500001,
+      "preparationElapsedMs": 1287.3849159999518,
+      "evaluationElapsedMs": 428.2562919999999,
+      "cleanupElapsedMs": 57.928750000020955,
+      "probeElapsedMs": 80.26224999999977,
+      "newDifferencesDelivered": 0,
+      "probeObservations": [
+        {
+          "stage": "D0-observations.json",
+          "status": "matched",
+          "snapshotSha256": "3c0e69a9fc05bac6fbcfe5b6469f347af7d43548adde643af9c9538774a41e23",
+          "differences": [],
+          "limits": []
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slot": 3,
+      "task": "02-grid-mirror",
+      "arm": "candidate",
+      "status": "completed",
+      "R": true,
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd22.feature",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd22.preservation",
+          "status": "PASS"
+        }
+      ],
+      "stages": [
+        {
+          "stage": "D0",
+          "R": true,
+          "evaluationProven": true,
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd22.feature",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd22.preservation",
+              "status": "PASS"
+            }
+          ]
+        }
+      ],
+      "evaluationProven": true,
+      "initialR": true,
+      "initialEvaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 17,
+      "requestsWithoutUsage": 0,
+      "knownTokens": {
+        "input_tokens": 167074,
+        "output_tokens": 5133,
+        "cached_tokens": 60416,
+        "reasoning_tokens": 2020
+      },
+      "tokens": {
+        "input_tokens": 167074,
+        "output_tokens": 5133,
+        "cached_tokens": 60416,
+        "reasoning_tokens": 2020
+      },
+      "money": "unknown",
+      "taskElapsedMs": 48497.519375,
+      "preparationElapsedMs": 1285.3624169999966,
+      "evaluationElapsedMs": 425.527292,
+      "cleanupElapsedMs": 60.15120799999568,
+      "probeElapsedMs": 75.9108750000014,
+      "newDifferencesDelivered": 0,
+      "probeObservations": [
+        {
+          "stage": "D0-observations.json",
+          "status": "matched",
+          "snapshotSha256": "320347159e247371963d406599c917897f73187064c47d8b64aae4baec413882",
+          "differences": [],
+          "limits": []
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slot": 4,
+      "task": "02-grid-mirror",
+      "arm": "control",
+      "status": "completed",
+      "R": true,
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd22.feature",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd22.preservation",
+          "status": "PASS"
+        }
+      ],
+      "stages": [
+        {
+          "stage": "D0",
+          "R": true,
+          "evaluationProven": true,
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd22.feature",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd22.preservation",
+              "status": "PASS"
+            }
+          ]
+        }
+      ],
+      "evaluationProven": true,
+      "initialR": true,
+      "initialEvaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 15,
+      "requestsWithoutUsage": 0,
+      "knownTokens": {
+        "input_tokens": 130358,
+        "output_tokens": 4051,
+        "cached_tokens": 66560,
+        "reasoning_tokens": 1540
+      },
+      "tokens": {
+        "input_tokens": 130358,
+        "output_tokens": 4051,
+        "cached_tokens": 66560,
+        "reasoning_tokens": 1540
+      },
+      "money": "unknown",
+      "taskElapsedMs": 41044.19779199999,
+      "preparationElapsedMs": 1274.3445409999404,
+      "evaluationElapsedMs": 429.2649590000001,
+      "cleanupElapsedMs": 60.300665999995545,
+      "probeElapsedMs": 0,
+      "newDifferencesDelivered": 0,
+      "probeObservations": [
+        {
+          "stage": "D0-observations.json",
+          "status": "disabled",
+          "snapshotSha256": "b0e1712cd3e4ca661bc6fe9d2f7f9f6de97d9235da2fac7d4b6110a6b2f35ed4",
+          "differences": [],
+          "limits": []
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slot": 5,
+      "task": "03-required-column",
+      "arm": "control",
+      "status": "completed",
+      "R": true,
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd23.feature",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd23.preservation",
+          "status": "PASS"
+        }
+      ],
+      "stages": [
+        {
+          "stage": "D0",
+          "R": true,
+          "evaluationProven": true,
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd23.feature",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd23.preservation",
+              "status": "PASS"
+            }
+          ]
+        }
+      ],
+      "evaluationProven": true,
+      "initialR": true,
+      "initialEvaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 19,
+      "requestsWithoutUsage": 0,
+      "knownTokens": {
+        "input_tokens": 198241,
+        "output_tokens": 5160,
+        "cached_tokens": 94208,
+        "reasoning_tokens": 1725
+      },
+      "tokens": {
+        "input_tokens": 198241,
+        "output_tokens": 5160,
+        "cached_tokens": 94208,
+        "reasoning_tokens": 1725
+      },
+      "money": "unknown",
+      "taskElapsedMs": 51627.595,
+      "preparationElapsedMs": 1281.1410410000244,
+      "evaluationElapsedMs": 429.3127919999997,
+      "cleanupElapsedMs": 60.79704199999105,
+      "probeElapsedMs": 0,
+      "newDifferencesDelivered": 0,
+      "probeObservations": [
+        {
+          "stage": "D0-observations.json",
+          "status": "disabled",
+          "snapshotSha256": "47a83b431e5effadc7130388f1b3331a1f5f87fe5e30657fdc012d630bfeb552",
+          "differences": [],
+          "limits": []
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slot": 6,
+      "task": "03-required-column",
+      "arm": "candidate",
+      "status": "completed",
+      "R": true,
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd23.feature",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd23.preservation",
+          "status": "PASS"
+        }
+      ],
+      "stages": [
+        {
+          "stage": "D0",
+          "R": true,
+          "evaluationProven": true,
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd23.feature",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd23.preservation",
+              "status": "PASS"
+            }
+          ]
+        }
+      ],
+      "evaluationProven": true,
+      "initialR": true,
+      "initialEvaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 22,
+      "requestsWithoutUsage": 0,
+      "knownTokens": {
+        "input_tokens": 237386,
+        "output_tokens": 7012,
+        "cached_tokens": 101376,
+        "reasoning_tokens": 3225
+      },
+      "tokens": {
+        "input_tokens": 237386,
+        "output_tokens": 7012,
+        "cached_tokens": 101376,
+        "reasoning_tokens": 3225
+      },
+      "money": "unknown",
+      "taskElapsedMs": 72693.23145799997,
+      "preparationElapsedMs": 1269.0848749999423,
+      "evaluationElapsedMs": 427.854292,
+      "cleanupElapsedMs": 58.194083000009414,
+      "probeElapsedMs": 86.80445900000632,
+      "newDifferencesDelivered": 0,
+      "probeObservations": [
+        {
+          "stage": "D0-observations.json",
+          "status": "matched",
+          "snapshotSha256": "ba275354206a0b99810aa486dfe9b8ffc0da8693bf24213c79629379b4232c89",
+          "differences": [],
+          "limits": []
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slot": 7,
+      "task": "04-label-suffix",
+      "arm": "candidate",
+      "status": "completed",
+      "R": true,
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd24.feature",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd24.preservation",
+          "status": "PASS"
+        }
+      ],
+      "stages": [
+        {
+          "stage": "D0",
+          "R": true,
+          "evaluationProven": true,
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd24.feature",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd24.preservation",
+              "status": "PASS"
+            }
+          ]
+        },
+        {
+          "stage": "D1",
+          "R": true,
+          "evaluationProven": true,
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd24.feature",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd24.preservation",
+              "status": "PASS"
+            }
+          ]
+        },
+        {
+          "stage": "D2",
+          "R": true,
+          "evaluationProven": true,
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd24.feature",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd24.preservation",
+              "status": "PASS"
+            }
+          ]
+        }
+      ],
+      "evaluationProven": true,
+      "initialR": true,
+      "initialEvaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 2,
+      "Q": true,
+      "requests": 28,
+      "requestsWithoutUsage": 0,
+      "knownTokens": {
+        "input_tokens": 473440,
+        "output_tokens": 9191,
+        "cached_tokens": 169472,
+        "reasoning_tokens": 5094
+      },
+      "tokens": {
+        "input_tokens": 473440,
+        "output_tokens": 9191,
+        "cached_tokens": 169472,
+        "reasoning_tokens": 5094
+      },
+      "money": "unknown",
+      "taskElapsedMs": 98546.484375,
+      "preparationElapsedMs": 1285.3746249999385,
+      "evaluationElapsedMs": 428.47400000000016,
+      "cleanupElapsedMs": 59.503083000017796,
+      "probeElapsedMs": 265.1707080000051,
+      "newDifferencesDelivered": 0,
+      "probeObservations": [
+        {
+          "stage": "D0-observations.json",
+          "status": "matched",
+          "snapshotSha256": "c8550582aafc353e739de377a6f541ff0daafa7a974f6744840bf2433a00a806",
+          "differences": [],
+          "limits": []
+        },
+        {
+          "stage": "D1-observations.json",
+          "status": "matched",
+          "snapshotSha256": "91f92cfe77d26f8630ee922c167589bd744cbc574fe11fc8f647be38b0985018",
+          "differences": [],
+          "limits": []
+        },
+        {
+          "stage": "D2-observations.json",
+          "status": "matched",
+          "snapshotSha256": "91f92cfe77d26f8630ee922c167589bd744cbc574fe11fc8f647be38b0985018",
+          "differences": [],
+          "limits": []
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slot": 8,
+      "task": "04-label-suffix",
+      "arm": "control",
+      "status": "completed",
+      "R": true,
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd24.feature",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd24.preservation",
+          "status": "PASS"
+        }
+      ],
+      "stages": [
+        {
+          "stage": "D0",
+          "R": true,
+          "evaluationProven": true,
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd24.feature",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd24.preservation",
+              "status": "PASS"
+            }
+          ]
+        }
+      ],
+      "evaluationProven": true,
+      "initialR": true,
+      "initialEvaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 17,
+      "requestsWithoutUsage": 0,
+      "knownTokens": {
+        "input_tokens": 159092,
+        "output_tokens": 4266,
+        "cached_tokens": 77312,
+        "reasoning_tokens": 1456
+      },
+      "tokens": {
+        "input_tokens": 159092,
+        "output_tokens": 4266,
+        "cached_tokens": 77312,
+        "reasoning_tokens": 1456
+      },
+      "money": "unknown",
+      "taskElapsedMs": 48698.092917,
+      "preparationElapsedMs": 1276.300084000104,
+      "evaluationElapsedMs": 424.93733299999985,
+      "cleanupElapsedMs": 61.15625,
+      "probeElapsedMs": 0,
+      "newDifferencesDelivered": 0,
+      "probeObservations": [
+        {
+          "stage": "D0-observations.json",
+          "status": "disabled",
+          "snapshotSha256": "d8d502fb9d1c8f772052d59762d338463c732794b9643aae40cc2ad31baa4129",
+          "differences": [],
+          "limits": []
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slot": 9,
+      "task": "05-packet-separator",
+      "arm": "control",
+      "status": "completed",
+      "R": true,
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd25.feature",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd25.preservation",
+          "status": "PASS"
+        }
+      ],
+      "stages": [
+        {
+          "stage": "D0",
+          "R": true,
+          "evaluationProven": true,
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd25.feature",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd25.preservation",
+              "status": "PASS"
+            }
+          ]
+        }
+      ],
+      "evaluationProven": true,
+      "initialR": true,
+      "initialEvaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 21,
+      "requestsWithoutUsage": 0,
+      "knownTokens": {
+        "input_tokens": 219248,
+        "output_tokens": 5895,
+        "cached_tokens": 84992,
+        "reasoning_tokens": 2458
+      },
+      "tokens": {
+        "input_tokens": 219248,
+        "output_tokens": 5895,
+        "cached_tokens": 84992,
+        "reasoning_tokens": 2458
+      },
+      "money": "unknown",
+      "taskElapsedMs": 59875.04233299999,
+      "preparationElapsedMs": 1290.6332500000717,
+      "evaluationElapsedMs": 432.6403329999994,
+      "cleanupElapsedMs": 57.34691700001713,
+      "probeElapsedMs": 0,
+      "newDifferencesDelivered": 0,
+      "probeObservations": [
+        {
+          "stage": "D0-observations.json",
+          "status": "disabled",
+          "snapshotSha256": "0d5f45b753d6957ab110bb12537b069b98c922447ce3bb22bf5da88556060b4f",
+          "differences": [],
+          "limits": []
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slot": 10,
+      "task": "05-packet-separator",
+      "arm": "candidate",
+      "status": "completed",
+      "R": true,
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd25.feature",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd25.preservation",
+          "status": "PASS"
+        }
+      ],
+      "stages": [
+        {
+          "stage": "D0",
+          "R": true,
+          "evaluationProven": true,
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd25.feature",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd25.preservation",
+              "status": "PASS"
+            }
+          ]
+        }
+      ],
+      "evaluationProven": true,
+      "initialR": true,
+      "initialEvaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 19,
+      "requestsWithoutUsage": 0,
+      "knownTokens": {
+        "input_tokens": 187075,
+        "output_tokens": 4383,
+        "cached_tokens": 93696,
+        "reasoning_tokens": 1483
+      },
+      "tokens": {
+        "input_tokens": 187075,
+        "output_tokens": 4383,
+        "cached_tokens": 93696,
+        "reasoning_tokens": 1483
+      },
+      "money": "unknown",
+      "taskElapsedMs": 52779.02262499998,
+      "preparationElapsedMs": 1282.4973750000354,
+      "evaluationElapsedMs": 432.9445830000004,
+      "cleanupElapsedMs": 58.57904199999757,
+      "probeElapsedMs": 86.30854199999885,
+      "newDifferencesDelivered": 0,
+      "probeObservations": [
+        {
+          "stage": "D0-observations.json",
+          "status": "matched",
+          "snapshotSha256": "96e325f34a52ec7bbee2d2da8e6104231b49673e872d75a8cee83dd304a691ee",
+          "differences": [],
+          "limits": []
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slot": 11,
+      "task": "06-point-offset",
+      "arm": "candidate",
+      "status": "completed",
+      "R": true,
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd26.feature",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd26.preservation",
+          "status": "PASS"
+        }
+      ],
+      "stages": [
+        {
+          "stage": "D0",
+          "R": true,
+          "evaluationProven": true,
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd26.feature",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd26.preservation",
+              "status": "PASS"
+            }
+          ]
+        }
+      ],
+      "evaluationProven": true,
+      "initialR": true,
+      "initialEvaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 14,
+      "requestsWithoutUsage": 0,
+      "knownTokens": {
+        "input_tokens": 115436,
+        "output_tokens": 3468,
+        "cached_tokens": 68096,
+        "reasoning_tokens": 1373
+      },
+      "tokens": {
+        "input_tokens": 115436,
+        "output_tokens": 3468,
+        "cached_tokens": 68096,
+        "reasoning_tokens": 1373
+      },
+      "money": "unknown",
+      "taskElapsedMs": 37898.81570799998,
+      "preparationElapsedMs": 1271.3187919999473,
+      "evaluationElapsedMs": 431.5342079999991,
+      "cleanupElapsedMs": 59.09379199997056,
+      "probeElapsedMs": 80.87524999999732,
+      "newDifferencesDelivered": 0,
+      "probeObservations": [
+        {
+          "stage": "D0-observations.json",
+          "status": "matched",
+          "snapshotSha256": "a3df215b4243928d74e0203af4e7568f7e0d2a1d0f87828324c2dba255428a03",
+          "differences": [],
+          "limits": []
+        }
+      ],
+      "errors": []
+    },
+    {
+      "slot": 12,
+      "task": "06-point-offset",
+      "arm": "control",
+      "status": "completed",
+      "R": true,
+      "obligations": [
+        {
+          "type": "obligation",
+          "id": "fd26.feature",
+          "status": "PASS"
+        },
+        {
+          "type": "obligation",
+          "id": "fd26.preservation",
+          "status": "PASS"
+        }
+      ],
+      "stages": [
+        {
+          "stage": "D0",
+          "R": true,
+          "evaluationProven": true,
+          "obligations": [
+            {
+              "type": "obligation",
+              "id": "fd26.feature",
+              "status": "PASS"
+            },
+            {
+              "type": "obligation",
+              "id": "fd26.preservation",
+              "status": "PASS"
+            }
+          ]
+        }
+      ],
+      "evaluationProven": true,
+      "initialR": true,
+      "initialEvaluationProven": true,
+      "delivery": true,
+      "providerConfirmed": true,
+      "authorCompleted": true,
+      "internalStatus": "incomplete",
+      "corrections": 0,
+      "Q": true,
+      "requests": 22,
+      "requestsWithoutUsage": 0,
+      "knownTokens": {
+        "input_tokens": 227394,
+        "output_tokens": 5575,
+        "cached_tokens": 98816,
+        "reasoning_tokens": 2284
+      },
+      "tokens": {
+        "input_tokens": 227394,
+        "output_tokens": 5575,
+        "cached_tokens": 98816,
+        "reasoning_tokens": 2284
+      },
+      "money": "unknown",
+      "taskElapsedMs": 67588.98591699998,
+      "preparationElapsedMs": 1292.703582999995,
+      "evaluationElapsedMs": 423.0537080000013,
+      "cleanupElapsedMs": 58.33320800005458,
+      "probeElapsedMs": 0,
+      "newDifferencesDelivered": 0,
+      "probeObservations": [
+        {
+          "stage": "D0-observations.json",
+          "status": "disabled",
+          "snapshotSha256": "b547819e36ff4e067795bac2cbc66579042016578c15a1c5ecc83292c5ef9814",
+          "differences": [],
+          "limits": []
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "pairs": [
+    {
+      "task": "01-consecutive-runs",
+      "result": "tie"
+    },
+    {
+      "task": "02-grid-mirror",
+      "result": "tie"
+    },
+    {
+      "task": "03-required-column",
+      "result": "tie"
+    },
+    {
+      "task": "04-label-suffix",
+      "result": "tie"
+    },
+    {
+      "task": "05-packet-separator",
+      "result": "tie"
+    },
+    {
+      "task": "06-point-offset",
+      "result": "tie"
+    }
+  ],
+  "wins": 0,
+  "losses": 0,
+  "ties": 6,
+  "unknown": 0,
+  "firstRequestAt": "2026-10-08T22:24:28.215Z",
+  "preRunCI": {
+    "runId": 37850901417,
+    "url": "https://github.com/Tah10n/opencode-harness/actions/runs/37850901417",
+    "completedAt": "2026-10-08T22:20:56Z",
+    "secondsBeforeFirstRequest": 212.215,
+    "checkouts": [
+      {
+        "jobId": 113563256255,
+        "name": "Native product and model-free evaluation",
+        "commit": "d3c2cadd336aa93222ce8bed7d7a50afa3fc6aa0"
+      },
+      {
+        "jobId": 113563256459,
+        "name": "Evaluation container boundary",
+        "commit": "d3c2cadd336aa93222ce8bed7d7a50afa3fc6aa0"
+      }
+    ]
+  },
+  "usage": {
+    "requests": 236,
+    "knownUsageRecords": 236,
+    "requestsWithoutUsage": 0,
+    "knownTokens": {
+      "input_tokens": 2557802,
+      "output_tokens": 64817,
+      "cached_tokens": 1055744,
+      "reasoning_tokens": 26249
+    },
+    "money": "unknown",
+    "taskElapsedMs": 697596.1954999999,
+    "taskElapsedUnknown": 0
+  },
+  "probe": {
+    "activations": 8,
+    "deliveredDifferences": 0,
+    "additionalRepairs": 0,
+    "falseSignalsObserved": 0,
+    "newIndependentFailuresAfterCorrection": 0
+  },
+  "isolation": {
+    "requestsInspected": 236,
+    "independentIdentityLeaks": 0,
+    "rawRequestsPublished": false
+  },
+  "historyV1": {
+    "separate": true,
+    "started": 2,
+    "completed": 1,
+    "interrupted": 1,
+    "notStarted": 10,
+    "requests": 57,
+    "knownUsageRecords": 56,
+    "knownInputTokens": 835844,
+    "knownOutputTokens": 15121,
+    "unknownUsage": 1,
+    "money": "unknown"
+  },
+  "provenance": {
+    "freezeSha256": "b88a77b9ff1f692a81976a1f64d98ff4d84166b30675458687e7bf4869528e62",
+    "reportSha256": "5bef5f1ee90603398b2120a06974eb5c4a65b9dafc0d13ec905f6e72e92807c3",
+    "readinessSha256": "910926e4f8cada58f00b7df10da8bf7694b012d397cd3838c54b0e3244c05cb2",
+    "privateArchive": {
+      "path": "local/compat-replay-v2-evidence.tar.gz",
+      "sha256": "8a9f4d1d380b56f331d55688b8520ff2e09b105243b76c62e446b66c1cd77cb2",
+      "bytes": 26457653,
+      "filesVerified": 4870
+    }
+  },
+  "interpretation": "На этом development-наборе добавочная польза не показана",
+  "correctionAttribution": {
+    "task": "04-label-suffix",
+    "arm": "candidate",
+    "corrections": 2,
+    "source": "Existing D feedback about an unresolved additional public check failure; not compatibility replay",
+    "stages": [
+      {
+        "stage": "D0",
+        "correctionReasons": [
+          "Unresolved additional project check failure: node --test test/public.test.mjs"
+        ],
+        "probeStatus": "matched",
+        "independentR": true
+      },
+      {
+        "stage": "D1",
+        "correctionReasons": [
+          "Unresolved additional project check failure: node --test test/public.test.mjs"
+        ],
+        "probeStatus": "matched",
+        "independentR": true
+      },
+      {
+        "stage": "D2",
+        "correctionReasons": [],
+        "probeStatus": "matched",
+        "independentR": true
+      }
+    ]
+  }
+}
