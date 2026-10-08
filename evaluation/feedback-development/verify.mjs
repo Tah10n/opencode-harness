@@ -9,6 +9,7 @@ import {providerConfig,prepare} from './prepare.mjs';
 import {summarize,report} from './report.mjs';
 import {runPrepared,verifyRealAdmission,verifyUnstarted} from './run.mjs';
 import {manifest} from '../support/manifest.mjs';
+import {hashFile} from '../support/output-files.mjs';
 import {image} from '../support/container-session.mjs';
 import {verifyReport} from './verify-report.mjs';
 import {verifyPreparation} from './verify-preparation.mjs';
@@ -91,7 +92,20 @@ try {
   fs.writeFileSync(path.join(partial,'runs',tasks[0].id+'-direct','provider-metadata.json'),JSON.stringify([{forwarded:true,usage:{input_tokens:10,output_tokens:5,cached_tokens:0,reasoning_tokens:0}},{forwarded:true}]));
   const incomplete=(await report(partial,{evaluate:false})).rows[0];
   assert.equal(incomplete.requests,2);assert.equal(incomplete.tokens.input_tokens,null);assert.equal(incomplete.knownTokens.input_tokens,10);assert.equal(incomplete.Q,null);
-  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(directory,'frozen-manifest.json'))),frozenManifest());
+  // The completed campaign's manifest is historical evidence, not the current
+  // runtime freeze. Preserve its exact bytes and all unchanged source entries;
+  // only this verifier and the two product changes may have new source hashes.
+  const historicalFile=path.join(directory,'frozen-manifest.json');
+  assert.equal(hashFile(historicalFile).sha256,'b458d3d4f0efd49dcf71c31ee98e21b7e88deeed352ceaef14078ba9bcb9f3c3');
+  const historical=JSON.parse(fs.readFileSync(historicalFile)),comparison=frozenManifest();
+  for(const [section,file] of [['product','lib/native-task-plugin.mjs'],['product','lib/native-task-workflow.mjs'],['files','evaluation/feedback-development/verify.mjs']]) {
+    // A retained hash must still be rejected for admission against current
+    // source bytes; the compatibility check below never changes that boundary.
+    if(plan[section][file].sha256!==historical[section][file].sha256)
+      assert.throws(()=>verifyRealAdmission(realBatch,{...admitted,files:{...admitted.files,[path.join(repository,file)]:historical[section][file].sha256}},seal,digest,testImage),/Unfrozen adapter\/product file/);
+    comparison[section][file].sha256=historical[section][file].sha256;
+  }
+  assert.deepEqual(comparison,historical);
   await verifyReport(path.join(temp,'report-regressions'));
   await verifyAuth(path.join(temp,'auth-regressions'));
   verifyPreparation(path.join(temp,'preparation-regressions'));
