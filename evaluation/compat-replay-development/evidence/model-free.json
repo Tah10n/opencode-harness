@@ -1,0 +1,851 @@
+{
+  "kind": "model-free technical evidence",
+  "passed": true,
+  "sourceCommit": "cc7a255eb62983dd5c83b52a898affd6685786ee",
+  "realProviderCalls": 0,
+  "executionImage": "sha256:5d92de0484dc569c7fb6ea6c95eb4fd6520ecf050eb5ff883bbdb48d17ef721c",
+  "probeSha256": "638010cd8977d684d42dd335fce97f71396849e74abcaba8536665c057da28d8",
+  "workerSha256": "c0ec955a221055b9445ae0605144d66bb3fd03c954990ec1c7964e5004a90dc5",
+  "receipts": {
+    "preflight": "cb479077426b7897fdea6562fd47549d028929b41e186671baf2f4000927461f",
+    "installed": "8cabcb861fc086958e2f0ef342ed12a6ae370976338c68a51ef3225ae976b3f9",
+    "deadline": "9bf49af4982e405a60adb05bfc6461a681ce9f46503ed7260f63ce83c3e5e3a1",
+    "boundaries": "1876f5724742a36f2862974cdbc3dc62812ba468a72dcc6dea2d369291477b7c"
+  },
+  "rows": [
+    {
+      "task": "01-consecutive-runs",
+      "baseline": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "matched",
+        "differences": [],
+        "independentR": false
+      },
+      "gold": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "matched",
+        "differences": [],
+        "independentR": true
+      },
+      "wrong": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "different",
+        "differences": [
+          {
+            "id": "1",
+            "entrypoint": "src/index.mjs#encode",
+            "input": [
+              [
+                "a",
+                "b",
+                "a"
+              ]
+            ],
+            "baseline": {
+              "kind": "return",
+              "value": [
+                {
+                  "count": 1,
+                  "value": "a"
+                },
+                {
+                  "count": 1,
+                  "value": "b"
+                },
+                {
+                  "count": 1,
+                  "value": "a"
+                }
+              ],
+              "args": [
+                [
+                  "a",
+                  "b",
+                  "a"
+                ]
+              ]
+            },
+            "candidate": {
+              "kind": "return",
+              "value": [
+                {
+                  "count": 2,
+                  "value": "a"
+                },
+                {
+                  "count": 1,
+                  "value": "b"
+                }
+              ],
+              "args": [
+                [
+                  "a",
+                  "b",
+                  "a"
+                ]
+              ]
+            },
+            "snapshotSha256": "7e7db11e7694aa2ec9e8bf5f3b48881b7b490fecb873bfbbf95188c66b18b18e",
+            "candidateSha256": "7e7db11e7694aa2ec9e8bf5f3b48881b7b490fecb873bfbbf95188c66b18b18e",
+            "reproduction": {
+              "worker": "/template/worker.mjs",
+              "baseline": "/template/baseline",
+              "candidate": "/work/repo",
+              "corpus": "/template/baseline/compat.json",
+              "caseId": "1"
+            }
+          },
+          {
+            "id": "2",
+            "entrypoint": "src/index.mjs#summary",
+            "input": [
+              [
+                "b",
+                "b",
+                "a",
+                "b"
+              ]
+            ],
+            "baseline": {
+              "kind": "return",
+              "value": "b:2,a:1,b:1",
+              "args": [
+                [
+                  "b",
+                  "b",
+                  "a",
+                  "b"
+                ]
+              ]
+            },
+            "candidate": {
+              "kind": "return",
+              "value": "b:3,a:1",
+              "args": [
+                [
+                  "b",
+                  "b",
+                  "a",
+                  "b"
+                ]
+              ]
+            },
+            "snapshotSha256": "7e7db11e7694aa2ec9e8bf5f3b48881b7b490fecb873bfbbf95188c66b18b18e",
+            "candidateSha256": "7e7db11e7694aa2ec9e8bf5f3b48881b7b490fecb873bfbbf95188c66b18b18e",
+            "reproduction": {
+              "worker": "/template/worker.mjs",
+              "baseline": "/template/baseline",
+              "candidate": "/work/repo",
+              "corpus": "/template/baseline/compat.json",
+              "caseId": "2"
+            }
+          }
+        ],
+        "independentR": false
+      }
+    },
+    {
+      "task": "02-grid-mirror",
+      "baseline": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "matched",
+        "differences": [],
+        "independentR": false
+      },
+      "gold": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "matched",
+        "differences": [],
+        "independentR": true
+      },
+      "wrong": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "different",
+        "differences": [
+          {
+            "id": "1",
+            "entrypoint": "src/index.mjs#mirror",
+            "input": [
+              [
+                1,
+                2,
+                3
+              ]
+            ],
+            "baseline": {
+              "kind": "return",
+              "value": [
+                3,
+                2,
+                1
+              ],
+              "args": [
+                [
+                  1,
+                  2,
+                  3
+                ]
+              ]
+            },
+            "candidate": {
+              "kind": "return",
+              "value": [
+                3,
+                2,
+                1
+              ],
+              "args": [
+                [
+                  3,
+                  2,
+                  1
+                ]
+              ]
+            },
+            "snapshotSha256": "e7a73a4bd9fd2f9b76addb695a171494b07a26d17543742f6dc772437c75bf4a",
+            "candidateSha256": "e7a73a4bd9fd2f9b76addb695a171494b07a26d17543742f6dc772437c75bf4a",
+            "reproduction": {
+              "worker": "/template/worker.mjs",
+              "baseline": "/template/baseline",
+              "candidate": "/work/repo",
+              "corpus": "/template/baseline/compat.json",
+              "caseId": "1"
+            }
+          },
+          {
+            "id": "2",
+            "entrypoint": "src/index.mjs#mirrorGrid",
+            "input": [
+              [
+                [
+                  1,
+                  2
+                ],
+                [],
+                [
+                  3,
+                  4
+                ]
+              ]
+            ],
+            "baseline": {
+              "kind": "return",
+              "value": [
+                [
+                  2,
+                  1
+                ],
+                [],
+                [
+                  4,
+                  3
+                ]
+              ],
+              "args": [
+                [
+                  [
+                    1,
+                    2
+                  ],
+                  [],
+                  [
+                    3,
+                    4
+                  ]
+                ]
+              ]
+            },
+            "candidate": {
+              "kind": "return",
+              "value": [
+                [
+                  2,
+                  1
+                ],
+                [],
+                [
+                  4,
+                  3
+                ]
+              ],
+              "args": [
+                [
+                  [
+                    2,
+                    1
+                  ],
+                  [],
+                  [
+                    4,
+                    3
+                  ]
+                ]
+              ]
+            },
+            "snapshotSha256": "e7a73a4bd9fd2f9b76addb695a171494b07a26d17543742f6dc772437c75bf4a",
+            "candidateSha256": "e7a73a4bd9fd2f9b76addb695a171494b07a26d17543742f6dc772437c75bf4a",
+            "reproduction": {
+              "worker": "/template/worker.mjs",
+              "baseline": "/template/baseline",
+              "candidate": "/work/repo",
+              "corpus": "/template/baseline/compat.json",
+              "caseId": "2"
+            }
+          }
+        ],
+        "independentR": false
+      }
+    },
+    {
+      "task": "03-required-column",
+      "baseline": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "matched",
+        "differences": [],
+        "independentR": false
+      },
+      "gold": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "matched",
+        "differences": [],
+        "independentR": true
+      },
+      "wrong": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "different",
+        "differences": [
+          {
+            "id": "1",
+            "entrypoint": "src/index.mjs#column",
+            "input": [
+              [
+                {
+                  "n": 1
+                },
+                {}
+              ],
+              "n"
+            ],
+            "baseline": {
+              "kind": "throw",
+              "name": "RangeError",
+              "message": "missing field: n",
+              "args": [
+                [
+                  {
+                    "n": 1
+                  },
+                  {}
+                ],
+                "n"
+              ]
+            },
+            "candidate": {
+              "kind": "return",
+              "value": [
+                1,
+                null
+              ],
+              "args": [
+                [
+                  {
+                    "n": 1
+                  },
+                  {}
+                ],
+                "n"
+              ]
+            },
+            "snapshotSha256": "8240066176040dc2bfaa632c9f37758aeab265e77c5557587ba8e8fb0fcbb86e",
+            "candidateSha256": "8240066176040dc2bfaa632c9f37758aeab265e77c5557587ba8e8fb0fcbb86e",
+            "reproduction": {
+              "worker": "/template/worker.mjs",
+              "baseline": "/template/baseline",
+              "candidate": "/work/repo",
+              "corpus": "/template/baseline/compat.json",
+              "caseId": "1"
+            }
+          },
+          {
+            "id": "2",
+            "entrypoint": "src/index.mjs#first",
+            "input": [
+              [
+                {}
+              ],
+              "n"
+            ],
+            "baseline": {
+              "kind": "throw",
+              "name": "RangeError",
+              "message": "missing field: n",
+              "args": [
+                [
+                  {}
+                ],
+                "n"
+              ]
+            },
+            "candidate": {
+              "kind": "return",
+              "value": null,
+              "args": [
+                [
+                  {}
+                ],
+                "n"
+              ]
+            },
+            "snapshotSha256": "8240066176040dc2bfaa632c9f37758aeab265e77c5557587ba8e8fb0fcbb86e",
+            "candidateSha256": "8240066176040dc2bfaa632c9f37758aeab265e77c5557587ba8e8fb0fcbb86e",
+            "reproduction": {
+              "worker": "/template/worker.mjs",
+              "baseline": "/template/baseline",
+              "candidate": "/work/repo",
+              "corpus": "/template/baseline/compat.json",
+              "caseId": "2"
+            }
+          }
+        ],
+        "independentR": false
+      }
+    },
+    {
+      "task": "04-label-suffix",
+      "baseline": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "matched",
+        "differences": [],
+        "independentR": false
+      },
+      "gold": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "matched",
+        "differences": [],
+        "independentR": true
+      },
+      "wrong": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "different",
+        "differences": [
+          {
+            "id": "1",
+            "entrypoint": "src/index.mjs#label",
+            "input": [
+              "😀xy",
+              1
+            ],
+            "baseline": {
+              "kind": "return",
+              "value": "😀…",
+              "args": [
+                "😀xy",
+                1
+              ]
+            },
+            "candidate": {
+              "kind": "return",
+              "value": "\ud83d…",
+              "args": [
+                "😀xy",
+                1
+              ]
+            },
+            "snapshotSha256": "0b4ae76ecc83f7f9c906b85f231ca9764e2382301537600f797ef9b866da32b8",
+            "candidateSha256": "0b4ae76ecc83f7f9c906b85f231ca9764e2382301537600f797ef9b866da32b8",
+            "reproduction": {
+              "worker": "/template/worker.mjs",
+              "baseline": "/template/baseline",
+              "candidate": "/work/repo",
+              "corpus": "/template/baseline/compat.json",
+              "caseId": "1"
+            }
+          },
+          {
+            "id": "2",
+            "entrypoint": "src/index.mjs#label",
+            "input": [
+              "😀",
+              1
+            ],
+            "baseline": {
+              "kind": "return",
+              "value": "😀",
+              "args": [
+                "😀",
+                1
+              ]
+            },
+            "candidate": {
+              "kind": "return",
+              "value": "\ud83d…",
+              "args": [
+                "😀",
+                1
+              ]
+            },
+            "snapshotSha256": "0b4ae76ecc83f7f9c906b85f231ca9764e2382301537600f797ef9b866da32b8",
+            "candidateSha256": "0b4ae76ecc83f7f9c906b85f231ca9764e2382301537600f797ef9b866da32b8",
+            "reproduction": {
+              "worker": "/template/worker.mjs",
+              "baseline": "/template/baseline",
+              "candidate": "/work/repo",
+              "corpus": "/template/baseline/compat.json",
+              "caseId": "2"
+            }
+          }
+        ],
+        "independentR": false
+      }
+    },
+    {
+      "task": "05-packet-separator",
+      "baseline": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "matched",
+        "differences": [],
+        "independentR": false
+      },
+      "gold": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "matched",
+        "differences": [],
+        "independentR": true
+      },
+      "wrong": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "different",
+        "differences": [
+          {
+            "id": "1",
+            "entrypoint": "src/index.mjs#packet",
+            "input": [
+              [
+                "",
+                "x",
+                "",
+                ""
+              ]
+            ],
+            "baseline": {
+              "kind": "return",
+              "value": "|x||",
+              "args": [
+                [
+                  "",
+                  "x",
+                  "",
+                  ""
+                ]
+              ]
+            },
+            "candidate": {
+              "kind": "return",
+              "value": "x",
+              "args": [
+                [
+                  "",
+                  "x",
+                  "",
+                  ""
+                ]
+              ]
+            },
+            "snapshotSha256": "b6ea1f9f216834ed82645a7b1f508f7e6179b20def69e5c894a85fa7ef32f9e2",
+            "candidateSha256": "b6ea1f9f216834ed82645a7b1f508f7e6179b20def69e5c894a85fa7ef32f9e2",
+            "reproduction": {
+              "worker": "/template/worker.mjs",
+              "baseline": "/template/baseline",
+              "candidate": "/work/repo",
+              "corpus": "/template/baseline/compat.json",
+              "caseId": "1"
+            }
+          },
+          {
+            "id": "2",
+            "entrypoint": "src/index.mjs#packet",
+            "input": [
+              [
+                "",
+                ""
+              ]
+            ],
+            "baseline": {
+              "kind": "return",
+              "value": "|",
+              "args": [
+                [
+                  "",
+                  ""
+                ]
+              ]
+            },
+            "candidate": {
+              "kind": "return",
+              "value": "",
+              "args": [
+                [
+                  "",
+                  ""
+                ]
+              ]
+            },
+            "snapshotSha256": "b6ea1f9f216834ed82645a7b1f508f7e6179b20def69e5c894a85fa7ef32f9e2",
+            "candidateSha256": "b6ea1f9f216834ed82645a7b1f508f7e6179b20def69e5c894a85fa7ef32f9e2",
+            "reproduction": {
+              "worker": "/template/worker.mjs",
+              "baseline": "/template/baseline",
+              "candidate": "/work/repo",
+              "corpus": "/template/baseline/compat.json",
+              "caseId": "2"
+            }
+          }
+        ],
+        "independentR": false
+      }
+    },
+    {
+      "task": "06-point-offset",
+      "baseline": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "matched",
+        "differences": [],
+        "independentR": false
+      },
+      "gold": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "matched",
+        "differences": [],
+        "independentR": true
+      },
+      "wrong": {
+        "publicExit": 0,
+        "existingCorrectionReasons": [],
+        "probeStatus": "different",
+        "differences": [
+          {
+            "id": "1",
+            "entrypoint": "src/index.mjs#transform",
+            "input": [
+              [
+                [
+                  2,
+                  4
+                ],
+                [
+                  1,
+                  3
+                ]
+              ],
+              {
+                "scale": 0
+              }
+            ],
+            "baseline": {
+              "kind": "return",
+              "value": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0
+                ]
+              ],
+              "args": [
+                [
+                  [
+                    2,
+                    4
+                  ],
+                  [
+                    1,
+                    3
+                  ]
+                ],
+                {
+                  "scale": 0
+                }
+              ]
+            },
+            "candidate": {
+              "kind": "return",
+              "value": [
+                [
+                  2,
+                  4
+                ],
+                [
+                  1,
+                  3
+                ]
+              ],
+              "args": [
+                [
+                  [
+                    2,
+                    4
+                  ],
+                  [
+                    1,
+                    3
+                  ]
+                ],
+                {
+                  "scale": 0
+                }
+              ]
+            },
+            "snapshotSha256": "0ce6d50462bd2e3f871cad09c18c4f018404636d40a396758578b74d310ed8c8",
+            "candidateSha256": "0ce6d50462bd2e3f871cad09c18c4f018404636d40a396758578b74d310ed8c8",
+            "reproduction": {
+              "worker": "/template/worker.mjs",
+              "baseline": "/template/baseline",
+              "candidate": "/work/repo",
+              "corpus": "/template/baseline/compat.json",
+              "caseId": "1"
+            }
+          }
+        ],
+        "independentR": false
+      }
+    }
+  ],
+  "negative": [
+    {
+      "name": "unsupported",
+      "status": "unsupported",
+      "limits": [
+        "Unsupported JSON value",
+        "Missing synchronous entrypoint"
+      ]
+    },
+    {
+      "name": "nondeterminism",
+      "status": "unproven",
+      "limits": [
+        "nondeterminism",
+        "Missing synchronous entrypoint"
+      ]
+    },
+    {
+      "name": "stateful",
+      "status": "unproven",
+      "limits": [
+        "nondeterminism",
+        "Missing synchronous entrypoint"
+      ]
+    },
+    {
+      "name": "execution",
+      "status": "unsupported",
+      "limits": [
+        "module execution: Unexpected identifier 'is'"
+      ]
+    },
+    {
+      "name": "timeout",
+      "status": "unproven",
+      "limits": [
+        "timeout",
+        "Missing synchronous entrypoint"
+      ]
+    },
+    {
+      "name": "corpus",
+      "status": "unproven",
+      "limits": [
+        "Baseline/corpus integrity mismatch"
+      ]
+    },
+    {
+      "name": "baseline",
+      "status": "unproven",
+      "limits": [
+        "Baseline/corpus integrity mismatch"
+      ]
+    },
+    {
+      "name": "participant-corpus",
+      "status": "unproven",
+      "limits": [
+        "Candidate changed declaration/corpus"
+      ]
+    },
+    {
+      "name": "missing-corpus",
+      "status": "unproven",
+      "limits": [
+        "ENOENT: no such file or directory, open '/work/repo/compat.json'"
+      ]
+    },
+    {
+      "name": "worker-timeout",
+      "status": "unproven",
+      "limits": [
+        "Task budget exhausted"
+      ]
+    }
+  ],
+  "installed": [
+    {
+      "arm": "control",
+      "initialR": false,
+      "R": false,
+      "delivery": true,
+      "Q": false,
+      "corrections": 0,
+      "newDifferencesDelivered": 0
+    },
+    {
+      "arm": "candidate",
+      "initialR": false,
+      "R": true,
+      "delivery": true,
+      "Q": true,
+      "corrections": 1,
+      "newDifferencesDelivered": 2
+    }
+  ],
+  "probeDelivered": true,
+  "probeCleared": true,
+  "deadline": [
+    {
+      "arm": "control",
+      "hangIssued": true,
+      "terminationVerified": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0
+    },
+    {
+      "arm": "candidate",
+      "hangIssued": true,
+      "terminationVerified": true,
+      "relayRemoved": true,
+      "activeProviderHandlers": 0
+    }
+  ],
+  "limitations": [
+    "Scripted provider outputs are technical fixtures, not model quality.",
+    "Earlier preparation failures remain in private evidence: missing rg in old image; reporter id format; wrong worker executable; scripted untracked-helper repair; Error.stack accessor classification.",
+    "worker-timeout control exhausted remaining budget before worker launch; function timeout and native workload deadline are separate executed controls."
+  ]
+}
