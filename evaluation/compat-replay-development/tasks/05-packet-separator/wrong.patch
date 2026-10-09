@@ -1,0 +1,7 @@
+diff --git a/src/parts.mjs b/src/parts.mjs
+index e04e338..526a632 100644
+--- a/src/parts.mjs
++++ b/src/parts.mjs
+@@ -1 +1 @@
+-export function joinParts(parts){return parts.join('|');}
++export function joinParts(parts,options={}){return parts.filter(Boolean).join(options.separator??'|');}

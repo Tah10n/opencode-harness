@@ -1,0 +1,15 @@
+diff --git a/src/append.mjs b/src/append.mjs
+new file mode 100644
+index 0000000..b493ffc
+--- /dev/null
++++ b/src/append.mjs
+@@ -0,0 +1 @@
++export function appendRun(out,value){const last=out.at(-1);if(last&&last.value===value)last.count++;else out.push({value,count:1});}
+diff --git a/src/runs.mjs b/src/runs.mjs
+index 791f1c2..fd27e3b 100644
+--- a/src/runs.mjs
++++ b/src/runs.mjs
+@@ -1 +1,2 @@
+-export function runs(values){const out=[];for(const value of values){const last=out.at(-1);if(last&&last.value===value)last.count++;else out.push({value,count:1});}return out;}
++import {appendRun} from './append.mjs';
++export function runs(values){const out=[];for(const value of values)appendRun(out,value);return out;}

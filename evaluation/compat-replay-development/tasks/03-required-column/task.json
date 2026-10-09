@@ -1,0 +1,10 @@
+{
+  "id": "03-required-column",
+  "group": "refactor",
+  "feature": [
+    "fd23.feature"
+  ],
+  "preservation": [
+    "fd23.preservation"
+  ]
+}

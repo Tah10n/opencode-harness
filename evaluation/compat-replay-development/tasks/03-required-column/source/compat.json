@@ -1,0 +1,55 @@
+{
+  "revision": 1,
+  "domain": "synchronous bounded JSON; declared calls only",
+  "preserved": "Missing own field throws RangeError with message missing field: KEY; null and false are values; empty first returns null. Input rows unchanged.",
+  "excluded": "Internal structure only.",
+  "cases": [
+    {
+      "id": "1",
+      "module": "src/index.mjs",
+      "export": "column",
+      "args": [
+        [
+          {
+            "n": 1
+          },
+          {}
+        ],
+        "n"
+      ]
+    },
+    {
+      "id": "2",
+      "module": "src/index.mjs",
+      "export": "first",
+      "args": [
+        [
+          {}
+        ],
+        "n"
+      ]
+    },
+    {
+      "id": "3",
+      "module": "src/index.mjs",
+      "export": "first",
+      "args": [
+        [
+          {
+            "n": false
+          }
+        ],
+        "n"
+      ]
+    },
+    {
+      "id": "4",
+      "module": "src/index.mjs",
+      "export": "column",
+      "args": [
+        [],
+        "n"
+      ]
+    }
+  ]
+}

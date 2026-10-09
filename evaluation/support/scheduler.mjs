@@ -48,7 +48,7 @@ export function knownResponseTerminal(record){return !!record.terminalResponse&&
 
 export function verifyFrozenSchedule(f,runTaskImplementation,fetchImpl=fetch){
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
- if(!['polybench','polybench-preflight','fixture','feedback-development','feedback-calibration'].includes(f.experimentKind))throw Error('Unsupported evaluation schedule; historical campaigns cannot resume');
+ if(!['polybench','polybench-preflight','fixture','feedback-development','feedback-calibration','compat-replay-development'].includes(f.experimentKind))throw Error('Unsupported evaluation schedule; historical campaigns cannot resume');
  if(f.experimentKind==='fixture'&&fetchImpl===fetch)throw Error('Fixtures cannot access provider');
  if(typeof runTaskImplementation!=='function'||typeof f.model!=='string'||!/^openai\/[^/\s]+$/.test(f.model)||typeof f.variant!=='string'||!f.variant||!Number.isSafeInteger(f.budgetMs)||f.budgetMs<=0||f.budgetMs>3600000||!f.preflightPassed)throw Error('Invalid frozen configuration');
  for(const [file,digest] of Object.entries(f.files))if(sha(fs.readFileSync(file))!==digest)throw Error('Frozen file changed: '+file);
@@ -59,12 +59,16 @@ const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
   const tasks=new Set();
   for(let i=0;i<16;i+=2){const a=f.attempts[i],b=f.attempts[i+1];if(a.task!==b.task||tasks.has(a.task)||[a.arm,b.arm].join(',')!==(i%4===0?'direct,D':'D,direct')||a.source!==b.source)throw Error('Invalid feedback development pair/order');tasks.add(a.task);}
  }
+ if(f.experimentKind==='compat-replay-development') {
+  if(f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==600000||f.strategy!=='per-slot'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.length!==12)throw Error('Invalid compatibility development configuration/allocation');
+  const seen=new Set();for(let i=0;i<12;i+=2){const a=f.attempts[i],b=f.attempts[i+1];if(a.task!==b.task||seen.has(a.task)||a.source!==b.source||[a.arm,b.arm].join(',')!==(i%4===0?'control,candidate':'candidate,control'))throw Error('Invalid compatibility development pair/order');seen.add(a.task);}
+ }
  if(f.experimentKind==='feedback-calibration') {
   const orders=['P,H0,H1','H0,H1,P','H1,P,H0','P,H1,H0','H1,H0,P','H0,P,H1'];
   if(f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==600000||f.strategy!=='per-slot'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.length!==18||JSON.stringify(f.armModes)!==JSON.stringify({P:'plain',H0:'task',H1:'task'}))throw Error('Invalid calibration configuration/allocation');
   const seen=new Set();for(let i=0;i<6;i++){const group=f.attempts.slice(i*3,i*3+3),a=group[0];if(seen.has(a.task)||group.some(b=>b.task!==a.task||b.source!==a.source)||group.map(b=>b.arm).join(',')!==orders[i])throw Error('Invalid calibration order/input');seen.add(a.task);}
  }
- if(!['fixture','feedback-development','feedback-calibration'].includes(f.experimentKind)){
+ if(!['fixture','feedback-development','feedback-calibration','compat-replay-development'].includes(f.experimentKind)){
   const consolidated=nativeCampaign(f.campaign),remaining=f.campaign==='consolidated-remaining-v1',quality=qualityCampaign(f.campaign);
   if(f.campaign&&!consolidated)throw Error('Unsupported PolyBench campaign');
   const spec=quality?qualitySpecification(f.campaign):null;

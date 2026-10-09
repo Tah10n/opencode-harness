@@ -1,0 +1,7 @@
+diff --git a/src/clip.mjs b/src/clip.mjs
+index 46dbbaa..1c96d9c 100644
+--- a/src/clip.mjs
++++ b/src/clip.mjs
+@@ -1 +1 @@
+-export function clip(text,width){const chars=Array.from(text);return chars.length<=width?text:chars.slice(0,width).join('')+'…';}
++export function clip(text,width,options={}){const chars=text.split('');return chars.length<=width?text:chars.slice(0,width).join('')+(options.suffix??'…');}

@@ -1,0 +1,4198 @@
+{
+  "kind": "model-free technical evidence",
+  "sourceCommit": "979395caeaa947e735972b04f13289bf1378f174",
+  "realProviderCalls": 0,
+  "failBefore": {
+    "sourceCommit": "e8f0547dd8c78c0b5d3a020f58c2498be59fa30c",
+    "exitCode": 1,
+    "rows": [
+      {
+        "fullVerify": "missing",
+        "realPreparationAccepted": true,
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "fullVerify": "running",
+        "realPreparationAccepted": true,
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "fullVerify": "failed",
+        "realPreparationAccepted": true,
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "fullVerify": "interrupted",
+        "realPreparationAccepted": true,
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      }
+    ],
+    "logSha256": "e4691cafd700ea6da0e43d917c7a15762db859fd41f62aee6298b5201a63e29f",
+    "reproducerSha256": "d89da29fdb5f322af2d1f0a3ceed7311397fa705d7cfacbc6cdd6f0d583da792"
+  },
+  "passAfter": {
+    "passed": true,
+    "fixtureOnly": true,
+    "rows": [
+      {
+        "name": "missing-full-verify",
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "name": "verify-missing",
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "name": "verify-running",
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "name": "verify-failed",
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "name": "verify-interrupted",
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "name": "changed-source",
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "name": "changed-verification-script",
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "name": "changed-bundle",
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "name": "changed-toolchain",
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "name": "ci-pending",
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "name": "ci-skipped",
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "name": "ci-stale",
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "name": "direct-runPrepared-without-readiness",
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "name": "fixture-real-authorization",
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "name": "fixture-real-transport",
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "name": "closed-v1",
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      },
+      {
+        "name": "already-started",
+        "authAccesses": 0,
+        "upstreamRequests": 0,
+        "participantAttempts": 0
+      }
+    ],
+    "commandFailureControls": 3,
+    "ciMetadataPreservedAfterStep": true
+  },
+  "sourceChangeDuringPreparation": {
+    "result": "rejected",
+    "readinessPublished": false,
+    "logSha256": "2ae5921cf589c7b5bce87b31f49a94cbfb606ebe3ec56793db4595f312973410"
+  },
+  "ciMetadataCollision": {
+    "result": "readiness publication rejected; metadata and step receipts now use distinct files",
+    "logSha256": "42d853719c2b0948033ed811205a782955bafd713d5ee10802ff86d708b15305"
+  },
+  "historicalReader": {
+    "passed": true,
+    "suite": "compat-replay-development-v1",
+    "originalPathsPreserved": true,
+    "rows": 12,
+    "originalEvidenceModified": false
+  },
+  "initialCI": {
+    "runId": 37847248831,
+    "result": "native job failed on fixture Node version; source fixed before inference",
+    "logSha256": "e75dacfdd02a4443460829ca5ab05a93b2dcca4a55505c0ebad707cfa55642c5"
+  },
+  "preparationSteps": [
+    {
+      "name": "dependencies",
+      "command": [
+        "npm",
+        "ci",
+        "--ignore-scripts"
+      ],
+      "startedAt": "2026-10-08T22:02:47.875Z",
+      "finishedAt": "2026-10-08T22:02:48.436Z",
+      "status": "completed",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "log": {
+        "path": "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/dependencies.log",
+        "sha256": "0db0c42227009805be4becd988f3d841fdc0e67b0a51c9701318ab581ba9c3ab"
+      }
+    },
+    {
+      "name": "sensitivity-dependencies",
+      "command": [
+        "npm",
+        "ci",
+        "--ignore-scripts",
+        "--prefix",
+        "profiles/native/sensitivity"
+      ],
+      "startedAt": "2026-10-08T22:02:48.610Z",
+      "finishedAt": "2026-10-08T22:02:49.671Z",
+      "status": "completed",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "log": {
+        "path": "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/sensitivity-dependencies.log",
+        "sha256": "93df4725940d3a49b913b3343c672b745a3a7e65ab565e6482342725c766fcab"
+      }
+    },
+    {
+      "name": "assets",
+      "command": [
+        "/opt/homebrew/Cellar/node@24/24.19.0/bin/node",
+        "/Users/tahion/dev/opencode-harness/evaluation/compat-replay-development/prepare-ready.mjs",
+        "assets",
+        "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/assets",
+        "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/runtime/node_modules/opencode-linux-arm64/bin/opencode"
+      ],
+      "startedAt": "2026-10-08T22:02:49.818Z",
+      "finishedAt": "2026-10-08T22:02:52.194Z",
+      "status": "completed",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "log": {
+        "path": "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/assets.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "verify",
+      "command": [
+        "npm",
+        "run",
+        "verify"
+      ],
+      "startedAt": "2026-10-08T22:02:54.263Z",
+      "finishedAt": "2026-10-08T22:12:59.754Z",
+      "status": "completed",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "log": {
+        "path": "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/verify.log",
+        "sha256": "17380fb9f0c456b7edefe7d5ef1bdc0528051b27c26f1574d5a156986b7d8869"
+      }
+    },
+    {
+      "name": "verify-installed",
+      "command": [
+        "npm",
+        "run",
+        "verify:installed"
+      ],
+      "startedAt": "2026-10-08T22:13:01.505Z",
+      "finishedAt": "2026-10-08T22:17:54.807Z",
+      "status": "completed",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "log": {
+        "path": "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/verify-installed.log",
+        "sha256": "5a2139f9bc9806addef6240d17ec2b2ec8a5d22903c30d1b75113a53233c515b"
+      }
+    },
+    {
+      "name": "container-boundary",
+      "command": [
+        "/opt/homebrew/Cellar/node@24/24.19.0/bin/node",
+        "evaluation/support/verify-output-boundaries.mjs"
+      ],
+      "startedAt": "2026-10-08T22:17:56.592Z",
+      "finishedAt": "2026-10-08T22:17:57.831Z",
+      "status": "completed",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "log": {
+        "path": "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/container-boundary.log",
+        "sha256": "7a4f2c2097e63b6592875ecb9d278c42c19b48c78e06b87a2540357be1d6853f"
+      }
+    },
+    {
+      "name": "experiment-container",
+      "command": [
+        "/opt/homebrew/Cellar/node@24/24.19.0/bin/node",
+        "evaluation/compat-replay-development/container-checks.mjs",
+        "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/preflight",
+        "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/assets/toolchain"
+      ],
+      "startedAt": "2026-10-08T22:17:58.852Z",
+      "finishedAt": "2026-10-08T22:18:32.598Z",
+      "status": "completed",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "log": {
+        "path": "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/experiment-container.log",
+        "sha256": "e6fddad8a32ed72e72342aeb77fa53bd24421dc8a6939e6640aa29dbe6b77314"
+      }
+    },
+    {
+      "name": "installed-correction-and-deadlines",
+      "command": [
+        "/opt/homebrew/Cellar/node@24/24.19.0/bin/node",
+        "evaluation/compat-replay-development/installed.mjs",
+        "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/installed",
+        "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/assets/bundle",
+        "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/assets/toolchain"
+      ],
+      "startedAt": "2026-10-08T22:18:33.635Z",
+      "finishedAt": "2026-10-08T22:19:03.762Z",
+      "status": "completed",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "log": {
+        "path": "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/installed-correction-and-deadlines.log",
+        "sha256": "75e7d53a6f024d9cc9531f423acf10c9bd56d2fc8573944b9dd846497d2f4370"
+      }
+    },
+    {
+      "name": "scripted-schedule",
+      "command": [
+        "/opt/homebrew/Cellar/node@24/24.19.0/bin/node",
+        "evaluation/compat-replay-development/installed.mjs",
+        "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/rehearsal",
+        "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/assets/bundle",
+        "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/assets/toolchain",
+        "--all"
+      ],
+      "startedAt": "2026-10-08T22:19:04.747Z",
+      "finishedAt": "2026-10-08T22:20:21.915Z",
+      "status": "completed",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "log": {
+        "path": "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/scripted-schedule.log",
+        "sha256": "87252cea1551f227733df1a6b026055dec1b9802c6aa52780ff948588067b3d0"
+      }
+    },
+    {
+      "name": "ci",
+      "command": [
+        "/opt/homebrew/Cellar/node@24/24.19.0/bin/node",
+        "/Users/tahion/dev/opencode-harness/evaluation/compat-replay-development/prepare-ready.mjs",
+        "ci",
+        "979395caeaa947e735972b04f13289bf1378f174",
+        "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3"
+      ],
+      "startedAt": "2026-10-08T22:20:22.909Z",
+      "finishedAt": "2026-10-08T22:21:17.155Z",
+      "status": "completed",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "log": {
+        "path": "/Users/tahion/dev/opencode-harness/local/compat-replay-v2/preparation-3/ci.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "preflight": {
+    "rows": [
+      {
+        "task": "01-consecutive-runs",
+        "results": {
+          "baseline": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [],
+            "probe": {
+              "revision": 1,
+              "status": "matched",
+              "snapshotSha256": "8064659945fea01865a2eb60c31f7077f2ddeca54ce4f2f52553152dace96ec5",
+              "pins": {
+                "baselineSha256": "8064659945fea01865a2eb60c31f7077f2ddeca54ce4f2f52553152dace96ec5",
+                "corpusSha256": "48635d314a22df7c31baa97984fca97bd9ea5b05aeb0b00dad3581d51c0ffba4"
+              },
+              "differences": [],
+              "limits": [],
+              "candidateSha256": "8064659945fea01865a2eb60c31f7077f2ddeca54ce4f2f52553152dace96ec5",
+              "elapsedMs": 98.04054199999999
+            },
+            "independentR": false
+          },
+          "gold": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [],
+            "probe": {
+              "revision": 1,
+              "status": "matched",
+              "snapshotSha256": "c7cbf9fa74d82b3acd14035fa5ede2c5d495cada4c1a2b546ccaaaeaa5694120",
+              "pins": {
+                "baselineSha256": "8064659945fea01865a2eb60c31f7077f2ddeca54ce4f2f52553152dace96ec5",
+                "corpusSha256": "48635d314a22df7c31baa97984fca97bd9ea5b05aeb0b00dad3581d51c0ffba4"
+              },
+              "differences": [],
+              "limits": [],
+              "candidateSha256": "c7cbf9fa74d82b3acd14035fa5ede2c5d495cada4c1a2b546ccaaaeaa5694120",
+              "elapsedMs": 92.002708
+            },
+            "independentR": true
+          },
+          "wrong": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [
+              "Preserved behavior differs on fixed baseline calls: src/index.mjs#encode case 1, src/index.mjs#summary case 2"
+            ],
+            "probe": {
+              "revision": 1,
+              "status": "different",
+              "snapshotSha256": "7e7db11e7694aa2ec9e8bf5f3b48881b7b490fecb873bfbbf95188c66b18b18e",
+              "pins": {
+                "baselineSha256": "8064659945fea01865a2eb60c31f7077f2ddeca54ce4f2f52553152dace96ec5",
+                "corpusSha256": "48635d314a22df7c31baa97984fca97bd9ea5b05aeb0b00dad3581d51c0ffba4"
+              },
+              "differences": [
+                {
+                  "id": "1",
+                  "entrypoint": "src/index.mjs#encode",
+                  "input": [
+                    [
+                      "a",
+                      "b",
+                      "a"
+                    ]
+                  ],
+                  "baseline": {
+                    "kind": "return",
+                    "value": [
+                      {
+                        "count": 1,
+                        "value": "a"
+                      },
+                      {
+                        "count": 1,
+                        "value": "b"
+                      },
+                      {
+                        "count": 1,
+                        "value": "a"
+                      }
+                    ],
+                    "args": [
+                      [
+                        "a",
+                        "b",
+                        "a"
+                      ]
+                    ]
+                  },
+                  "candidate": {
+                    "kind": "return",
+                    "value": [
+                      {
+                        "count": 2,
+                        "value": "a"
+                      },
+                      {
+                        "count": 1,
+                        "value": "b"
+                      }
+                    ],
+                    "args": [
+                      [
+                        "a",
+                        "b",
+                        "a"
+                      ]
+                    ]
+                  },
+                  "snapshotSha256": "7e7db11e7694aa2ec9e8bf5f3b48881b7b490fecb873bfbbf95188c66b18b18e",
+                  "candidateSha256": "7e7db11e7694aa2ec9e8bf5f3b48881b7b490fecb873bfbbf95188c66b18b18e",
+                  "reproduction": {
+                    "worker": "/template/worker.mjs",
+                    "baseline": "/template/baseline",
+                    "candidate": "/work/repo",
+                    "corpus": "/template/baseline/compat.json",
+                    "caseId": "1"
+                  }
+                },
+                {
+                  "id": "2",
+                  "entrypoint": "src/index.mjs#summary",
+                  "input": [
+                    [
+                      "b",
+                      "b",
+                      "a",
+                      "b"
+                    ]
+                  ],
+                  "baseline": {
+                    "kind": "return",
+                    "value": "b:2,a:1,b:1",
+                    "args": [
+                      [
+                        "b",
+                        "b",
+                        "a",
+                        "b"
+                      ]
+                    ]
+                  },
+                  "candidate": {
+                    "kind": "return",
+                    "value": "b:3,a:1",
+                    "args": [
+                      [
+                        "b",
+                        "b",
+                        "a",
+                        "b"
+                      ]
+                    ]
+                  },
+                  "snapshotSha256": "7e7db11e7694aa2ec9e8bf5f3b48881b7b490fecb873bfbbf95188c66b18b18e",
+                  "candidateSha256": "7e7db11e7694aa2ec9e8bf5f3b48881b7b490fecb873bfbbf95188c66b18b18e",
+                  "reproduction": {
+                    "worker": "/template/worker.mjs",
+                    "baseline": "/template/baseline",
+                    "candidate": "/work/repo",
+                    "corpus": "/template/baseline/compat.json",
+                    "caseId": "2"
+                  }
+                }
+              ],
+              "limits": [],
+              "candidateSha256": "7e7db11e7694aa2ec9e8bf5f3b48881b7b490fecb873bfbbf95188c66b18b18e",
+              "elapsedMs": 94.64175
+            },
+            "independentR": false
+          }
+        }
+      },
+      {
+        "task": "02-grid-mirror",
+        "results": {
+          "baseline": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [],
+            "probe": {
+              "revision": 1,
+              "status": "matched",
+              "snapshotSha256": "75e4d6bde50af00f19b1b00ffe11e86536d0de4944e9b7b9d0720ad97df957f5",
+              "pins": {
+                "baselineSha256": "75e4d6bde50af00f19b1b00ffe11e86536d0de4944e9b7b9d0720ad97df957f5",
+                "corpusSha256": "1c4e4113dd048a57db32491744f276eb1670665fce1f6faef2e19b5fd8f10501"
+              },
+              "differences": [],
+              "limits": [],
+              "candidateSha256": "75e4d6bde50af00f19b1b00ffe11e86536d0de4944e9b7b9d0720ad97df957f5",
+              "elapsedMs": 82.716667
+            },
+            "independentR": false
+          },
+          "gold": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [],
+            "probe": {
+              "revision": 1,
+              "status": "matched",
+              "snapshotSha256": "a197504d1dd35e580d438b2c1ee71ab6e7fa5a7ccded624a7ab7bd22ff54791c",
+              "pins": {
+                "baselineSha256": "75e4d6bde50af00f19b1b00ffe11e86536d0de4944e9b7b9d0720ad97df957f5",
+                "corpusSha256": "1c4e4113dd048a57db32491744f276eb1670665fce1f6faef2e19b5fd8f10501"
+              },
+              "differences": [],
+              "limits": [],
+              "candidateSha256": "a197504d1dd35e580d438b2c1ee71ab6e7fa5a7ccded624a7ab7bd22ff54791c",
+              "elapsedMs": 91.482417
+            },
+            "independentR": true
+          },
+          "wrong": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [
+              "Preserved behavior differs on fixed baseline calls: src/index.mjs#mirror case 1, src/index.mjs#mirrorGrid case 2"
+            ],
+            "probe": {
+              "revision": 1,
+              "status": "different",
+              "snapshotSha256": "e7a73a4bd9fd2f9b76addb695a171494b07a26d17543742f6dc772437c75bf4a",
+              "pins": {
+                "baselineSha256": "75e4d6bde50af00f19b1b00ffe11e86536d0de4944e9b7b9d0720ad97df957f5",
+                "corpusSha256": "1c4e4113dd048a57db32491744f276eb1670665fce1f6faef2e19b5fd8f10501"
+              },
+              "differences": [
+                {
+                  "id": "1",
+                  "entrypoint": "src/index.mjs#mirror",
+                  "input": [
+                    [
+                      1,
+                      2,
+                      3
+                    ]
+                  ],
+                  "baseline": {
+                    "kind": "return",
+                    "value": [
+                      3,
+                      2,
+                      1
+                    ],
+                    "args": [
+                      [
+                        1,
+                        2,
+                        3
+                      ]
+                    ]
+                  },
+                  "candidate": {
+                    "kind": "return",
+                    "value": [
+                      3,
+                      2,
+                      1
+                    ],
+                    "args": [
+                      [
+                        3,
+                        2,
+                        1
+                      ]
+                    ]
+                  },
+                  "snapshotSha256": "e7a73a4bd9fd2f9b76addb695a171494b07a26d17543742f6dc772437c75bf4a",
+                  "candidateSha256": "e7a73a4bd9fd2f9b76addb695a171494b07a26d17543742f6dc772437c75bf4a",
+                  "reproduction": {
+                    "worker": "/template/worker.mjs",
+                    "baseline": "/template/baseline",
+                    "candidate": "/work/repo",
+                    "corpus": "/template/baseline/compat.json",
+                    "caseId": "1"
+                  }
+                },
+                {
+                  "id": "2",
+                  "entrypoint": "src/index.mjs#mirrorGrid",
+                  "input": [
+                    [
+                      [
+                        1,
+                        2
+                      ],
+                      [],
+                      [
+                        3,
+                        4
+                      ]
+                    ]
+                  ],
+                  "baseline": {
+                    "kind": "return",
+                    "value": [
+                      [
+                        2,
+                        1
+                      ],
+                      [],
+                      [
+                        4,
+                        3
+                      ]
+                    ],
+                    "args": [
+                      [
+                        [
+                          1,
+                          2
+                        ],
+                        [],
+                        [
+                          3,
+                          4
+                        ]
+                      ]
+                    ]
+                  },
+                  "candidate": {
+                    "kind": "return",
+                    "value": [
+                      [
+                        2,
+                        1
+                      ],
+                      [],
+                      [
+                        4,
+                        3
+                      ]
+                    ],
+                    "args": [
+                      [
+                        [
+                          2,
+                          1
+                        ],
+                        [],
+                        [
+                          4,
+                          3
+                        ]
+                      ]
+                    ]
+                  },
+                  "snapshotSha256": "e7a73a4bd9fd2f9b76addb695a171494b07a26d17543742f6dc772437c75bf4a",
+                  "candidateSha256": "e7a73a4bd9fd2f9b76addb695a171494b07a26d17543742f6dc772437c75bf4a",
+                  "reproduction": {
+                    "worker": "/template/worker.mjs",
+                    "baseline": "/template/baseline",
+                    "candidate": "/work/repo",
+                    "corpus": "/template/baseline/compat.json",
+                    "caseId": "2"
+                  }
+                }
+              ],
+              "limits": [],
+              "candidateSha256": "e7a73a4bd9fd2f9b76addb695a171494b07a26d17543742f6dc772437c75bf4a",
+              "elapsedMs": 92.676833
+            },
+            "independentR": false
+          }
+        }
+      },
+      {
+        "task": "03-required-column",
+        "results": {
+          "baseline": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [],
+            "probe": {
+              "revision": 1,
+              "status": "matched",
+              "snapshotSha256": "64855263494528707207cd3a843a3549d4d5a9f39a9a1a7872d4d372ae1f67c8",
+              "pins": {
+                "baselineSha256": "64855263494528707207cd3a843a3549d4d5a9f39a9a1a7872d4d372ae1f67c8",
+                "corpusSha256": "932fae2902542a0b16c36fd5653381b0a44dd47b3bf99f3bf69dca47bb4cab02"
+              },
+              "differences": [],
+              "limits": [],
+              "candidateSha256": "64855263494528707207cd3a843a3549d4d5a9f39a9a1a7872d4d372ae1f67c8",
+              "elapsedMs": 103.271625
+            },
+            "independentR": false
+          },
+          "gold": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [],
+            "probe": {
+              "revision": 1,
+              "status": "matched",
+              "snapshotSha256": "fac3b395a868fe23b7b51027e79c9643c9529c15b9a3542ae720f29a53525cf7",
+              "pins": {
+                "baselineSha256": "64855263494528707207cd3a843a3549d4d5a9f39a9a1a7872d4d372ae1f67c8",
+                "corpusSha256": "932fae2902542a0b16c36fd5653381b0a44dd47b3bf99f3bf69dca47bb4cab02"
+              },
+              "differences": [],
+              "limits": [],
+              "candidateSha256": "fac3b395a868fe23b7b51027e79c9643c9529c15b9a3542ae720f29a53525cf7",
+              "elapsedMs": 103.443208
+            },
+            "independentR": true
+          },
+          "wrong": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [
+              "Preserved behavior differs on fixed baseline calls: src/index.mjs#column case 1, src/index.mjs#first case 2"
+            ],
+            "probe": {
+              "revision": 1,
+              "status": "different",
+              "snapshotSha256": "8240066176040dc2bfaa632c9f37758aeab265e77c5557587ba8e8fb0fcbb86e",
+              "pins": {
+                "baselineSha256": "64855263494528707207cd3a843a3549d4d5a9f39a9a1a7872d4d372ae1f67c8",
+                "corpusSha256": "932fae2902542a0b16c36fd5653381b0a44dd47b3bf99f3bf69dca47bb4cab02"
+              },
+              "differences": [
+                {
+                  "id": "1",
+                  "entrypoint": "src/index.mjs#column",
+                  "input": [
+                    [
+                      {
+                        "n": 1
+                      },
+                      {}
+                    ],
+                    "n"
+                  ],
+                  "baseline": {
+                    "kind": "throw",
+                    "name": "RangeError",
+                    "message": "missing field: n",
+                    "args": [
+                      [
+                        {
+                          "n": 1
+                        },
+                        {}
+                      ],
+                      "n"
+                    ]
+                  },
+                  "candidate": {
+                    "kind": "return",
+                    "value": [
+                      1,
+                      null
+                    ],
+                    "args": [
+                      [
+                        {
+                          "n": 1
+                        },
+                        {}
+                      ],
+                      "n"
+                    ]
+                  },
+                  "snapshotSha256": "8240066176040dc2bfaa632c9f37758aeab265e77c5557587ba8e8fb0fcbb86e",
+                  "candidateSha256": "8240066176040dc2bfaa632c9f37758aeab265e77c5557587ba8e8fb0fcbb86e",
+                  "reproduction": {
+                    "worker": "/template/worker.mjs",
+                    "baseline": "/template/baseline",
+                    "candidate": "/work/repo",
+                    "corpus": "/template/baseline/compat.json",
+                    "caseId": "1"
+                  }
+                },
+                {
+                  "id": "2",
+                  "entrypoint": "src/index.mjs#first",
+                  "input": [
+                    [
+                      {}
+                    ],
+                    "n"
+                  ],
+                  "baseline": {
+                    "kind": "throw",
+                    "name": "RangeError",
+                    "message": "missing field: n",
+                    "args": [
+                      [
+                        {}
+                      ],
+                      "n"
+                    ]
+                  },
+                  "candidate": {
+                    "kind": "return",
+                    "value": null,
+                    "args": [
+                      [
+                        {}
+                      ],
+                      "n"
+                    ]
+                  },
+                  "snapshotSha256": "8240066176040dc2bfaa632c9f37758aeab265e77c5557587ba8e8fb0fcbb86e",
+                  "candidateSha256": "8240066176040dc2bfaa632c9f37758aeab265e77c5557587ba8e8fb0fcbb86e",
+                  "reproduction": {
+                    "worker": "/template/worker.mjs",
+                    "baseline": "/template/baseline",
+                    "candidate": "/work/repo",
+                    "corpus": "/template/baseline/compat.json",
+                    "caseId": "2"
+                  }
+                }
+              ],
+              "limits": [],
+              "candidateSha256": "8240066176040dc2bfaa632c9f37758aeab265e77c5557587ba8e8fb0fcbb86e",
+              "elapsedMs": 98.26908300000001
+            },
+            "independentR": false
+          }
+        }
+      },
+      {
+        "task": "04-label-suffix",
+        "results": {
+          "baseline": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [],
+            "probe": {
+              "revision": 1,
+              "status": "matched",
+              "snapshotSha256": "89ffef2bdcf667ff43bba030a6357102ad0b57a90fc6fc0194ee0b9e5b83f591",
+              "pins": {
+                "baselineSha256": "89ffef2bdcf667ff43bba030a6357102ad0b57a90fc6fc0194ee0b9e5b83f591",
+                "corpusSha256": "e0720f1a5054de3883cd2955656b1d524c57cd5cc1f75fcd4cb70679d5d5c4c7"
+              },
+              "differences": [],
+              "limits": [],
+              "candidateSha256": "89ffef2bdcf667ff43bba030a6357102ad0b57a90fc6fc0194ee0b9e5b83f591",
+              "elapsedMs": 96.009375
+            },
+            "independentR": false
+          },
+          "gold": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [],
+            "probe": {
+              "revision": 1,
+              "status": "matched",
+              "snapshotSha256": "8437962fba9c258e248af3f28a282e9fcc75b4d86bdde50ca125eaaefb6079d1",
+              "pins": {
+                "baselineSha256": "89ffef2bdcf667ff43bba030a6357102ad0b57a90fc6fc0194ee0b9e5b83f591",
+                "corpusSha256": "e0720f1a5054de3883cd2955656b1d524c57cd5cc1f75fcd4cb70679d5d5c4c7"
+              },
+              "differences": [],
+              "limits": [],
+              "candidateSha256": "8437962fba9c258e248af3f28a282e9fcc75b4d86bdde50ca125eaaefb6079d1",
+              "elapsedMs": 101.825917
+            },
+            "independentR": true
+          },
+          "wrong": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [
+              "Preserved behavior differs on fixed baseline calls: src/index.mjs#label case 1, src/index.mjs#label case 2"
+            ],
+            "probe": {
+              "revision": 1,
+              "status": "different",
+              "snapshotSha256": "0b4ae76ecc83f7f9c906b85f231ca9764e2382301537600f797ef9b866da32b8",
+              "pins": {
+                "baselineSha256": "89ffef2bdcf667ff43bba030a6357102ad0b57a90fc6fc0194ee0b9e5b83f591",
+                "corpusSha256": "e0720f1a5054de3883cd2955656b1d524c57cd5cc1f75fcd4cb70679d5d5c4c7"
+              },
+              "differences": [
+                {
+                  "id": "1",
+                  "entrypoint": "src/index.mjs#label",
+                  "input": [
+                    "😀xy",
+                    1
+                  ],
+                  "baseline": {
+                    "kind": "return",
+                    "value": "😀…",
+                    "args": [
+                      "😀xy",
+                      1
+                    ]
+                  },
+                  "candidate": {
+                    "kind": "return",
+                    "value": "\ud83d…",
+                    "args": [
+                      "😀xy",
+                      1
+                    ]
+                  },
+                  "snapshotSha256": "0b4ae76ecc83f7f9c906b85f231ca9764e2382301537600f797ef9b866da32b8",
+                  "candidateSha256": "0b4ae76ecc83f7f9c906b85f231ca9764e2382301537600f797ef9b866da32b8",
+                  "reproduction": {
+                    "worker": "/template/worker.mjs",
+                    "baseline": "/template/baseline",
+                    "candidate": "/work/repo",
+                    "corpus": "/template/baseline/compat.json",
+                    "caseId": "1"
+                  }
+                },
+                {
+                  "id": "2",
+                  "entrypoint": "src/index.mjs#label",
+                  "input": [
+                    "😀",
+                    1
+                  ],
+                  "baseline": {
+                    "kind": "return",
+                    "value": "😀",
+                    "args": [
+                      "😀",
+                      1
+                    ]
+                  },
+                  "candidate": {
+                    "kind": "return",
+                    "value": "\ud83d…",
+                    "args": [
+                      "😀",
+                      1
+                    ]
+                  },
+                  "snapshotSha256": "0b4ae76ecc83f7f9c906b85f231ca9764e2382301537600f797ef9b866da32b8",
+                  "candidateSha256": "0b4ae76ecc83f7f9c906b85f231ca9764e2382301537600f797ef9b866da32b8",
+                  "reproduction": {
+                    "worker": "/template/worker.mjs",
+                    "baseline": "/template/baseline",
+                    "candidate": "/work/repo",
+                    "corpus": "/template/baseline/compat.json",
+                    "caseId": "2"
+                  }
+                }
+              ],
+              "limits": [],
+              "candidateSha256": "0b4ae76ecc83f7f9c906b85f231ca9764e2382301537600f797ef9b866da32b8",
+              "elapsedMs": 98.105
+            },
+            "independentR": false
+          }
+        }
+      },
+      {
+        "task": "05-packet-separator",
+        "results": {
+          "baseline": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [],
+            "probe": {
+              "revision": 1,
+              "status": "matched",
+              "snapshotSha256": "55e3b554aeb109f71faf922f1e635e16044437e48627fe8253d957201e48a903",
+              "pins": {
+                "baselineSha256": "55e3b554aeb109f71faf922f1e635e16044437e48627fe8253d957201e48a903",
+                "corpusSha256": "218f3b707bba1c34147bdb4e09f563aa598fe75115655c746fc0a1f02630b7f7"
+              },
+              "differences": [],
+              "limits": [],
+              "candidateSha256": "55e3b554aeb109f71faf922f1e635e16044437e48627fe8253d957201e48a903",
+              "elapsedMs": 103.01695799999999
+            },
+            "independentR": false
+          },
+          "gold": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [],
+            "probe": {
+              "revision": 1,
+              "status": "matched",
+              "snapshotSha256": "feab7baf8f69ae19ddd40713b486de2620ded2f18e61335501ee5fd721b4a7d1",
+              "pins": {
+                "baselineSha256": "55e3b554aeb109f71faf922f1e635e16044437e48627fe8253d957201e48a903",
+                "corpusSha256": "218f3b707bba1c34147bdb4e09f563aa598fe75115655c746fc0a1f02630b7f7"
+              },
+              "differences": [],
+              "limits": [],
+              "candidateSha256": "feab7baf8f69ae19ddd40713b486de2620ded2f18e61335501ee5fd721b4a7d1",
+              "elapsedMs": 100.091667
+            },
+            "independentR": true
+          },
+          "wrong": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [
+              "Preserved behavior differs on fixed baseline calls: src/index.mjs#packet case 1, src/index.mjs#packet case 2"
+            ],
+            "probe": {
+              "revision": 1,
+              "status": "different",
+              "snapshotSha256": "b6ea1f9f216834ed82645a7b1f508f7e6179b20def69e5c894a85fa7ef32f9e2",
+              "pins": {
+                "baselineSha256": "55e3b554aeb109f71faf922f1e635e16044437e48627fe8253d957201e48a903",
+                "corpusSha256": "218f3b707bba1c34147bdb4e09f563aa598fe75115655c746fc0a1f02630b7f7"
+              },
+              "differences": [
+                {
+                  "id": "1",
+                  "entrypoint": "src/index.mjs#packet",
+                  "input": [
+                    [
+                      "",
+                      "x",
+                      "",
+                      ""
+                    ]
+                  ],
+                  "baseline": {
+                    "kind": "return",
+                    "value": "|x||",
+                    "args": [
+                      [
+                        "",
+                        "x",
+                        "",
+                        ""
+                      ]
+                    ]
+                  },
+                  "candidate": {
+                    "kind": "return",
+                    "value": "x",
+                    "args": [
+                      [
+                        "",
+                        "x",
+                        "",
+                        ""
+                      ]
+                    ]
+                  },
+                  "snapshotSha256": "b6ea1f9f216834ed82645a7b1f508f7e6179b20def69e5c894a85fa7ef32f9e2",
+                  "candidateSha256": "b6ea1f9f216834ed82645a7b1f508f7e6179b20def69e5c894a85fa7ef32f9e2",
+                  "reproduction": {
+                    "worker": "/template/worker.mjs",
+                    "baseline": "/template/baseline",
+                    "candidate": "/work/repo",
+                    "corpus": "/template/baseline/compat.json",
+                    "caseId": "1"
+                  }
+                },
+                {
+                  "id": "2",
+                  "entrypoint": "src/index.mjs#packet",
+                  "input": [
+                    [
+                      "",
+                      ""
+                    ]
+                  ],
+                  "baseline": {
+                    "kind": "return",
+                    "value": "|",
+                    "args": [
+                      [
+                        "",
+                        ""
+                      ]
+                    ]
+                  },
+                  "candidate": {
+                    "kind": "return",
+                    "value": "",
+                    "args": [
+                      [
+                        "",
+                        ""
+                      ]
+                    ]
+                  },
+                  "snapshotSha256": "b6ea1f9f216834ed82645a7b1f508f7e6179b20def69e5c894a85fa7ef32f9e2",
+                  "candidateSha256": "b6ea1f9f216834ed82645a7b1f508f7e6179b20def69e5c894a85fa7ef32f9e2",
+                  "reproduction": {
+                    "worker": "/template/worker.mjs",
+                    "baseline": "/template/baseline",
+                    "candidate": "/work/repo",
+                    "corpus": "/template/baseline/compat.json",
+                    "caseId": "2"
+                  }
+                }
+              ],
+              "limits": [],
+              "candidateSha256": "b6ea1f9f216834ed82645a7b1f508f7e6179b20def69e5c894a85fa7ef32f9e2",
+              "elapsedMs": 95.433709
+            },
+            "independentR": false
+          }
+        }
+      },
+      {
+        "task": "06-point-offset",
+        "results": {
+          "baseline": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [],
+            "probe": {
+              "revision": 1,
+              "status": "matched",
+              "snapshotSha256": "700348e2dbcb80d2ddc5075231ba245c38d2513da8a35d7b975b823c3fd1458b",
+              "pins": {
+                "baselineSha256": "700348e2dbcb80d2ddc5075231ba245c38d2513da8a35d7b975b823c3fd1458b",
+                "corpusSha256": "2fc539f1c0641765f25315067acf07d83643035a2b9aded74421c127daa93fd4"
+              },
+              "differences": [],
+              "limits": [],
+              "candidateSha256": "700348e2dbcb80d2ddc5075231ba245c38d2513da8a35d7b975b823c3fd1458b",
+              "elapsedMs": 97.331458
+            },
+            "independentR": false
+          },
+          "gold": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [],
+            "probe": {
+              "revision": 1,
+              "status": "matched",
+              "snapshotSha256": "135b2556e3f62a330e265ae8d2973c5d81765121ff70ffd23461013b49efaec4",
+              "pins": {
+                "baselineSha256": "700348e2dbcb80d2ddc5075231ba245c38d2513da8a35d7b975b823c3fd1458b",
+                "corpusSha256": "2fc539f1c0641765f25315067acf07d83643035a2b9aded74421c127daa93fd4"
+              },
+              "differences": [],
+              "limits": [],
+              "candidateSha256": "135b2556e3f62a330e265ae8d2973c5d81765121ff70ffd23461013b49efaec4",
+              "elapsedMs": 93.39283400000001
+            },
+            "independentR": true
+          },
+          "wrong": {
+            "publicExit": 0,
+            "existingCorrectionReasons": [],
+            "extendedCorrectionReasons": [
+              "Preserved behavior differs on fixed baseline calls: src/index.mjs#transform case 1"
+            ],
+            "probe": {
+              "revision": 1,
+              "status": "different",
+              "snapshotSha256": "0ce6d50462bd2e3f871cad09c18c4f018404636d40a396758578b74d310ed8c8",
+              "pins": {
+                "baselineSha256": "700348e2dbcb80d2ddc5075231ba245c38d2513da8a35d7b975b823c3fd1458b",
+                "corpusSha256": "2fc539f1c0641765f25315067acf07d83643035a2b9aded74421c127daa93fd4"
+              },
+              "differences": [
+                {
+                  "id": "1",
+                  "entrypoint": "src/index.mjs#transform",
+                  "input": [
+                    [
+                      [
+                        2,
+                        4
+                      ],
+                      [
+                        1,
+                        3
+                      ]
+                    ],
+                    {
+                      "scale": 0
+                    }
+                  ],
+                  "baseline": {
+                    "kind": "return",
+                    "value": [
+                      [
+                        0,
+                        0
+                      ],
+                      [
+                        0,
+                        0
+                      ]
+                    ],
+                    "args": [
+                      [
+                        [
+                          2,
+                          4
+                        ],
+                        [
+                          1,
+                          3
+                        ]
+                      ],
+                      {
+                        "scale": 0
+                      }
+                    ]
+                  },
+                  "candidate": {
+                    "kind": "return",
+                    "value": [
+                      [
+                        2,
+                        4
+                      ],
+                      [
+                        1,
+                        3
+                      ]
+                    ],
+                    "args": [
+                      [
+                        [
+                          2,
+                          4
+                        ],
+                        [
+                          1,
+                          3
+                        ]
+                      ],
+                      {
+                        "scale": 0
+                      }
+                    ]
+                  },
+                  "snapshotSha256": "0ce6d50462bd2e3f871cad09c18c4f018404636d40a396758578b74d310ed8c8",
+                  "candidateSha256": "0ce6d50462bd2e3f871cad09c18c4f018404636d40a396758578b74d310ed8c8",
+                  "reproduction": {
+                    "worker": "/template/worker.mjs",
+                    "baseline": "/template/baseline",
+                    "candidate": "/work/repo",
+                    "corpus": "/template/baseline/compat.json",
+                    "caseId": "1"
+                  }
+                }
+              ],
+              "limits": [],
+              "candidateSha256": "0ce6d50462bd2e3f871cad09c18c4f018404636d40a396758578b74d310ed8c8",
+              "elapsedMs": 92.02025
+            },
+            "independentR": false
+          }
+        }
+      }
+    ],
+    "negative": [
+      {
+        "name": "unsupported",
+        "status": "unsupported",
+        "limits": [
+          "Unsupported JSON value",
+          "Missing synchronous entrypoint"
+        ]
+      },
+      {
+        "name": "nondeterminism",
+        "status": "unproven",
+        "limits": [
+          "nondeterminism",
+          "Missing synchronous entrypoint"
+        ]
+      },
+      {
+        "name": "stateful",
+        "status": "unproven",
+        "limits": [
+          "nondeterminism",
+          "Missing synchronous entrypoint"
+        ]
+      },
+      {
+        "name": "execution",
+        "status": "unsupported",
+        "limits": [
+          "module execution: Unexpected identifier 'is'"
+        ]
+      },
+      {
+        "name": "timeout",
+        "status": "unproven",
+        "limits": [
+          "timeout",
+          "Missing synchronous entrypoint"
+        ]
+      },
+      {
+        "name": "corpus",
+        "status": "unproven",
+        "limits": [
+          "Baseline/corpus integrity mismatch"
+        ]
+      },
+      {
+        "name": "baseline",
+        "status": "unproven",
+        "limits": [
+          "Baseline/corpus integrity mismatch"
+        ]
+      },
+      {
+        "name": "participant-corpus",
+        "status": "unproven",
+        "limits": [
+          "Candidate changed declaration/corpus"
+        ]
+      },
+      {
+        "name": "missing-corpus",
+        "status": "unproven",
+        "limits": [
+          "ENOENT: no such file or directory, open '/work/repo/compat.json'"
+        ]
+      },
+      {
+        "name": "worker-timeout",
+        "status": "unproven",
+        "limits": [
+          "Task budget exhausted"
+        ]
+      }
+    ]
+  },
+  "installed": {
+    "rows": [
+      {
+        "slot": 1,
+        "task": "01-consecutive-runs",
+        "arm": "control",
+        "status": "completed",
+        "R": false,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd21.feature",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd21.preservation",
+            "status": "FAIL"
+          }
+        ],
+        "stages": [
+          {
+            "stage": "D0",
+            "R": false,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd21.feature",
+                "status": "PASS"
+              },
+              {
+                "type": "obligation",
+                "id": "fd21.preservation",
+                "status": "FAIL"
+              }
+            ]
+          }
+        ],
+        "evaluationProven": true,
+        "initialR": false,
+        "initialEvaluationProven": true,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "checks_passed",
+        "corrections": 0,
+        "Q": false,
+        "requests": 7,
+        "requestsWithoutUsage": 0,
+        "knownTokens": {
+          "input_tokens": 70,
+          "output_tokens": 35,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "tokens": {
+          "input_tokens": 70,
+          "output_tokens": 35,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "taskElapsedMs": 2892.814291,
+        "preparationElapsedMs": 1356.195582999997,
+        "evaluationElapsedMs": 432.62562499999876,
+        "cleanupElapsedMs": 56.85425000000032,
+        "probeElapsedMs": 0,
+        "newDifferencesDelivered": 0,
+        "probeObservations": [
+          {
+            "stage": "D0-observations.json",
+            "status": "disabled",
+            "snapshotSha256": "9261ca5d5c603f5186dc9dc366b800c3a649dda25b8f3f6450d6f5b182dfd111",
+            "differences": [],
+            "limits": []
+          }
+        ],
+        "errors": []
+      },
+      {
+        "slot": 2,
+        "task": "01-consecutive-runs",
+        "arm": "candidate",
+        "status": "completed",
+        "R": true,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd21.feature",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd21.preservation",
+            "status": "PASS"
+          }
+        ],
+        "stages": [
+          {
+            "stage": "D0",
+            "R": false,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd21.feature",
+                "status": "PASS"
+              },
+              {
+                "type": "obligation",
+                "id": "fd21.preservation",
+                "status": "FAIL"
+              }
+            ]
+          },
+          {
+            "stage": "D1",
+            "R": true,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd21.feature",
+                "status": "PASS"
+              },
+              {
+                "type": "obligation",
+                "id": "fd21.preservation",
+                "status": "PASS"
+              }
+            ]
+          }
+        ],
+        "evaluationProven": true,
+        "initialR": false,
+        "initialEvaluationProven": true,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "checks_passed",
+        "corrections": 1,
+        "Q": true,
+        "requests": 10,
+        "requestsWithoutUsage": 0,
+        "knownTokens": {
+          "input_tokens": 100,
+          "output_tokens": 50,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "tokens": {
+          "input_tokens": 100,
+          "output_tokens": 50,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "taskElapsedMs": 3569.4369589999997,
+        "preparationElapsedMs": 1289.8405420000272,
+        "evaluationElapsedMs": 430.8323330000003,
+        "cleanupElapsedMs": 55.996124999999665,
+        "probeElapsedMs": 166.68137500000012,
+        "newDifferencesDelivered": 2,
+        "probeObservations": [
+          {
+            "stage": "D0-observations.json",
+            "status": "different",
+            "snapshotSha256": "055da82ea1240037aa592d741b3215bc7a510ce2ac6065fd2c88996bc2b1cdd4",
+            "differences": [
+              {
+                "id": "1",
+                "entrypoint": "src/index.mjs#encode",
+                "input": [
+                  [
+                    "a",
+                    "b",
+                    "a"
+                  ]
+                ],
+                "baseline": {
+                  "kind": "return",
+                  "value": [
+                    {
+                      "count": 1,
+                      "value": "a"
+                    },
+                    {
+                      "count": 1,
+                      "value": "b"
+                    },
+                    {
+                      "count": 1,
+                      "value": "a"
+                    }
+                  ],
+                  "args": [
+                    [
+                      "a",
+                      "b",
+                      "a"
+                    ]
+                  ]
+                },
+                "candidate": {
+                  "kind": "return",
+                  "value": [
+                    {
+                      "count": 2,
+                      "value": "a"
+                    },
+                    {
+                      "count": 1,
+                      "value": "b"
+                    }
+                  ],
+                  "args": [
+                    [
+                      "a",
+                      "b",
+                      "a"
+                    ]
+                  ]
+                },
+                "snapshotSha256": "055da82ea1240037aa592d741b3215bc7a510ce2ac6065fd2c88996bc2b1cdd4",
+                "candidateSha256": "7e7db11e7694aa2ec9e8bf5f3b48881b7b490fecb873bfbbf95188c66b18b18e",
+                "reproduction": {
+                  "worker": "/template/compat/worker.mjs",
+                  "baseline": "/input",
+                  "candidate": "/work/repo/.git/harness-task/37269bad-f5e7-4329-9675-eed82bd438f6/worktree",
+                  "corpus": "/input/compat.json",
+                  "caseId": "1"
+                }
+              },
+              {
+                "id": "2",
+                "entrypoint": "src/index.mjs#summary",
+                "input": [
+                  [
+                    "b",
+                    "b",
+                    "a",
+                    "b"
+                  ]
+                ],
+                "baseline": {
+                  "kind": "return",
+                  "value": "b:2,a:1,b:1",
+                  "args": [
+                    [
+                      "b",
+                      "b",
+                      "a",
+                      "b"
+                    ]
+                  ]
+                },
+                "candidate": {
+                  "kind": "return",
+                  "value": "b:3,a:1",
+                  "args": [
+                    [
+                      "b",
+                      "b",
+                      "a",
+                      "b"
+                    ]
+                  ]
+                },
+                "snapshotSha256": "055da82ea1240037aa592d741b3215bc7a510ce2ac6065fd2c88996bc2b1cdd4",
+                "candidateSha256": "7e7db11e7694aa2ec9e8bf5f3b48881b7b490fecb873bfbbf95188c66b18b18e",
+                "reproduction": {
+                  "worker": "/template/compat/worker.mjs",
+                  "baseline": "/input",
+                  "candidate": "/work/repo/.git/harness-task/37269bad-f5e7-4329-9675-eed82bd438f6/worktree",
+                  "corpus": "/input/compat.json",
+                  "caseId": "2"
+                }
+              }
+            ],
+            "limits": []
+          },
+          {
+            "stage": "D1-observations.json",
+            "status": "matched",
+            "snapshotSha256": "b881b6597d98cfa21d54a0509a9f314bb012a1bea296b5cfa5cad144b2edde61",
+            "differences": [],
+            "limits": []
+          }
+        ],
+        "errors": []
+      }
+    ],
+    "authAccesses": 0,
+    "probeDelivered": true,
+    "probeCleared": true
+  },
+  "deadline": [
+    {
+      "arm": "control",
+      "hangIssued": true,
+      "outcome": {
+        "status": "finished",
+        "pause": null
+      },
+      "stop": {
+        "timing": {
+          "taskStarted": {
+            "at": "2026-10-08T22:18:50.416Z",
+            "monotonicMs": 16761.105917
+          },
+          "deadlineAt": "2026-10-08T22:18:55.416Z",
+          "deadlineTimerFired": {
+            "at": "2026-10-08T22:18:55.419Z",
+            "monotonicMs": 21764.353667
+          },
+          "forwardingClosed": {
+            "at": "2026-10-08T22:18:55.419Z",
+            "monotonicMs": 21764.382125
+          },
+          "abortRequested": {
+            "at": "2026-10-08T22:18:55.419Z",
+            "monotonicMs": 21764.390458
+          },
+          "handlersSettled": {
+            "at": "2026-10-08T22:18:55.510Z",
+            "monotonicMs": 21854.502
+          },
+          "captureStarted": {
+            "at": "2026-10-08T22:18:55.559Z",
+            "monotonicMs": 21903.907375
+          },
+          "captureFinished": {
+            "at": "2026-10-08T22:18:55.751Z",
+            "monotonicMs": 22096.177208
+          },
+          "cleanupStarted": {
+            "at": "2026-10-08T22:18:55.752Z",
+            "monotonicMs": 22096.731667
+          },
+          "cleanupFinished": {
+            "at": "2026-10-08T22:18:55.828Z",
+            "monotonicMs": 22172.598583
+          }
+        },
+        "ownTaskDeadlineTriggered": true,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      }
+    },
+    {
+      "arm": "candidate",
+      "hangIssued": true,
+      "outcome": {
+        "status": "finished",
+        "pause": null
+      },
+      "stop": {
+        "timing": {
+          "taskStarted": {
+            "at": "2026-10-08T22:18:58.106Z",
+            "monotonicMs": 24450.873208
+          },
+          "deadlineAt": "2026-10-08T22:19:03.106Z",
+          "deadlineTimerFired": {
+            "at": "2026-10-08T22:19:03.108Z",
+            "monotonicMs": 29452.614833
+          },
+          "forwardingClosed": {
+            "at": "2026-10-08T22:19:03.108Z",
+            "monotonicMs": 29452.624042
+          },
+          "abortRequested": {
+            "at": "2026-10-08T22:19:03.108Z",
+            "monotonicMs": 29452.628417
+          },
+          "handlersSettled": {
+            "at": "2026-10-08T22:19:03.196Z",
+            "monotonicMs": 29541.21725
+          },
+          "captureStarted": {
+            "at": "2026-10-08T22:19:03.245Z",
+            "monotonicMs": 29589.629833
+          },
+          "captureFinished": {
+            "at": "2026-10-08T22:19:03.437Z",
+            "monotonicMs": 29782.286292
+          },
+          "cleanupStarted": {
+            "at": "2026-10-08T22:19:03.438Z",
+            "monotonicMs": 29782.912458
+          },
+          "cleanupFinished": {
+            "at": "2026-10-08T22:19:03.521Z",
+            "monotonicMs": 29866.020167
+          }
+        },
+        "ownTaskDeadlineTriggered": true,
+        "terminationVerified": true,
+        "captureSaved": true,
+        "forwardingClosed": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "providerServerStateMayRemainUnknown": false
+      }
+    }
+  ],
+  "scriptedSchedule": {
+    "rows": [
+      {
+        "slot": 1,
+        "task": "01-consecutive-runs",
+        "arm": "control",
+        "status": "completed",
+        "R": false,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd21.feature",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd21.preservation",
+            "status": "FAIL"
+          }
+        ],
+        "stages": [
+          {
+            "stage": "D0",
+            "R": false,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd21.feature",
+                "status": "PASS"
+              },
+              {
+                "type": "obligation",
+                "id": "fd21.preservation",
+                "status": "FAIL"
+              }
+            ]
+          }
+        ],
+        "evaluationProven": true,
+        "initialR": false,
+        "initialEvaluationProven": true,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "checks_passed",
+        "corrections": 0,
+        "Q": false,
+        "requests": 7,
+        "requestsWithoutUsage": 0,
+        "knownTokens": {
+          "input_tokens": 70,
+          "output_tokens": 35,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "tokens": {
+          "input_tokens": 70,
+          "output_tokens": 35,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "taskElapsedMs": 2819.438209,
+        "preparationElapsedMs": 1293.9356250000292,
+        "evaluationElapsedMs": 426.5900829999955,
+        "cleanupElapsedMs": 59.19200000000001,
+        "probeElapsedMs": 0,
+        "newDifferencesDelivered": 0,
+        "probeObservations": [
+          {
+            "stage": "D0-observations.json",
+            "status": "disabled",
+            "snapshotSha256": "fe44114808d25cb980552fd23f9a7e1b548ff4b52624e3e09981a14879da8767",
+            "differences": [],
+            "limits": []
+          }
+        ],
+        "errors": []
+      },
+      {
+        "slot": 2,
+        "task": "01-consecutive-runs",
+        "arm": "candidate",
+        "status": "completed",
+        "R": true,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd21.feature",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd21.preservation",
+            "status": "PASS"
+          }
+        ],
+        "stages": [
+          {
+            "stage": "D0",
+            "R": false,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd21.feature",
+                "status": "PASS"
+              },
+              {
+                "type": "obligation",
+                "id": "fd21.preservation",
+                "status": "FAIL"
+              }
+            ]
+          },
+          {
+            "stage": "D1",
+            "R": true,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd21.feature",
+                "status": "PASS"
+              },
+              {
+                "type": "obligation",
+                "id": "fd21.preservation",
+                "status": "PASS"
+              }
+            ]
+          }
+        ],
+        "evaluationProven": true,
+        "initialR": false,
+        "initialEvaluationProven": true,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "checks_passed",
+        "corrections": 1,
+        "Q": true,
+        "requests": 10,
+        "requestsWithoutUsage": 0,
+        "knownTokens": {
+          "input_tokens": 100,
+          "output_tokens": 50,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "tokens": {
+          "input_tokens": 100,
+          "output_tokens": 50,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "taskElapsedMs": 3504.452459000001,
+        "preparationElapsedMs": 1280.7697920000455,
+        "evaluationElapsedMs": 449.1349160000027,
+        "cleanupElapsedMs": 59.20366699999977,
+        "probeElapsedMs": 165.3461659999998,
+        "newDifferencesDelivered": 2,
+        "probeObservations": [
+          {
+            "stage": "D0-observations.json",
+            "status": "different",
+            "snapshotSha256": "f2ac07c75cfc56c6b3f0710109282d0f9163752a8731cb831f67f4a13968668f",
+            "differences": [
+              {
+                "id": "1",
+                "entrypoint": "src/index.mjs#encode",
+                "input": [
+                  [
+                    "a",
+                    "b",
+                    "a"
+                  ]
+                ],
+                "baseline": {
+                  "kind": "return",
+                  "value": [
+                    {
+                      "count": 1,
+                      "value": "a"
+                    },
+                    {
+                      "count": 1,
+                      "value": "b"
+                    },
+                    {
+                      "count": 1,
+                      "value": "a"
+                    }
+                  ],
+                  "args": [
+                    [
+                      "a",
+                      "b",
+                      "a"
+                    ]
+                  ]
+                },
+                "candidate": {
+                  "kind": "return",
+                  "value": [
+                    {
+                      "count": 2,
+                      "value": "a"
+                    },
+                    {
+                      "count": 1,
+                      "value": "b"
+                    }
+                  ],
+                  "args": [
+                    [
+                      "a",
+                      "b",
+                      "a"
+                    ]
+                  ]
+                },
+                "snapshotSha256": "f2ac07c75cfc56c6b3f0710109282d0f9163752a8731cb831f67f4a13968668f",
+                "candidateSha256": "7e7db11e7694aa2ec9e8bf5f3b48881b7b490fecb873bfbbf95188c66b18b18e",
+                "reproduction": {
+                  "worker": "/template/compat/worker.mjs",
+                  "baseline": "/input",
+                  "candidate": "/work/repo/.git/harness-task/85580be5-4e22-4a1f-92ce-1d6965c6f570/worktree",
+                  "corpus": "/input/compat.json",
+                  "caseId": "1"
+                }
+              },
+              {
+                "id": "2",
+                "entrypoint": "src/index.mjs#summary",
+                "input": [
+                  [
+                    "b",
+                    "b",
+                    "a",
+                    "b"
+                  ]
+                ],
+                "baseline": {
+                  "kind": "return",
+                  "value": "b:2,a:1,b:1",
+                  "args": [
+                    [
+                      "b",
+                      "b",
+                      "a",
+                      "b"
+                    ]
+                  ]
+                },
+                "candidate": {
+                  "kind": "return",
+                  "value": "b:3,a:1",
+                  "args": [
+                    [
+                      "b",
+                      "b",
+                      "a",
+                      "b"
+                    ]
+                  ]
+                },
+                "snapshotSha256": "f2ac07c75cfc56c6b3f0710109282d0f9163752a8731cb831f67f4a13968668f",
+                "candidateSha256": "7e7db11e7694aa2ec9e8bf5f3b48881b7b490fecb873bfbbf95188c66b18b18e",
+                "reproduction": {
+                  "worker": "/template/compat/worker.mjs",
+                  "baseline": "/input",
+                  "candidate": "/work/repo/.git/harness-task/85580be5-4e22-4a1f-92ce-1d6965c6f570/worktree",
+                  "corpus": "/input/compat.json",
+                  "caseId": "2"
+                }
+              }
+            ],
+            "limits": []
+          },
+          {
+            "stage": "D1-observations.json",
+            "status": "matched",
+            "snapshotSha256": "14689237870151b8befa5d0e0fab026e33b00a550a924430d01c0802fe631823",
+            "differences": [],
+            "limits": []
+          }
+        ],
+        "errors": []
+      },
+      {
+        "slot": 3,
+        "task": "02-grid-mirror",
+        "arm": "candidate",
+        "status": "completed",
+        "R": true,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd22.feature",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd22.preservation",
+            "status": "PASS"
+          }
+        ],
+        "stages": [
+          {
+            "stage": "D0",
+            "R": false,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd22.feature",
+                "status": "PASS"
+              },
+              {
+                "type": "obligation",
+                "id": "fd22.preservation",
+                "status": "FAIL"
+              }
+            ]
+          },
+          {
+            "stage": "D1",
+            "R": true,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd22.feature",
+                "status": "PASS"
+              },
+              {
+                "type": "obligation",
+                "id": "fd22.preservation",
+                "status": "PASS"
+              }
+            ]
+          }
+        ],
+        "evaluationProven": true,
+        "initialR": false,
+        "initialEvaluationProven": true,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "checks_passed",
+        "corrections": 1,
+        "Q": true,
+        "requests": 10,
+        "requestsWithoutUsage": 0,
+        "knownTokens": {
+          "input_tokens": 100,
+          "output_tokens": 50,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "tokens": {
+          "input_tokens": 100,
+          "output_tokens": 50,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "taskElapsedMs": 3463.029584,
+        "preparationElapsedMs": 1292.4903339999455,
+        "evaluationElapsedMs": 430.98775000000023,
+        "cleanupElapsedMs": 57.007957999998325,
+        "probeElapsedMs": 150.31370800000013,
+        "newDifferencesDelivered": 2,
+        "probeObservations": [
+          {
+            "stage": "D0-observations.json",
+            "status": "different",
+            "snapshotSha256": "837108275e5ca025caf1f16a84e9f244203937606c622cb41e68611dd4bac115",
+            "differences": [
+              {
+                "id": "1",
+                "entrypoint": "src/index.mjs#mirror",
+                "input": [
+                  [
+                    1,
+                    2,
+                    3
+                  ]
+                ],
+                "baseline": {
+                  "kind": "return",
+                  "value": [
+                    3,
+                    2,
+                    1
+                  ],
+                  "args": [
+                    [
+                      1,
+                      2,
+                      3
+                    ]
+                  ]
+                },
+                "candidate": {
+                  "kind": "return",
+                  "value": [
+                    3,
+                    2,
+                    1
+                  ],
+                  "args": [
+                    [
+                      3,
+                      2,
+                      1
+                    ]
+                  ]
+                },
+                "snapshotSha256": "837108275e5ca025caf1f16a84e9f244203937606c622cb41e68611dd4bac115",
+                "candidateSha256": "e7a73a4bd9fd2f9b76addb695a171494b07a26d17543742f6dc772437c75bf4a",
+                "reproduction": {
+                  "worker": "/template/compat/worker.mjs",
+                  "baseline": "/input",
+                  "candidate": "/work/repo/.git/harness-task/816379b7-39b0-4083-9ea1-f296e4c6ae41/worktree",
+                  "corpus": "/input/compat.json",
+                  "caseId": "1"
+                }
+              },
+              {
+                "id": "2",
+                "entrypoint": "src/index.mjs#mirrorGrid",
+                "input": [
+                  [
+                    [
+                      1,
+                      2
+                    ],
+                    [],
+                    [
+                      3,
+                      4
+                    ]
+                  ]
+                ],
+                "baseline": {
+                  "kind": "return",
+                  "value": [
+                    [
+                      2,
+                      1
+                    ],
+                    [],
+                    [
+                      4,
+                      3
+                    ]
+                  ],
+                  "args": [
+                    [
+                      [
+                        1,
+                        2
+                      ],
+                      [],
+                      [
+                        3,
+                        4
+                      ]
+                    ]
+                  ]
+                },
+                "candidate": {
+                  "kind": "return",
+                  "value": [
+                    [
+                      2,
+                      1
+                    ],
+                    [],
+                    [
+                      4,
+                      3
+                    ]
+                  ],
+                  "args": [
+                    [
+                      [
+                        2,
+                        1
+                      ],
+                      [],
+                      [
+                        4,
+                        3
+                      ]
+                    ]
+                  ]
+                },
+                "snapshotSha256": "837108275e5ca025caf1f16a84e9f244203937606c622cb41e68611dd4bac115",
+                "candidateSha256": "e7a73a4bd9fd2f9b76addb695a171494b07a26d17543742f6dc772437c75bf4a",
+                "reproduction": {
+                  "worker": "/template/compat/worker.mjs",
+                  "baseline": "/input",
+                  "candidate": "/work/repo/.git/harness-task/816379b7-39b0-4083-9ea1-f296e4c6ae41/worktree",
+                  "corpus": "/input/compat.json",
+                  "caseId": "2"
+                }
+              }
+            ],
+            "limits": []
+          },
+          {
+            "stage": "D1-observations.json",
+            "status": "matched",
+            "snapshotSha256": "fac917d10b16163617307ccf6c2716efb541e8c7981d909cb002141ed63b070a",
+            "differences": [],
+            "limits": []
+          }
+        ],
+        "errors": []
+      },
+      {
+        "slot": 4,
+        "task": "02-grid-mirror",
+        "arm": "control",
+        "status": "completed",
+        "R": false,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd22.feature",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd22.preservation",
+            "status": "FAIL"
+          }
+        ],
+        "stages": [
+          {
+            "stage": "D0",
+            "R": false,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd22.feature",
+                "status": "PASS"
+              },
+              {
+                "type": "obligation",
+                "id": "fd22.preservation",
+                "status": "FAIL"
+              }
+            ]
+          }
+        ],
+        "evaluationProven": true,
+        "initialR": false,
+        "initialEvaluationProven": true,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "checks_passed",
+        "corrections": 0,
+        "Q": false,
+        "requests": 7,
+        "requestsWithoutUsage": 0,
+        "knownTokens": {
+          "input_tokens": 70,
+          "output_tokens": 35,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "tokens": {
+          "input_tokens": 70,
+          "output_tokens": 35,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "taskElapsedMs": 2809.0621250000004,
+        "preparationElapsedMs": 1296.1635830000487,
+        "evaluationElapsedMs": 429.26845900000626,
+        "cleanupElapsedMs": 57.49274999999761,
+        "probeElapsedMs": 0,
+        "newDifferencesDelivered": 0,
+        "probeObservations": [
+          {
+            "stage": "D0-observations.json",
+            "status": "disabled",
+            "snapshotSha256": "4042b6e6707d9e95a58dfdfba65eddc0a453bb78106d2aa6e8711471e24489ed",
+            "differences": [],
+            "limits": []
+          }
+        ],
+        "errors": []
+      },
+      {
+        "slot": 5,
+        "task": "03-required-column",
+        "arm": "control",
+        "status": "completed",
+        "R": false,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd23.feature",
+            "status": "FAIL"
+          },
+          {
+            "type": "obligation",
+            "id": "fd23.preservation",
+            "status": "FAIL"
+          }
+        ],
+        "stages": [
+          {
+            "stage": "D0",
+            "R": false,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd23.feature",
+                "status": "FAIL"
+              },
+              {
+                "type": "obligation",
+                "id": "fd23.preservation",
+                "status": "FAIL"
+              }
+            ]
+          }
+        ],
+        "evaluationProven": true,
+        "initialR": false,
+        "initialEvaluationProven": true,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "checks_passed",
+        "corrections": 0,
+        "Q": false,
+        "requests": 7,
+        "requestsWithoutUsage": 0,
+        "knownTokens": {
+          "input_tokens": 70,
+          "output_tokens": 35,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "tokens": {
+          "input_tokens": 70,
+          "output_tokens": 35,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "taskElapsedMs": 2718.663375,
+        "preparationElapsedMs": 1279.4507079999748,
+        "evaluationElapsedMs": 434.3519169999927,
+        "cleanupElapsedMs": 59.990874999999505,
+        "probeElapsedMs": 0,
+        "newDifferencesDelivered": 0,
+        "probeObservations": [
+          {
+            "stage": "D0-observations.json",
+            "status": "disabled",
+            "snapshotSha256": "dd6cf596e36b6c2b9b33b53e40fcec67477c88fca8982b0fbdd24c37aa706be6",
+            "differences": [],
+            "limits": []
+          }
+        ],
+        "errors": []
+      },
+      {
+        "slot": 6,
+        "task": "03-required-column",
+        "arm": "candidate",
+        "status": "completed",
+        "R": true,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd23.feature",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd23.preservation",
+            "status": "PASS"
+          }
+        ],
+        "stages": [
+          {
+            "stage": "D0",
+            "R": false,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd23.feature",
+                "status": "FAIL"
+              },
+              {
+                "type": "obligation",
+                "id": "fd23.preservation",
+                "status": "FAIL"
+              }
+            ]
+          },
+          {
+            "stage": "D1",
+            "R": true,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd23.feature",
+                "status": "PASS"
+              },
+              {
+                "type": "obligation",
+                "id": "fd23.preservation",
+                "status": "PASS"
+              }
+            ]
+          }
+        ],
+        "evaluationProven": true,
+        "initialR": false,
+        "initialEvaluationProven": true,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "checks_passed",
+        "corrections": 1,
+        "Q": true,
+        "requests": 10,
+        "requestsWithoutUsage": 0,
+        "knownTokens": {
+          "input_tokens": 100,
+          "output_tokens": 50,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "tokens": {
+          "input_tokens": 100,
+          "output_tokens": 50,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "taskElapsedMs": 3445.5936250000013,
+        "preparationElapsedMs": 1289.8476249999767,
+        "evaluationElapsedMs": 428.59366600000067,
+        "cleanupElapsedMs": 56.53195799999958,
+        "probeElapsedMs": 169.6270840000002,
+        "newDifferencesDelivered": 2,
+        "probeObservations": [
+          {
+            "stage": "D0-observations.json",
+            "status": "different",
+            "snapshotSha256": "0b78336a75c36e95311d3404a84462bc7ce5b171934909d70cad6837dd7d3d49",
+            "differences": [
+              {
+                "id": "1",
+                "entrypoint": "src/index.mjs#column",
+                "input": [
+                  [
+                    {
+                      "n": 1
+                    },
+                    {}
+                  ],
+                  "n"
+                ],
+                "baseline": {
+                  "kind": "throw",
+                  "name": "RangeError",
+                  "message": "missing field: n",
+                  "args": [
+                    [
+                      {
+                        "n": 1
+                      },
+                      {}
+                    ],
+                    "n"
+                  ]
+                },
+                "candidate": {
+                  "kind": "return",
+                  "value": [
+                    1,
+                    null
+                  ],
+                  "args": [
+                    [
+                      {
+                        "n": 1
+                      },
+                      {}
+                    ],
+                    "n"
+                  ]
+                },
+                "snapshotSha256": "0b78336a75c36e95311d3404a84462bc7ce5b171934909d70cad6837dd7d3d49",
+                "candidateSha256": "8240066176040dc2bfaa632c9f37758aeab265e77c5557587ba8e8fb0fcbb86e",
+                "reproduction": {
+                  "worker": "/template/compat/worker.mjs",
+                  "baseline": "/input",
+                  "candidate": "/work/repo/.git/harness-task/642a7c27-c583-4d51-bf0c-e7d7525d1d80/worktree",
+                  "corpus": "/input/compat.json",
+                  "caseId": "1"
+                }
+              },
+              {
+                "id": "2",
+                "entrypoint": "src/index.mjs#first",
+                "input": [
+                  [
+                    {}
+                  ],
+                  "n"
+                ],
+                "baseline": {
+                  "kind": "throw",
+                  "name": "RangeError",
+                  "message": "missing field: n",
+                  "args": [
+                    [
+                      {}
+                    ],
+                    "n"
+                  ]
+                },
+                "candidate": {
+                  "kind": "return",
+                  "value": null,
+                  "args": [
+                    [
+                      {}
+                    ],
+                    "n"
+                  ]
+                },
+                "snapshotSha256": "0b78336a75c36e95311d3404a84462bc7ce5b171934909d70cad6837dd7d3d49",
+                "candidateSha256": "8240066176040dc2bfaa632c9f37758aeab265e77c5557587ba8e8fb0fcbb86e",
+                "reproduction": {
+                  "worker": "/template/compat/worker.mjs",
+                  "baseline": "/input",
+                  "candidate": "/work/repo/.git/harness-task/642a7c27-c583-4d51-bf0c-e7d7525d1d80/worktree",
+                  "corpus": "/input/compat.json",
+                  "caseId": "2"
+                }
+              }
+            ],
+            "limits": []
+          },
+          {
+            "stage": "D1-observations.json",
+            "status": "matched",
+            "snapshotSha256": "5176d8d81e2131c095080a4922a3b271fd259dddf44074910a48bab69097876b",
+            "differences": [],
+            "limits": []
+          }
+        ],
+        "errors": []
+      },
+      {
+        "slot": 7,
+        "task": "04-label-suffix",
+        "arm": "candidate",
+        "status": "completed",
+        "R": true,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd24.feature",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd24.preservation",
+            "status": "PASS"
+          }
+        ],
+        "stages": [
+          {
+            "stage": "D0",
+            "R": false,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd24.feature",
+                "status": "FAIL"
+              },
+              {
+                "type": "obligation",
+                "id": "fd24.preservation",
+                "status": "FAIL"
+              }
+            ]
+          },
+          {
+            "stage": "D1",
+            "R": true,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd24.feature",
+                "status": "PASS"
+              },
+              {
+                "type": "obligation",
+                "id": "fd24.preservation",
+                "status": "PASS"
+              }
+            ]
+          }
+        ],
+        "evaluationProven": true,
+        "initialR": false,
+        "initialEvaluationProven": true,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "checks_passed",
+        "corrections": 1,
+        "Q": true,
+        "requests": 10,
+        "requestsWithoutUsage": 0,
+        "knownTokens": {
+          "input_tokens": 100,
+          "output_tokens": 50,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "tokens": {
+          "input_tokens": 100,
+          "output_tokens": 50,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "taskElapsedMs": 3443.8279580000017,
+        "preparationElapsedMs": 1296.2287920000272,
+        "evaluationElapsedMs": 434.4351250000036,
+        "cleanupElapsedMs": 58.37237499999901,
+        "probeElapsedMs": 171.58212600000024,
+        "newDifferencesDelivered": 2,
+        "probeObservations": [
+          {
+            "stage": "D0-observations.json",
+            "status": "different",
+            "snapshotSha256": "1d652eacadd53604324bbcf483cc6999c8c00b09e4985250497c188528c30c50",
+            "differences": [
+              {
+                "id": "1",
+                "entrypoint": "src/index.mjs#label",
+                "input": [
+                  "😀xy",
+                  1
+                ],
+                "baseline": {
+                  "kind": "return",
+                  "value": "😀…",
+                  "args": [
+                    "😀xy",
+                    1
+                  ]
+                },
+                "candidate": {
+                  "kind": "return",
+                  "value": "\ud83d…",
+                  "args": [
+                    "😀xy",
+                    1
+                  ]
+                },
+                "snapshotSha256": "1d652eacadd53604324bbcf483cc6999c8c00b09e4985250497c188528c30c50",
+                "candidateSha256": "0b4ae76ecc83f7f9c906b85f231ca9764e2382301537600f797ef9b866da32b8",
+                "reproduction": {
+                  "worker": "/template/compat/worker.mjs",
+                  "baseline": "/input",
+                  "candidate": "/work/repo/.git/harness-task/6d18c5bb-963f-4533-936b-0587863b94c5/worktree",
+                  "corpus": "/input/compat.json",
+                  "caseId": "1"
+                }
+              },
+              {
+                "id": "2",
+                "entrypoint": "src/index.mjs#label",
+                "input": [
+                  "😀",
+                  1
+                ],
+                "baseline": {
+                  "kind": "return",
+                  "value": "😀",
+                  "args": [
+                    "😀",
+                    1
+                  ]
+                },
+                "candidate": {
+                  "kind": "return",
+                  "value": "\ud83d…",
+                  "args": [
+                    "😀",
+                    1
+                  ]
+                },
+                "snapshotSha256": "1d652eacadd53604324bbcf483cc6999c8c00b09e4985250497c188528c30c50",
+                "candidateSha256": "0b4ae76ecc83f7f9c906b85f231ca9764e2382301537600f797ef9b866da32b8",
+                "reproduction": {
+                  "worker": "/template/compat/worker.mjs",
+                  "baseline": "/input",
+                  "candidate": "/work/repo/.git/harness-task/6d18c5bb-963f-4533-936b-0587863b94c5/worktree",
+                  "corpus": "/input/compat.json",
+                  "caseId": "2"
+                }
+              }
+            ],
+            "limits": []
+          },
+          {
+            "stage": "D1-observations.json",
+            "status": "matched",
+            "snapshotSha256": "bd28cbc0ab9d4f6a834b6a7bda5e7ac3ecbb9d5074a54effe5b54e66ff1fe711",
+            "differences": [],
+            "limits": []
+          }
+        ],
+        "errors": []
+      },
+      {
+        "slot": 8,
+        "task": "04-label-suffix",
+        "arm": "control",
+        "status": "completed",
+        "R": false,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd24.feature",
+            "status": "FAIL"
+          },
+          {
+            "type": "obligation",
+            "id": "fd24.preservation",
+            "status": "FAIL"
+          }
+        ],
+        "stages": [
+          {
+            "stage": "D0",
+            "R": false,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd24.feature",
+                "status": "FAIL"
+              },
+              {
+                "type": "obligation",
+                "id": "fd24.preservation",
+                "status": "FAIL"
+              }
+            ]
+          }
+        ],
+        "evaluationProven": true,
+        "initialR": false,
+        "initialEvaluationProven": true,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "checks_passed",
+        "corrections": 0,
+        "Q": false,
+        "requests": 7,
+        "requestsWithoutUsage": 0,
+        "knownTokens": {
+          "input_tokens": 70,
+          "output_tokens": 35,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "tokens": {
+          "input_tokens": 70,
+          "output_tokens": 35,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "taskElapsedMs": 2764.044915999999,
+        "preparationElapsedMs": 1288.907332999952,
+        "evaluationElapsedMs": 436.75345899999957,
+        "cleanupElapsedMs": 49.89245899999514,
+        "probeElapsedMs": 0,
+        "newDifferencesDelivered": 0,
+        "probeObservations": [
+          {
+            "stage": "D0-observations.json",
+            "status": "disabled",
+            "snapshotSha256": "2904d0f29ae9e4c143913eb88a81e802a5851e2b0416197bddcd369b56160389",
+            "differences": [],
+            "limits": []
+          }
+        ],
+        "errors": []
+      },
+      {
+        "slot": 9,
+        "task": "05-packet-separator",
+        "arm": "control",
+        "status": "completed",
+        "R": false,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd25.feature",
+            "status": "FAIL"
+          },
+          {
+            "type": "obligation",
+            "id": "fd25.preservation",
+            "status": "FAIL"
+          }
+        ],
+        "stages": [
+          {
+            "stage": "D0",
+            "R": false,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd25.feature",
+                "status": "FAIL"
+              },
+              {
+                "type": "obligation",
+                "id": "fd25.preservation",
+                "status": "FAIL"
+              }
+            ]
+          }
+        ],
+        "evaluationProven": true,
+        "initialR": false,
+        "initialEvaluationProven": true,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "checks_passed",
+        "corrections": 0,
+        "Q": false,
+        "requests": 7,
+        "requestsWithoutUsage": 0,
+        "knownTokens": {
+          "input_tokens": 70,
+          "output_tokens": 35,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "tokens": {
+          "input_tokens": 70,
+          "output_tokens": 35,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "taskElapsedMs": 2784.944457999998,
+        "preparationElapsedMs": 1295.2715420000168,
+        "evaluationElapsedMs": 443.3586670000077,
+        "cleanupElapsedMs": 61.127042000000074,
+        "probeElapsedMs": 0,
+        "newDifferencesDelivered": 0,
+        "probeObservations": [
+          {
+            "stage": "D0-observations.json",
+            "status": "disabled",
+            "snapshotSha256": "0ae348e3a9e84de144f2b8e9b250eca843f73856e158bf82de8186a7f214083a",
+            "differences": [],
+            "limits": []
+          }
+        ],
+        "errors": []
+      },
+      {
+        "slot": 10,
+        "task": "05-packet-separator",
+        "arm": "candidate",
+        "status": "completed",
+        "R": true,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd25.feature",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd25.preservation",
+            "status": "PASS"
+          }
+        ],
+        "stages": [
+          {
+            "stage": "D0",
+            "R": false,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd25.feature",
+                "status": "FAIL"
+              },
+              {
+                "type": "obligation",
+                "id": "fd25.preservation",
+                "status": "FAIL"
+              }
+            ]
+          },
+          {
+            "stage": "D1",
+            "R": true,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd25.feature",
+                "status": "PASS"
+              },
+              {
+                "type": "obligation",
+                "id": "fd25.preservation",
+                "status": "PASS"
+              }
+            ]
+          }
+        ],
+        "evaluationProven": true,
+        "initialR": false,
+        "initialEvaluationProven": true,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "checks_passed",
+        "corrections": 1,
+        "Q": true,
+        "requests": 10,
+        "requestsWithoutUsage": 0,
+        "knownTokens": {
+          "input_tokens": 100,
+          "output_tokens": 50,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "tokens": {
+          "input_tokens": 100,
+          "output_tokens": 50,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "taskElapsedMs": 3435.2328750000015,
+        "preparationElapsedMs": 1266.7833749999481,
+        "evaluationElapsedMs": 433.8246250000084,
+        "cleanupElapsedMs": 60.43404200000077,
+        "probeElapsedMs": 165.46900000000005,
+        "newDifferencesDelivered": 2,
+        "probeObservations": [
+          {
+            "stage": "D0-observations.json",
+            "status": "different",
+            "snapshotSha256": "31a1f26f13fb9668952663ea82e0a07ea04b5e409d153e077684b3d3869c0d66",
+            "differences": [
+              {
+                "id": "1",
+                "entrypoint": "src/index.mjs#packet",
+                "input": [
+                  [
+                    "",
+                    "x",
+                    "",
+                    ""
+                  ]
+                ],
+                "baseline": {
+                  "kind": "return",
+                  "value": "|x||",
+                  "args": [
+                    [
+                      "",
+                      "x",
+                      "",
+                      ""
+                    ]
+                  ]
+                },
+                "candidate": {
+                  "kind": "return",
+                  "value": "x",
+                  "args": [
+                    [
+                      "",
+                      "x",
+                      "",
+                      ""
+                    ]
+                  ]
+                },
+                "snapshotSha256": "31a1f26f13fb9668952663ea82e0a07ea04b5e409d153e077684b3d3869c0d66",
+                "candidateSha256": "b6ea1f9f216834ed82645a7b1f508f7e6179b20def69e5c894a85fa7ef32f9e2",
+                "reproduction": {
+                  "worker": "/template/compat/worker.mjs",
+                  "baseline": "/input",
+                  "candidate": "/work/repo/.git/harness-task/d2676658-a3ed-42bb-b852-96aaa37351d5/worktree",
+                  "corpus": "/input/compat.json",
+                  "caseId": "1"
+                }
+              },
+              {
+                "id": "2",
+                "entrypoint": "src/index.mjs#packet",
+                "input": [
+                  [
+                    "",
+                    ""
+                  ]
+                ],
+                "baseline": {
+                  "kind": "return",
+                  "value": "|",
+                  "args": [
+                    [
+                      "",
+                      ""
+                    ]
+                  ]
+                },
+                "candidate": {
+                  "kind": "return",
+                  "value": "",
+                  "args": [
+                    [
+                      "",
+                      ""
+                    ]
+                  ]
+                },
+                "snapshotSha256": "31a1f26f13fb9668952663ea82e0a07ea04b5e409d153e077684b3d3869c0d66",
+                "candidateSha256": "b6ea1f9f216834ed82645a7b1f508f7e6179b20def69e5c894a85fa7ef32f9e2",
+                "reproduction": {
+                  "worker": "/template/compat/worker.mjs",
+                  "baseline": "/input",
+                  "candidate": "/work/repo/.git/harness-task/d2676658-a3ed-42bb-b852-96aaa37351d5/worktree",
+                  "corpus": "/input/compat.json",
+                  "caseId": "2"
+                }
+              }
+            ],
+            "limits": []
+          },
+          {
+            "stage": "D1-observations.json",
+            "status": "matched",
+            "snapshotSha256": "8277464d4280000a1da569eda7c5e16d27a8e16853ed05ff3d60f34f01bb8761",
+            "differences": [],
+            "limits": []
+          }
+        ],
+        "errors": []
+      },
+      {
+        "slot": 11,
+        "task": "06-point-offset",
+        "arm": "candidate",
+        "status": "completed",
+        "R": true,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd26.feature",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd26.preservation",
+            "status": "PASS"
+          }
+        ],
+        "stages": [
+          {
+            "stage": "D0",
+            "R": false,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd26.feature",
+                "status": "PASS"
+              },
+              {
+                "type": "obligation",
+                "id": "fd26.preservation",
+                "status": "FAIL"
+              }
+            ]
+          },
+          {
+            "stage": "D1",
+            "R": true,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd26.feature",
+                "status": "PASS"
+              },
+              {
+                "type": "obligation",
+                "id": "fd26.preservation",
+                "status": "PASS"
+              }
+            ]
+          }
+        ],
+        "evaluationProven": true,
+        "initialR": false,
+        "initialEvaluationProven": true,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "checks_passed",
+        "corrections": 1,
+        "Q": true,
+        "requests": 10,
+        "requestsWithoutUsage": 0,
+        "knownTokens": {
+          "input_tokens": 100,
+          "output_tokens": 50,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "tokens": {
+          "input_tokens": 100,
+          "output_tokens": 50,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "taskElapsedMs": 3466.7378329999992,
+        "preparationElapsedMs": 1273.6556670000064,
+        "evaluationElapsedMs": 428.9136249999865,
+        "cleanupElapsedMs": 57.70420799999556,
+        "probeElapsedMs": 160.5901240000003,
+        "newDifferencesDelivered": 1,
+        "probeObservations": [
+          {
+            "stage": "D0-observations.json",
+            "status": "different",
+            "snapshotSha256": "bc4fc7a3f65e8cf35f2e464245ea2bff03fbec372c6d3c613a86f131d3d053f3",
+            "differences": [
+              {
+                "id": "1",
+                "entrypoint": "src/index.mjs#transform",
+                "input": [
+                  [
+                    [
+                      2,
+                      4
+                    ],
+                    [
+                      1,
+                      3
+                    ]
+                  ],
+                  {
+                    "scale": 0
+                  }
+                ],
+                "baseline": {
+                  "kind": "return",
+                  "value": [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      0,
+                      0
+                    ]
+                  ],
+                  "args": [
+                    [
+                      [
+                        2,
+                        4
+                      ],
+                      [
+                        1,
+                        3
+                      ]
+                    ],
+                    {
+                      "scale": 0
+                    }
+                  ]
+                },
+                "candidate": {
+                  "kind": "return",
+                  "value": [
+                    [
+                      2,
+                      4
+                    ],
+                    [
+                      1,
+                      3
+                    ]
+                  ],
+                  "args": [
+                    [
+                      [
+                        2,
+                        4
+                      ],
+                      [
+                        1,
+                        3
+                      ]
+                    ],
+                    {
+                      "scale": 0
+                    }
+                  ]
+                },
+                "snapshotSha256": "bc4fc7a3f65e8cf35f2e464245ea2bff03fbec372c6d3c613a86f131d3d053f3",
+                "candidateSha256": "0ce6d50462bd2e3f871cad09c18c4f018404636d40a396758578b74d310ed8c8",
+                "reproduction": {
+                  "worker": "/template/compat/worker.mjs",
+                  "baseline": "/input",
+                  "candidate": "/work/repo/.git/harness-task/0e92c5c6-089c-42ec-b63e-5e48dd30a0cf/worktree",
+                  "corpus": "/input/compat.json",
+                  "caseId": "1"
+                }
+              }
+            ],
+            "limits": []
+          },
+          {
+            "stage": "D1-observations.json",
+            "status": "matched",
+            "snapshotSha256": "2fa64f6dc5116bbc3d0ab06fc5fea6a9c8c73e0033ed8485c5c2875ff1663bd2",
+            "differences": [],
+            "limits": []
+          }
+        ],
+        "errors": []
+      },
+      {
+        "slot": 12,
+        "task": "06-point-offset",
+        "arm": "control",
+        "status": "completed",
+        "R": false,
+        "obligations": [
+          {
+            "type": "obligation",
+            "id": "fd26.feature",
+            "status": "PASS"
+          },
+          {
+            "type": "obligation",
+            "id": "fd26.preservation",
+            "status": "FAIL"
+          }
+        ],
+        "stages": [
+          {
+            "stage": "D0",
+            "R": false,
+            "evaluationProven": true,
+            "obligations": [
+              {
+                "type": "obligation",
+                "id": "fd26.feature",
+                "status": "PASS"
+              },
+              {
+                "type": "obligation",
+                "id": "fd26.preservation",
+                "status": "FAIL"
+              }
+            ]
+          }
+        ],
+        "evaluationProven": true,
+        "initialR": false,
+        "initialEvaluationProven": true,
+        "delivery": true,
+        "providerConfirmed": true,
+        "authorCompleted": true,
+        "internalStatus": "checks_passed",
+        "corrections": 0,
+        "Q": false,
+        "requests": 7,
+        "requestsWithoutUsage": 0,
+        "knownTokens": {
+          "input_tokens": 70,
+          "output_tokens": 35,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "tokens": {
+          "input_tokens": 70,
+          "output_tokens": 35,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "money": "unknown",
+        "taskElapsedMs": 2758.0722499999974,
+        "preparationElapsedMs": 1295.1297079999931,
+        "evaluationElapsedMs": 436.05941699999676,
+        "cleanupElapsedMs": 58.2667500000025,
+        "probeElapsedMs": 0,
+        "newDifferencesDelivered": 0,
+        "probeObservations": [
+          {
+            "stage": "D0-observations.json",
+            "status": "disabled",
+            "snapshotSha256": "3d2ac1b70dcdf99f2524ff8dd598969da38b311f351307bda9ffee3be6e7ed12",
+            "differences": [],
+            "limits": []
+          }
+        ],
+        "errors": []
+      }
+    ],
+    "authAccesses": 0,
+    "syntheticRequests": 102,
+    "frames": [
+      {
+        "slot": 1,
+        "task": "01-consecutive-runs",
+        "arm": "control",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 1,
+        "task": "01-consecutive-runs",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 1,
+        "task": "01-consecutive-runs",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 1,
+        "task": "01-consecutive-runs",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 1,
+        "task": "01-consecutive-runs",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 1,
+        "task": "01-consecutive-runs",
+        "arm": "control",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 2,
+        "task": "01-consecutive-runs",
+        "arm": "candidate",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 2,
+        "task": "01-consecutive-runs",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 2,
+        "task": "01-consecutive-runs",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 2,
+        "task": "01-consecutive-runs",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 2,
+        "task": "01-consecutive-runs",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 2,
+        "task": "01-consecutive-runs",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 2,
+        "task": "01-consecutive-runs",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 2,
+        "task": "01-consecutive-runs",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 2,
+        "task": "01-consecutive-runs",
+        "arm": "candidate",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 3,
+        "task": "02-grid-mirror",
+        "arm": "candidate",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 3,
+        "task": "02-grid-mirror",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 3,
+        "task": "02-grid-mirror",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 3,
+        "task": "02-grid-mirror",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 3,
+        "task": "02-grid-mirror",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 3,
+        "task": "02-grid-mirror",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 3,
+        "task": "02-grid-mirror",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 3,
+        "task": "02-grid-mirror",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 3,
+        "task": "02-grid-mirror",
+        "arm": "candidate",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 4,
+        "task": "02-grid-mirror",
+        "arm": "control",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 4,
+        "task": "02-grid-mirror",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 4,
+        "task": "02-grid-mirror",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 4,
+        "task": "02-grid-mirror",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 4,
+        "task": "02-grid-mirror",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 4,
+        "task": "02-grid-mirror",
+        "arm": "control",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 5,
+        "task": "03-required-column",
+        "arm": "control",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 5,
+        "task": "03-required-column",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 5,
+        "task": "03-required-column",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 5,
+        "task": "03-required-column",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 5,
+        "task": "03-required-column",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 5,
+        "task": "03-required-column",
+        "arm": "control",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 6,
+        "task": "03-required-column",
+        "arm": "candidate",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 6,
+        "task": "03-required-column",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 6,
+        "task": "03-required-column",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 6,
+        "task": "03-required-column",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 6,
+        "task": "03-required-column",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 6,
+        "task": "03-required-column",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 6,
+        "task": "03-required-column",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 6,
+        "task": "03-required-column",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 6,
+        "task": "03-required-column",
+        "arm": "candidate",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 7,
+        "task": "04-label-suffix",
+        "arm": "candidate",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 7,
+        "task": "04-label-suffix",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 7,
+        "task": "04-label-suffix",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 7,
+        "task": "04-label-suffix",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 7,
+        "task": "04-label-suffix",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 7,
+        "task": "04-label-suffix",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 7,
+        "task": "04-label-suffix",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 7,
+        "task": "04-label-suffix",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 7,
+        "task": "04-label-suffix",
+        "arm": "candidate",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 8,
+        "task": "04-label-suffix",
+        "arm": "control",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 8,
+        "task": "04-label-suffix",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 8,
+        "task": "04-label-suffix",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 8,
+        "task": "04-label-suffix",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 8,
+        "task": "04-label-suffix",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 8,
+        "task": "04-label-suffix",
+        "arm": "control",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 9,
+        "task": "05-packet-separator",
+        "arm": "control",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 9,
+        "task": "05-packet-separator",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 9,
+        "task": "05-packet-separator",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 9,
+        "task": "05-packet-separator",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 9,
+        "task": "05-packet-separator",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 9,
+        "task": "05-packet-separator",
+        "arm": "control",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 10,
+        "task": "05-packet-separator",
+        "arm": "candidate",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 10,
+        "task": "05-packet-separator",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 10,
+        "task": "05-packet-separator",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 10,
+        "task": "05-packet-separator",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 10,
+        "task": "05-packet-separator",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 10,
+        "task": "05-packet-separator",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 10,
+        "task": "05-packet-separator",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 10,
+        "task": "05-packet-separator",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 10,
+        "task": "05-packet-separator",
+        "arm": "candidate",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 11,
+        "task": "06-point-offset",
+        "arm": "candidate",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 11,
+        "task": "06-point-offset",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 11,
+        "task": "06-point-offset",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 11,
+        "task": "06-point-offset",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 11,
+        "task": "06-point-offset",
+        "arm": "candidate",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 11,
+        "task": "06-point-offset",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 11,
+        "task": "06-point-offset",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 11,
+        "task": "06-point-offset",
+        "arm": "candidate",
+        "stage": "correction",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 11,
+        "task": "06-point-offset",
+        "arm": "candidate",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 12,
+        "task": "06-point-offset",
+        "arm": "control",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 12,
+        "task": "06-point-offset",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 12,
+        "task": "06-point-offset",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 12,
+        "task": "06-point-offset",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 12,
+        "task": "06-point-offset",
+        "arm": "control",
+        "stage": "author",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      },
+      {
+        "slot": 12,
+        "task": "06-point-offset",
+        "arm": "control",
+        "stage": "bootstrap",
+        "model": "gpt-5.6-luna",
+        "effort": "high"
+      }
+    ]
+  },
+  "runtimeAndProtectedInputs": "Core, prompts, tasks, corpus, probe semantics, evaluator, dependencies and stop code unchanged from e8f0547d; see Git diff and history-preservation.json.",
+  "afterCampaign": {
+    "sourceManifestUnchanged": true,
+    "bundleManifestUnchanged": true,
+    "toolchainManifestUnchanged": true,
+    "fullPatchesIndependentlyGraded": 12,
+    "allParticipantTerminationAndCleanupVerified": true
+  }
+}

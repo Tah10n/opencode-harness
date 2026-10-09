@@ -1,0 +1,44 @@
+{
+  "revision": 1,
+  "domain": "synchronous bounded JSON; declared calls only",
+  "preserved": "Calls with omitted options retain code point counting, default ellipsis, zero width, no change for short strings, and input immutability. Domain text strings and integer widths 0..64.",
+  "excluded": "Only explicitly supplied suffix changes clipped output.",
+  "cases": [
+    {
+      "id": "1",
+      "module": "src/index.mjs",
+      "export": "label",
+      "args": [
+        "😀xy",
+        1
+      ]
+    },
+    {
+      "id": "2",
+      "module": "src/index.mjs",
+      "export": "label",
+      "args": [
+        "😀",
+        1
+      ]
+    },
+    {
+      "id": "3",
+      "module": "src/index.mjs",
+      "export": "label",
+      "args": [
+        "abc",
+        0
+      ]
+    },
+    {
+      "id": "4",
+      "module": "src/index.mjs",
+      "export": "label",
+      "args": [
+        "ab",
+        4
+      ]
+    }
+  ]
+}

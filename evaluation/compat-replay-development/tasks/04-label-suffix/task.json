@@ -1,0 +1,10 @@
+{
+  "id": "04-label-suffix",
+  "group": "compatible extension",
+  "feature": [
+    "fd24.feature"
+  ],
+  "preservation": [
+    "fd24.preservation"
+  ]
+}

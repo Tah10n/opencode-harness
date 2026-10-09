@@ -14,6 +14,19 @@ The [exact-model technical follow-up](../evaluation/feedback-development/evidenc
 records title none/refusal before correction, installed model/high frames after
 correction and synthetic direct/D delivery. It makes no model effectiveness claim.
 
+## Differential compatibility replay: prototype works, comparison stopped
+
+The [experimental replay report](../evaluation/compat-replay-development/evidence/REPORT.md)
+records six new JS baseline/gold/wrong controls. Every wrong patch passes the
+ordinary suite but produces an additional baseline-derived preservation signal;
+installed scripted D receives and repairs it. Technical fixtures do not measure
+model quality. The real Luna/high D versus D-plus-probe campaign stopped when a
+mandatory source-import check failed: one control completed, one candidate was
+interrupted and ten slots never started. All six pairs remain unknown. The
+candidate produced no real differential corrective signal, so model benefit is
+not shown. Packaging was repaired after stop; no retry or campaign continuation
+followed, and the component remains experimental.
+
 ## Plain / direct / D calibration: Plain ceiling, no D activation
 
 The [model-free post-hoc outbox diagnosis](../evaluation/feedback-development/evidence/calibration-run-v1/DIAGNOSIS.md)
@@ -289,3 +302,13 @@ fixtures test transport, deadlines, capture errors and unknown usage. Compiler
 and sensitivity fixtures test their implemented diagnostic mechanisms. They
 contain no evidence of improved model decisions. Current-head technical status
 belongs in [STATUS](STATUS.md) and the actual PR check results.
+
+## Compatibility replay development v2
+
+The [separate v2 protocol](../evaluation/compat-replay-development/PROTOCOL-v2.md)
+authorizes one twelve-slot development rerun after fixing premature admission.
+The sequential readiness launcher must complete all local, installed, container,
+scripted-schedule and current CI checks before any model request. Its result is
+recorded separately in
+[`development-run-v2/REPORT.md`](../evaluation/compat-replay-development/evidence/development-run-v2/REPORT.md).
+The stopped v1 campaign and its two attempts remain historical and are not pooled.

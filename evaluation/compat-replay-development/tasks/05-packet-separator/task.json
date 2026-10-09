@@ -1,0 +1,10 @@
+{
+  "id": "05-packet-separator",
+  "group": "compatible extension",
+  "feature": [
+    "fd25.feature"
+  ],
+  "preservation": [
+    "fd25.preservation"
+  ]
+}

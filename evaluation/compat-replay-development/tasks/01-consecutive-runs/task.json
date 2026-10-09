@@ -1,0 +1,10 @@
+{
+  "id": "01-consecutive-runs",
+  "group": "refactor",
+  "feature": [
+    "fd21.feature"
+  ],
+  "preservation": [
+    "fd21.preservation"
+  ]
+}
