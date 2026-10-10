@@ -94,13 +94,15 @@ try {
   assert.equal(incomplete.requests,2);assert.equal(incomplete.tokens.input_tokens,null);assert.equal(incomplete.knownTokens.input_tokens,10);assert.equal(incomplete.Q,null);
   // The completed campaign's manifest is historical evidence, not the current
   // runtime freeze. Preserve its exact bytes and all unchanged source entries;
-  // only the product presentation/cleanup, deadline cause propagation and live
-  // fixture checks may differ. Historical bytes and real admission stay frozen.
+  // only the product presentation/cleanup, deadline cause propagation, Node
+  // test interpretation and live fixture checks may differ. Historical bytes
+  // and real admission stay frozen; old observer hashes must fail admission.
   const historicalFile=path.join(directory,'frozen-manifest.json');
   assert.equal(hashFile(historicalFile).sha256,'b458d3d4f0efd49dcf71c31ee98e21b7e88deeed352ceaef14078ba9bcb9f3c3');
   const historical=JSON.parse(fs.readFileSync(historicalFile)),comparison=frozenManifest();
   for(const [section,file] of [
     ['product','lib/native-task-plugin.mjs'],['product','lib/native-task-workflow.mjs'],
+    ['product','lib/native-task-observations.mjs'],
     ['product','evaluation/support/native-run.mjs'],['product','evaluation/support/scheduler.mjs'],
     ['files','evaluation/feedback-development/verify.mjs'],['files','evaluation/feedback-development/prepare.mjs'],
     ['files','evaluation/feedback-development/verify-title.mjs'],['files','evaluation/feedback-development/installed.mjs'],

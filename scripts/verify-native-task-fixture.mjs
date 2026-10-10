@@ -95,7 +95,8 @@ const fixture=http.createServer(async(req,res)=>{
   }
   let calls=[];
   if(stage==='implementation') {
-   if(actionableModes.includes(mode)) {
+   if(mode==='no-passed-tests')calls=[bash('npm test')];
+   else if(actionableModes.includes(mode)) {
     if(mode==='unsupported-current')calls=[bash('npm run opaque')];
     if(mode==='unsupported-mixed')calls=[bash(writeFixture('value.mjs',source.replace('value = 2','value = 1'))),bash('node --test'),bash('npm run opaque')];
     if(mode==='unsupported-stale')calls=[bash('npm run opaque'),bash(writeFixture('value.mjs',source+'// after required command\n'))];
@@ -211,7 +212,16 @@ const fixture=http.createServer(async(req,res)=>{
    else calls=[bash('node --test')];
   } else {
    const feedback=JSON.parse(text);assert.ok(feedback.originalTask.includes('ORIGINAL_TASK_FIXTURE'));assert.ok(feedback.current.diff!==undefined);
-   if(actionableModes.includes(mode)) {
+   if(mode==='no-passed-tests'){
+    assert.equal(pass,1);
+    const check=feedback.observations.latestChecks.find(c=>c.command==='npm test');
+    assert.equal(check.execution.status,'completed_exit_0');assert.equal(check.execution.successful,true);
+    assert.equal(check.successful,false);assert.equal(check.testSummary.pass,0);assert.equal(check.testSummary.skipped,1);
+    assert.equal(feedback.observations.checksCurrent,false);assert.deepEqual(feedback.observations.unresolvedFailures,[]);
+    assert.ok(feedback.observations.correctionReasons.some(r=>r.includes('No passed tests')));
+    calls=[bash(writeFixture('value.test.mjs',originalTest)),bash('npm test')];
+   }
+   else if(actionableModes.includes(mode)) {
     assert.equal(pass,1,'No repeat solely for unsupported interpretation');
     assert.ok(feedback.observations.correctionReasons.length);
     if(mode==='unsupported-mixed'){
@@ -276,12 +286,16 @@ const api = async (method, route, body) => { const r = await fetch(`http://127.0
 try {
  let ready=false;for(let n=0;n<150;n++){try{await api('GET','/global/health');ready=true;break;}catch{await new Promise(r=>setTimeout(r,100));}}assert.ok(ready,stderr);
  const fixtureHead=git('rev-parse','HEAD');
- const allModes=[...actionableModes,...ordinaryErrorModes.filter(m=>!m.startsWith('glob-compound')),'stateful','variant','both-required','narrow','worktree-path','external-path','external-argument','bash-denial','second-denial','stdout-denial','runtime-error','unknown-error','diagnostic','unresolved','correct','two-fixes','comment-only','defect','coverage-loss','intentional','relocation','late-check','final-stale','no-progress','permission','cancel','budget','concurrent-save','staged-work','external-save'];
+ const allModes=['no-passed-tests',...actionableModes,...ordinaryErrorModes.filter(m=>!m.startsWith('glob-compound')),'stateful','variant','both-required','narrow','worktree-path','external-path','external-argument','bash-denial','second-denial','stdout-denial','runtime-error','unknown-error','diagnostic','unresolved','correct','two-fixes','comment-only','defect','coverage-loss','intentional','relocation','late-check','final-stale','no-progress','permission','cancel','budget','concurrent-save','staged-work','external-save'];
  const selectedModes=process.env.NATIVE_TASK_FIXTURE_MODES?.split(',')??allModes;
  for(mode of selectedModes){
   git('reset','--hard',fixtureHead);git('clean','-fd');
   const artifactRoot=path.join(project,'.git/harness-task');priorArtifacts=new Set(fs.existsSync(artifactRoot)?fs.readdirSync(artifactRoot):[]);
   fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Deliver value '+(mode==='intentional'?'3 instead of 2':'2')+'; preserve the independent legacy() = 7 scenario. Run node --test after the last edit.');
+  if(mode==='no-passed-tests'){
+   fs.writeFileSync(path.join(project,'value.test.mjs'),originalTest.replace('test(', 'test.skip('));
+   fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Verify the public requirement and legacy scenario with `npm test`.');
+  }
   if(actionableModes.includes(mode)){
    fs.writeFileSync(path.join(project,'package.json'),JSON.stringify({private:true,scripts:{test:'node --test',opaque:'node --version'}}));
    fs.writeFileSync(task,'ORIGINAL_TASK_FIXTURE: Preserve value 2 and legacy() = 7. Run `npm run opaque`.'+(mode==='unsupported-mixed'?' Also run `node --test` after the last edit.':''));
@@ -382,10 +396,20 @@ try {
    console.log(JSON.stringify({largeGitBytes:Buffer.byteLength(git('ls-files','-v','-z')),installedOpenCode:version.stdout.trim(),portablePatch:true,userStatePreserved:true,elapsedMs:Date.now()-fixtureStarted}));
   }
   assert.equal(fs.readFileSync(path.join(project,'value.mjs'),'utf8'),mode==='concurrent-save'?source+'// concurrent USER_SAVE\n':userBytes);
-  const corrected=['unsupported-mixed','unsupported-missing','unsupported-stale','stateful','both-required','narrow','defect','two-fixes','comment-only','late-check','final-stale','no-progress'].includes(mode);
+  const corrected=['no-passed-tests','unsupported-mixed','unsupported-missing','unsupported-stale','stateful','both-required','narrow','defect','two-fixes','comment-only','late-check','final-stale','no-progress'].includes(mode);
   assert.equal(report.repairs,['two-fixes','comment-only','no-progress','unresolved'].includes(mode)?2:mode==='final-stale'?2:corrected?1:0,JSON.stringify(report));assert.deepEqual(Object.keys(report.sessions),['author']);
   assert.equal(report.status,[...actionableModes,'glob-compound','glob-compound-failure','diagnostic','no-progress','comment-only','unresolved','final-stale','permission','second-denial','unknown-error','runtime-error','external-save'].includes(mode)?'incomplete':'checks_passed',JSON.stringify(report));
   assert.equal(requests.filter(r=>r.mode===mode&&r.stage==='correction'&&r.n===0).length,report.repairs,'Actual corrective author calls: '+mode);
+  if(mode==='no-passed-tests'){
+   const first=JSON.parse(fs.readFileSync(path.join(report.artifacts,'D0-observations.json')));
+   assert.equal(first.checksCurrent,false);assert.equal(first.requiredChecks[0].observed,true);
+   assert.equal(first.latestChecks[0].execution.status,'completed_exit_0');assert.equal(first.latestChecks[0].successful,false);
+   assert.equal(first.latestChecks[0].testSummary.pass,0);assert.equal(first.latestChecks[0].testSummary.skipped,1);
+   const checks=report.observations.checks.filter(c=>c.command==='npm test');assert.equal(checks.length,2);
+   assert.deepEqual(checks.map(c=>[c.execution.successful,c.successful,c.testSummary.pass]),[[true,false,0],[true,true,1]]);
+   assert.equal(report.observations.checksCurrent,true);assert.deepEqual(report.observations.unresolvedFailures,[]);
+   assert.deepEqual(report.observations.correctionReasons,[]);assert.equal(report.status,'checks_passed');
+  }
   if(actionableModes.includes(mode)){
    assert.match(report.stopReason,/No actionable/);assert.doesNotMatch(report.stopReason,/exhausted/);
    assert.deepEqual(report.observations.correctionReasons,[]);assert.ok(report.remaining.length);assert.ok(report.limits.length);

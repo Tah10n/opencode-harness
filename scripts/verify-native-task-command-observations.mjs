@@ -14,6 +14,102 @@ const rules=[{permission:'read',pattern:'*',action:'allow'}];
 const scenarios=['compound','signal','timeout','nonzero','stale','revert','other-cwd','script-change','npmrc-change','hooks','partial','absent','supported','zero','denied','unfinished','environment','shell-chain','previous-failure','ava','mocha','tsd','lint'];
 const workflowScenarios=['unparsed','partial-output','unparsed-failure','zero','failure','mixed','missing','stale','stale-diagnostic','other-command','whitespace-only','nonzero','signal','timeout','unknown','unfinished','permission','cancel','deadline','boundary','comment-only'];
 try {
+ // Actual Node output goes through the production observer, not a parser copy.
+ const nodeProjects=(mode,body,task='Run `npm test`.',cwdControl=false)=>{
+  const dir=path.join(temp,'node-evidence-'+mode);fs.mkdirSync(dir);
+  const git=(...args)=>{const r=spawnSync('git',args,{cwd:dir,encoding:'utf8'});assert.equal(r.status,0,r.stderr);};
+  const good="import {test,describe} from 'node:test';import assert from 'node:assert/strict';\n";
+  fs.writeFileSync(path.join(dir,'package.json'),JSON.stringify({scripts:{test:'node --test'}}));
+  if(body!==null)fs.writeFileSync(path.join(dir,'value.test.mjs'),good+body+'\n');
+  if(cwdControl){
+   fs.mkdirSync(path.join(dir,'sub'));fs.writeFileSync(path.join(dir,'sub/package.json'),JSON.stringify({scripts:{test:'node --test public.spec.mjs'}}));
+   // Explicit cwd control is not discovered by the root's automatic test run.
+   fs.writeFileSync(path.join(dir,'sub/public.spec.mjs'),good+"test('cwd control',()=>{});\n");
+  }
+  git('init','-q');git('add','.');git('-c','user.name=Fixture','-c','user.email=fixture@local','commit','-qm','base');
+  const artifacts=path.join(dir,'.git/observations');fs.mkdirSync(artifacts);
+  const observer=prepareObservations({directory:dir,artifacts,permissionRules:rules,task});
+  const capture=()=>({...reviewContext({cwd:dir,base:'HEAD',permissionRules:rules}),task});
+  const events=[];
+  const execute=(command='npm test',workdir='.')=>{
+   const before=capture().snapshotSha256,r=spawnSync('/bin/sh',['-c',command],{cwd:path.join(dir,workdir),encoding:'utf8',timeout:20000});
+   const e={tool:'bash',callID:'call-'+events.length,args:{command,workdir},state:'completed',exit:r.status,signal:r.signal,output:r.stdout+r.stderr,before,after:capture().snapshotSha256};events.push(e);return e;
+  };
+  const mutate=body=>{const before=capture().snapshotSha256;fs.writeFileSync(path.join(dir,'value.test.mjs'),good+body+'\n');events.push({tool:'write',state:'completed',before,after:capture().snapshotSha256});};
+  return {dir,artifacts,events,capture,execute,mutate,observe:()=>observer(events,capture())};
+ };
+ const bodies={skip:"test.skip('public',()=>{});",todo:"test.todo('public',()=>{});",'todo-failure':"test.todo('public',()=>{throw Error('expected TODO')});",pass:"test('public',()=>{});",mixed:"test('public',()=>{});test.skip('skip',()=>{});test.todo('todo',()=>{throw Error('expected TODO')});",nested:"describe('outer',()=>{test('public',()=>{});test.skip('skip',()=>{});describe('inner',()=>{test('nested',()=>{});test.todo('todo',()=>{})});});",'suite-skip':"describe.skip('skipped suite',()=>{test('public',()=>{})});",'suite-todo':"describe.todo('todo suite',()=>{test('public',()=>{})});",zero:null};
+ const runnerResults=[];
+ for(const reporter of ['tap','spec'])for(const [mode,body] of Object.entries(bodies)){
+  const f=nodeProjects(reporter+'-'+mode,body,'Run `node --test --test-reporter='+reporter+'`.');
+  const e=f.execute('node --test --test-reporter='+reporter),facts=f.observe(),check=facts.checks[0];
+  runnerResults.push({reporter,mode,node:process.version,exit:e.exit,execution:check.execution,tests:check.tests,testSummary:check.testSummary,successful:check.successful,checksCurrent:facts.checksCurrent,output:e.output});
+ }
+ console.log(JSON.stringify({nodeRunnerReproduction:runnerResults}));
+ for(const r of runnerResults){
+  assert.equal(r.exit,0);assert.equal(r.execution.status,'completed_exit_0');assert.equal(r.execution.successful,true);
+  assert.equal(r.successful,['pass','mixed','nested'].includes(r.mode),r.reporter+' '+r.mode+' must require passed tests');
+  assert.equal(r.checksCurrent,r.successful,r.reporter+' '+r.mode);
+  if(['mixed','nested'].includes(r.mode)){assert.equal(r.testSummary.skipped,1);assert.equal(r.testSummary.todo,1);}
+ }
+ // Malformations below are explicit corruptions of actual passing TAP/spec.
+ for(const reporter of ['tap','spec']){
+  const f=nodeProjects('summary-'+reporter,bodies.pass,'Run `node --test --test-reporter='+reporter+'`.');
+  const e=f.execute('node --test --test-reporter='+reporter),output=e.output,prefix=reporter==='tap'?'# ':'ℹ ';
+  const sum=Number(f.observe().checks[0].tests);
+  const corruptions={missing:output.replace(new RegExp('^'+prefix+'fail .*\\n','m'),''),duplicate:output+prefix+'pass '+sum+'\n',malformedDuplicate:output+prefix+'pass unsupported\n',contradictory:output.replace(prefix+'tests '+sum,prefix+'tests '+(sum+1)),negative:output.replace(prefix+'pass '+sum,prefix+'pass -1'),unsafe:output.replace(prefix+'tests '+sum,prefix+'tests 9007199254740993'),mixedReporter:output.replace(prefix+'pass ',(reporter==='tap'?'ℹ ':'# ')+'pass '),cancelled:output.replace(prefix+'pass '+sum,prefix+'pass '+(sum-1)).replace(prefix+'cancelled 0',prefix+'cancelled 1')};
+  for(const [name,bytes] of Object.entries(corruptions)){
+   e.output=bytes;const facts=f.observe();assert.equal(facts.checks[0].successful,false,reporter+' '+name);assert.equal(facts.checksCurrent,false);
+   if(name!=='cancelled')assert.equal(facts.checks[0].interpretation.status,'unparsed',reporter+' '+name);
+  }
+  e.output=output;
+  for(const [field,value] of [['signal','SIGTERM'],['timeout',true],['exit',null],['state','running']]){
+   const original=e[field];e[field]=value;assert.equal(f.observe().checks[0].successful,false,field);e[field]=original;
+  }
+ }
+ for(const mode of ['required-skip','required-todo','required-stuck','optional-skip','optional-todo','required-with-green','failure-skip','failure-pass','diagnostic-failure-skip','other-command','other-filter','other-cwd','other-env','stale']){
+  const optional=mode.startsWith('optional'),noPass=mode==='required-todo'||mode==='optional-todo'?bodies.todo:bodies.skip;
+  const initialBody=mode==='optional-todo'?bodies.pass+bodies.todo.replace("'public'","'publicTodo'"):mode==='optional-skip'?bodies.pass+bodies.skip.replace("'public'","'publicSkip'"):bodies.pass;
+  const f=nodeProjects('workflow-'+mode,initialBody,optional?'Run `node --test value.test.mjs`.':mode==='diagnostic-failure-skip'?'Run `node --test sub/public.spec.mjs`.':'Run `npm test`.',['other-cwd','required-with-green','diagnostic-failure-skip'].includes(mode));
+  let first;const prompts=[];
+  const report=await runWorkflow({capture:f.capture,observe:()=>{const facts=f.observe();first??=facts;return facts;},save:()=>{},messages:async()=>[],aborted:()=>false,checkActive:()=>{},prompt:async(role,prompt)=>{
+   prompts.push(prompt);
+   if(prompts.length===1){
+    if(['required-skip','required-todo','required-stuck','required-with-green','failure-skip','failure-pass','diagnostic-failure-skip'].includes(mode)){
+     if(mode.startsWith('failure')||mode==='diagnostic-failure-skip'){f.mutate("test('public',()=>assert.fail('real failure')); ");f.execute();}
+     f.mutate(mode.startsWith('failure')?bodies.skip:noPass);f.execute();
+     if(mode==='failure-pass'){f.mutate(bodies.pass);f.execute();}
+     if(['required-with-green','diagnostic-failure-skip'].includes(mode))f.execute('node --test sub/public.spec.mjs');
+    }else if(optional){f.execute('node --test value.test.mjs');f.execute('node --test --test-name-pattern='+ (mode==='optional-todo'?'publicTodo':'publicSkip')+' value.test.mjs');}
+    else if(mode.startsWith('other-')){
+     f.mutate("test('public',()=>assert.fail('real failure')); ");f.execute();
+     f.mutate(bodies.pass);
+     f.execute({'other-command':'node --test value.test.mjs','other-filter':'node --test --test-name-pattern=public value.test.mjs','other-cwd':'npm test','other-env':'CHECK_MODE=1 npm test'}[mode],mode==='other-cwd'?'sub':'.');
+    }else{f.execute();f.mutate(bodies.pass+'// after PASS');}
+   }else{
+    const feedback=JSON.parse(prompt);assert.ok(feedback.observations.correctionReasons.length);
+    if(['required-skip','required-todo','required-with-green','failure-skip'].includes(mode)){
+     const check=feedback.observations.checks.findLast(c=>c.command==='npm test');
+     assert.equal(check.execution.successful,true);assert.equal(check.testSummary.pass,0);assert.equal(check.successful,false);assert.equal(feedback.observations.checksCurrent,false);
+     assert.ok(feedback.observations.correctionReasons.some(r=>r.includes('No passed tests')));
+    }
+    if(mode==='required-stuck')f.execute();
+    else{f.mutate(bodies.pass);f.execute();if(mode==='diagnostic-failure-skip')f.execute('node --test sub/public.spec.mjs');}
+   }
+   return {info:{finish:'stop'},parts:[{type:'text',text:'Actual fixture events retained'}]};
+  }});
+  const noCorrection=optional||mode==='failure-pass';
+  assert.equal(report.repairs,noCorrection?0:mode==='required-stuck'?2:1,mode);assert.equal(report.status,['required-stuck','other-env'].includes(mode)?'incomplete':'checks_passed',mode);assert.equal(report.observations.checksCurrent,mode!=='required-stuck',mode);
+  if(mode==='required-stuck'){assert.match(report.stopReason,/Two consecutive/);assert.ok(report.remaining.some(r=>r.includes('No passed tests')));}
+  assert.deepEqual(report.observations.unresolvedFailures,[],mode);
+  if(optional){assert.deepEqual(first.correctionReasons,[]);assert.deepEqual(first.unresolvedFailures,[]);assert.equal(first.latestChecks.at(-1).successful,false);assert.equal(first.latestChecks.at(-1).testSummary.pass,0);assert.equal(first.checksCurrent,true);}
+  if(['failure-skip','diagnostic-failure-skip'].includes(mode)||mode.startsWith('other-'))assert.ok(first.unresolvedFailures.some(c=>c.command==='npm test'&&c.exit===1),mode);
+  if(mode==='stale')assert.equal(first.checks[0].current,false);
+  const compact=compactTaskResult({observations:first,remaining:first.reasons,limits:first.limits},{artifacts:f.artifacts});
+  assert.deepEqual(compact.observations.checks.map(c=>[c.execution,c.successful,c.testSummary]),first.checks.map(c=>[c.execution,c.successful,c.testSummary]));
+  if(['required-skip','required-todo','required-with-green','failure-skip'].includes(mode))assert.match(taskResultText({observations:first},{artifacts:f.artifacts}),/No passed tests/);
+  console.log(JSON.stringify({nodeEvidenceWorkflow:mode,repairs:report.repairs,status:report.status,firstChecksCurrent:first.checksCurrent,firstUnresolvedFailures:first.unresolvedFailures.length}));
+ }
  // An executed required command needs no rerun solely for an absent adapter.
  // Build observations from real commands/snapshots and count actual author IO.
  {

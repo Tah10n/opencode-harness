@@ -71,6 +71,18 @@ The human-readable result shows:
 4. The separate workflow status, correction count, recorded stop reason and paths
    to `result.json`, `tool-events.json` and the delivery worktree.
 
+The supported Node test adapter reads TAP and spec summaries. A successful
+process exit establishes command completion. Positive test verification also
+requires a complete, consistent summary with at least one passed test and no
+failed or cancelled tests. Skipped and TODO counts remain visible; a mixed run
+with passed tests can qualify, but it does not certify coverage or task completeness.
+An explicitly required run with no passed tests stays unfinished and explains
+that missing evidence in corrective feedback. An optional diagnostic with only
+skipped/TODO tests creates no repeat obligation when current positive verification
+is already available. It cannot resolve an earlier real failure: that needs a
+positive rerun of the same command, working directory and scope. Results before
+the last mutation remain stale. Unsupported or damaged output stays unverified.
+
 `incomplete` can accompany a saved patch and successful commands: verification
 constraints remain open. `checks_passed` means recorded project checks met
 workflow criteria, not independent acceptance of every task requirement. Neither
