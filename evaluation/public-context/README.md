@@ -106,6 +106,12 @@ rendered discussion block, 1 MiB for the original task, 15 seconds per API call.
 A full eligible discussion exceeding its bound blocks; no convenient prefix is
 selected. Duplicate IDs, incomplete counts, malformed/misdirected pagination,
 changed issue metadata, API failures and rate limits block the whole result.
+Pagination accepts the named `/repos/owner/repo/issues/number/comments` route
+and `/repositories/id/issues/number/comments` for the same verified public
+repository. The ID must be a positive safe integer from that repository response.
+Only `page` and `per_page` are accepted, once each, in either order; targets,
+values and consecutive pages remain bounded. Requests still use the named route,
+and original `Link` headers are preserved for the same checks during offline replay.
 There are no automatic retries. Pagination checks detect observed inconsistency;
 GitHub provides no atomic historical snapshot and deleted comments cannot be
 recovered. Hashes attest preserved bytes, not truth, historical completeness or

@@ -24,7 +24,7 @@ const issueURL = b => `${api(b)}/issues/${b.issue}`;
 const html = b => `https://github.com/${b.repository}/issues/${b.issue}`;
 const pageURL = (b,p) => `${issueURL(b)}/comments?per_page=${LIMITS.perPage}&page=${p}`;
 function repoCheck(repo,b) {
-  if(repo?.full_name!==b.repository||repo?.private!==false||repo?.visibility!=='public'||repo?.url!==api(b)) block('repository_not_verified_public');
+  if(!Number.isSafeInteger(repo?.id)||repo.id<1||repo.full_name!==b.repository||repo?.private!==false||repo?.visibility!=='public'||repo?.url!==api(b)) block('repository_not_verified_public');
 }
 function issueCheck(issue,b) {
   if(!issue||Object.hasOwn(issue,'pull_request')||issue.number!==b.issue||issue.url!==issueURL(b)||issue.html_url!==html(b)||issue.repository_url!==api(b)||!Number.isSafeInteger(issue.comments)||issue.comments<0) block('issue_source_mismatch_or_pull_request');
@@ -50,14 +50,21 @@ function unpack(r,url) {
   record(url,r);
   try{return JSON.parse(r.body);}catch{block('invalid_api_json');}
 }
-function nextPage(link,b,p) {
+function nextPage(link,b,p,repo) {
   if(!link) return false;
   const links=new Map();
   for(const item of link.split(',')) {
     const match=item.trim().match(/^<([^>]+)>; rel="(next|prev|first|last)"$/);
     if(!match||links.has(match[2])) block('invalid_pagination');
-    const url=new URL(match[1]);const page=Number(url.searchParams.get('page'));
-    if(!Number.isSafeInteger(page)||page<1||page>LIMITS.pages||match[1]!==pageURL(b,page)) block('pagination_target_or_limit');
+    let url;
+    try{url=new URL(match[1]);}catch{block('pagination_target_or_limit');}
+    const query=url.searchParams,page=Number(query.get('page'));
+    // Both routes must identify the same already verified public repository.
+    // Only the page number is consumed; transport URLs remain locally constructed.
+    const paths=[`/repos/${b.repository}/issues/${b.issue}/comments`,`/repositories/${repo.id}/issues/${b.issue}/comments`];
+    if(url.origin!=='https://api.github.com'||url.username||url.password||url.hash||match[1].includes('#')||!paths.includes(url.pathname)||
+       query.size!==2||query.getAll('page').length!==1||query.getAll('per_page').length!==1||
+       query.get('per_page')!==String(LIMITS.perPage)||!Number.isSafeInteger(page)||page<1||page>LIMITS.pages||query.get('page')!==String(page)) block('pagination_target_or_limit');
     links.set(match[2],page);
   }
   if(links.has('next')&&links.get('next')!==p+1) block('pagination_sequence');
@@ -69,12 +76,12 @@ export function collect(binding,task,read) {
   validateBinding(binding,task);
   const records=[];
   const get=url=>{const r=record(url,read(url));records.push(r);return unpack(r,url);};
-  repoCheck(get(api(binding)),binding);
+  const repo=get(api(binding));repoCheck(repo,binding);
   const issue=get(issueURL(binding));issueCheck(issue,binding);
   if(issue.comments>LIMITS.pages*LIMITS.perPage) block('comment_count_limit');
   for(let p=1;;p++) {
     get(pageURL(binding,p));
-    if(!nextPage(records.at(-1).link,binding,p))break;
+    if(!nextPage(records.at(-1).link,binding,p,repo))break;
     if(p===LIMITS.pages)block('page_limit');
   }
   const after=get(issueURL(binding));issueCheck(after,binding);
@@ -88,14 +95,14 @@ export function build(binding,task,snapshot) {
   if(snapshot?.version!==1||JSON.stringify(snapshot.binding)!==JSON.stringify(binding)||JSON.stringify(snapshot.limits)!==JSON.stringify(LIMITS)||!Array.isArray(snapshot.records))block('snapshot_binding_mismatch');
   const records=snapshot.records;
   if(records.length<4||records.length>LIMITS.pages+3)block('incomplete_snapshot');
-  repoCheck(unpack(records[0],api(binding)),binding);
+  const repo=unpack(records[0],api(binding));repoCheck(repo,binding);
   const issue=unpack(records[1],issueURL(binding));issueCheck(issue,binding);
   const after=unpack(records.at(-1),issueURL(binding));issueCheck(after,binding);
   if(after.comments!==issue.comments||after.updated_at!==issue.updated_at)block('issue_changed_during_collection');
   const seen=new Set(),comments=[],excluded=[];
   for(let i=2;i<records.length-1;i++) {
     const page=i-1,r=records[i],items=unpack(r,pageURL(binding,page));
-    if(!Array.isArray(items)||items.length>LIMITS.perPage||nextPage(r.link,binding,page)!==(i<records.length-2))block('incomplete_pagination');
+    if(!Array.isArray(items)||items.length>LIMITS.perPage||nextPage(r.link,binding,page,repo)!==(i<records.length-2))block('incomplete_pagination');
     if(i<records.length-2&&items.length!==LIMITS.perPage)block('short_nonterminal_page');
     for(const c of items) {
       if(!Number.isSafeInteger(c.id)||c.id<1||seen.has(c.id))block('duplicate_or_invalid_comment');seen.add(c.id);

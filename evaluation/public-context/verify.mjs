@@ -48,6 +48,116 @@ test('pagination, duplicate and changed-issue detection; no partial success',()=
  assert.throws(()=>result(Array.from({length:501},(_,i)=>comment(i+1))),/limit/);
  assert.throws(()=>collect(binding,task,reader(comments,(r,url)=>{if(url.includes('page=2'))r.status=429;})),/api_http_429/);
 });
+const paginatedComments=()=>Array.from({length:101},(_,i)=>comment(i+1,{body:'x'}));
+const namedComments='https://api.github.com/repos/example/project/issues/7/comments';
+const numericComments='https://api.github.com/repositories/123456/issues/7/comments';
+const paginationLink=(endpoint,page,reordered=false,rel='next')=>`<${endpoint}?${reordered?`page=${page}&per_page=100`:`per_page=100&page=${page}`}>; rel="${rel}"`;
+function paginationReader(comments,endpoint,reordered=false) {
+ return reader(comments,(r,url)=>{
+  if(!url.includes('/comments?'))return;
+  const page=Number(new URL(url).searchParams.get('page'));
+  r.link=(page===1?[[2,'next'],[2,'last']]:[[1,'prev'],[1,'first']]).map(([p,rel])=>paginationLink(endpoint,p,reordered,rel)).join(', ');
+ });
+}
+function withPreparation(run) {
+ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'public-context-pagination-'));
+ try {
+  const taskFile=path.join(temp,'original.md'),metadataFile=path.join(temp,'metadata.json');
+  fs.writeFileSync(taskFile,task);fs.writeFileSync(metadataFile,JSON.stringify(binding));
+  return run({taskFile,metadataFile},temp);
+ }finally{fs.rmSync(temp,{recursive:true,force:true});}
+}
+test('two-page pagination accepts named and verified numeric URLs in either query order',async t=>{
+ const comments=paginatedComments(),expected=result(comments);
+ for(const [name,endpoint,reordered] of [['named',namedComments,false],['numeric',numericComments,false],['named reordered',namedComments,true],['numeric reordered',numericComments,true]]) {
+  await t.test(`${name}: collect and offline build preserve all 101 comments`,()=>{
+   const saved=collect(binding,task,paginationReader(comments,endpoint,reordered));
+   assert.equal(saved.records.length,5);
+   assert.equal(saved.records[2].link,[paginationLink(endpoint,2,reordered,'next'),paginationLink(endpoint,2,reordered,'last')].join(', '));
+   assert.deepEqual(build(binding,task,JSON.parse(JSON.stringify(saved))),expected);
+   assert.equal(expected.audit.admitted,101);
+  });
+  await t.test(`${name}: online and offline prepare preserve all bytes`,()=>withPreparation((options,temp)=>{
+   const calls=[],read=paginationReader(comments,endpoint,reordered),live=path.join(temp,'live');
+   const receipt=prepare({...options,fetchPublic:true,out:live},url=>{calls.push(url);return read(url);});
+   assert.equal(receipt.public_api_requests,5);assert.equal(receipt.admitted,101);
+   assert.deepEqual(calls,[fixture.repository.url,fixture.issue.url,`${namedComments}?per_page=100&page=1`,`${namedComments}?per_page=100&page=2`,fixture.issue.url]);
+   const offline=path.join(temp,'offline');
+   const replay=prepare({...options,snapshotFile:path.join(live,'snapshot.json'),snapshotSha256:receipt.snapshot_sha256,out:offline},()=>assert.fail('offline transport'));
+   assert.equal(replay.public_api_requests,0);assert.equal(replay.admitted,101);
+   for(const file of ['TASK.md','context.json','audit.json','snapshot.json'])assert.deepEqual(fs.readFileSync(path.join(live,file)),fs.readFileSync(path.join(offline,file)));
+   assert.deepEqual(fs.readFileSync(path.join(live,'TASK.md')),expected.task);
+  }));
+ }
+});
+function assertBlockedOutput(out,requests) {
+ assert.deepEqual(fs.readdirSync(out),['failure.json']);
+ const failure=JSON.parse(fs.readFileSync(path.join(out,'failure.json')));
+ assert.equal(failure.status,'blocked');assert.equal(failure.public_api_requests,requests);
+}
+test('pagination rejection blocks online and offline without partial artifacts or foreign requests',async t=>{
+ const comments=paginatedComments(),saved=collect(binding,task,reader(comments));
+ const cases=[];
+ const badURL=(name,url)=>cases.push({name,mutate:(r,u,n)=>{if(n===3)r.link=`<${url}>; rel="next"`;},error:/pagination_target_or_limit/,calls:3});
+ for(const [name,url] of [
+  ['foreign repository ID',`${numericComments.replace('123456','999')}?per_page=100&page=2`],
+  ['foreign repository name',`${namedComments.replace('example/project','other/project')}?per_page=100&page=2`],
+  ...[namedComments,numericComments].flatMap(endpoint=>[
+   ['other issue',`${endpoint.replace('/7/','/8/')}?per_page=100&page=2`],
+   ['other endpoint',`${endpoint.replace('/comments','/events')}?per_page=100&page=2`],
+   ['other host',`${endpoint.replace('api.github.com','evil.invalid')}?per_page=100&page=2`],
+   ['HTTP',`${endpoint.replace('https:','http:')}?per_page=100&page=2`],
+   ['credentials',`${endpoint.replace('https://','https://user:secret@')}?per_page=100&page=2`],
+   ['fragment',`${endpoint}?per_page=100&page=2#fragment`],
+   ['empty fragment',`${endpoint}?per_page=100&page=2#`],
+   ['other port',`${endpoint.replace('api.github.com','api.github.com:444')}?per_page=100&page=2`],
+   ...['per_page=100&page=2&page=2','per_page=100&per_page=100&page=2','per_page=100&page=2&extra=1','per_page=1&page=2','page=2','per_page=100','per_page=100&page=02','per_page=100&page=2.0','per_page=100&page=0','per_page=100&page=-1','per_page=100&page=6'].map(query=>[query,`${endpoint}?${query}`])
+  ]),
+  ['invalid URL','not-a-url']
+ ])badURL(`${name}: ${url}`,url);
+ for(const page of [1,3])cases.push({name:`repeated or skipped next page ${page}`,mutate:(r,u,n)=>{if(n===3)r.link=paginationLink(numericComments,page);},error:/pagination_sequence/,calls:3});
+ cases.push(
+  {name:'cycle from second page',mutate:(r,u,n)=>{if(n===4)r.link=paginationLink(numericComments,1);},error:/pagination_sequence/,calls:4},
+  {name:'missing next despite last',mutate:(r,u,n)=>{if(n===3)r.link=paginationLink(numericComments,2,false,'last');},error:/pagination_missing_next/,calls:3},
+  {name:'duplicate relation',mutate:(r,u,n)=>{if(n===3)r.link=[paginationLink(namedComments,2),paginationLink(numericComments,2)].join(', ');},error:/invalid_pagination/,calls:3},
+  {name:'missing next with incomplete count',mutate:(r,u,n)=>{if(n===3)r.link='';},error:/incomplete_/,calls:4},
+  {name:'duplicate comment',mutate:(r,u,n)=>{if(n===4)r.body=JSON.stringify([comments[0]]);},error:/duplicate_or_invalid_comment/,calls:5},
+  {name:'incomplete count',mutate:(r,u)=>{if(u.endsWith('/issues/7'))r.body=JSON.stringify({...JSON.parse(r.body),comments:102});},error:/incomplete_comment_count/,calls:5},
+  {name:'short first page',mutate:(r,u,n)=>{if(n===3)r.body=JSON.stringify(comments.slice(0,99));},error:/short_nonterminal_page/,calls:5},
+  {name:'next page HTTP failure',mutate:(r,u,n)=>{if(n===4)r.status=429;},error:/api_http_429|snapshot_source_or_hash_mismatch/,calls:4}
+ );
+ for(const id of [undefined,null,'123456',0,-1,1.5,Number.MAX_SAFE_INTEGER+1])cases.push({name:`invalid repository ID ${id}`,mutate:(r,u,n)=>{if(n===1)r.body=JSON.stringify({...JSON.parse(r.body),id});},error:/repository_not_verified_public/,calls:1});
+ for(const {name,mutate,error,calls:expectedCalls} of cases)await t.test(name,()=>withPreparation((options,temp)=>{
+  const urls=[],read=reader(comments,mutate),live=path.join(temp,'live');
+  assert.throws(()=>prepare({...options,fetchPublic:true,out:live},url=>{urls.push(url);return read(url);}),error);
+  assert.equal(urls.length,expectedCalls);assertBlockedOutput(live,expectedCalls);
+  const expectedURLs=[fixture.repository.url,fixture.issue.url,`${namedComments}?per_page=100&page=1`];
+  if(expectedCalls>3)expectedURLs.push(name==='missing next with incomplete count'?fixture.issue.url:`${namedComments}?per_page=100&page=2`);
+  if(expectedCalls>4)expectedURLs.push(fixture.issue.url);
+  assert.deepEqual(urls,expectedURLs.slice(0,expectedCalls));
+  const snapshot=clone(saved);
+  snapshot.records.forEach((r,i)=>{mutate(r,r.url,i+1);r.sha256=sha256(r.body);});
+  assert.throws(()=>build(binding,task,snapshot),error);
+  const snapshotFile=path.join(temp,'snapshot.json'),bytes=JSON.stringify(snapshot),offline=path.join(temp,'offline');fs.writeFileSync(snapshotFile,bytes);
+  assert.throws(()=>prepare({...options,snapshotFile,snapshotSha256:sha256(bytes),out:offline},()=>assert.fail('offline transport')),error);
+  assertBlockedOutput(offline,0);
+ }));
+});
+test('page limit holds online and offline even when issue count fits the bound',()=>withPreparation((options,temp)=>{
+ // Excluded comments exercise all five pages without hitting the independent context limit.
+ const comments=Array.from({length:500},(_,i)=>comment(i+1,{body:'x',updated_at:binding.cutoff.at}));
+ const saved=collect(binding,task,reader(comments));
+ assert.equal(saved.records.length,8);
+ const link=paginationLink(numericComments,6);
+ const read=reader(comments,(r,url)=>{if(url.endsWith('page=5'))r.link=link;});
+ let calls=0;const out=path.join(temp,'live');
+ assert.throws(()=>prepare({...options,fetchPublic:true,out},url=>{calls++;assert.ok(!url.endsWith('page=6'));return read(url);}),/pagination_target_or_limit/);
+ assert.equal(calls,7);assertBlockedOutput(out,7);
+ saved.records[6].link=link;assert.throws(()=>build(binding,task,saved),/pagination_target_or_limit/);
+ const bytes=JSON.stringify(saved),snapshotFile=path.join(temp,'snapshot.json'),offline=path.join(temp,'offline');fs.writeFileSync(snapshotFile,bytes);
+ assert.throws(()=>prepare({...options,snapshotFile,snapshotSha256:sha256(bytes),out:offline},()=>assert.fail('offline transport')),/pagination_target_or_limit/);
+ assertBlockedOutput(offline,0);
+}));
 test('fixed limits and transport failures block instead of selecting a subset',()=>{
  assert.throws(()=>collect(binding,task),/explicit_transport/);
  assert.throws(()=>result([comment(1,{body:'x'.repeat(LIMITS.commentBytes+1)})]),/limit/);
