@@ -171,6 +171,16 @@ Preparation, complete task timers, evaluator and unmetered maintainer/CI costs
 are separate. Money is unknown. Historical results below are unchanged and
 are not added to this candidate's score or expenses.
 
+## Serverless-8159 saved-solution diagnosis
+
+The [model-free diagnosis](../evaluation/polybench/diagnostics/serverless-8159/README.md)
+replays the original baseline and unchanged P/C/T patches in the pinned offline
+Serverless image. P removes form while retaining JSON; C/T disable all mappings
+with their chosen interfaces and retain the null-member crash. Delivery and patch
+application succeeded historically. Decision B: a pre-PR public issue clarification exists in saved hints but was
+omitted from all author inputs. Bounded clarification input is an unimplemented
+candidate, with no causal or quality claim; the earlier H1 remains rejected. Official scores and all historical artifacts are unchanged.
+
 ## Remaining eight tasks: candidate f83b101b
 
 The [new report](../evaluation/polybench/campaigns/consolidated-remaining-v1/REPORT.md)
