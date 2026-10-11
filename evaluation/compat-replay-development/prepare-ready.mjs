@@ -49,7 +49,12 @@ export async function executeStep({name,argv,output,env=process.env,timeoutMs=36
       // ownership is retired permanently; there is no deferred unconditional kill.
       const leader=table.find(p=>p.pid===pgid);
       if(leader&&leader.pgid!==pgid)throw Error('Preparation leader changed group');
-      for(const p of table)if(identities.has(p.pid)&&identities.get(p.pid)!==p.identity)throw Error('Preparation process identity changed');
+      for(const p of table)if(identities.has(p.pid)) {
+        if(identities.get(p.pid)!==p.identity)throw Error('Preparation process identity changed');
+        // We cannot signal a different group. An observed escape also prevents
+        // claiming a stable log, even when the original group has drained.
+        if(p.pgid!==pgid&&running(p))throw Error('Observed preparation process left its group');
+      }
       const members=table.filter(p=>p.pgid===pgid);
       if(!observed&&leader&&leader.pgid===pgid)observed=true;
       if(members.length&&!observed)throw Error('Preparation group ownership unverified');

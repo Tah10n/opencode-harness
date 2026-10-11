@@ -41,20 +41,27 @@ if (mode === '--descendant') {
   const [root, behavior] = process.argv.slice(3), ready = path.join(root, 'ready');
   const {mock} = await import('node:test');
   const commands = behavior === 'command-error' ? [[process.execPath, '-e', 'process.exit(4)']] :
-    [[process.execPath, self, '--parent', ready, behavior === 'residue' ? 'normal' : 'timeout']];
+    [[process.execPath, self, '--parent', ready, ['residue', 'known-escape'].includes(behavior) ? 'normal' : 'timeout']];
   commands.push([process.execPath, '-e', `require('fs').writeFileSync(${JSON.stringify(root + '/next')},'started')`]);
   mock.module(new URL('./readiness.mjs', import.meta.url).href, {namedExports: {
     sourceManifest: () => ({}), snapshot: () => ({}), verifySourceCommit: () => {}, verifyCI: () => {},
     requiredSteps: ['first', 'second'], preparationCommands: () => commands,
     verifyReadiness: () => fs.writeFileSync(root + '/published', 'unexpected'),
   }});
-  if (['inspect-error', 'stop-error', 'identity-reuse', 'retired-group'].includes(behavior)) {
+  if (['inspect-error', 'stop-error', 'identity-reuse', 'retired-group', 'known-escape'].includes(behavior)) {
     const cp = await import('node:child_process'), {syncBuiltinESMExports} = await import('node:module');
     const original = cp.default.spawnSync, originalKill = process.kill;
+    let descendantObserved = false;
     cp.default.spawnSync = (bin, args, options) => {
       if (bin !== '/bin/ps') return original(bin, args, options);
       if (behavior === 'inspect-error' && fs.existsSync(ready)) return {status: 1, stderr: 'fixture: process inspection denied (EPERM)'};
       const r = original(bin, args, options);
+      if (behavior === 'known-escape' && fs.existsSync(ready)) {
+        const pid = JSON.parse(fs.readFileSync(ready)).pid;
+        if (descendantObserved) r.stdout = r.stdout.split('\n').map(line => line.replace(
+          new RegExp('^(\\s*' + pid + '\\s+)\\d+(\\s+)'), (_, prefix, gap) => prefix + pid + gap)).join('\n');
+        descendantObserved = true; // First snapshot records its real group identity.
+      }
       if (fs.existsSync(ready) && ['identity-reuse', 'retired-group'].includes(behavior)) {
         const pgid = +fs.readFileSync(ready + '.parent', 'utf8');
         if (behavior === 'identity-reuse') r.stdout = r.stdout.split('\n').map(line =>
@@ -167,11 +174,12 @@ if (mode === '--descendant') {
       assert.equal(fs.existsSync(root + '/next'), false, 'real sequential launcher blocked next step');
       assert.equal(fs.existsSync(root + '/published'), false);
       assert.equal(fs.existsSync(root + '/output/readiness.json'), false);
-      if (['inspect-error', 'stop-error', 'identity-reuse'].includes(behavior)) {
+      if (['inspect-error', 'stop-error', 'identity-reuse', 'known-escape'].includes(behavior)) {
         assert.equal(receipt.cleanup.verified, false);
         assert.equal(receipt.log.sha256, null);
         assert.equal(receipt.log.stable, false);
         if (behavior === 'identity-reuse') assert.match(receipt.cleanup.error, /identity changed/);
+        else if (behavior === 'known-escape') { assert.match(receipt.cleanup.error, /left its group/); assert.equal(receipt.exitCode, 0); assert.equal(receipt.signal, null); }
         else assert.match(receipt.cleanup.error, /EPERM/);
         const sent = fs.existsSync(root + '/signals') ? fs.readFileSync(root + '/signals', 'utf8').trim().split('\n').map(JSON.parse) : [];
         assert.equal(sent.length, behavior === 'stop-error' ? 1 : 0);
@@ -219,7 +227,7 @@ if (mode === '--descendant') {
       } finally { if (fs.existsSync(ready + '.parent')) await cleanupGroup(+fs.readFileSync(ready + '.parent', 'utf8')); }
       for (const signal of ['SIGINT', 'SIGTERM']) await launchCase('launcher-' + signal, 'signal', [signal]);
       await launchCase('repeated-cancellation', 'signal', ['SIGINT', 'SIGTERM', 'SIGINT']);
-      for (const behavior of ['command-error', 'residue', 'inspect-error', 'stop-error', 'identity-reuse', 'retired-group']) await launchCase(behavior, behavior);
+      for (const behavior of ['command-error', 'residue', 'inspect-error', 'stop-error', 'identity-reuse', 'retired-group', 'known-escape']) await launchCase(behavior, behavior);
       await assert.rejects(() => executeStep({name: 'spawn-error', argv: [temp + '/missing-executable'], output: temp}));
       const failed = JSON.parse(fs.readFileSync(temp + '/spawn-error.json'));
       assert.equal(failed.cleanup.pgid, null); assert.deepEqual(failed.cleanup.signals, []);
