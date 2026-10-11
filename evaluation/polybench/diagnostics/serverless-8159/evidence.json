@@ -1,0 +1,608 @@
+{
+  "kind": "selective historical evidence verification, not a new campaign",
+  "archive": {
+    "name": "polybench-remaining-evidence-20261001T050450Z.tar.gz",
+    "sha256": "1c3c667ae5384161f4f91af18ee7a5a0ec9dfd65a345bf94fc365fb5c5a1a227",
+    "manifest_sha256": "7f94936029553881cf12baa9f2fe83a64558565db35e01cf1f9e505984496077"
+  },
+  "verified_members": [
+    {
+      "path": "evaluations/T/run_logs_javascript/serverless__serverless-8159_run.log",
+      "size": 53879,
+      "sha256": "bca19504cadce6207474600f9116d9f2f08459ed07856d7b26a54ccad76e30e2"
+    },
+    {
+      "path": "evaluations/T/results/serverless__serverless-8159_result.json",
+      "size": 5177,
+      "sha256": "709370e3bbbe2198fe71f24b7db9159e517b3fb1bb98e7f6a829272b972a8f03"
+    },
+    {
+      "path": "evaluations/C/run_logs_javascript/serverless__serverless-8159_run.log",
+      "size": 53903,
+      "sha256": "0e358d080fb4dc864d4a94b399a922436e4ba2c2cb6dd470fc5b539b6d8589a5"
+    },
+    {
+      "path": "evaluations/C/results/serverless__serverless-8159_result.json",
+      "size": 5183,
+      "sha256": "597b72da1430694f9e8f0efacee1b23450b725ab6b353a0dd887cbd65d0f78d1"
+    },
+    {
+      "path": "evaluations/P/run_logs_javascript/serverless__serverless-8159_run.log",
+      "size": 52047,
+      "sha256": "fe6a39933403e5de832328bf4bc0778c6f7a61f1ef2af54d5da66b6a368af535"
+    },
+    {
+      "path": "evaluations/P/results/serverless__serverless-8159_result.json",
+      "size": 5177,
+      "sha256": "e240948354cdbd5b05ce739c58d1e3a5e2536d79783c954e7b8922fe21cd0214"
+    },
+    {
+      "path": "batch/runs/serverless__serverless-8159-P/native-evidence.json",
+      "size": 508270,
+      "sha256": "3c24788bb8b6006c54551c9927f3da856a50114d22a319a41d578881a23d8ace"
+    },
+    {
+      "path": "batch/runs/serverless__serverless-8159-C/native-evidence.json",
+      "size": 627901,
+      "sha256": "34b2e1417e83e8cbb733334e947d0154e463e3539711f5ec151f92aadf05ba5e"
+    },
+    {
+      "path": "batch/runs/serverless__serverless-8159-T/native-evidence.json",
+      "size": 509533,
+      "sha256": "f2696d94885eaa2ccd3c37f8930b1f19ae121c193416de5d6cf645f56d01eaa1"
+    },
+    {
+      "path": "prompts/serverless__serverless-8159.md",
+      "size": 1246,
+      "sha256": "0c2f5a295e857a0ec4423015d4079b52fcabdd32b25de89dabf30b3dcd332416"
+    }
+  ],
+  "arms": {
+    "P": {
+      "patch_sha256": "3cb53d90e0856bc2f494f3670a29aac40fa83a3a17fb3f2a8e815116e52048c2",
+      "official_result_sha256": "e240948354cdbd5b05ce739c58d1e3a5e2536d79783c954e7b8922fe21cd0214",
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true
+      },
+      "delivery": true,
+      "commands": [
+        {
+          "tool_index": 10,
+          "command": "git status --short",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 14,
+          "command": "git log --all --oneline --decorate -20 -- lib/plugins/aws/package/compile/events/apiGateway/lib/method/integration.js",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 21,
+          "command": "git branch --all --verbose --no-abbrev",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 31,
+          "command": "npx mocha lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": [
+            "\n\n  52 passing (236ms)"
+          ]
+        },
+        {
+          "tool_index": 32,
+          "command": "git diff --check && git diff -- lib/plugins/aws/package/compile/events/apiGateway/lib/method/integration.js lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js docs/providers/aws/events/apigateway.md",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 34,
+          "command": "npx prettier -c \"docs/providers/aws/events/apigateway.md\" \"lib/plugins/aws/package/compile/events/apiGateway/lib/method/integration.js\" \"lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js\"",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 35,
+          "command": "npx eslint lib/plugins/aws/package/compile/events/apiGateway/lib/method/integration.js lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 36,
+          "command": "npx mocha lib/plugins/aws/package/compile/events/apiGateway/lib/validate.test.js",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": [
+            "\n\n  80 passing (819ms)"
+          ]
+        },
+        {
+          "tool_index": 37,
+          "command": "git diff --check && git status --short",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 38,
+          "command": "git diff --check && git diff --stat && git diff -- lib/plugins/aws/package/compile/events/apiGateway/lib/method/integration.js lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js docs/providers/aws/events/apigateway.md",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 39,
+          "command": "npm test -- --grep '#compileMethods\\(\\)|#validate\\(\\)'",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": [
+            "\n\n  181 passing (412ms)"
+          ]
+        },
+        {
+          "tool_index": 40,
+          "command": "npm test",
+          "workdir": "/work/repo",
+          "exit": 2,
+          "test_counts": [
+            "\n\n  2481 passing (30s)",
+            "  2 failing"
+          ]
+        },
+        {
+          "tool_index": 41,
+          "command": "git status --short && git diff --check",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        }
+      ],
+      "edits": [
+        {
+          "tool_index": 28,
+          "status": "completed",
+          "sha256": "162d7b04822c4eeddea7a0f6084d638c45b311c9a753c04eec59e1160aaa28ba",
+          "production_change": true
+        },
+        {
+          "tool_index": 33,
+          "status": "completed",
+          "sha256": "29a90b6b7dd62c94d7d97fdd68ccd267a481c1c51f8a7d7912acc469d03a25b0",
+          "production_change": false
+        }
+      ],
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      }
+    },
+    "C": {
+      "patch_sha256": "5fc1f9cbf7626ea68280c6c99ab8c72a19a2985821890ae1c563bf234e07177b",
+      "official_result_sha256": "597b72da1430694f9e8f0efacee1b23450b725ab6b353a0dd887cbd65d0f78d1",
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      },
+      "delivery": true,
+      "commands": [
+        {
+          "tool_index": 24,
+          "command": "git log --all --oneline --decorate -20",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 25,
+          "command": "git status --short",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 36,
+          "command": "git remote -v",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 41,
+          "command": "npx mocha lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": [
+            "\n\n  52 passing (600ms)"
+          ]
+        },
+        {
+          "tool_index": 42,
+          "command": "npx mocha lib/plugins/aws/package/compile/events/apiGateway/lib/validate.test.js",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": [
+            "\n\n  80 passing (1s)"
+          ]
+        },
+        {
+          "tool_index": 43,
+          "command": "npx prettier -c \"lib/plugins/aws/package/compile/events/apiGateway/lib/method/integration.js\" \"lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js\" \"docs/providers/aws/events/apigateway.md\" \"docs/providers/aws/guide/serverless.yml.md\"",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 44,
+          "command": "npx eslint lib/plugins/aws/package/compile/events/apiGateway/lib/method/integration.js lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 45,
+          "command": "git diff --check",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 46,
+          "command": "git diff -- lib/plugins/aws/package/compile/events/apiGateway/lib/method/integration.js lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js docs/providers/aws/events/apigateway.md docs/providers/aws/guide/serverless.yml.md",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 47,
+          "command": "git status --short",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 52,
+          "command": "git diff --check && git diff --stat && git status --short",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 53,
+          "command": "npx prettier -c \"lib/plugins/aws/package/compile/events/apiGateway/lib/method/integration.js\" \"lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js\" \"docs/providers/aws/events/apigateway.md\" \"docs/providers/aws/guide/serverless.yml.md\"",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 54,
+          "command": "git diff -- docs/providers/aws/events/apigateway.md",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 56,
+          "command": "npx mocha \"lib/plugins/aws/package/compile/events/apiGateway/**/*.test.js\"",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": [
+            "\n\n  232 passing (1s)"
+          ]
+        },
+        {
+          "tool_index": 58,
+          "command": "npx mocha lib/plugins/aws/package/compile/events/apiGateway/lib/validate.test.js",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": [
+            "\n\n  81 passing (872ms)"
+          ]
+        },
+        {
+          "tool_index": 59,
+          "command": "npx eslint lib/plugins/aws/package/compile/events/apiGateway/lib/method/integration.js lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js lib/plugins/aws/package/compile/events/apiGateway/lib/validate.test.js",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 60,
+          "command": "npx prettier -c \"lib/plugins/aws/package/compile/events/apiGateway/lib/method/integration.js\" \"lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js\" \"lib/plugins/aws/package/compile/events/apiGateway/lib/validate.test.js\" \"docs/providers/aws/events/apigateway.md\" \"docs/providers/aws/guide/serverless.yml.md\"",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 61,
+          "command": "git diff --check && git diff --stat",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 62,
+          "command": "git diff -- lib/plugins/aws/package/compile/events/apiGateway/lib/method/integration.js lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js lib/plugins/aws/package/compile/events/apiGateway/lib/validate.test.js",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 63,
+          "command": "git diff -- docs/providers/aws/events/apigateway.md docs/providers/aws/guide/serverless.yml.md",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 64,
+          "command": "git status --short",
+          "workdir": "/work/repo",
+          "exit": 0,
+          "test_counts": []
+        }
+      ],
+      "edits": [
+        {
+          "tool_index": 39,
+          "status": "completed",
+          "sha256": "7540728a914f469bfefbe7312d86bf27a6af0a2b69c393a121e78ce7a36b3688",
+          "production_change": true
+        },
+        {
+          "tool_index": 49,
+          "status": "completed",
+          "sha256": "c03e2386154b8b255cc4264dbb5fc6fec2c2edb190a7d9e7970091ad96e3734d",
+          "production_change": false
+        },
+        {
+          "tool_index": 51,
+          "status": "completed",
+          "sha256": "d0f9eaa8a31d27dfce974debf0c78f2988ff71b303f1323e3fb676d3c6e06e0a",
+          "production_change": false
+        },
+        {
+          "tool_index": 57,
+          "status": "completed",
+          "sha256": "677b3747c09a9ea4d778e980571044ee73ddaaf0f48d5361035e316c57a6da11",
+          "production_change": false
+        }
+      ],
+      "investigation": {
+        "tool_calls": 0,
+        "actions": {},
+        "result_present": false,
+        "usable": null,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": null,
+        "patch_bytes": null,
+        "preparation_started": false,
+        "limitation": null,
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      }
+    },
+    "T": {
+      "patch_sha256": "d8b53fdfd705350a359f6fdb3022ba50ef2648bcb84ab65a175c7e4b8f8d00f5",
+      "official_result_sha256": "709370e3bbbe2198fe71f24b7db9159e517b3fb1bb98e7f6a829272b972a8f03",
+      "official_outcome": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false
+      },
+      "delivery": true,
+      "commands": [
+        {
+          "tool_index": 22,
+          "command": "git log --oneline --all -- lib/plugins/aws/package/compile/events/apiGateway/lib/method/integration.js",
+          "workdir": ".",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 23,
+          "command": "git status --short && git log --oneline -10",
+          "workdir": ".",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 31,
+          "command": "git branch -a && git tag --list | tail -n 20",
+          "workdir": ".",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 32,
+          "command": "git remote -v",
+          "workdir": ".",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 37,
+          "command": "./node_modules/.bin/mocha --grep \"should allow disabling default request templates\" lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js",
+          "workdir": ".",
+          "exit": 0,
+          "test_counts": [
+            "\n\n  1 passing (27ms)"
+          ]
+        },
+        {
+          "tool_index": 38,
+          "command": "./node_modules/.bin/mocha --grep \"should setup a default|should set custom request templates|should be possible to overwrite default request templates\" lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js",
+          "workdir": ".",
+          "exit": 0,
+          "test_counts": [
+            "\n\n  4 passing (54ms)"
+          ]
+        },
+        {
+          "tool_index": 39,
+          "command": "./node_modules/.bin/mocha lib/plugins/aws/package/compile/events/apiGateway/lib/validate.test.js",
+          "workdir": ".",
+          "exit": 0,
+          "test_counts": [
+            "\n\n  80 passing (612ms)"
+          ]
+        },
+        {
+          "tool_index": 40,
+          "command": "./node_modules/.bin/prettier -c lib/plugins/aws/package/compile/events/apiGateway/lib/method/integration.js lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js docs/providers/aws/events/apigateway.md docs/providers/aws/guide/serverless.yml.md",
+          "workdir": ".",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 41,
+          "command": "git diff --check && git diff --stat && git status --short",
+          "workdir": ".",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 42,
+          "command": "git diff -- lib/plugins/aws/package/compile/events/apiGateway/lib/method/integration.js lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js docs/providers/aws/events/apigateway.md docs/providers/aws/guide/serverless.yml.md",
+          "workdir": ".",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 45,
+          "command": "./node_modules/.bin/mocha lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js",
+          "workdir": ".",
+          "exit": 0,
+          "test_counts": [
+            "\n\n  52 passing (246ms)"
+          ]
+        },
+        {
+          "tool_index": 46,
+          "command": "./node_modules/.bin/eslint lib/plugins/aws/package/compile/events/apiGateway/lib/method/integration.js lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js",
+          "workdir": ".",
+          "exit": 0,
+          "test_counts": []
+        },
+        {
+          "tool_index": 47,
+          "command": "./node_modules/.bin/mocha \"lib/plugins/aws/package/compile/events/apiGateway/lib/**/*.test.js\"",
+          "workdir": ".",
+          "exit": 0,
+          "test_counts": [
+            "\n\n  224 passing (1s)"
+          ]
+        },
+        {
+          "tool_index": 48,
+          "command": "git diff --check && git status --short",
+          "workdir": ".",
+          "exit": 0,
+          "test_counts": []
+        }
+      ],
+      "edits": [
+        {
+          "tool_index": 35,
+          "status": "completed",
+          "sha256": "6223ac11abbd2d2d75d4fd20a9db3999cf5ddfddfb3d65f12842e1bd162fba36",
+          "production_change": true
+        }
+      ],
+      "investigation": {
+        "tool_calls": 1,
+        "actions": {
+          "investigate": 1
+        },
+        "result_present": true,
+        "usable": false,
+        "finish": null,
+        "disposition": null,
+        "elapsed_ms": 60644.66761099998,
+        "patch_bytes": 0,
+        "preparation_started": true,
+        "limitation": "Dependency copy exceeds first-version bounds",
+        "child_commands_observed": false,
+        "child_sessions_created": 0,
+        "child_model_sessions_observed": 0,
+        "child_assistant_messages": 0,
+        "child_evidence_method": "Recorded harness_task role IDs, checked against native parent and isolated-copy directory; exact copy layout recovers IDs when compact output is absent. Positive native session usage proves model work. Preparation, creation and messages remain separate.",
+        "integration": null,
+        "accepted_nonempty_test_patches": 0,
+        "accepted_changed_test_files": 0,
+        "test_count_unit": "Accepted nonempty child test patches and changed test files; assertion/case count is not inferred from source text. Missing or ambiguous result after investigation is unknown."
+      }
+    }
+  },
+  "input_verification": {
+    "prompt_sha256": "0c2f5a295e857a0ec4423015d4079b52fcabdd32b25de89dabf30b3dcd332416",
+    "single_row_csv_sha256": "427795c3fdb948a42af74e7f710e8c18369c2833328080ccb0ed202f316c3f8c",
+    "recovered_base_matches_image": {
+      "docs/providers/aws/events/apigateway.md": "c3c0a8b913c7a6172bf67e861516711f0e7e7fde40eab06fa361997f9a732704",
+      "docs/providers/aws/guide/serverless.yml.md": "05877f26ad59e253525bf90b9cb96e595419216da664d42dfa887129189a45e0",
+      "lib/plugins/aws/package/compile/events/apiGateway/lib/method/index.test.js": "91192f237a2613392a9c40aa67ba8a83a264665d11ecb22854bd14906a91c617",
+      "lib/plugins/aws/package/compile/events/apiGateway/lib/method/integration.js": "f9b4c932b45ca5e87356b38140ccc491002e62aae551373174299a392bd899d1",
+      "lib/plugins/aws/package/compile/events/apiGateway/lib/validate.test.js": "7fa6c738622d3b41044ee9fe0f1a2bf2f07dbd886635b30f51d8dfa92cbe388b"
+    },
+    "historical_and_current_core_sha256": "9adcc862446ac6c0e5a407ec89e2f65fe4a249aedcc34ba36f143f3589edd4f7"
+  },
+  "public_clarification": {
+    "created_at": "2020-07-06T11:48:19Z",
+    "html_url": "https://github.com/serverless/serverless/issues/7008#issuecomment-654185286",
+    "id": 654185286,
+    "updated_at": "2020-07-06T11:48:19Z",
+    "body_sha256": "6d4b5c100e4c24893bc9b587f54e548de68997225c618d307f981e66d8af1b55",
+    "present_in_saved_hints_text": true,
+    "absent_from_frozen_prompt": true,
+    "pull_request_created_at": "2020-08-31T20:08:28Z",
+    "retrieval_command": "gh api repos/serverless/serverless/issues/7008/comments --paginate",
+    "source_issue": 7008,
+    "fixing_pull_request": 8159
+  }
+}
