@@ -72,6 +72,14 @@ if(process.argv[2]!=='--child'){
     if(state==='missing')r.steps=r.steps.filter(x=>x.name!=='verify');else if(state==='running')s.status='running';else if(state==='failed')s.exitCode=1;else{s.exitCode=null;s.signal='SIGTERM';}
     await negative('verify-'+state,r);
   }
+  for(const state of ['legacy','unverified','stopped','unstable-log']){
+    const r=structuredClone(valid),s=r.steps.find(x=>x.name==='verify');
+    if(state==='legacy')delete s.cleanup;
+    else if(state==='unverified')s.cleanup.verified=false;
+    else if(state==='stopped')s.cleanup.status='stopped';
+    else s.log.stable=false;
+    await negative('cleanup-'+state,r);
+  }
   for(const [name,file] of [['source','lib/native-task-plugin.mjs'],['verification-script','scripts/verify-all.mjs'],['bundle',path.relative(repository,bundle+'/plugin.mjs')],['toolchain',path.relative(repository,toolchain+'/binary')]]){
     const p=path.join(repository,file),saved=fs.readFileSync(p);try{fs.appendFileSync(p,'\n// changed\n');await negative('changed-'+name);}finally{fs.writeFileSync(p,saved);}
   }
