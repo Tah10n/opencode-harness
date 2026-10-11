@@ -1,29 +1,121 @@
 // Sequential, model-free preparation. Success is published only by this launcher.
 import fs from 'node:fs';
 import path from 'node:path';
-import {spawn} from 'node:child_process';
+import {spawn,spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {command} from '../feedback-development/suite.mjs';
 import {privateJSON,hashFile} from '../support/output-files.mjs';
 import {repository} from './suite.mjs';
 import {sourceManifest,snapshot,verifySourceCommit,verifyReadiness,verifyCI,requiredSteps,preparationCommands} from './readiness.mjs';
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+
+// POSIX preparation groups only. Z/X cannot execute or keep writing the log.
+// Do not use kill(-pgid, 0) as proof: it also sees zombies and hides permission errors.
+function processTable() {
+  const r=spawnSync('/bin/ps',['-axo','pid=,pgid=,stat=,lstart='],{
+    encoding:'utf8',env:{...process.env,LC_ALL:'C'},timeout:2000,maxBuffer:8*1024*1024,
+  });
+  if(r.error||r.status!==0)throw r.error??Error('Cannot inspect preparation group: '+r.stderr.trim());
+  return r.stdout.trim().split('\n').map(line=>{
+    const m=line.trim().match(/^(\d+)\s+(\d+)\s+(\S+)\s+(.+)$/);
+    if(!m||!Number.isFinite(Date.parse(m[4])))throw Error('Unknown preparation process state');
+    return {pid:+m[1],pgid:+m[2],state:m[3],identity:m[1]+':'+m[4]};
+  });
+}
+const running=p=>! /^[ZX]/.test(p.state);
+const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+
 export async function executeStep({name,argv,output,env=process.env,timeoutMs=3600000}) {
   const log=path.join(output,name+'.log'),fd=fs.openSync(log,'wx',0o600),startedAt=new Date().toISOString();
   let result;
-  try{result=await new Promise(resolve=>{
-    let error=null,expired=false,killTimer;
-    const child=spawn(argv[0],argv.slice(1),{cwd:repository,env,stdio:['ignore',fd,fd],detached:true});
-    const stop=()=>{try{process.kill(-child.pid,'SIGTERM');}catch{}killTimer??=setTimeout(()=>{try{process.kill(-child.pid,'SIGKILL');}catch{}},5000);};
-    const interrupt=()=>{error='launcher interrupted';stop();};
-    process.once('SIGINT',interrupt);process.once('SIGTERM',interrupt);
-    const timer=setTimeout(()=>{expired=true;stop();},timeoutMs);
-    child.on('error',e=>{error=e.message;});
-    child.on('close',(exitCode,signal)=>{clearTimeout(timer);clearTimeout(killTimer);process.removeListener('SIGINT',interrupt);process.removeListener('SIGTERM',interrupt);resolve({exitCode,signal,error:expired?'timeout':error});});
-  });}finally{fs.closeSync(fd);}
-  const step={name,command:argv,startedAt,finishedAt:new Date().toISOString(),status:'completed',...result,log:{path:log,sha256:hashFile(log).sha256}};
+  try {
+    const cleanup={revision:1,pgid:null,verified:false,status:'unverified',signals:[],error:null};
+    let child,closed=false,exitCode=null,signal=null,error=null,stopAt=null,closedAt=null,timer;
+    let retired=false,observed=false;
+    const identities=new Map();
+    // Every trigger feeds this one procedure. Repeated cancellation cannot reset
+    // the grace period, overwrite the first cause, or install another kill timer.
+    const stop=reason=>{error??=reason;stopAt??=performance.now();};
+    const interrupt=received=>stop('launcher interrupted: '+received);
+    const sigint=()=>interrupt('SIGINT'),sigterm=()=>interrupt('SIGTERM');
+    process.on('SIGINT',sigint);process.on('SIGTERM',sigterm);
+    const inspect=()=>{
+      const pgid=cleanup.pgid;
+      if(retired||!Number.isSafeInteger(pgid)||pgid<=1||pgid!==child.pid||pgid===process.pid)throw Error('Invalid or retired preparation group');
+      const table=processTable(),own=table.find(p=>p.pid===process.pid);
+      if(!own||own.pgid===pgid)throw Error('Preparation group overlaps launcher');
+      // Pin observed PID/start identities, including the leader. If an ID is
+      // reused, fail closed instead of signalling its new occupant. Once empty,
+      // ownership is retired permanently; there is no deferred unconditional kill.
+      const leader=table.find(p=>p.pid===pgid);
+      if(leader&&leader.pgid!==pgid)throw Error('Preparation leader changed group');
+      for(const p of table)if(identities.has(p.pid)&&identities.get(p.pid)!==p.identity)throw Error('Preparation process identity changed');
+      const members=table.filter(p=>p.pgid===pgid);
+      if(!observed&&leader&&leader.pgid===pgid)observed=true;
+      if(members.length&&!observed)throw Error('Preparation group ownership unverified');
+      for(const p of members)identities.set(p.pid,p.identity);
+      const live=members.filter(running);
+      if(!live.length)retired=true;
+      return live;
+    };
+    const send=kind=>{
+      // Re-inspect immediately before each signal, including escalation.
+      if(!inspect().length)return;
+      try { process.kill(-cleanup.pgid,kind);cleanup.signals.push(kind); }
+      catch(e) { if(e.code!=='ESRCH')throw e; }
+    };
+    try {
+      if(!['linux','darwin'].includes(process.platform))throw Error('POSIX preparation groups required');
+      child=spawn(argv[0],argv.slice(1),{cwd:repository,env,stdio:['ignore',fd,fd],detached:true});
+      const spawned=new Promise(resolve=>{
+        child.once('spawn',()=>{cleanup.pgid=child.pid;resolve();});
+        child.once('error',e=>{stop(e.message);resolve();});
+      });
+      child.once('close',(code,received)=>{
+        exitCode=code;signal=received;closed=true;closedAt=performance.now();
+        // Preserve the real command facts, and don't cancel cleanup on close.
+        if(code!==0||received!==null)stop('command terminated: '+(received??code));
+      });
+      timer=setTimeout(()=>stop('timeout'),timeoutMs);
+      await spawned;
+      if(cleanup.pgid===null) {
+        // A failed spawn has no group: never turn an undefined PID into a signal.
+        await new Promise(resolve=>closed?resolve():child.once('close',resolve));
+        cleanup.verified=true;cleanup.status='not-started';
+      } else {
+        // Establish ownership while the new detached leader is still present.
+        let live=inspect(),termSent=false,killSent=false,termAt=null,emptyAt=null;
+        for(;;) {
+          if(!live.length) {
+            emptyAt??=performance.now();
+            if(closed) { cleanup.verified=true;cleanup.status=termSent?'stopped':'empty';break; }
+            if(performance.now()-emptyAt>=1000)throw Error('Preparation parent close unverified');
+          } else {
+            // Allow a short natural drain after exit 0, never the full kill grace.
+            if(closed&&stopAt===null&&performance.now()-closedAt>=100)stop('parent left running descendants');
+            if(stopAt!==null) {
+              if(!termSent) { send('SIGTERM');termSent=true;termAt=performance.now(); }
+              if(!retired&&performance.now()-termAt>=5000&&!killSent) { send('SIGKILL');killSent=true; }
+              if(performance.now()-termAt>=6000)throw Error('Preparation group termination unverified');
+            }
+          }
+          await pause(25);
+          live=retired?[]:inspect();
+        }
+      }
+    } catch(e) {
+      error??=e.message;cleanup.error=e.message;
+      // No verified observation means no safe group signal and no final log hash.
+    } finally {
+      clearTimeout(timer);
+      process.removeListener('SIGINT',sigint);process.removeListener('SIGTERM',sigterm);
+    }
+    result={exitCode,signal,error,cleanup};
+  } finally { fs.closeSync(fd); }
+  const stable=result.cleanup.verified;
+  const step={name,command:argv,startedAt,finishedAt:new Date().toISOString(),status:'completed',...result,log:{path:log,sha256:stable?hashFile(log).sha256:null,stable}};
   privateJSON(path.join(output,name+'.json'),step);
-  if(step.exitCode!==0||step.signal!==null||step.error!==null)throw Error('Preparation failed at '+name+'; see '+log);
+  if(step.exitCode!==0||step.signal!==null||step.error!==null||!step.cleanup.verified)throw Error('Preparation failed at '+name+'; see '+log);
   return step;
 }
 export async function collectCI(sourceCommit,output) {

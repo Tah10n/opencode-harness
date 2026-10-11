@@ -76,6 +76,9 @@ export function verifySteps(r) {
   let last=0;
   for(const s of r.steps){
     if(s.status!=='completed'||s.exitCode!==0||s.signal!==null||s.error!==null||!Array.isArray(s.command)||!s.command.length||!Number.isFinite(Date.parse(s.startedAt))||!Number.isFinite(Date.parse(s.finishedAt))||Date.parse(s.startedAt)<last||Date.parse(s.finishedAt)<Date.parse(s.startedAt))throw Error('Mandatory readiness step not successful: '+s.name);
+    // Historical JSON remains readable, but missing group evidence is not a new
+    // admission grant. Forced cleanup also cannot certify successful preparation.
+    if(s.cleanup?.revision!==1||s.cleanup.verified!==true||s.cleanup.status!=='empty'||s.cleanup.error!==null||!Array.isArray(s.cleanup.signals)||s.cleanup.signals.length||s.log?.stable!==true)throw Error('Mandatory readiness cleanup not confirmed: '+s.name);
     last=Date.parse(s.finishedAt);
   }
   if(Date.parse(r.completedAt)<last||!Number.isFinite(Date.parse(r.completedAt)))throw Error('Incomplete readiness publication');
