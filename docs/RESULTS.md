@@ -171,6 +171,16 @@ Preparation, complete task timers, evaluator and unmetered maintainer/CI costs
 are separate. Money is unknown. Historical results below are unchanged and
 are not added to this candidate's score or expenses.
 
+## Public issue context preparation candidate
+
+The [experimental preparation tool](../evaluation/public-context/README.md)
+implements candidate B as an explicit issue/task/cutoff-bound input step, with
+model-free source/time/integrity checks and offline replay. Its installed fixture
+checks actual full-input delivery to Plain, native core and task authors through
+OpenCode 1.18.26 and a local scripted provider. These are processing and delivery
+checks, not new solutions, scores, evidence of improved quality or a comparison
+of harness effectiveness. The historical diagnosis below remains unchanged.
+
 ## Serverless-8159 saved-solution diagnosis
 
 The [model-free diagnosis](../evaluation/polybench/diagnostics/serverless-8159/README.md)
