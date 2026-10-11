@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "installedVersion": "1.18.26",
+  "scriptedRequests": 8,
+  "evaluationModelRequests": 0,
+  "excludedCommentsChecked": 2,
+  "results": [
+    {
+      "mode": "plain",
+      "task_sha256": "400b3627eb701d4b5bd55ff0d7abd53b06176beff0dd781b5aaef76ab0eaad7e",
+      "original_sha256": "0c2f5a295e857a0ec4423015d4079b52fcabdd32b25de89dabf30b3dcd332416",
+      "message_sha256": "14cb0619c0d12551a4625b3b91ed3d93717e360190325f155572bc70999f72a2",
+      "transport": "opencode-cli-quoted",
+      "author": true,
+      "delivery": "passed",
+      "exitCode": 0
+    },
+    {
+      "mode": "core",
+      "task_sha256": "400b3627eb701d4b5bd55ff0d7abd53b06176beff0dd781b5aaef76ab0eaad7e",
+      "original_sha256": "0c2f5a295e857a0ec4423015d4079b52fcabdd32b25de89dabf30b3dcd332416",
+      "message_sha256": "14cb0619c0d12551a4625b3b91ed3d93717e360190325f155572bc70999f72a2",
+      "transport": "opencode-cli-quoted",
+      "author": true,
+      "delivery": "passed",
+      "exitCode": 0
+    },
+    {
+      "mode": "task",
+      "task_sha256": "400b3627eb701d4b5bd55ff0d7abd53b06176beff0dd781b5aaef76ab0eaad7e",
+      "original_sha256": "0c2f5a295e857a0ec4423015d4079b52fcabdd32b25de89dabf30b3dcd332416",
+      "message_sha256": "893c6c9e384f5d2c827e660208030165efe6ec9b3957ab666573bb43a13e55a2",
+      "transport": "native-task-file",
+      "author": true,
+      "delivery": "passed",
+      "exitCode": 0
+    }
+  ]
+}

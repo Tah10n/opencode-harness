@@ -181,6 +181,13 @@ OpenCode 1.18.26 and a local scripted provider. These are processing and deliver
 checks, not new solutions, scores, evidence of improved quality or a comparison
 of harness effectiveness. The historical diagnosis below remains unchanged.
 
+The [saved Serverless demonstration](../evaluation/public-context/fixtures/serverless-7008/README.md)
+uses the metadata-verified first-commit cutoff `2020-08-31T19:50:27Z`: 14 of 16
+comments are eligible, including the diagnostic clarification and contemporary
+alternatives; two late comments are excluded. Offline replay preserves the task
+and context hashes. Real installed Plain/core/task delivery uses a local scripted
+provider only. No new evaluation model requests or quality scores are involved.
+
 ## Serverless-8159 saved-solution diagnosis
 
 The [model-free diagnosis](../evaluation/polybench/diagnostics/serverless-8159/README.md)

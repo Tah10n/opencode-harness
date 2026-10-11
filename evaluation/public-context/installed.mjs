@@ -7,22 +7,31 @@ import http from 'node:http';
 import {spawn,spawnSync} from 'node:child_process';
 import {materializeNativeTemplate} from '../../lib/native-template.mjs';
 import {runNativePhase} from '../support/native-run.mjs';
-import {collect,prepare,sha256} from './context.mjs';
+import {build,collect,prepare,sha256} from './context.mjs';
 const root=path.resolve(import.meta.dirname,'../..'),bin=process.env.OPENCODE_BIN;
 assert.ok(bin&&path.isAbsolute(bin),'OPENCODE_BIN must name pinned OpenCode');
 const version=spawnSync(bin,['--version'],{encoding:'utf8'});assert.equal(version.status,0);assert.equal(version.stdout.trim(),'1.18.26');
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'public-context-installed-'));
 let fixture,child,mode,bootstrapped=false,requests=0;const observed=[];
 try {
- let taskFile,original,receipt;
- if(process.argv[2]) {
-  const demo=path.resolve(process.argv[2]);
+ let taskFile,original,receipt,saved;
+ let demo=process.argv[2];
+ if(demo==='--serverless') {
+  const source=path.join(import.meta.dirname,'fixtures/serverless-7008');
+  const pin=JSON.parse(fs.readFileSync(path.join(source,'collection.json'))).snapshot_sha256;
+  demo=path.join(temp,'prepared');
+  prepare({taskFile:path.join(source,'original.md'),metadataFile:path.join(source,'metadata.json'),snapshotFile:path.join(source,'snapshot.json'),snapshotSha256:pin,out:demo});
+ }
+ if(demo) {
+  demo=path.resolve(demo);
   // External demo must be replayed through prepare first; this invocation only reads its verified output.
   taskFile=path.join(demo,'TASK.md');receipt=JSON.parse(fs.readFileSync(path.join(demo,'receipt.json')));
   assert.equal(sha256(fs.readFileSync(taskFile)),receipt.output_sha256);
   assert.equal(sha256(fs.readFileSync(path.join(demo,'context.json'))),receipt.context_sha256);
   original=fs.readFileSync(taskFile).subarray(0,fs.readFileSync(taskFile).indexOf('\n\nPublic task discussion'));
   assert.equal(sha256(original),receipt.binding.task_sha256);
+  const bytes=fs.readFileSync(path.join(demo,'snapshot.json'));
+  assert.equal(sha256(bytes),receipt.snapshot_sha256);saved=JSON.parse(bytes);
  }else {
   const api=JSON.parse(fs.readFileSync(new URL('./fixtures/api.json',import.meta.url)));
   original=Buffer.from('ORIGINAL_TASK_DELIVERY\r\nEnvironment: local scripted delivery only.\r\n');
@@ -31,10 +40,18 @@ try {
   fs.writeFileSync(metadataFile,JSON.stringify(binding));
   const comments=[api.comment,{...api.comment,id:2,url:api.comment.url.replace('/1','/2'),html_url:api.comment.html_url.replace('-1','-2'),updated_at:'2021-01-01T00:00:00Z',body:'EXCLUDED_LATE_DELIVERY_SENTINEL'}];
   const read=url=>({status:200,link:'',body:JSON.stringify(url.includes('/comments?')?comments:url.endsWith('/issues/7')?{...api.issue,comments:2}:api.repository)});
-  const snapshot=collect(binding,original,read),snapshotFile=path.join(temp,'snapshot.json');fs.writeFileSync(snapshotFile,JSON.stringify(snapshot));
+  const snapshot=collect(binding,original,read),snapshotFile=path.join(temp,'snapshot.json');saved=snapshot;fs.writeFileSync(snapshotFile,JSON.stringify(snapshot));
   const out=path.join(temp,'prepared');receipt=prepare({taskFile:originalFile,metadataFile,snapshotFile,snapshotSha256:sha256(fs.readFileSync(snapshotFile)),out});taskFile=path.join(out,'TASK.md');
  }
  const task=fs.readFileSync(taskFile,'utf8');assert.ok(task.includes('Public task discussion'));assert.ok(Buffer.from(task).subarray(0,original.length).equals(original));
+ const rebuilt=build(receipt.binding,original,saved);assert.equal(rebuilt.task.toString(),task);
+ const excluded=new Set(rebuilt.audit.excluded.map(c=>c.id));
+ const forbidden=saved.records.slice(2,-1).flatMap(r=>JSON.parse(r.body)).filter(c=>excluded.has(c.id)&&c.body.length).flatMap(c=>{
+  const escaped=JSON.stringify(c.body).slice(1,-1);
+  return [c.body,escaped,escaped.replaceAll('"','\\"')];
+ });
+ // Inspect decoded string values in every request, including title and parent requests.
+ const strings=value=>typeof value==='string'?[value]:value&&typeof value==='object'?Object.values(value).flatMap(strings):[];
  const reply=(res,tool)=>{
   const base={id:'local-context',object:'chat.completion.chunk',created:1,model:'fixture'};
   const delta=tool?{role:'assistant',tool_calls:[{index:0,id:'bootstrap',type:'function',function:{name:'harness_task',arguments:'{}'}}]}:{role:'assistant',content:'Scripted transport receipt only; no implementation or understanding claim.'};
@@ -45,6 +62,7 @@ try {
   const chunks=[];for await(const c of req)chunks.push(c);const body=JSON.parse(Buffer.concat(chunks));requests++;
   const texts=body.messages.filter(m=>m.role==='user').map(m=>typeof m.content==='string'?m.content:(m.content??[]).map(p=>p.text??'').join('\n'));
   assert.ok(!JSON.stringify(body).includes('EXCLUDED_LATE_DELIVERY_SENTINEL'));
+  for(const text of strings(body))for(const denied of forbidden)assert.ok(!text.includes(denied),'Excluded audit text reached a provider request');
   // OpenCode 1.18.26's CLI quotes an argv prompt and escapes double quotes.
   // Assert the complete exact envelope, not a sentinel/substring approximation.
   const cliEnvelope='"'+task.replaceAll('"','\\"')+'"';
@@ -80,7 +98,7 @@ try {
   results.push({...observed.find(x=>x.mode===mode&&x.author),delivery:'passed',exitCode:result.exitCode});
  }
  assert.deepEqual(failures,[]);assert.equal(new Set(results.map(x=>x.task_sha256)).size,1);
- console.log(JSON.stringify({passed:true,installedVersion:version.stdout.trim(),scriptedRequests:requests,evaluationModelRequests:0,results}));
+ console.log(JSON.stringify({passed:true,installedVersion:version.stdout.trim(),scriptedRequests:requests,evaluationModelRequests:0,excludedCommentsChecked:excluded.size,results}));
 }finally {
  if(child&&child.exitCode===null){child.kill('SIGKILL');await new Promise(resolve=>child.once('close',resolve));}
  if(fixture?.listening){fixture.closeAllConnections();await new Promise(resolve=>fixture.close(resolve));}

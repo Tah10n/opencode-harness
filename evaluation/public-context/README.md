@@ -146,6 +146,7 @@ changes are needed. Fixtures make no solutions or model-quality claims.
 ```sh
 node --test evaluation/public-context/verify.mjs
 OPENCODE_BIN=/absolute/opencode-1.18.26 node evaluation/public-context/installed.mjs
+OPENCODE_BIN=/absolute/opencode-1.18.26 node evaluation/public-context/installed.mjs --serverless
 ```
 
 Both checks are included in the existing `npm run verify` and
@@ -154,3 +155,9 @@ dates, task/source/PR substitution, duplicates and broken pagination, limits,
 API failures, contradictory proposals, hostile text, snapshot tampering, empty
 results, exclusive output, disabled bytes and deterministic offline replay.
 No new CI matrix or live-GitHub CI step is added.
+
+The [saved Serverless example](fixtures/serverless-7008/README.md) records the
+separately verified first-commit cutoff, four-response public collection, all 14
+eligible comments, two explicit exclusions, exact offline replay hashes and
+installed delivery through all three author paths. It remains a known development
+example; no new Serverless solutions or quality measurements were made.

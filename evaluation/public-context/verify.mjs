@@ -79,3 +79,31 @@ test('offline CLI replay, tamper detection, exclusive output and disabled bytes'
   const failed=path.join(temp,'failed');assert.throws(()=>prepare({...options,out:failed},()=>{throw Error('api_timeout');}),/timeout/);assert.equal(JSON.parse(fs.readFileSync(path.join(failed,'failure.json'))).status,'blocked');assert.ok(!fs.existsSync(path.join(failed,'TASK.md')));
  }finally{fs.rmSync(temp,{recursive:true,force:true});}
 });
+test('saved Serverless discussion replays every eligible alternative with a verified commit cutoff',()=>{
+ const source=path.join(import.meta.dirname,'fixtures/serverless-7008');
+ const read=name=>fs.readFileSync(path.join(source,name));
+ const metadata=JSON.parse(read('metadata.json')),collection=JSON.parse(read('collection.json'));
+ const commits=read('commit-times.jsonl').toString().trim().split('\n').map(JSON.parse);
+ assert.equal(commits[0].sha,'c5b39313585955f4b447fc647e3c17d879e1e6b6');
+ assert.equal(metadata.cutoff.at,'2020-08-31T19:50:27Z');
+ assert.equal(metadata.cutoff.at,commits.flatMap(c=>[c.author_date,c.committer_date]).sort()[0]);
+ assert.equal(metadata.cutoff.at,metadata.cutoff.first_solution_commit_at);
+ assert.equal(sha256(read('original.md')),'0c2f5a295e857a0ec4423015d4079b52fcabdd32b25de89dabf30b3dcd332416');
+ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'public-context-serverless-'));
+ try {
+  for(const name of ['first','second']) {
+   const out=path.join(temp,name),receipt=prepare({taskFile:path.join(source,'original.md'),metadataFile:path.join(source,'metadata.json'),snapshotFile:path.join(source,'snapshot.json'),snapshotSha256:collection.snapshot_sha256,out},()=>assert.fail('offline demo must not fetch'));
+   assert.equal(receipt.public_api_requests,0);assert.equal(receipt.observed,16);assert.equal(receipt.admitted,14);
+   assert.deepEqual(receipt.excluded,[{id:684019468,reason:'created_at_or_after_cutoff'},{id:684582037,reason:'created_at_or_after_cutoff'}]);
+   for(const key of ['snapshot_sha256','context_sha256','output_sha256'])assert.equal(receipt[key],collection[key]);
+  }
+  const context=JSON.parse(fs.readFileSync(path.join(temp,'first/context.json')));
+  assert.deepEqual(context.comments.map(c=>c.id),[558638078,558678869,558680253,558682032,558684462,653757152,654164403,654171412,654185286,654242312,655573822,663469743,663476818,683961107]);
+  assert.equal(context.comments.find(c=>c.id===654185286).body_sha256,'6d4b5c100e4c24893bc9b587f54e548de68997225c618d307f981e66d8af1b55');
+  const task=fs.readFileSync(path.join(temp,'first/TASK.md'));
+  assert.ok(task.subarray(0,read('original.md').length).equals(read('original.md')));
+  for(const file of ['TASK.md','context.json','audit.json','snapshot.json'])assert.ok(fs.readFileSync(path.join(temp,'first',file)).equals(fs.readFileSync(path.join(temp,'second',file))));
+  const late=JSON.parse(JSON.parse(read('snapshot.json')).records[2].body).filter(c=>[684019468,684582037].includes(c.id));
+  for(const c of late){assert.ok(!task.includes(c.body));assert.ok(!task.includes(JSON.stringify(c.body).slice(1,-1)));}
+ }finally{fs.rmSync(temp,{recursive:true,force:true});}
+});
