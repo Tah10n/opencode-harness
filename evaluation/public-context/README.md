@@ -52,7 +52,8 @@ directories and symlinks are refused. Outputs are:
 
 - `TASK.md`: unchanged original bytes, then a clearly separated indented JSON
   discussion block with a warning that comments are untrusted, fallible proposals.
-- `context.json`: task/source/cutoff binding and eligible comments with author,
+- `context.json` (v2): only repository, issue, original-task hash and cutoff time
+  in the participant binding; eligible comments with author,
   source URLs, exact text, timestamps and body hash.
 - `snapshot.json`: bounded API response bodies, source endpoints, pagination
   headers and hashes, including rejected text. **Administrative audit only.**
@@ -60,12 +61,18 @@ directories and symlinks are refused. Outputs are:
 - `receipt.json`: status (`complete` or honest `empty`), counts, parameters,
   output/context/snapshot hashes and public API invocation count.
 
-Only give `TASK.md` to participants. Keep snapshot, audit and metadata outside
-participant checkouts and tool-readable mounts; they may contain late text.
+Only give `TASK.md` to participants. Keep snapshot, audit, receipt and metadata
+outside participant checkouts and tool-readable mounts; they may contain late
+text or solution identifiers. The complete reviewed binding (including cutoff
+verification evidence) remains in administrative snapshot/receipt files only.
+The participant binding is an allowlist; extra metadata fields are never rendered.
 The script does not configure a sandbox or grant file permissions to a model.
-Failure exits nonzero and writes `failure.json` with `blocked`, reason and the
+Once the absent output directory has been created, failures (including missing,
+unreadable, non-regular and oversized task input) exit nonzero and write
+`failure.json` with `blocked`, reason and the
 number of attempted API invocations. It never falls back to a successful
-unaugmented task. Interrupted/partial outputs without a success receipt are
+unaugmented task. An invalid or existing destination is refused without writing
+there. Interrupted/partial outputs without a success receipt are
 unusable; choose a fresh output directory on a deliberate retry.
 
 ## Offline replay and disabled mode
@@ -85,7 +92,10 @@ node evaluation/public-context/prepare.mjs \
 
 Replay performs no network operation. It validates saved bytes, all source
 identities, pagination and the task/cutoff binding again, then deterministically
-rebuilds the same task/context bytes. Metadata property order is part of the
+rebuilds the same v2 task/context bytes. Existing v1 snapshots remain readable;
+v1 collection/delivery receipts remain historical evidence. The v2 projection
+intentionally changes task/context hashes; never rewrite historical receipts or
+seals. Metadata property order is part of the
 snapshot binding in v1; keep the original metadata file. Disabled mode copies
 arbitrary original bytes exactly and makes zero API calls. Importing modules and
 automated tests do not contact GitHub. This step does not run an author or grant
@@ -103,6 +113,13 @@ are all retained, with no ranking or chosen interface.
 Fixed bounds, chosen before the Serverless demonstration: 5 pages of at most
 100 comments, 2 MiB per API response, 32 KiB per comment, 64 KiB for the entire
 rendered discussion block, 1 MiB for the original task, 15 seconds per API call.
+Augmented output now additionally must fit **131,071 bytes**, including the
+original task and rendered block. This reserves the terminating NUL within
+Linux's 128 KiB per-argument limit used by Plain/core, and also fits task mode's
+1 MiB file bound. An oversized final task is blocked without truncation. Disabled
+mode remains a byte-preserving copy within the original-input bound, not a
+certification of downstream delivery size. Snapshot v1 collection limits are
+unchanged.
 A full eligible discussion exceeding its bound blocks; no convenient prefix is
 selected. Duplicate IDs, incomplete counts, malformed/misdirected pagination,
 changed issue metadata, API failures and rate limits block the whole result.
@@ -125,24 +142,41 @@ security guarantee for a real model.
 
 ## Existing author delivery
 
-After this explicit preparation step, use the new `TASK.md` with the existing
-runner. In the PolyBench preparation path, append to the task already produced
+For a cutoff-controlled experiment, authors **must run without external network
+access**, with no external web/MCP tools, inherited host configuration or
+credentials. Public source URLs remain provenance, not permission to fetch their
+current contents. Denying only `webfetch` is insufficient when bash can use the
+network. Ordinary local `/harness-task` or web-enabled native core is not a
+supported environment for enforcing this cutoff.
+
+Use the existing `evaluation/support/container-session.mjs` runner, which creates
+a fresh container with `--network none`, isolated HOME/XDG paths and only the
+explicit input/toolchain mounts. Its loopback provider relay forwards model
+requests through the host; it grants no general web proxy or author egress.
+Keep administrative files, solution objects and hidden data outside all author
+mounts, and admit only the reviewed model-provider configuration (no remote tools).
+The existing container boundary check verifies Docker isolation and actual socket
+egress rejection. The local scripted fixture below proves delivery only; it does
+not provide or certify this network boundary for a real author.
+
+After this explicit preparation step, use the new `TASK.md` with that existing
+contained runner. In the PolyBench preparation path, append to the task produced
 by `environments.py`; future separately authorized experiments must bind the new
 file in their ordinary preparation/freeze process. Do not modify old aliases,
 seals or admission rules to inject it into a historical campaign.
 
 Plain/core receive the new task as the existing `runNativePhase` `task` argument;
 task mode receives the same bytes as `HARNESS_TASK_FILE` (the runner's prepared
-`/work/repo/TASK.md`). In local native task delivery, set `HARNESS_TASK_FILE` to
-the generated absolute path and use the existing `/harness-task`. Install/setup
-instructions remain in [native usage](../../docs/USAGE.md). This documentation
-is not authorization to start model-backed work.
+`/work/repo/TASK.md`). General installation instructions remain in
+[native usage](../../docs/USAGE.md); they do not establish experiment containment.
+This documentation is not authorization to start model-backed work.
 
 The installed fixture invokes the actual existing `runNativePhase` launcher for
 Plain, native core and task mode, mapping only container paths to isolated local
 fixture paths. It runs pinned OpenCode 1.18.26 and captures requests at a loopback
 scripted provider. It asserts the **whole** task in the real author input and
-rejects excluded late text in every request. OpenCode's CLI wraps argv text in
+rejects excluded late text and administrative cutoff evidence in every request.
+OpenCode's CLI wraps argv text in
 quotes and escapes double quotes; Plain/core assertions check that exact full
 envelope. Task mode checks the original file text in the real child author
 request. This distinguishes transport representation from task bytes; it is not
@@ -153,17 +187,21 @@ changes are needed. Fixtures make no solutions or model-quality claims.
 node --test evaluation/public-context/verify.mjs
 OPENCODE_BIN=/absolute/opencode-1.18.26 node evaluation/public-context/installed.mjs
 OPENCODE_BIN=/absolute/opencode-1.18.26 node evaluation/public-context/installed.mjs --serverless
+OPENCODE_BIN=/absolute/opencode-1.18.26 node evaluation/public-context/installed.mjs --delivery-limit
 ```
 
-Both checks are included in the existing `npm run verify` and
+These checks are included in the existing `npm run verify` and
 `npm run verify:installed` sets. API fixtures test cutoff boundaries, invalid
 dates, task/source/PR substitution, duplicates and broken pagination, limits,
 API failures, contradictory proposals, hostile text, snapshot tampering, empty
-results, exclusive output, disabled bytes and deterministic offline replay.
+results, exclusive output, task-admission failure receipts, disabled bytes and
+deterministic offline replay. The installed delivery-limit scenario exercises
+the largest admitted augmented task through all three real author paths.
 No new CI matrix or live-GitHub CI step is added.
 
 The [saved Serverless example](fixtures/serverless-7008/README.md) records the
 separately verified first-commit cutoff, four-response public collection, all 14
-eligible comments, two explicit exclusions, exact offline replay hashes and
-installed delivery through all three author paths. It remains a known development
-example; no new Serverless solutions or quality measurements were made.
+eligible comments, two explicit exclusions, historical v1 hashes and
+installed delivery through all three author paths. Current replay emits v2 with
+administrative solution evidence removed and therefore different output hashes.
+It remains a known development example; no new Serverless solutions or quality measurements were made.

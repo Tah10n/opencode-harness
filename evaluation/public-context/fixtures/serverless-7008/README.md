@@ -30,7 +30,7 @@ This snapshot is administrative fixture data: it includes excluded late comments
 and current repository/issue metadata. **Never mount this directory for an author.**
 Only the newly prepared `TASK.md` is participant input.
 
-## Observed result
+## Historical v1 observed result
 
 All 16 observed comments were accounted for. The 14 eligible comments remain in
 chronological order, including [654185286](https://github.com/serverless/serverless/issues/7008#issuecomment-654185286)
@@ -47,7 +47,15 @@ untrusted discussion block. Context SHA-256 is
 The snapshot SHA-256 is
 `0b4b927ce6cb07abbb9aeb09e823cfd4c0851b4535ccf200abee337bd4a52273`.
 
-## Reproduce without network or a model
+The files `collection.json` and `delivery.json` retain the original v1 receipts.
+Current preparation emits participant context v2, omitting administrative cutoff
+basis and first-solution metadata. Replaying the same pinned snapshot therefore
+produces different task/context hashes; it does not recreate or replace those
+historical receipts. Original task bytes, eligible comment bodies/order, cutoff
+and the pinned snapshot remain unchanged. Only use the newly prepared v2 task in
+future authorized work, under the [required author network isolation](../../README.md#existing-author-delivery).
+
+## Replay with the current participant format without network or a model
 
 From the repository root, choose an absent absolute output directory whose parent
 exists (replace `/absolute/new-serverless-context` below):
@@ -72,7 +80,8 @@ copied to the participant project. `delivery.json` records the successful local
 demonstration: eight scripted requests, zero evaluation model requests.
 Scripted responses do not implement a solution or prove model understanding.
 
-`npm run verify` replays this saved fixture twice and checks hashes, alternatives,
+`npm run verify` replays this saved fixture twice and checks snapshot integrity,
+v2 deterministic output, absence of solution locators, alternatives,
 cutoff and exclusions. `npm run verify:installed` also replays and delivers this
 fixture via `installed.mjs --serverless`, without contacting GitHub. The original
 collection used four public API requests; the separately authorized metadata

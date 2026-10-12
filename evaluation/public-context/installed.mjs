@@ -7,7 +7,7 @@ import http from 'node:http';
 import {spawn,spawnSync} from 'node:child_process';
 import {materializeNativeTemplate} from '../../lib/native-template.mjs';
 import {runNativePhase} from '../support/native-run.mjs';
-import {build,collect,prepare,sha256} from './context.mjs';
+import {build,collect,prepare,sha256,DELIVERY_TASK_BYTES} from './context.mjs';
 const root=path.resolve(import.meta.dirname,'../..'),bin=process.env.OPENCODE_BIN;
 assert.ok(bin&&path.isAbsolute(bin),'OPENCODE_BIN must name pinned OpenCode');
 const version=spawnSync(bin,['--version'],{encoding:'utf8'});assert.equal(version.status,0);assert.equal(version.stdout.trim(),'1.18.26');
@@ -15,7 +15,8 @@ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'public-context-installed-'));
 let fixture,child,mode,bootstrapped=false,requests=0;const observed=[];
 try {
  let taskFile,original,receipt,saved;
- let demo=process.argv[2];
+ const boundary=process.argv[2]==='--delivery-limit';
+ let demo=boundary?undefined:process.argv[2];
  if(demo==='--serverless') {
   const source=path.join(import.meta.dirname,'fixtures/serverless-7008');
   const pin=JSON.parse(fs.readFileSync(path.join(source,'collection.json'))).snapshot_sha256;
@@ -37,19 +38,29 @@ try {
   original=Buffer.from('ORIGINAL_TASK_DELIVERY\r\nEnvironment: local scripted delivery only.\r\n');
   const originalFile=path.join(temp,'original.md'),metadataFile=path.join(temp,'metadata.json');fs.writeFileSync(originalFile,original);
   const binding={repository:'example/project',issue:7,task_sha256:sha256(original),cutoff:{at:'2020-02-01T00:00:00Z',first_solution_commit_at:'2020-02-01T00:00:00Z',verified:true,basis:'Synthetic delivery fixture'}};
-  fs.writeFileSync(metadataFile,JSON.stringify(binding));
   const comments=[api.comment,{...api.comment,id:2,url:api.comment.url.replace('/1','/2'),html_url:api.comment.html_url.replace('-1','-2'),updated_at:'2021-01-01T00:00:00Z',body:'EXCLUDED_LATE_DELIVERY_SENTINEL'}];
   const read=url=>({status:200,link:'',body:JSON.stringify(url.includes('/comments?')?comments:url.endsWith('/issues/7')?{...api.issue,comments:2}:api.repository)});
+  if(boundary) {
+   const overhead=build(binding,original,collect(binding,original,read)).task.length-original.length;
+   // Multibyte bytes and quotes exercise the exact largest admitted argv task.
+   const prefix=Buffer.from('ORIGINAL_TASK_DELIVERY "quoted" \u00e9\r\n');
+   original=Buffer.concat([prefix,Buffer.alloc(DELIVERY_TASK_BYTES-overhead-prefix.length,120)]);
+   binding.task_sha256=sha256(original);fs.writeFileSync(originalFile,original);
+  }
+  fs.writeFileSync(metadataFile,JSON.stringify(binding));
   const snapshot=collect(binding,original,read),snapshotFile=path.join(temp,'snapshot.json');saved=snapshot;fs.writeFileSync(snapshotFile,JSON.stringify(snapshot));
   const out=path.join(temp,'prepared');receipt=prepare({taskFile:originalFile,metadataFile,snapshotFile,snapshotSha256:sha256(fs.readFileSync(snapshotFile)),out});taskFile=path.join(out,'TASK.md');
  }
  const task=fs.readFileSync(taskFile,'utf8');assert.ok(task.includes('Public task discussion'));assert.ok(Buffer.from(task).subarray(0,original.length).equals(original));
  const rebuilt=build(receipt.binding,original,saved);assert.equal(rebuilt.task.toString(),task);
+ assert.equal(rebuilt.context.version,2);
+ if(boundary)assert.equal(Buffer.byteLength(task),DELIVERY_TASK_BYTES);
  const excluded=new Set(rebuilt.audit.excluded.map(c=>c.id));
  const forbidden=saved.records.slice(2,-1).flatMap(r=>JSON.parse(r.body)).filter(c=>excluded.has(c.id)&&c.body.length).flatMap(c=>{
   const escaped=JSON.stringify(c.body).slice(1,-1);
   return [c.body,escaped,escaped.replaceAll('"','\\"')];
  });
+ forbidden.push(receipt.binding.cutoff.basis,...(receipt.binding.cutoff.basis.match(/\b[a-f0-9]{40}\b/g)??[]));
  // Inspect decoded string values in every request, including title and parent requests.
  const strings=value=>typeof value==='string'?[value]:value&&typeof value==='object'?Object.values(value).flatMap(strings):[];
  const reply=(res,tool)=>{
@@ -98,7 +109,7 @@ try {
   results.push({...observed.find(x=>x.mode===mode&&x.author),delivery:'passed',exitCode:result.exitCode});
  }
  assert.deepEqual(failures,[]);assert.equal(new Set(results.map(x=>x.task_sha256)).size,1);
- console.log(JSON.stringify({passed:true,installedVersion:version.stdout.trim(),scriptedRequests:requests,evaluationModelRequests:0,excludedCommentsChecked:excluded.size,results}));
+ console.log(JSON.stringify({passed:true,deliveryLimit:boundary,taskBytes:Buffer.byteLength(task),installedVersion:version.stdout.trim(),scriptedRequests:requests,evaluationModelRequests:0,excludedCommentsChecked:excluded.size,results}));
 }finally {
  if(child&&child.exitCode===null){child.kill('SIGKILL');await new Promise(resolve=>child.once('close',resolve));}
  if(fixture?.listening){fixture.closeAllConnections();await new Promise(resolve=>fixture.close(resolve));}
