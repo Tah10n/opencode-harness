@@ -38,6 +38,13 @@ writes and preserves the fixture's user settings.
 
 ## Task delivery (experimental)
 
+An optional [public issue context preparation step](../evaluation/public-context/README.md)
+can append provenance- and time-checked discussion to a new task file before
+delivery. It is disabled unless explicitly invoked and must give Plain and
+harness the same context. Cutoff-controlled experiments require the documented
+no-network container environment; ordinary local delivery below does not enforce
+that boundary. It does not establish model effectiveness.
+
 Install with `--task`, install its pinned dependencies, and set:
 
 ```sh

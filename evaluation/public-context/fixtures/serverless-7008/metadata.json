@@ -1,0 +1,11 @@
+{
+  "repository": "serverless/serverless",
+  "issue": 7008,
+  "task_sha256": "0c2f5a295e857a0ec4423015d4079b52fcabdd32b25de89dabf30b3dcd332416",
+  "cutoff": {
+    "at": "2020-08-31T19:50:27Z",
+    "first_solution_commit_at": "2020-08-31T19:50:27Z",
+    "verified": true,
+    "basis": "User-authorized metadata-only GET https://api.github.com/repos/serverless/serverless/pulls/8159/commits?per_page=100 (all pages); three commits. First SHA c5b39313585955f4b447fc647e3c17d879e1e6b6 has author and committer timestamps 2020-08-31T19:50:27Z, the minimum across the returned commit timestamps. Retained only SHA, author_date and committer_date; no PR body, diff, files or tests."
+  }
+}

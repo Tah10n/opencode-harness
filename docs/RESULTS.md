@@ -171,6 +171,23 @@ Preparation, complete task timers, evaluator and unmetered maintainer/CI costs
 are separate. Money is unknown. Historical results below are unchanged and
 are not added to this candidate's score or expenses.
 
+## Public issue context preparation candidate
+
+The [experimental preparation tool](../evaluation/public-context/README.md)
+implements candidate B as an explicit issue/task/cutoff-bound input step, with
+model-free source/time/integrity checks and offline replay. Its installed fixture
+checks actual full-input delivery to Plain, native core and task authors through
+OpenCode 1.18.26 and a local scripted provider. These are processing and delivery
+checks, not new solutions, scores, evidence of improved quality or a comparison
+of harness effectiveness. The historical diagnosis below remains unchanged.
+
+The [saved Serverless demonstration](../evaluation/public-context/fixtures/serverless-7008/README.md)
+uses the metadata-verified first-commit cutoff `2020-08-31T19:50:27Z`: 14 of 16
+comments are eligible, including the diagnostic clarification and contemporary
+alternatives; two late comments are excluded. Offline replay preserves the task
+and context hashes. Real installed Plain/core/task delivery uses a local scripted
+provider only. No new evaluation model requests or quality scores are involved.
+
 ## Serverless-8159 saved-solution diagnosis
 
 The [model-free diagnosis](../evaluation/polybench/diagnostics/serverless-8159/README.md)

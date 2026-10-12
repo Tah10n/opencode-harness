@@ -1,0 +1,30 @@
+{
+  "status": "complete",
+  "observed": 16,
+  "admitted": 14,
+  "excluded": [
+    {
+      "id": 684019468,
+      "reason": "created_at_or_after_cutoff"
+    },
+    {
+      "id": 684582037,
+      "reason": "created_at_or_after_cutoff"
+    }
+  ],
+  "binding": {
+    "repository": "serverless/serverless",
+    "issue": 7008,
+    "task_sha256": "0c2f5a295e857a0ec4423015d4079b52fcabdd32b25de89dabf30b3dcd332416",
+    "cutoff": {
+      "at": "2020-08-31T19:50:27Z",
+      "first_solution_commit_at": "2020-08-31T19:50:27Z",
+      "verified": true,
+      "basis": "User-authorized metadata-only GET https://api.github.com/repos/serverless/serverless/pulls/8159/commits?per_page=100 (all pages); three commits. First SHA c5b39313585955f4b447fc647e3c17d879e1e6b6 has author and committer timestamps 2020-08-31T19:50:27Z, the minimum across the returned commit timestamps. Retained only SHA, author_date and committer_date; no PR body, diff, files or tests."
+    }
+  },
+  "snapshot_sha256": "0b4b927ce6cb07abbb9aeb09e823cfd4c0851b4535ccf200abee337bd4a52273",
+  "context_sha256": "9128c12b4c4e59a3fbe7d52a36f2b5e26a6bb3b761d36ad26bfb55c730f0c8f1",
+  "output_sha256": "400b3627eb701d4b5bd55ff0d7abd53b06176beff0dd781b5aaef76ab0eaad7e",
+  "public_api_requests": 4
+}

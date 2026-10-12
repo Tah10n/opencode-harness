@@ -11,6 +11,9 @@ try{
  session=await startContainer({source:root+'/source',toolchain,template:null,output:root+'/session',onRequest:()=>{throw Error('No provider requests permitted');}});
  const inspect=JSON.parse(execFileSync('docker',['inspect',session.name],{encoding:'utf8'}))[0];
  assert.equal(inspect.HostConfig.NetworkMode,'none');assert.equal(inspect.HostConfig.Privileged,false);assert.equal(inspect.HostConfig.ReadonlyRootfs,true);assert.ok(inspect.Mounts.every(m=>m.RW===false));assert.deepEqual(inspect.Mounts.map(m=>m.Destination).sort(),['/input','/opt/opencode','/relay.mjs'].sort());
+ // A task may include live issue URLs: actual socket egress must fail even from bash.
+ const network=session.exec(['node','-e',`const net=require('net');const socket=net.connect({host:'192.0.2.1',port:443});socket.setTimeout(2000);socket.on('connect',()=>{socket.destroy();process.exit(1)});socket.on('timeout',()=>{socket.destroy();process.exit(2)});socket.on('error',e=>{if(e.code!=='ENETUNREACH')process.exit(3);console.log(e.code)});`]);
+ assert.equal(network.status,0,network.stderr);assert.equal(network.stdout.trim(),'ENETUNREACH');results.push('author socket egress denied with ENETUNREACH; live issue URLs cannot be fetched');
  const pidResult=session.exec(['node','-e',"const p=require('child_process').spawn(process.execPath,['-e','setInterval(()=>{},1000)'],{detached:true,stdio:'ignore'});p.unref();console.log(p.pid)"]);assert.equal(pidResult.status,0);const workload=Number(pidResult.stdout.trim());assert.ok(workload>1);
  const stopped=stopWorkload(session);assert.ok(stopped.terminationVerified);
  const alive=session.exec(['node','-e',`const fs=require('fs');try{const s=fs.readFileSync('/proc/${workload}/stat','utf8');if(s.slice(s.lastIndexOf(') ')+2)[0]!=='Z')process.exit(1);}catch(e){if(e.code!=='ENOENT')throw e;}`]);assert.equal(alive.status,0,'Detached workload remains alive');results.push('actual network/mount isolation and detached workload termination');
