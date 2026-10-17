@@ -3,7 +3,7 @@ import csv,hashlib,importlib.util,json,os,subprocess,tempfile
 from pathlib import Path
 from campaign import LOCAL, SELECTION, CONFIG, ARMS
 ROOT=Path(__file__).resolve().parents[2];DEV=ROOT/'evaluation/polybench'
-QUALITY_NAMES=['evidence-backed-core-development-v1','evidence-backed-core-h2-v1','quality-confirmation-v1']
+QUALITY_NAMES=['evidence-backed-core-development-v1','evidence-backed-core-h2-v1','quality-confirmation-v1','public-context-development-v1']
 spec=importlib.util.spec_from_file_location('pilot_results',DEV/'results.py');helpers=importlib.util.module_from_spec(spec);spec.loader.exec_module(helpers)
 def read(path,default=None):return json.loads(path.read_text()) if path.exists() else default
 
@@ -108,10 +108,14 @@ def main():
    assert len(controls)==12 and {(r['instance_id'],r['arm']) for r in controls}=={(r['instance_id'],a) for r in rows for a in ['P','C0']}
    output['fresh_control_slots']=controls;comparison_rows=rows+controls;pairs=[('H2','P'),('H2','C0')]
   elif CONFIG['name']=='quality-confirmation-v1':pairs=[('H','P')]
+  elif CONFIG['name']=='public-context-development-v1':pairs=[('P1','P0'),('C1','C0'),('C0','P0'),('C1','P1')]
   else:pairs=[('H1','P'),('H1','C0'),('C0','P')]
   formal=CONFIG['name']=='quality-confirmation-v1'
   output['comparisons']={a+'-'+b:{field:helpers.quality_paired_statistics(comparison_rows,a,b,field,formal=formal and field=='D') for field in ['D','R']} for a,b in pairs}
   output['leave_one_repository_out']={repo:{field:helpers.quality_paired_statistics([r for r in comparison_rows if r['repo']!=repo],pairs[0][0],pairs[0][1],field,formal=formal and field=='D') for field in ['D','R']} for repo in sorted({r['repo'] for r in comparison_rows})}
+  if CONFIG['name']=='public-context-development-v1':
+   output['comparisons']={a+'-'+b:{field:helpers.paired(rows,a,b,field) for field in ['R','T','D']} for a,b in pairs}
+   output.pop('leave_one_repository_out',None)
   output['primary_endpoint']='D = R AND T_delivery'
  else:
   output['comparisons']={a+'-'+b:{field:helpers.paired_statistics(rows,a,b,field,formal=CONFIG is not None and a=='T' and b=='P' and field=='R') if CONFIG else helpers.paired(rows,a,b,field) for field in ['R','D_bench']} for a,b in [(ARMS[2],ARMS[0]),(ARMS[1],ARMS[0]),(ARMS[2],ARMS[1])]}

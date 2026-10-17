@@ -1,3 +1,4 @@
+import {contextCampaign,contextModes,contextAssignments} from './public-context-campaign.mjs';
 // Campaign wiring: reuse existing request capture, auth, admission and stop policy.
 import fs from 'node:fs';import path from 'node:path';import os from 'node:os';
 import {createHash} from 'node:crypto';
@@ -13,7 +14,8 @@ import {nativeCampaign,qualityCampaign,qualityAssignments} from './campaign.mjs'
 export async function runTask(session,options){
  session.arm=options.arm;
  const mode=options.armMode??(options.arm==='P'?'plain':options.arm==='C'?'core':['T','H0','H1'].includes(options.arm)?'task':null);
- if(!['plain','core','task'].includes(mode)||!['P','C','C0','T','H0','H1','H2','H'].includes(options.arm))throw Error('Unknown PolyBench arm');
+ if(!['plain','core','task'].includes(mode)||!['P','C','P0','P1','C0','C1','T','H0','H1','H2','H'].includes(options.arm))throw Error('Unknown PolyBench arm');
+ if(Object.hasOwn(contextModes,options.arm)&&options.arm!=='C0'&&mode!==contextModes[options.arm])throw Error('Context cell mode mismatch');
  session.armMode=mode;
  if(Object.hasOwn(process.env,'OPENCODE_CONFIG_CONTENT'))throw Error('Existing inline override must be preserved; unsupported launch');
  const offline=JSON.parse(fs.readFileSync('fixtures/native-offline/build.json'));
@@ -37,6 +39,7 @@ export async function runTask(session,options){
 export async function run(root,extra={}){
  if(!extra.fetchImpl&&!extra.authorized)throw Error('Explicit --authorize-model-runs is required before credential access');
  const freeze=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
+ if(!extra.fetchImpl&&contextCampaign(freeze.campaign)&&path.resolve(root)!==path.resolve(contextAssignments().config.local_directory,'batch'))throw Error('Context campaign requires canonical batch; no copies/resume');
  if(!extra.fetchImpl&&qualityCampaign(freeze.campaign)&&path.resolve(root)!==path.resolve(qualityAssignments(freeze.campaign).config.local_directory,'batch'))throw Error('Real quality admission requires the canonical batch root; copies cannot resume or repeat');
  if(!extra.fetchImpl && freeze.experimentKind!=='polybench')throw Error('Scripted preparation cannot access provider');
  if(!extra.fetchImpl){

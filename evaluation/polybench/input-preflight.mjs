@@ -28,7 +28,7 @@ export async function verifyReadyInputs(f,root,{verifyInput=verifyPreparedInput}
  const ready=new Map();for(const a of f.attempts)if(a.preparationStatus!=='preparation_error')ready.set(a.source,a);
  const parent=path.join(root,'input-preflight');fs.mkdirSync(parent,{mode:0o700});
  for(const [source,a] of ready){
-  const output=path.join(parent,a.task);fs.mkdirSync(output,{mode:0o700});
+  const output=path.join(parent,a.task+'-'+a.arm);fs.mkdirSync(output,{mode:0o700});
   const expected=f.runtimeManifests?.[source]??f.inputManifests[a.task+'-'+a.arm];
   if(!expected||!f.environments?.[source])throw Error('Frozen prepared input unavailable: '+a.task);
   await verifyInput({source,toolchain:f.toolchain,template:f.templates?.T??f.template,output,preparedEnvironment:f.environments[source],expected});

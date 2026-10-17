@@ -1,9 +1,10 @@
+import {contextCampaign} from './public-context-campaign.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 export const qualityCampaign=name=>['evidence-backed-core-development-v1','evidence-backed-core-h2-v1','quality-confirmation-v1'].includes(name);
-export const nativeCampaign=name=>['consolidated-v1','consolidated-remaining-v1'].includes(name)||qualityCampaign(name);
+export const nativeCampaign=name=>contextCampaign(name)||['consolidated-v1','consolidated-remaining-v1'].includes(name)||qualityCampaign(name);
 export function qualitySpecification(name){
  const specifications={
   'evidence-backed-core-development-v1':{arms:['P','C0','H1'],tasks:6,slots:18},

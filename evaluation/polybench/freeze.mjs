@@ -1,9 +1,11 @@
+import {contextCampaign,contextAssignments,contextTemplates,contextModes,contextVariants,verifyContextSchedule} from './public-context-campaign.mjs';
 // Final admission freeze: no provider activity; requires all ten complete controls.
 import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';import {execFileSync} from 'node:child_process';
 import {manifest} from '../support/manifest.mjs';
 import {local,campaign,selectionPath,arms,configPath,remainingAssignments,qualityCampaign,qualityAssignments,qualityTemplates} from './campaign.mjs';
-const quality=qualityCampaign(campaign?.name);
+const quality=qualityCampaign(campaign?.name),context=contextCampaign(campaign?.name);
+if(context)contextAssignments();
 const dev=path.resolve('evaluation/polybench'),root=local+'/batch';
 assert.ok(!fs.existsSync(root),'Never replace a frozen or started batch');
 execFileSync('python3',[dev+'/verify.py',...(campaign?['--consolidated-dataset']:[])],{stdio:'inherit'});
@@ -14,7 +16,7 @@ if(campaign?.name==='consolidated-remaining-v1')remainingAssignments();
 if(quality)qualityAssignments(campaign.name);
 execFileSync('python3',['-B','-c','from evaluator_integrity import verify; verify('+JSON.stringify(local+'/evaluator')+')'],{cwd:dev,stdio:'inherit'});
 const preparation=campaign?get(local+'/preparation.json'):null;
-if(campaign?.name==='quality-confirmation-v1')assert.ok(selection.selected.every(row=>preparation[row.instance_id]?.status==='ready'),'All 30 confirmation inputs must be ready before model admission');
+if(context||campaign?.name==='quality-confirmation-v1')assert.ok(selection.selected.every(row=>preparation[row.instance_id]?.status==='ready'),'All selected inputs must be ready before model admission');
 assert.equal(execFileSync('git',['rev-parse','HEAD'],{cwd:local+'/evaluator',encoding:'utf8'}).trim(),'9c836c5d7f3cb991934132b77d29e6941d912a07');
 assert.equal(execFileSync('git',['diff','HEAD','--','src'],{cwd:local+'/evaluator',encoding:'utf8'}).trim(),'');
 const runtime=get(local+'/runtime.json');
@@ -77,7 +79,7 @@ for(const row of selection.selected){
 }
 assert.equal(get(local+'/recorder-fixture/result.json').passed,true);
 assert.equal(get(local+'/container-preflight-final/verification.json').passed,true);
-if(campaign){assert.equal(get(local+'/capture-shape-check/verification.json').passed,true);assert.equal(get(local+'/scripted-preflight-final/verification.json').official_export_control.patch_applied,true);}
+if(campaign){if(context)assert.equal(get(local+'/container-preflight-final/verification.json').captureRoundtrip,true);else assert.equal(get(local+'/capture-shape-check/verification.json').passed,true);assert.equal(get(local+'/scripted-preflight-final/verification.json').official_export_control.patch_applied,true);}
 const bundleDirectories=quality?runtime.bundleDirectories:campaign?['bundle','core-bundle','plain-dependencies']:['bundle','plain-dependencies'];
 for(const dir of bundleDirectories)runtimeManifests[local+'/'+dir]=manifest(local+'/'+dir);
 const files={};for(const name of ['run.mjs','capture.mjs','dependencies.mjs','evaluate.py','evaluate_predictions.py','collect.py','results.py','requirements.lock'])files[dev+'/'+name]=hash(dev+'/'+name);
@@ -93,9 +95,29 @@ if(quality){
 if(campaign)files[path.join(path.dirname(configPath),'PLAN.md')]=hash(path.join(path.dirname(configPath),'PLAN.md'));
 for(const name of fs.readdirSync(dev).filter(n=>/\.(mjs|py)$/.test(n)))files[dev+'/'+name]=hash(dev+'/'+name);
 const toolchain=local+'/toolchain';files[toolchain+'/package/bin/opencode']=hash(toolchain+'/package/bin/opencode');
-const attempts=selection.slots.map(s=>({slot:s.slot,...(s.original_slot?{original_slot:s.original_slot}:{}),task:s.instance_id,arm:s.arm,project:selection.selected.find(r=>r.instance_id===s.instance_id).repo,source:local+'/author-inputs/'+s.instance_id+'/source',...(campaign?{preparationStatus:preparation[s.instance_id].status}:{})}));
-const frozen={version:1,experimentKind:'polybench',...(campaign?{campaign:campaign.name,preparation,templates:quality?runtime.templates:{P:local+'/plain-dependencies',C:local+'/core-bundle',T:local+'/bundle'},...(quality?{armModes:runtime.armModes,armProducts:runtime.armProducts}:{}),recordingProfile:campaign.recording_profile,adapterSha}:{}),runtimeSha:runtime.sha,model:runtime.model,variant:runtime.variant,budgetMs:1800000,strategy:'direct',preflightPassed:true,controlsPassed:true,authorIsolationPassed:true,streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,toolchain,template:local+'/bundle',dependencies:local+'/plain-dependencies',config:get(local+'/experiment-config.json'),attempts,environments,inputManifests,runtimeManifests,files};
+const attempts=selection.slots.map(s=>({slot:s.slot,...(s.original_slot?{original_slot:s.original_slot}:{}),task:s.instance_id,arm:s.arm,project:selection.selected.find(r=>r.instance_id===s.instance_id).repo,source:context?get(local+'/input-variants.json')[s.instance_id][contextVariants[s.arm]].source:local+'/author-inputs/'+s.instance_id+'/source',...(campaign?{preparationStatus:preparation[s.instance_id].status}:{})}));
+const frozen={version:1,experimentKind:'polybench',...(campaign?{campaign:campaign.name,preparation,templates:context?contextTemplates(local):quality?runtime.templates:{P:local+'/plain-dependencies',C:local+'/core-bundle',T:local+'/bundle'},...(context?{armModes:contextModes,inputVariants:get(local+'/input-variants.json')}:quality?{armModes:runtime.armModes,armProducts:runtime.armProducts}:{}),recordingProfile:campaign.recording_profile,adapterSha}:{}),runtimeSha:runtime.sha,model:runtime.model,variant:runtime.variant,budgetMs:1800000,strategy:'direct',preflightPassed:true,controlsPassed:true,authorIsolationPassed:true,streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,toolchain,template:local+'/bundle',dependencies:local+'/plain-dependencies',config:get(local+'/experiment-config.json'),attempts,environments,inputManifests,runtimeManifests,files};
 if(campaign)frozen.timeAccounting=campaign.time_accounting;
+if(context){
+ files[local+'/input-variants.json']=hash(local+'/input-variants.json');
+ for(const task of tasks){
+  const id=task.instance_id,binding=frozen.inputVariants[id],augmented=binding['public-context-v2'];
+  const preflight=get(local+'/input-preflight-context-'+id+'/verification.json');
+  assert.equal(preflight.passed,true);assert.equal(preflight.source,augmented.source);assert.deepEqual(preflight.environment,environments[augmented.source]);
+  runtimeManifests[augmented.source]=manifest(augmented.source);
+  assert.deepEqual(get(local+'/input-preflight-context-'+id+'/actual-input-manifest.json'),runtimeManifests[augmented.source]);
+  const base=local+'/'+id;
+  assert.equal(binding.sourceEvidenceSha256,selection.decisions.find(d=>d.instance_id===id&&d.disposition==='selected').source_evidence_sha256);
+  for(const [file,expected] of [['source-evidence.json',binding.sourceEvidenceSha256],['metadata.json',binding.metadataSha256],['prepared-context/snapshot.json',binding.snapshotSha256],['prepared-context/receipt.json',binding.receiptSha256],['offline-replay/receipt.json',binding.replayReceiptSha256]]){assert.equal(hash(base+'/'+file),expected);files[base+'/'+file]=expected;}
+  const receipt=get(base+'/prepared-context/receipt.json'),replay=get(base+'/offline-replay/receipt.json');
+  assert.equal(receipt.status,'complete');assert.ok(receipt.admitted>0);assert.equal(receipt.snapshot_sha256,binding.snapshotSha256);assert.equal(receipt.output_sha256,augmented.taskSha256);assert.equal(receipt.binding.task_sha256,binding.original.taskSha256);
+  assert.equal(replay.public_api_requests,0);assert.equal(replay.output_sha256,augmented.taskSha256);
+  assert.ok(fs.readFileSync(base+'/prepared-context/TASK.md').equals(fs.readFileSync(augmented.source+'/TASK.md')));
+  assert.ok(fs.readFileSync(base+'/offline-replay/TASK.md').equals(fs.readFileSync(augmented.source+'/TASK.md')));
+  task.inputVariants={original:{taskSha256:binding.original.taskSha256},'public-context-v2':{taskSha256:augmented.taskSha256},snapshotSha256:binding.snapshotSha256,receiptSha256:binding.receiptSha256,replayReceiptSha256:binding.replayReceiptSha256};
+ }
+ verifyContextSchedule(frozen);
+}
 fs.mkdirSync(root,{mode:0o700});fs.writeFileSync(root+'/freeze.json',JSON.stringify(frozen));
 const published={version:1,stage:'frozen_before_model_requests',runtimeSha:frozen.runtimeSha,evaluatorSha:'9c836c5d7f3cb991934132b77d29e6941d912a07',datasetRevision:selection.dataset_revision,datasetSha256:selection.dataset_sha256,selectedCsvSha256:hash(local+'/selected.csv'),freezeSha256:hash(root+'/freeze.json'),model:frozen.model,opencode:'1.18.26',reasoning:runtime.variant,budgetSeconds:1800,flags:{STRATEGY:'direct',CONTEXT:0,CHECKS:0,SENSITIVITY:0,INVESTIGATION:0,COMMAND_HINTS:0,EXTRA_ATTENTION:0,TYPE_COMPAT:{P:'absent',H0:0,H1:1}},compiler:{version:'6.0.3',profile:'returned-callable-strict-v1',maxAnalyses:2,maxSecondsPerAnalysis:60,maxTotalSeconds:120},tasks,slots:selection.slots,realProviderRequestsBeforeFreeze:0};
 if(campaign){
@@ -106,6 +128,7 @@ if(campaign){
  published.installedHashes=Object.fromEntries(bundleDirectories.map(dir=>[dir,createHash('sha256').update(JSON.stringify(manifest(local+'/'+dir))).digest('hex')]));
  if(quality){published.armModes=runtime.armModes;published.armProducts=runtime.armProducts;published.armBundles=Object.fromEntries(arms.map(arm=>[arm,{directory:path.basename(runtime.templates[arm]),sha256:published.installedHashes[path.basename(runtime.templates[arm])],coreSha256:arm==='P'?null:hash(runtime.templates[arm]+'/core.md')} ]));}
  published.configurationSha256=hash(local+'/experiment-config.json');
+ if(context){published.armModes=contextModes;published.inputVariants=contextVariants;published.flags.INVESTIGATION=Object.fromEntries(arms.map(a=>[a,'absent']));}
  published.preparation=preparation;
 }
 fs.writeFileSync(root+'/manifest.json',JSON.stringify(published,null,2)+'\n');

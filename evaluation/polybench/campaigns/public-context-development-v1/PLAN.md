@@ -112,3 +112,36 @@ summands. Missing usage/cost stays unknown; scripted usage is separate. Positive
 negative, harmful and unchanged results are all valid. Positive results can only
 motivate separately authorized evaluation on a fresh set; no automatic expansion
 or enabling B by default.
+
+## Reproduction sequence
+
+Use this branch's adapter, with product extracted from the accepted SHA. Verify
+`selection.json` against the exact CSV with `verify.py --consolidated-dataset`;
+`selection.public_context_pool` reconstructs the bounded metadata candidate order.
+Source/cutoff metadata and API snapshots are private preparation evidence. They
+must be reviewed before `prepare-context.mjs` and never mounted for participants.
+Do not replace selected IDs or silently regenerate existing outputs.
+
+Set `POLYBENCH_CAMPAIGN` to this directory's `campaign.json`, `POLYBENCH_MODEL` to
+`openai/gpt-5.6-luna`, and `POLYBENCH_VARIANT` to `high`. The supported sequence is:
+
+1. Finish pinned evaluator checkout, Python 3.12 and requirements.lock installation;
+   verify evaluator integrity and exact CSV/subset bytes before controls.
+2. Run `remaining_controls.py`, `runtime.mjs`, `prepare_diagnostic.py`, then
+   `prepare_authors.py`. Inspect every fixed-task disposition before continuing.
+3. Run `prepare-context.mjs` to invoke the existing public-context prepare CLI,
+   offline replay and actual augmented-input preflight. Originals stay unchanged.
+4. Run `preflight_ready.py` for the four-cell real scripted launcher and unchanged
+   official patch-export control. Run `verify-container.mjs container-preflight-final`
+   (includes exact capture roundtrip), `verify-output-boundaries.mjs` with the
+   immutable diagnostic image, and `verify-recording.mjs` in the private directory.
+5. Run repository/installed checks, commit adapter changes, then `freeze.mjs`.
+   Review and commit its public manifest byte-for-byte as `frozen-manifest.json`.
+   The real launcher requires all four tasks ready and the committed freeze.
+
+Do not use `prepare.py --full` for this experiment: it would invoke shared
+preflight before the two context inputs exist. The sequence above uses the same
+preparation modules and the same launcher; there is no alternate launch wrapper.
+Only TASK.md is duplicated into the context source. Source/dependency manifests
+must match after excluding precisely that file, and same-variant P/C cells share
+one identical source path. All four cells use only plain or core bundles.

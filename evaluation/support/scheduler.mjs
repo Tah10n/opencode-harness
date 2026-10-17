@@ -1,3 +1,4 @@
+import {contextCampaign,verifyContextSchedule,contextAssignments} from '../polybench/public-context-campaign.mjs';
 import {manifest} from './manifest.mjs';
 import {captureInputManifest,compareInputManifest} from './input-manifest.mjs';
 import {performance} from 'node:perf_hooks';
@@ -68,7 +69,8 @@ const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
   if(f.model!=='openai/gpt-5.6-luna'||f.variant!=='high'||f.budgetMs!==600000||f.strategy!=='per-slot'||f.streamLimit!=='remaining-task-budget'||f.connectionTimeoutMs!==30000||f.attempts.length!==18||JSON.stringify(f.armModes)!==JSON.stringify({P:'plain',H0:'task',H1:'task'}))throw Error('Invalid calibration configuration/allocation');
   const seen=new Set();for(let i=0;i<6;i++){const group=f.attempts.slice(i*3,i*3+3),a=group[0];if(seen.has(a.task)||group.some(b=>b.task!==a.task||b.source!==a.source)||group.map(b=>b.arm).join(',')!==orders[i])throw Error('Invalid calibration order/input');seen.add(a.task);}
  }
- if(!['fixture','feedback-development','feedback-calibration','compat-replay-development'].includes(f.experimentKind)){
+ if(contextCampaign(f.campaign))verifyContextSchedule(f);
+ if(!contextCampaign(f.campaign)&&!['fixture','feedback-development','feedback-calibration','compat-replay-development'].includes(f.experimentKind)){
   const consolidated=nativeCampaign(f.campaign),remaining=f.campaign==='consolidated-remaining-v1',quality=qualityCampaign(f.campaign);
   if(f.campaign&&!consolidated)throw Error('Unsupported PolyBench campaign');
   const spec=quality?qualitySpecification(f.campaign):null;
@@ -103,13 +105,14 @@ const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 
 export async function runComparison({root,startContainer,captureCandidate,stopWorkload,readAuth,fetchImpl=fetch,runTaskImplementation,readInput=captureInputManifest}) {
 const f=JSON.parse(fs.readFileSync(path.join(root,'freeze.json')));
+if(fetchImpl===fetch&&contextCampaign(f.campaign)&&path.resolve(root)!==path.resolve(contextAssignments().config.local_directory,'batch'))throw Error('Context campaign requires canonical batch; no copies/resume');
 if(fetchImpl===fetch&&qualityCampaign(f.campaign)&&path.resolve(root)!==path.resolve(qualityAssignments(f.campaign).config.local_directory,'batch'))throw Error('Real quality admission requires the canonical batch root; copies cannot resume or repeat');
 const selectedRecording=selectRecordingProfile(f.recordingProfile??recordingProfile.name);
 const outputRoot=root;
 const verify=()=>verifyFrozenSchedule(f,runTaskImplementation,fetchImpl);
 verify();
 if(fs.existsSync(path.join(root,'scheduling-paused.json')))throw Error('Admission paused; no automatic resume');
-if((f.campaign==='consolidated-remaining-v1'||qualityCampaign(f.campaign))&&fs.existsSync(path.join(root,'runs'))&&fs.readdirSync(path.join(root,'runs')).length)throw Error('Previously created campaign attempts must never be retried');
+if((contextCampaign(f.campaign)||f.campaign==='consolidated-remaining-v1'||qualityCampaign(f.campaign))&&fs.existsSync(path.join(root,'runs'))&&fs.readdirSync(path.join(root,'runs')).length)throw Error('Previously created campaign attempts must never be retried');
 let pause=null;
 function pauseScheduling(kind,slot,details={}){if(pause)return;pause={kind,slot,...details};try{fs.writeFileSync(path.join(outputRoot,'scheduling-paused.json'),JSON.stringify(pause,null,2),{flag:'wx',mode:0o600});}catch(error){pause.persistenceError=error.message;}}
 for(const attempt of f.attempts){
