@@ -1,0 +1,280 @@
+{
+  "stage": "selected_before_technical_controls",
+  "campaign": "public-context-development-v1",
+  "configuration_sha256": "f5fc4a69f51afb317d6496c34115c7b39b066ca1dfd14e8bb8f73d68612e4621",
+  "protocol_commit": "5c7cb47b",
+  "dataset_revision": "b3fca77b637379f0c01ad86d18753a7ac1998b53",
+  "dataset_sha256": "0c8138e73c34fa29a5276b675b146b72d78ce001fcc4560d76302c908b4808a5",
+  "candidate_limit": 12,
+  "candidates_inspected": 6,
+  "decisions": [
+    {
+      "rank": 1,
+      "instance_id": "sveltejs__svelte-1116",
+      "order_sha256": "002a68e1553d60aa02929aa3f097f18243546d8d10b40ce4864d3fbd60c02f03",
+      "issue_url": "https://github.com/sveltejs/svelte/issues/1107",
+      "disposition": "selected",
+      "reason": "criteria_satisfied",
+      "eligible_comments": 2,
+      "source_evidence_sha256": "72f6110ca94db4b74102836f53e26e36aaf5ec522ba539e1a737b13ad0b0a42f"
+    },
+    {
+      "rank": 2,
+      "instance_id": "sveltejs__svelte-3314",
+      "order_sha256": "008dfc58db4bd16ece851c324dfaccfed80d235041a3e356baba0f78b15713c3",
+      "issue_url": "https://github.com/sveltejs/svelte/issues/3312",
+      "disposition": "rejected",
+      "reason": "empty_public_context",
+      "eligible_comments": 0,
+      "source_evidence_sha256": "5e33d17061861699140e051de01a54ad85936f21f99a175b22788af73c7d7ccd"
+    },
+    {
+      "rank": 3,
+      "instance_id": "mui__material-ui-22696",
+      "order_sha256": "0095f689fbf33b4a934f14d8a6ff7c00dedd0202c8b22276cf05d4633b626012",
+      "issue_url": "https://github.com/mui/material-ui/issues/19654",
+      "disposition": "selected",
+      "reason": "criteria_satisfied",
+      "eligible_comments": 7,
+      "source_evidence_sha256": "5b16be4b3cf3ea5ffdd194f3a199cdb5c72075305dcdde54190df15d2c3aa8a5",
+      "identity_note": "Explicit PR fixes reference; body identical, title differs only in Autocomplete capitalization."
+    },
+    {
+      "rank": 4,
+      "instance_id": "sveltejs__svelte-6525",
+      "order_sha256": "00e1d59a0eacfb5bcb3ca089604f424865d12c5d79a8e592e3859280da452e35",
+      "issue_url": "https://github.com/sveltejs/svelte/issues/6462",
+      "disposition": "selected",
+      "reason": "criteria_satisfied",
+      "eligible_comments": 3,
+      "source_evidence_sha256": "dcd26f16ecc7b3ce27d9b84ac1d2287deda9f686319060b619c5729e2d3a315e"
+    },
+    {
+      "rank": 5,
+      "instance_id": "sveltejs__svelte-728",
+      "order_sha256": "01960489285938568228a6a3b53a93e3abe50d6054df542ec025b707738d5796",
+      "issue_url": "https://github.com/sveltejs/svelte/issues/721",
+      "disposition": "rejected",
+      "reason": "repository_cap_two_svelte_tasks_already_selected",
+      "eligible_comments": 1,
+      "source_evidence_sha256": "7189ac56e9decf8e060e5dcd83762c09acfbd9bc9b4afeca153eb3a7d7616c34",
+      "inspection_note": "Metadata/comments inspected in bounded batch; excluded by repository cap regardless of content."
+    },
+    {
+      "rank": 6,
+      "instance_id": "mui__material-ui-12236",
+      "order_sha256": "034d45c0ba777d6a2b0989cd8bf90224eca2b265edb79d7870b85dd87b14b219",
+      "issue_url": "https://github.com/mui/material-ui/issues/12216",
+      "disposition": "selected",
+      "reason": "criteria_satisfied",
+      "eligible_comments": 6,
+      "source_evidence_sha256": "4b46a87cc9fb454ffafb6ef5be620fc9a160984f4aa44acae66718e86bdc1bc3"
+    }
+  ],
+  "selected": [
+    {
+      "instance_id": "sveltejs__svelte-1116",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "8057884cb64f6c2cdf837411bc3962daf69e2bb5"
+    },
+    {
+      "instance_id": "mui__material-ui-22696",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "fad48de8f7d9a449adb4ab9796e9ed1c2c0593ca"
+    },
+    {
+      "instance_id": "sveltejs__svelte-6525",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Refactoring",
+      "base_commit": "33307a54c86daf45aa49f4cfaeef2ab07ff37ed0"
+    },
+    {
+      "instance_id": "mui__material-ui-12236",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "18aa6293ad8b67dc8a323db19117c93efa966c7c"
+    }
+  ],
+  "exclusions": [
+    "angular__angular-37561",
+    "coder__code-server-3277",
+    "coder__code-server-4923",
+    "coder__code-server-6278",
+    "microsoft__vscode-108964",
+    "microsoft__vscode-113837",
+    "microsoft__vscode-123294",
+    "microsoft__vscode-135805",
+    "microsoft__vscode-136347",
+    "microsoft__vscode-148971",
+    "microsoft__vscode-153121",
+    "microsoft__vscode-168752",
+    "microsoft__vscode-173585",
+    "microsoft__vscode-177084",
+    "microsoft__vscode-189223",
+    "mrdoob__three.js-24461",
+    "mui__material-ui-12406",
+    "mui__material-ui-13534",
+    "mui__material-ui-14496",
+    "mui__material-ui-17301",
+    "mui__material-ui-18141",
+    "mui__material-ui-18683",
+    "mui__material-ui-19121",
+    "mui__material-ui-20356",
+    "mui__material-ui-28186",
+    "mui__material-ui-28813",
+    "mui__material-ui-36971",
+    "mui__material-ui-38544",
+    "mui__material-ui-42412",
+    "prettier__prettier-12930",
+    "prettier__prettier-3436",
+    "prettier__prettier-459",
+    "prettier__prettier-5025",
+    "prettier__prettier-8777",
+    "serverless__serverless-1910",
+    "serverless__serverless-2434",
+    "serverless__serverless-2842",
+    "serverless__serverless-2945",
+    "serverless__serverless-3095",
+    "serverless__serverless-3799",
+    "serverless__serverless-6366",
+    "serverless__serverless-6534",
+    "serverless__serverless-6842",
+    "serverless__serverless-6869",
+    "serverless__serverless-7102",
+    "serverless__serverless-8159",
+    "sveltejs__svelte-1190",
+    "sveltejs__svelte-3151",
+    "sveltejs__svelte-3435",
+    "sveltejs__svelte-3749",
+    "sveltejs__svelte-4288",
+    "sveltejs__svelte-4558",
+    "sveltejs__svelte-477",
+    "sveltejs__svelte-5452",
+    "sveltejs__svelte-5850",
+    "sveltejs__svelte-5875",
+    "sveltejs__svelte-6458",
+    "sveltejs__svelte-738",
+    "tailwindlabs__tailwindcss-550",
+    "tailwindlabs__tailwindcss-853"
+  ],
+  "slots": [
+    {
+      "slot": 1,
+      "instance_id": "sveltejs__svelte-1116",
+      "arm": "P0",
+      "mode": "plain",
+      "input_variant": "original"
+    },
+    {
+      "slot": 2,
+      "instance_id": "sveltejs__svelte-1116",
+      "arm": "P1",
+      "mode": "plain",
+      "input_variant": "public-context-v2"
+    },
+    {
+      "slot": 3,
+      "instance_id": "sveltejs__svelte-1116",
+      "arm": "C0",
+      "mode": "core",
+      "input_variant": "original"
+    },
+    {
+      "slot": 4,
+      "instance_id": "sveltejs__svelte-1116",
+      "arm": "C1",
+      "mode": "core",
+      "input_variant": "public-context-v2"
+    },
+    {
+      "slot": 5,
+      "instance_id": "mui__material-ui-22696",
+      "arm": "P1",
+      "mode": "plain",
+      "input_variant": "public-context-v2"
+    },
+    {
+      "slot": 6,
+      "instance_id": "mui__material-ui-22696",
+      "arm": "C0",
+      "mode": "core",
+      "input_variant": "original"
+    },
+    {
+      "slot": 7,
+      "instance_id": "mui__material-ui-22696",
+      "arm": "C1",
+      "mode": "core",
+      "input_variant": "public-context-v2"
+    },
+    {
+      "slot": 8,
+      "instance_id": "mui__material-ui-22696",
+      "arm": "P0",
+      "mode": "plain",
+      "input_variant": "original"
+    },
+    {
+      "slot": 9,
+      "instance_id": "sveltejs__svelte-6525",
+      "arm": "C0",
+      "mode": "core",
+      "input_variant": "original"
+    },
+    {
+      "slot": 10,
+      "instance_id": "sveltejs__svelte-6525",
+      "arm": "C1",
+      "mode": "core",
+      "input_variant": "public-context-v2"
+    },
+    {
+      "slot": 11,
+      "instance_id": "sveltejs__svelte-6525",
+      "arm": "P0",
+      "mode": "plain",
+      "input_variant": "original"
+    },
+    {
+      "slot": 12,
+      "instance_id": "sveltejs__svelte-6525",
+      "arm": "P1",
+      "mode": "plain",
+      "input_variant": "public-context-v2"
+    },
+    {
+      "slot": 13,
+      "instance_id": "mui__material-ui-12236",
+      "arm": "C1",
+      "mode": "core",
+      "input_variant": "public-context-v2"
+    },
+    {
+      "slot": 14,
+      "instance_id": "mui__material-ui-12236",
+      "arm": "P0",
+      "mode": "plain",
+      "input_variant": "original"
+    },
+    {
+      "slot": 15,
+      "instance_id": "mui__material-ui-12236",
+      "arm": "P1",
+      "mode": "plain",
+      "input_variant": "public-context-v2"
+    },
+    {
+      "slot": 16,
+      "instance_id": "mui__material-ui-12236",
+      "arm": "C0",
+      "mode": "core",
+      "input_variant": "original"
+    }
+  ]
+}
