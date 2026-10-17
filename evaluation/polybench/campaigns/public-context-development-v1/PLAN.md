@@ -95,7 +95,8 @@ No retries, extra candidates or silent continuation past an unreviewed dispositi
 
 Retain official resolved as R; actual complete autonomous patch delivery as T
 (with terminal/capture/roundtrip/applicability evidence); correct delivery D = R
-AND T. Unknown R/T stay null unless a known false determines the conjunction.
+AND T. The existing reader retains unknown R as null in both R and D; delivery
+failures remain explicit in T. When R is known, D uses R AND T_delivery.
 Confirmed model errors and official evaluator FAIL remain failures, not unknown.
 Report preparation/evaluator errors separately; preserve not_started, incomplete,
 unknown, every failed attempt and full patches including authored tests without
