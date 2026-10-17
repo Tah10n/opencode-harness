@@ -1,6 +1,6 @@
 # Technical preparation
 
-Status: **technical preflight PASS; admission BLOCKED until freeze is committed**.
+Status: **READY for separate model-run authorization**.
 Quality: **NOT RUN**. New evaluation-model requests: **0**.
 
 The accepted product and freshly fetched origin/main both were
@@ -122,8 +122,10 @@ and is not reclassified by these fresh checks.
 ## Planned runtime and admission
 
 Product: accepted `ffbf979b4fdae958b71796e22e6b7a81a0edce50`.
-The clean adapter SHA, input/snapshot hashes, images and installed runtime hashes
-will be recorded in the ordinary frozen manifest. The earlier runtime preparation
+The clean frozen adapter SHA is `16d390e7458383fd94efb67c4bd76e1ee498a198`.
+The [ordinary frozen manifest](frozen-manifest.json) records both input variants,
+snapshots, images and installed runtime hashes. Freeze SHA-256:
+`ab80a1800f9b4a5622a33e80eb87c8be63c85fc16f1acc3c596a7f732ca8579b`. The earlier runtime preparation
 receipt retains its then-current Git HEAD separately; evaluation changes were
 subsequently committed at `b26806cc`. Product extraction always used the accepted SHA.
 
@@ -134,3 +136,26 @@ prespecified comparisons/stop rules are in [PLAN.md](PLAN.md).
 
 No real model requests, stopped-campaign resumption, manual external review,
 merge, Ready, release, deployment or branch deletion were performed.
+
+## Final admission and cleanup
+
+The ordinary freeze passed all controls and the actual frozen schedule verifier;
+its 16 slots contain exactly four ready tasks with the prescribed order. Its public
+manifest is copied byte-for-byte into this commit. The private real batch contains
+only freeze.json and manifest.json: no attempts, scores or provider records.
+The final origin/main refresh still resolves to the accepted product SHA.
+Later report/manifest commits do not change the frozen executable adapter files.
+
+Removed the dedicated preparation builder and its reported 25.02 GB BuildKit cache,
+3,145,807,275 logical bytes of owned temporary archives/caches/verification installs,
+and the unneeded diagnostic fixture image. No containers remain; the owned builder
+is absent. Existing unrelated builder registrations/volume were left untouched.
+Retained about 6.3 GiB of private preparation, principally 4.8 GiB of the eight
+frozen source/dependency inputs, the pinned evaluator/Python runtime, materialized
+bundles, Linux OpenCode and minimal controls/receipts. The four official images and
+four author images are retained for the separately authorized run. These are live
+frozen launch inputs, not report-only copies. Raw scripted requests and source
+snapshots stay private and outside author mounts; no credentials are published.
+
+Local checks above passed. Remote CI is reported on the Draft PR for its exact
+head; it is separate from these preparation results and from model quality.

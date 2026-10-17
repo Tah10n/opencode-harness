@@ -14,6 +14,19 @@ The [exact-model technical follow-up](../evaluation/feedback-development/evidenc
 records title none/refusal before correction, installed model/high frames after
 correction and synthetic direct/D delivery. It makes no model effectiveness claim.
 
+## Public context development v1: prepared, quality NOT RUN
+
+The [plan](../evaluation/polybench/campaigns/public-context-development-v1/PLAN.md),
+[technical preflight](../evaluation/polybench/campaigns/public-context-development-v1/PREFLIGHT.md)
+and [frozen manifest](../evaluation/polybench/campaigns/public-context-development-v1/frozen-manifest.json)
+prepare four new tasks from two repositories for 16 one-shot P0/P1/C0/C1 slots.
+All eight official baseline/gold controls, online/offline byte equality, isolated
+input checks and four scripted real-launcher cells passed. New evaluation-model
+requests: **0**; quality: **NOT RUN**. Running requires separate authorization.
+The selection is limited to tasks with accessible eligible public comments; this
+development screening cannot establish superiority, equivalence or training-set
+independence. Candidate B remains optional and historical results are unchanged.
+
 ## Differential compatibility replay: prototype works, comparison stopped
 
 The [experimental replay report](../evaluation/compat-replay-development/evidence/REPORT.md)

@@ -1,0 +1,412 @@
+{
+  "version": 1,
+  "stage": "frozen_before_model_requests",
+  "runtimeSha": "ffbf979b4fdae958b71796e22e6b7a81a0edce50",
+  "evaluatorSha": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+  "datasetRevision": "b3fca77b637379f0c01ad86d18753a7ac1998b53",
+  "datasetSha256": "0c8138e73c34fa29a5276b675b146b72d78ce001fcc4560d76302c908b4808a5",
+  "selectedCsvSha256": "df89cc26e7e734c8054e4d0472a76265dcaf2c4909786b636c1277ce83998908",
+  "freezeSha256": "ab80a1800f9b4a5622a33e80eb87c8be63c85fc16f1acc3c596a7f732ca8579b",
+  "model": "openai/gpt-5.6-luna",
+  "opencode": "1.18.26",
+  "reasoning": "high",
+  "budgetSeconds": 1800,
+  "flags": {
+    "STRATEGY": "direct",
+    "CONTEXT": 0,
+    "CHECKS": 0,
+    "TYPE_COMPAT": 0,
+    "SENSITIVITY": 0,
+    "INVESTIGATION": {
+      "P0": "absent",
+      "P1": "absent",
+      "C0": "absent",
+      "C1": "absent"
+    },
+    "COMMAND_HINTS": 0,
+    "EXTRA_ATTENTION": 0,
+    "PRESERVATION_NUDGE": 0
+  },
+  "tasks": [
+    {
+      "instance_id": "sveltejs__svelte-1116",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "8057884cb64f6c2cdf837411bc3962daf69e2bb5",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116@sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+        "id": "sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 5418809953,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:9a48ff7da51b9ba666c02ca12c1a3037d5db2aeee78ed6396ce65b97b749a3e7",
+      "projectNode": "v16.20.2",
+      "npm": "8.19.4",
+      "promptSha256": "7d537e420e24ec4572452b23f5d85c65f6aab7bbe4fc454a490260344c1375b0",
+      "originalRowCsvSha256": "2f2c80e496d270251c579dcd7da843978da955cbf7305ba451b7ebbeabdd01e0",
+      "lfsAuditSha256": "4b2304a2ffdeb8bfb7e6ce42d3c57df943149956ca08edd1b111156ba298b1f2",
+      "archives": {
+        "base.tar": "e61dcdcb882216c58605b842118628a64a5d0e316f4a40a278ef676b8db2cc73",
+        "dependencies.tar": "ea564de83ba5a420725117347a1fc0383bd7b9aa07b616cd113e889d488caf89"
+      },
+      "submodules": [],
+      "preparedExtra": null,
+      "controls": {
+        "gold": {
+          "resultSha256": "bab7b85bef66ddafd584afb99d734f734004d9400edaad87073b3016ca29f183",
+          "resolved": true,
+          "passed": 1562,
+          "failed": 9
+        },
+        "baseline": {
+          "resultSha256": "32323df45c4b26fb31706c8824de2b47d6b054237b3caec2f79286eca11568e5",
+          "resolved": false,
+          "passed": 1561,
+          "failed": 10
+        }
+      },
+      "scriptedPreflightSha256": "04a2837fc5e56353ef5b4cb0c740a98e08dd2d585e44d58324d75eb8a31fce88",
+      "isolationSha256": "fcd09242914abe87eae8d1c67af98e8b7fdfaec730eacf8c123a193c555bf43a",
+      "inputVariants": {
+        "original": {
+          "taskSha256": "7d537e420e24ec4572452b23f5d85c65f6aab7bbe4fc454a490260344c1375b0"
+        },
+        "public-context-v2": {
+          "taskSha256": "5a680d96b166fd17c046c0798223e25fca715c3bfc0676b4629aa8034038a24d"
+        },
+        "snapshotSha256": "3bb3475d2e2cb2dbfab55c808ce29ac8508e617fdadd51acfd7a391f51508724",
+        "receiptSha256": "ec3da7871f03bb11d3bd10153256a79371b2f3c0f910d659d2cbdc625ced68d3",
+        "replayReceiptSha256": "01ea39ebe54c350da8e83a6f30121de9bc55a7d86e4ea3ef8763ae24035c3bfd"
+      }
+    },
+    {
+      "instance_id": "mui__material-ui-22696",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "fad48de8f7d9a449adb4ab9796e9ed1c2c0593ca",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696@sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+        "id": "sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 8945390461,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:0f31bf6a64ce3f2e08d408b89229a180d76d99c1a8cbf6b213190a23f37cd4bc",
+      "projectNode": "v18.8.0",
+      "npm": "8.18.0",
+      "promptSha256": "1dceda17a64c4452f93e9552e0d110ccfccb941c93465fdc5beeef9522463990",
+      "originalRowCsvSha256": "5ff10fb2068027fc8f06cc22880920750989a7fb935d21e079efe313fae340f0",
+      "lfsAuditSha256": "f718e19d32b01b4a7af832f2cdd11df6afec0f49178a219d94ab3f71f1c3c7b8",
+      "archives": {
+        "base.tar": "78ca11e53406767c7c62d6cf8c953f39514d8bc0701a2c86d4b612183297ce3c",
+        "dependencies.tar": "6db815387602d2c997ea87803248f5b5e7856cb223443a99216a6133c9e51442"
+      },
+      "submodules": [],
+      "preparedExtra": null,
+      "controls": {
+        "gold": {
+          "resultSha256": "82eca35d6c30b9a91871314f23226c4c3051c62b9e2c8654ba3bd12ddd6cdad4",
+          "resolved": true,
+          "passed": 95,
+          "failed": 0
+        },
+        "baseline": {
+          "resultSha256": "6007acad71de3a2fca917f0ea87858e8551f264e9c0bd584f2cafe7ca4d64bd4",
+          "resolved": false,
+          "passed": 93,
+          "failed": 2
+        }
+      },
+      "scriptedPreflightSha256": "04a2837fc5e56353ef5b4cb0c740a98e08dd2d585e44d58324d75eb8a31fce88",
+      "isolationSha256": "d044df5bfac9411703a645cf9e324b0148dface354ca929f85f008356d9d653c",
+      "inputVariants": {
+        "original": {
+          "taskSha256": "1dceda17a64c4452f93e9552e0d110ccfccb941c93465fdc5beeef9522463990"
+        },
+        "public-context-v2": {
+          "taskSha256": "79e238e9455c199a24bb0e5ea9fa96882122bc7374e81da91c8bd7d8962eb755"
+        },
+        "snapshotSha256": "6b2c3ef951c8d1d6102b0108dbcfedd9ec8bf9dc4fa783d9a3e075278738b170",
+        "receiptSha256": "4fa6b27dcba21992b14535751093f4dd474700741618eb8a62322dcfcde9cd37",
+        "replayReceiptSha256": "ad93d6a2a4781ba815cbdbd055ec38b205160634d84ef8b381ffb8d93ef880ae"
+      }
+    },
+    {
+      "instance_id": "sveltejs__svelte-6525",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Refactoring",
+      "base_commit": "33307a54c86daf45aa49f4cfaeef2ab07ff37ed0",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525@sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+        "id": "sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 5832672895,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:663bdbe438a15b44af1dda2b8500f99663064175e16eca703321ca2dda1488cc",
+      "projectNode": "v16.20.2",
+      "npm": "8.19.4",
+      "promptSha256": "c80cc13c407598f21ac542dfc4015503ad3dbb491674e95c09806598d58fd568",
+      "originalRowCsvSha256": "72455fc803641c91d73e6f3f5b5b8b2cae2d99095b5f596ed956b6368f7be84c",
+      "lfsAuditSha256": "0352cf541c261b3835976cd11f9dd6488226f546e723defffc430e4e010bf273",
+      "archives": {
+        "base.tar": "facb484379f30b085e22915a2e78a66f8ed9dbf0cb8104d876fbd3fd1d2b274d",
+        "dependencies.tar": "2f289bfed8d9106f83ca89d7062e199a85145c4d119d90cc029dbbb58d6479b8"
+      },
+      "submodules": [],
+      "preparedExtra": null,
+      "controls": {
+        "gold": {
+          "resultSha256": "3daf9178a274fecea50d90088dcd0c1278b795537be995ce2441fec30f92574f",
+          "resolved": true,
+          "passed": 4313,
+          "failed": 2
+        },
+        "baseline": {
+          "resultSha256": "2169638816a766429320cee78b0fbf231d67214b4cd9f11f76933b10adc0a914",
+          "resolved": false,
+          "passed": 4311,
+          "failed": 4
+        }
+      },
+      "scriptedPreflightSha256": "04a2837fc5e56353ef5b4cb0c740a98e08dd2d585e44d58324d75eb8a31fce88",
+      "isolationSha256": "c21690ae148bbd3091bd9f85b4fd252ae040b0d254941432adb14a04cf46fc62",
+      "inputVariants": {
+        "original": {
+          "taskSha256": "c80cc13c407598f21ac542dfc4015503ad3dbb491674e95c09806598d58fd568"
+        },
+        "public-context-v2": {
+          "taskSha256": "00d2996e7bbedca58648e3cc1a18da86e093b8916987726c54ca07ce5ecb5853"
+        },
+        "snapshotSha256": "a2ec128e1c50f79630c74bb9498f5ab15565da7eb42a20cda46d9c24227e2c48",
+        "receiptSha256": "c1218986398952c6bf0c8d86a2941716dae6431b3cd64a76312e343053065dd6",
+        "replayReceiptSha256": "f49bcd3203d2e3bfe19db8fcb3a28eb5429c4d0322616ff1e4ed6cee0d59c75f"
+      }
+    },
+    {
+      "instance_id": "mui__material-ui-12236",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "18aa6293ad8b67dc8a323db19117c93efa966c7c",
+      "officialImage": {
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236:v1.1",
+        "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236@sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+        "id": "sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+        "architecture": "amd64",
+        "os": "linux",
+        "size": 8198556570,
+        "workdir": "/testbed"
+      },
+      "authorImage": "sha256:b75b4b4fa6654d6b684842278329d03dc07f1df8c0bec52b52c93b84496a2c1d",
+      "projectNode": "v14.21.3",
+      "npm": "6.14.18",
+      "promptSha256": "11906fd5d1a6892b8ba82e6b8e7597ab00205044f6a87e24ede89533707e27b2",
+      "originalRowCsvSha256": "b914e09c48fdfa23b88ac7287328c232fe8606324c0546c6aa9732c58984680e",
+      "lfsAuditSha256": "5a9fa28f2b9f77cfdd149dd52cf6fe41ac235d207880a4aba9a7695fd479d9cb",
+      "archives": {
+        "base.tar": "78b72e0f210f3ab93051f5585aaea3efa058a47f97cc7dce06a294250fe15f67",
+        "dependencies.tar": "6946313baa9c818480b5fa3c98e0198495cc6e2a4ae65e22cc95ebda28abd828"
+      },
+      "submodules": [],
+      "preparedExtra": null,
+      "controls": {
+        "gold": {
+          "resultSha256": "e0acf8aa8bcf8fea9384e6967a71d2c3f003f20c760006edfd00d5a81549c8df",
+          "resolved": true,
+          "passed": 19,
+          "failed": 0
+        },
+        "baseline": {
+          "resultSha256": "ea33c31bdf11744acae41d994fa95eacb8ffa70d23241685ed6a50946954999b",
+          "resolved": false,
+          "passed": 17,
+          "failed": 2
+        }
+      },
+      "scriptedPreflightSha256": "04a2837fc5e56353ef5b4cb0c740a98e08dd2d585e44d58324d75eb8a31fce88",
+      "isolationSha256": "bcf57d76ca4610c9f0ec9fe37c6a3d23970c9b7845c8ab102e4cf3888e39ebec",
+      "inputVariants": {
+        "original": {
+          "taskSha256": "11906fd5d1a6892b8ba82e6b8e7597ab00205044f6a87e24ede89533707e27b2"
+        },
+        "public-context-v2": {
+          "taskSha256": "5088a79643dc19e286a8716c2731f9bddf8583201c64fa71ba4856f9113371d2"
+        },
+        "snapshotSha256": "08badda9eff04ac5612a492d2f652af16241b49600748550cc4a7f14a85ba9f0",
+        "receiptSha256": "a36fd8090330f1df921c952b8941f67748883ff279c44ee89b35370f5f9d2900",
+        "replayReceiptSha256": "75d70c598d056ee7c827b0247a63fad43b0416b7e5d4ac72caaf08e4802baca7"
+      }
+    }
+  ],
+  "slots": [
+    {
+      "slot": 1,
+      "instance_id": "sveltejs__svelte-1116",
+      "arm": "P0",
+      "mode": "plain",
+      "input_variant": "original"
+    },
+    {
+      "slot": 2,
+      "instance_id": "sveltejs__svelte-1116",
+      "arm": "P1",
+      "mode": "plain",
+      "input_variant": "public-context-v2"
+    },
+    {
+      "slot": 3,
+      "instance_id": "sveltejs__svelte-1116",
+      "arm": "C0",
+      "mode": "core",
+      "input_variant": "original"
+    },
+    {
+      "slot": 4,
+      "instance_id": "sveltejs__svelte-1116",
+      "arm": "C1",
+      "mode": "core",
+      "input_variant": "public-context-v2"
+    },
+    {
+      "slot": 5,
+      "instance_id": "mui__material-ui-22696",
+      "arm": "P1",
+      "mode": "plain",
+      "input_variant": "public-context-v2"
+    },
+    {
+      "slot": 6,
+      "instance_id": "mui__material-ui-22696",
+      "arm": "C0",
+      "mode": "core",
+      "input_variant": "original"
+    },
+    {
+      "slot": 7,
+      "instance_id": "mui__material-ui-22696",
+      "arm": "C1",
+      "mode": "core",
+      "input_variant": "public-context-v2"
+    },
+    {
+      "slot": 8,
+      "instance_id": "mui__material-ui-22696",
+      "arm": "P0",
+      "mode": "plain",
+      "input_variant": "original"
+    },
+    {
+      "slot": 9,
+      "instance_id": "sveltejs__svelte-6525",
+      "arm": "C0",
+      "mode": "core",
+      "input_variant": "original"
+    },
+    {
+      "slot": 10,
+      "instance_id": "sveltejs__svelte-6525",
+      "arm": "C1",
+      "mode": "core",
+      "input_variant": "public-context-v2"
+    },
+    {
+      "slot": 11,
+      "instance_id": "sveltejs__svelte-6525",
+      "arm": "P0",
+      "mode": "plain",
+      "input_variant": "original"
+    },
+    {
+      "slot": 12,
+      "instance_id": "sveltejs__svelte-6525",
+      "arm": "P1",
+      "mode": "plain",
+      "input_variant": "public-context-v2"
+    },
+    {
+      "slot": 13,
+      "instance_id": "mui__material-ui-12236",
+      "arm": "C1",
+      "mode": "core",
+      "input_variant": "public-context-v2"
+    },
+    {
+      "slot": 14,
+      "instance_id": "mui__material-ui-12236",
+      "arm": "P0",
+      "mode": "plain",
+      "input_variant": "original"
+    },
+    {
+      "slot": 15,
+      "instance_id": "mui__material-ui-12236",
+      "arm": "P1",
+      "mode": "plain",
+      "input_variant": "public-context-v2"
+    },
+    {
+      "slot": 16,
+      "instance_id": "mui__material-ui-12236",
+      "arm": "C0",
+      "mode": "core",
+      "input_variant": "original"
+    }
+  ],
+  "realProviderRequestsBeforeFreeze": 0,
+  "campaign": "public-context-development-v1",
+  "productSha": "ffbf979b4fdae958b71796e22e6b7a81a0edce50",
+  "adapterSha": "16d390e7458383fd94efb67c4bd76e1ee498a198",
+  "planSha256": "1a3e1bffa1182ad197300138bf1dee2f1e86e665d34673fea649eb5e5e4baec6",
+  "recordingProfile": "research-full-inspect-ledger-1g-v1",
+  "installedHashes": {
+    "bundle": "5390b30af48a3166907ab4b7965cad5f028217542e5af22644f26af018ee1d34",
+    "core-bundle": "e36fb78c437f1a3be69504af5063949a741adbd4de65bbc696b215d1d853ebb3",
+    "plain-dependencies": "c4e99fe034dc7e1ae8a3f53794413901d12fc9bdf18dbeda96693dbf509baf40"
+  },
+  "configurationSha256": "d16c89f0390b081948d75ece875c1c10b64a74c809dfe30d916afca875e47cf5",
+  "armModes": {
+    "P0": "plain",
+    "P1": "plain",
+    "C0": "core",
+    "C1": "core"
+  },
+  "inputVariants": {
+    "P0": "original",
+    "P1": "public-context-v2",
+    "C0": "original",
+    "C1": "public-context-v2"
+  },
+  "preparation": {
+    "sveltejs__svelte-1116": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": 257.07017993927
+    },
+    "mui__material-ui-22696": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": 450.35081601142883
+    },
+    "sveltejs__svelte-6525": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": 142.98082518577576
+    },
+    "mui__material-ui-12236": {
+      "status": "ready",
+      "phase": "prepared",
+      "elapsed_seconds": 397.94612407684326
+    }
+  }
+}
