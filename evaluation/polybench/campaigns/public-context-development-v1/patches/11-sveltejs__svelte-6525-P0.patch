@@ -1,0 +1,390 @@
+diff --git a/src/compiler/compile/Component.ts b/src/compiler/compile/Component.ts
+index ab4800e42bc0a7b14ccacf0f6ea60f2e928964d8..1231851be4bbcc5e7700d74d11a97e5e516d2958 100644
+--- a/src/compiler/compile/Component.ts
++++ b/src/compiler/compile/Component.ts
+@@ -271,6 +271,9 @@ export default class Component {
+ 								node.name = alias.name;
+ 							} else {
+ 								let name = node.name.slice(1);
++								if (compile_options.hydratable && (name === 'append' || name === 'insert')) {
++									name += '_hydrate';
++								}
+ 
+ 								if (compile_options.dev) {
+ 									if (internal_exports.has(`${name}_dev`)) {
+diff --git a/src/runtime/internal/dom.ts b/src/runtime/internal/dom.ts
+index 7af26917856dc653571d4ff6f887e22991ec102e..416b1f7bc7a0c6b7f875ddf5c8bfd298d8f91145 100644
+--- a/src/runtime/internal/dom.ts
++++ b/src/runtime/internal/dom.ts
+@@ -1,130 +1,16 @@
+ import { has_prop } from './utils';
++import { insert_hydrate } from './dom_hydration';
++import { is_hydrating, start_hydrating, end_hydrating } from './hydration_state';
+ 
+-// Track which nodes are claimed during hydration. Unclaimed nodes can then be removed from the DOM
+-// at the end of hydration without touching the remaining nodes.
+-let is_hydrating = false;
+-
+-export function start_hydrating() {
+-	is_hydrating = true;
+-}
+-export function end_hydrating() {
+-	is_hydrating = false;
+-}
++export { is_hydrating, start_hydrating, end_hydrating };
+ 
+ type NodeEx = Node & {
+ 	claim_order?: number,
+-	hydrate_init? : true,
++	hydrate_init?: true,
+ 	actual_end_child?: NodeEx,
+ 	childNodes: NodeListOf<NodeEx>,
+ };
+ 
+-function upper_bound(low: number, high: number, key: (index: number) => number, value: number) {
+-	// Return first index of value larger than input value in the range [low, high)
+-	while (low < high) {
+-		const mid = low + ((high - low) >> 1);
+-		if (key(mid) <= value) {
+-			low = mid + 1;
+-		} else {
+-			high = mid;
+-		}
+-	}
+-	return low;
+-}
+-
+-function init_hydrate(target: NodeEx) {
+-	if (target.hydrate_init) return;
+-	target.hydrate_init = true;
+-
+-	type NodeEx2 = NodeEx & {claim_order: number};
+-
+-	// We know that all children have claim_order values since the unclaimed have been detached if target is not <head>
+-	let children: ArrayLike<NodeEx2> = target.childNodes as NodeListOf<NodeEx2>;
+-
+-	// If target is <head>, there may be children without claim_order
+-	if (target.nodeName === 'HEAD') {
+-		const myChildren = [];
+-		for (let i = 0; i < children.length; i++) {
+-			const node = children[i];
+-			if (node.claim_order !== undefined) {
+-				myChildren.push(node);
+-			}
+-		}
+-		children = myChildren;
+-	}
+-
+-	/*
+-	* Reorder claimed children optimally.
+-	* We can reorder claimed children optimally by finding the longest subsequence of
+-	* nodes that are already claimed in order and only moving the rest. The longest
+-	* subsequence subsequence of nodes that are claimed in order can be found by
+-	* computing the longest increasing subsequence of .claim_order values.
+-	*
+-	* This algorithm is optimal in generating the least amount of reorder operations
+-	* possible.
+-	*
+-	* Proof:
+-	* We know that, given a set of reordering operations, the nodes that do not move
+-	* always form an increasing subsequence, since they do not move among each other
+-	* meaning that they must be already ordered among each other. Thus, the maximal
+-	* set of nodes that do not move form a longest increasing subsequence.
+-	*/
+-
+-	// Compute longest increasing subsequence
+-	// m: subsequence length j => index k of smallest value that ends an increasing subsequence of length j
+-	const m = new Int32Array(children.length + 1);
+-	// Predecessor indices + 1
+-	const p = new Int32Array(children.length);
+-
+-	m[0] = -1;
+-	let longest = 0;
+-	for (let i = 0; i < children.length; i++) {
+-		const current = children[i].claim_order;
+-		// Find the largest subsequence length such that it ends in a value less than our current value
+-
+-		// upper_bound returns first greater value, so we subtract one
+-		// with fast path for when we are on the current longest subsequence
+-		const seqLen = ((longest > 0 && children[m[longest]].claim_order <= current) ? longest + 1 : upper_bound(1, longest, idx => children[m[idx]].claim_order, current)) - 1;
+-
+-		p[i] = m[seqLen] + 1;
+-
+-		const newLen = seqLen + 1;
+-
+-		// We can guarantee that current is the smallest value. Otherwise, we would have generated a longer sequence.
+-		m[newLen] = i;
+-
+-		longest = Math.max(newLen, longest);
+-	}
+-
+-	// The longest increasing subsequence of nodes (initially reversed)
+-	const lis: NodeEx2[] = [];
+-	// The rest of the nodes, nodes that will be moved
+-	const toMove: NodeEx2[] = [];
+-	let last = children.length - 1;
+-	for (let cur = m[longest] + 1; cur != 0; cur = p[cur - 1]) {
+-		lis.push(children[cur - 1]);
+-		for (; last >= cur; last--) {
+-			toMove.push(children[last]);
+-		}
+-		last--;
+-	}
+-	for (; last >= 0; last--) {
+-		toMove.push(children[last]);
+-	}
+-	lis.reverse();
+-
+-	// We sort the nodes being moved to guarantee that their insertion order matches the claim order
+-	toMove.sort((a, b) => a.claim_order - b.claim_order);
+-
+-	// Finally, we move the nodes
+-	for (let i = 0, j = 0; i < toMove.length; i++) {
+-		while (j < lis.length && toMove[i].claim_order >= lis[j].claim_order) {
+-			j++;
+-		}
+-		const anchor = j < lis.length ? lis[j] : null;
+-		target.insertBefore(toMove[i], anchor);
+-	}
+-}
+-
+ export function append_styles(
+ 	target: Node,
+ 	style_sheet_id: string,
+@@ -162,35 +48,13 @@ function append_stylesheet(node: ShadowRoot | Document, style: HTMLStyleElement)
+ }
+ 
+ export function append(target: NodeEx, node: NodeEx) {
+-	if (is_hydrating) {
+-		init_hydrate(target);
+-
+-		if ((target.actual_end_child === undefined) || ((target.actual_end_child !== null) && (target.actual_end_child.parentElement !== target))) {
+-			target.actual_end_child = target.firstChild;
+-		}
+-
+-		// Skip nodes of undefined ordering
+-		while ((target.actual_end_child !== null) && (target.actual_end_child.claim_order === undefined)) {
+-			target.actual_end_child = target.actual_end_child.nextSibling;
+-		}
+-
+-		if (node !== target.actual_end_child) {
+-			// We only insert if the ordering of this node should be modified or the parent node is not target
+-			if (node.claim_order !== undefined || node.parentNode !== target) {
+-				target.insertBefore(node, target.actual_end_child);
+-			}
+-		} else {
+-			target.actual_end_child = node.nextSibling;
+-		}
+-	} else if (node.parentNode !== target) {
++	if (node.parentNode !== target) {
+ 		target.appendChild(node);
+ 	}
+ }
+ 
+ export function insert(target: NodeEx, node: NodeEx, anchor?: NodeEx) {
+-	if (is_hydrating && !anchor) {
+-		append(target, node);
+-	} else if (node.parentNode !== target || node.nextSibling != anchor) {
++	if (node.parentNode !== target || node.nextSibling != anchor) {
+ 		target.insertBefore(node, anchor || null);
+ 	}
+ }
+@@ -661,7 +525,7 @@ export class HtmlTag {
+ 
+ 	i(anchor) {
+ 		for (let i = 0; i < this.n.length; i += 1) {
+-			insert(this.t, this.n[i], anchor);
++			insert_hydrate(this.t, this.n[i], anchor);
+ 		}
+ 	}
+ 
+diff --git a/src/runtime/internal/dom_hydration.ts b/src/runtime/internal/dom_hydration.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..f5ef1605ab9e6b78648c7da30346786c7fa2daf5
+--- /dev/null
++++ b/src/runtime/internal/dom_hydration.ts
+@@ -0,0 +1,91 @@
++import { is_hydrating } from './hydration_state';
++
++type NodeEx = Node & {
++	claim_order?: number,
++	hydrate_init?: true,
++	actual_end_child?: NodeEx,
++	childNodes: NodeListOf<NodeEx>,
++};
++
++function upper_bound(low: number, high: number, key: (index: number) => number, value: number) {
++	while (low < high) {
++		const mid = low + ((high - low) >> 1);
++		if (key(mid) <= value) low = mid + 1;
++		else high = mid;
++	}
++	return low;
++}
++
++function init_hydrate(target: NodeEx) {
++	if (target.hydrate_init) return;
++	target.hydrate_init = true;
++
++	type NodeEx2 = NodeEx & { claim_order: number };
++	let children: ArrayLike<NodeEx2> = target.childNodes as NodeListOf<NodeEx2>;
++	if (target.nodeName === 'HEAD') {
++		const myChildren = [];
++		for (let i = 0; i < children.length; i++) {
++			const node = children[i];
++			if (node.claim_order !== undefined) myChildren.push(node);
++		}
++		children = myChildren;
++	}
++
++	const m = new Int32Array(children.length + 1);
++	const p = new Int32Array(children.length);
++	m[0] = -1;
++	let longest = 0;
++	for (let i = 0; i < children.length; i++) {
++		const current = children[i].claim_order;
++		const seqLen = ((longest > 0 && children[m[longest]].claim_order <= current)
++			? longest + 1
++			: upper_bound(1, longest, idx => children[m[idx]].claim_order, current)) - 1;
++		p[i] = m[seqLen] + 1;
++		const newLen = seqLen + 1;
++		m[newLen] = i;
++		longest = Math.max(newLen, longest);
++	}
++
++	const lis: NodeEx2[] = [];
++	const toMove: NodeEx2[] = [];
++	let last = children.length - 1;
++	for (let cur = m[longest] + 1; cur !== 0; cur = p[cur - 1]) {
++		lis.push(children[cur - 1]);
++		for (; last >= cur; last--) toMove.push(children[last]);
++		last--;
++	}
++	for (; last >= 0; last--) toMove.push(children[last]);
++	lis.reverse();
++	toMove.sort((a, b) => a.claim_order - b.claim_order);
++	for (let i = 0, j = 0; i < toMove.length; i++) {
++		while (j < lis.length && toMove[i].claim_order >= lis[j].claim_order) j++;
++		const anchor = j < lis.length ? lis[j] : null;
++		target.insertBefore(toMove[i], anchor);
++	}
++}
++
++export function append_hydrate(target: NodeEx, node: NodeEx) {
++	if (is_hydrating) {
++		init_hydrate(target);
++		if (target.actual_end_child === undefined || (target.actual_end_child !== null && target.actual_end_child.parentElement !== target)) {
++			target.actual_end_child = target.firstChild;
++		}
++		while (target.actual_end_child !== null && target.actual_end_child.claim_order === undefined) {
++			target.actual_end_child = target.actual_end_child.nextSibling;
++		}
++		if (node !== target.actual_end_child) {
++			if (node.claim_order !== undefined || node.parentNode !== target) {
++				target.insertBefore(node, target.actual_end_child);
++			}
++		} else {
++			target.actual_end_child = node.nextSibling;
++		}
++	} else if (node.parentNode !== target) {
++		target.appendChild(node);
++	}
++}
++
++export function insert_hydrate(target: NodeEx, node: NodeEx, anchor?: NodeEx) {
++	if (is_hydrating && !anchor) append_hydrate(target, node);
++	else if (node.parentNode !== target || node.nextSibling != anchor) target.insertBefore(node, anchor || null);
++}
+diff --git a/src/runtime/internal/hydration_state.ts b/src/runtime/internal/hydration_state.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..bebd47dad232596470eea9a7ad3b21bb8de3db3c
+--- /dev/null
++++ b/src/runtime/internal/hydration_state.ts
+@@ -0,0 +1,9 @@
++export let is_hydrating = false;
++
++export function start_hydrating() {
++	is_hydrating = true;
++}
++
++export function end_hydrating() {
++	is_hydrating = false;
++}
+diff --git a/src/runtime/internal/index.ts b/src/runtime/internal/index.ts
+index e1dd2a1fcf364d0a11c60a8f80f330f4f9145bbc..b2ce83cb4842294817b436328936367031f6249b 100644
+--- a/src/runtime/internal/index.ts
++++ b/src/runtime/internal/index.ts
+@@ -1,6 +1,7 @@
+ export * from './animations';
+ export * from './await_block';
+ export * from './dom';
++export * from './dom_hydration';
+ export * from './environment';
+ export * from './globals';
+ export * from './keyed_each';
+diff --git a/test/js/samples/hydrated-void-element/expected.js b/test/js/samples/hydrated-void-element/expected.js
+index 2df469e68903eadd0658a5046a71a0b712d58e21..7ebea773017dd7788be37080df3846ae938b9b13 100644
+--- a/test/js/samples/hydrated-void-element/expected.js
++++ b/test/js/samples/hydrated-void-element/expected.js
+@@ -8,7 +8,7 @@ import {
+ 	detach,
+ 	element,
+ 	init,
+-	insert,
++	insert_hydrate,
+ 	noop,
+ 	safe_not_equal,
+ 	space,
+@@ -40,9 +40,9 @@ function create_fragment(ctx) {
+ 			attr(img, "alt", "donuts");
+ 		},
+ 		m(target, anchor) {
+-			insert(target, img, anchor);
+-			insert(target, t, anchor);
+-			insert(target, div, anchor);
++			insert_hydrate(target, img, anchor);
++			insert_hydrate(target, t, anchor);
++			insert_hydrate(target, div, anchor);
+ 		},
+ 		p: noop,
+ 		i: noop,
+@@ -62,4 +62,4 @@ class Component extends SvelteComponent {
+ 	}
+ }
+ 
+-export default Component;
++export default Component;
+\ No newline at end of file
+diff --git a/test/js/samples/src-attribute-check/expected.js b/test/js/samples/src-attribute-check/expected.js
+index 8a13cff21c65c3c6edda96d144c9f8c32d9b47a9..cfd2949311c668f252ccc0e4be76f54e554e893e 100644
+--- a/test/js/samples/src-attribute-check/expected.js
++++ b/test/js/samples/src-attribute-check/expected.js
+@@ -7,7 +7,7 @@ import {
+ 	detach,
+ 	element,
+ 	init,
+-	insert,
++	insert_hydrate,
+ 	noop,
+ 	safe_not_equal,
+ 	space,
+@@ -41,9 +41,9 @@ function create_fragment(ctx) {
+ 			if (!src_url_equal(img1.src, img1_src_value = "" + (/*slug*/ ctx[1] + ".jpg"))) attr(img1, "src", img1_src_value);
+ 		},
+ 		m(target, anchor) {
+-			insert(target, img0, anchor);
+-			insert(target, t, anchor);
+-			insert(target, img1, anchor);
++			insert_hydrate(target, img0, anchor);
++			insert_hydrate(target, t, anchor);
++			insert_hydrate(target, img1, anchor);
+ 		},
+ 		p(ctx, [dirty]) {
+ 			if (dirty & /*url*/ 1 && !src_url_equal(img0.src, img0_src_value = /*url*/ ctx[0])) {
+@@ -83,4 +83,4 @@ class Component extends SvelteComponent {
+ 	}
+ }
+ 
+-export default Component;
++export default Component;
+\ No newline at end of file

@@ -1,0 +1,79 @@
+diff --git a/packages/material-ui/src/withWidth/withWidth.d.ts b/packages/material-ui/src/withWidth/withWidth.d.ts
+index fa980f3deef64769265969935be2c95b608664d6..2749941858c93395d3a3bcd55537fec054abc4b5 100644
+--- a/packages/material-ui/src/withWidth/withWidth.d.ts
++++ b/packages/material-ui/src/withWidth/withWidth.d.ts
+@@ -1,3 +1,4 @@
++import * as React from 'react';
+ import { Breakpoint } from '../styles/createBreakpoints';
+ import { ConsistentWith, Overwrite } from '..';
+ 
+@@ -7,6 +8,7 @@ export interface WithWidthOptions {
+ 
+ export interface WithWidthProps {
+   width: Breakpoint;
++  innerRef?: React.Ref<any>;
+ }
+ 
+ export function isWidthDown(
+diff --git a/packages/material-ui/src/withWidth/withWidth.js b/packages/material-ui/src/withWidth/withWidth.js
+index 670c3d36c2dc107b345b60a5dcf8836e5991c13d..b19cbcab03bb24dc9621da116752033e570e4fa4 100644
+--- a/packages/material-ui/src/withWidth/withWidth.js
++++ b/packages/material-ui/src/withWidth/withWidth.js
+@@ -98,7 +98,7 @@ const withWidth = (options = {}) => Component => {
+     }
+ 
+     render() {
+-      const { initialWidth, theme, width, ...other } = this.props;
++      const { initialWidth, innerRef, theme, width, ...other } = this.props;
+ 
+       const props = {
+         width:
+@@ -127,7 +127,7 @@ const withWidth = (options = {}) => Component => {
+ 
+       return (
+         <EventListener target="window" onResize={this.handleResize}>
+-          <Component {...more} {...props} />
++          <Component {...more} {...props} ref={innerRef} />
+         </EventListener>
+       );
+     }
+@@ -144,6 +144,10 @@ const withWidth = (options = {}) => Component => {
+      * http://caniuse.com/#search=client%20hint
+      */
+     initialWidth: PropTypes.oneOf(['xs', 'sm', 'md', 'lg', 'xl']),
++    /**
++     * Use this property to pass a ref callback to the decorated component.
++     */
++    innerRef: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
+     /**
+      * @ignore
+      */
+diff --git a/packages/material-ui/src/withWidth/withWidth.test.js b/packages/material-ui/src/withWidth/withWidth.test.js
+index 8902ebc344fd5f9cf7efabf8b986b03df3090f80..e28e26552450fcae24132eaed0190de345b88a12 100644
+--- a/packages/material-ui/src/withWidth/withWidth.test.js
++++ b/packages/material-ui/src/withWidth/withWidth.test.js
+@@ -39,6 +39,24 @@ describe('withWidth', () => {
+     });
+   });
+ 
++  describe('prop: innerRef', () => {
++    it('should forward the ref to the decorated component', () => {
++      class Component extends React.Component {
++        componentDidMount() {}
++
++        render() {
++          return <div />;
++        }
++      }
++
++      const ComponentWithWidth = withWidth()(Component);
++      const ref = React.createRef();
++      mount(<ComponentWithWidth innerRef={ref} />);
++
++      assert.instanceOf(ref.current, Component);
++    });
++  });
++
+   describe('browser', () => {
+     it('should provide the right width to the child element', () => {
+       const wrapper = mount(<EmptyWithWidth />);

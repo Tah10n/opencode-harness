@@ -1,0 +1,49 @@
+diff --git a/packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js b/packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js
+index 8e47b279d5a5d866d7489e43f7a5ec9497d6839a..68d168209e78cc38e49e9f0cbffac1109ab8ca58 100644
+--- a/packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js
++++ b/packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js
+@@ -1461,6 +1461,27 @@ describe('<Autocomplete />', () => {
+       expect(combobox).to.have.attribute('aria-expanded', 'true');
+     });
+ 
++    it('should keep the list box open when selecting with a modifier key in multiple mode', () => {
++      const { getByRole, getAllByRole } = render(
++        <Autocomplete
++          {...defaultProps}
++          multiple
++          options={['one', 'two', 'three']}
++          renderInput={(params) => <TextField {...params} />}
++        />,
++      );
++      const combobox = getByRole('combobox');
++      fireEvent.mouseDown(getByRole('textbox'));
++      fireEvent.click(getAllByRole('option')[0], { ctrlKey: true });
++      expect(combobox).to.have.attribute('aria-expanded', 'true');
++
++      fireEvent.click(getAllByRole('option')[1], { shiftKey: true });
++      expect(combobox).to.have.attribute('aria-expanded', 'true');
++
++      fireEvent.click(getAllByRole('option')[2]);
++      expect(combobox).to.have.attribute('aria-expanded', 'false');
++    });
++
+     it('should not toggle list box', () => {
+       const handleHighlightChange = spy();
+       const { getByRole } = render(
+diff --git a/packages/material-ui-lab/src/useAutocomplete/useAutocomplete.js b/packages/material-ui-lab/src/useAutocomplete/useAutocomplete.js
+index a9d8d48de30823165fb7c928ba12fe38ab7d6ee4..7a727941aa69cda103a680a4dbf7d09fdf48443a 100644
+--- a/packages/material-ui-lab/src/useAutocomplete/useAutocomplete.js
++++ b/packages/material-ui-lab/src/useAutocomplete/useAutocomplete.js
+@@ -563,7 +563,11 @@ export default function useAutocomplete(props) {
+     resetInputValue(event, newValue);
+ 
+     handleValue(event, newValue, reason, { option });
+-    if (!disableCloseOnSelect) {
++    const keepOpen =
++      multiple &&
++      event.type === 'click' &&
++      (event.ctrlKey || event.metaKey || event.shiftKey);
++    if (!disableCloseOnSelect && !keepOpen) {
+       handleClose(event, reason);
+     }
+ 

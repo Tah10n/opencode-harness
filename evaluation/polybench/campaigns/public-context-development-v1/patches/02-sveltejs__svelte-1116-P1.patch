@@ -1,0 +1,59 @@
+diff --git a/src/generators/server-side-rendering/index.ts b/src/generators/server-side-rendering/index.ts
+index 37bf859da7c70aecf8cb36b6390f682e0b3e0dc0..ce5ee219d86a042d9ae05ba454bf1f13822cceda 100644
+--- a/src/generators/server-side-rendering/index.ts
++++ b/src/generators/server-side-rendering/index.ts
+@@ -114,7 +114,6 @@ export default function ssr(
+ 			}
+ 
+ 			var result = { head: '', addComponent };
+-			${templateProperties.store && `options.store = %store();`}
+ 			var html = ${name}._render(result, state, options);
+ 
+ 			var cssCode = Array.from(components).map(c => c.css && c.css.code).filter(Boolean).join('\\n');
+@@ -131,6 +130,7 @@ export default function ssr(
+ 
+ 		${name}._render = function(__result, state, options) {
+ 			__result.addComponent(${name});
++			${templateProperties.store && `options.store = options.store || %store();`}
+ 
+ 			state = Object.assign(${initialState.join(', ')});
+ 
+diff --git a/test/server-side-rendering/samples/nested-store/Child.html b/test/server-side-rendering/samples/nested-store/Child.html
+new file mode 100644
+index 0000000000000000000000000000000000000000..c6e44ac9dd7146dc47029804711855fe8309040c
+--- /dev/null
++++ b/test/server-side-rendering/samples/nested-store/Child.html
+@@ -0,0 +1,11 @@
++<p>{{$name}}</p>
++
++<script>
++	import { Store } from '../../../../store.js';
++
++	export default {
++		store() {
++			return new Store({ name: 'nested' });
++		}
++	};
++</script>
+diff --git a/test/server-side-rendering/samples/nested-store/_expected.html b/test/server-side-rendering/samples/nested-store/_expected.html
+new file mode 100644
+index 0000000000000000000000000000000000000000..c230e50ebc61305f54c9ec9e2199e6f0924ce8b4
+--- /dev/null
++++ b/test/server-side-rendering/samples/nested-store/_expected.html
+@@ -0,0 +1 @@
++<p>nested</p>
+diff --git a/test/server-side-rendering/samples/nested-store/main.html b/test/server-side-rendering/samples/nested-store/main.html
+new file mode 100644
+index 0000000000000000000000000000000000000000..7f1681489726b52918fa79878fae33b21eaa2193
+--- /dev/null
++++ b/test/server-side-rendering/samples/nested-store/main.html
+@@ -0,0 +1,9 @@
++<Child />
++
++<script>
++	import Child from './Child.html';
++
++	export default {
++		components: { Child }
++	};
++</script>

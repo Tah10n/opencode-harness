@@ -1,0 +1,16 @@
+diff --git a/src/generators/server-side-rendering/visitors/Component.ts b/src/generators/server-side-rendering/visitors/Component.ts
+index 4843010fcbcb5bb79fad5004be7daf43c67d654e..aff96f67f7ba3b6e126a06abbf0c5749e77289b7 100644
+--- a/src/generators/server-side-rendering/visitors/Component.ts
++++ b/src/generators/server-side-rendering/visitors/Component.ts
+@@ -86,10 +86,7 @@ export default function visitComponent(
+ 
+ 	let open = `\${${expression}._render(__result, {${props}}`;
+ 
+-	const options = [];
+-	if (generator.options.store) {
+-		options.push(`store: options.store`);
+-	}
++	const options = [`store: options.store`];
+ 
+ 	if (node.children.length) {
+ 		const appendTarget: AppendTarget = {

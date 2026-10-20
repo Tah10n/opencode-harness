@@ -1,0 +1,58 @@
+diff --git a/src/generators/server-side-rendering/index.ts b/src/generators/server-side-rendering/index.ts
+index 37bf859da7c70aecf8cb36b6390f682e0b3e0dc0..2fd4c2c14bcbd1dde930a6a6078b281f5a146376 100644
+--- a/src/generators/server-side-rendering/index.ts
++++ b/src/generators/server-side-rendering/index.ts
+@@ -131,6 +131,7 @@ export default function ssr(
+ 
+ 		${name}._render = function(__result, state, options) {
+ 			__result.addComponent(${name});
++			${templateProperties.store && `options.store = options.store || %store();`}
+ 
+ 			state = Object.assign(${initialState.join(', ')});
+ 
+diff --git a/test/runtime/samples/store-nested/Nested.html b/test/runtime/samples/store-nested/Nested.html
+new file mode 100644
+index 0000000000000000000000000000000000000000..d80f3b43ffbfe9b342dc160e2fce80e2cbb032bd
+--- /dev/null
++++ b/test/runtime/samples/store-nested/Nested.html
+@@ -0,0 +1,11 @@
++<p>Nested store: {{$name}}</p>
++
++<script>
++	import { Store } from '../../../../store.js';
++
++	export default {
++		store() {
++			return new Store({ name: 'hello' });
++		}
++	};
++</script>
+diff --git a/test/runtime/samples/store-nested/_config.js b/test/runtime/samples/store-nested/_config.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..e324d4f5b2ca983e180cd9b7c29c53a9cd1cfc5b
+--- /dev/null
++++ b/test/runtime/samples/store-nested/_config.js
+@@ -0,0 +1,6 @@
++export default {
++	store: true,
++	html: `
++		<p>Nested store: hello</p>
++	`
++};
+diff --git a/test/runtime/samples/store-nested/main.html b/test/runtime/samples/store-nested/main.html
+new file mode 100644
+index 0000000000000000000000000000000000000000..48ce07524d1b638713cad7c1665c5039ba809636
+--- /dev/null
++++ b/test/runtime/samples/store-nested/main.html
+@@ -0,0 +1,11 @@
++<Nested />
++
++<script>
++	import Nested from './Nested.html';
++
++	export default {
++		components: {
++			Nested
++		}
++	};
++</script>

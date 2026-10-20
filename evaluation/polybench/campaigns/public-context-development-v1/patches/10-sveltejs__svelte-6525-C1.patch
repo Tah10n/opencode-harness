@@ -1,0 +1,281 @@
+diff --git a/src/compiler/compile/render_dom/Block.ts b/src/compiler/compile/render_dom/Block.ts
+index 63195b610ffef50b2db1cd1808160754f2cc65d6..3b346275e62271b78b292ea54c4be3ffc001e556 100644
+--- a/src/compiler/compile/render_dom/Block.ts
++++ b/src/compiler/compile/render_dom/Block.ts
+@@ -177,10 +177,12 @@ export default class Block {
+ 		}
+ 
+ 		if (parent_node) {
+-			this.chunks.mount.push(b`@append(${parent_node}, ${id});`);
++			const append = this.renderer.options.hydratable ? x`@append_hydrate` : x`@append`;
++			this.chunks.mount.push(b`${append}(${parent_node}, ${id});`);
+ 			if (is_head(parent_node) && !no_detach) this.chunks.destroy.push(b`@detach(${id});`);
+ 		} else {
+-			this.chunks.mount.push(b`@insert(#target, ${id}, #anchor);`);
++			const insert = this.renderer.options.hydratable ? x`@insert_hydrate` : x`@insert`;
++			this.chunks.mount.push(b`${insert}(#target, ${id}, #anchor);`);
+ 			if (!no_detach) this.chunks.destroy.push(b`if (detaching) @detach(${id});`);
+ 		}
+ 	}
+diff --git a/src/compiler/compile/render_dom/index.ts b/src/compiler/compile/render_dom/index.ts
+index b3ee1e91b177836340d95cc559ef0da4fe9dec03..e8d2d812d3b98b131507f41485c7b8ad9fdc451c 100644
+--- a/src/compiler/compile/render_dom/index.ts
++++ b/src/compiler/compile/render_dom/index.ts
+@@ -113,6 +113,7 @@ export default function dom(
+ 	const accessors = [];
+ 
+ 	const not_equal = component.component_options.immutable ? x`@not_equal` : x`@safe_not_equal`;
++	const init = options.hydratable ? x`@init_hydrate` : x`@init`;
+ 	let dev_props_check: Node[] | Node;
+ 	let inject_state: Expression;
+ 	let capture_state: Expression;
+@@ -544,7 +545,7 @@ export default function dom(
+ 			class ${name} extends ${superclass} {
+ 				constructor(options) {
+ 					super(${options.dev && 'options'});
+-					@init(this, options, ${definition}, ${has_create_fragment ? 'create_fragment' : 'null'}, ${not_equal}, ${prop_indexes}, ${optional_parameters});
++					${init}(this, options, ${definition}, ${has_create_fragment ? 'create_fragment' : 'null'}, ${not_equal}, ${prop_indexes}, ${optional_parameters});
+ 					${options.dev && b`@dispatch_dev("SvelteRegisterComponent", { component: this, tagName: "${name.name}", options, id: create_fragment.name });`}
+ 
+ 					${dev_props_check}
+diff --git a/src/compiler/compile/render_dom/wrappers/Element/index.ts b/src/compiler/compile/render_dom/wrappers/Element/index.ts
+index 20dfed891d4ddab611914c63b2f1d703928f6e7d..bb4a08f8add2ef3a3dc140f98362226633f6653e 100644
+--- a/src/compiler/compile/render_dom/wrappers/Element/index.ts
++++ b/src/compiler/compile/render_dom/wrappers/Element/index.ts
+@@ -263,7 +263,8 @@ export default class ElementWrapper extends Wrapper {
+ 		}
+ 
+ 		if (parent_node) {
+-			const append = b`@append(${parent_node}, ${node});`;
++			const append_helper = renderer.options.hydratable ? x`@append_hydrate` : x`@append`;
++			const append = b`${append_helper}(${parent_node}, ${node});`;
+ 			((append[0] as ExpressionStatement).expression as CallExpression).callee.loc = {
+ 				start: this.renderer.locate(this.node.start),
+ 				end: this.renderer.locate(this.node.end)
+@@ -274,7 +275,8 @@ export default class ElementWrapper extends Wrapper {
+ 				block.chunks.destroy.push(b`@detach(${node});`);
+ 			}
+ 		} else {
+-			const insert = b`@insert(#target, ${node}, #anchor);`;
++			const insert_helper = renderer.options.hydratable ? x`@insert_hydrate` : x`@insert`;
++			const insert = b`${insert_helper}(#target, ${node}, #anchor);`;
+ 			((insert[0] as ExpressionStatement).expression as CallExpression).callee.loc = {
+ 				start: this.renderer.locate(this.node.start),
+ 				end: this.renderer.locate(this.node.end)
+diff --git a/src/compiler/compile/render_dom/wrappers/InlineComponent/index.ts b/src/compiler/compile/render_dom/wrappers/InlineComponent/index.ts
+index e6eab33fbdeeebead7b98f494733ae5ee7c54428..26c15ea601a6fe186ceb1412c3b4d06e9582d3bb 100644
+--- a/src/compiler/compile/render_dom/wrappers/InlineComponent/index.ts
++++ b/src/compiler/compile/render_dom/wrappers/InlineComponent/index.ts
+@@ -542,12 +542,14 @@ export default class InlineComponentWrapper extends Wrapper {
+ 
+ 			if (has_css_custom_properties) {
+ 				if (parent_node) {
+-					block.chunks.mount.push(b`@append(${parent_node}, ${css_custom_properties_wrapper})`);
++					const append = this.renderer.options.hydratable ? x`@append_hydrate` : x`@append`;
++					block.chunks.mount.push(b`${append}(${parent_node}, ${css_custom_properties_wrapper})`);
+ 					if (is_head(parent_node)) {
+ 						block.chunks.destroy.push(b`@detach(${css_custom_properties_wrapper});`);
+ 					}
+ 				} else {
+-					block.chunks.mount.push(b`@insert(#target, ${css_custom_properties_wrapper}, #anchor);`);
++					const insert = this.renderer.options.hydratable ? x`@insert_hydrate` : x`@insert`;
++					block.chunks.mount.push(b`${insert}(#target, ${css_custom_properties_wrapper}, #anchor);`);
+ 					// TODO we eventually need to consider what happens to elements
+ 					// that belong to the same outgroup as an outroing element...
+ 					block.chunks.destroy.push(b`if (detaching) @detach(${css_custom_properties_wrapper});`);
+diff --git a/src/runtime/internal/Component.ts b/src/runtime/internal/Component.ts
+index e706928af305b20d788136b5e36df233afeb9658..1904ca92810af0f49182317b93d4ff7337b59e5a 100644
+--- a/src/runtime/internal/Component.ts
++++ b/src/runtime/internal/Component.ts
+@@ -105,6 +105,24 @@ function make_dirty(component, i) {
+ }
+ 
+ export function init(component, options, instance, create_fragment, not_equal, props, append_styles, dirty = [-1]) {
++	if (options.hydrate) {
++		throw new Error('options.hydrate only works if the component was compiled with the `hydratable: true` option');
++	}
++	init_component(component, options, instance, create_fragment, not_equal, props, append_styles, dirty);
++}
++
++export function init_hydrate(component, options, instance, create_fragment, not_equal, props, append_styles, dirty = [-1]) {
++	init_component(component, options, instance, create_fragment, not_equal, props, append_styles, dirty, start_hydrating_component, end_hydrating);
++}
++
++function start_hydrating_component(component, target) {
++	start_hydrating();
++	const nodes = children(target);
++	component.$$.fragment && component.$$.fragment.l(nodes);
++	nodes.forEach(detach);
++}
++
++function init_component(component, options, instance, create_fragment, not_equal, props, append_styles, dirty, before_mount?, after_mount?) {
+ 	const parent_component = current_component;
+ 	set_current_component(component);
+ 
+@@ -156,12 +174,8 @@ export function init(component, options, instance, create_fragment, not_equal, p
+ 	$$.fragment = create_fragment ? create_fragment($$.ctx) : false;
+ 
+ 	if (options.target) {
+-		if (options.hydrate) {
+-			start_hydrating();
+-			const nodes = children(options.target);
+-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+-			$$.fragment && $$.fragment!.l(nodes);
+-			nodes.forEach(detach);
++		if (options.hydrate && before_mount) {
++			before_mount(component, options.target);
+ 		} else {
+ 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+ 			$$.fragment && $$.fragment!.c();
+@@ -169,7 +183,7 @@ export function init(component, options, instance, create_fragment, not_equal, p
+ 
+ 		if (options.intro) transition_in(component.$$.fragment);
+ 		mount_component(component, options.target, options.anchor, options.customElement);
+-		end_hydrating();
++		options.hydrate && after_mount && after_mount();
+ 		flush();
+ 	}
+ 
+diff --git a/src/runtime/internal/dom.ts b/src/runtime/internal/dom.ts
+index 7af26917856dc653571d4ff6f887e22991ec102e..d3694a884920c1cbe3e8b90172e2637dce476bd7 100644
+--- a/src/runtime/internal/dom.ts
++++ b/src/runtime/internal/dom.ts
+@@ -161,7 +161,13 @@ function append_stylesheet(node: ShadowRoot | Document, style: HTMLStyleElement)
+ 	append((node as Document).head || node, style);
+ }
+ 
+-export function append(target: NodeEx, node: NodeEx) {
++export function append(target: Node, node: Node) {
++	if (node.parentNode !== target) {
++		target.appendChild(node);
++	}
++}
++
++export function append_hydrate(target: NodeEx, node: NodeEx) {
+ 	if (is_hydrating) {
+ 		init_hydrate(target);
+ 
+@@ -187,9 +193,15 @@ export function append(target: NodeEx, node: NodeEx) {
+ 	}
+ }
+ 
+-export function insert(target: NodeEx, node: NodeEx, anchor?: NodeEx) {
++export function insert(target: Node, node: Node, anchor?: Node) {
++	if (node.parentNode !== target || node.nextSibling != anchor) {
++		target.insertBefore(node, anchor || null);
++	}
++}
++
++export function insert_hydrate(target: NodeEx, node: NodeEx, anchor?: NodeEx) {
+ 	if (is_hydrating && !anchor) {
+-		append(target, node);
++		append_hydrate(target, node);
+ 	} else if (node.parentNode !== target || node.nextSibling != anchor) {
+ 		target.insertBefore(node, anchor || null);
+ 	}
+@@ -661,7 +673,7 @@ export class HtmlTag {
+ 
+ 	i(anchor) {
+ 		for (let i = 0; i < this.n.length; i += 1) {
+-			insert(this.t, this.n[i], anchor);
++			insert_hydrate(this.t, this.n[i], anchor);
+ 		}
+ 	}
+ 
+diff --git a/test/js/index.ts b/test/js/index.ts
+index b94c9c01d67ff7fb84396097ad96a4a4a3950f93..998eef4f8b8ddb43ca89cdb770857de395b96369 100644
+--- a/test/js/index.ts
++++ b/test/js/index.ts
+@@ -5,6 +5,18 @@ import * as colors from 'kleur';
+ import { loadConfig, svelte, shouldUpdateExpected } from '../helpers';
+ 
+ describe('js', () => {
++	it('uses hydration initialization only when hydratable', () => {
++		const source = '<h1>Hello world!</h1>';
++		const regular = svelte.compile(source).js.code;
++		const hydratable = svelte.compile(source, { hydratable: true }).js.code;
++
++		assert.match(regular, /\binit\(/);
++		assert.doesNotMatch(regular, /init_hydrate/);
++		assert.doesNotMatch(regular, /insert_hydrate/);
++		assert.match(hydratable, /\binit_hydrate\(/);
++		assert.match(hydratable, /insert_hydrate/);
++	});
++
+ 	fs.readdirSync(`${__dirname}/samples`).forEach(dir => {
+ 		if (dir[0] === '.') return;
+ 
+diff --git a/test/js/samples/hydrated-void-element/expected.js b/test/js/samples/hydrated-void-element/expected.js
+index 2df469e68903eadd0658a5046a71a0b712d58e21..d5107f78be8c24cdababd36d550475ed834bba20 100644
+--- a/test/js/samples/hydrated-void-element/expected.js
++++ b/test/js/samples/hydrated-void-element/expected.js
+@@ -7,8 +7,8 @@ import {
+ 	claim_space,
+ 	detach,
+ 	element,
+-	init,
+-	insert,
++	init_hydrate,
++	insert_hydrate,
+ 	noop,
+ 	safe_not_equal,
+ 	space,
+@@ -40,9 +40,9 @@ function create_fragment(ctx) {
+ 			attr(img, "alt", "donuts");
+ 		},
+ 		m(target, anchor) {
+-			insert(target, img, anchor);
+-			insert(target, t, anchor);
+-			insert(target, div, anchor);
++			insert_hydrate(target, img, anchor);
++			insert_hydrate(target, t, anchor);
++			insert_hydrate(target, div, anchor);
+ 		},
+ 		p: noop,
+ 		i: noop,
+@@ -58,7 +58,7 @@ function create_fragment(ctx) {
+ class Component extends SvelteComponent {
+ 	constructor(options) {
+ 		super();
+-		init(this, options, null, create_fragment, safe_not_equal, {});
++		init_hydrate(this, options, null, create_fragment, safe_not_equal, {});
+ 	}
+ }
+ 
+diff --git a/test/js/samples/src-attribute-check/expected.js b/test/js/samples/src-attribute-check/expected.js
+index 8a13cff21c65c3c6edda96d144c9f8c32d9b47a9..2b913177b59d17ee755ffdb6131d61ca1b85aa43 100644
+--- a/test/js/samples/src-attribute-check/expected.js
++++ b/test/js/samples/src-attribute-check/expected.js
+@@ -6,8 +6,8 @@ import {
+ 	claim_space,
+ 	detach,
+ 	element,
+-	init,
+-	insert,
++	init_hydrate,
++	insert_hydrate,
+ 	noop,
+ 	safe_not_equal,
+ 	space,
+@@ -41,9 +41,9 @@ function create_fragment(ctx) {
+ 			if (!src_url_equal(img1.src, img1_src_value = "" + (/*slug*/ ctx[1] + ".jpg"))) attr(img1, "src", img1_src_value);
+ 		},
+ 		m(target, anchor) {
+-			insert(target, img0, anchor);
+-			insert(target, t, anchor);
+-			insert(target, img1, anchor);
++			insert_hydrate(target, img0, anchor);
++			insert_hydrate(target, t, anchor);
++			insert_hydrate(target, img1, anchor);
+ 		},
+ 		p(ctx, [dirty]) {
+ 			if (dirty & /*url*/ 1 && !src_url_equal(img0.src, img0_src_value = /*url*/ ctx[0])) {
+@@ -79,7 +79,7 @@ function instance($$self, $$props, $$invalidate) {
+ class Component extends SvelteComponent {
+ 	constructor(options) {
+ 		super();
+-		init(this, options, instance, create_fragment, safe_not_equal, { url: 0, slug: 1 });
++		init_hydrate(this, options, instance, create_fragment, safe_not_equal, { url: 0, slug: 1 });
+ 	}
+ }
+ 

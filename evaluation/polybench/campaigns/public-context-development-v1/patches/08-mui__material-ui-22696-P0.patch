@@ -1,0 +1,72 @@
+diff --git a/packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js b/packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js
+index 8e47b279d5a5d866d7489e43f7a5ec9497d6839a..786b92aad0cfcbd51c5e3ae1bf0fafc9ffc9ebb2 100644
+--- a/packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js
++++ b/packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js
+@@ -1461,6 +1461,29 @@ describe('<Autocomplete />', () => {
+       expect(combobox).to.have.attribute('aria-expanded', 'true');
+     });
+ 
++    it('keeps the list box open when selecting multiple options with Ctrl or Shift', () => {
++      const { getByRole, getAllByRole } = render(
++        <Autocomplete
++          multiple
++          options={['one', 'two']}
++          renderInput={(params) => <TextField {...params} />}
++        />,
++      );
++      const combobox = getByRole('combobox');
++      const textbox = getByRole('textbox');
++
++      fireEvent.mouseDown(textbox);
++      const options = getAllByRole('option');
++      fireEvent.click(options[0], { ctrlKey: true });
++      expect(combobox).to.have.attribute('aria-expanded', 'true');
++      expect(options[0]).to.have.attribute('aria-selected', 'true');
++      fireEvent.click(options[1], { shiftKey: true });
++      expect(combobox).to.have.attribute('aria-expanded', 'true');
++      expect(options[1]).to.have.attribute('aria-selected', 'true');
++      fireEvent.click(options[0]);
++      expect(combobox).to.have.attribute('aria-expanded', 'false');
++    });
++
+     it('should not toggle list box', () => {
+       const handleHighlightChange = spy();
+       const { getByRole } = render(
+diff --git a/packages/material-ui-lab/src/useAutocomplete/useAutocomplete.js b/packages/material-ui-lab/src/useAutocomplete/useAutocomplete.js
+index a9d8d48de30823165fb7c928ba12fe38ab7d6ee4..f77155f23aac5c8662d0fa5ca35f7a83f6f30b38 100644
+--- a/packages/material-ui-lab/src/useAutocomplete/useAutocomplete.js
++++ b/packages/material-ui-lab/src/useAutocomplete/useAutocomplete.js
+@@ -530,7 +530,13 @@ export default function useAutocomplete(props) {
+ 
+   const isTouch = React.useRef(false);
+ 
+-  const selectNewValue = (event, option, reasonProp = 'select-option', origin = 'options') => {
++  const selectNewValue = (
++    event,
++    option,
++    reasonProp = 'select-option',
++    origin = 'options',
++    closeOnSelect = true,
++  ) => {
+     let reason = reasonProp;
+     let newValue = option;
+ 
+@@ -563,7 +569,7 @@ export default function useAutocomplete(props) {
+     resetInputValue(event, newValue);
+ 
+     handleValue(event, newValue, reason, { option });
+-    if (!disableCloseOnSelect) {
++    if (!disableCloseOnSelect && closeOnSelect) {
+       handleClose(event, reason);
+     }
+ 
+@@ -843,7 +849,8 @@ export default function useAutocomplete(props) {
+ 
+   const handleOptionClick = (event) => {
+     const index = Number(event.currentTarget.getAttribute('data-option-index'));
+-    selectNewValue(event, filteredOptions[index], 'select-option');
++    const closeOnSelect = !multiple || (!event.ctrlKey && !event.shiftKey);
++    selectNewValue(event, filteredOptions[index], 'select-option', 'options', closeOnSelect);
+ 
+     isTouch.current = false;
+   };

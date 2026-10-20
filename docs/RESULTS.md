@@ -14,18 +14,22 @@ The [exact-model technical follow-up](../evaluation/feedback-development/evidenc
 records title none/refusal before correction, installed model/high frames after
 correction and synthetic direct/D delivery. It makes no model effectiveness claim.
 
-## Public context development v1: prepared, quality NOT RUN
+## Public context development v1: one Plain context win, no core advantage
 
-The [plan](../evaluation/polybench/campaigns/public-context-development-v1/PLAN.md),
-[technical preflight](../evaluation/polybench/campaigns/public-context-development-v1/PREFLIGHT.md)
-and [frozen manifest](../evaluation/polybench/campaigns/public-context-development-v1/frozen-manifest.json)
-prepare four new tasks from two repositories for 16 one-shot P0/P1/C0/C1 slots.
-All eight official baseline/gold controls, online/offline byte equality, isolated
-input checks and four scripted real-launcher cells passed. New evaluation-model
-requests: **0**; quality: **NOT RUN**. Running requires separate authorization.
-The selection is limited to tasks with accessible eligible public comments; this
-development screening cannot establish superiority, equivalence or training-set
-independence. Candidate B remains optional and historical results are unchanged.
+The [completed report](../evaluation/polybench/campaigns/public-context-development-v1/REPORT.md)
+and [machine results](../evaluation/polybench/campaigns/public-context-development-v1/results.json)
+record all 16 authorized one-shot GPT-6 Luna/high attempts and independent
+evaluations. R/D: **P0 0/4, P1 1/4, C0 0/4, C1 0/4**; T: **4/4 in every arm**.
+P1−P0 has one win and three ties; C1−C0 and C0−P0 each have four ties;
+C1−P1 has one loss and three ties. No pairs are unknown. Five complete patches
+were officially rejected after the evaluator's test patch; eleven reached tests.
+All 397 real requests have complete usage and returned `gpt-6-luna`.
+
+The owner authorized the [model/freeze amendment](../evaluation/polybench/campaigns/public-context-development-v1/MODEL-AMENDMENT.md)
+before the first model request. Original preparation remains historical.
+These four tasks with accessible comments cannot establish superiority,
+equivalence or training-set independence. Core remains optional; historical
+campaigns and product defaults are unchanged.
 
 ## Differential compatibility replay: prototype works, comparison stopped
 
