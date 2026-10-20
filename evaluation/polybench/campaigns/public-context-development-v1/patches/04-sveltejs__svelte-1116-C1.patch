@@ -1,0 +1,86 @@
+diff --git a/src/generators/server-side-rendering/visitors/Component.ts b/src/generators/server-side-rendering/visitors/Component.ts
+index 4843010fcbcb5bb79fad5004be7daf43c67d654e..aff96f67f7ba3b6e126a06abbf0c5749e77289b7 100644
+--- a/src/generators/server-side-rendering/visitors/Component.ts
++++ b/src/generators/server-side-rendering/visitors/Component.ts
+@@ -86,10 +86,7 @@ export default function visitComponent(
+ 
+ 	let open = `\${${expression}._render(__result, {${props}}`;
+ 
+-	const options = [];
+-	if (generator.options.store) {
+-		options.push(`store: options.store`);
+-	}
++	const options = [`store: options.store`];
+ 
+ 	if (node.children.length) {
+ 		const appendTarget: AppendTarget = {
+diff --git a/test/server-side-rendering/index.js b/test/server-side-rendering/index.js
+index 019c452c2fce18d99e3aed2fc5b1b7a5ade5cf19..dced840e4b5cdf759ab0d25bf2f31ffa82a1824c 100644
+--- a/test/server-side-rendering/index.js
++++ b/test/server-side-rendering/index.js
+@@ -58,8 +58,17 @@ describe("ssr", () => {
+ 				const expectedCss = tryToReadFile(`${dir}/_expected.css`) || "";
+ 
+ 				const data = tryToLoadJson(`${dir}/data.json`);
+-
+-				const rendered = component.render(data);
++				const storeState = tryToLoadJson(`${dir}/store.json`);
++				const options = storeState && {
++					store: {
++						_init: props => props.reduce((state, prop) => {
++							state[`$${prop}`] = storeState[prop];
++							return state;
++						}, {})
++					}
++				};
++
++				const rendered = component.render(data, options || {});
+ 				const { html, css, head } = rendered;
+ 
+ 				// rendered.toString() === rendered.html
+diff --git a/test/server-side-rendering/samples/component-store/Widget.html b/test/server-side-rendering/samples/component-store/Widget.html
+new file mode 100644
+index 0000000000000000000000000000000000000000..579c36c880477a7df8ddd67b7986d2cfef3d082e
+--- /dev/null
++++ b/test/server-side-rendering/samples/component-store/Widget.html
+@@ -0,0 +1,5 @@
++{{#if $enabled}}
++	<p>enabled</p>
++{{else}}
++	<p>disabled</p>
++{{/if}}
+diff --git a/test/server-side-rendering/samples/component-store/_expected.html b/test/server-side-rendering/samples/component-store/_expected.html
+new file mode 100644
+index 0000000000000000000000000000000000000000..f4dc125f10badd20ff064d7d3ad64ea6c92f9677
+--- /dev/null
++++ b/test/server-side-rendering/samples/component-store/_expected.html
+@@ -0,0 +1,3 @@
++<div>
++	<p>enabled</p>
++</div>
+diff --git a/test/server-side-rendering/samples/component-store/main.html b/test/server-side-rendering/samples/component-store/main.html
+new file mode 100644
+index 0000000000000000000000000000000000000000..5b119b5527edf2c9cd26c4af3ad320abcde02550
+--- /dev/null
++++ b/test/server-side-rendering/samples/component-store/main.html
+@@ -0,0 +1,11 @@
++<div>
++	<Widget/>
++</div>
++
++<script>
++	import Widget from './Widget.html';
++
++	export default {
++		components: { Widget }
++	};
++</script>
+diff --git a/test/server-side-rendering/samples/component-store/store.json b/test/server-side-rendering/samples/component-store/store.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..361f651135ac0244df719ad21d2dbd4a8680bd91
+--- /dev/null
++++ b/test/server-side-rendering/samples/component-store/store.json
+@@ -0,0 +1,3 @@
++{
++	"enabled": true
++}

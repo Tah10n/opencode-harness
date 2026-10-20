@@ -1,27 +1,41 @@
+import {contextCampaign,contextTemplates,contextModes,contextVariants} from './public-context-campaign.mjs';
 // Scripted native OpenCode sessions; no auth read and no external model calls.
 import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';
 import {run} from './run.mjs';import {manifest} from '../support/manifest.mjs';
 import {local,campaign,selectionPath,arms,qualityCampaign} from './campaign.mjs';
 const quality=qualityCampaign(campaign?.name),runtime=JSON.parse(fs.readFileSync(local+'/runtime.json'));
-const direct=arm=>quality||['P','C'].includes(arm);
+const context=contextCampaign(campaign?.name);
+const variants=context?JSON.parse(fs.readFileSync(local+'/input-variants.json')):null;
+const direct=arm=>context||quality||['P','C'].includes(arm);
 const out=local+'/'+(process.argv[2]??'scripted-preflight');fs.mkdirSync(out,{mode:0o700});
 const task=process.argv[3]??'serverless__serverless-2434',source=local+'/author-inputs/'+task+'/source';
 const row=JSON.parse(fs.readFileSync(selectionPath)).selected.find(r=>r.instance_id===task);assert.ok(row);
 const checkArms=process.argv[4]?[process.argv[4]]:arms;assert.ok(checkArms.every(a=>arms.includes(a)));
-const attempts=checkArms.map((arm,i)=>({slot:i+1,task,arm,project:row.repo,source}));
-const inputManifests={};for(const a of attempts)inputManifests[task+'-'+a.arm]=manifest(source);
+const attempts=checkArms.map((arm,i)=>({slot:i+1,task,arm,project:row.repo,source:context?variants[task][contextVariants[arm]].source:source,...(context?{preparationStatus:'ready'}:{})}));
+const inputManifests={};for(const a of attempts)inputManifests[task+'-'+a.arm]=manifest(a.source);
 const config=JSON.parse(fs.readFileSync(local+'/experiment-config.json'));
 const environments=JSON.parse(fs.readFileSync(local+'/environments.json'));
 const environment=environments[source];assert.ok(environment);
 const shellQuote=value=>"'"+value.replaceAll("'", "'\"'\"'")+"'";
 const dependencyCheck=`node -e ${shellQuote('const fs=require("fs"); for(const d of '+JSON.stringify(environment.dependencyDirectories)+'){if(!fs.existsSync(d))throw Error("Missing local dependency directory: "+d);}console.log("PREPARED_WORKTREE_OK");')}`;
 const publicCheck=task==='serverless__serverless-2434'?'npm test -- --grep "should attach serverless instance"':dependencyCheck;
-fs.writeFileSync(out+'/freeze.json',JSON.stringify({version:1,experimentKind:process.argv[4]?'fixture':'polybench-preflight',...(campaign?{campaign:campaign.name,templates:quality?runtime.templates:{P:local+'/plain-dependencies',C:local+'/core-bundle',T:local+'/bundle'},...(quality?{armModes:runtime.armModes}:{}),recordingProfile:campaign.recording_profile}:{}),runtimeSha:runtime.sha,model:config.model,variant:runtime.variant,budgetMs:1800000,strategy:'direct',preflightPassed:true,streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,toolchain:local+'/toolchain',template:local+'/bundle',dependencies:local+'/plain-dependencies',config,attempts,inputManifests,environments,files:{}}));
+fs.writeFileSync(out+'/freeze.json',JSON.stringify({version:1,experimentKind:process.argv[4]?'fixture':'polybench-preflight',...(campaign?{campaign:campaign.name,templates:context?contextTemplates(local):quality?runtime.templates:{P:local+'/plain-dependencies',C:local+'/core-bundle',T:local+'/bundle'},...(context?{armModes:contextModes,inputVariants:variants}:quality?{armModes:runtime.armModes}:{}),recordingProfile:campaign.recording_profile}:{}),runtimeSha:runtime.sha,model:config.model,variant:runtime.variant,budgetMs:1800000,strategy:'direct',preflightPassed:true,streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,toolchain:local+'/toolchain',template:local+'/bundle',dependencies:local+'/plain-dependencies',config,attempts,inputManifests,environments,files:{}}));
 let seq=0;const states=new Map();
 const outcome=await run(out,{readAuth:()=>({access:'scripted-no-credential',accountId:'scripted'}),fetchImpl:async(url,settings)=>{
  assert.equal(url,'https://chatgpt.com/backend-api/codex/responses');const body=JSON.parse(settings.body),all=JSON.stringify(body);
  const a=attempts.find(a=>fs.existsSync(out+'/runs/'+task+'-'+a.arm+'/started.json')&&!fs.existsSync(out+'/runs/'+task+'-'+a.arm+'/completed.json'));assert.ok(a);
  const state=states.get(a.arm)??{parent:0,author:0};states.set(a.arm,state);
+ if(context){
+   const texts=[];const walk=v=>{if(typeof v==='string')texts.push(v);else if(v&&typeof v==='object')Object.values(v).forEach(walk);};walk(body);
+   const metadata=JSON.parse(fs.readFileSync(local+'/'+task+'/metadata.json'));
+   for(const text of texts)assert.ok(!text.includes(metadata.cutoff.basis),'Administrative evidence reached author');
+   const snapshot=JSON.parse(fs.readFileSync(local+'/'+task+'/prepared-context/snapshot.json'));
+   const audit=JSON.parse(fs.readFileSync(local+'/'+task+'/prepared-context/audit.json'));
+   const excluded=new Set(audit.excluded.map(c=>c.id));
+   const forbidden=snapshot.records.slice(2,-1).flatMap(r=>JSON.parse(r.body)).filter(c=>excluded.has(c.id)&&c.body.length).flatMap(c=>{const escaped=JSON.stringify(c.body).slice(1,-1);return [c.body,escaped,escaped.replaceAll('"','\\"')];});
+   const evidence=JSON.parse(fs.readFileSync(local+'/'+task+'/source-evidence.json'));forbidden.push(...evidence.commits.map(c=>c.sha));
+   for(const text of texts)for(const denied of forbidden)assert.ok(!text.includes(denied),'Excluded/admin text reached provider request');
+ }
  const names=(body.tools??[]).map(t=>t.name),title=!names.length,author=direct(a.arm)||all.includes('Implement the complete original task');let call;
  if(names.length){assert.ok(!names.includes('webfetch'));for(const name of ['read','bash','glob','grep','apply_patch'])assert.ok(names.includes(name));}
  if(direct(a.arm)){assert.ok(!names.includes('harness_task'));assert.ok(!all.includes('Native task workflow'));}
@@ -30,10 +44,17 @@ const outcome=await run(out,{readAuth:()=>({access:'scripted-no-credential',acco
  if(!title&&a.arm==='T'&&author)assert.ok(names.includes('harness_investigate'),'Investigator tool missing');
  if(!title&&!author){assert.ok(names.includes('harness_task'));if(state.parent++===0)call={name:'harness_task',args:{}};}
  if(!title&&author){
-  const original=fs.readFileSync(source+'/TASK.md','utf8');
+  const original=fs.readFileSync(a.source+'/TASK.md','utf8');
   const nativeTexts=(body.input??[]).flatMap(x=>Array.isArray(x.content)?x.content.map(c=>c.text??''):[x.content??'']);
   const decoded=nativeTexts.map(t=>t.startsWith('\"')&&t.endsWith('\"')?t.slice(1,-1).replaceAll('\\\"','\"'):t);
   assert.ok(decoded.some(t=>t.includes(original.trim()))||all.includes(JSON.stringify(original.trim()).slice(1,-1)),'Full original prompt missing');
+  if(context){
+   const envelope='"'+original.replaceAll('"','\\"')+'"';
+   assert.ok(nativeTexts.includes(envelope),'Whole exact task envelope missing');
+   const core=fs.readFileSync(local+'/core-bundle/core.md','utf8').trim();
+   assert.equal(all.includes(JSON.stringify(core).slice(1,-1)),contextModes[a.arm]==='core','Core presence differs from cell mode');
+
+  }
   const n=state.author++;
   const calls=[{name:'bash',args:{command:'node --version && npm --version && '+dependencyCheck,description:'Verify prepared project toolchain',timeout:120000}},
    {name:'apply_patch',args:{patchText:'*** Begin Patch\n*** Add File: preflight-marker.txt\n+scripted recorder check, not a model solution\n*** End Patch'}},

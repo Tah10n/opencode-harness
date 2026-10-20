@@ -31,6 +31,6 @@ try{
  const patch=fs.readFileSync(patchDirectory+'/model.patch','utf8');
  for(const text of ['deleted file mode 100644','new file mode 100644','old mode 100644\nnew mode 100755'])assert.ok(patch.includes(text));
  assert.equal(JSON.parse(fs.readFileSync(patchDirectory+'/patch-capture.json')).roundtripVerified,true);
- fs.writeFileSync(output+'/verification.json',JSON.stringify({passed:true,providerRequests:0,opencode:'1.18.26',projectNode:preparedEnvironment.projectNode,diagnosticNode:'24.19.0',freshGitHistory:true,network:'none',readOnlyRoot:true,mounts:inspect.Mounts.map(m=>({destination:m.Destination,readOnly:!m.RW}))},null,2));
+ fs.writeFileSync(output+'/verification.json',JSON.stringify({passed:true,captureRoundtrip:true,providerRequests:0,opencode:'1.18.26',projectNode:preparedEnvironment.projectNode,diagnosticNode:'24.19.0',freshGitHistory:true,network:'none',readOnlyRoot:true,mounts:inspect.Mounts.map(m=>({destination:m.Destination,readOnly:!m.RW}))},null,2));
 }finally{assert.equal(session.close(),0);}
 console.log('Actual offline author container preflight passed');

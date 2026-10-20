@@ -1,0 +1,55 @@
+diff --git a/packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js b/packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js
+index 8e47b279d5a5d866d7489e43f7a5ec9497d6839a..5a7bbbf14486ab3d82ba3923acff53cadb974269 100644
+--- a/packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js
++++ b/packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js
+@@ -366,6 +366,33 @@ describe('<Autocomplete />', () => {
+   });
+ 
+   describe('prop: multiple', () => {
++    it('keeps the popup open on modifier-click and closes on a regular click', () => {
++      const options = ['one', 'two', 'three'];
++      const handleChange = spy();
++      const { getAllByRole, getByRole } = render(
++        <Autocomplete
++          {...defaultProps}
++          multiple
++          options={options}
++          onChange={handleChange}
++          renderInput={(params) => <TextField {...params} autoFocus />}
++        />,
++      );
++      const combobox = getByRole('combobox');
++
++      fireEvent.click(getAllByRole('option')[0], { ctrlKey: true });
++      expect(combobox).to.have.attribute('aria-expanded', 'true');
++      expect(getAllByRole('option')[0]).to.have.attribute('aria-selected', 'true');
++
++      fireEvent.click(getAllByRole('option')[1], { shiftKey: true });
++      expect(combobox).to.have.attribute('aria-expanded', 'true');
++      expect(getAllByRole('option')[1]).to.have.attribute('aria-selected', 'true');
++
++      fireEvent.click(getAllByRole('option')[2]);
++      expect(combobox).to.have.attribute('aria-expanded', 'false');
++      expect(handleChange.args[2][1]).to.deep.equal(options);
++    });
++
+     it('should not crash', () => {
+       const { getByRole } = render(
+         <Autocomplete
+diff --git a/packages/material-ui-lab/src/useAutocomplete/useAutocomplete.js b/packages/material-ui-lab/src/useAutocomplete/useAutocomplete.js
+index a9d8d48de30823165fb7c928ba12fe38ab7d6ee4..3fb9c7f98899c3dc17f147ecc8419f7243aca5f3 100644
+--- a/packages/material-ui-lab/src/useAutocomplete/useAutocomplete.js
++++ b/packages/material-ui-lab/src/useAutocomplete/useAutocomplete.js
+@@ -563,7 +563,11 @@ export default function useAutocomplete(props) {
+     resetInputValue(event, newValue);
+ 
+     handleValue(event, newValue, reason, { option });
+-    if (!disableCloseOnSelect) {
++    const modifierClick =
++      multiple &&
++      event.type === 'click' &&
++      (event.ctrlKey || event.metaKey || event.shiftKey);
++    if (!disableCloseOnSelect && !modifierClick) {
+       handleClose(event, reason);
+     }
+ 

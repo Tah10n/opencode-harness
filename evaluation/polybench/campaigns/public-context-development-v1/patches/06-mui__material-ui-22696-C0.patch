@@ -1,0 +1,51 @@
+diff --git a/packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js b/packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js
+index 8e47b279d5a5d866d7489e43f7a5ec9497d6839a..2dffbc44ba34d3184a456a8d7aa3be21274a69c0 100644
+--- a/packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js
++++ b/packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js
+@@ -366,6 +366,33 @@ describe('<Autocomplete />', () => {
+   });
+ 
+   describe('prop: multiple', () => {
++    it('keeps the popup open when selecting options with Ctrl or Shift', () => {
++      const handleChange = spy();
++      const { getByRole, getAllByRole } = render(
++        <Autocomplete
++          {...defaultProps}
++          multiple
++          options={['one', 'two', 'three']}
++          onChange={handleChange}
++          renderInput={(params) => <TextField {...params} />}
++        />,
++      );
++      const textbox = getByRole('textbox');
++      const combobox = getByRole('combobox');
++
++      fireEvent.mouseDown(textbox);
++      fireEvent.click(getAllByRole('option')[0]);
++      expect(combobox).to.have.attribute('aria-expanded', 'false');
++
++      fireEvent.mouseDown(textbox);
++      fireEvent.click(getAllByRole('option')[1], { ctrlKey: true });
++      expect(combobox).to.have.attribute('aria-expanded', 'true');
++
++      fireEvent.click(getAllByRole('option')[2], { shiftKey: true });
++      expect(combobox).to.have.attribute('aria-expanded', 'true');
++      expect(handleChange.lastCall.args[1]).to.deep.equal(['one', 'two', 'three']);
++    });
++
+     it('should not crash', () => {
+       const { getByRole } = render(
+         <Autocomplete
+diff --git a/packages/material-ui-lab/src/useAutocomplete/useAutocomplete.js b/packages/material-ui-lab/src/useAutocomplete/useAutocomplete.js
+index a9d8d48de30823165fb7c928ba12fe38ab7d6ee4..405a5bcdfb9a44372b68e8cc526122d9cbaea598 100644
+--- a/packages/material-ui-lab/src/useAutocomplete/useAutocomplete.js
++++ b/packages/material-ui-lab/src/useAutocomplete/useAutocomplete.js
+@@ -563,7 +563,7 @@ export default function useAutocomplete(props) {
+     resetInputValue(event, newValue);
+ 
+     handleValue(event, newValue, reason, { option });
+-    if (!disableCloseOnSelect) {
++    if (!disableCloseOnSelect && !(multiple && event && (event.ctrlKey || event.shiftKey))) {
+       handleClose(event, reason);
+     }
+ 

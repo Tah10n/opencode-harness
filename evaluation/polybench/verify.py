@@ -85,14 +85,24 @@ if '--consolidated-dataset' in __import__('sys').argv:
  from campaign import CONFIG as active_config, SELECTION as active_selection
  active_config=active_config or config
  with (root/active_config['local_directory']/'verified.csv').open(newline='') as f: full=list(csv.DictReader(f))
- if active_config['name'] in ['evidence-backed-core-development-v1','evidence-backed-core-h2-v1','quality-confirmation-v1']:
+ if active_config['name'] in ['public-context-development-v1','evidence-backed-core-development-v1','evidence-backed-core-h2-v1','quality-confirmation-v1']:
   active_saved=json.loads(active_selection.read_text())
   assert len(active_saved['selected'])==active_config['task_count']
   assert len(active_saved['slots'])==active_config['slot_count']
   assert __import__('hashlib').sha256((root/active_config['local_directory']/'verified.csv').read_bytes()).hexdigest()==active_saved['dataset_sha256']
   by_id={x['instance_id']:x for x in full};chosen=[by_id[x['instance_id']] for x in active_saved['selected']]
   assert all(all(row[k]==saved[k] for k in saved) for row,saved in zip(chosen,active_saved['selected']))
-  checked=subprocess.run(['node','--input-type=module','-e',"import {qualityAssignments} from './evaluation/polybench/campaign.mjs'; qualityAssignments("+json.dumps(active_config['name'])+");"],cwd=root,capture_output=True,text=True)
+  check="import {contextAssignments} from './evaluation/polybench/public-context-campaign.mjs'; contextAssignments();" if active_config['name']=='public-context-development-v1' else "import {qualityAssignments} from './evaluation/polybench/campaign.mjs'; qualityAssignments("+json.dumps(active_config['name'])+");"
+  if active_config['name']=='public-context-development-v1':
+   candidates=m.public_context_pool(full,active_config)
+   decisions=active_saved['decisions']
+   assert len(decisions)<=12 and len(decisions)==active_saved['candidates_inspected']
+   assert [r['instance_id'] for r in candidates[:len(decisions)]]==[d['instance_id'] for d in decisions]
+   assert [d['instance_id'] for d in decisions if d['disposition']=='selected']==[r['instance_id'] for r in active_saved['selected']]
+   normalized=lambda text:' '.join(text.split()).casefold()
+   prior={normalized(r['problem_statement']) for r in full if r['instance_id'] in active_config['excluded_instance_ids']}
+   assert all(normalized(r['problem_statement']) not in prior for r in chosen), 'Repeated historical issue statement'
+  checked=subprocess.run(['node','--input-type=module','-e',check],cwd=root,capture_output=True,text=True)
   if checked.returncode:raise RuntimeError(checked.stdout+checked.stderr)
  elif active_config['name']=='consolidated-remaining-v1':
   selected,slots=m.remaining_assignment(active_config)
@@ -252,5 +262,27 @@ with tempfile.TemporaryDirectory() as tmp:
  with contextlib.redirect_stdout(io.StringIO()):collector.main()
  by={x['arm']:x for x in json.loads((batch/'accounting.json').read_text())['slots']}
  assert by['H1']['R'] is True and by['H1']['T_delivery'] is False and by['H1']['D'] is False and by['H1']['artifact_kind']=='partial'
+ # Four-cell report uses mode mapping, complete patch exports and the four specified pairs.
+ context_arms=['P0','P1','C0','C1']
+ for arm in ['P0','P1','C1']:
+  shutil.copytree(batch/'runs'/(task+'-P'),batch/'runs'/(task+'-'+arm))
+  shutil.copytree(base/'evaluations/P',base/'evaluations'/arm)
+ (batch/'runs'/(task+'-C0')/'provider-metadata.json').write_text('[]')
+ failed=base/'evaluations/P1/results'/(task+'_result.json')
+ failed.write_text(json.dumps({'resolved':False,'passed_tests':[],'failed_tests':['public-fixture'],'patch_applied':True}))
+ context_slots=[{'slot':i+1,'instance_id':task,'arm':arm} for i,arm in enumerate(context_arms)]
+ (base/'selection.json').write_text(json.dumps({'selected':[selected],'slots':context_slots}))
+ shutil.rmtree(batch/'export')
+ r.export_started(context_slots,{i+1:{'started':arm!='C0','patch':patch if arm!='C0' else None} for i,arm in enumerate(context_arms)},[selected],batch/'export')
+ collector.CONFIG={'name':'public-context-development-v1','arm_modes':{'P0':'plain','P1':'plain','C0':'core','C1':'core'}};collector.ARMS=context_arms
+ with contextlib.redirect_stdout(io.StringIO()):collector.main()
+ data=json.loads((batch/'accounting.json').read_text());by={x['arm']:x for x in data['slots']}
+ assert by['P0']['D'] is True and by['P1']['R'] is False and by['P1']['T'] is True and by['P1']['D'] is False
+ assert by['C0']['status']=='not_started' and by['C0']['D'] is None and by['C1']['D'] is True
+ assert set(data['comparisons'])=={'P1-P0','C1-C0','C0-P0','C1-P1'}
+ assert data['comparisons']['P1-P0']['D']['losses']==1 and data['comparisons']['C1-P1']['D']['wins']==1
+ assert data['comparisons']['C1-C0']['D']['unknown']==1 and data['comparisons']['C0-P0']['D']['unknown']==1
+ assert json.loads((batch/'export/C1/predictions.jsonl').read_text())['model_patch']==patch
+ print('Four-cell report: direct delivery, confirmed FAIL, not_started unknown, exact pairs and unchanged patch export passed')
 print('New direct core delivery, roundtrip/capture/provider trust and primary D accounting passed')
 subprocess.run([__import__('sys').executable, Path(__file__).with_name('verify_tap_identity.py')], check=True)

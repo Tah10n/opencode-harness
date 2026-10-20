@@ -1,3 +1,4 @@
+import {contextCampaign,contextModes,contextTemplates} from './public-context-campaign.mjs';
 // Public pinned installation only. No credentials or inference.
 import fs from 'node:fs';import path from 'node:path';import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
@@ -57,6 +58,6 @@ const config={
 };
 fs.writeFileSync(local+'/experiment-config.json',JSON.stringify(config,null,2));
 if(!campaign)assertClean();
-const templates=quality?qualityTemplates(campaign):null;
-fs.writeFileSync(local+'/runtime.json',JSON.stringify({sha:runtimeSha,adapterSha,model,variant,opencode:'1.18.26',...(quality?{templates,armModes:campaign.arm_modes,armProducts:campaign.arm_products,bundleDirectories}:{} )},null,2));
+const templates=quality?qualityTemplates(campaign):contextCampaign(campaign?.name)?contextTemplates(local):null;
+fs.writeFileSync(local+'/runtime.json',JSON.stringify({sha:runtimeSha,adapterSha,model,variant,opencode:'1.18.26',...(quality?{templates,armModes:campaign.arm_modes,armProducts:campaign.arm_products,bundleDirectories}:contextCampaign(campaign?.name)?{templates,armModes:contextModes,bundleDirectories}:{} )},null,2));
 console.log('Current native bundle and pinned Linux ARM64 tools prepared; provider requests: 0');

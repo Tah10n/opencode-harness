@@ -1,0 +1,85 @@
+diff --git a/packages/material-ui/src/withWidth/withWidth.d.ts b/packages/material-ui/src/withWidth/withWidth.d.ts
+index fa980f3deef64769265969935be2c95b608664d6..5ded5189a33bf80406cc3c54b91be86aafea2fb2 100644
+--- a/packages/material-ui/src/withWidth/withWidth.d.ts
++++ b/packages/material-ui/src/withWidth/withWidth.d.ts
+@@ -7,6 +7,7 @@ export interface WithWidthOptions {
+ 
+ export interface WithWidthProps {
+   width: Breakpoint;
++  innerRef?: React.Ref<any> | React.RefObject<any>;
+ }
+ 
+ export function isWidthDown(
+diff --git a/packages/material-ui/src/withWidth/withWidth.js b/packages/material-ui/src/withWidth/withWidth.js
+index 670c3d36c2dc107b345b60a5dcf8836e5991c13d..0de4edc53af64c6d46daee6749a133e3417639c5 100644
+--- a/packages/material-ui/src/withWidth/withWidth.js
++++ b/packages/material-ui/src/withWidth/withWidth.js
+@@ -98,7 +98,7 @@ const withWidth = (options = {}) => Component => {
+     }
+ 
+     render() {
+-      const { initialWidth, theme, width, ...other } = this.props;
++      const { initialWidth, innerRef, theme, width, ...other } = this.props;
+ 
+       const props = {
+         width:
+@@ -127,7 +127,7 @@ const withWidth = (options = {}) => Component => {
+ 
+       return (
+         <EventListener target="window" onResize={this.handleResize}>
+-          <Component {...more} {...props} />
++          <Component {...more} {...props} ref={innerRef} />
+         </EventListener>
+       );
+     }
+@@ -144,6 +144,10 @@ const withWidth = (options = {}) => Component => {
+      * http://caniuse.com/#search=client%20hint
+      */
+     initialWidth: PropTypes.oneOf(['xs', 'sm', 'md', 'lg', 'xl']),
++    /**
++     * Use that property to pass a ref callback to the decorated component.
++     */
++    innerRef: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
+     /**
+      * @ignore
+      */
+diff --git a/packages/material-ui/src/withWidth/withWidth.test.js b/packages/material-ui/src/withWidth/withWidth.test.js
+index 8902ebc344fd5f9cf7efabf8b986b03df3090f80..a900ad0a77df6c1ec57ea4b8f84f4bcf59884661 100644
+--- a/packages/material-ui/src/withWidth/withWidth.test.js
++++ b/packages/material-ui/src/withWidth/withWidth.test.js
+@@ -9,6 +9,14 @@ import createMuiTheme from '../styles/createMuiTheme';
+ const Empty = () => <div />;
+ const EmptyWithWidth = withWidth()(Empty);
+ 
++class ComponentWithState extends React.Component {
++  state = {};
++
++  render() {
++    return <div />;
++  }
++}
++
+ const breakpoints = createBreakpoints({});
+ const TEST_ENV_WIDTH = window.innerWidth > breakpoints.values.md ? 'md' : 'sm';
+ 
+@@ -39,6 +47,20 @@ describe('withWidth', () => {
+     });
+   });
+ 
++  describe('prop: innerRef', () => {
++    it('should provide a ref on the inner component', () => {
++      let innerInstance;
++      const handleRef = instance => {
++        innerInstance = instance;
++      };
++      const ComponentWithWidth = withWidth()(ComponentWithState);
++      const wrapper = mount(<ComponentWithWidth initialWidth="md" innerRef={handleRef} />);
++
++      assert.instanceOf(innerInstance, ComponentWithState);
++      assert.strictEqual(wrapper.find(ComponentWithState).props().innerRef, undefined);
++    });
++  });
++
+   describe('browser', () => {
+     it('should provide the right width to the child element', () => {
+       const wrapper = mount(<EmptyWithWidth />);

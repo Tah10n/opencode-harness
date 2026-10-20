@@ -1,0 +1,3170 @@
+{
+  "schema_version": 1,
+  "campaign": "public-context-development-v1",
+  "measured_at": "2026-10-20",
+  "original_accepted_head": "c57888631a8c75bd31f800957428fc80028ebdd5",
+  "original_freeze_sha256": "ab80a1800f9b4a5622a33e80eb87c8be63c85fc16f1acc3c596a7f732ca8579b",
+  "participant_head": "8c12965db3da07a474ffa7a749c0be9f9488ec15",
+  "product_sha": "ffbf979b4fdae958b71796e22e6b7a81a0edce50",
+  "adapter_sha": "41dd7ecc7b05be623f8b54186d80b53b4ed8870a",
+  "freeze_sha256": "e66e10b7725609fae063f444856f91ec6474e2308ad6e360fe24b3e8b4904970",
+  "freeze_unchanged_during_series": true,
+  "model": "openai/gpt-6-luna",
+  "actual_response_models": [
+    "gpt-6-luna"
+  ],
+  "opencode": "1.18.26",
+  "effort": "high",
+  "attempt_budget_seconds": 1800,
+  "concurrency": 1,
+  "attempt_retries": 0,
+  "assigned": 16,
+  "started": 16,
+  "completed": 16,
+  "officially_evaluated": 16,
+  "test_executed_slots": 11,
+  "official_patch_rejections": 5,
+  "outcome": {
+    "status": "finished",
+    "pause": null
+  },
+  "scheduling_pause": null,
+  "endpoint": "D = R AND T_delivery; official patch rejection is R=false, not unknown",
+  "request_accounting": {
+    "requests": 397,
+    "request_kinds": {
+      "title": 16,
+      "work": 381
+    },
+    "actual_models": [
+      "gpt-6-luna"
+    ],
+    "usage": {
+      "input_tokens": 13578378,
+      "output_tokens": 88266,
+      "cached_tokens": 5416960,
+      "reasoning_tokens": 37317
+    },
+    "unknown_usage_requests": 0,
+    "unknown_provider_outcomes": 0,
+    "money": null
+  },
+  "costs": {
+    "requests": 397,
+    "input_tokens": 13578378,
+    "output_tokens": 88266,
+    "cached_tokens": 5416960,
+    "reasoning_tokens": 37317,
+    "native_elapsed_seconds": 4938.607964122999,
+    "capture_seconds": 15.770947874000878,
+    "container_cleanup_seconds": 4.843964416999603,
+    "tool_calls": 632,
+    "money": null
+  },
+  "arms": {
+    "P0": {
+      "assigned": 4,
+      "completed": 4,
+      "officially_evaluated": 4,
+      "R": 0,
+      "T": 4,
+      "D": 0,
+      "costs": {
+        "requests": 88,
+        "input_tokens": 2444573,
+        "output_tokens": 21451,
+        "cached_tokens": 1013376,
+        "reasoning_tokens": 8489,
+        "native_elapsed_seconds": 887.4128165419996,
+        "capture_seconds": 3.7656732490006832,
+        "container_cleanup_seconds": 0.9308029589998769,
+        "tool_calls": 137,
+        "money": null
+      }
+    },
+    "P1": {
+      "assigned": 4,
+      "completed": 4,
+      "officially_evaluated": 4,
+      "R": 1,
+      "T": 4,
+      "D": 1,
+      "costs": {
+        "requests": 90,
+        "input_tokens": 2402927,
+        "output_tokens": 15220,
+        "cached_tokens": 954880,
+        "reasoning_tokens": 5535,
+        "native_elapsed_seconds": 1078.0816543320002,
+        "capture_seconds": 3.830897750000586,
+        "container_cleanup_seconds": 0.9467528750003549,
+        "tool_calls": 142,
+        "money": null
+      }
+    },
+    "C0": {
+      "assigned": 4,
+      "completed": 4,
+      "officially_evaluated": 4,
+      "R": 0,
+      "T": 4,
+      "D": 0,
+      "costs": {
+        "requests": 101,
+        "input_tokens": 3039026,
+        "output_tokens": 21926,
+        "cached_tokens": 1196672,
+        "reasoning_tokens": 9270,
+        "native_elapsed_seconds": 1129.5657152919994,
+        "capture_seconds": 3.8125576239998917,
+        "container_cleanup_seconds": 1.0041785829996224,
+        "tool_calls": 160,
+        "money": null
+      }
+    },
+    "C1": {
+      "assigned": 4,
+      "completed": 4,
+      "officially_evaluated": 4,
+      "R": 0,
+      "T": 4,
+      "D": 0,
+      "costs": {
+        "requests": 118,
+        "input_tokens": 5691852,
+        "output_tokens": 29669,
+        "cached_tokens": 2252032,
+        "reasoning_tokens": 14023,
+        "native_elapsed_seconds": 1843.5477779569999,
+        "capture_seconds": 4.361819250999717,
+        "container_cleanup_seconds": 1.9622299999997486,
+        "tool_calls": 193,
+        "money": null
+      }
+    }
+  },
+  "comparisons": {
+    "P1-P0": {
+      "candidate": "P1",
+      "control": "P0",
+      "R": {
+        "wins": 1,
+        "losses": 0,
+        "ties": 3,
+        "unknown": 0
+      },
+      "T": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 4,
+        "unknown": 0
+      },
+      "D": {
+        "wins": 1,
+        "losses": 0,
+        "ties": 3,
+        "unknown": 0
+      },
+      "costs": {
+        "candidate": {
+          "requests": 90,
+          "input_tokens": 2402927,
+          "output_tokens": 15220,
+          "cached_tokens": 954880,
+          "reasoning_tokens": 5535,
+          "native_elapsed_seconds": 1078.0816543320002,
+          "capture_seconds": 3.830897750000586,
+          "container_cleanup_seconds": 0.9467528750003549,
+          "tool_calls": 142,
+          "money": null
+        },
+        "control": {
+          "requests": 88,
+          "input_tokens": 2444573,
+          "output_tokens": 21451,
+          "cached_tokens": 1013376,
+          "reasoning_tokens": 8489,
+          "native_elapsed_seconds": 887.4128165419996,
+          "capture_seconds": 3.7656732490006832,
+          "container_cleanup_seconds": 0.9308029589998769,
+          "tool_calls": 137,
+          "money": null
+        },
+        "delta": {
+          "requests": 2,
+          "input_tokens": -41646,
+          "output_tokens": -6231,
+          "cached_tokens": -58496,
+          "reasoning_tokens": -2954,
+          "native_elapsed_seconds": 190.66883779000057,
+          "capture_seconds": 0.06522450099990262,
+          "container_cleanup_seconds": 0.015949916000478015,
+          "tool_calls": 5,
+          "money": null
+        }
+      },
+      "per_task": [
+        {
+          "instance_id": "sveltejs__svelte-1116",
+          "R": {
+            "candidate": true,
+            "control": false,
+            "delta": 1
+          },
+          "T": {
+            "candidate": true,
+            "control": true,
+            "delta": 0
+          },
+          "D": {
+            "candidate": true,
+            "control": false,
+            "delta": 1
+          },
+          "cost_delta": {
+            "requests": -4,
+            "input_tokens": -53911,
+            "output_tokens": -318,
+            "cached_tokens": -15104,
+            "reasoning_tokens": -697,
+            "native_elapsed_seconds": 103.39442699899996,
+            "capture_seconds": 0.03124637599999558,
+            "container_cleanup_seconds": -0.005066374999936674,
+            "tool_calls": -3,
+            "money": null
+          }
+        },
+        {
+          "instance_id": "mui__material-ui-22696",
+          "R": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "T": {
+            "candidate": true,
+            "control": true,
+            "delta": 0
+          },
+          "D": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "cost_delta": {
+            "requests": 5,
+            "input_tokens": -99518,
+            "output_tokens": -103,
+            "cached_tokens": 8192,
+            "reasoning_tokens": -138,
+            "native_elapsed_seconds": 187.8530371670001,
+            "capture_seconds": -0.03655125000001869,
+            "container_cleanup_seconds": -0.07177466699993237,
+            "tool_calls": 2,
+            "money": null
+          }
+        },
+        {
+          "instance_id": "sveltejs__svelte-6525",
+          "R": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "T": {
+            "candidate": true,
+            "control": true,
+            "delta": 0
+          },
+          "D": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "cost_delta": {
+            "requests": 1,
+            "input_tokens": 118371,
+            "output_tokens": -4873,
+            "cached_tokens": -58752,
+            "reasoning_tokens": -2010,
+            "native_elapsed_seconds": -129.25572012599935,
+            "capture_seconds": -0.006307874999940455,
+            "container_cleanup_seconds": -0.04158245899993929,
+            "tool_calls": 9,
+            "money": null
+          }
+        },
+        {
+          "instance_id": "mui__material-ui-12236",
+          "R": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "T": {
+            "candidate": true,
+            "control": true,
+            "delta": 0
+          },
+          "D": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "cost_delta": {
+            "requests": 0,
+            "input_tokens": -6588,
+            "output_tokens": -937,
+            "cached_tokens": 7168,
+            "reasoning_tokens": -109,
+            "native_elapsed_seconds": 28.677093749999997,
+            "capture_seconds": 0.07683724999986596,
+            "container_cleanup_seconds": 0.13437341700028627,
+            "tool_calls": -3,
+            "money": null
+          }
+        }
+      ]
+    },
+    "C1-C0": {
+      "candidate": "C1",
+      "control": "C0",
+      "R": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 4,
+        "unknown": 0
+      },
+      "T": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 4,
+        "unknown": 0
+      },
+      "D": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 4,
+        "unknown": 0
+      },
+      "costs": {
+        "candidate": {
+          "requests": 118,
+          "input_tokens": 5691852,
+          "output_tokens": 29669,
+          "cached_tokens": 2252032,
+          "reasoning_tokens": 14023,
+          "native_elapsed_seconds": 1843.5477779569999,
+          "capture_seconds": 4.361819250999717,
+          "container_cleanup_seconds": 1.9622299999997486,
+          "tool_calls": 193,
+          "money": null
+        },
+        "control": {
+          "requests": 101,
+          "input_tokens": 3039026,
+          "output_tokens": 21926,
+          "cached_tokens": 1196672,
+          "reasoning_tokens": 9270,
+          "native_elapsed_seconds": 1129.5657152919994,
+          "capture_seconds": 3.8125576239998917,
+          "container_cleanup_seconds": 1.0041785829996224,
+          "tool_calls": 160,
+          "money": null
+        },
+        "delta": {
+          "requests": 17,
+          "input_tokens": 2652826,
+          "output_tokens": 7743,
+          "cached_tokens": 1055360,
+          "reasoning_tokens": 4753,
+          "native_elapsed_seconds": 713.9820626650005,
+          "capture_seconds": 0.549261626999825,
+          "container_cleanup_seconds": 0.9580514170001262,
+          "tool_calls": 33,
+          "money": null
+        }
+      },
+      "per_task": [
+        {
+          "instance_id": "sveltejs__svelte-1116",
+          "R": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "T": {
+            "candidate": true,
+            "control": true,
+            "delta": 0
+          },
+          "D": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "cost_delta": {
+            "requests": -4,
+            "input_tokens": 15134,
+            "output_tokens": -126,
+            "cached_tokens": -36736,
+            "reasoning_tokens": 765,
+            "native_elapsed_seconds": 70.38204449899979,
+            "capture_seconds": 0.07787575000012292,
+            "container_cleanup_seconds": -0.005317375000100585,
+            "tool_calls": -2,
+            "money": null
+          }
+        },
+        {
+          "instance_id": "mui__material-ui-22696",
+          "R": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "T": {
+            "candidate": true,
+            "control": true,
+            "delta": 0
+          },
+          "D": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "cost_delta": {
+            "requests": -5,
+            "input_tokens": -192425,
+            "output_tokens": -473,
+            "cached_tokens": -162560,
+            "reasoning_tokens": 199,
+            "native_elapsed_seconds": 177.57735116600014,
+            "capture_seconds": 0.04983883400028577,
+            "container_cleanup_seconds": 0.22473683399986474,
+            "tool_calls": -11,
+            "money": null
+          }
+        },
+        {
+          "instance_id": "sveltejs__svelte-6525",
+          "R": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "T": {
+            "candidate": true,
+            "control": true,
+            "delta": 0
+          },
+          "D": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "cost_delta": {
+            "requests": 28,
+            "input_tokens": 2752716,
+            "output_tokens": 8904,
+            "cached_tokens": 1190272,
+            "reasoning_tokens": 4381,
+            "native_elapsed_seconds": 441.7938829160002,
+            "capture_seconds": 0.4181487509999424,
+            "container_cleanup_seconds": 0.8355278749996795,
+            "tool_calls": 43,
+            "money": null
+          }
+        },
+        {
+          "instance_id": "mui__material-ui-12236",
+          "R": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "T": {
+            "candidate": true,
+            "control": true,
+            "delta": 0
+          },
+          "D": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "cost_delta": {
+            "requests": -2,
+            "input_tokens": 77401,
+            "output_tokens": -562,
+            "cached_tokens": 64384,
+            "reasoning_tokens": -592,
+            "native_elapsed_seconds": 24.228784084000623,
+            "capture_seconds": 0.003398291999474168,
+            "container_cleanup_seconds": -0.09689591699931771,
+            "tool_calls": 3,
+            "money": null
+          }
+        }
+      ]
+    },
+    "C0-P0": {
+      "candidate": "C0",
+      "control": "P0",
+      "R": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 4,
+        "unknown": 0
+      },
+      "T": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 4,
+        "unknown": 0
+      },
+      "D": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 4,
+        "unknown": 0
+      },
+      "costs": {
+        "candidate": {
+          "requests": 101,
+          "input_tokens": 3039026,
+          "output_tokens": 21926,
+          "cached_tokens": 1196672,
+          "reasoning_tokens": 9270,
+          "native_elapsed_seconds": 1129.5657152919994,
+          "capture_seconds": 3.8125576239998917,
+          "container_cleanup_seconds": 1.0041785829996224,
+          "tool_calls": 160,
+          "money": null
+        },
+        "control": {
+          "requests": 88,
+          "input_tokens": 2444573,
+          "output_tokens": 21451,
+          "cached_tokens": 1013376,
+          "reasoning_tokens": 8489,
+          "native_elapsed_seconds": 887.4128165419996,
+          "capture_seconds": 3.7656732490006832,
+          "container_cleanup_seconds": 0.9308029589998769,
+          "tool_calls": 137,
+          "money": null
+        },
+        "delta": {
+          "requests": 13,
+          "input_tokens": 594453,
+          "output_tokens": 475,
+          "cached_tokens": 183296,
+          "reasoning_tokens": 781,
+          "native_elapsed_seconds": 242.15289874999974,
+          "capture_seconds": 0.0468843749992085,
+          "container_cleanup_seconds": 0.07337562399974551,
+          "tool_calls": 23,
+          "money": null
+        }
+      },
+      "per_task": [
+        {
+          "instance_id": "sveltejs__svelte-1116",
+          "R": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "T": {
+            "candidate": true,
+            "control": true,
+            "delta": 0
+          },
+          "D": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "cost_delta": {
+            "requests": 7,
+            "input_tokens": 329847,
+            "output_tokens": 1739,
+            "cached_tokens": 198144,
+            "reasoning_tokens": -113,
+            "native_elapsed_seconds": 195.75490975000008,
+            "capture_seconds": 0.05661108399997472,
+            "container_cleanup_seconds": 0.01068587500008289,
+            "tool_calls": 11,
+            "money": null
+          }
+        },
+        {
+          "instance_id": "mui__material-ui-22696",
+          "R": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "T": {
+            "candidate": true,
+            "control": true,
+            "delta": 0
+          },
+          "D": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "cost_delta": {
+            "requests": 6,
+            "input_tokens": 285253,
+            "output_tokens": 905,
+            "cached_tokens": 162816,
+            "reasoning_tokens": 223,
+            "native_elapsed_seconds": 165.9225756669999,
+            "capture_seconds": -0.08062666700035348,
+            "container_cleanup_seconds": -0.07743208399973808,
+            "tool_calls": 12,
+            "money": null
+          }
+        },
+        {
+          "instance_id": "sveltejs__svelte-6525",
+          "R": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "T": {
+            "candidate": true,
+            "control": true,
+            "delta": 0
+          },
+          "D": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "cost_delta": {
+            "requests": -1,
+            "input_tokens": 12468,
+            "output_tokens": -1938,
+            "cached_tokens": -152320,
+            "reasoning_tokens": -38,
+            "native_elapsed_seconds": -120.5307818329996,
+            "capture_seconds": -0.051322999999858454,
+            "container_cleanup_seconds": -0.02746812599990517,
+            "tool_calls": 2,
+            "money": null
+          }
+        },
+        {
+          "instance_id": "mui__material-ui-12236",
+          "R": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "T": {
+            "candidate": true,
+            "control": true,
+            "delta": 0
+          },
+          "D": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "cost_delta": {
+            "requests": 1,
+            "input_tokens": -33115,
+            "output_tokens": -231,
+            "cached_tokens": -25344,
+            "reasoning_tokens": 709,
+            "native_elapsed_seconds": 1.0061951659992445,
+            "capture_seconds": 0.1222229579994456,
+            "container_cleanup_seconds": 0.16758995899930595,
+            "tool_calls": -2,
+            "money": null
+          }
+        }
+      ]
+    },
+    "C1-P1": {
+      "candidate": "C1",
+      "control": "P1",
+      "R": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 3,
+        "unknown": 0
+      },
+      "T": {
+        "wins": 0,
+        "losses": 0,
+        "ties": 4,
+        "unknown": 0
+      },
+      "D": {
+        "wins": 0,
+        "losses": 1,
+        "ties": 3,
+        "unknown": 0
+      },
+      "costs": {
+        "candidate": {
+          "requests": 118,
+          "input_tokens": 5691852,
+          "output_tokens": 29669,
+          "cached_tokens": 2252032,
+          "reasoning_tokens": 14023,
+          "native_elapsed_seconds": 1843.5477779569999,
+          "capture_seconds": 4.361819250999717,
+          "container_cleanup_seconds": 1.9622299999997486,
+          "tool_calls": 193,
+          "money": null
+        },
+        "control": {
+          "requests": 90,
+          "input_tokens": 2402927,
+          "output_tokens": 15220,
+          "cached_tokens": 954880,
+          "reasoning_tokens": 5535,
+          "native_elapsed_seconds": 1078.0816543320002,
+          "capture_seconds": 3.830897750000586,
+          "container_cleanup_seconds": 0.9467528750003549,
+          "tool_calls": 142,
+          "money": null
+        },
+        "delta": {
+          "requests": 28,
+          "input_tokens": 3288925,
+          "output_tokens": 14449,
+          "cached_tokens": 1297152,
+          "reasoning_tokens": 8488,
+          "native_elapsed_seconds": 765.4661236249997,
+          "capture_seconds": 0.5309215009991308,
+          "container_cleanup_seconds": 1.0154771249993937,
+          "tool_calls": 51,
+          "money": null
+        }
+      },
+      "per_task": [
+        {
+          "instance_id": "sveltejs__svelte-1116",
+          "R": {
+            "candidate": false,
+            "control": true,
+            "delta": -1
+          },
+          "T": {
+            "candidate": true,
+            "control": true,
+            "delta": 0
+          },
+          "D": {
+            "candidate": false,
+            "control": true,
+            "delta": -1
+          },
+          "cost_delta": {
+            "requests": 7,
+            "input_tokens": 398892,
+            "output_tokens": 1931,
+            "cached_tokens": 176512,
+            "reasoning_tokens": 1349,
+            "native_elapsed_seconds": 162.7425272499999,
+            "capture_seconds": 0.10324045800010206,
+            "container_cleanup_seconds": 0.010434874999918978,
+            "tool_calls": 12,
+            "money": null
+          }
+        },
+        {
+          "instance_id": "mui__material-ui-22696",
+          "R": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "T": {
+            "candidate": true,
+            "control": true,
+            "delta": 0
+          },
+          "D": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "cost_delta": {
+            "requests": -4,
+            "input_tokens": 192346,
+            "output_tokens": 535,
+            "cached_tokens": -7936,
+            "reasoning_tokens": 560,
+            "native_elapsed_seconds": 155.64688966599994,
+            "capture_seconds": 0.0057634169999509766,
+            "container_cleanup_seconds": 0.21907941700005903,
+            "tool_calls": -1,
+            "money": null
+          }
+        },
+        {
+          "instance_id": "sveltejs__svelte-6525",
+          "R": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "T": {
+            "candidate": true,
+            "control": true,
+            "delta": 0
+          },
+          "D": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "cost_delta": {
+            "requests": 26,
+            "input_tokens": 2646813,
+            "output_tokens": 11839,
+            "cached_tokens": 1096704,
+            "reasoning_tokens": 6353,
+            "native_elapsed_seconds": 450.51882120899995,
+            "capture_seconds": 0.3731336260000244,
+            "container_cleanup_seconds": 0.8496422079997137,
+            "tool_calls": 36,
+            "money": null
+          }
+        },
+        {
+          "instance_id": "mui__material-ui-12236",
+          "R": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "T": {
+            "candidate": true,
+            "control": true,
+            "delta": 0
+          },
+          "D": {
+            "candidate": false,
+            "control": false,
+            "delta": 0
+          },
+          "cost_delta": {
+            "requests": -1,
+            "input_tokens": 50874,
+            "output_tokens": 144,
+            "cached_tokens": 31872,
+            "reasoning_tokens": 226,
+            "native_elapsed_seconds": -3.4421145000001303,
+            "capture_seconds": 0.048783999999053806,
+            "container_cleanup_seconds": -0.06367937500029802,
+            "tool_calls": 4,
+            "money": null
+          }
+        }
+      ]
+    }
+  },
+  "slots": [
+    {
+      "slot": 1,
+      "instance_id": "sveltejs__svelte-1116",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "8057884cb64f6c2cdf837411bc3962daf69e2bb5",
+      "arm": "P0",
+      "mode": "plain",
+      "input_variant": "original",
+      "artifact_kind": "terminal",
+      "status": "completed",
+      "R": false,
+      "T": true,
+      "D": false,
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "48727a7b44bd6bba29dd6979070204728c9b55ea33afe4fe35a8e570ce8d332c",
+      "patch_bytes": 700,
+      "author_elapsed_ms": 110457.56679200003,
+      "usage": {
+        "requests": 23,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 459160,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 4425,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 117504,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 2860,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 23
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "usage_complete": true,
+      "patch_roundtrip": true,
+      "execution_error_present": false,
+      "observed_tests": 1571,
+      "evaluation_tests_unobserved": false,
+      "patch": "patches/01-sveltejs__svelte-1116-P0.patch",
+      "audit": {
+        "slot": 1,
+        "patch_sha256": "48727a7b44bd6bba29dd6979070204728c9b55ea33afe4fe35a8e570ce8d332c",
+        "patch_bytes": 700,
+        "requests": 23,
+        "sessions": 1,
+        "tool_calls": 38,
+        "native_evidence_sha256": "4371bef94baecf91e93f5e858a99e492364fee3314d8e62048ec7184f151b539",
+        "agents": {
+          "build": 22
+        },
+        "capture_elapsed_ms": 694.7212910000235,
+        "container_cleanup_elapsed_ms": 118.24016699998174,
+        "native_execution_elapsed_ms": 110175.939167,
+        "native_stop_elapsed_ms": 281.6262080000015,
+        "author_elapsed_ms": 110457.56679200003
+      },
+      "timing": {
+        "taskStarted": "2026-10-20T12:57:06.113Z",
+        "deadlineAt": "2026-10-20T13:27:06.113Z",
+        "forwardingClosed": "2026-10-20T12:58:56.622Z",
+        "handlersSettled": "2026-10-20T12:58:56.622Z",
+        "captureStarted": "2026-10-20T12:58:56.680Z",
+        "captureFinished": "2026-10-20T12:58:57.374Z",
+        "cleanupStarted": "2026-10-20T12:58:57.375Z",
+        "cleanupFinished": "2026-10-20T12:58:57.494Z"
+      },
+      "official": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false,
+        "passed_test_count": 1561,
+        "failed_tests": [
+          "custom-elements escaped-css",
+          "custom-elements html",
+          "custom-elements html-slots",
+          "custom-elements nested",
+          "custom-elements new",
+          "custom-elements new-styled",
+          "runtime binding-select (shared helpers)",
+          "runtime binding-select (shared helpers , hydration)",
+          "runtime binding-select (inline helpers)",
+          "ssr store-nested"
+        ],
+        "result_sha256": "32323df45c4b26fb31706c8824de2b47d6b054237b3caec2f79286eca11568e5"
+      },
+      "evidence_hashes": {
+        "result.json": "474b4471bf1d496df802896c83558c069ee2d0a910b26fd2b8a2ade2a7a8b29d",
+        "started.json": "2819f5961e8229284e0f1fad67fdbb5bb2aadec73f45204083224bda5b234f3b",
+        "completed.json": "c368fe6a53cc8c01bf09fe3e7fb2ca9d6e4d0ba71dfa8db5dbc22f664ff40407",
+        "provider-metadata.json": "b95a6678677c784446d4c7a9c95d5df4c92cc52f1b3ac105a824fea7a61a3d19",
+        "stop-verification.json": "6a5efebadc8381c61321dad4f1f735b695544aedc79a92445fab469ee89abe25",
+        "native-evidence.json": "4371bef94baecf91e93f5e858a99e492364fee3314d8e62048ec7184f151b539",
+        "patch-capture.json": "b7fe1024cdeef5d1f94b4cc9cfe8befde4ac3d7ae731df4cc85f64e916906a25",
+        "evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+      }
+    },
+    {
+      "slot": 2,
+      "instance_id": "sveltejs__svelte-1116",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "8057884cb64f6c2cdf837411bc3962daf69e2bb5",
+      "arm": "P1",
+      "mode": "plain",
+      "input_variant": "public-context-v2",
+      "artifact_kind": "terminal",
+      "status": "completed",
+      "R": true,
+      "T": true,
+      "D": true,
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "cbb9d1e79b6a6d909b8a3f5e058536c422316331ad024c72e35216be023d9c00",
+      "patch_bytes": 2247,
+      "author_elapsed_ms": 213851.993791,
+      "usage": {
+        "requests": 19,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 405249,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 4107,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 102400,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 2163,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 19
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "usage_complete": true,
+      "patch_roundtrip": true,
+      "execution_error_present": false,
+      "observed_tests": 1572,
+      "evaluation_tests_unobserved": false,
+      "patch": "patches/02-sveltejs__svelte-1116-P1.patch",
+      "audit": {
+        "slot": 2,
+        "patch_sha256": "cbb9d1e79b6a6d909b8a3f5e058536c422316331ad024c72e35216be023d9c00",
+        "patch_bytes": 2247,
+        "requests": 19,
+        "sessions": 1,
+        "tool_calls": 35,
+        "native_evidence_sha256": "3b531605f0ce0431c70cd69b3c5c69381cd2c97409bd5c8a5320376e2ce958f6",
+        "agents": {
+          "build": 18
+        },
+        "capture_elapsed_ms": 725.967667000019,
+        "container_cleanup_elapsed_ms": 113.17379200004507,
+        "native_execution_elapsed_ms": 213579.71608299995,
+        "native_stop_elapsed_ms": 272.2756250000093,
+        "author_elapsed_ms": 213851.993791
+      },
+      "timing": {
+        "taskStarted": "2026-10-20T12:59:34.788Z",
+        "deadlineAt": "2026-10-20T13:29:34.788Z",
+        "forwardingClosed": "2026-10-20T13:03:08.697Z",
+        "handlersSettled": "2026-10-20T13:03:08.697Z",
+        "captureStarted": "2026-10-20T13:03:08.753Z",
+        "captureFinished": "2026-10-20T13:03:09.479Z",
+        "cleanupStarted": "2026-10-20T13:03:09.481Z",
+        "cleanupFinished": "2026-10-20T13:03:09.594Z"
+      },
+      "official": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": true,
+        "no_p2p_failed": true,
+        "resolved": true,
+        "passed_test_count": 1563,
+        "failed_tests": [
+          "custom-elements escaped-css",
+          "custom-elements html",
+          "custom-elements html-slots",
+          "custom-elements nested",
+          "custom-elements new",
+          "custom-elements new-styled",
+          "runtime binding-select (shared helpers)",
+          "runtime binding-select (shared helpers , hydration)",
+          "runtime binding-select (inline helpers)"
+        ],
+        "result_sha256": "5d546029607e3c04bdcf0d2a4574d792a3eda74c6dc8dc90c99454660ce87492"
+      },
+      "evidence_hashes": {
+        "result.json": "9c7ca458186d4eeaad9347e5d4a928afa48e5bce70285614812f35444c72f62b",
+        "started.json": "41701cacf975435476b30656ed40e4a83f411b6c9b21a2c955cc4176eaaaecba",
+        "completed.json": "61ba9649eda2ceafd2108e0d18166b6ad62b9dbcaf19328258d6c8f2c76e3378",
+        "provider-metadata.json": "c39059b698db7e1719e5e39945acf0e46d4a3f37fd222fea89a058f069be5211",
+        "stop-verification.json": "9ff2c97a6f8f3f38e7306c81428658d1e853f5144f21225ec5c487d5db8ef38d",
+        "native-evidence.json": "3b531605f0ce0431c70cd69b3c5c69381cd2c97409bd5c8a5320376e2ce958f6",
+        "patch-capture.json": "8051716dd6878273e9dc846612dcadbc7fc0fd2f33c08030d8dc4edb9bf021b1",
+        "evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+      }
+    },
+    {
+      "slot": 3,
+      "instance_id": "sveltejs__svelte-1116",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "8057884cb64f6c2cdf837411bc3962daf69e2bb5",
+      "arm": "C0",
+      "mode": "core",
+      "input_variant": "original",
+      "artifact_kind": "terminal",
+      "status": "completed",
+      "R": false,
+      "T": true,
+      "D": false,
+      "evaluation_status": "official_patch_rejected",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "dad957945611b4facc38c6b5853c7a6b27301a926b86c07fe001cdc86f3adfb5",
+      "patch_bytes": 1882,
+      "author_elapsed_ms": 306212.4765420001,
+      "usage": {
+        "requests": 30,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 789007,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 6164,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 315648,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 2747,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 30
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "usage_complete": true,
+      "patch_roundtrip": true,
+      "execution_error_present": false,
+      "observed_tests": 0,
+      "evaluation_tests_unobserved": true,
+      "patch": "patches/03-sveltejs__svelte-1116-C0.patch",
+      "audit": {
+        "slot": 3,
+        "patch_sha256": "dad957945611b4facc38c6b5853c7a6b27301a926b86c07fe001cdc86f3adfb5",
+        "patch_bytes": 1882,
+        "requests": 30,
+        "sessions": 1,
+        "tool_calls": 49,
+        "native_evidence_sha256": "6b10b6bd7df87b0cea7fc534f775f95afd3ec123dd2f24a481e123e7db3b735c",
+        "agents": {
+          "build": 29
+        },
+        "capture_elapsed_ms": 751.3323749999981,
+        "container_cleanup_elapsed_ms": 128.92604200006463,
+        "native_execution_elapsed_ms": 305933.6094170001,
+        "native_stop_elapsed_ms": 278.8649579999037,
+        "author_elapsed_ms": 306212.4765420001
+      },
+      "timing": {
+        "taskStarted": "2026-10-20T13:03:41.732Z",
+        "deadlineAt": "2026-10-20T13:33:41.732Z",
+        "forwardingClosed": "2026-10-20T13:08:48.000Z",
+        "handlersSettled": "2026-10-20T13:08:48.001Z",
+        "captureStarted": "2026-10-20T13:08:48.062Z",
+        "captureFinished": "2026-10-20T13:08:48.814Z",
+        "cleanupStarted": "2026-10-20T13:08:48.815Z",
+        "cleanupFinished": "2026-10-20T13:08:48.944Z"
+      },
+      "official": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false,
+        "passed_test_count": 0,
+        "failed_tests": [],
+        "result_sha256": "f42e431d716ef5d9ef1aff84ae25dd8d008ee9da851393f138361bee043ebb47"
+      },
+      "evidence_hashes": {
+        "result.json": "c3bf334e2050e87998ecd568aae528f607130145b27106dfa2213fb6a35bfcf8",
+        "started.json": "99a02feccd1edae2d052d8534bb8e710faa9b4b02f893dc8ccb3a581f2354fd1",
+        "completed.json": "0570bf8ac8ad40bffbd58af7f001143b8f06c5e5c23e3661302cabe7bbabbb91",
+        "provider-metadata.json": "3cea35a6a8de6daa6d9a383f2745f8c33551096ce6475c5f2f26066dfcb30bec",
+        "stop-verification.json": "749d438f361f1e1a614079da0d4852d0fd13f50f5b325f5bc101eb7c7f34fe60",
+        "native-evidence.json": "6b10b6bd7df87b0cea7fc534f775f95afd3ec123dd2f24a481e123e7db3b735c",
+        "patch-capture.json": "f2c5a88e79b8ab86e1ef1c5eb252ec98662661aaec354399049decc27e6ea214",
+        "evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+      }
+    },
+    {
+      "slot": 4,
+      "instance_id": "sveltejs__svelte-1116",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Bug Fix",
+      "base_commit": "8057884cb64f6c2cdf837411bc3962daf69e2bb5",
+      "arm": "C1",
+      "mode": "core",
+      "input_variant": "public-context-v2",
+      "artifact_kind": "terminal",
+      "status": "completed",
+      "R": false,
+      "T": true,
+      "D": false,
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "588c2ae1b32a0ccb33efb0962f5dff855b7bba87a560cabf68522c0acf098b1b",
+      "patch_bytes": 3271,
+      "author_elapsed_ms": 376594.5210409999,
+      "usage": {
+        "requests": 26,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 804141,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 6038,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 278912,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 3512,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 26
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "usage_complete": true,
+      "patch_roundtrip": true,
+      "execution_error_present": false,
+      "observed_tests": 1572,
+      "evaluation_tests_unobserved": false,
+      "patch": "patches/04-sveltejs__svelte-1116-C1.patch",
+      "audit": {
+        "slot": 4,
+        "patch_sha256": "588c2ae1b32a0ccb33efb0962f5dff855b7bba87a560cabf68522c0acf098b1b",
+        "patch_bytes": 3271,
+        "requests": 26,
+        "sessions": 1,
+        "tool_calls": 47,
+        "native_evidence_sha256": "609b73cbd60da5a4ad3f7170b3f64c796fedeb8013608125201d8a5e07c1e7fa",
+        "agents": {
+          "build": 25
+        },
+        "capture_elapsed_ms": 829.2081250001211,
+        "container_cleanup_elapsed_ms": 123.60866699996404,
+        "native_execution_elapsed_ms": 376330.35683299985,
+        "native_stop_elapsed_ms": 264.16212499979883,
+        "author_elapsed_ms": 376594.5210409999
+      },
+      "timing": {
+        "taskStarted": "2026-10-20T13:09:20.735Z",
+        "deadlineAt": "2026-10-20T13:39:20.735Z",
+        "forwardingClosed": "2026-10-20T13:15:37.381Z",
+        "handlersSettled": "2026-10-20T13:15:37.381Z",
+        "captureStarted": "2026-10-20T13:15:37.444Z",
+        "captureFinished": "2026-10-20T13:15:38.273Z",
+        "cleanupStarted": "2026-10-20T13:15:38.274Z",
+        "cleanupFinished": "2026-10-20T13:15:38.398Z"
+      },
+      "official": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false,
+        "passed_test_count": 1562,
+        "failed_tests": [
+          "custom-elements escaped-css",
+          "custom-elements html",
+          "custom-elements html-slots",
+          "custom-elements nested",
+          "custom-elements new",
+          "custom-elements new-styled",
+          "runtime binding-select (shared helpers)",
+          "runtime binding-select (shared helpers , hydration)",
+          "runtime binding-select (inline helpers)",
+          "ssr store-nested"
+        ],
+        "result_sha256": "b75bdac413f9cec0359e4e79de6b397192a456d0e01b1daba23b758d39588744"
+      },
+      "evidence_hashes": {
+        "result.json": "1c75531006a6f9c2359c39f45920e73acfb8eaba73ce7867ffdeeaad2294dbd1",
+        "started.json": "a2b73ea083d6156e5cc6842112b3e7212b1163da3833861284fa89d34bb63846",
+        "completed.json": "b9d5afe7facd57ecb46c2d884e885037d5cab8e5ab81a5a0b6eef6ff701a934c",
+        "provider-metadata.json": "dccf1e812b92b661d05f6b24a9c71730d5688a31823c7cfbd9edc7a73f6fc5a7",
+        "stop-verification.json": "9119f35389d260fb2f33d32b62e20a03b0ff8554f958abdc3b0bd4e440667aed",
+        "native-evidence.json": "609b73cbd60da5a4ad3f7170b3f64c796fedeb8013608125201d8a5e07c1e7fa",
+        "patch-capture.json": "c4424d1097fa5d83ff6307a10de16a198f6f7bfe269d27890f363d0b23abedd4",
+        "evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+      }
+    },
+    {
+      "slot": 5,
+      "instance_id": "mui__material-ui-22696",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "fad48de8f7d9a449adb4ab9796e9ed1c2c0593ca",
+      "arm": "P1",
+      "mode": "plain",
+      "input_variant": "public-context-v2",
+      "artifact_kind": "terminal",
+      "status": "completed",
+      "R": false,
+      "T": true,
+      "D": false,
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "6bd16c918197e50144c608f9f68ddaf6d5d2d9cc6e97f2e9d9dcab48b1093df0",
+      "patch_bytes": 2308,
+      "author_elapsed_ms": 408920.0871250001,
+      "usage": {
+        "requests": 19,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 289462,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 3167,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 113792,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 929,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 19
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "usage_complete": true,
+      "patch_roundtrip": true,
+      "execution_error_present": false,
+      "observed_tests": 96,
+      "evaluation_tests_unobserved": false,
+      "patch": "patches/05-mui__material-ui-22696-P1.patch",
+      "audit": {
+        "slot": 5,
+        "patch_sha256": "6bd16c918197e50144c608f9f68ddaf6d5d2d9cc6e97f2e9d9dcab48b1093df0",
+        "patch_bytes": 2308,
+        "requests": 19,
+        "sessions": 1,
+        "tool_calls": 24,
+        "native_evidence_sha256": "f5b2f3041cd2b1975210c32dce13064346bdaab11730d8957758fc1f1fa9eb95",
+        "agents": {
+          "build": 18
+        },
+        "capture_elapsed_ms": 1088.897375000175,
+        "container_cleanup_elapsed_ms": 241.28899999987334,
+        "native_execution_elapsed_ms": 408628.99570800015,
+        "native_stop_elapsed_ms": 291.0888749998994,
+        "author_elapsed_ms": 408920.0871250001
+      },
+      "timing": {
+        "taskStarted": "2026-10-20T13:16:20.294Z",
+        "deadlineAt": "2026-10-20T13:46:20.294Z",
+        "forwardingClosed": "2026-10-20T13:23:09.271Z",
+        "handlersSettled": "2026-10-20T13:23:09.272Z",
+        "captureStarted": "2026-10-20T13:23:09.335Z",
+        "captureFinished": "2026-10-20T13:23:10.424Z",
+        "cleanupStarted": "2026-10-20T13:23:10.425Z",
+        "cleanupFinished": "2026-10-20T13:23:10.666Z"
+      },
+      "official": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false,
+        "passed_test_count": 94,
+        "failed_tests": [
+          "packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js-><Autocomplete /> when popup open does not close the popup when option selected if Control is pressed",
+          "packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js-><Autocomplete /> when popup open does not close the popup when option selected if Meta is pressed"
+        ],
+        "result_sha256": "867b14e55c3ef9f3039952fe6f99818db5fda4b7fa72f9bd15bbd95b91ad5ae2"
+      },
+      "evidence_hashes": {
+        "result.json": "0a5bb9867e0ec092d1da357261e71001766ccc398268d89fa891a554fb1f7109",
+        "started.json": "2ed8f5a3f0d2da1a3751922a45c9ea43f3bc9f4c042381562c96c52e9d8ab5f8",
+        "completed.json": "5135e59f63d49d2d06f3187976fd863a4427499dc40a889d9ba83607483f477a",
+        "provider-metadata.json": "f3088e00563459232c067a39f67c4331472463fbb7f509e8c73939c2c6ddeab4",
+        "stop-verification.json": "6b5ad317936dfb7b7a818906e76e10bf15b321d4096afd08e41603c12fe73722",
+        "native-evidence.json": "f5b2f3041cd2b1975210c32dce13064346bdaab11730d8957758fc1f1fa9eb95",
+        "patch-capture.json": "9219a8d8a543198f49901379701dd233c9d67a37191387d69e490a3b7b175b0d",
+        "evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+      }
+    },
+    {
+      "slot": 6,
+      "instance_id": "mui__material-ui-22696",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "fad48de8f7d9a449adb4ab9796e9ed1c2c0593ca",
+      "arm": "C0",
+      "mode": "core",
+      "input_variant": "original",
+      "artifact_kind": "terminal",
+      "status": "completed",
+      "R": false,
+      "T": true,
+      "D": false,
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "3c11f13ade4fa34b1efc861215c8dfe0903f544bfca137c5630970e60d58c6fe",
+      "patch_bytes": 2364,
+      "author_elapsed_ms": 386989.62562499987,
+      "usage": {
+        "requests": 20,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 674233,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 4175,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 268416,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 1290,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 20
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "usage_complete": true,
+      "patch_roundtrip": true,
+      "execution_error_present": false,
+      "observed_tests": 96,
+      "evaluation_tests_unobserved": false,
+      "patch": "patches/06-mui__material-ui-22696-C0.patch",
+      "audit": {
+        "slot": 6,
+        "patch_sha256": "3c11f13ade4fa34b1efc861215c8dfe0903f544bfca137c5630970e60d58c6fe",
+        "patch_bytes": 2364,
+        "requests": 20,
+        "sessions": 1,
+        "tool_calls": 34,
+        "native_evidence_sha256": "5a432389f0ed980e35f4ed4c425f405e08564e680c811eb57c7592da08d80326",
+        "agents": {
+          "build": 19
+        },
+        "capture_elapsed_ms": 1044.8219579998404,
+        "container_cleanup_elapsed_ms": 235.63158300006762,
+        "native_execution_elapsed_ms": 386717.15925,
+        "native_stop_elapsed_ms": 272.46504099993035,
+        "author_elapsed_ms": 386989.62562499987
+      },
+      "timing": {
+        "taskStarted": "2026-10-20T13:24:05.429Z",
+        "deadlineAt": "2026-10-20T13:54:05.429Z",
+        "forwardingClosed": "2026-10-20T13:30:32.478Z",
+        "handlersSettled": "2026-10-20T13:30:32.478Z",
+        "captureStarted": "2026-10-20T13:30:32.536Z",
+        "captureFinished": "2026-10-20T13:30:33.580Z",
+        "cleanupStarted": "2026-10-20T13:30:33.582Z",
+        "cleanupFinished": "2026-10-20T13:30:33.818Z"
+      },
+      "official": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false,
+        "passed_test_count": 94,
+        "failed_tests": [
+          "packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js-><Autocomplete /> when popup open does not close the popup when option selected if Control is pressed",
+          "packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js-><Autocomplete /> when popup open does not close the popup when option selected if Meta is pressed"
+        ],
+        "result_sha256": "c8c9600257f524452c74bcd98945f608d32de9595b7104168d062cc2f638b1be"
+      },
+      "evidence_hashes": {
+        "result.json": "9e89efbcd5770e8208347c384aafc0ab6202c17368d8bc985a5da541cfbf53bf",
+        "started.json": "da4c933138e45b0e56507d72d3b1cd55ac8db2f0947359045ed405aec935a5ff",
+        "completed.json": "8fb3eb498d58c2e60683b5cca0b6587d3818d75b827da0d606693f92e352020e",
+        "provider-metadata.json": "4c23baac2a45c2ca967287d2d8f6b53725f61d60ab5c5226d0afafee4e298466",
+        "stop-verification.json": "11c882fe3ba40d053d715bd2cec0ff12879b201e2b642922999e798452c62b69",
+        "native-evidence.json": "5a432389f0ed980e35f4ed4c425f405e08564e680c811eb57c7592da08d80326",
+        "patch-capture.json": "c0bd18d2d235d09d0bf178e2c50527dc4db01c14b629aeb3f79c81714c11fe15",
+        "evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+      }
+    },
+    {
+      "slot": 7,
+      "instance_id": "mui__material-ui-22696",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "fad48de8f7d9a449adb4ab9796e9ed1c2c0593ca",
+      "arm": "C1",
+      "mode": "core",
+      "input_variant": "public-context-v2",
+      "artifact_kind": "terminal",
+      "status": "completed",
+      "R": false,
+      "T": true,
+      "D": false,
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "1e0e25363520d6373891ac730f713c2fb1f11de6076b54691b530cf93bc0e1b9",
+      "patch_bytes": 2537,
+      "author_elapsed_ms": 564566.976791,
+      "usage": {
+        "requests": 15,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 481808,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 3702,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 105856,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 1489,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 15
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "usage_complete": true,
+      "patch_roundtrip": true,
+      "execution_error_present": false,
+      "observed_tests": 96,
+      "evaluation_tests_unobserved": false,
+      "patch": "patches/07-mui__material-ui-22696-C1.patch",
+      "audit": {
+        "slot": 7,
+        "patch_sha256": "1e0e25363520d6373891ac730f713c2fb1f11de6076b54691b530cf93bc0e1b9",
+        "patch_bytes": 2537,
+        "requests": 15,
+        "sessions": 1,
+        "tool_calls": 23,
+        "native_evidence_sha256": "7863cd96117a495317b70c0f312679a42d70de20d16fdef404c3934f64881f42",
+        "agents": {
+          "build": 14
+        },
+        "capture_elapsed_ms": 1094.660792000126,
+        "container_cleanup_elapsed_ms": 460.3684169999324,
+        "native_execution_elapsed_ms": 564261.0792080001,
+        "native_stop_elapsed_ms": 305.8927909997292,
+        "author_elapsed_ms": 564566.976791
+      },
+      "timing": {
+        "taskStarted": "2026-10-20T13:31:21.870Z",
+        "deadlineAt": "2026-10-20T14:01:21.870Z",
+        "forwardingClosed": "2026-10-20T13:40:46.492Z",
+        "handlersSettled": "2026-10-20T13:40:46.493Z",
+        "captureStarted": "2026-10-20T13:40:46.563Z",
+        "captureFinished": "2026-10-20T13:40:47.658Z",
+        "cleanupStarted": "2026-10-20T13:40:47.659Z",
+        "cleanupFinished": "2026-10-20T13:40:48.119Z"
+      },
+      "official": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false,
+        "passed_test_count": 94,
+        "failed_tests": [
+          "packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js-><Autocomplete /> when popup open does not close the popup when option selected if Control is pressed",
+          "packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js-><Autocomplete /> when popup open does not close the popup when option selected if Meta is pressed"
+        ],
+        "result_sha256": "336aff808860035a62c84f89eca8479d01680732756b32876e432f6c44639cf7"
+      },
+      "evidence_hashes": {
+        "result.json": "bffa3f7a16ae2d39506912ae85371c1217dbd3d4c380215a35e9403a849f0bd8",
+        "started.json": "efcfc4747a6e6992b2ac7402d775044ba86b024cfcd81911a27f2bf1a9fd0c8d",
+        "completed.json": "f7d888166ce19a581079e80bcb65cd541505bda51be035d0e031dd00567994c3",
+        "provider-metadata.json": "34bed39a029c580f13701278e3817ad8e8ad0bff855c67977d31f15bfad00a7f",
+        "stop-verification.json": "859704098ba08a7aaabff0c1ef0b0058ecbba2aa8c9945b719cb4b9fd7245e6e",
+        "native-evidence.json": "7863cd96117a495317b70c0f312679a42d70de20d16fdef404c3934f64881f42",
+        "patch-capture.json": "c05784efe6b2b34f3c99d895a681046f253782a4602ebc2db5d9942961936b76",
+        "evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+      }
+    },
+    {
+      "slot": 8,
+      "instance_id": "mui__material-ui-22696",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "fad48de8f7d9a449adb4ab9796e9ed1c2c0593ca",
+      "arm": "P0",
+      "mode": "plain",
+      "input_variant": "original",
+      "artifact_kind": "terminal",
+      "status": "completed",
+      "R": false,
+      "T": true,
+      "D": false,
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "4d6ca944f0d383b830b9d0023e351558ce23f2eb5991babfa5711e1fb820aef9",
+      "patch_bytes": 3200,
+      "author_elapsed_ms": 221067.04995799996,
+      "usage": {
+        "requests": 14,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 388980,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 3270,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 105600,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 1067,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 14
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "usage_complete": true,
+      "patch_roundtrip": true,
+      "execution_error_present": false,
+      "observed_tests": 96,
+      "evaluation_tests_unobserved": false,
+      "patch": "patches/08-mui__material-ui-22696-P0.patch",
+      "audit": {
+        "slot": 8,
+        "patch_sha256": "4d6ca944f0d383b830b9d0023e351558ce23f2eb5991babfa5711e1fb820aef9",
+        "patch_bytes": 3200,
+        "requests": 14,
+        "sessions": 1,
+        "tool_calls": 22,
+        "native_evidence_sha256": "ab1c63c6771e93d72274350cc3bc8c59745c3aaec8551146a6038160f9e414d6",
+        "agents": {
+          "build": 13
+        },
+        "capture_elapsed_ms": 1125.4486250001937,
+        "container_cleanup_elapsed_ms": 313.0636669998057,
+        "native_execution_elapsed_ms": 220777.99612500006,
+        "native_stop_elapsed_ms": 289.0518330000341,
+        "author_elapsed_ms": 221067.04995799996
+      },
+      "timing": {
+        "taskStarted": "2026-10-20T13:41:54.551Z",
+        "deadlineAt": "2026-10-20T14:11:54.551Z",
+        "forwardingClosed": "2026-10-20T13:45:35.679Z",
+        "handlersSettled": "2026-10-20T13:45:35.680Z",
+        "captureStarted": "2026-10-20T13:45:35.748Z",
+        "captureFinished": "2026-10-20T13:45:36.873Z",
+        "cleanupStarted": "2026-10-20T13:45:36.874Z",
+        "cleanupFinished": "2026-10-20T13:45:37.187Z"
+      },
+      "official": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false,
+        "passed_test_count": 94,
+        "failed_tests": [
+          "packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js-><Autocomplete /> when popup open does not close the popup when option selected if Control is pressed",
+          "packages/material-ui-lab/src/Autocomplete/Autocomplete.test.js-><Autocomplete /> when popup open does not close the popup when option selected if Meta is pressed"
+        ],
+        "result_sha256": "c7f94d4c975f213952798b93e9fa598bcfa26ee956f39f748686692f37d7f724"
+      },
+      "evidence_hashes": {
+        "result.json": "355185fc41d01ac30af7a2eb25ed6ed1a7843edc76fa509786f5166ab2233bd4",
+        "started.json": "37fee243d543c8fcf71e195395a3b6cd260d14abe42957a8498735ce416b3134",
+        "completed.json": "78cb0e44fadb292a11f5a3d0e6de79cb1fb2b2ec82ef406ab9b21109bb58cec2",
+        "provider-metadata.json": "781566ab2d2bd7807dbcb26da4b3570d3f81dc64337bb4e9501d5ec7f673deef",
+        "stop-verification.json": "777c8e8dc4eab74e16a060dfb75fabed74b987a71e75040817b13a131de0fc94",
+        "native-evidence.json": "ab1c63c6771e93d72274350cc3bc8c59745c3aaec8551146a6038160f9e414d6",
+        "patch-capture.json": "54a6b9df75795f32e317318bc202737707ea17e8263ff9bf83266d29fa37c338",
+        "evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+      }
+    },
+    {
+      "slot": 9,
+      "instance_id": "sveltejs__svelte-6525",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Refactoring",
+      "base_commit": "33307a54c86daf45aa49f4cfaeef2ab07ff37ed0",
+      "arm": "C0",
+      "mode": "core",
+      "input_variant": "original",
+      "artifact_kind": "terminal",
+      "status": "completed",
+      "R": false,
+      "T": true,
+      "D": false,
+      "evaluation_status": "official_patch_rejected",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "9f6b2ec156dbc3edcda1fec66ee6f35ae1c5d4bc540de89b1cbb8e138837c648",
+      "patch_bytes": 6579,
+      "author_elapsed_ms": 341753.75383399986,
+      "usage": {
+        "requests": 35,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 1293195,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 8235,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 534400,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 3927,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 35
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "usage_complete": true,
+      "patch_roundtrip": true,
+      "execution_error_present": false,
+      "observed_tests": 0,
+      "evaluation_tests_unobserved": true,
+      "patch": "patches/09-sveltejs__svelte-6525-C0.patch",
+      "audit": {
+        "slot": 9,
+        "patch_sha256": "9f6b2ec156dbc3edcda1fec66ee6f35ae1c5d4bc540de89b1cbb8e138837c648",
+        "patch_bytes": 6579,
+        "requests": 35,
+        "sessions": 1,
+        "tool_calls": 52,
+        "native_evidence_sha256": "158930e607a59367d3d002a41e8cc17725c827bbb23d7a9192b3c6ae4a756b45",
+        "agents": {
+          "build": 34
+        },
+        "capture_elapsed_ms": 844.0974580002949,
+        "container_cleanup_elapsed_ms": 236.19883299991488,
+        "native_execution_elapsed_ms": 341483.8174999999,
+        "native_stop_elapsed_ms": 269.9344580001198,
+        "author_elapsed_ms": 341753.75383399986
+      },
+      "timing": {
+        "taskStarted": "2026-10-20T13:46:17.857Z",
+        "deadlineAt": "2026-10-20T14:16:17.857Z",
+        "forwardingClosed": "2026-10-20T13:51:59.668Z",
+        "handlersSettled": "2026-10-20T13:51:59.669Z",
+        "captureStarted": "2026-10-20T13:51:59.737Z",
+        "captureFinished": "2026-10-20T13:52:00.581Z",
+        "cleanupStarted": "2026-10-20T13:52:00.582Z",
+        "cleanupFinished": "2026-10-20T13:52:00.818Z"
+      },
+      "official": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false,
+        "passed_test_count": 0,
+        "failed_tests": [],
+        "result_sha256": "7a388b58aa945b6631352cae411e7a361e5d32b5933bdf0391fb7e69c24bd4d9"
+      },
+      "evidence_hashes": {
+        "result.json": "6249abc8df0e9830aea34bdab176beb499ed973a69e77ab718509d98a21b7431",
+        "started.json": "a7d39b5065245ec21dea911c9a687a23c6a4d047165abed96516c71a81c4658a",
+        "completed.json": "a362749153cb9e39f2f023ecb8edc1a9fa75692ee7e152cb405dea449bfad565",
+        "provider-metadata.json": "518a473ea7849deff27b5f8f04369c452d4e328a77b5f4a8186dd221bbf38dd0",
+        "stop-verification.json": "5932abdd81393dc5cda230c34b137bea9ae17496a297f123bdad9bf9e765eb9e",
+        "native-evidence.json": "158930e607a59367d3d002a41e8cc17725c827bbb23d7a9192b3c6ae4a756b45",
+        "patch-capture.json": "e1f5239db19d728f94d0c8d6ba3b3aa6b1c89dbcbf027374513a792a6167ccc5",
+        "evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+      }
+    },
+    {
+      "slot": 10,
+      "instance_id": "sveltejs__svelte-6525",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Refactoring",
+      "base_commit": "33307a54c86daf45aa49f4cfaeef2ab07ff37ed0",
+      "arm": "C1",
+      "mode": "core",
+      "input_variant": "public-context-v2",
+      "artifact_kind": "terminal",
+      "status": "completed",
+      "R": false,
+      "T": true,
+      "D": false,
+      "evaluation_status": "official_patch_rejected",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "b92392982bc41c79510ee23febe4183b637e341a5472d226ca5e26fe98717b40",
+      "patch_bytes": 12398,
+      "author_elapsed_ms": 783547.6367500001,
+      "usage": {
+        "requests": 63,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 4045911,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 17139,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 1724672,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 8308,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 63
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "usage_complete": true,
+      "patch_roundtrip": true,
+      "execution_error_present": false,
+      "observed_tests": 0,
+      "evaluation_tests_unobserved": true,
+      "patch": "patches/10-sveltejs__svelte-6525-C1.patch",
+      "audit": {
+        "slot": 10,
+        "patch_sha256": "b92392982bc41c79510ee23febe4183b637e341a5472d226ca5e26fe98717b40",
+        "patch_bytes": 12398,
+        "requests": 63,
+        "sessions": 1,
+        "tool_calls": 95,
+        "native_evidence_sha256": "c9c86e2eddb0cd367194c0a749e23e82bb9fb00843670547d73fa453ba575778",
+        "agents": {
+          "build": 62
+        },
+        "capture_elapsed_ms": 1262.2462090002373,
+        "container_cleanup_elapsed_ms": 1071.7267079995945,
+        "native_execution_elapsed_ms": 783252.31275,
+        "native_stop_elapsed_ms": 295.322832999751,
+        "author_elapsed_ms": 783547.6367500001
+      },
+      "timing": {
+        "taskStarted": "2026-10-20T13:52:46.745Z",
+        "deadlineAt": "2026-10-20T14:22:46.745Z",
+        "forwardingClosed": "2026-10-20T14:05:50.351Z",
+        "handlersSettled": "2026-10-20T14:05:50.351Z",
+        "captureStarted": "2026-10-20T14:05:50.427Z",
+        "captureFinished": "2026-10-20T14:05:51.690Z",
+        "cleanupStarted": "2026-10-20T14:05:51.693Z",
+        "cleanupFinished": "2026-10-20T14:05:52.765Z"
+      },
+      "official": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false,
+        "passed_test_count": 0,
+        "failed_tests": [],
+        "result_sha256": "7a388b58aa945b6631352cae411e7a361e5d32b5933bdf0391fb7e69c24bd4d9"
+      },
+      "evidence_hashes": {
+        "result.json": "2db038f477db7a37a37a508b77569cd0906656272e2143fc2ae49d05ce734e7f",
+        "started.json": "99386eed7d13a5d0b8749085a5411e10f7155b06d696b168f192bdf2c9d538d0",
+        "completed.json": "0dcfe8e8b0434c07fc87bb6574ffe34b86e1597e6db79cfc32e954d670b08794",
+        "provider-metadata.json": "bed7c2e058305a43b7f2075b66cd1c300fa8f48f30093ca62b7f1f9e5d2b99a6",
+        "stop-verification.json": "6a391779158948d7b67351ecd7cfc2d5c17e70aac06c6a0001d6ca6f1808e060",
+        "native-evidence.json": "c9c86e2eddb0cd367194c0a749e23e82bb9fb00843670547d73fa453ba575778",
+        "patch-capture.json": "f0a6bdffff3ad07c376216e0ef7486a79d43528ee983bf85cb6533634a3031de",
+        "evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+      }
+    },
+    {
+      "slot": 11,
+      "instance_id": "sveltejs__svelte-6525",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Refactoring",
+      "base_commit": "33307a54c86daf45aa49f4cfaeef2ab07ff37ed0",
+      "arm": "P0",
+      "mode": "plain",
+      "input_variant": "original",
+      "artifact_kind": "terminal",
+      "status": "completed",
+      "R": false,
+      "T": true,
+      "D": false,
+      "evaluation_status": "official_patch_rejected",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "afbb21d2170b195811cb3b0dc515ea6aa16693fe8fa1eafa34ded8fd08d6c9b7",
+      "patch_bytes": 13456,
+      "author_elapsed_ms": 462284.5356669994,
+      "usage": {
+        "requests": 36,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 1280727,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 10173,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 686720,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 3965,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 36
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "usage_complete": true,
+      "patch_roundtrip": true,
+      "execution_error_present": false,
+      "observed_tests": 0,
+      "evaluation_tests_unobserved": true,
+      "patch": "patches/11-sveltejs__svelte-6525-P0.patch",
+      "audit": {
+        "slot": 11,
+        "patch_sha256": "afbb21d2170b195811cb3b0dc515ea6aa16693fe8fa1eafa34ded8fd08d6c9b7",
+        "patch_bytes": 13456,
+        "requests": 36,
+        "sessions": 1,
+        "tool_calls": 50,
+        "native_evidence_sha256": "0f941b6c706e3ed8a00af0e05985447bb6a2ee3157c8d642aa13f69382950c20",
+        "agents": {
+          "build": 35
+        },
+        "capture_elapsed_ms": 895.4204580001533,
+        "container_cleanup_elapsed_ms": 263.66695899982005,
+        "native_execution_elapsed_ms": 461982.9455840001,
+        "native_stop_elapsed_ms": 301.58920800033957,
+        "author_elapsed_ms": 462284.5356669994
+      },
+      "timing": {
+        "taskStarted": "2026-10-20T14:06:43.297Z",
+        "deadlineAt": "2026-10-20T14:36:43.296Z",
+        "forwardingClosed": "2026-10-20T14:14:25.648Z",
+        "handlersSettled": "2026-10-20T14:14:25.648Z",
+        "captureStarted": "2026-10-20T14:14:25.719Z",
+        "captureFinished": "2026-10-20T14:14:26.615Z",
+        "cleanupStarted": "2026-10-20T14:14:26.616Z",
+        "cleanupFinished": "2026-10-20T14:14:26.880Z"
+      },
+      "official": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false,
+        "passed_test_count": 0,
+        "failed_tests": [],
+        "result_sha256": "7a388b58aa945b6631352cae411e7a361e5d32b5933bdf0391fb7e69c24bd4d9"
+      },
+      "evidence_hashes": {
+        "result.json": "3dc6609ee976b864675d6872345ed9ef15eca36db609a9531a405a43b37a1f3e",
+        "started.json": "335aa84f1a94527f61474a7a3e42a59bdf52bdbc93a5ff61ee6ac946b0f03ab8",
+        "completed.json": "744796f3f53336767ca9c302dd20a51ab0dfc6a64ea5fa6c3b68d087b23535c0",
+        "provider-metadata.json": "73f186979946d23c2210792597adbffbf4fc0542c11a739bad4d5f08e245bfac",
+        "stop-verification.json": "03f3326a27238d6d9a48610418ab9039b05695423dce2358e20895bfc35c3852",
+        "native-evidence.json": "0f941b6c706e3ed8a00af0e05985447bb6a2ee3157c8d642aa13f69382950c20",
+        "patch-capture.json": "f500f457ca7b9786b2397b79415d1c7187a4468cb10a1765f9ade5bb0ae7d7e4",
+        "evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+      }
+    },
+    {
+      "slot": 12,
+      "instance_id": "sveltejs__svelte-6525",
+      "repo": "sveltejs/svelte",
+      "language": "JavaScript",
+      "task_category": "Refactoring",
+      "base_commit": "33307a54c86daf45aa49f4cfaeef2ab07ff37ed0",
+      "arm": "P1",
+      "mode": "plain",
+      "input_variant": "public-context-v2",
+      "artifact_kind": "terminal",
+      "status": "completed",
+      "R": false,
+      "T": true,
+      "D": false,
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "ddf13643dd1b203073d99d2c14a1b88bb1ec96fe5d60b7bb1f4ae4e035ed5751",
+      "patch_bytes": 5420,
+      "author_elapsed_ms": 333028.8155410001,
+      "usage": {
+        "requests": 37,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 1399098,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 5300,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 627968,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 1955,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 37
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "usage_complete": true,
+      "patch_roundtrip": true,
+      "execution_error_present": false,
+      "observed_tests": 4316,
+      "evaluation_tests_unobserved": false,
+      "patch": "patches/12-sveltejs__svelte-6525-P1.patch",
+      "audit": {
+        "slot": 12,
+        "patch_sha256": "ddf13643dd1b203073d99d2c14a1b88bb1ec96fe5d60b7bb1f4ae4e035ed5751",
+        "patch_bytes": 5420,
+        "requests": 37,
+        "sessions": 1,
+        "tool_calls": 59,
+        "native_evidence_sha256": "ba64640673248dec6318d7a6a84e8ed3995611bea11315316c1c8f15e4fdaa25",
+        "agents": {
+          "build": 36
+        },
+        "capture_elapsed_ms": 889.1125830002129,
+        "container_cleanup_elapsed_ms": 222.0844999998808,
+        "native_execution_elapsed_ms": 332730.2421249999,
+        "native_stop_elapsed_ms": 298.57241700030863,
+        "author_elapsed_ms": 333028.8155410001
+      },
+      "timing": {
+        "taskStarted": "2026-10-20T14:15:10.858Z",
+        "deadlineAt": "2026-10-20T14:45:10.858Z",
+        "forwardingClosed": "2026-10-20T14:20:43.941Z",
+        "handlersSettled": "2026-10-20T14:20:43.941Z",
+        "captureStarted": "2026-10-20T14:20:44.006Z",
+        "captureFinished": "2026-10-20T14:20:44.895Z",
+        "cleanupStarted": "2026-10-20T14:20:44.896Z",
+        "cleanupFinished": "2026-10-20T14:20:45.119Z"
+      },
+      "official": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false,
+        "passed_test_count": 4312,
+        "failed_tests": [
+          "custom-elements \"before all\" hook for \"$$props\"",
+          "js hydrated-void-element",
+          "js src-attribute-check",
+          "runtime (puppeteer) \"before all\" hook for \"component-css-custom-properties \""
+        ],
+        "result_sha256": "4027ec17d35cc6ab614ab6dc0903165515cbd1864a8cf040eb062ff4bc3d739b"
+      },
+      "evidence_hashes": {
+        "result.json": "71cfb0b0612ec3b0d27cc28bf143777a4625ec95e4925d0259683f164fd52218",
+        "started.json": "2e2af88fe4fb9f1b71ad2f4dfc8c77d80be86fde39a5b3bed606f551581a344f",
+        "completed.json": "58736b50524b563efc435b206266a2684c2c10c6643501f8ae1732eabf1131f5",
+        "provider-metadata.json": "54468445186944c02b48e978e47a485e911fbbd093b2b6e0ed3ddc15682e17bf",
+        "stop-verification.json": "7a71af3c5bd1abc5fa1e572e0ab6fbde58851f41a080ee905aed2ab2268f5acd",
+        "native-evidence.json": "ba64640673248dec6318d7a6a84e8ed3995611bea11315316c1c8f15e4fdaa25",
+        "patch-capture.json": "404ed44556ef702e5a916fe171605414fbbdb3f2d50a87d37d799c97fe25c3f9",
+        "evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+      }
+    },
+    {
+      "slot": 13,
+      "instance_id": "mui__material-ui-12236",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "18aa6293ad8b67dc8a323db19117c93efa966c7c",
+      "arm": "C1",
+      "mode": "core",
+      "input_variant": "public-context-v2",
+      "artifact_kind": "terminal",
+      "status": "completed",
+      "R": false,
+      "T": true,
+      "D": false,
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "2e30c1c310298495522c370f68531b86c0a2470d5f41e2439ea09e8bee4f9891",
+      "patch_bytes": 2949,
+      "author_elapsed_ms": 118838.64337499999,
+      "usage": {
+        "requests": 14,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 359992,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 2790,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 142592,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 714,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 14
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "usage_complete": true,
+      "patch_roundtrip": true,
+      "execution_error_present": false,
+      "observed_tests": 20,
+      "evaluation_tests_unobserved": false,
+      "patch": "patches/13-mui__material-ui-12236-C1.patch",
+      "audit": {
+        "slot": 13,
+        "patch_sha256": "2e30c1c310298495522c370f68531b86c0a2470d5f41e2439ea09e8bee4f9891",
+        "patch_bytes": 2949,
+        "requests": 14,
+        "sessions": 1,
+        "tool_calls": 28,
+        "native_evidence_sha256": "a276b0a10760428d2531a9364c0aa8ce6e843fe4240fcfcfab16042d673971b5",
+        "agents": {
+          "build": 13
+        },
+        "capture_elapsed_ms": 1175.7041249992326,
+        "container_cleanup_elapsed_ms": 306.5262080002576,
+        "native_execution_elapsed_ms": 118387.55687500071,
+        "native_stop_elapsed_ms": 451.08487500064075,
+        "author_elapsed_ms": 118838.64337499999
+      },
+      "timing": {
+        "taskStarted": "2026-10-20T14:22:00.675Z",
+        "deadlineAt": "2026-10-20T14:52:00.674Z",
+        "forwardingClosed": "2026-10-20T14:23:59.634Z",
+        "handlersSettled": "2026-10-20T14:23:59.635Z",
+        "captureStarted": "2026-10-20T14:23:59.722Z",
+        "captureFinished": "2026-10-20T14:24:00.898Z",
+        "cleanupStarted": "2026-10-20T14:24:00.899Z",
+        "cleanupFinished": "2026-10-20T14:24:01.205Z"
+      },
+      "official": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false,
+        "passed_test_count": 19,
+        "failed_tests": [
+          "packages/material-ui/src/styles/withTheme.test.js->withTheme prop: innerRef should provide a ref on the inner component"
+        ],
+        "result_sha256": "b5d817257bf603594a732b78c5724a58d29eec09d6b6a51263fa8e8ce3743742"
+      },
+      "evidence_hashes": {
+        "result.json": "45d4f03e83128e767dab643b26b56877935aeed00b62e5c1828a7439b51b0120",
+        "started.json": "c8f038509b22b2bc736bf205b77f4558bc1877c3792225b9c4b642f83e0bd4b2",
+        "completed.json": "58a640f6e836fdff59f32a72e94654cbb9086bfa4ec987ee757f25f3a05f34c2",
+        "provider-metadata.json": "f6e14f3f1d1f8b2c3a5fe55235d2fd5f940115390a59b366e04c5289cc506175",
+        "stop-verification.json": "911e5fc2787fa530ee9ddf3d242781a42c9229ca66f072eb6db10dbe73fa8f42",
+        "native-evidence.json": "a276b0a10760428d2531a9364c0aa8ce6e843fe4240fcfcfab16042d673971b5",
+        "patch-capture.json": "4df60e50fc84c3d4b00e15fa07d8293b99eb53f4c5b22b37ea0dd4a49ebca8e8",
+        "evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+      }
+    },
+    {
+      "slot": 14,
+      "instance_id": "mui__material-ui-12236",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "18aa6293ad8b67dc8a323db19117c93efa966c7c",
+      "arm": "P0",
+      "mode": "plain",
+      "input_variant": "original",
+      "artifact_kind": "terminal",
+      "status": "completed",
+      "R": false,
+      "T": true,
+      "D": false,
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "48d94c32cc4a21fe4becfb885a5d89d157913f0ee85042137c01d6539e7dae9f",
+      "patch_bytes": 2994,
+      "author_elapsed_ms": 93603.66412500013,
+      "usage": {
+        "requests": 15,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 315706,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 3583,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 103552,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 597,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 15
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "usage_complete": true,
+      "patch_roundtrip": true,
+      "execution_error_present": false,
+      "observed_tests": 20,
+      "evaluation_tests_unobserved": false,
+      "patch": "patches/14-mui__material-ui-12236-P0.patch",
+      "audit": {
+        "slot": 14,
+        "patch_sha256": "48d94c32cc4a21fe4becfb885a5d89d157913f0ee85042137c01d6539e7dae9f",
+        "patch_bytes": 2994,
+        "requests": 15,
+        "sessions": 1,
+        "tool_calls": 27,
+        "native_evidence_sha256": "91650cd995da5250bdc6591130b38e53560b9554b5f8dedb56ea0fd1a14aa9a9",
+        "agents": {
+          "build": 14
+        },
+        "capture_elapsed_ms": 1050.082875000313,
+        "container_cleanup_elapsed_ms": 235.83216600026935,
+        "native_execution_elapsed_ms": 93305.17750000022,
+        "native_stop_elapsed_ms": 298.4855829998851,
+        "author_elapsed_ms": 93603.66412500013
+      },
+      "timing": {
+        "taskStarted": "2026-10-20T14:25:00.699Z",
+        "deadlineAt": "2026-10-20T14:55:00.699Z",
+        "forwardingClosed": "2026-10-20T14:26:34.365Z",
+        "handlersSettled": "2026-10-20T14:26:34.365Z",
+        "captureStarted": "2026-10-20T14:26:34.427Z",
+        "captureFinished": "2026-10-20T14:26:35.477Z",
+        "cleanupStarted": "2026-10-20T14:26:35.478Z",
+        "cleanupFinished": "2026-10-20T14:26:35.714Z"
+      },
+      "official": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false,
+        "passed_test_count": 19,
+        "failed_tests": [
+          "packages/material-ui/src/styles/withTheme.test.js->withTheme prop: innerRef should provide a ref on the inner component"
+        ],
+        "result_sha256": "67725396723131b62e30612be50e9325650faf360f1662b726b8913b99d2ffcc"
+      },
+      "evidence_hashes": {
+        "result.json": "72f299005d6cea052610d269cf98c1e1fb4fa2d9bddac8ec167840038a233034",
+        "started.json": "9cc227933dc042c11f0d118686dce49022c2765a574ecca3b7aa31b11e30297c",
+        "completed.json": "0a2ffdd1e33681e7bd81a8d7a4517b9eb9ce4fbfd6a99189533cab569ef6d607",
+        "provider-metadata.json": "a2ab233db86f3afa07903f863ad98f6507d8be2754b77948e4f0ec7a93a2ad92",
+        "stop-verification.json": "4005a55e7ad1530f797d5aa720e8f548862b39a35462f25d04952b0e79e3b8ec",
+        "native-evidence.json": "91650cd995da5250bdc6591130b38e53560b9554b5f8dedb56ea0fd1a14aa9a9",
+        "patch-capture.json": "bdfdb59ff58e85337a3e66e549f206a8782e7a1c8b7823757c9c9fde0eb49e1b",
+        "evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+      }
+    },
+    {
+      "slot": 15,
+      "instance_id": "mui__material-ui-12236",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "18aa6293ad8b67dc8a323db19117c93efa966c7c",
+      "arm": "P1",
+      "mode": "plain",
+      "input_variant": "public-context-v2",
+      "artifact_kind": "terminal",
+      "status": "completed",
+      "R": false,
+      "T": true,
+      "D": false,
+      "evaluation_status": "official_patch_rejected",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "f6801204aba352112ff30dbc8327831ff5f4ba0c3f66a34b237724359d0c658e",
+      "patch_bytes": 3310,
+      "author_elapsed_ms": 122280.75787500013,
+      "usage": {
+        "requests": 15,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 309118,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 2646,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 110720,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 488,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 15
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "usage_complete": true,
+      "patch_roundtrip": true,
+      "execution_error_present": false,
+      "observed_tests": 0,
+      "evaluation_tests_unobserved": true,
+      "patch": "patches/15-mui__material-ui-12236-P1.patch",
+      "audit": {
+        "slot": 15,
+        "patch_sha256": "f6801204aba352112ff30dbc8327831ff5f4ba0c3f66a34b237724359d0c658e",
+        "patch_bytes": 3310,
+        "requests": 15,
+        "sessions": 1,
+        "tool_calls": 24,
+        "native_evidence_sha256": "ca4e719fd1e9a3719dd0129b16e63da8e2eff7381f90a8828f8b12a31efd1aef",
+        "agents": {
+          "build": 14
+        },
+        "capture_elapsed_ms": 1126.9201250001788,
+        "container_cleanup_elapsed_ms": 370.20558300055563,
+        "native_execution_elapsed_ms": 121968.6426249994,
+        "native_stop_elapsed_ms": 312.11441600043327,
+        "author_elapsed_ms": 122280.75787500013
+      },
+      "timing": {
+        "taskStarted": "2026-10-20T14:27:27.502Z",
+        "deadlineAt": "2026-10-20T14:57:27.502Z",
+        "forwardingClosed": "2026-10-20T14:29:29.848Z",
+        "handlersSettled": "2026-10-20T14:29:29.848Z",
+        "captureStarted": "2026-10-20T14:29:29.920Z",
+        "captureFinished": "2026-10-20T14:29:31.046Z",
+        "cleanupStarted": "2026-10-20T14:29:31.048Z",
+        "cleanupFinished": "2026-10-20T14:29:31.418Z"
+      },
+      "official": {
+        "patch_applied": false,
+        "generation": true,
+        "with_logs": false,
+        "all_f2p_passed": false,
+        "no_p2p_failed": false,
+        "resolved": false,
+        "passed_test_count": 0,
+        "failed_tests": [],
+        "result_sha256": "2428852ab878b5f4946d0443d8a3d913fd04792b2ea1b5d6e8036a24b4d26acc"
+      },
+      "evidence_hashes": {
+        "result.json": "edf2de9008a33a55b80aa27ef1f079742ebc182648556f9f9022f19ffe77f801",
+        "started.json": "ecbfe3957131677d1c8ec7fe7ae12897b3852ea6370a033e9209ab3e464e21d7",
+        "completed.json": "50ad5d6d06596e028ab49e00cb7d8233774dacb2df0774eb321ef3bfb98d53a3",
+        "provider-metadata.json": "c5d235181a326dc8876600c1a934aa971929a4cb9cd4560e61d4cefb5cfa5046",
+        "stop-verification.json": "7c37eba053a11390d7cf6b45c49c41d3e7b7d11d9eca6d1a986527396fa59e7c",
+        "native-evidence.json": "ca4e719fd1e9a3719dd0129b16e63da8e2eff7381f90a8828f8b12a31efd1aef",
+        "patch-capture.json": "1bbe2476f18c10980154ff157f7dc7530a7700f7f901ca637bf822b3ef567ba1",
+        "evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+      }
+    },
+    {
+      "slot": 16,
+      "instance_id": "mui__material-ui-12236",
+      "repo": "mui/material-ui",
+      "language": "TypeScript",
+      "task_category": "Feature",
+      "base_commit": "18aa6293ad8b67dc8a323db19117c93efa966c7c",
+      "arm": "C0",
+      "mode": "core",
+      "input_variant": "original",
+      "artifact_kind": "terminal",
+      "status": "completed",
+      "R": false,
+      "T": true,
+      "D": false,
+      "evaluation_status": "official_result",
+      "native_completed": true,
+      "pending_tools": 0,
+      "strict_patch_applicable": true,
+      "patch_sha256": "211c7ff3dd8735cdba3fba3e85eedf8ff8db3d7cd9283184d4b507ab1659a897",
+      "patch_bytes": 2919,
+      "author_elapsed_ms": 94609.85929099936,
+      "usage": {
+        "requests": 16,
+        "requests_without_usage": 0,
+        "input_tokens": {
+          "observed": 282591,
+          "unknown_requests": 0
+        },
+        "output_tokens": {
+          "observed": 3352,
+          "unknown_requests": 0
+        },
+        "cached_tokens": {
+          "observed": 78208,
+          "unknown_requests": 0
+        },
+        "reasoning_tokens": {
+          "observed": 1306,
+          "unknown_requests": 0
+        },
+        "money": null
+      },
+      "provider_outcomes": {
+        "completed": 16
+      },
+      "provider_outcome": "completed",
+      "evidence_status": "evidence_complete",
+      "recording_complete": true,
+      "usage_complete": true,
+      "patch_roundtrip": true,
+      "execution_error_present": false,
+      "observed_tests": 20,
+      "evaluation_tests_unobserved": false,
+      "patch": "patches/16-mui__material-ui-12236-C0.patch",
+      "audit": {
+        "slot": 16,
+        "patch_sha256": "211c7ff3dd8735cdba3fba3e85eedf8ff8db3d7cd9283184d4b507ab1659a897",
+        "patch_bytes": 2919,
+        "requests": 16,
+        "sessions": 1,
+        "tool_calls": 25,
+        "native_evidence_sha256": "f835426127d2ac62ab00a8956c1466ff4a22bccc431fdebc0ada8b34443e2bbd",
+        "agents": {
+          "build": 15
+        },
+        "capture_elapsed_ms": 1172.3058329997584,
+        "container_cleanup_elapsed_ms": 403.4221249995753,
+        "native_execution_elapsed_ms": 94279.36249999981,
+        "native_stop_elapsed_ms": 330.49595899973065,
+        "author_elapsed_ms": 94609.85929099936
+      },
+      "timing": {
+        "taskStarted": "2026-10-20T14:30:25.689Z",
+        "deadlineAt": "2026-10-20T15:00:25.689Z",
+        "forwardingClosed": "2026-10-20T14:32:00.358Z",
+        "handlersSettled": "2026-10-20T14:32:00.359Z",
+        "captureStarted": "2026-10-20T14:32:00.451Z",
+        "captureFinished": "2026-10-20T14:32:01.623Z",
+        "cleanupStarted": "2026-10-20T14:32:01.624Z",
+        "cleanupFinished": "2026-10-20T14:32:02.028Z"
+      },
+      "official": {
+        "patch_applied": true,
+        "generation": true,
+        "with_logs": true,
+        "all_f2p_passed": false,
+        "no_p2p_failed": true,
+        "resolved": false,
+        "passed_test_count": 19,
+        "failed_tests": [
+          "packages/material-ui/src/styles/withTheme.test.js->withTheme prop: innerRef should provide a ref on the inner component"
+        ],
+        "result_sha256": "3dfadf325cb9252057f2c247a849fd2d4aad87701541db978ad9844d6d6e32b3"
+      },
+      "evidence_hashes": {
+        "result.json": "538f30f3bb39ba2b102bcde7578f3409229b77397424a66f94547ccbfa8fcaae",
+        "started.json": "cc4b6da4a03a51be7ad9f8cfb5b5abcd2d326fd1e76674693949cb0e5c607e33",
+        "completed.json": "46d122a88e451c770f3823e5e3314483f93ad1b1bef21bc2546cb2b16f989dfb",
+        "provider-metadata.json": "00f0ea10073dcb0f23423df379a8c109d6c58ca1e9743ff903336ef811bf165a",
+        "stop-verification.json": "dcaa76baab6ab1d4f81400ec808576a58fd365312717d0db4c88a88e977dd9e5",
+        "native-evidence.json": "f835426127d2ac62ab00a8956c1466ff4a22bccc431fdebc0ada8b34443e2bbd",
+        "patch-capture.json": "ae15fad346a665fe07c513a4cc3a351cbc4fcf2e55e50ad886036ca2af39b4d2",
+        "evidence-capture.json": "c696c01359f7962f0ba1f942209f61530e30850c1078f14d5fecdd164f3df86e"
+      }
+    }
+  ],
+  "evaluations": {
+    "P0": {
+      "process": {
+        "exit_code": 0,
+        "elapsed_seconds": 170.88764071464539
+      },
+      "provenance": {
+        "evaluator": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+        "mode": "predictions",
+        "instances": [
+          "sveltejs__svelte-1116",
+          "mui__material-ui-22696",
+          "sveltejs__svelte-6525",
+          "mui__material-ui-12236"
+        ],
+        "predictions_sha256": "187b372005ebebea7d2520d50950f6e4c6b2c39cab5624aca49cfca4bdd1a113",
+        "subset_sha256": "df89cc26e7e734c8054e4d0472a76265dcaf2c4909786b636c1277ce83998908",
+        "images": {
+          "polybench_javascript_sveltejs__svelte-1116": {
+            "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116:v1.1",
+            "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116@sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+            "id": "sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+            "architecture": "amd64",
+            "os": "linux",
+            "size": 5418809953,
+            "workdir": "/testbed"
+          },
+          "polybench_typescript_mui__material-ui-22696": {
+            "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696:v1.1",
+            "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696@sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+            "id": "sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+            "architecture": "amd64",
+            "os": "linux",
+            "size": 8945390461,
+            "workdir": "/testbed"
+          },
+          "polybench_javascript_sveltejs__svelte-6525": {
+            "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525:v1.1",
+            "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525@sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+            "id": "sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+            "architecture": "amd64",
+            "os": "linux",
+            "size": 5832672895,
+            "workdir": "/testbed"
+          },
+          "polybench_typescript_mui__material-ui-12236": {
+            "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236:v1.1",
+            "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236@sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+            "id": "sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+            "architecture": "amd64",
+            "os": "linux",
+            "size": 8198556570,
+            "workdir": "/testbed"
+          }
+        },
+        "prepared_dependencies": {},
+        "wrapper_sha256": "9bcdeed7aca85cf4a0bb3dfac78ce6310dca61f71cdab0848e19e6f6f4bf2cd3",
+        "container_boundary": {
+          "network": "none",
+          "cap_drop": [
+            "ALL"
+          ],
+          "no_new_privileges": true,
+          "memory": "8g",
+          "cpus": 4
+        }
+      },
+      "strict_application": [
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116@sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+          "patch_type": "test",
+          "patch_sha256": "ce79fbbd6a959e604d5aab317a67710f7937760e7d32ab5d0e7d52b982a1efeb",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116@sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+          "patch_type": "code",
+          "patch_sha256": "48727a7b44bd6bba29dd6979070204728c9b55ea33afe4fe35a8e570ce8d332c",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696@sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+          "patch_type": "test",
+          "patch_sha256": "a64b331f9b0a751e08728fa98ec46d1c6e5f7cc225b750cb82dc647b02e60683",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696@sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+          "patch_type": "code",
+          "patch_sha256": "4d6ca944f0d383b830b9d0023e351558ce23f2eb5991babfa5711e1fb820aef9",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525@sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+          "patch_type": "test",
+          "patch_sha256": "b329f8bc16e6abfb2df62333f7aeebc63dd216194f830d01597f2d5f24adb960",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525@sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+          "patch_type": "code",
+          "patch_sha256": "afbb21d2170b195811cb3b0dc515ea6aa16693fe8fa1eafa34ded8fd08d6c9b7",
+          "strict_exit_code": 1,
+          "strict_output": "error: patch failed: test/js/samples/hydrated-void-element/expected.js:8\nerror: test/js/samples/hydrated-void-element/expected.js: patch does not apply\nerror: patch failed: test/js/samples/src-attribute-check/expected.js:7\nerror: test/js/samples/src-attribute-check/expected.js: patch does not apply\n"
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236@sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+          "patch_type": "test",
+          "patch_sha256": "ea43d117fe3f4ca1bdff7cdbc7f347d0d682bf11777d60b7402f6af642db4ad8",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236@sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+          "patch_type": "code",
+          "patch_sha256": "48d94c32cc4a21fe4becfb885a5d89d157913f0ee85042137c01d6539e7dae9f",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        }
+      ],
+      "retained_files": {
+        "provenance.json": "7ffee295c5cda8041745866926908e039cb64d003c2945e00969d531f54397c7",
+        "result.json": "65a70743da882e0a64e2a95547f01eac44c47a46cc6cf12888f391ec912b043b",
+        "strict-application.jsonl": "febe06ff17ca555f3a50b9c5e13c50c2da47ddd81d4bcd9c496590854972a380",
+        "run_logs_javascript/sveltejs__svelte-1116_run.log": "262a70ff7de1a032b473f7c08e3fda7c4a503c34de752b5f8f76a1963b3ffa36",
+        "results/mui__material-ui-22696_metrics.json": "6d8ceeb29eae0f9c5c9f2b108e7a2550660a1ca121652494e98c88354cb58dd5",
+        "results/sveltejs__svelte-1116_result.json": "32323df45c4b26fb31706c8824de2b47d6b054237b3caec2f79286eca11568e5",
+        "results/sveltejs__svelte-6525_metrics.json": "11e1b9c693b21d1a3727f31491fc82c7a6a69f08b89335c37c4203f895927056",
+        "results/mui__material-ui-22696_result.json": "c7f94d4c975f213952798b93e9fa598bcfa26ee956f39f748686692f37d7f724",
+        "results/mui__material-ui-12236_result.json": "67725396723131b62e30612be50e9325650faf360f1662b726b8913b99d2ffcc",
+        "results/sveltejs__svelte-1116_metrics.json": "d39d09fc8a04f565da5450e451783471d3103606072c1755885d50081b1063aa",
+        "results/sveltejs__svelte-6525_result.json": "7a388b58aa945b6631352cae411e7a361e5d32b5933bdf0391fb7e69c24bd4d9",
+        "results/mui__material-ui-12236_metrics.json": "914b9fac6b7ae15d924c7129e4fa7efa807cb2c8d9d182a4763a4eef0f78445d",
+        "run_logs_typescript/mui__material-ui-22696_run.log": "75f81657232fcad22016a151b9979d0eef752badcf3ed4660e5a9af89032f482",
+        "run_logs_typescript/mui__material-ui-12236_run.log": "1dc3735bb2877b82b40d0600b7b02145bac13ebe5eee29d724f2d3ab50aaa831"
+      }
+    },
+    "P1": {
+      "process": {
+        "exit_code": 0,
+        "elapsed_seconds": 299.36805391311646
+      },
+      "provenance": {
+        "evaluator": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+        "mode": "predictions",
+        "instances": [
+          "sveltejs__svelte-1116",
+          "mui__material-ui-22696",
+          "sveltejs__svelte-6525",
+          "mui__material-ui-12236"
+        ],
+        "predictions_sha256": "d48b69060ae2ada97c0aaa3eaf143dc83fbb99b0514b189e39a7f2e095fff88f",
+        "subset_sha256": "df89cc26e7e734c8054e4d0472a76265dcaf2c4909786b636c1277ce83998908",
+        "images": {
+          "polybench_javascript_sveltejs__svelte-1116": {
+            "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116:v1.1",
+            "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116@sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+            "id": "sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+            "architecture": "amd64",
+            "os": "linux",
+            "size": 5418809953,
+            "workdir": "/testbed"
+          },
+          "polybench_typescript_mui__material-ui-22696": {
+            "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696:v1.1",
+            "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696@sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+            "id": "sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+            "architecture": "amd64",
+            "os": "linux",
+            "size": 8945390461,
+            "workdir": "/testbed"
+          },
+          "polybench_javascript_sveltejs__svelte-6525": {
+            "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525:v1.1",
+            "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525@sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+            "id": "sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+            "architecture": "amd64",
+            "os": "linux",
+            "size": 5832672895,
+            "workdir": "/testbed"
+          },
+          "polybench_typescript_mui__material-ui-12236": {
+            "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236:v1.1",
+            "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236@sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+            "id": "sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+            "architecture": "amd64",
+            "os": "linux",
+            "size": 8198556570,
+            "workdir": "/testbed"
+          }
+        },
+        "prepared_dependencies": {},
+        "wrapper_sha256": "9bcdeed7aca85cf4a0bb3dfac78ce6310dca61f71cdab0848e19e6f6f4bf2cd3",
+        "container_boundary": {
+          "network": "none",
+          "cap_drop": [
+            "ALL"
+          ],
+          "no_new_privileges": true,
+          "memory": "8g",
+          "cpus": 4
+        }
+      },
+      "strict_application": [
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116@sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+          "patch_type": "test",
+          "patch_sha256": "ce79fbbd6a959e604d5aab317a67710f7937760e7d32ab5d0e7d52b982a1efeb",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116@sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+          "patch_type": "code",
+          "patch_sha256": "cbb9d1e79b6a6d909b8a3f5e058536c422316331ad024c72e35216be023d9c00",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696@sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+          "patch_type": "test",
+          "patch_sha256": "a64b331f9b0a751e08728fa98ec46d1c6e5f7cc225b750cb82dc647b02e60683",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696@sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+          "patch_type": "code",
+          "patch_sha256": "6bd16c918197e50144c608f9f68ddaf6d5d2d9cc6e97f2e9d9dcab48b1093df0",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525@sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+          "patch_type": "test",
+          "patch_sha256": "b329f8bc16e6abfb2df62333f7aeebc63dd216194f830d01597f2d5f24adb960",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525@sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+          "patch_type": "code",
+          "patch_sha256": "ddf13643dd1b203073d99d2c14a1b88bb1ec96fe5d60b7bb1f4ae4e035ed5751",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236@sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+          "patch_type": "test",
+          "patch_sha256": "ea43d117fe3f4ca1bdff7cdbc7f347d0d682bf11777d60b7402f6af642db4ad8",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236@sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+          "patch_type": "code",
+          "patch_sha256": "f6801204aba352112ff30dbc8327831ff5f4ba0c3f66a34b237724359d0c658e",
+          "strict_exit_code": 1,
+          "strict_output": "error: patch failed: packages/material-ui/src/withWidth/withWidth.test.js:9\nerror: packages/material-ui/src/withWidth/withWidth.test.js: patch does not apply\n"
+        }
+      ],
+      "retained_files": {
+        "provenance.json": "cf20816780828835e3e7d6507e9f3bc1fbc113672757573ece2f1a252b67ea62",
+        "result.json": "42edbcc1eeac2f650a97ea1d888a86b023269afbfe9973b4f6b80f2f49df7556",
+        "strict-application.jsonl": "c4073af1bd33a7cabe4bbd97fde3339862b5e9de494bc5504309c3a63d08865d",
+        "run_logs_javascript/sveltejs__svelte-1116_run.log": "c4cc7d18a4cdb04878b7651f9012b324b21ae1e406030cd74ccad03afc86a238",
+        "run_logs_javascript/sveltejs__svelte-6525_run.log": "ad3e0a7b97ccbcc33e4229155d1a4eaf6c1538f78869f6afeebcee19d42b3d2b",
+        "results/mui__material-ui-22696_metrics.json": "6d8ceeb29eae0f9c5c9f2b108e7a2550660a1ca121652494e98c88354cb58dd5",
+        "results/sveltejs__svelte-1116_result.json": "5d546029607e3c04bdcf0d2a4574d792a3eda74c6dc8dc90c99454660ce87492",
+        "results/sveltejs__svelte-6525_metrics.json": "5907c8175613c65ca202302dec0a1b568b346d6c9fc3521a83131cf2a5c601eb",
+        "results/mui__material-ui-22696_result.json": "867b14e55c3ef9f3039952fe6f99818db5fda4b7fa72f9bd15bbd95b91ad5ae2",
+        "results/mui__material-ui-12236_result.json": "2428852ab878b5f4946d0443d8a3d913fd04792b2ea1b5d6e8036a24b4d26acc",
+        "results/sveltejs__svelte-1116_metrics.json": "528af90198cd9ceab607d8d0697ff4a0f485b7b9d75dbb4f4206083f021354b6",
+        "results/sveltejs__svelte-6525_result.json": "4027ec17d35cc6ab614ab6dc0903165515cbd1864a8cf040eb062ff4bc3d739b",
+        "results/mui__material-ui-12236_metrics.json": "41295dd730eb0d91e1b8d7296fe1b3c614690c9a353adaa4e404f3a73ace1a07",
+        "run_logs_typescript/mui__material-ui-22696_run.log": "7ed57b52109500c5d898c47f6ef94f9082422caddde6a8323e4920db64bf6509"
+      }
+    },
+    "C0": {
+      "process": {
+        "exit_code": 0,
+        "elapsed_seconds": 77.11592674255371
+      },
+      "provenance": {
+        "evaluator": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+        "mode": "predictions",
+        "instances": [
+          "sveltejs__svelte-1116",
+          "mui__material-ui-22696",
+          "sveltejs__svelte-6525",
+          "mui__material-ui-12236"
+        ],
+        "predictions_sha256": "29c248d5f70b6dd70bf00849c1870472700aba6d572c82ca73d18f5f087158d7",
+        "subset_sha256": "df89cc26e7e734c8054e4d0472a76265dcaf2c4909786b636c1277ce83998908",
+        "images": {
+          "polybench_javascript_sveltejs__svelte-1116": {
+            "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116:v1.1",
+            "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116@sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+            "id": "sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+            "architecture": "amd64",
+            "os": "linux",
+            "size": 5418809953,
+            "workdir": "/testbed"
+          },
+          "polybench_typescript_mui__material-ui-22696": {
+            "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696:v1.1",
+            "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696@sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+            "id": "sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+            "architecture": "amd64",
+            "os": "linux",
+            "size": 8945390461,
+            "workdir": "/testbed"
+          },
+          "polybench_javascript_sveltejs__svelte-6525": {
+            "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525:v1.1",
+            "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525@sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+            "id": "sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+            "architecture": "amd64",
+            "os": "linux",
+            "size": 5832672895,
+            "workdir": "/testbed"
+          },
+          "polybench_typescript_mui__material-ui-12236": {
+            "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236:v1.1",
+            "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236@sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+            "id": "sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+            "architecture": "amd64",
+            "os": "linux",
+            "size": 8198556570,
+            "workdir": "/testbed"
+          }
+        },
+        "prepared_dependencies": {},
+        "wrapper_sha256": "9bcdeed7aca85cf4a0bb3dfac78ce6310dca61f71cdab0848e19e6f6f4bf2cd3",
+        "container_boundary": {
+          "network": "none",
+          "cap_drop": [
+            "ALL"
+          ],
+          "no_new_privileges": true,
+          "memory": "8g",
+          "cpus": 4
+        }
+      },
+      "strict_application": [
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116@sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+          "patch_type": "test",
+          "patch_sha256": "ce79fbbd6a959e604d5aab317a67710f7937760e7d32ab5d0e7d52b982a1efeb",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116@sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+          "patch_type": "code",
+          "patch_sha256": "dad957945611b4facc38c6b5853c7a6b27301a926b86c07fe001cdc86f3adfb5",
+          "strict_exit_code": 1,
+          "strict_output": "error: test/runtime/samples/store-nested/Nested.html: already exists in working directory\nerror: test/runtime/samples/store-nested/_config.js: already exists in working directory\nerror: test/runtime/samples/store-nested/main.html: already exists in working directory\n"
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696@sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+          "patch_type": "test",
+          "patch_sha256": "a64b331f9b0a751e08728fa98ec46d1c6e5f7cc225b750cb82dc647b02e60683",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696@sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+          "patch_type": "code",
+          "patch_sha256": "3c11f13ade4fa34b1efc861215c8dfe0903f544bfca137c5630970e60d58c6fe",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525@sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+          "patch_type": "test",
+          "patch_sha256": "b329f8bc16e6abfb2df62333f7aeebc63dd216194f830d01597f2d5f24adb960",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525@sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+          "patch_type": "code",
+          "patch_sha256": "9f6b2ec156dbc3edcda1fec66ee6f35ae1c5d4bc540de89b1cbb8e138837c648",
+          "strict_exit_code": 1,
+          "strict_output": "error: patch failed: test/js/samples/hydrated-void-element/expected.js:8\nerror: test/js/samples/hydrated-void-element/expected.js: patch does not apply\nerror: patch failed: test/js/samples/src-attribute-check/expected.js:7\nerror: test/js/samples/src-attribute-check/expected.js: patch does not apply\n"
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236@sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+          "patch_type": "test",
+          "patch_sha256": "ea43d117fe3f4ca1bdff7cdbc7f347d0d682bf11777d60b7402f6af642db4ad8",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236@sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+          "patch_type": "code",
+          "patch_sha256": "211c7ff3dd8735cdba3fba3e85eedf8ff8db3d7cd9283184d4b507ab1659a897",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        }
+      ],
+      "retained_files": {
+        "provenance.json": "16844d80348192ae119cb38100bb7d69ff459c9580e6d494e0a10d80751cb89a",
+        "result.json": "80c0b7bc537f9e72769acec5a03cc5079732a516639b8668f89e495e84160f50",
+        "strict-application.jsonl": "c7f08afcf7b6bbf32c2b610acfabe9d970976908669079d6963a999dc3c4395a",
+        "results/mui__material-ui-22696_metrics.json": "6d8ceeb29eae0f9c5c9f2b108e7a2550660a1ca121652494e98c88354cb58dd5",
+        "results/sveltejs__svelte-1116_result.json": "f42e431d716ef5d9ef1aff84ae25dd8d008ee9da851393f138361bee043ebb47",
+        "results/sveltejs__svelte-6525_metrics.json": "11e1b9c693b21d1a3727f31491fc82c7a6a69f08b89335c37c4203f895927056",
+        "results/mui__material-ui-22696_result.json": "c8c9600257f524452c74bcd98945f608d32de9595b7104168d062cc2f638b1be",
+        "results/mui__material-ui-12236_result.json": "3dfadf325cb9252057f2c247a849fd2d4aad87701541db978ad9844d6d6e32b3",
+        "results/sveltejs__svelte-1116_metrics.json": "d39d09fc8a04f565da5450e451783471d3103606072c1755885d50081b1063aa",
+        "results/sveltejs__svelte-6525_result.json": "7a388b58aa945b6631352cae411e7a361e5d32b5933bdf0391fb7e69c24bd4d9",
+        "results/mui__material-ui-12236_metrics.json": "914b9fac6b7ae15d924c7129e4fa7efa807cb2c8d9d182a4763a4eef0f78445d",
+        "run_logs_typescript/mui__material-ui-22696_run.log": "09ef9f5ff8c9beee8f041966d6763b8d1b8d3a87fc96da56601947e8b06cc723",
+        "run_logs_typescript/mui__material-ui-12236_run.log": "5f959507719096dcc31dd99ec9c511443cb3879d8ef82cdcea892994c857dced"
+      }
+    },
+    "C1": {
+      "process": {
+        "exit_code": 0,
+        "elapsed_seconds": 162.99160385131836
+      },
+      "provenance": {
+        "evaluator": "9c836c5d7f3cb991934132b77d29e6941d912a07",
+        "mode": "predictions",
+        "instances": [
+          "sveltejs__svelte-1116",
+          "mui__material-ui-22696",
+          "sveltejs__svelte-6525",
+          "mui__material-ui-12236"
+        ],
+        "predictions_sha256": "3caafdaa76ae1c3d9a104166ec10def43fbd74f68a78d440062dc5c2bee43ca0",
+        "subset_sha256": "df89cc26e7e734c8054e4d0472a76265dcaf2c4909786b636c1277ce83998908",
+        "images": {
+          "polybench_javascript_sveltejs__svelte-1116": {
+            "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116:v1.1",
+            "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116@sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+            "id": "sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+            "architecture": "amd64",
+            "os": "linux",
+            "size": 5418809953,
+            "workdir": "/testbed"
+          },
+          "polybench_typescript_mui__material-ui-22696": {
+            "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696:v1.1",
+            "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696@sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+            "id": "sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+            "architecture": "amd64",
+            "os": "linux",
+            "size": 8945390461,
+            "workdir": "/testbed"
+          },
+          "polybench_javascript_sveltejs__svelte-6525": {
+            "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525:v1.1",
+            "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525@sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+            "id": "sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+            "architecture": "amd64",
+            "os": "linux",
+            "size": 5832672895,
+            "workdir": "/testbed"
+          },
+          "polybench_typescript_mui__material-ui-12236": {
+            "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236:v1.1",
+            "digest": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236@sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+            "id": "sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+            "architecture": "amd64",
+            "os": "linux",
+            "size": 8198556570,
+            "workdir": "/testbed"
+          }
+        },
+        "prepared_dependencies": {},
+        "wrapper_sha256": "9bcdeed7aca85cf4a0bb3dfac78ce6310dca61f71cdab0848e19e6f6f4bf2cd3",
+        "container_boundary": {
+          "network": "none",
+          "cap_drop": [
+            "ALL"
+          ],
+          "no_new_privileges": true,
+          "memory": "8g",
+          "cpus": 4
+        }
+      },
+      "strict_application": [
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116@sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+          "patch_type": "test",
+          "patch_sha256": "ce79fbbd6a959e604d5aab317a67710f7937760e7d32ab5d0e7d52b982a1efeb",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116@sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+          "patch_type": "code",
+          "patch_sha256": "588c2ae1b32a0ccb33efb0962f5dff855b7bba87a560cabf68522c0acf098b1b",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696@sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+          "patch_type": "test",
+          "patch_sha256": "a64b331f9b0a751e08728fa98ec46d1c6e5f7cc225b750cb82dc647b02e60683",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696@sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+          "patch_type": "code",
+          "patch_sha256": "1e0e25363520d6373891ac730f713c2fb1f11de6076b54691b530cf93bc0e1b9",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525@sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+          "patch_type": "test",
+          "patch_sha256": "b329f8bc16e6abfb2df62333f7aeebc63dd216194f830d01597f2d5f24adb960",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525@sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+          "patch_type": "code",
+          "patch_sha256": "b92392982bc41c79510ee23febe4183b637e341a5472d226ca5e26fe98717b40",
+          "strict_exit_code": 1,
+          "strict_output": "error: patch failed: test/js/samples/hydrated-void-element/expected.js:7\nerror: test/js/samples/hydrated-void-element/expected.js: patch does not apply\nerror: patch failed: test/js/samples/src-attribute-check/expected.js:6\nerror: test/js/samples/src-attribute-check/expected.js: patch does not apply\n"
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236@sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+          "patch_type": "test",
+          "patch_sha256": "ea43d117fe3f4ca1bdff7cdbc7f347d0d682bf11777d60b7402f6af642db4ad8",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        },
+        {
+          "image": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236@sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+          "patch_type": "code",
+          "patch_sha256": "2e30c1c310298495522c370f68531b86c0a2470d5f41e2439ea09e8bee4f9891",
+          "strict_exit_code": 0,
+          "strict_output": ""
+        }
+      ],
+      "retained_files": {
+        "provenance.json": "eeed07b50579d74f5da6e2b9251a6ecffd3690e86d70759aa5da9d4ff64c58aa",
+        "result.json": "65a70743da882e0a64e2a95547f01eac44c47a46cc6cf12888f391ec912b043b",
+        "strict-application.jsonl": "b810cd272585c86b82bb84f1e17b676e3922cfccfe58942217be84277e9b744d",
+        "run_logs_javascript/sveltejs__svelte-1116_run.log": "eba99428e1f8cf6577bd4853f39badb6edd401daaf1ac6a0eb7e9a7b5694139b",
+        "results/mui__material-ui-22696_metrics.json": "6d8ceeb29eae0f9c5c9f2b108e7a2550660a1ca121652494e98c88354cb58dd5",
+        "results/sveltejs__svelte-1116_result.json": "b75bdac413f9cec0359e4e79de6b397192a456d0e01b1daba23b758d39588744",
+        "results/sveltejs__svelte-6525_metrics.json": "11e1b9c693b21d1a3727f31491fc82c7a6a69f08b89335c37c4203f895927056",
+        "results/mui__material-ui-22696_result.json": "336aff808860035a62c84f89eca8479d01680732756b32876e432f6c44639cf7",
+        "results/mui__material-ui-12236_result.json": "b5d817257bf603594a732b78c5724a58d29eec09d6b6a51263fa8e8ce3743742",
+        "results/sveltejs__svelte-1116_metrics.json": "d39d09fc8a04f565da5450e451783471d3103606072c1755885d50081b1063aa",
+        "results/sveltejs__svelte-6525_result.json": "7a388b58aa945b6631352cae411e7a361e5d32b5933bdf0391fb7e69c24bd4d9",
+        "results/mui__material-ui-12236_metrics.json": "914b9fac6b7ae15d924c7129e4fa7efa807cb2c8d9d182a4763a4eef0f78445d",
+        "run_logs_typescript/mui__material-ui-22696_run.log": "12ace314bd8744adee82ab3731b0249ebca3dbb9ef0c6fc38496edb7c283163e",
+        "run_logs_typescript/mui__material-ui-12236_run.log": "5ce51d1ee8e6e4e829ada4c0361d54ccb18752e2a5364d24665af86fe294fcc7"
+      }
+    }
+  },
+  "cost_notes": [
+    "Cached tokens are a subset of input; reasoning tokens are a subset of output.",
+    "Money is unknown: no trustworthy billed-price evidence for the existing OAuth connection.",
+    "Native elapsed includes workload stop; container capture/cleanup are separate.",
+    "No separate parent/child phase: one native session per slot; all title and work requests counted.",
+    "Historical preparation and 20 model-amendment scripted requests are excluded from real usage."
+  ],
+  "scope": "Four-task development screening; no superiority, equivalence, or training-data-independence claim."
+}

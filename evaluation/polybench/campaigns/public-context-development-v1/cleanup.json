@@ -1,0 +1,159 @@
+{
+  "archive": {
+    "archive": "evidence-2026-10-20.tar.gz",
+    "archive_sha256": "04b9482232aa01e34a8ef939f4269f6a092cf54e5725f50ca48886a57f2d1a24",
+    "archive_bytes": 173207965,
+    "files": 3129,
+    "source_bytes": 663116486,
+    "every_archived_file_reread_and_hash_verified": true
+  },
+  "filesystem": {
+    "removed": [
+      {
+        "path": "author-inputs",
+        "logical_bytes": 4253949517
+      },
+      {
+        "path": "evaluator",
+        "logical_bytes": 277244610
+      },
+      {
+        "path": "plain-dependencies",
+        "logical_bytes": 83171085
+      },
+      {
+        "path": "python",
+        "logical_bytes": 52387143
+      },
+      {
+        "path": "bundle",
+        "logical_bytes": 83475718
+      },
+      {
+        "path": "core-bundle",
+        "logical_bytes": 83173578
+      },
+      {
+        "path": "venv",
+        "logical_bytes": 684243068
+      },
+      {
+        "path": "toolchain",
+        "logical_bytes": 184133918
+      },
+      {
+        "path": "batch/runs",
+        "logical_bytes": 292752990
+      },
+      {
+        "path": "batch/input-preflight",
+        "logical_bytes": 44233686
+      },
+      {
+        "path": "model-amendment-scripted",
+        "logical_bytes": 21849093
+      },
+      {
+        "path": "scripted-preflight-final",
+        "logical_bytes": 22959456
+      },
+      {
+        "path": "container-preflight-final",
+        "logical_bytes": 13708
+      },
+      {
+        "path": "recorder-fixture",
+        "logical_bytes": 112525
+      },
+      {
+        "path": "recorder-fixture-sandbox-denied",
+        "logical_bytes": 1298
+      },
+      {
+        "path": "input-preflight-context-sveltejs__svelte-1116",
+        "logical_bytes": 2050321
+      },
+      {
+        "path": "input-preflight-sveltejs__svelte-1116",
+        "logical_bytes": 2050305
+      },
+      {
+        "path": "input-preflight-sveltejs__svelte-6525",
+        "logical_bytes": 2934877
+      },
+      {
+        "path": "input-preflight-context-sveltejs__svelte-6525",
+        "logical_bytes": 2934892
+      },
+      {
+        "path": "input-preflight-mui__material-ui-12236",
+        "logical_bytes": 6659790
+      },
+      {
+        "path": "input-preflight-mui__material-ui-22696",
+        "logical_bytes": 10471840
+      },
+      {
+        "path": "input-preflight-context-mui__material-ui-12236",
+        "logical_bytes": 6659806
+      },
+      {
+        "path": "input-preflight-context-mui__material-ui-22696",
+        "logical_bytes": 10471857
+      },
+      {
+        "path": "history/gpt-5.6-luna-pre-admission-2026-10-20/input-preflight",
+        "logical_bytes": 14574478
+      }
+    ],
+    "logical_bytes_removed": 6142509559,
+    "verified_archive_sha256": "04b9482232aa01e34a8ef939f4269f6a092cf54e5725f50ca48886a57f2d1a24",
+    "archive_bytes": 173207965,
+    "original_freeze_sha256": "ab80a1800f9b4a5622a33e80eb87c8be63c85fc16f1acc3c596a7f732ca8579b",
+    "amended_freeze_sha256": "e66e10b7725609fae063f444856f91ec6474e2308ad6e360fe24b3e8b4904970",
+    "retained_logical_bytes": 294773064
+  },
+  "docker": {
+    "removed": [
+      {
+        "id": "sha256:0f31bf6a64ce3f2e08d408b89229a180d76d99c1a8cbf6b213190a23f37cd4bc",
+        "tag": "opencode-polybench-pilot-author-mui__material-ui-22696:latest"
+      },
+      {
+        "id": "sha256:663bdbe438a15b44af1dda2b8500f99663064175e16eca703321ca2dda1488cc",
+        "tag": "opencode-polybench-pilot-author-sveltejs__svelte-6525:latest"
+      },
+      {
+        "id": "sha256:9a48ff7da51b9ba666c02ca12c1a3037d5db2aeee78ed6396ce65b97b749a3e7",
+        "tag": "opencode-polybench-pilot-author-sveltejs__svelte-1116:latest"
+      },
+      {
+        "id": "sha256:b75b4b4fa6654d6b684842278329d03dc07f1df8c0bec52b52c93b84496a2c1d",
+        "tag": "opencode-polybench-pilot-author-mui__material-ui-12236:latest"
+      },
+      {
+        "id": "sha256:3327e3dbb045ff1d3c809b90bbb1746bd95b0572903c5d3d5156f6cd646272b7",
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-1116:v1.1"
+      },
+      {
+        "id": "sha256:604551c425c93646c6ac2344ce3e763c2f9c752a9b102c3223fc73dccbccc0ad",
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-22696:v1.1"
+      },
+      {
+        "id": "sha256:b328c0cc810c3f5275fa3d70380d8ffb7b40f06f851765e78551ceb3e73156e4",
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.mui__material-ui-12236:v1.1"
+      },
+      {
+        "id": "sha256:e03f74484df0abcf2d55404fd8311662fde9770b1ae0ae54830c0a48b42863cf",
+        "tag": "ghcr.io/timesler/swe-polybench.eval.x86_64.sveltejs__svelte-6525:v1.1"
+      }
+    ],
+    "remaining_owned_images": 0,
+    "force": false,
+    "global_prune": false,
+    "reclaimed_physical_bytes": null
+  },
+  "earlier_amendment_dependency_cleanup_bytes": 52402167,
+  "private_archive_not_published": true,
+  "historical_preparation_cleanup_excluded": true
+}

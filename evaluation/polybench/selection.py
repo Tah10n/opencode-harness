@@ -32,6 +32,13 @@ def select(rows):
         raise ValueError('Ten-instance stratification infeasible')
     return pool, selected
 
+def public_context_pool(rows, config):
+    """Bounded metadata order only; public-source eligibility is separately evidenced."""
+    excluded = set(config['excluded_instance_ids'])
+    return sorted((r for r in rows if r['language'] in config['languages'] and r['instance_id'] not in excluded),
+                  key=lambda r: (hashlib.sha256((config['seed'] + r['instance_id']).encode()).hexdigest(), r['instance_id']))[:config['max_candidates']]
+
+
 def select_campaign(rows, config):
     """Select only metadata; never inspect a solution, task text or test list."""
     excluded = set(config['excluded_instance_ids'])
