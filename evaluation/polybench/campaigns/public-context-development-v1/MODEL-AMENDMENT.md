@@ -18,8 +18,10 @@ The accepted original head was
 `ab80a1800f9b4a5622a33e80eb87c8be63c85fc16f1acc3c596a7f732ca8579b`;
 the original public manifest is preserved byte-for-byte in
 [history/gpt-5.6-luna-frozen-manifest.json](history/gpt-5.6-luna-frozen-manifest.json).
-The active [frozen manifest](frozen-manifest.json) will bind the amended adapter
-and model before any participant starts.
+The active [frozen manifest](frozen-manifest.json) binds adapter
+`41dd7ecc7b05be623f8b54186d80b53b4ed8870a` and the amended model before any
+participant starts. Its freeze SHA-256 is
+`e66e10b7725609fae063f444856f91ec6474e2308ad6e360fe24b3e8b4904970`.
 
 Only the model pin, its small-model/provider configuration, and the hashes and
 adapter provenance affected by this amendment change. The campaign name and
@@ -51,3 +53,13 @@ each cell emitted five local scripted requests, all with `gpt-6-luna` and
 removal. Whole task envelopes and core presence were checked by the unchanged
 preflight. These 20 scripted requests are separate from model usage and prove
 configuration delivery only; external model requests remain zero at this point.
+
+The ordinary freeze generator completed using existing preparation. A structural
+comparison with the original private freeze confirmed that only `adapterSha`,
+`model`, the model fields in `config`, and three entries in `files` changed.
+Those three hashes bind `campaign.json`, `selection.json` and
+`public-context-campaign.mjs`. All source/runtime manifests, environments,
+attempts, input variants, templates, budgets and other fields are identical.
+The public manifest differs only in model, adapter SHA, configuration hash and
+freeze hash. Original plan/preflight bytes and all original control hashes
+remain unchanged.

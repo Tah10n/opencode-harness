@@ -6,8 +6,8 @@
   "datasetRevision": "b3fca77b637379f0c01ad86d18753a7ac1998b53",
   "datasetSha256": "0c8138e73c34fa29a5276b675b146b72d78ce001fcc4560d76302c908b4808a5",
   "selectedCsvSha256": "df89cc26e7e734c8054e4d0472a76265dcaf2c4909786b636c1277ce83998908",
-  "freezeSha256": "ab80a1800f9b4a5622a33e80eb87c8be63c85fc16f1acc3c596a7f732ca8579b",
-  "model": "openai/gpt-5.6-luna",
+  "freezeSha256": "e66e10b7725609fae063f444856f91ec6474e2308ad6e360fe24b3e8b4904970",
+  "model": "openai/gpt-6-luna",
   "opencode": "1.18.26",
   "reasoning": "high",
   "budgetSeconds": 1800,
@@ -366,7 +366,7 @@
   "realProviderRequestsBeforeFreeze": 0,
   "campaign": "public-context-development-v1",
   "productSha": "ffbf979b4fdae958b71796e22e6b7a81a0edce50",
-  "adapterSha": "16d390e7458383fd94efb67c4bd76e1ee498a198",
+  "adapterSha": "41dd7ecc7b05be623f8b54186d80b53b4ed8870a",
   "planSha256": "1a3e1bffa1182ad197300138bf1dee2f1e86e665d34673fea649eb5e5e4baec6",
   "recordingProfile": "research-full-inspect-ledger-1g-v1",
   "installedHashes": {
@@ -374,7 +374,7 @@
     "core-bundle": "e36fb78c437f1a3be69504af5063949a741adbd4de65bbc696b215d1d853ebb3",
     "plain-dependencies": "c4e99fe034dc7e1ae8a3f53794413901d12fc9bdf18dbeda96693dbf509baf40"
   },
-  "configurationSha256": "d16c89f0390b081948d75ece875c1c10b64a74c809dfe30d916afca875e47cf5",
+  "configurationSha256": "40b65fb144d0ad513905a2c58534d743ad452602fdbcb0746e87e27f279d3b3c",
   "armModes": {
     "P0": "plain",
     "P1": "plain",
