@@ -14,7 +14,7 @@ export function contextAssignments(directory=path.resolve('evaluation/polybench/
  assert.equal(config.name,'public-context-development-v1');assert.equal(config.product_sha,'ffbf979b4fdae958b71796e22e6b7a81a0edce50');
  assert.equal(config.local_directory,'local/public-context-development-v1');
  assert.deepEqual(config.arms,Object.keys(contextModes));assert.deepEqual(config.arm_modes,contextModes);assert.deepEqual(config.input_variants,contextVariants);assert.deepEqual(config.orders,contextOrders);
- assert.equal(config.model,'openai/gpt-5.6-luna');assert.equal(config.effort,'high');assert.equal(config.opencode,'1.18.26');assert.equal(config.task_budget_seconds,1800);assert.equal(config.repeats,1);assert.equal(config.concurrency,1);
+ assert.equal(config.model,'openai/gpt-6-luna');assert.equal(config.effort,'high');assert.equal(config.opencode,'1.18.26');assert.equal(config.task_budget_seconds,1800);assert.equal(config.repeats,1);assert.equal(config.concurrency,1);
  assert.equal(selection.configuration_sha256,digest(fs.readFileSync(path.join(directory,'campaign.json'))));
  assert.equal(selection.selected.length,4);assert.equal(new Set(selection.selected.map(r=>r.instance_id)).size,4);
  assert.equal(selection.dataset_revision,'b3fca77b637379f0c01ad86d18753a7ac1998b53');assert.equal(selection.dataset_sha256,'0c8138e73c34fa29a5276b675b146b72d78ce001fcc4560d76302c908b4808a5');

@@ -151,7 +151,7 @@
       "C0"
     ]
   ],
-  "model": "openai/gpt-5.6-luna",
+  "model": "openai/gpt-6-luna",
   "effort": "high",
   "opencode": "1.18.26",
   "task_budget_seconds": 1800,
