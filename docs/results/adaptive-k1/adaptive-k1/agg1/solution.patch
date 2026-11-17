@@ -1,0 +1,26 @@
+diff --git a/author.test.mjs b/author.test.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..b211f8234b218bd3e9a3b9d87740b3ee2e2fa7e0
+--- /dev/null
++++ b/author.test.mjs
+@@ -0,0 +1 @@
++import {test} from 'node:test';import assert from 'node:assert/strict';import {mergeRanges} from './ranges.mjs';test('author overlap check',()=>assert.deepEqual(mergeRanges([[1,4],[2,3]]),[[1,4]]));
+diff --git a/ranges.mjs b/ranges.mjs
+index 87f68d2df51e00231bded1aebb6ea519b3128685..4ed9e28ad7f5de7fe50841cba6cfdd43875a8b12 100644
+--- a/ranges.mjs
++++ b/ranges.mjs
+@@ -1,4 +1,4 @@
+-export function mergeRanges(ranges) {
++export function mergeRanges(ranges, {joinAdjacent=false}={}) {
+   if (!Array.isArray(ranges)) throw new TypeError('ranges');
+   const ordered = ranges.map(pair => {
+     if (!Array.isArray(pair) || pair.length !== 2 || !pair.every(Number.isSafeInteger) || pair[0] >= pair[1]) throw new TypeError('range');
+@@ -7,7 +7,7 @@ export function mergeRanges(ranges) {
+   const out=[];
+   for (const pair of ordered) {
+     const last=out.at(-1);
+-    if (last && pair[0] < last[1]) last[1]=Math.max(last[1],pair[1]);
++    if (last && (pair[0] < last[1] || (joinAdjacent && pair[0] === last[1]))) last[1]=Math.max(last[1],pair[1]);
+     else out.push(pair);
+   }
+   return out;

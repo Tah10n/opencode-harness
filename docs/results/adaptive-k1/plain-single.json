@@ -1,0 +1,394 @@
+{
+  "name": "plain-single",
+  "status": "complete",
+  "reason": null,
+  "independentStatus": 1,
+  "selected": {
+    "id": "A",
+    "label": "base",
+    "sha256": "d4c628c41c62f70d58fbb6f330597b716c5effe9154e4e3e4772cf8dca310b9a",
+    "patchHash": "c70f4663231e6ed307e22305fc1c5c4471ebf8ce9e0435421c96f8d6b6c41da8",
+    "composition": null,
+    "candidateCount": 1
+  },
+  "budget": {
+    "policy": {
+      "milliseconds": 600000,
+      "requests": 120,
+      "roleRequests": {
+        "solver": 48,
+        "editor": 32,
+        "composer": 16,
+        "selector": 8,
+        "auxiliary": 16
+      }
+    },
+    "counts": {
+      "solver": 5,
+      "editor": 0,
+      "composer": 0,
+      "selector": 0,
+      "auxiliary": 1
+    },
+    "requests": 6,
+    "elapsedMs": 11674.814709,
+    "closed": null,
+    "tokens": "observed after response; no hard token cap"
+  },
+  "observedUsage": {
+    "input": 60,
+    "output": 30
+  },
+  "realModelRequests": 0,
+  "freeze": {
+    "upstream": "1cfe254e8d25b15f37048c3730134686abe60335",
+    "adapterHead": "5d6778907a205b8a7ceea7810491ded16f0fb574",
+    "adapter": {
+      "README.md": {
+        "sha256": "1ac545718f3396557b63b1ede901552b0bd567ca1a21c5b13897e1dc645d860f",
+        "executable": false
+      },
+      "assets.mjs": {
+        "sha256": "73f0ee0db0452dcdf3324a505a6a4e9ad2216bd8bee409a92f90d5492196e8be",
+        "executable": false
+      },
+      "controller.py": {
+        "sha256": "d2da5862875eca07d07ecdd60aa73528f91bc0574809ace6c68175af0120f8c3",
+        "executable": false
+      },
+      "export-evidence.mjs": {
+        "sha256": "1cb9e13bf008a711184316656bd23a3a909c7b336bdd271ac4eef6db076af0bf",
+        "executable": false
+      },
+      "fixture/admin/acceptance.mjs": {
+        "sha256": "79403caa91a6bd3401e1ba149ea81658163ffb6492d565cbe0d1310026c4276e",
+        "executable": false
+      },
+      "fixture/source/TASK.md": {
+        "sha256": "1342065018bdd9f3cc8e4bbb495093d9d9c18d172f511376bb39446c9ccdeaaf",
+        "executable": false
+      },
+      "fixture/source/public.test.mjs": {
+        "sha256": "9e67759de1e50038b9506fe1651736b139947c4fa54c032a3e84887754c9f4e1",
+        "executable": false
+      },
+      "fixture/source/ranges.mjs": {
+        "sha256": "fd51480980b38127c57b9cf9c1e4e7594fcb829dfbbfbedccec22dc39046dba2",
+        "executable": false
+      },
+      "policy.mjs": {
+        "sha256": "23502b59d22df7962c8b7e21e708cd4d4b7ef19b2eb0cfa05ea795fcc935d02a",
+        "executable": false
+      },
+      "prompts.json": {
+        "sha256": "d09699ae822d041b195ea8b324d05e1d8d6d5899aad2066eb1eb134013248640",
+        "executable": false
+      },
+      "run.mjs": {
+        "sha256": "e0597e960a06b267f8302327a4e6e670a4df0f97e38b95a3eb123e49037e5ef5",
+        "executable": false
+      },
+      "scripted.mjs": {
+        "sha256": "e9e7ce2ea6eb936048f77bbd6dffc7b03907af7ae81ed77b564296cfdb896839",
+        "executable": false
+      },
+      "upstream.json": {
+        "sha256": "02f0f91dc7be699597085eccb40935fd4815caf4d3a7a196535b0b7ce068ba4b",
+        "executable": false
+      },
+      "vendor/LICENSE": {
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "executable": false
+      },
+      "vendor/harness2/__init__.py": {
+        "sha256": "de20a79ef3cf3974bf32cb6afdbb32608655676e749a466ffd6c7c173bb7e26a",
+        "executable": false
+      },
+      "vendor/harness2/config.py": {
+        "sha256": "0db5ba0c42b87f5b14cbff2d11aaecddda1cd45500903c1d61741232bd1e0a88",
+        "executable": false
+      },
+      "vendor/harness2/core/__init__.py": {
+        "sha256": "ce487673e00fd8921139e3afb688c566fc43d9b07acba048d2102663a81f7151",
+        "executable": false
+      },
+      "vendor/harness2/core/context.py": {
+        "sha256": "63dd482e5d9467d7e659d186a11289fc7861d08c8aed603244ff0cee92de91f3",
+        "executable": false
+      },
+      "vendor/harness2/core/ledger.py": {
+        "sha256": "7059de5d90fc9fb8d4b3b799ff075f09d34f182ba0fdb56eb9d8b8383d0bbf55",
+        "executable": false
+      },
+      "vendor/harness2/core/prompts.py": {
+        "sha256": "d1f4f8db4ab4cb4addcbca175b548db2270375499fda727ac95d271c63cc2504",
+        "executable": false
+      },
+      "vendor/harness2/core/proposer.py": {
+        "sha256": "475ef49d72228e249d7172d793f8362913774412402dfd259ae6e01c6586e175",
+        "executable": false
+      },
+      "vendor/harness2/core/recursion.py": {
+        "sha256": "b299813b5334f2c0f89024a7f14162f0fdd5418ebd4413be93920b5334a204c1",
+        "executable": false
+      },
+      "vendor/harness2/core/selection.py": {
+        "sha256": "2cb3353b2fd4ec72e6322f2c1f35db1ff2cdab88b0b50c8809d1841d235cb92f",
+        "executable": false
+      },
+      "vendor/harness2/core/spec.py": {
+        "sha256": "f245ec9e314778e2a1a51594b906584255b9eed8340c073b864a8a6f2c8dc400",
+        "executable": false
+      },
+      "vendor/harness2/core/tree.py": {
+        "sha256": "c2a15690b1b6b02156e922c5e0b1a215c5065d7bea5a3bae2e56b47309197552",
+        "executable": false
+      },
+      "vendor/pyproject.toml": {
+        "sha256": "c78fd0d09d2f92bf796871c168b548dd4d33e21566dbb582e343266e24a0bada",
+        "executable": false
+      },
+      "verify-installed.mjs": {
+        "sha256": "ca0eb4f572006eac6bdd1ef944e4de3c32ddce5114a9a894343df0b39da8fd7f",
+        "executable": false
+      },
+      "verify.mjs": {
+        "sha256": "268ee440bd7f48cae99bbffe4dcc5e2110611d0617e3b888ea5a9069a856e039",
+        "executable": false
+      }
+    },
+    "source": "1675c36656c276365830c0b83cdc2b2ea060869c147c7bde81fa183b675a7e3c",
+    "task": "1342065018bdd9f3cc8e4bbb495093d9d9c18d172f511376bb39446c9ccdeaaf",
+    "image": "sha256:5bfd0c5bc797c87d6ac2ead9fbced32c24ce67d09135f688b323ad5ec82d41d2",
+    "runtimeBinary": {
+      "sha256": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe",
+      "executable": true
+    },
+    "graph": [
+      "base"
+    ],
+    "surface": [
+      "systemprompt.md",
+      "skills/<name>/SKILL.md"
+    ],
+    "selection": {
+      "pool": "base",
+      "rule": "existing id + full-tree SHA256; no repair or fallback"
+    }
+  },
+  "journal": [
+    {
+      "sequence": 1,
+      "event": "stage-admitted",
+      "label": "base",
+      "role": "solver",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 2,
+      "event": "stage-finished",
+      "label": "base",
+      "role": "solver",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 3,
+      "event": "selection-committed",
+      "label": "base",
+      "role": null,
+      "harnessHash": null,
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 4,
+      "event": "independent-check-started",
+      "label": null,
+      "role": null,
+      "harnessHash": null,
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 5,
+      "event": "independent-check-finished",
+      "label": null,
+      "role": null,
+      "harnessHash": null,
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    }
+  ],
+  "method": null,
+  "stages": [
+    {
+      "role": "solver",
+      "label": "base",
+      "inputHash": "1675c36656c276365830c0b83cdc2b2ea060869c147c7bde81fa183b675a7e3c",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "configHash": "466cb9b6db7571e2f52f00bd1be8c755db6e6555fb617c962255017260c9fa6f",
+      "missionHash": "1342065018bdd9f3cc8e4bbb495093d9d9c18d172f511376bb39446c9ccdeaaf",
+      "snapshotHash": "d4c628c41c62f70d58fbb6f330597b716c5effe9154e4e3e4772cf8dca310b9a",
+      "patchHash": "c70f4663231e6ed307e22305fc1c5c4471ebf8ce9e0435421c96f8d6b6c41da8",
+      "isolation": {
+        "network": "none",
+        "readOnlyRoot": true,
+        "mountTargets": [
+          "target=/input,readonly",
+          "target=/opt/opencode,readonly",
+          "target=/relay.mjs,readonly",
+          "target=/template,readonly"
+        ],
+        "home": "/work/home",
+        "dockerSocket": false
+      },
+      "isolationProbeObserved": true,
+      "cleanBaselineObserved": true,
+      "completePublicReadObserved": false,
+      "missionDeliveries": [
+        {
+          "index": 2,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 3,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 4,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 5,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 6,
+          "representation": "opencode-cli-quoted"
+        }
+      ],
+      "deliveredTexts": [],
+      "checks": [
+        {
+          "exit": 1,
+          "output": "✔ author overlap check (0.805541ms)\n✔ overlap (0.813917ms)\n✔ adjacent opt-in (0.126458ms)\n✖ adjacent default (0.62375ms)\n✔ input stays unchanged (0.104208ms)\n✔ invalid endpoints (0.855125ms)\nℹ tests 6\nℹ suites 0\nℹ pass 5\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 77.346334\n\n✖ failing tests:\n\ntest at public.test.mjs:6:1\n✖ adjacent default (0.62375ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n  + actual - expected\n  \n    [\n      [\n        1,\n  -     2\n  -   ],\n  -   [\n  -     2,\n        3\n      ]\n    ]\n  \n      at TestContext.<anonymous> (file:///work/repo/public.test.mjs:6:36)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1382:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)\n      at Test.postRun (node:internal/test_runner/test:1522:19)\n      at Test.run (node:internal/test_runner/test:1447:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: [ [ 1, 3 ] ],\n    expected: [ [ 1, 2 ], [ 2, 3 ] ],\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\n",
+          "truncated": false
+        }
+      ],
+      "requests": [
+        {
+          "index": 1,
+          "kind": "title",
+          "forwarded": true,
+          "complete": true,
+          "request": "aa8f4b0c2ac4c8599ab0151d8f0a3ce4504468e3ce8cfcbf0b45af79aba87e63",
+          "response": "46078094d73c66f756cd70b546d0199ed0eaf3a1a9753ba9ba529fe922996a01",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 2,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "9910e77552e22ca12085ba0802a0814e466f3c60d7c679e15fd2acdb890b71bc",
+          "response": "dd7df8bd2e9551121c84ed311a323d1177972d5067920286504e705b5c46abe3",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 3,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "7771a7a12ad571556b1986728076c58c0482ad3b4a65796c7bad9aae8af0f698",
+          "response": "73b77cd4a619f87a734862ba53c14a5df65b032ab5690ae02040f08356f1b19d",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 4,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "c2fabb31787c430ea69fa477aabf73fe4a07c05f1b1a88459f58522409f34258",
+          "response": "583168fad773d9ee936c0aedcf9ac4e173a8d84500dd507ff0d6f03a15bb3d45",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 5,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "5b3e9537d36e4c58351c52b76950b26f8b712fc3553d55f460a520d39907f60c",
+          "response": "464a37584b1c45258d90c849cbe6f9f039f1c68da525ed1fefd0f81820d9d7d9",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 6,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "f33ad2a279bbfbd18fcf0b92e9a9515e1ce02bbc14b6997fe67c47e4ddeff17f",
+          "response": "f7a84fa171fb708be4e96bc6b7871d0eba13b5f02dac0d2a9e54040764313542",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        }
+      ],
+      "stop": {
+        "terminationVerified": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "forwardingClosed": true,
+        "providerServerStateMayRemainUnknown": false
+      }
+    }
+  ]
+}
