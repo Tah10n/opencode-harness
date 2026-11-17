@@ -8,9 +8,11 @@ const [output,assets,scope='all']=process.argv.slice(2);
 if(fs.existsSync(output))throw Error('Fresh verification output required');fs.mkdirSync(output,{recursive:true});
 const read=file=>JSON.parse(fs.readFileSync(file));
 const rows=[];
-const normal=scope==='all'||scope==='normal';
-const failures=scope==='all'||scope==='negative';
-const cases=[...(normal?['plain-single','plain-multi','adaptive-k1']:[]),...(failures?['forbidden','symlink','outside','empty','selection','tamper','unknown','process','recording','request-budget','editor-time','composer-time','injection']:[])];
+const normal=['plain-single','plain-multi','adaptive-k1'];
+const failures=['forbidden','symlink','outside','empty','selection','tamper','unknown','process','recording','request-budget','editor-time','composer-time','injection'];
+const all=[...normal,...failures];
+const cases=scope==='all'?all:scope==='normal'?normal:scope==='negative'?failures:scope.split(',');
+if(cases.some(name=>!all.includes(name))||new Set(cases).size!==cases.length)throw Error('Unknown or repeated verification case');
 for(const name of cases) {
   const mode=name.startsWith('plain-')?name:'adaptive-k1',fault=mode===name?null:name,root=path.join(output,name);
   const budgetOptions=fault==='request-budget'?{requests:8}:fault==='editor-time'?{milliseconds:30000}:fault==='composer-time'?{milliseconds:85000}:undefined;
@@ -24,7 +26,7 @@ for(const name of cases) {
     const absent=spawnSync('docker',['inspect',c.name],{encoding:'utf8'});assert.notEqual(absent.status,0,'Owned container remains');assert.match(absent.stderr,/no such (object|container)/i);
   }
   for(const r of done){assert.equal(r.stop.terminationVerified,true);assert.equal(r.stop.relayRemoved,true);assert.equal(r.stop.activeProviderHandlers,0);}
-  if(normal&&mode===name||fault==='injection') {
+  if(normal.includes(name)||fault==='injection') {
     assert.equal(result.status,'complete',JSON.stringify(result));
     const solvers=done.filter(e=>e.role==='solver');assert.equal(solvers.length,mode==='plain-single'?1:4);
     assert.equal(new Set(solvers.map(e=>e.container)).size,solvers.length);assert.equal(new Set(admitted.filter(e=>e.role==='solver').map(e=>e.inputHash)).size,1);

@@ -70,9 +70,22 @@ export function scripted({role,label,source,harness,candidates,fault,budget,onDe
         else if(!['forbidden','empty','symlink','outside'].includes(fault)) {assert.match(outputs(body),/INV_WORKFLOW/);assert.match(outputs(body),/DOM_WORKFLOW/);assert.match(outputs(body),/validation accidentally omitted/);}
         if((fault==='editor-time'&&role==='editor')||(fault==='composer-time'&&role==='composer')) {
           onDeadlineProbe();
-          // Bounded scripted wall-time exhaustion; no provider usage or hidden verdict.
-          await new Promise(resolve=>{const timer=setTimeout(resolve,Math.max(1,budget.deadline-Date.now()+10));options.signal.addEventListener('abort',()=>{clearTimeout(timer);resolve();},{once:true});});
-          budget.check();
+          // Return headers immediately so the connection timeout cannot mask the
+          // overall task deadline. Leave the stream pending until cancellation.
+          const body=new ReadableStream({
+            start(controller) {
+              let timer;
+              const close=()=>{
+                clearTimeout(timer);
+                options.signal.removeEventListener('abort',close);
+                controller.error(options.signal.reason??Error('Scripted response expired'));
+              };
+              timer=setTimeout(close,Math.max(1,Math.ceil(budget.remaining())+50));
+              if(options.signal.aborted)close();
+              else options.signal.addEventListener('abort',close,{once:true});
+            },
+          });
+          return new Response(body,{headers:{'content-type':'text/event-stream'}});
         }
         const key=label.split('.')[0],tree={'systemprompt.md':instructions[key]};
         if(key!=='dom1')tree['skills/boundary-check/SKILL.md']=skill;
