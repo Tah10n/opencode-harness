@@ -72,6 +72,7 @@ export async function run({output,assets,mode='adaptive-k1',scriptedOnly=false,b
       runtimeManifests:{[template]:manifest(template)},toolchain:path.join(assets,'toolchain'),dependencies:template,config,
       streamLimit:'remaining-task-budget',connectionTimeoutMs:30000,inputManifests:{'task-P':manifest(input)},attempts:[{slot:1,task:'task',arm:'P',source:input}]});
     let snapshot,result,nativeSession;const admissionAbort=new AbortController();
+    const out=path.join(root,'runs/task-P');
     const providerScript=scripted({role,label,source,harness:tree,candidates,fault,budget,
       onDeadlineProbe:()=>log({event:'deadline-probe',role,label})});
     let recordingFault=false;
