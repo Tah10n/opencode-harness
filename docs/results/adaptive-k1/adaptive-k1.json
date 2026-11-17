@@ -1,0 +1,1682 @@
+{
+  "name": "adaptive-k1",
+  "status": "complete",
+  "reason": null,
+  "independentStatus": 0,
+  "selected": {
+    "id": "B",
+    "label": "agg1",
+    "sha256": "b1fb25b6369cc630f0477c28f067326d9ecb3fb35610af45ca54a1c16b5864ca",
+    "patchHash": "9785ba0650d8089a46c927bb565d7efb65f4d9ad7dd82e48ec19d8e50ff6ff78",
+    "composition": {
+      "label": "agg1",
+      "sha256": "b1fb25b6369cc630f0477c28f067326d9ecb3fb35610af45ca54a1c16b5864ca",
+      "patchHash": "9785ba0650d8089a46c927bb565d7efb65f4d9ad7dd82e48ec19d8e50ff6ff78"
+    },
+    "candidateCount": 2
+  },
+  "budget": {
+    "policy": {
+      "milliseconds": 600000,
+      "requests": 120,
+      "roleRequests": {
+        "solver": 48,
+        "editor": 32,
+        "composer": 16,
+        "selector": 8,
+        "auxiliary": 16
+      }
+    },
+    "counts": {
+      "solver": 20,
+      "editor": 8,
+      "composer": 4,
+      "selector": 3,
+      "auxiliary": 8
+    },
+    "requests": 43,
+    "elapsedMs": 68516.776583,
+    "closed": null,
+    "tokens": "observed after response; no hard token cap"
+  },
+  "observedUsage": {
+    "input": 430,
+    "output": 215
+  },
+  "realModelRequests": 0,
+  "freeze": {
+    "upstream": "1cfe254e8d25b15f37048c3730134686abe60335",
+    "adapterHead": "5d6778907a205b8a7ceea7810491ded16f0fb574",
+    "adapter": {
+      "README.md": {
+        "sha256": "1ac545718f3396557b63b1ede901552b0bd567ca1a21c5b13897e1dc645d860f",
+        "executable": false
+      },
+      "assets.mjs": {
+        "sha256": "73f0ee0db0452dcdf3324a505a6a4e9ad2216bd8bee409a92f90d5492196e8be",
+        "executable": false
+      },
+      "controller.py": {
+        "sha256": "d2da5862875eca07d07ecdd60aa73528f91bc0574809ace6c68175af0120f8c3",
+        "executable": false
+      },
+      "export-evidence.mjs": {
+        "sha256": "1cb9e13bf008a711184316656bd23a3a909c7b336bdd271ac4eef6db076af0bf",
+        "executable": false
+      },
+      "fixture/admin/acceptance.mjs": {
+        "sha256": "79403caa91a6bd3401e1ba149ea81658163ffb6492d565cbe0d1310026c4276e",
+        "executable": false
+      },
+      "fixture/source/TASK.md": {
+        "sha256": "1342065018bdd9f3cc8e4bbb495093d9d9c18d172f511376bb39446c9ccdeaaf",
+        "executable": false
+      },
+      "fixture/source/public.test.mjs": {
+        "sha256": "9e67759de1e50038b9506fe1651736b139947c4fa54c032a3e84887754c9f4e1",
+        "executable": false
+      },
+      "fixture/source/ranges.mjs": {
+        "sha256": "fd51480980b38127c57b9cf9c1e4e7594fcb829dfbbfbedccec22dc39046dba2",
+        "executable": false
+      },
+      "policy.mjs": {
+        "sha256": "23502b59d22df7962c8b7e21e708cd4d4b7ef19b2eb0cfa05ea795fcc935d02a",
+        "executable": false
+      },
+      "prompts.json": {
+        "sha256": "d09699ae822d041b195ea8b324d05e1d8d6d5899aad2066eb1eb134013248640",
+        "executable": false
+      },
+      "run.mjs": {
+        "sha256": "e0597e960a06b267f8302327a4e6e670a4df0f97e38b95a3eb123e49037e5ef5",
+        "executable": false
+      },
+      "scripted.mjs": {
+        "sha256": "e9e7ce2ea6eb936048f77bbd6dffc7b03907af7ae81ed77b564296cfdb896839",
+        "executable": false
+      },
+      "upstream.json": {
+        "sha256": "02f0f91dc7be699597085eccb40935fd4815caf4d3a7a196535b0b7ce068ba4b",
+        "executable": false
+      },
+      "vendor/LICENSE": {
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "executable": false
+      },
+      "vendor/harness2/__init__.py": {
+        "sha256": "de20a79ef3cf3974bf32cb6afdbb32608655676e749a466ffd6c7c173bb7e26a",
+        "executable": false
+      },
+      "vendor/harness2/config.py": {
+        "sha256": "0db5ba0c42b87f5b14cbff2d11aaecddda1cd45500903c1d61741232bd1e0a88",
+        "executable": false
+      },
+      "vendor/harness2/core/__init__.py": {
+        "sha256": "ce487673e00fd8921139e3afb688c566fc43d9b07acba048d2102663a81f7151",
+        "executable": false
+      },
+      "vendor/harness2/core/context.py": {
+        "sha256": "63dd482e5d9467d7e659d186a11289fc7861d08c8aed603244ff0cee92de91f3",
+        "executable": false
+      },
+      "vendor/harness2/core/ledger.py": {
+        "sha256": "7059de5d90fc9fb8d4b3b799ff075f09d34f182ba0fdb56eb9d8b8383d0bbf55",
+        "executable": false
+      },
+      "vendor/harness2/core/prompts.py": {
+        "sha256": "d1f4f8db4ab4cb4addcbca175b548db2270375499fda727ac95d271c63cc2504",
+        "executable": false
+      },
+      "vendor/harness2/core/proposer.py": {
+        "sha256": "475ef49d72228e249d7172d793f8362913774412402dfd259ae6e01c6586e175",
+        "executable": false
+      },
+      "vendor/harness2/core/recursion.py": {
+        "sha256": "b299813b5334f2c0f89024a7f14162f0fdd5418ebd4413be93920b5334a204c1",
+        "executable": false
+      },
+      "vendor/harness2/core/selection.py": {
+        "sha256": "2cb3353b2fd4ec72e6322f2c1f35db1ff2cdab88b0b50c8809d1841d235cb92f",
+        "executable": false
+      },
+      "vendor/harness2/core/spec.py": {
+        "sha256": "f245ec9e314778e2a1a51594b906584255b9eed8340c073b864a8a6f2c8dc400",
+        "executable": false
+      },
+      "vendor/harness2/core/tree.py": {
+        "sha256": "c2a15690b1b6b02156e922c5e0b1a215c5065d7bea5a3bae2e56b47309197552",
+        "executable": false
+      },
+      "vendor/pyproject.toml": {
+        "sha256": "c78fd0d09d2f92bf796871c168b548dd4d33e21566dbb582e343266e24a0bada",
+        "executable": false
+      },
+      "verify-installed.mjs": {
+        "sha256": "ca0eb4f572006eac6bdd1ef944e4de3c32ddce5114a9a894343df0b39da8fd7f",
+        "executable": false
+      },
+      "verify.mjs": {
+        "sha256": "268ee440bd7f48cae99bbffe4dcc5e2110611d0617e3b888ea5a9069a856e039",
+        "executable": false
+      }
+    },
+    "source": "1675c36656c276365830c0b83cdc2b2ea060869c147c7bde81fa183b675a7e3c",
+    "task": "1342065018bdd9f3cc8e4bbb495093d9d9c18d172f511376bb39446c9ccdeaaf",
+    "image": "sha256:5bfd0c5bc797c87d6ac2ead9fbced32c24ce67d09135f688b323ad5ec82d41d2",
+    "runtimeBinary": {
+      "sha256": "096d32aa9778f98981390a0602c1f8af55ee5f1d6d5c58206f8fb2743c90eafe",
+      "executable": true
+    },
+    "graph": [
+      "base",
+      "inv1.a1 (one invalid-proposal repair maximum)",
+      "dom1.a1 (one invalid-proposal repair maximum)",
+      "inv1",
+      "dom1",
+      "agg1.a1 (one invalid-proposal repair maximum)",
+      "agg1",
+      "selector"
+    ],
+    "surface": [
+      "systemprompt.md",
+      "skills/<name>/SKILL.md"
+    ],
+    "selection": {
+      "pool": "base + agg1",
+      "rule": "existing id + full-tree SHA256; no repair or fallback"
+    }
+  },
+  "journal": [
+    {
+      "sequence": 1,
+      "event": "stage-admitted",
+      "label": "base",
+      "role": "solver",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 2,
+      "event": "stage-finished",
+      "label": "base",
+      "role": "solver",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 3,
+      "event": "stage-admitted",
+      "label": "inv1.a1",
+      "role": "editor",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 4,
+      "event": "stage-finished",
+      "label": "inv1.a1",
+      "role": "editor",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 5,
+      "event": "proposal",
+      "label": "inv1.a1",
+      "role": null,
+      "harnessHash": null,
+      "proposalHash": "54d55743dbb94d2f7bda8b9efdebf85008cede40044a291564b52c4c4204e9a5",
+      "valid": true,
+      "reason": ""
+    },
+    {
+      "sequence": 6,
+      "event": "stage-admitted",
+      "label": "dom1.a1",
+      "role": "editor",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 7,
+      "event": "stage-finished",
+      "label": "dom1.a1",
+      "role": "editor",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 8,
+      "event": "proposal",
+      "label": "dom1.a1",
+      "role": null,
+      "harnessHash": null,
+      "proposalHash": "850c5f4f8a992a8ff024ea6bb442e9898f355a2c9245a7273753f6aca013e3bd",
+      "valid": true,
+      "reason": ""
+    },
+    {
+      "sequence": 9,
+      "event": "stage-admitted",
+      "label": "inv1",
+      "role": "solver",
+      "harnessHash": "c158eedab3cf48cbbd0802586580184e63e7ba80efcc82063db301b9451339d4",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 10,
+      "event": "stage-finished",
+      "label": "inv1",
+      "role": "solver",
+      "harnessHash": "c158eedab3cf48cbbd0802586580184e63e7ba80efcc82063db301b9451339d4",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 11,
+      "event": "stage-admitted",
+      "label": "dom1",
+      "role": "solver",
+      "harnessHash": "850c5f4f8a992a8ff024ea6bb442e9898f355a2c9245a7273753f6aca013e3bd",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 12,
+      "event": "stage-finished",
+      "label": "dom1",
+      "role": "solver",
+      "harnessHash": "850c5f4f8a992a8ff024ea6bb442e9898f355a2c9245a7273753f6aca013e3bd",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 13,
+      "event": "stage-admitted",
+      "label": "agg1.a1",
+      "role": "composer",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 14,
+      "event": "stage-finished",
+      "label": "agg1.a1",
+      "role": "composer",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 15,
+      "event": "proposal",
+      "label": "agg1.a1",
+      "role": null,
+      "harnessHash": null,
+      "proposalHash": "bbd0a645f0ddfb27013b682c6d7effbef9a17fdbda78678d8b836a9eab5b3bf2",
+      "valid": true,
+      "reason": ""
+    },
+    {
+      "sequence": 16,
+      "event": "stage-admitted",
+      "label": "agg1",
+      "role": "solver",
+      "harnessHash": "bbd0a645f0ddfb27013b682c6d7effbef9a17fdbda78678d8b836a9eab5b3bf2",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 17,
+      "event": "stage-finished",
+      "label": "agg1",
+      "role": "solver",
+      "harnessHash": "bbd0a645f0ddfb27013b682c6d7effbef9a17fdbda78678d8b836a9eab5b3bf2",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 18,
+      "event": "stage-admitted",
+      "label": "selector",
+      "role": "selector",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 19,
+      "event": "stage-finished",
+      "label": "selector",
+      "role": "selector",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 20,
+      "event": "selection-committed",
+      "label": "agg1",
+      "role": null,
+      "harnessHash": null,
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 21,
+      "event": "independent-check-started",
+      "label": null,
+      "role": null,
+      "harnessHash": null,
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    },
+    {
+      "sequence": 22,
+      "event": "independent-check-finished",
+      "label": null,
+      "role": null,
+      "harnessHash": null,
+      "proposalHash": null,
+      "valid": null,
+      "reason": null
+    }
+  ],
+  "method": {
+    "mode": "agg",
+    "task_id": "intervals",
+    "k": 1,
+    "finals": [
+      "agg1"
+    ],
+    "ok": true,
+    "fell_back": [],
+    "kept_base": [],
+    "stages": [
+      {
+        "label": "inv1",
+        "dim": "INV",
+        "fell_back": false,
+        "kept_base": false,
+        "attempts": 1,
+        "usd": 0,
+        "cached": false,
+        "notes": "Use the observed adjacent default and invalid endpoints checks and the actual candidate patches.",
+        "error": ""
+      },
+      {
+        "label": "dom1",
+        "dim": "DOM",
+        "fell_back": false,
+        "kept_base": false,
+        "attempts": 1,
+        "usd": 0,
+        "cached": false,
+        "notes": "Use the observed adjacent default and invalid endpoints checks and the actual candidate patches.",
+        "error": ""
+      },
+      {
+        "label": "agg1",
+        "dim": "AGG",
+        "fell_back": false,
+        "kept_base": false,
+        "attempts": 1,
+        "usd": 0,
+        "cached": false,
+        "notes": "Use the observed adjacent default and invalid endpoints checks and the actual candidate patches.",
+        "error": ""
+      }
+    ],
+    "similarity": {
+      "n": 1,
+      "n_distinct": 1,
+      "mean_line_jaccard": 1
+    },
+    "ledger": {
+      "mode": "agg",
+      "task_id": "intervals",
+      "k": 1,
+      "R": 4,
+      "expected_R": 4,
+      "P": 3,
+      "session_attempts": 3,
+      "expected_P": 3,
+      "usd": 0,
+      "rollout_usd": 0,
+      "session_usd": 0,
+      "rollouts": [
+        "base",
+        "inv1",
+        "dom1",
+        "agg1"
+      ],
+      "sessions": [
+        "inv1",
+        "dom1",
+        "agg1"
+      ]
+    },
+    "errors": []
+  },
+  "stages": [
+    {
+      "role": "solver",
+      "label": "base",
+      "inputHash": "1675c36656c276365830c0b83cdc2b2ea060869c147c7bde81fa183b675a7e3c",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "configHash": "466cb9b6db7571e2f52f00bd1be8c755db6e6555fb617c962255017260c9fa6f",
+      "missionHash": "1342065018bdd9f3cc8e4bbb495093d9d9c18d172f511376bb39446c9ccdeaaf",
+      "snapshotHash": "d4c628c41c62f70d58fbb6f330597b716c5effe9154e4e3e4772cf8dca310b9a",
+      "patchHash": "c70f4663231e6ed307e22305fc1c5c4471ebf8ce9e0435421c96f8d6b6c41da8",
+      "isolation": {
+        "network": "none",
+        "readOnlyRoot": true,
+        "mountTargets": [
+          "target=/input,readonly",
+          "target=/opt/opencode,readonly",
+          "target=/relay.mjs,readonly",
+          "target=/template,readonly"
+        ],
+        "home": "/work/home",
+        "dockerSocket": false
+      },
+      "isolationProbeObserved": true,
+      "cleanBaselineObserved": true,
+      "completePublicReadObserved": false,
+      "missionDeliveries": [
+        {
+          "index": 2,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 3,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 4,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 5,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 6,
+          "representation": "opencode-cli-quoted"
+        }
+      ],
+      "deliveredTexts": [],
+      "checks": [
+        {
+          "exit": 1,
+          "output": "✔ author overlap check (0.72025ms)\n✔ overlap (0.890917ms)\n✔ adjacent opt-in (0.097375ms)\n✖ adjacent default (0.621375ms)\n✔ input stays unchanged (0.098167ms)\n✔ invalid endpoints (0.624125ms)\nℹ tests 6\nℹ suites 0\nℹ pass 5\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 62.310625\n\n✖ failing tests:\n\ntest at public.test.mjs:6:1\n✖ adjacent default (0.621375ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n  + actual - expected\n  \n    [\n      [\n        1,\n  -     2\n  -   ],\n  -   [\n  -     2,\n        3\n      ]\n    ]\n  \n      at TestContext.<anonymous> (file:///work/repo/public.test.mjs:6:36)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1382:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)\n      at Test.postRun (node:internal/test_runner/test:1522:19)\n      at Test.run (node:internal/test_runner/test:1447:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: [ [ 1, 3 ] ],\n    expected: [ [ 1, 2 ], [ 2, 3 ] ],\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\n",
+          "truncated": false
+        }
+      ],
+      "requests": [
+        {
+          "index": 1,
+          "kind": "title",
+          "forwarded": true,
+          "complete": true,
+          "request": "aa8f4b0c2ac4c8599ab0151d8f0a3ce4504468e3ce8cfcbf0b45af79aba87e63",
+          "response": "46078094d73c66f756cd70b546d0199ed0eaf3a1a9753ba9ba529fe922996a01",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 2,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "c755fd599cd074ee6902dcc72365b28dee57f3ed778d54fe02f5b5bd765512f8",
+          "response": "dd7df8bd2e9551121c84ed311a323d1177972d5067920286504e705b5c46abe3",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 3,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "e8c99416e988b84a9143133ae14bd2a33be530e06994a951791f2c37982e57a6",
+          "response": "73b77cd4a619f87a734862ba53c14a5df65b032ab5690ae02040f08356f1b19d",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 4,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "7ca82de657cbdfe9cda319010df7d120e0447690ec9e461f478988c162f67382",
+          "response": "583168fad773d9ee936c0aedcf9ac4e173a8d84500dd507ff0d6f03a15bb3d45",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 5,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "2c2cefce8c6458d1726224b5bad29ba55d69bd09a2c4363d16de5d9b30329bbe",
+          "response": "464a37584b1c45258d90c849cbe6f9f039f1c68da525ed1fefd0f81820d9d7d9",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 6,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "503da00658b424a7e87f74118e2e861535c0a232197263d02955679268365bbd",
+          "response": "f7a84fa171fb708be4e96bc6b7871d0eba13b5f02dac0d2a9e54040764313542",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        }
+      ],
+      "stop": {
+        "terminationVerified": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "forwardingClosed": true,
+        "providerServerStateMayRemainUnknown": false
+      }
+    },
+    {
+      "role": "editor",
+      "label": "inv1.a1",
+      "inputHash": "d5e8c3a06a96fff71d23bb635adfa66308067a7c0f8ad7aae3bb5fef23814e9c",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "configHash": "466cb9b6db7571e2f52f00bd1be8c755db6e6555fb617c962255017260c9fa6f",
+      "missionHash": "b0822b278674b626813d8bffb07db4fc87f1387df961bfc453ed85653ea57a9d",
+      "snapshotHash": "dabe18ba160255bfe5ca56e774b9b764be171af46eba58f410e1c6e7c9dbdf28",
+      "patchHash": "77d116dd7b84c3745faf0fea44ed2c5322aa4e4ae416d6322ecdfaa5a74bca5e",
+      "isolation": {
+        "network": "none",
+        "readOnlyRoot": true,
+        "mountTargets": [
+          "target=/input,readonly",
+          "target=/opt/opencode,readonly",
+          "target=/relay.mjs,readonly",
+          "target=/template,readonly"
+        ],
+        "home": "/work/home",
+        "dockerSocket": false
+      },
+      "isolationProbeObserved": true,
+      "cleanBaselineObserved": true,
+      "completePublicReadObserved": true,
+      "missionDeliveries": [
+        {
+          "index": 2,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 3,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 4,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 5,
+          "representation": "opencode-cli-quoted"
+        }
+      ],
+      "deliveredTexts": [],
+      "checks": [],
+      "requests": [
+        {
+          "index": 1,
+          "kind": "title",
+          "forwarded": true,
+          "complete": true,
+          "request": "767be29f750720fe0bea7c12157a32fbe2f7498f3f9446198c0b402684c63b67",
+          "response": "46078094d73c66f756cd70b546d0199ed0eaf3a1a9753ba9ba529fe922996a01",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 2,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "8a7f4d12762540dff7712a411d766ae386017891cc9c4eff47c3f8d514c5be61",
+          "response": "dd7df8bd2e9551121c84ed311a323d1177972d5067920286504e705b5c46abe3",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 3,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "7f7e3e3b95a70f897ab1c0187f3b1df0740bd6f39ef55f84000ec6cdf3442a03",
+          "response": "5ca1931a9423f1f31a03258dc1885f659a4077b1f3a7191b50f6ca94d251c6b0",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 4,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "e738b4e8f85de52d97541ad4a9e41a65ad6c57f9de7067f109a1be4897662bc2",
+          "response": "7e1b3a9a6030a18d94c433304f81bbd0fd84565d92421b04c4d3297e3b514a64",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 5,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "3f78e213879132fdf705c52aafe067b5fb00129a79f107eeba832c7226d04bf5",
+          "response": "684bb36ff883aacb1c502165bfe3c6e01e34728b9065c52e602c8786a398da2f",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        }
+      ],
+      "stop": {
+        "terminationVerified": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "forwardingClosed": true,
+        "providerServerStateMayRemainUnknown": false
+      }
+    },
+    {
+      "role": "editor",
+      "label": "dom1.a1",
+      "inputHash": "f984b9755a1310755fcd3f3dc979984cb7dc64e4bae2dc5922b578fac767d61b",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "configHash": "466cb9b6db7571e2f52f00bd1be8c755db6e6555fb617c962255017260c9fa6f",
+      "missionHash": "38ec408360b00621f541f52b67f5f8f5a9356f455f34a7bc58800ab7ab7b81ad",
+      "snapshotHash": "af9041badf3a5fdb57d5e4f3313f9ab898767b70ed640bd460da0977b4d31e16",
+      "patchHash": "561cef2d01c96092debb410864e9209509540b1ee283819d7a084c8ce2ae6820",
+      "isolation": {
+        "network": "none",
+        "readOnlyRoot": true,
+        "mountTargets": [
+          "target=/input,readonly",
+          "target=/opt/opencode,readonly",
+          "target=/relay.mjs,readonly",
+          "target=/template,readonly"
+        ],
+        "home": "/work/home",
+        "dockerSocket": false
+      },
+      "isolationProbeObserved": true,
+      "cleanBaselineObserved": true,
+      "completePublicReadObserved": true,
+      "missionDeliveries": [
+        {
+          "index": 2,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 3,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 4,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 5,
+          "representation": "opencode-cli-quoted"
+        }
+      ],
+      "deliveredTexts": [],
+      "checks": [],
+      "requests": [
+        {
+          "index": 1,
+          "kind": "title",
+          "forwarded": true,
+          "complete": true,
+          "request": "03d3f0da6c9957d463bec6712998b2f7455935b06c5a70cba50752eac0d6780e",
+          "response": "46078094d73c66f756cd70b546d0199ed0eaf3a1a9753ba9ba529fe922996a01",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 2,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "e772b39dd2a0c0d9bf42a0027602854f3cefb3c2dc80a6dea1c66251f648d03e",
+          "response": "dd7df8bd2e9551121c84ed311a323d1177972d5067920286504e705b5c46abe3",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 3,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "8f6272bc4971a43467ba42873179e1053bcc49b71c196537b66ffd8024a0ab7e",
+          "response": "5ca1931a9423f1f31a03258dc1885f659a4077b1f3a7191b50f6ca94d251c6b0",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 4,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "551dea7813bed4b395f541f539a1de11afe52ed51cc29d9b5811dfff5e92ee5b",
+          "response": "10939aeeae4236af0d46a7670d63c2a152054898c63e67947f23f5f6e6869e66",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 5,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "45a89acd4fdfa8f5e5dfbb87f343e9c30ad203e1ad46ebe401ce1036b75dd33a",
+          "response": "684bb36ff883aacb1c502165bfe3c6e01e34728b9065c52e602c8786a398da2f",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        }
+      ],
+      "stop": {
+        "terminationVerified": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "forwardingClosed": true,
+        "providerServerStateMayRemainUnknown": false
+      }
+    },
+    {
+      "role": "solver",
+      "label": "inv1",
+      "inputHash": "1675c36656c276365830c0b83cdc2b2ea060869c147c7bde81fa183b675a7e3c",
+      "harnessHash": "c158eedab3cf48cbbd0802586580184e63e7ba80efcc82063db301b9451339d4",
+      "configHash": "0022a506e9c339a66d84102d9b2dd1e8b465e4418f901f032880053fc29c5ba3",
+      "missionHash": "1342065018bdd9f3cc8e4bbb495093d9d9c18d172f511376bb39446c9ccdeaaf",
+      "snapshotHash": "7b3264c58915a0d5e8a996ed10f06a1d1c653e9741c28faf663c4298170f4145",
+      "patchHash": "fb2b90065a68e7f80b647720c99ed0596f6572cbe4ca5dc95157c168919edc01",
+      "isolation": {
+        "network": "none",
+        "readOnlyRoot": true,
+        "mountTargets": [
+          "target=/input,readonly",
+          "target=/opt/opencode,readonly",
+          "target=/relay.mjs,readonly",
+          "target=/template,readonly"
+        ],
+        "home": "/work/home",
+        "dockerSocket": false
+      },
+      "isolationProbeObserved": true,
+      "cleanBaselineObserved": true,
+      "completePublicReadObserved": false,
+      "missionDeliveries": [
+        {
+          "index": 2,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 3,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 4,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 5,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 6,
+          "representation": "opencode-cli-quoted"
+        }
+      ],
+      "deliveredTexts": [
+        {
+          "name": "systemprompt.md",
+          "text": "INV_WORKFLOW: Reproduce each public failure and check all preserved contracts before delivery.\nWhen checking new options and preserved boundary behavior, read /template/harness/skills/boundary-check/SKILL.md.",
+          "requestIndexes": [
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        }
+      ],
+      "checks": [
+        {
+          "exit": 1,
+          "output": "✔ author overlap check (0.718208ms)\n✔ overlap (0.708042ms)\n✔ adjacent opt-in (0.088875ms)\n✔ adjacent default (0.327833ms)\n✔ input stays unchanged (0.317666ms)\n✖ invalid endpoints (1.943583ms)\nℹ tests 6\nℹ suites 0\nℹ pass 5\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 70.858417\n\n✖ failing tests:\n\ntest at public.test.mjs:8:1\n✖ invalid endpoints (1.943583ms)\n  AssertionError [ERR_ASSERTION]: Missing expected exception (TypeError).\n      at TestContext.<anonymous> (file:///work/repo/public.test.mjs:8:37)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1382:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)\n      at Test.postRun (node:internal/test_runner/test:1522:19)\n      at Test.run (node:internal/test_runner/test:1447:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {\n    generatedMessage: false,\n    code: 'ERR_ASSERTION',\n    actual: undefined,\n    operator: 'throws',\n    diff: 'simple'\n  }\n",
+          "truncated": false
+        }
+      ],
+      "requests": [
+        {
+          "index": 1,
+          "kind": "title",
+          "forwarded": true,
+          "complete": true,
+          "request": "aa8f4b0c2ac4c8599ab0151d8f0a3ce4504468e3ce8cfcbf0b45af79aba87e63",
+          "response": "46078094d73c66f756cd70b546d0199ed0eaf3a1a9753ba9ba529fe922996a01",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 2,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "97020431a010f00753f6891058d16d1df9144bdd78ce643240365d74049a1884",
+          "response": "dd7df8bd2e9551121c84ed311a323d1177972d5067920286504e705b5c46abe3",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 3,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "306144e2d2f3d838f0d0d574ca582e040523e228161e4a563185f00defd5b96e",
+          "response": "73b77cd4a619f87a734862ba53c14a5df65b032ab5690ae02040f08356f1b19d",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 4,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "03696dcca1d1585fe771d2b1bde55e7c6b5e3b88dfd98b6a2bb675c058b73d1e",
+          "response": "26821dd47e87d110cb73fb5d76f333ac470d1714e0b375126cc8297dd2c38796",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 5,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "e9dbeac5a852aff37991f97e2367a6561ec5c0ad8484b8c1769d4262fb3fcf59",
+          "response": "464a37584b1c45258d90c849cbe6f9f039f1c68da525ed1fefd0f81820d9d7d9",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 6,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "16a9d01a909bf7e2af5934121a1372e486dd7f79f44168bfb868d1148ec44183",
+          "response": "f7a84fa171fb708be4e96bc6b7871d0eba13b5f02dac0d2a9e54040764313542",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        }
+      ],
+      "stop": {
+        "terminationVerified": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "forwardingClosed": true,
+        "providerServerStateMayRemainUnknown": false
+      }
+    },
+    {
+      "role": "solver",
+      "label": "dom1",
+      "inputHash": "1675c36656c276365830c0b83cdc2b2ea060869c147c7bde81fa183b675a7e3c",
+      "harnessHash": "850c5f4f8a992a8ff024ea6bb442e9898f355a2c9245a7273753f6aca013e3bd",
+      "configHash": "0022a506e9c339a66d84102d9b2dd1e8b465e4418f901f032880053fc29c5ba3",
+      "missionHash": "1342065018bdd9f3cc8e4bbb495093d9d9c18d172f511376bb39446c9ccdeaaf",
+      "snapshotHash": "d4c628c41c62f70d58fbb6f330597b716c5effe9154e4e3e4772cf8dca310b9a",
+      "patchHash": "c70f4663231e6ed307e22305fc1c5c4471ebf8ce9e0435421c96f8d6b6c41da8",
+      "isolation": {
+        "network": "none",
+        "readOnlyRoot": true,
+        "mountTargets": [
+          "target=/input,readonly",
+          "target=/opt/opencode,readonly",
+          "target=/relay.mjs,readonly",
+          "target=/template,readonly"
+        ],
+        "home": "/work/home",
+        "dockerSocket": false
+      },
+      "isolationProbeObserved": true,
+      "cleanBaselineObserved": true,
+      "completePublicReadObserved": false,
+      "missionDeliveries": [
+        {
+          "index": 2,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 3,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 4,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 5,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 6,
+          "representation": "opencode-cli-quoted"
+        }
+      ],
+      "deliveredTexts": [
+        {
+          "name": "systemprompt.md",
+          "text": "DOM_WORKFLOW: For half-open ranges, distinguish overlap from adjacency and preserve validation and input ownership.\n",
+          "requestIndexes": [
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        }
+      ],
+      "checks": [
+        {
+          "exit": 1,
+          "output": "✔ author overlap check (0.785917ms)\n✔ overlap (0.715166ms)\n✔ adjacent opt-in (0.100958ms)\n✖ adjacent default (0.674041ms)\n✔ input stays unchanged (0.106041ms)\n✔ invalid endpoints (0.660666ms)\nℹ tests 6\nℹ suites 0\nℹ pass 5\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 67.025\n\n✖ failing tests:\n\ntest at public.test.mjs:6:1\n✖ adjacent default (0.674041ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n  + actual - expected\n  \n    [\n      [\n        1,\n  -     2\n  -   ],\n  -   [\n  -     2,\n        3\n      ]\n    ]\n  \n      at TestContext.<anonymous> (file:///work/repo/public.test.mjs:6:36)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1382:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)\n      at Test.postRun (node:internal/test_runner/test:1522:19)\n      at Test.run (node:internal/test_runner/test:1447:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: [ [ 1, 3 ] ],\n    expected: [ [ 1, 2 ], [ 2, 3 ] ],\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\n",
+          "truncated": false
+        }
+      ],
+      "requests": [
+        {
+          "index": 1,
+          "kind": "title",
+          "forwarded": true,
+          "complete": true,
+          "request": "aa8f4b0c2ac4c8599ab0151d8f0a3ce4504468e3ce8cfcbf0b45af79aba87e63",
+          "response": "46078094d73c66f756cd70b546d0199ed0eaf3a1a9753ba9ba529fe922996a01",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 2,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "d44a303b34ac8476d01ed59c8895e3c2024d60f46c109bd5961ba0df6fb8665d",
+          "response": "dd7df8bd2e9551121c84ed311a323d1177972d5067920286504e705b5c46abe3",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 3,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "b997508bb16b6b21cb5be7c25a30eb90eaa493ccddf2d1e3006c510e68658880",
+          "response": "73b77cd4a619f87a734862ba53c14a5df65b032ab5690ae02040f08356f1b19d",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 4,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "1012b4a8eb206f6ca4a8ee36bcec646561d0cc9d91657d1117235927110618f5",
+          "response": "583168fad773d9ee936c0aedcf9ac4e173a8d84500dd507ff0d6f03a15bb3d45",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 5,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "6909569f31a14cf67986e00fc32ef1c89ca51231058c6be7e22f05cf7ae94599",
+          "response": "464a37584b1c45258d90c849cbe6f9f039f1c68da525ed1fefd0f81820d9d7d9",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 6,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "affc557a080de42a7c2dbb0cef97257dcc8a944b6a6d488d043cb1d3dffaf712",
+          "response": "f7a84fa171fb708be4e96bc6b7871d0eba13b5f02dac0d2a9e54040764313542",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        }
+      ],
+      "stop": {
+        "terminationVerified": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "forwardingClosed": true,
+        "providerServerStateMayRemainUnknown": false
+      }
+    },
+    {
+      "role": "composer",
+      "label": "agg1.a1",
+      "inputHash": "bf8bdafe3ee42417e8972fbc631cc2296678ece88021142bc836994d2d1bf4c8",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "configHash": "466cb9b6db7571e2f52f00bd1be8c755db6e6555fb617c962255017260c9fa6f",
+      "missionHash": "bf3770c3f44b36e920af75e8d7ce294e3010bd1b662de9a6b543b36c8026f5e4",
+      "snapshotHash": "b39d6b68b971a410ca0e00698c6058f90faade55b9345b359e3de652768a6e13",
+      "patchHash": "5c22b760edaba7267bd4b2215e1f37cadce5e0750a4c3c4b7fe98e860d024565",
+      "isolation": {
+        "network": "none",
+        "readOnlyRoot": true,
+        "mountTargets": [
+          "target=/input,readonly",
+          "target=/opt/opencode,readonly",
+          "target=/relay.mjs,readonly",
+          "target=/template,readonly"
+        ],
+        "home": "/work/home",
+        "dockerSocket": false
+      },
+      "isolationProbeObserved": true,
+      "cleanBaselineObserved": true,
+      "completePublicReadObserved": true,
+      "missionDeliveries": [
+        {
+          "index": 2,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 3,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 4,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 5,
+          "representation": "opencode-cli-quoted"
+        }
+      ],
+      "deliveredTexts": [],
+      "checks": [],
+      "requests": [
+        {
+          "index": 1,
+          "kind": "title",
+          "forwarded": true,
+          "complete": true,
+          "request": "998df7d43fb6f198a5e8f0e77ef707c5056854b33b259ecbdb4f03f43885039b",
+          "response": "46078094d73c66f756cd70b546d0199ed0eaf3a1a9753ba9ba529fe922996a01",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 2,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "d72a1bc6eda9e78fc44c5fd080ebbe274d44afae0bf4e426c61cea228cc9b73a",
+          "response": "dd7df8bd2e9551121c84ed311a323d1177972d5067920286504e705b5c46abe3",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 3,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "fe51656ef591ddff66f78421f1ca3ba871ddc1c14288bbd9f34e58afbae0ddcc",
+          "response": "5ca1931a9423f1f31a03258dc1885f659a4077b1f3a7191b50f6ca94d251c6b0",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 4,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "9e231a3594bda81300fc966f7c8269d74dcf965ea43aa77a34d5d4732a053b04",
+          "response": "962c1c89eeb9f51f38fd72e73390233e64400dbd82ed9e4b39128862344439eb",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 5,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "efff45bd343000ed90800cdc4fdb6ff5435b6249236b0df1d150b3cedec64646",
+          "response": "684bb36ff883aacb1c502165bfe3c6e01e34728b9065c52e602c8786a398da2f",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        }
+      ],
+      "stop": {
+        "terminationVerified": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "forwardingClosed": true,
+        "providerServerStateMayRemainUnknown": false
+      }
+    },
+    {
+      "role": "solver",
+      "label": "agg1",
+      "inputHash": "1675c36656c276365830c0b83cdc2b2ea060869c147c7bde81fa183b675a7e3c",
+      "harnessHash": "bbd0a645f0ddfb27013b682c6d7effbef9a17fdbda78678d8b836a9eab5b3bf2",
+      "configHash": "0022a506e9c339a66d84102d9b2dd1e8b465e4418f901f032880053fc29c5ba3",
+      "missionHash": "1342065018bdd9f3cc8e4bbb495093d9d9c18d172f511376bb39446c9ccdeaaf",
+      "snapshotHash": "b1fb25b6369cc630f0477c28f067326d9ecb3fb35610af45ca54a1c16b5864ca",
+      "patchHash": "9785ba0650d8089a46c927bb565d7efb65f4d9ad7dd82e48ec19d8e50ff6ff78",
+      "isolation": {
+        "network": "none",
+        "readOnlyRoot": true,
+        "mountTargets": [
+          "target=/input,readonly",
+          "target=/opt/opencode,readonly",
+          "target=/relay.mjs,readonly",
+          "target=/template,readonly"
+        ],
+        "home": "/work/home",
+        "dockerSocket": false
+      },
+      "isolationProbeObserved": true,
+      "cleanBaselineObserved": true,
+      "completePublicReadObserved": false,
+      "missionDeliveries": [
+        {
+          "index": 2,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 3,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 4,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 5,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 6,
+          "representation": "opencode-cli-quoted"
+        }
+      ],
+      "deliveredTexts": [
+        {
+          "name": "systemprompt.md",
+          "text": "COMPOSED_WORKFLOW: Combine public failure reproduction with separate overlap, adjacency, validation and ownership checks. Read boundary-check when adding options.\n",
+          "requestIndexes": [
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        }
+      ],
+      "checks": [
+        {
+          "exit": 0,
+          "output": "✔ author overlap check (0.75425ms)\n✔ overlap (1.093666ms)\n✔ adjacent opt-in (0.152125ms)\n✔ adjacent default (0.16125ms)\n✔ input stays unchanged (0.285125ms)\n✔ invalid endpoints (0.431667ms)\nℹ tests 6\nℹ suites 0\nℹ pass 6\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 75.842416\n",
+          "truncated": false
+        }
+      ],
+      "requests": [
+        {
+          "index": 1,
+          "kind": "title",
+          "forwarded": true,
+          "complete": true,
+          "request": "aa8f4b0c2ac4c8599ab0151d8f0a3ce4504468e3ce8cfcbf0b45af79aba87e63",
+          "response": "46078094d73c66f756cd70b546d0199ed0eaf3a1a9753ba9ba529fe922996a01",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 2,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "2d74a8cc79d251cd409b0b687c205260abadb8bff18e1b4c1db1014d8fe8f239",
+          "response": "dd7df8bd2e9551121c84ed311a323d1177972d5067920286504e705b5c46abe3",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 3,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "baef56d834aacfdce2f5d4a4dc68fdde171a560b95f7be6198a2a303e243746c",
+          "response": "73b77cd4a619f87a734862ba53c14a5df65b032ab5690ae02040f08356f1b19d",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 4,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "7d4cb6655a737f769cc12abbb70470fe38934cb4301cb656884bed79b75db00a",
+          "response": "85eef88dad9030fe261fecb3958fc4b11cc6eaad32818eccfd526589ac2d1206",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 5,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "15654cd04499417a4a07baa05a18e98c87853f3c947e72446fc52d2fa4359483",
+          "response": "464a37584b1c45258d90c849cbe6f9f039f1c68da525ed1fefd0f81820d9d7d9",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 6,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "7809b04bd969ce3a5db7dabb3cc0901e0b1c7d14f0f5efa160502857a7d87db1",
+          "response": "f7a84fa171fb708be4e96bc6b7871d0eba13b5f02dac0d2a9e54040764313542",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        }
+      ],
+      "stop": {
+        "terminationVerified": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "forwardingClosed": true,
+        "providerServerStateMayRemainUnknown": false
+      }
+    },
+    {
+      "role": "selector",
+      "label": "selector",
+      "inputHash": "549ca499b057e428d9a4fe64dd4210861683d2e45cc93b27279a0f8b3bfa8969",
+      "harnessHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "configHash": "466cb9b6db7571e2f52f00bd1be8c755db6e6555fb617c962255017260c9fa6f",
+      "missionHash": "1efc43cc42257757f69f5e522041258b81dd407a72273d7245333687aca28566",
+      "snapshotHash": "549ca499b057e428d9a4fe64dd4210861683d2e45cc93b27279a0f8b3bfa8969",
+      "patchHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "isolation": {
+        "network": "none",
+        "readOnlyRoot": true,
+        "mountTargets": [
+          "target=/input,readonly",
+          "target=/opt/opencode,readonly",
+          "target=/relay.mjs,readonly",
+          "target=/template,readonly"
+        ],
+        "home": "/work/home",
+        "dockerSocket": false
+      },
+      "isolationProbeObserved": true,
+      "cleanBaselineObserved": false,
+      "completePublicReadObserved": true,
+      "missionDeliveries": [
+        {
+          "index": 2,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 3,
+          "representation": "opencode-cli-quoted"
+        },
+        {
+          "index": 4,
+          "representation": "opencode-cli-quoted"
+        }
+      ],
+      "deliveredTexts": [],
+      "checks": [],
+      "requests": [
+        {
+          "index": 1,
+          "kind": "title",
+          "forwarded": true,
+          "complete": true,
+          "request": "4096f2aa4fedab8d1ec87e08fa10873e91b6e01887e5e38d0e99dc9f69b7bb50",
+          "response": "46078094d73c66f756cd70b546d0199ed0eaf3a1a9753ba9ba529fe922996a01",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 2,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "699f03f949adeea8b0725ec32ddf5170c67bb01ba75af19540eba7316bd0e91e",
+          "response": "dd7df8bd2e9551121c84ed311a323d1177972d5067920286504e705b5c46abe3",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 3,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "603c667b304bf68ac58c7e601c52e61c2cdbcd0af98b186d6525ef7578a74c28",
+          "response": "5ca1931a9423f1f31a03258dc1885f659a4077b1f3a7191b50f6ca94d251c6b0",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        },
+        {
+          "index": 4,
+          "kind": "work",
+          "forwarded": true,
+          "complete": true,
+          "request": "11fb2d72a895b0868be375076a3af24fa2ae32ba9ce9e653c16e04b1dd68be9f",
+          "response": "a52aa3699484e6c6d5575ca026c163a3d0f2424c868af84c7a09457d5d376623",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "cached_tokens": 0,
+            "reasoning_tokens": 0
+          },
+          "completion": "completed"
+        }
+      ],
+      "stop": {
+        "terminationVerified": true,
+        "relayRemoved": true,
+        "activeProviderHandlers": 0,
+        "forwardingClosed": true,
+        "providerServerStateMayRemainUnknown": false
+      }
+    }
+  ]
+}

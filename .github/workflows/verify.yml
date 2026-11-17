@@ -47,7 +47,7 @@ jobs:
   containment:
     name: Evaluation container boundary
     runs-on: ubuntu-24.04-arm
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -83,12 +83,17 @@ jobs:
         run: |
           export EVALUATION_IMAGE="$(cat "$RUNNER_TEMP/evaluation-image")"
           node evaluation/compat-replay-development/installed.mjs "$RUNNER_TEMP/compat-schedule" "$RUNNER_TEMP/feedback-assets/bundle" "$RUNNER_TEMP/feedback-assets/toolchain" --all
+      - name: Harness squared task-local scripted cycle and refusal controls
+        run: |
+          export EVALUATION_IMAGE="$(cat "$RUNNER_TEMP/evaluation-image")"
+          node evaluation/adaptive-harness/assets.mjs "$RUNNER_TEMP/adaptive-assets" "$RUNNER_TEMP/opencode/node_modules/opencode-linux-arm64/bin/opencode"
+          node evaluation/adaptive-harness/verify-installed.mjs "$RUNNER_TEMP/adaptive-checks" "$RUNNER_TEMP/adaptive-assets"
       - name: Remove owned feedback fixture files
         id: feedback-cleanup
         if: always()
         run: |
-          node evaluation/feedback-development/recover-retained.mjs "$RUNNER_TEMP/feedback-cleanup-safe.json" "$RUNNER_TEMP/feedback-preflight" "$RUNNER_TEMP/feedback-fixture" "$RUNNER_TEMP/feedback-fixture-deadline" "$RUNNER_TEMP/feedback-title-boundary" "$RUNNER_TEMP/compat-preflight" "$RUNNER_TEMP/compat-installed" "$RUNNER_TEMP/compat-installed-deadline" "$RUNNER_TEMP/compat-schedule"
-          rm -rf "$RUNNER_TEMP/feedback-assets" "$RUNNER_TEMP/feedback-preflight" "$RUNNER_TEMP/feedback-fixture" "$RUNNER_TEMP/feedback-fixture-deadline" "$RUNNER_TEMP/feedback-title-boundary" "$RUNNER_TEMP/compat-preflight" "$RUNNER_TEMP/compat-installed" "$RUNNER_TEMP/compat-installed-deadline" "$RUNNER_TEMP/compat-schedule"
+          node evaluation/feedback-development/recover-retained.mjs "$RUNNER_TEMP/feedback-cleanup-safe.json" "$RUNNER_TEMP/feedback-preflight" "$RUNNER_TEMP/feedback-fixture" "$RUNNER_TEMP/feedback-fixture-deadline" "$RUNNER_TEMP/feedback-title-boundary" "$RUNNER_TEMP/compat-preflight" "$RUNNER_TEMP/compat-installed" "$RUNNER_TEMP/compat-installed-deadline" "$RUNNER_TEMP/compat-schedule" "$RUNNER_TEMP/adaptive-checks"
+          rm -rf "$RUNNER_TEMP/feedback-assets" "$RUNNER_TEMP/feedback-preflight" "$RUNNER_TEMP/feedback-fixture" "$RUNNER_TEMP/feedback-fixture-deadline" "$RUNNER_TEMP/feedback-title-boundary" "$RUNNER_TEMP/compat-preflight" "$RUNNER_TEMP/compat-installed" "$RUNNER_TEMP/compat-installed-deadline" "$RUNNER_TEMP/compat-schedule" "$RUNNER_TEMP/adaptive-checks" "$RUNNER_TEMP/adaptive-assets"
       - name: Preserve minimal safe cleanup diagnostics
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

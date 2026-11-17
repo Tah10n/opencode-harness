@@ -339,3 +339,11 @@ scripted-schedule and current CI checks before any model request. Its result is
 recorded separately in
 [`development-run-v2/REPORT.md`](../evaluation/compat-replay-development/evidence/development-run-v2/REPORT.md).
 The stopped v1 campaign and its two attempts remain historical and are not pooled.
+
+## Task-local Harness squared prototype
+
+The [experimental adapter](../evaluation/adaptive-harness/README.md) uses pinned upstream
+`run_parallel(k=1)` with isolated OpenCode scripted execution, Plain controls and
+post-selection independent checks. See the [installed fixture report](results/adaptive-k1/REPORT.md)
+for stage hashes, patches and refusal controls. This is mechanism evidence only; real-model
+adaptation quality remains NOT RUN. The two-file product is unchanged.

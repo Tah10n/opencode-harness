@@ -1,0 +1,2 @@
+INV_WORKFLOW: Reproduce each public failure and check all preserved contracts before delivery.
+When checking new options and preserved boundary behavior, read /template/harness/skills/boundary-check/SKILL.md.

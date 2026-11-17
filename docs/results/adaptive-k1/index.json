@@ -1,0 +1,230 @@
+{
+  "mechanismChecksPassed": true,
+  "realModelRequests": 0,
+  "rows": [
+    {
+      "name": "plain-single",
+      "status": "complete",
+      "independentStatus": 1,
+      "counts": {
+        "solver": 5,
+        "editor": 0,
+        "composer": 0,
+        "selector": 0,
+        "auxiliary": 1
+      },
+      "requests": 6,
+      "elapsedMs": 11674.814709
+    },
+    {
+      "name": "plain-multi",
+      "status": "complete",
+      "independentStatus": 1,
+      "counts": {
+        "solver": 20,
+        "editor": 0,
+        "composer": 0,
+        "selector": 3,
+        "auxiliary": 5
+      },
+      "requests": 28,
+      "elapsedMs": 44859.39675
+    },
+    {
+      "name": "adaptive-k1",
+      "status": "complete",
+      "independentStatus": 0,
+      "counts": {
+        "solver": 20,
+        "editor": 8,
+        "composer": 4,
+        "selector": 3,
+        "auxiliary": 8
+      },
+      "requests": 43,
+      "elapsedMs": 68516.776583
+    },
+    {
+      "name": "forbidden",
+      "status": "complete",
+      "independentStatus": 1,
+      "counts": {
+        "solver": 20,
+        "editor": 16,
+        "composer": 8,
+        "selector": 3,
+        "auxiliary": 11
+      },
+      "requests": 58,
+      "elapsedMs": 97936.36529199999
+    },
+    {
+      "name": "symlink",
+      "status": "complete",
+      "independentStatus": 1,
+      "counts": {
+        "solver": 20,
+        "editor": 16,
+        "composer": 8,
+        "selector": 3,
+        "auxiliary": 11
+      },
+      "requests": 58,
+      "elapsedMs": 97889.822708
+    },
+    {
+      "name": "outside",
+      "status": "complete",
+      "independentStatus": 1,
+      "counts": {
+        "solver": 20,
+        "editor": 16,
+        "composer": 8,
+        "selector": 3,
+        "auxiliary": 11
+      },
+      "requests": 58,
+      "elapsedMs": 83906.95362499997
+    },
+    {
+      "name": "empty",
+      "status": "complete",
+      "independentStatus": 1,
+      "counts": {
+        "solver": 20,
+        "editor": 16,
+        "composer": 8,
+        "selector": 3,
+        "auxiliary": 11
+      },
+      "requests": 58,
+      "elapsedMs": 73404.74379200005
+    },
+    {
+      "name": "selection",
+      "status": "selection_failed",
+      "independentStatus": null,
+      "counts": {
+        "solver": 20,
+        "editor": 8,
+        "composer": 4,
+        "selector": 3,
+        "auxiliary": 8
+      },
+      "requests": 43,
+      "elapsedMs": 70661.983792
+    },
+    {
+      "name": "tamper",
+      "status": "incomplete",
+      "independentStatus": null,
+      "counts": {
+        "solver": 5,
+        "editor": 8,
+        "composer": 0,
+        "selector": 0,
+        "auxiliary": 3
+      },
+      "requests": 16,
+      "elapsedMs": 26829.748041999992
+    },
+    {
+      "name": "unknown",
+      "status": "incomplete",
+      "independentStatus": null,
+      "counts": {
+        "solver": 1,
+        "editor": 0,
+        "composer": 0,
+        "selector": 0,
+        "auxiliary": 1
+      },
+      "requests": 2,
+      "elapsedMs": 6957.068250000011
+    },
+    {
+      "name": "process",
+      "status": "incomplete",
+      "independentStatus": null,
+      "counts": {
+        "solver": 1,
+        "editor": 0,
+        "composer": 0,
+        "selector": 0,
+        "auxiliary": 1
+      },
+      "requests": 2,
+      "elapsedMs": 7496.486375000008
+    },
+    {
+      "name": "recording",
+      "status": "incomplete",
+      "independentStatus": null,
+      "counts": {
+        "solver": 0,
+        "editor": 0,
+        "composer": 0,
+        "selector": 0,
+        "auxiliary": 1
+      },
+      "requests": 1,
+      "elapsedMs": 7114.667040999979
+    },
+    {
+      "name": "request-budget",
+      "status": "incomplete",
+      "independentStatus": null,
+      "counts": {
+        "solver": 5,
+        "editor": 1,
+        "composer": 0,
+        "selector": 0,
+        "auxiliary": 2
+      },
+      "requests": 8,
+      "elapsedMs": 16497.649166000017
+    },
+    {
+      "name": "editor-time",
+      "status": "incomplete",
+      "independentStatus": null,
+      "counts": {
+        "solver": 5,
+        "editor": 3,
+        "composer": 0,
+        "selector": 0,
+        "auxiliary": 2
+      },
+      "requests": 10,
+      "elapsedMs": 30604.94075000001
+    },
+    {
+      "name": "composer-time",
+      "status": "incomplete",
+      "independentStatus": null,
+      "counts": {
+        "solver": 15,
+        "editor": 8,
+        "composer": 3,
+        "selector": 0,
+        "auxiliary": 6
+      },
+      "requests": 32,
+      "elapsedMs": 85511.27075
+    },
+    {
+      "name": "injection",
+      "status": "complete",
+      "independentStatus": 0,
+      "counts": {
+        "solver": 20,
+        "editor": 8,
+        "composer": 4,
+        "selector": 3,
+        "auxiliary": 8
+      },
+      "requests": 43,
+      "elapsedMs": 70652.48008300002
+    }
+  ]
+}
